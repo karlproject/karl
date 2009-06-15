@@ -1,0 +1,94 @@
+karl package Changelog
+======================
+
+Unreleased
+----------
+
+- Intersect text index search results last for advanced search,
+  hopefully improving relevance ranking.
+
+- Micro-speedups for "communities" page.
+
+- Consolidated three showtag views to use same code.
+
+- Filter items in showtag view according to view permission of authenticated 
+  user.
+  
+- Make sure new user profiles get initialized with __acl__.
+
+osi-production-20090611 (2009-06-11)
+------------------------------------
+
+- Temporarily revert commit to use "natural" order of text index
+  committed in osi-production-20090610 because caused search queries
+  to ignore catalog security info.
+
+osi-production-20090610 (2009-06-10)
+------------------------------------
+
+- LP #384096: Updated code for generic search to use "natural" order of
+  text index, where possible.
+
+- Fixed 'karl.views.people.show_profile_view' not to blow up when
+  userid != login.
+
+- Add member_name index for text searching of just member names.
+  NOTE: This requires running reindex_catalog -p /profiles
+
+- Improved performance of member search widget in add_member_view
+
+osi-production-20090608 (2009-06-08)
+------------------------------------
+
+- Switched to using a multi-adapter for footer (replaces hard-wired OSI
+  branding).
+
+osi-production-20090603 (2009-06-03)
+------------------------------------
+
+- Made the lastfirst index case-insensitive
+
+- LP #382857: Sort community members by last name / first name.
+
+- Use get_setting instead of looking ISettings.
+
+- LP #382576: Use 'method="get"' in the advanced search form.  Also, gather
+  vars for batching from either POST or GET submissions. 
+
+- grid: Fix initial sorting direction, and direction on the first click.
+
+- grid: Make header borders collapse, and adjust column width calculations
+
+- Added OfflineContextURL for enabling use of model_url outside of HTTP
+  context, and registered OfflineContextURL as an adapter for OfflineRequest.
+
+- LP #382572:
+
+  o Ensure that community / profile tag listings are slpha-sorted.
+
+- LP #381671:
+
+  o Allow narrowing tagging APIs by user.
+
+  o Pass user to profile-specific invocations of getFrequency.
+
+  o Show better breadcrumbs in tag views.
+
+  o Pass user to 'getRelatedTags' in 'profile_showtag_view'.
+
+  o Show related tag links relative to profile / community / root.
+
+- login: Disable all validation against spaces in the username.
+
+- tagsearch: Fix tagsearch result list to never wrap, and extend its length
+  for longer search results.
+
+osi-production-20090531 (2009-05-31)
+------------------------------------
+
+- No changes to this package.
+
+osi-production-20090528 (2009-05-28)
+------------------------------------
+
+- Initial version rolled out to replace KARL2.

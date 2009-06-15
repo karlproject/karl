@@ -1,0 +1,18 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <p>
+    Please enter your email below and click the <em>submit</em>
+    button.  You will receive an email with your login instructions.
+    If you need additional help, please email the <a
+    href="mailto:${api.settings.admin_email}">Site Administrator</a>.
+    </p>
+
+    <div tal:content="structure form.rendered_form"></div>
+
+  </div>
+</html>

@@ -1,0 +1,359 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <!-- Publish static resources under /static/ -->
+  <view
+    for="*"
+    view=".acl.edit_acl_view"
+    name="edit_acl.html"
+    permission="administer"
+  />
+
+  <!-- Publish static resources under /static/ -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".site.static_view"
+    name="static"
+  />
+  
+  <!-- Redirect requests to site root, to correct URL -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".site.site_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.advancedsearch_view"
+    permission="view"
+    name="advancedsearch.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.searchresults_view"
+    permission="view"
+    name="searchresults.html"
+  />
+
+
+  <!-- Start global tagging related views -->
+
+  <!-- This view gets a tag and returns a view on it -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.showtag_view"
+    permission="view"
+    name="showtag"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_showtag_view"
+    permission="view"
+    name="showtag"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.profile_showtag_view"
+    permission="view"
+    name="showtag"
+  />
+
+  <!-- Tag cloud, listing, users -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_cloud_view"
+    permission="view"
+    name="tagcloud.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_cloud_view"
+    permission="view"
+    name="tagcloud.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_listing_view"
+    permission="view"
+    name="taglisting.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_listing_view"
+    permission="view"
+    name="taglisting.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.profile_tag_listing_view"
+    permission="view"
+    name="taglisting.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_users_view"
+    permission="view"
+    name="tagusers.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_users_view"
+    permission="view"
+    name="tagusers.html" 
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.manage_tags_view"
+    permission="edit"
+    name="manage_tags.html" 
+  />
+
+  
+
+  <!-- /stop global tagging related views -->
+
+
+  <view
+    for="karl.models.interfaces.ICommunities"
+    view=".communities.show_communities_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommunities"
+    name="add_community.html"
+    view=".communities.add_community_view"
+    permission="create"
+  />
+  
+  <!-- We need to be able to add the intranets hierarchy at root -->
+  <view
+    for="karl.models.interfaces.ISite"
+    name="add_community.html"
+    view=".communities.add_community_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".community.redirect_community_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".community.show_community_view"
+    name="view.html"
+    permission="view"
+  /> 
+  
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".atom.community_atom_view"
+    name="atom.xml"
+    permission="view"
+  /> 
+  
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="edit.html"
+    view=".community.edit_community_view"
+    permission="moderate"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="delete.html"
+    view=".community.delete_community_view"
+    permission="moderate"
+  />  
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="searchresults.html"
+    view=".search.searchresults_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="join.html"
+    view=".community.join_community_view"
+    permission="view"
+    />
+    
+  <adapter
+    for="karl.models.interfaces.ICommunity
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ISidebar"
+    factory=".community.CommunitySidebar"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="login.html"
+    view=".login.login_view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    name="logout.html"
+    view=".login.logout_view"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.edit_profile_view"
+    name="edit_profile.html"
+    permission="edit"
+  />
+  
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.change_password_view"
+    name="change_password.html"
+    permission="edit"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.recent_content_view"
+    name="recent_content.html"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="reset_request.html"
+    view=".resetpassword.reset_request_view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="reset_sent.html"
+    view=".resetpassword.reset_sent_view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="reset_confirm.html"
+    view=".resetpassword.reset_confirm_view"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.manage_communities_view"
+    name="manage_communities.html"
+    permission="edit"
+    />
+    
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.show_profile_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommunityContent"
+    name="delete.html"
+    view=".resource.delete_resource_view"
+    permission="delete"
+  />  
+
+  <view
+    for="karl.models.interfaces.IProfiles"
+    view=".people.show_profiles_view"
+    permission="view"
+  />
+
+  <view
+     for="karl.models.interfaces.IMembers"
+     view=".members.show_members_view"
+     permission="view"
+     />
+
+  <view
+    for="karl.models.interfaces.IMembers"
+    view=".members.jquery_member_search_view"
+    permission="moderate"
+    name="jquery_member_search"
+  />
+
+  <view
+     for="karl.models.interfaces.IMembers"
+     view=".members.manage_members_view"
+     permission="moderate"
+     name="manage.html"
+     />
+
+  <view
+     for="karl.models.interfaces.IMembers"
+     view=".members.add_existing_user_view"
+     permission="moderate"
+     name="add_existing.html"
+     />
+
+  <view
+     for="karl.models.interfaces.IMembers"
+     view=".members.invite_new_user_view"
+     permission="moderate"
+     name="invite_new.html"
+     />
+
+  <view
+     for="karl.models.interfaces.IInvitation"
+     view=".members.accept_invitation_view"
+     />
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.jquery_livesearch_view"
+    permission="view"
+    name="jquery_livesearch"
+  />
+
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.jquery_tag_search_view"
+    permission="view"
+    name="jquery_tag_search"
+  />
+  <view
+    for="*"
+    view=".tags.jquery_tag_add_view"
+    permission="view"
+    name="jquery_tag_add"
+  />
+  <view
+    for="*"
+    view=".tags.jquery_tag_del_view"
+    permission="view"
+    name="jquery_tag_del"
+  />
+
+  <view
+    for="karl.models.interfaces.IFile"
+    view=".file.serve_file_view"
+    permission="view"
+    />
+  
+  <view
+    for="karl.models.interfaces.IAttachmentsFolder"
+    view=".redirect_up.redirect_up_view"
+    />
+    
+</configure>
+  

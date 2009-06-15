@@ -1,0 +1,21 @@
+[ -d .svn ] || {
+   echo "This is not a Subversion working directory." 1>&2
+   exit 1
+}
+
+editable="svn+ssh://osi@osi.agendaless.com/home/osi/bfgsvn"
+readonly="http://osi.agendaless.com/bfgsvn"
+
+root=`svn info $1|grep Root|cut -d ' ' -f 3-`
+schema=${root%%://*}
+
+[ "$schema" = "svn+ssh" ] && {
+   svn switch --relocate $root $readonly .
+   echo "Switched base to $readonly (read-only)"
+}
+
+[ "$schema" = "http" ] && {
+   svn switch --relocate $root $editable .
+   echo "Switched base to $editable (editable)"
+}
+

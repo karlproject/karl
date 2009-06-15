@@ -1,0 +1,16 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.generic_layout.macros['master']">
+
+<div metal:fill-slot="content">
+
+<a class="rightFloatLink" title="View tag listing"
+    href="${api.app_url}/taglisting.html">Tag listing</a>
+
+<h1>${api.page_title}</h1>
+
+<div metal:use-macro="api.snippets.macros['tagcloud']"/>
+
+</div>
+</div>

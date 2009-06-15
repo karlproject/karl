@@ -1,0 +1,66 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml" 
+	  title="${api.page_title}" href="${feed_url}"
+	  />
+  </span>
+  
+  <div metal:fill-slot="content">
+    
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1 class="kscreentitle">Overview</h1>
+    
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>    
+    <div class="koverview_body" 
+	 tal:condition="api.context.text != u''">
+      <span tal:replace="structure api.context.text"/>
+    </div>
+    <div class="recentItemsWrapper">
+      <h3>Recent Activity</h3>
+      <table class="content-listing">
+        <thead>
+          <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
+            <th colspan="4" class="ui-widget-header" style="padding: 0;">
+              <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+            </th>
+          </tr>
+          <tr>
+            <th class="cldate">Date</th>
+            <th class="cltitle">Title</th>
+            <th class="cltype">Type</th>
+            <th class="clauthor">Author</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="ri in recent_items">
+            <td class="cldate">${ri.modified}</td>
+            <td class="cltitle">
+              <a href="${ri.url}">${ri.title}</a>
+            </td>
+            <td class="cltype">${ri.type}</td>
+            <td class="clauthor">
+              <a href="${ri.creator_url}">${ri.creator_title}</a>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot tal:condition="batch_info.batching_required">
+          <tr class="ui-grid-footer">
+            <th colspan="4" class="ui-widget-header" style="padding: 0;">
+              <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+            </th>
+          </tr>
+	</tfoot>
+      </table>
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['rss_icon']"/>
+
+  </div>
+
+</html>

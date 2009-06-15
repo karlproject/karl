@@ -1,0 +1,13 @@
+<div xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+  <form method="post" action="${post_url}" class="k3_genericForm"
+        enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <fieldset metal:use-macro="formfields.macros['email-field']"/>
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+</div>

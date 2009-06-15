@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <title>${error_message}</title>
+    <link href="${static_url}/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+    <link href="${static_url}/images/favicon.ico" rel="icon" type="image/vnd.microsoft.icon" />
+    <link href="${static_url}/themedstyles.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body id="login-wrapper">
+    <img src="${static_url}/images/login_gradient.gif" id="login-gradient" />
+    <div id="outer">
+      <div id="inner">
+        <h1 class="kscreentitle" style="margin-top: 50px">
+          <span></span>
+        </h1>
+	<h2 style="margin-top: 20px; text-align: center">${error_message}</h2>
+        <p align="center">${error_text}</p>
+	<p align="center" tal:condition="home_url">
+	  Return to the <a href="${home_url}">home page</a>.
+	</p>
+	<tal:block condition="traceback_info">
+	  <!--
+	      ${traceback_info}
+	    -->
+	</tal:block>
+	<tal:block condition="errorlog_url">
+            <!--
+	      You may refer to the error log here:
+	      ${errorlog_url}
+	    -->
+	</tal:block>
+      </div>
+
+    </div>
+
+  </body>
+</html>

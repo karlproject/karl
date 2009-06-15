@@ -1,0 +1,11 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+  
+  <adapter
+    for="zope.interface.Interface
+         karl.adapters.url.OfflineRequest"
+    provides="repoze.bfg.interfaces.IContextURL"
+    factory="karl.adapters.url.OfflineContextURL"
+    />
+
+</configure>
+  

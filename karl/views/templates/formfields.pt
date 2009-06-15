@@ -1,0 +1,753 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+ <head>
+   <title>KARL3 Forms Macros</title>
+ </head>
+ <body>
+
+   <div metal:define-macro="formerror"
+	tal:condition="fielderrors.keys()"
+	class="portalMessage">Please correct the indicated errors.</div>
+
+    <fieldset metal:define-macro="users-field"
+	      tal:define="error fielderrors['users']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="users-field">
+      <label class="required">Users</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="users" id="membersearch-input" />
+    </fieldset>
+
+
+    <fieldset metal:define-macro="emailaddrs-field"
+	      tal:define="error fielderrors['emailaddrs']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="emailaddrs-field">
+      <label class="required">Email Addresses</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="emailaddrs"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="text-field"
+	      tal:define="error fielderrors['text']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="text-field">
+      <label>Text</label>
+      <div class="fieldHelp" tal:content="help['text']|''"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input type="hidden" name="text_text_format" value="text/html" />
+      <textarea id="text" name="text" rows="1" cols="40"
+		class="mceEditor karlrichtextfield"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="message-field"
+	      tal:define="error fielderrors['text']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="text-field">
+      <label>Message</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <textarea id="message" name="message" rows="5" cols="60"
+		class="karltextareafield"></textarea>
+    </fieldset>
+    
+    <fieldset metal:define-macro="description-field"
+	      tal:define="error fielderrors['description']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="description-field">
+      <label class="required">Description</label>
+      <div class="fieldHelp">This description will appear in search 
+	results and on the community listing page. Please limit your 
+	description to 100 words or less.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <textarea id="description" name="description" rows="5" cols="60"
+		class="karltextareafield"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="sharing-field"
+	      tal:define="error fielderrors['sharing']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="sharing-field">
+      <label class="required">Is this community private?</label>
+      <div class="fieldHelp">If you designate this community private, 
+	    only invited members will be able to view items posted to 
+	    the community.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div class="karlselectionradiofield">
+	    <input type="radio" name="sharing" id="sharing_0" class="noborder"
+	       value="false" checked="checked" />	
+	    <label for="sharing_0">Public</label>
+	    <input type="radio" name="sharing" id="sharing_1" class="noborder"
+	       value="true" />
+	    <label for="sharing_1">Private</label>
+      </div>
+      <div class="dialogContent">
+        <p>
+        Private communities can never be made public, are you sure?
+        </p>
+      </div>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the dialog from the embedded content
+            var dialog = $('#sharing-field .dialogContent')
+                .karldialog({
+                    title: 'Confirm',
+                    buttons: {
+                        "Cancel": function() {
+                            $(this).karldialog('close');
+                        },
+                        "Ok": function() {
+                            $(this).karldialog('close');
+                            // change the value really.
+                            $('#sharing_1').attr('checked', 'checked');
+                            //$(this).karldialog().old_value = 'true';
+                            dialog.old_value = 'true';
+                        }
+                    }
+                });
+            // bind the click to open the dialog
+            $('input#sharing_1')
+                .click(function(e) {
+                    // Since we use click instead of change (we want the dialog
+                    // open immediately, even on IE),
+                    // we need to handle a state (old_value)
+                    // to prevent clicking without a change.
+                    var new_value = $('#sharing-field .karlselectionradiofield input:checked').val();
+                    if (dialog.old_value != new_value) {
+                      // The dialog will set it if ok is clicked.
+                      dialog.karldialog('open');
+                      // In addition to preventdefault,
+                      // also change the value back (needed for IE)
+                      $('#sharing_0').attr('checked', 'checked');
+                    }
+                    // Prevent it from happening.
+                    e.preventDefault();
+                });
+            $('input#sharing_0')
+                .click(function(e) {
+                    var new_value = $('#sharing-field .karlselectionradiofield input:checked').val();
+                    dialog.old_value = new_value;
+                });
+        });
+      </script>  
+    </fieldset>
+
+    <fieldset metal:define-macro="resource-sharing-field"
+	      tal:define="error fielderrors['sharing']|None"
+	      class="${error and 'fieldError' or ''}"
+	      tal:condition="show_is_private|True"
+	      id="resource-sharing-field">
+      <label class="required">Is this private?</label>
+      <div class="fieldHelp">Items marked as private can only be seen by 
+	members of this community.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div class="karlselectionradiofield">
+	<input type="radio" name="sharing" id="sharing_0" 
+	       class="noborder" value="false" checked="checked" />	
+	<label for="sharing_0">Public</label>
+	<input type="radio" name="sharing" id="sharing_1" 
+	       class="noborder" value="true" />
+	<label for="sharing_1">Private</label>
+      </div>
+    </fieldset>
+
+    <fieldset metal:define-macro="tools-field"
+	      tal:define="error fielderrors['tools']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="tools-field">
+      <label>Tools</label>
+      <div class="fieldHelp">Select which tools to enable on 
+	this community.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <ul class="karlcheckboxlist" id="tools">
+	<li tal:repeat="tool tools">
+          <input tal:condition="tool['state']" type="checkbox" 
+		 name="${tool['name']}" value="${tool['title']}" 
+		 checked="checked" class="noborder" />
+          <input tal:condition="not tool['state']" type="checkbox" 
+		 name="${tool['name']}" value="${tool['title']}" class="noborder"  />
+	  <label for="${tool['name']}">${tool['title']}</label>
+	</li>
+      </ul>
+    </fieldset>
+
+
+    <fieldset metal:define-macro="add_comment-field"
+	      tal:define="error fielderrors['add_comment']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="add-comment-field">
+      <a name="addcomment"></a>
+      <label>Add Comment</label>
+      <div class="fieldHelp">Enter your comments below.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input type="hidden" name="add_comment_text_format" value="text/html" />
+      <textarea id="add_comment" name="add_comment" rows="1" cols="40"
+		class="mceEditor karlrichtextfield"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="email_addresses-field"
+	      tal:define="error fielderrors['email_addresses']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="email-addresses-field">
+      <label class="required">Email Addresses</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <textarea name="email_addresses" rows="5" cols="60"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="attendees-field"
+	      tal:define="error fielderrors['attendees']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="attendees-field">
+      <label>Attendees</label>
+      <div class="fieldHelp">One per line</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <textarea name="attendees" rows="5" cols="60"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="email-field"
+	      tal:define="error fielderrors['email']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="email-field">
+      <label class="required">Email</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="email"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="contact_name-field"
+	      tal:define="error fielderrors['contact_name']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="contact-name-field">
+      <label>Contact Name</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="contact_name"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="contact_email-field"
+	      tal:define="error fielderrors['contact_email']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="contact-email-field">
+      <label>Contact Email</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="contact_email"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="username-field"
+	      tal:define="error fielderrors['username']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="username-field">
+      <label class="required">Username</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="username"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="password-field"
+	      tal:define="error fielderrors['password']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="password-field">
+      <label class="required">Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="password_confirm-field"
+	      tal:define="error fielderrors['password_confirm']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="confirm-password-field">
+      <label class="required">Confirm Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password_confirm" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="old-password-field"
+              tal:define="error fielderrors['old_password']|None"
+              class="${error and 'fieldError' or ''}"
+              id="old-password-field">
+      <label class="required">Old Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="old_password" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="new-password-field"
+              tal:define="error fielderrors['password']|None"
+              class="${error and 'fieldError' or ''}"
+              id="password-field">
+      <label class="required">New Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="new-password_confirm-field"
+              tal:define="error fielderrors['password_confirm']|None"
+              class="${error and 'fieldError' or ''}"
+              id="confirm-password-field">
+      <label class="required">Confirm New Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password_confirm" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="title-field"
+	      tal:define="error fielderrors['title']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="title-field">
+      <label class="required">Title</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="title" style="width: 490px"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="firstname-field"
+	      tal:define="error fielderrors['firstname']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="firstname-field">
+      <label class="required">First Name</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="firstname"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="lastname-field"
+	      tal:define="error fielderrors['lastname']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="lastname-field">
+      <label class="required">Last Name</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="lastname"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="phone-field"
+	      tal:define="error fielderrors['phone']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="phone-field">
+      <label>Phone Number</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="phone"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="extension-field"
+	      tal:define="error fielderrors['extension']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="extension-field">
+      <label>Extension</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="extension"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="organization-field"
+	      tal:define="error fielderrors['organization']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="organization-field">
+      <label>Organization</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="organization"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="location-field"
+	      tal:define="error fielderrors['location']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="location-field">
+      <label>Location</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="location"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="country-field"
+	      tal:define="error fielderrors['country']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="country-field">
+      <label>Country</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <select name="country" size="1">
+        <option value="">Select...</option>
+	<option value="${c[0]}" 
+		tal:repeat="c vocabularies['countries']">${c[1]}</option>
+      </select>
+    </fieldset>
+
+    <fieldset metal:define-macro="department-field"
+	      tal:define="error fielderrors['department']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="department-field">
+      <label>Department</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="department"/>
+    </fieldset>
+ 
+    <fieldset metal:define-macro="position-field"
+	      tal:define="error fielderrors['position']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="position-field">
+      <label>Position</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="position"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="website-field"
+	      tal:define="error fielderrors['website']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="website-field">
+      <label>Website</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="website"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="languages-field"
+	      tal:define="error fielderrors['languages']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="languages-field">
+      <label>Languages</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="languages" />
+    </fieldset>
+
+    <fieldset metal:define-macro="biography-field"
+	      tal:define="error fielderrors['biography']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="biography-field">
+      <label>Biography</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input type="hidden" name="text_text_format" value="text/html" />
+      <textarea id="biography" name="biography" rows="1" cols="40"
+		class="mceEditor karlrichtextfield"></textarea>
+    </fieldset>
+
+    <fieldset metal:define-macro="photo-field"
+	      tal:define="error fielderrors['photo']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="photo-field">
+      <div style="float: left;">
+	<label>Photo</label>
+	<div class="fieldHelp"></div>
+	<div tal:condition="error" class="errorMessage">${error}</div>
+	<div style="padding-top: 0.5em;">
+	  <input type="file" name="photo"/>
+	</div>
+	<div tal:condition="photo.may_delete">
+	  <input type="checkbox" name="photo_delete" class="noborder"/> delete photo
+	</div>
+      </div>
+        <!-- XXX Browser scaling with fixed dims will not preserve aspect 
+                 ratio. -->
+        <img tal:condition="photo.url|None"
+	     height="100" width="75" 
+             src="${photo.url}"
+          style="width: 75px; float: left;"
+	  align="right"/>
+      <div style="clear: both;"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="caption-field"
+	      tal:define="error fielderrors['caption']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="caption-field">
+      <label>Caption</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="caption" style="width: 490px"/>
+    </fieldset>
+    
+    <fieldset id="terms_and_conditions-field" 
+	      metal:define-macro="terms_and_conditions-field"
+	      tal:define="error fielderrors['terms_and_conditions']|None"
+	      class="${error and 'fieldError' or ''}">
+      <label class="required">Terms and Conditions</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input type="checkbox" class="noborder" id="acceptterms" 
+	     value="true" name="terms_and_conditions"/>
+      <label style="font-weight: normal;" for="acceptterms">
+        I accept the KARL
+        <a class="dialogLink" href="#">Terms and Conditions</a>
+      </label>
+      <div title="Terms and Conditions" class="dialogContent"
+	   tal:content="structure terms_text" />
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the dialog from the embedded content
+            var dialog = $('#terms_and_conditions-field .dialogContent')
+                .karldialog({
+                    width: 666,
+                    height: 450,
+                    dialogClass: 'karlTermsDialog',
+                    buttons: {
+                        "Ok": function() {
+                            $(this).karldialog('close');
+                        }
+                    }
+                });
+            // bind the click to open the dialog
+            $('#terms_and_conditions-field .dialogLink')
+                .click(function(e) {
+                    dialog.karldialog('open');
+                    e.preventDefault();
+                });
+        });
+      </script>  
+    </fieldset>
+
+    <fieldset id="accept_privacy_policy-field" 
+              metal:define-macro="accept_privacy_policy-field"
+	      tal:define="error fielderrors['accept_privacy_policy']|None"
+	      class="${error and 'fieldError' or ''}">
+      <label class="required">Accept Privacy Policy</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input type="checkbox" class="noborder" id="acceptterms" 
+	     value="true" name="accept_privacy_policy"/>
+      <label style="font-weight: normal;" for="acceptterms">
+        I accept the KARL
+        <a class="dialogLink" href="#">Privacy Policy</a>
+      </label>
+      <div title="Privacy Policy" class="dialogContent"
+	   tal:content="structure privacy_text" />
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the dialog from the embedded content
+            var dialog = $('#accept_privacy_policy-field .dialogContent')
+                .karldialog({
+                    width: 666,
+                    height: 450,
+                    dialogClass: 'karlTermsDialog',
+                    buttons: {
+                        "Ok": function() {
+                            $(this).karldialog('close');
+                        }
+                    }
+                });
+            // bind the click to open the dialog
+            $('#accept_privacy_policy-field .dialogLink')
+                .click(function(e) {
+                    dialog.karldialog('open');
+                    e.preventDefault();
+                });
+        });
+      </script>  
+
+    </fieldset>
+
+    <fieldset id="attachment-field" 
+	      metal:define-macro="attachment-field"
+	      tal:define="error fielderrors['attachment']|None"
+              tal:condition="api.support_attachments"
+	      class="${error and 'fieldError' or ''}">
+      <label>Attachment</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div class="muf-widget">
+        <div class="muf-stub">
+          <input type="file" value="true" name="attachment"/>
+          <a href="#" class="muf-closebutton">Remove</a>
+        </div>
+        <a href="#" class="muf-addbutton">Attach another file</a>
+      </div>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the widget
+            $('#attachment-field .muf-widget')
+                .karlmultiupload({
+                });
+        });
+      </script>  
+    </fieldset>
+
+    <fieldset metal:define-macro="tags-field"
+	      tal:define="error fielderrors['tags']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="tags-field">
+      <label>Tags</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="tags" id="tags"/>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // get karl_client_data.tags_field
+            var tagbox_data = window.karl_client_data && karl_client_data.tags_field || {};
+            if (! tagbox_data.records) {
+                throw 'karl_client_data.tags_field not specified or has no records.';
+            }
+            // get global page data
+            var app_url = $("#karl-app-url")[0].content;
+            var here_url = $("#karl-here-url")[0].content;
+            // bind the widget
+            $("#tags").karltagbox({
+                validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                ajax: app_url + "/jquery_tag_search",
+                prevals: tagbox_data.records,
+                docid: tagbox_data.docid,
+                showtag_url: app_url + '/showtag/',
+                tagusers_url: app_url + '/tagusers.html',
+                name: "tags"
+            });
+        });
+        //]]>
+      </script>  
+    </fieldset>
+
+    <fieldset id="sendalert-field" 
+              metal:define-macro="sendalert-field"
+	      tal:define="error fielderrors['sendalert']|None"
+	      class="${error and 'fieldError' or ''}">
+      <label>Send email alert to community members?</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div>
+        <input type="radio" checked="checked" class="noborder"
+               id="sendalert-true" value="true" name="sendalert"/>
+        Yes
+        <input type="radio" class="noborder"
+               id="sendalert-false" value="false" name="sendalert"/>
+        No
+      </div>
+    </fieldset>
+
+    <fieldset metal:define-macro="start_date-field"
+	      tal:define="error fielderrors['startDate']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="startdate-field">
+      <label class="required">Start Date</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="startDate" id="startDate" value="1/31/2009 18:00"/>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the widget
+            $('#startDate')
+                .karldatetimepicker({
+                })
+                .bind('change.karldatetimepicker', function() {
+                    $('#endDate').karldatetimepicker('limitMinMax', 
+                            // add one hour
+                            new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000), 
+                            null);
+                });
+        });
+      </script>  
+    </fieldset>
+
+    <fieldset metal:define-macro="end_date-field"
+	      tal:define="error fielderrors['endDate']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="enddate-field">
+      <label class="required">End Date</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="endDate" id="endDate" value="2/17/2009 19:45"/>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the widget
+            $('#endDate')
+                .karldatetimepicker({
+                })
+                .bind('change.karldatetimepicker', function() {
+                    $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
+                });
+        });
+      </script>  
+    </fieldset>
+
+    <fieldset metal:define-macro="publication-date-field"
+	      tal:define="error fielderrors['publication_date']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="publication-date-field">
+      <label class="required">Publication Date</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="publication_date" id="publication_date" value="1/31/2009 18:00"/>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the widget
+            $('#publication_date')
+                .karldatetimepicker({
+                })
+                .bind('change.karldatetimepicker', function() {
+                    $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
+                });
+        });
+      </script>  
+    </fieldset>
+    
+    <fieldset metal:define-macro="add-file-field"
+          tal:define="error fielderrors['file']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="addfile-field">
+      <label class="required">File</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div>
+          <input type="file" value="true" name="file"/>
+      </div>
+    </fieldset>
+
+    <fieldset metal:define-macro="edit-file-field"
+          tal:define="error fielderrors['file']|None"
+          id="file-field"
+	      class="${error and 'fieldError' or ''}">
+      <label class="required">File</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div class="sif-widget">
+        <input id="file_nochange" class="sif-nochange noborder" type="radio" 
+              checked="checked" value="nochange" name="file-dummyoption"/>
+        <label for="file_nochange">Keep existing file</label>
+        <br />
+        <input id="file_upload" class="sif-upload noborder" type="radio"
+              value="" name="file-dummyoption"/>
+        <label for="file_upload">Replace with new file:</label>
+        <br />
+        <div class="sif-stub">
+          <input type="file" value="true" name="file"/>
+        </div>
+      </div>
+      <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            // create the widget
+            $('#file-field .sif-widget')
+                .karlsingleupload({
+                });
+        });
+      </script>  
+    </fieldset>
+
+
+    <fieldset metal:define-macro="form-submit"
+	      id="submitcancel-field">
+      <input type="submit" name="form.submitted" value="submit" 
+	     class="submit"/>
+      <input type="submit" name="form.cancel" value="cancel"
+	     class="button"
+	     style="margin-left:5px"/>
+      <style type="text/css">
+	.required {
+	  background-image: url(${api.static_url}/images/required.gif);
+	}
+      </style>
+    </fieldset>
+
+ </body>
+</html>

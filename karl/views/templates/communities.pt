@@ -1,0 +1,53 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1>Communities</h1>
+
+    <div class="rightcol">
+      <div metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['letter_box']"/>
+
+    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+    <table tal:condition="batch_info['batching_required']" width="70%">
+      <tr class="ui-grid-footer">
+        <th class="ui-widget-header">
+          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          </div>
+        </th>
+      </tr>
+    </table>
+
+    <div class="communityEntry" tal:repeat="community communities">
+      <div class="klisting_header">
+        <a href="${community.url}">${community.title}</a>
+        <span tal:condition="not api.has_staff_acl(community.context)"
+          metal:use-macro="api.snippets.macros['privacy_badge']"/>
+      </div>
+      <p>${community.description}</p>
+      <div class="documentByLine">
+        <span>${community.number_of_members} Member(s)</span>
+        <span> | </span>
+        <span>Last Activity: ${community.last_activity_date}</span>
+      </div>
+    </div>
+
+    <table tal:condition="batch_info['batching_required']" width="70%">
+      <tr class="ui-grid-footer">
+        <th class="ui-widget-header">
+          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          </div>
+        </th>
+      </tr>
+    </table>
+
+  </div>
+
+</html>

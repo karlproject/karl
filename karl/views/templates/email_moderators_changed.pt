@@ -1,0 +1,38 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:tal="http://xml.zope.org/namespaces/tal">
+<body>
+
+    <p>
+        The moderators for the
+        <a href="${community_href}">${community_name}</a> have changed:
+    </p>
+
+    <h4>Summary of changes</h4>
+    
+    <p>
+        <div tal:repeat="name new_moderators">
+            ${name} is now a moderator.
+        </div>
+        <div tal:repeat="name old_moderators">
+            ${name} is no longer a moderator.
+        </div>
+    </p>
+    
+    <h4>New Moderators</h4>
+    
+    <p>
+        <div tal:repeat="name cur_moderators">
+            ${name}        
+        </div>
+    </p>
+    
+    <h4>Previous Moderators</h4>
+    
+    <p>
+        <div tal:repeat="name prev_moderators">
+            ${name}
+        </div>
+    </p>
+    
+</body>
+</html>

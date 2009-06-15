@@ -1,0 +1,26 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+ 
+    <tal:block condition="api.userid is not None">
+
+      <p>You cannot accept an invitation while logged in. Please 
+	<a href="${api.app_url}/logout">log out</a> first. </p>
+
+    </tal:block>
+    <tal:block condition="api.userid is None">
+
+      <p>You have been invited to join
+	the <strong>${community_name}</strong> in
+	${system_name}. Please begin by creating a ${system_name}
+	login with profile information.</p>
+
+      <span tal:replace="structure form.rendered_form"/>
+
+    </tal:block>
+
+  </div>
+</div>

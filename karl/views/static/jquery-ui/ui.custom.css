@@ -1,0 +1,374 @@
+
+
+/* XXX grid styles should merge upstream */
+
+.ui-grid {
+    height: auto;
+}
+
+.ui-grid-content {
+    vertical-align: top;
+    overflow: auto;
+}
+
+.ui-grid-footer {
+    /* Hmm, these are needed too. */
+    line-height: 1.8em;
+    height: 1.8em;
+}
+
+.ui-grid-footer-text {
+    display: inline-block;
+    vertical-align: top;
+    float: left;
+    padding: 2px;
+    margin: 2px;
+}
+
+.ui-grid-pagination {
+    display: inline-block;
+    vertical-align: top;
+    /* This height sets it for all. */
+    height: 1.8em;
+    float: right;
+    padding: 2px;
+    margin: 2px 2px 4px 2px;
+}
+
+.ui-grid-pagination a,
+.ui-grid-pagination a:hover,
+.ui-grid-pagination span {
+    display: inline-block;
+    position: relative; /* XXX important for Safari */
+    top: 0;
+    vertical-align: top;
+    height: 100%;
+    margin: 0 1px;
+    padding: 0 0.2em;
+    text-decoration: none;
+}
+.ui-grid-pagination span {
+    cursor: default;
+}
+.ui-grid-pagination a.ui-grid-pagination-icon,
+.ui-grid-pagination a.ui-grid-pagination-icon:hover,
+.ui-grid-pagination span.ui-grid-pagination-icon {
+    padding: 0;
+    width: 16px;
+}
+.ui-grid-pagination .ui-icon {
+    position: absolute;
+    margin-top: -8px;  /* half of the icon height (16px) */
+    top: 50%;
+    left: 0;
+}
+.ui-grid-pagination a.ui-state-hover .ui-icon {
+    margin-top: -9px;
+}
+.ui-grid-pagination a.ui-grid-pagination-icon,
+.ui-grid-pagination a.ui-grid-pagination-icon:hover,
+.ui-grid-pagination span.ui-grid-pagination-icon {
+    padding: 0;
+    width: 16px;
+}
+/* IE: Need to set the width 2px wider then the icon width (16px) */
+/* Holly Hack targets IE Win only \*/
+* html .ui-grid-pagination a.ui-grid-pagination-icon,
+* html .ui-grid-pagination a.ui-grid-pagination-icon:hover,
+* html .ui-grid-pagination span.ui-grid-pagination-icon {
+    width: 18px;
+}
+/* End Holly Hack */
+
+
+
+.ui-grid-column {
+    overflow: hidden;
+    cursor: pointer;
+    height: 23px;
+}
+
+.ui-grid-column div {
+    padding: 0 3px 0;
+    height: 16px;
+    overflow: hidden;
+}
+
+.ui-grid-column-sort-left {
+    border-left: 1px solid red !important;
+}
+
+.ui-grid-column-sort-right {
+    border-right: 1px solid red !important;
+}
+
+/* ------------------------- */
+
+/* no horizontal bars between columns */
+.ui-grid-column,
+.ui-grid-row-hover .ui-grid-column,
+.ui-grid-row-selected .ui-grid-column {
+    border-top: 0; 
+    border-left: 0; 
+    border-right: 0; 
+    //XXpadding-top: 1px; 
+    padding-left: 2px; 
+    padding-right: 2px; 
+}
+
+/* alternate row coloring */
+.ui-grid-row.even .ui-grid-column {
+    background: #fbf9ee url(/static/jquery-ui/grid/themes/base/images/fbf9ee_40x100_textures_02_glass_55.png) 0 50% repeat-x;
+}
+/* override selections on top of alternate colors,
+ * and this time also apply correct absolute url. */
+.ui-grid-row-hover td {
+    background: #e6e6e6 url(/static/jquery-ui/grid/themes/base/images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
+}
+.ui-grid-row-selected td {
+    background: #dadada url(/static/jquery-ui/grid/themes/base/images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
+}
+
+
+
+/* visual sorting indicators */
+
+.ui-grid-column-header {
+    cursor: pointer;
+}
+
+/*.ui-grid-column-header div {*/
+.ui-grid-column-header a {
+    display: inline-block;
+    overflow: hidden;
+    margin: 3px;
+}
+
+.ui-grid-column-header .ui-grid-visual-sorting-indicator {
+    position: absolute;
+    margin-top: -8px;
+    top: 50%;
+    right: 8px;
+
+}
+.ui-grid-column-header .ui-grid-column-header-text {
+    padding-right: 19px;   /* 16px + 3px */
+}
+
+
+/* autobox2 customization */
+
+ul.autobox-list {
+    z-index: 99999;
+    font-size: 100% !important;
+    text-align: left !important;
+    white-space: nowrap;
+}
+
+ul.autobox-list .matching {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+li.bit-box {
+  padding: 1px 15px 2px 5px !important;
+}
+li.bit-box a.closebutton {
+  background: url('/static/jquery-ui/autobox2/close.gif') !important; 
+}
+
+ul.autobox-list li.active {
+    background-color: #BBBBBB !important;
+}
+
+/* nondeleteable tag bubbles have
+ * a different background */
+li.bit-box.nondeleteable {
+  background: #e5e5e5;
+}
+
+.addtag-button {
+    vertical-align: middle !important;
+}
+.autobox-input input {
+    padding: 0px 0px 0px 0px !important;
+    vertical-align: middle !important;
+    /*height: 21px !important;*/
+}
+.autobox-input span {
+    width: 182px !important;
+}
+
+/*li.bit-box .count {
+    display: inline;
+}*/
+
+ul.livesearch-list {
+  position: absolute;
+  width: 448px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  border: 1px solid #a3a3a3;
+  filter:alpha(opacity=95);
+  -moz-opacity:0.95;
+  -khtml-opacity: 0.95;
+  opacity: 0.95;
+  color: #000;
+  line-height: 1em;
+  background-color: #fff;
+  padding-bottom: 3px;
+  z-index: 99999;
+}
+ul.livesearch-list li {
+  width: 448px;
+  float: left;
+  margin: 0;
+  background: #fff;
+  padding: 1px 0 1px 0;
+  text-align: left;
+}
+
+ul.livesearch-list li.noresult,
+ul.livesearch-list li.showall {
+  padding: 0 0 5px 0;
+}
+ul.livesearch-list li.hasheader {
+  border-top: 1px solid #e6e6e6;
+  border-collapse: collapse;
+  padding-top: 3px;
+}
+ul.livesearch-list .header {
+  padding: 3px 10px 3px 10px;
+  font-weight: bold;
+  /* color: #a6a6a6; */
+  /* font-size: 90%; */
+}
+ul.livesearch-list .item {
+  width: 448px;
+  float: left;
+  /* font-size: 94%; */
+  line-height: 1em;
+}
+ul.livesearch-list .item a {
+  display: inline-block;
+  border-top: 1px transparent;
+  border-bottom: 1px transparent;
+  padding: 1px 12px 1px 20px;
+  text-decoration: none;
+  color: #000;
+}
+ul.livesearch-list .active .item {
+  background: #858c93 !important;
+}
+ul.livesearch-list .active .item a {
+  color: #fff !important;
+}
+ul.livesearch-list .header {
+    cursor: default;
+}
+/*
+ul.livesearch-list .noresult a:hover {
+  color: #000;
+  background: #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+}
+*/
+ul.livesearch-list .showall .item a {
+  color: #666;
+  /* font-size: 94%; */
+}
+/*
+ul.livesearch-list .showall .item a:hover {
+  color: #eee;
+  /* font-size: 94%; */
+}
+*/
+
+/* Links in the tag cloud have no underline
+ * only when hovered. */
+
+.showtag-link,
+.tagusers-link {
+    text-decoration: none;
+}
+
+ul.autobox-hldr {
+  width: 550px !important;
+  border: 0px none !important;
+  margin-top: 0px !important; 
+  margin-left: 0px !important; 
+  padding: 0 0 0 0 !important;
+}
+
+/* Style the add tag button */
+.addtag-button {
+    margin-left: 8px;
+}
+
+/* Style the input box */
+ul.autobox-hldr li.autobox-input input {
+  width: 125px;
+  border: 1px solid #cecece !important;
+}
+
+
+/* Styling for the karlstatusbox widget */
+.statusbox-item {
+    border: 1px solid grey;
+    background-color: #FFFFAF;
+    margin: 4px 0px 4px 0px;
+    padding: 4px 8px 4px 8px;
+}
+.statusbox-item li {
+  float: left;
+  list-style-type: none;
+  padding: 0 5px 4px 0;
+  margin-right: 5px;
+}
+.statusbox-item span.message-span {
+    float: left;
+}
+.statusbox-item span.closebutton-span {
+    float: left;
+    margin: 0px 8px 0px 8px;
+}
+
+.statusbox .message {
+    float: left;
+}
+
+.statusbox a.statusbox-closebutton {
+    display: block;
+    width: 7px; height: 7px;
+    font-size: 1px;
+    background: url('/static/jquery-ui/autobox2/close.gif'); 
+    float: right;
+    margin-top: 4px;
+}
+
+.statusbox a.statusbox-closebutton:hover {
+    background-position: 7px;
+}
+
+
+/* datetime picker */
+
+
+.ui-karldatetimepicker-dateinput {
+    margin-right: 8px;
+    width: 116px;
+}
+.ui-karldatetimepicker-hourinput,
+.ui-karldatetimepicker-minuteinput {
+   margin: 0px 4px 0px 4px; 
+   vertical-align: middle; 
+}
+
+/* dialog */
+
+.karlTermsDialog .dialogContent {
+    text-align: left;
+}
+

@@ -1,0 +1,20 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1>${api.page_title}</h1>
+
+    <p>Type a message to the moderators of this community, below.  Your
+    request to join the ${community.title} community will be sent to the 
+    community's moderators.</p>
+
+    <form method="post" action="${post_url}" class="k3_genericForm" 
+          name="save">
+      <fieldset metal:use-macro="formfields.macros['message-field']"/>
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+     </form>
+  </div>
+
+</div>

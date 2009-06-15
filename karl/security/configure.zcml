@@ -1,0 +1,9 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <utility
+      provides="repoze.bfg.interfaces.ISecurityPolicy"
+      factory=".policy.RepozeWhoKARLSecurityPolicy"
+      />
+
+</configure>
+

@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <p><strong>An email has been sent to ${email} with password reset
+    instructions.</strong></p>
+
+    <p>
+    If you know your username and password, please log in to KARL by
+    clicking the following link.  If you need additional help, please
+    email the <a
+    href="mailto:${api.settings.admin_email}">Site Administrator</a>.
+    </p>
+
+    <p><strong><a href="${api.app_url}/login.html">Log in</a></strong></p>
+
+  </div>
+</html>

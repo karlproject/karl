@@ -1,0 +1,83 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <form id="advancedsearch-view" method="get" action="${post_url}"
+	  class="k3_genericForm" name="save">
+
+      <fieldset>
+	<label for="body">Keyword</label>
+      <div class="fieldHelp"></div>
+	<input id="body" type="text" name="body"/>
+      </fieldset>
+
+      <fieldset>
+	<label for="creator">Author</label>
+      <div class="fieldHelp"></div>
+	<input id="creator" type="text" name="creator"/>
+      </fieldset>
+
+      <fieldset>
+	<label>Type</label>
+      <div class="fieldHelp"></div>
+        <div tal:repeat="typ type_choices">
+            <input type="checkbox" name="types"
+                tal:attributes="value typ[1]; id 'type-' + typ[1]" />
+            <label tal:attributes="for 'type-' + typ[1]"
+                tal:content="typ[0]">
+                Event
+            </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label>Tags</label>
+        <div class="fieldHelp"></div>
+        <input name="tags" id="tags"/>
+        <script language="javascript" type="text/javascript">
+            //<![CDATA[
+            $(document).ready(function() {
+                // get global page data
+                var app_url = $("#karl-app-url")[0].content;
+                var here_url = $("#karl-here-url")[0].content;
+                // bind the widget
+                $("#tags").karltagbox({
+                    validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                    ajax: app_url + "/jquery_tag_search",
+                    prevals: [],
+                    docid: "",
+                    showtag_url: app_url + '/showtag/',
+                    tagusers_url: app_url + '/tagusers.html',
+                    name: "tags"
+                });
+            });
+            //]]>
+        </script>
+      </fieldset>
+
+      <fieldset>
+	<label for="year">Year</label>
+      <div class="fieldHelp"></div>
+        <select name="year">
+          <option value=""></option>
+          <option tal:repeat="year_choice year_choices" 
+		  value="${year_choice}">${year_choice}</option>
+        </select>
+      </fieldset>
+
+
+      <fieldset>
+	<input type="submit" name="form.submitted" value="submit" 
+	       class="submit"/>
+      </fieldset>
+
+    </form>
+
+  </div>
+
+</html>

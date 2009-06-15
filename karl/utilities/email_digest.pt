@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <h2>Your ${system_name} alerts digest</h2>
+    
+    <tal:single condition="len(alerts) == 1" omit-tag=""
+                define="alert alerts[0]">
+      <p>
+        You have one new alert.
+      </p>
+      <hr/>
+      <div><b>From:</b> ${alert['from']}</div>
+      <div><b>To:</b> ${alert['to']}</div>
+      <div><b>Subject:</b> ${alert['subject']}</div>
+      <div>&nbsp;</div>
+      ${alert['body']}
+    </tal:single>
+    
+    <tal:multiple condition="len(alerts) != 1" omit-tag="">
+      <p>
+        You have ${len(alerts)} new alerts.
+      </p>
+      
+      <p>
+        <div tal:repeat="alert alerts">
+          <a href="#${repeat['alert'].index}">${alert['subject']}</a>
+        </div>
+      </p>
+      
+      <tal:repeat repeat="alert alerts" omit-tag="">
+        <hr/><a name="${repeat['alert'].index}"/>
+        <div><b>From:</b> ${alert['from']}</div>
+        <div><b>To:</b> ${alert['to']}</div>
+        <div><b>Subject:</b> ${alert['subject']}</div>
+        <div>&nbsp;</div>
+        ${alert['body']}
+      </tal:repeat>
+      
+    </tal:multiple>
+      
+  </body>
+</html>

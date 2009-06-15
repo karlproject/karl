@@ -1,0 +1,33 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal" metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">Edit Profile</h1>
+
+    <div tal:condition="not api.user_is_staff">
+        <p>
+        Use the following form to edit your profile information. If
+        you would like to delete your KARL account and remove yourself
+        from all communities, click this <a
+        href="${api.here_url}delete.html" id="deleteuserlink">delete
+        account</a> link and say <em>yes</em> to the confirmation
+        window. If you would like to change your password, please click
+        <a href="${api.here_url}change_password.html">Change Password</a>.
+        </p>
+    </div>
+
+    <div tal:condition="api.user_is_staff">
+        <p>
+        As a staff member, your user information is managed centrally.
+        If you notice something wrong, please send an email to <a
+        href="mailto:${api.settings.admin_email}">${api.settings.admin_email}</a>.
+        If would you like to change your password, please click
+        <a href="${staff_change_password_url}">Change Password</a>.
+        </p>
+    </div>
+
+    <div tal:content="structure form.rendered_form"></div>
+
+  </div>
+</div>

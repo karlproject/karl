@@ -1,0 +1,22 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+    <p>${person_name} has requested to join the ${community_title} commnity.</p>
+
+    <p><b>Member's profile:</b> ${profile_url}</p>
+
+    <p tal:condition="message is not None">
+      <h4>Message from member:</h4>
+      <div tal:content="structure message" />
+    </p>
+
+    <p>To add this user to the ${community_title} community follow the link
+    below.  (Member will be added immediately.)</p>
+
+    <p>
+      <a href="${accept_url}">${accept_url}</a>
+    </p>
+
+  </body>
+</html>

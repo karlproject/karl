@@ -1,0 +1,66 @@
+
+/* Hide unwanted elements */
+#header, #footer, #spo-header, #cheader, #backto, #crightcol, #left, ul.peopleTabs, #right {display:none}
+.cheader, .chactions, .kalphabetlisting, .search_utility_bar, .kpagination_frame {display:none}
+
+/* Make sure our content doesn't get cut its right margin cut off */
+.ccontent {width:75%;}
+
+/* Supress background and border styling  */
+#main {
+background:#FFFFFF;
+border-bottom:0px;
+margin:0px auto;
+padding-bottom:0px;
+padding-top:5px;
+padding-left:15px;
+text-align:left;
+width:100%;
+}
+
+.community_view #cleftcol .ccontent, .peopleSearchWrapper {
+background-color:white !important;;
+border-color:-moz-use-text-color #FFFFFF rgb(206, 206, 206);
+border-style:none none none none;
+border-width:0px 0px 0px 0px;
+margin-top:0px;
+padding:0px 0px 0px 0px;
+}
+
+#center {
+background-color:#FFFFFF;
+border:0px solid #FFFFFF;
+margin:0px;
+overflow:hidden;
+padding:0px;
+float:none;
+width: auto;
+/* position:relative; */
+}
+
+.community_view #cwrapper {
+background-color:#FFFFFF;
+clear:both;
+margin-top:0px;
+}
+
+#cwrapper {
+background-color:#FFFFFF;
+clear:both;
+margin-top:0px;
+}
+
+html, body#login-wrapper {
+background:#FFFFFF;
+height:95%;
+}
+
+.visual-portal-wrapper {
+margin:0px 0px 0px 0px;
+text-align:none;
+width:95%;
+}
+
+.profile_page_body {
+width:50%;
+}

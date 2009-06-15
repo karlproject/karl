@@ -1,0 +1,22 @@
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <title>${view.title}</title>
+  <link href="${view.link}"></link>
+  <subtitle>${view.subtitle}</subtitle>
+  <id>${view.id}</id>
+  <entry tal:repeat="entry view.entries">
+    <title>${entry.title}</title>
+    <link href="${entry.uri}"></link>
+    <id>${entry.uri}</id>
+    <published>${entry.published}</published>
+    <updated>${entry.updated}</updated>
+    <author>
+      <name>${entry.author.name}</name>
+      <uri>${entry.author.uri}</uri>
+    </author>
+    <content type="xhtml" tal:condition="entry.content" 
+             tal:content="structure entry.content">
+        Content
+    </content>
+  </entry>
+</feed>

@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+  <include package="karl.views" />
+  <include package="karl.models"/>
+  <include package="karl.utilities"/>
+  <include package="karl.security"/>
+  <include package="karl.tagging"/>
+  <include package="karl.adapters"/>
+</configure>

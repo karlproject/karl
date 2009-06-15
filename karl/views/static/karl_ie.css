@@ -1,0 +1,101 @@
+.visual-portal-wrapper {
+    width: 1003px;
+}
+.community_view #crightcol,
+* html .community_view #cleftcol .ccontent,
+* html #center,
+* html div.chactions,
+* html #left a,
+* html ul.menubar li a,
+* html ul.menubar li ul a {
+    height: 1%;
+}
+* html #spotlight-output {
+    right: 19px;
+}
+* html ul#header-menu {
+    width: 100%;
+}
+
+* html .community_view #cleftcol .ccontent {
+    position: relative;
+}
+* html input#livesearch-input {
+    font-size: medium;
+}
+.peopleSearchWrapper {
+    height: 1%;
+}
+* html #footer .extra  {
+    margin-right: 10px !important;
+}
+* html #footer {
+    width: 952px;
+}
+.portalMessage, 
+.portalWarningMessage, 
+.portalStopMessage, 
+.system-message, 
+#error-handling,
+.kstatus_message {
+    height: 1%;
+    width: 47em;
+}
+* html .portalMessage, 
+* html .portalWarningMessage, 
+* html .portalStopMessage, 
+* html .system-message, 
+* html #error-handling,
+* html .kstatus_message {
+    width: 50em;
+}  
+* html #inner .portalMessage {
+    width: 478px;
+}
+input.inputField {
+    width: 30em;
+}
+
+/*#outer {position: relative; text-align: center;}
+
+#middle {position: absolute; top: 50%; text-align: center;}
+
+* html #inner {top: -50%; width:700px;}*/
+
+* html #inner {width: 700px;}
+* html body#login-wrapper h1.kscreentitle {
+  height /**/: 32px;
+  overflow: hidden;
+}
+input#username {
+    width: 392px;
+}
+#staffprofile-content,
+#popular-tags-portlet table.portlet-table {
+	width: auto;
+}
+* html .profileDetails {margin-bottom:0em;}
+.kpagination_frame {height: 1%;}
+
+* html form#tagbox-newtagbox input.tagbox-newtag-submit {
+    padding: 0em;
+}
+* html #right div {
+    width: 255px;
+}
+span.sortingArrows {
+    margin:0;
+}
+.portlet-table {
+    font-size:0.9em;
+}
+#crightcol {
+    overflow:hidden;
+    width:195px;
+}
+
+/* accompanies ui.custom.css */
+.autobox-input input {
+    margin-top: -1px !important;
+}
+

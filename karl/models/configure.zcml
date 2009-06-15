@@ -1,0 +1,213 @@
+<configure xmlns="http://namespaces.repoze.org/bfg"
+    xmlns:lemonade="http://namespaces.repoze.org/lemonade">
+
+  <include package="repoze.lemonade.includes" file="meta.zcml" />
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.handle_content_removed"/>
+    
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.index_content"/>
+  
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectWillBeAddedEvent"
+      handler=".subscribers.set_created"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.set_modified"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.reindex_content"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.set_modified"/>
+
+  <subscriber
+      for=".interfaces.ICommunity
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.delete_community"/>
+
+  <subscriber
+      for=".interfaces.ICommunity
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.alpha_added"/>
+
+  <subscriber
+      for=".interfaces.ICommunity
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.alpha_removed"/>
+
+  <subscriber
+      for=".interfaces.ICommunity
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.alpha_added"/>
+
+  <subscriber
+      for=".interfaces.ICommunity
+           .interfaces.IObjectWillBeModifiedEvent"
+      handler=".subscribers.alpha_removed"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.alpha_added"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.alpha_removed"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.alpha_added"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           .interfaces.IObjectWillBeModifiedEvent"
+      handler=".subscribers.alpha_removed"/>
+
+  <subscriber
+      for=".interfaces.ICatalogQueryEvent"
+      handler=".subscribers.log_query"/>
+
+  <adapter
+      for=".interfaces.IProfile"
+      provides=".interfaces.ILetterManager"
+      factory=".adapters.ProfileLetterManager"
+     />
+
+  <adapter
+      for=".interfaces.IProfiles"
+      provides=".interfaces.ILetterManager"
+      factory=".adapters.ProfileLetterManager"
+     />
+
+  <adapter factory=".profile.profile_textindexdata" />
+
+  <subscriber
+      for=".interfaces.IProfile
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.profile_added"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.profile_removed"/>
+
+  <subscriber
+      for=".interfaces.IProfile
+           .interfaces.IObjectModifiedEvent"
+      handler=".subscribers.profile_added"/>
+
+  <adapter
+      for=".interfaces.ICommunity"
+      provides=".interfaces.ILetterManager"
+      factory=".adapters.CommunityLetterManager"
+     />
+
+  <adapter
+      for=".interfaces.ICommunities"
+      provides=".interfaces.ILetterManager"
+      factory=".adapters.CommunityLetterManager"
+     />
+
+  <lemonade:content
+      factory=".community.Community"
+      type=".interfaces.ICommunity"
+      />
+
+  <lemonade:content
+      factory=".profile.Profile"
+      type=".interfaces.IProfile"
+      />
+
+  <adapter
+    for=".interfaces.ICommunity 
+          repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ICommunityInfo"
+    factory=".adapters.CommunityInfo"
+  />
+
+  <!-- XXX Multi-adapter with IRequest not really necessary.
+           This should be deprecated, with registration immediately
+           following being the preferred way to get a CatalogSearch. -->
+  <adapter
+    for="zope.interface.Interface
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ICatalogSearch"
+    factory=".adapters.CatalogSearch"
+  />
+  
+  <adapter
+    for="zope.interface.Interface"
+    provides=".interfaces.ICatalogSearch"
+    factory=".adapters.CatalogSearch"
+    />
+    
+  <adapter
+    for="zope.interface.Interface
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ITagQuery"
+    factory=".adapters.TagQuery"
+  />
+  
+  <adapter
+    for="repoze.lemonade.interfaces.IContent
+          repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IGridEntryInfo"
+    factory=".adapters.GridEntryInfo"
+  />
+
+  <utility
+    provides=".interfaces.ICatalogSearchCache"
+    component=".catalog.cache"
+  />
+
+  <lemonade:content
+      factory=".members.Invitation"
+      type="karl.models.interfaces.IInvitation"
+      />
+
+  <lemonade:content
+      factory=".site.Site"
+      type=".interfaces.ISite"
+      />
+
+  <lemonade:content
+      factory=".community.CommunitiesFolder"
+      type=".interfaces.ICommunities"
+      />
+
+  <lemonade:content
+      factory=".profile.ProfilesFolder"
+      type=".interfaces.IProfiles"
+      />
+
+  <lemonade:content
+      factory=".image.ImageFile"
+      type=".interfaces.IImageFile"
+      />
+
+  <lemonade:content
+      factory=".feedstorage.FeedsContainer"
+      type=".interfaces.IFeedsContainer"
+      />
+
+  <lemonade:content
+      factory=".feedstorage.Feed"
+      type=".interfaces.IFeed"
+      />
+
+</configure>

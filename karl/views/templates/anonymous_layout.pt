@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      metal:define-macro="master">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
+    <metal:resources use-macro="api.snippets.macros['css_resources']"/>
+    <metal:resources use-macro="api.snippets.macros['js_resources']"/>
+    <span metal:define-slot="extra-headers" tal:omit-tag=""/>
+    <meta id="karl-home-url" content="${api.home_url}"/>
+  </head>
+  <body id="login-wrapper">
+    <img src="${api.static_url}/images/login_gradient.gif" 
+	 id="login-gradient" alt="" />
+    <div id="header-user-menu"></div>
+    <div id="outer">
+      <div id="inner">
+        <h1 class="kscreentitle" style="margin-top: 50px">
+          <span></span>
+        </h1>
+	<h2 style="margin-top: 20px; text-align: center">${api.page_title}</h2>
+        <div metal:define-slot="content"> Content goes here. </div>
+
+      </div>
+    </div>
+  </body>
+</html>

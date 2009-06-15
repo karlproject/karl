@@ -1,0 +1,38 @@
+
+TODO List for KARL 3
+======================
+
+- blog entries do not have comment sections yet
+
+- public items are marked as private
+
+- adding files needs to be added
+
+- deleting blog entries needs to be added
+
+- advanced search necessary for xapian_find and xapian_notfind
+
+- tag portlet appears to have tags left over from carlos
+
+- link for "Members" page on community overview is
+  /${community_name}members (no / between community_name and members)
+
+- WikiPage needs sendalert
+
+- Don't allow is_private in a private community
+
+- fix the make_name function to be unique, perhaps moving to a method
+  on context (folder)
+
+- stuff in a private folder is private
+
+- get rid of setContentValues and friends
+
+Done
+======
+
+- we need an affiliate user.  (We have one, login as
+  affiliate:affiliate)
+
+- no "edit folder" option.  (Added guard to not allow deleting the
+  root.)

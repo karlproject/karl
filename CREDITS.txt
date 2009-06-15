@@ -1,0 +1,4 @@
+This package contains code from the TextIndexNG 3.2.2 package from
+Andreas Jung (http://sourceforge.net/projects/textindexng/), licensed
+under the GPL 2.1.
+

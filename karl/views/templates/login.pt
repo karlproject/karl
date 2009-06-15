@@ -1,0 +1,98 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+ 
+    <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
+
+    <form name="formLogin" method="post" action="${app_url}/login">
+     
+      <fieldset class="field">
+
+	<span class="loginLabelWrapper">
+          <label for="username">Username</label>
+	</span>
+	<input name="login" id="username" value="" size="30"
+               tal:attributes="value username|nothing" />
+
+      </fieldset>
+
+      <fieldset class="field">
+
+	<span class="loginLabelWrapper">
+          <label for="password">Password</label>
+	</span>
+	<input type="password" name="password" id="password" value=""
+               size="30" tal:attributes="value password|nothing" />
+	<a href="${api.app_url}/reset_request.html">I forgot my password</a>
+	<div class="field loginLeftPadding discreet">
+          <input type="checkbox" name="osi.whoplugins.auth_tkt.max_age" id="remember" 
+		 class="noborder" value="315360000"/> <!-- Ten years -->
+          <label for="remember">Remember me on this computer</label>
+	</div>
+
+      </fieldset>
+
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // Clearing of status boxes only happens,
+            // if we haveOwnStatus. This permits the statically
+            // provided status box to stay if valid content is submitted.
+            var haveOwnStatus = false;
+            var blitstatus = function(message) {
+                var statusbox = $('.statusbox').data('karlstatusbox');
+                statusbox._clear();
+                statusbox._append($('<span class="message-span"></span>')
+                                      .text(message));
+                haveOwnStatus = true;
+            };
+            var validate = function() {
+                // XXX Allow spaces everywhere for a transitional period.
+                //var username = $('input#username').val();
+                //if (username.length > 0 && username.charAt(username.length - 1) == ' ') {
+                //    blitstatus('Username cannot end with a space. Please consider removing it.');
+                //    return false;
+                // }
+                //if (username.indexOf(' ') != -1) {
+                //    blitstatus('Username cannot contain spaces. Please consider retyping.');
+                //    return false;
+                //}
+                return true;
+            };
+            $('input#username:first')
+                .change(function(e) {
+                    if (validate() && haveOwnStatus) {
+                        $('.statusbox').data('karlstatusbox')._clear();
+                    }
+                });
+            $('input.button:first')
+                .click(function(e) {
+                    if (! validate()) {
+                        e.preventDefault();
+                    }
+                });
+
+            // Set focus into the username field.
+            $('input#username:first')
+                .focus();
+
+        });
+
+        //]]>
+      </script>  
+ 
+      <div class="formControlls loginLeftPadding">
+        <input type="hidden" name="came_from" id="came_from" 
+               value="${came_from}"/>
+        <input type="hidden" name="form.submitted" value="1" />
+        <input type="image" src="static/images/btn-signin.gif"
+               name="image" class="button" />
+
+      </div>
+    </form>
+
+  </div>
+</html>

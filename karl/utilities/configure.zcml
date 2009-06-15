@@ -1,0 +1,82 @@
+<configure xmlns="http://namespaces.repoze.org/bfg"
+    xmlns:lemonade="http://namespaces.repoze.org/lemonade">
+
+  <include package="karl.utilities.converters"/>
+
+  <utility
+      provides=".interfaces.IMimeInfo"
+      component=".mime.mime_info"
+      />
+
+  <utility
+      provides=".interfaces.IKarlDates"
+      component=".karldates.convert"
+      />
+
+  <!--utility
+    factory="karl.utilities.mailer.mail_delivery_factory"
+    provides="repoze.sendmail.interfaces.IMailDelivery"
+  /-->
+
+  <utility
+    component=".randomid.friendly_random_id"
+    provides=".interfaces.IRandomId"
+  />
+
+  <utility
+    component=".forbidden.Forbidden"
+    provides="repoze.bfg.interfaces.IUnauthorizedAppFactory"
+  />
+
+  <utility
+    factory=".alerts.Alerts"
+    provides=".interfaces.IAlerts"
+    />
+    
+  <lemonade:listitem
+    component=".groupsearch.people_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="People"
+    title="People"
+    description="People group"
+    sort_key="10"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.pages_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="Pages"
+    title="Pages"
+    description="Pages group"
+    sort_key="20"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.posts_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="Posts"
+    title="Posts"
+    description="Posts group"
+    sort_key="30"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.files_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="Files"
+    title="Files"
+    description="Files group"
+    sort_key="40"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.others_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="Others"
+    title="Others"
+    description="Others group"
+    sort_key="50"
+   />
+
+</configure>
+
