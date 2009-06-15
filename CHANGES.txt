@@ -1,8 +1,11 @@
 karl package Changelog
 ======================
 
-3.0 (2009-06-15)
+Unreleased
 ----------
+
+3.0 (2009-06-15)
+----------------
 
 - Intersect text index search results last for advanced search,
   hopefully improving relevance ranking.
