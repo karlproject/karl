@@ -58,7 +58,7 @@ requires = [
     ]
 
 setup(name='karl',
-      version='0.1',
+      version='3.0',
       description='karl',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
