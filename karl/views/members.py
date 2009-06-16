@@ -696,34 +696,53 @@ def invite_new_user_view(context, request):
 
     if form.submit in form.formdata:
         try:
-            profiles = find_profiles(context)
-            # XXX can we check these one at a time in the form logic
-            # instead of getting all of them in one go?  e.g. pass in
-            # some context and let the form logic try to find
-            # each email
-            emails = [profile.email for profile in profiles.values()]
-            state = baseforms.AppState(emails=emails)
+            state = baseforms.AppState()
             converted = form.to_python(form.fieldvalues, state)
             form.is_valid = True
             addresses = converted['email_addresses']
             random_id = getUtility(IRandomId)
-        
             html_body = converted['text']
+            members = community.member_names | community.moderator_names
+            
+            search = ICatalogSearch(context)
 
             for email_address in addresses:
-                invitation = create_content(
-                    IInvitation,
-                    email_address,
-                    html_body
-                )
-                while 1:
-                    name = random_id()
-                    if name not in context:
-                        context[name] = invitation
-                        break
+                # Check for existing members
+                total, docids, resolver = search(
+                    email=email_address.lower(),
+                    interfaces=[IProfile,],
+                    )
                 
-                _send_invitation_email(request, community, community_href, 
-                                       invitation)
+                if total:
+                    # User is already a member of Karl
+                    profile = resolver(docids[0])
+                    
+                    if profile.__name__ in members:
+                        # User is a member of this community, do nothing
+                        pass
+                    
+                    else:
+                        # User is in Karl but not in this community--just add
+                        # them to the community as though we had used the 
+                        # add existing user form.
+                        _add_existing_users(context, community, [profile,], 
+                                            html_body, request)
+            
+                else:
+                    # Invite new user to Karl
+                    invitation = create_content(
+                        IInvitation,
+                        email_address,
+                        html_body
+                    )
+                    while 1:
+                        name = random_id()
+                        if name not in context:
+                            context[name] = invitation
+                            break
+                    
+                    _send_invitation_email(request, community, community_href, 
+                                           invitation)
 
             qs = {'status_message':'%s user(s) invited' % len(addresses)}
             location = model_url(context, request, 'manage.html', query=qs)

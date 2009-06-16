@@ -382,6 +382,8 @@ class InviteNewUserViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
+        context.member_names = set()
+        context.moderator_names = set()
         context.users = karltesting.DummyUsers()
         context.title = 'thetitle'
         context.description = 'description'
@@ -430,7 +432,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(renderer1.form.is_valid, False)
 
-    def test_submitted_ok(self): # broken
+    def test_submitted_ok_new_to_karl(self):
         from repoze.sendmail.interfaces import IMailDelivery
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IInvitation
@@ -451,6 +453,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         context = self._getContext()
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
+        registerCatalogSearch()
         def nonrandom(size=6):
             return 'A' * size
         testing.registerUtility(nonrandom, IRandomId)
@@ -463,6 +466,80 @@ class InviteNewUserViewTests(unittest.TestCase):
         self.assertEqual(invitation.email, 'yo@plope.com')
         self.assertEqual(1, len(mailer))
         self.assertEqual(mailer[0].mto, [u"yo@plope.com",])
+
+    def test_submitted_ok_in_karl(self):
+        from repoze.sendmail.interfaces import IMailDelivery
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.models.interfaces import IInvitation
+        from karl.utilities.interfaces import IRandomId
+        renderer1 = testing.registerDummyRenderer(
+            'templates/invite_new_user.pt')
+        renderer2 = testing.registerDummyRenderer(
+            'templates/formfields.pt')
+        renderer3 = testing.registerDummyRenderer(
+            'templates/form_invite_new_users.pt',
+            renderer=StringTemplateRenderer(
+            '<form><input name="email_addresses"/><input name="text"/></form>'))
+        request = testing.DummyRequest({
+                'form.submitted':1,
+                'email_addresses': u'a@x.org\n',
+                'text': u'some text',
+                })
+        context = self._getContext()
+        mailer = karltesting.DummyMailer()
+        testing.registerUtility(mailer, IMailDelivery)
+        profile = karltesting.DummyProfile()
+        context['profiles']['a'] = profile
+        context.members_group_name = 'group:community:members'
+        registerCatalogSearch(results={'email=a@x.org': [profile,]})
+        def nonrandom(size=6):
+            return 'A' * size
+        testing.registerUtility(nonrandom, IRandomId)
+        registerContentFactory(DummyInvitation, IInvitation)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+          'http://example.com/manage.html?status_message=1+user%28s%29+invited'
+                         )
+        self.failIf('A'*6 in context)
+        self.assertEqual(context.users.added_groups, 
+                         [('a', 'group:community:members')])
+
+    def test_submitted_ok_in_community(self):
+        from repoze.sendmail.interfaces import IMailDelivery
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.models.interfaces import IInvitation
+        from karl.utilities.interfaces import IRandomId
+        renderer1 = testing.registerDummyRenderer(
+            'templates/invite_new_user.pt')
+        renderer2 = testing.registerDummyRenderer(
+            'templates/formfields.pt')
+        renderer3 = testing.registerDummyRenderer(
+            'templates/form_invite_new_users.pt',
+            renderer=StringTemplateRenderer(
+            '<form><input name="email_addresses"/><input name="text"/></form>'))
+        request = testing.DummyRequest({
+                'form.submitted':1,
+                'email_addresses': u'a@x.org\n',
+                'text': u'some text',
+                })
+        context = self._getContext()
+        mailer = karltesting.DummyMailer()
+        testing.registerUtility(mailer, IMailDelivery)
+        profile = karltesting.DummyProfile()
+        context['profiles']['a'] = profile
+        context.member_names.add('a')
+        context.members_group_name = 'group:community:members'
+        registerCatalogSearch(results={'email=a@x.org': [profile,]})
+        def nonrandom(size=6):
+            return 'A' * size
+        testing.registerUtility(nonrandom, IRandomId)
+        registerContentFactory(DummyInvitation, IInvitation)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+          'http://example.com/manage.html?status_message=1+user%28s%29+invited'
+                         )
+        self.failIf('A'*6 in context)
+        self.assertEqual(context.users.added_groups, [])
         
 class ManageMembersViewTests(unittest.TestCase):
     def setUp(self):
@@ -904,4 +981,26 @@ class DummyContent:
     def __init__(self, **kw):
         for key,value in kw.items():
             setattr(self, key, value)
+
+def dummy_search(results):
+    class DummySearchAdapter:
+        def __init__(self, context, request=None):
+            self.context = context
+            self.request = request
     
+        def __call__(self, **kw):
+            search = []
+            for k,v in kw.items():
+                key = '%s=%s' % (k,v)
+                if key in results:
+                    search.extend(results[key])
+                    
+            return len(search), search, lambda x: x
+
+    return DummySearchAdapter
+
+def registerCatalogSearch(results={}):
+    from repoze.bfg.testing import registerAdapter
+    from zope.interface import Interface
+    from karl.models.interfaces import ICatalogSearch 
+    registerAdapter(dummy_search(results), (Interface,), ICatalogSearch)
