@@ -57,6 +57,8 @@ class TestLoginView(unittest.TestCase):
                          dict([('Content-Type', 'text/html; charset=UTF-8'),
                               ('Content-Length', '0'), ('a', '1')]))
 
+_marker = object()
+
 class TestLogoutView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -64,15 +66,28 @@ class TestLogoutView(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
+    def _callFUT(self, context, request, reason=_marker):
         from karl.views.login import logout_view
+        if reason is not _marker:
+            return logout_view(context, request, reason)
         return logout_view(context, request)
 
-    def test_it(self):
+    def test_w_default_reason(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
+        headers = dict(response.headers)
+        self.assertEqual(headers['X-Authorization-Failure-Reason'],
+                         'Logged out')
+
+    def test_w_explicit_reason(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        response = self._callFUT(context, request, reason='testing')
+        self.assertEqual(response.status, '401 Unauthorized')
+        headers = dict(response.headers)
+        self.assertEqual(headers['X-Authorization-Failure-Reason'], 'testing')
         
 class DummyAuthenticationPlugin(object):
     def forget(self, environ, identity):

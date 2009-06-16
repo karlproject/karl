@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added optional 'reason' argument to 'logout_view', to enable overriding
+  the header value passed explaining why the user landed on the login form.
+  Use this argument when returning the logout response from another view.
+
 - LP #387974:  Made 'edit_acl.html' view reindex context in the 'allowed'
   index.
 

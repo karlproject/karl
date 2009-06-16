@@ -50,10 +50,10 @@ def login_view(context, request):
         response.headers.update(forget_headers)
     return response
 
-def logout_view(context, request):
+def logout_view(context, request, reason='Logged out'):
     unauthorized = HTTPUnauthorized()
     unauthorized.headerlist.append(
-        ('X-Authorization-Failure-Reason', 'Logged out'))
+        ('X-Authorization-Failure-Reason', reason))
     return unauthorized
 
 
