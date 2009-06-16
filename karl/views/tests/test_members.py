@@ -460,7 +460,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         registerContentFactory(DummyInvitation, IInvitation)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=1+user%28s%29+invited'
+          'http://example.com/manage.html?status_message=One+user+invited.++'
                          )
         invitation = context['A'*6]
         self.assertEqual(invitation.email, 'yo@plope.com')
@@ -498,7 +498,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         registerContentFactory(DummyInvitation, IInvitation)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=1+user%28s%29+invited'
+          'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, 
@@ -536,7 +536,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         registerContentFactory(DummyInvitation, IInvitation)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=1+user%28s%29+invited'
+          'http://example.com/manage.html?status_message=One+user+already+member.'
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, [])

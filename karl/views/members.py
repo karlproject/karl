@@ -691,6 +691,8 @@ def invite_new_user_view(context, request):
     form = InviteNewUsersForm(request.POST, submit='form.submitted', 
                               cancel='form.cancel')
 
+    ninvited = nadded = nignored = 0
+
     if form.cancel in form.formdata:
         return HTTPFound(location=model_url(context, request))
 
@@ -719,7 +721,7 @@ def invite_new_user_view(context, request):
                     
                     if profile.__name__ in members:
                         # User is a member of this community, do nothing
-                        pass
+                        nignored += 1
                     
                     else:
                         # User is in Karl but not in this community--just add
@@ -727,6 +729,7 @@ def invite_new_user_view(context, request):
                         # add existing user form.
                         _add_existing_users(context, community, [profile,], 
                                             html_body, request)
+                        nadded += 1
             
                 else:
                     # Invite new user to Karl
@@ -743,9 +746,29 @@ def invite_new_user_view(context, request):
                     
                     _send_invitation_email(request, community, community_href, 
                                            invitation)
+                    ninvited += 1
 
-            qs = {'status_message':'%s user(s) invited' % len(addresses)}
-            location = model_url(context, request, 'manage.html', query=qs)
+            status = ''
+            if ninvited:
+                if ninvited == 1:
+                    status = 'One user invited.  '
+                else:
+                    status = '%d users invited.  ' % ninvited
+                    
+            if nadded:
+                if nadded == 1:
+                    status += 'One existing Karl user added to community.  '
+                else:
+                    status += ('%d existing Karl users added to community.  ' 
+                               % nadded)
+            if nignored:
+                if nignored == 1:
+                    status += 'One user already member.'
+                else:
+                    status += '%d users already members.' % nignored
+                    
+            location = model_url(context, request, 'manage.html', 
+                                 query={'status_message': status})
             return HTTPFound(location=location)
 
         except Invalid, e:
