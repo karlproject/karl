@@ -800,11 +800,10 @@ ul.menubar a.karldropdown-heading {
 }
 
 /** parent link styles **/
-.chparent {
+.chparent_wrapper {
     margin-bottom: 2em;
 }
 a.chparent {
-    display: block;
     text-decoration: none;
 }
 a.chparent img {

@@ -203,7 +203,7 @@
       </a>
     </div>
 
-    <div metal:define-macro="backto_link" tal:condition="backto|False">
+    <div class="chparent_wrapper" metal:define-macro="backto_link" tal:condition="backto|False">
       <a class="chparent" href="${backto['href']}" id="backto">
         <img src="${api.app_url}/static/images/arrow_up.jpg" height="15"
              width="15" alt="Up to"/> Back to ${backto['title']} </a>

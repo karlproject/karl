@@ -13,6 +13,8 @@ Unreleased
 
 - LP #387974:  Made 'edit_acl.html' view reindex context in the 'allowed'
   index.
+  
+- LP #385580: Have the "Back to Parent" link not be full width on the <a>
 
 3.0 (2009-06-15)
 ----------------
