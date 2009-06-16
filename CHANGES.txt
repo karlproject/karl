@@ -1,8 +1,11 @@
 karl package Changelog
 ======================
 
-3.1 (2009-06-16)
+Unreleased
 ----------
+
+3.1 (2009-06-16)
+----------------
 
 - LP #387390:  add / enable delete profile view, deleting the corresponding
   user as well.
