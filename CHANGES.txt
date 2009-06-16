@@ -16,6 +16,11 @@ Unreleased
   
 - LP #385580: Have the "Back to Parent" link not be full width on the <a>
 
+- LP #385268: Email index is converted to lower case to facilitate case
+  insensitive search.
+  
+- LP #385636: Better handling of existing users in invite new users form.
+
 3.0 (2009-06-15)
 ----------------
 
