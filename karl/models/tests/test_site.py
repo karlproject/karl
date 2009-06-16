@@ -206,26 +206,38 @@ class TestGetTextRepr(unittest.TestCase):
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, 'stuff')
 
-class TestGetDate(object):
-    def test_it(self):
-        import datetime
-        from karl.utils import coarse_datetime_repr
+class _TestGetDate(object):
+
+    def test_not_set(self):
         context = testing.DummyModel()
         result = self._callFUT(context, None)
         self.assertEqual(result, None)
+
+    def test_w_datetime(self):
+        import datetime
+        from karl.utils import coarse_datetime_repr
+        context = testing.DummyModel()
         now = datetime.datetime.now()
         self._decorate(context, now)
         result = self._callFUT(context, None)
         self.assertEqual(result, coarse_datetime_repr(now))
-        now = datetime.date.today()
-        self._decorate(context, now)
+
+    def test_w_date(self):
+        import datetime
+        from karl.utils import coarse_datetime_repr
+        context = testing.DummyModel()
+        today = datetime.date.today()
+        self._decorate(context, today)
         result = self._callFUT(context, None)
-        self.assertEqual(result, coarse_datetime_repr(now))
+        self.assertEqual(result, coarse_datetime_repr(today))
+
+    def test_w_invalid_value(self):
+        context = testing.DummyModel()
         self._decorate(context, 'notadatetime')
         result = self._callFUT(context, None)
         self.assertEqual(result, None)
 
-class TestGetCreationDate(unittest.TestCase, TestGetDate):
+class TestGetCreationDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_creation_date
         return get_creation_date(object, default)
@@ -233,7 +245,7 @@ class TestGetCreationDate(unittest.TestCase, TestGetDate):
     def _decorate(self, context, val):
         context.created = val
         
-class TestGetModifiedDate(unittest.TestCase, TestGetDate):
+class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_modified_date
         return get_modified_date(object, default)
@@ -241,7 +253,7 @@ class TestGetModifiedDate(unittest.TestCase, TestGetDate):
     def _decorate(self, context, val):
         context.modified = val
         
-class TestGetStartDate(unittest.TestCase, TestGetDate):
+class TestGetStartDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_start_date
         return get_start_date(object, default)
@@ -249,7 +261,7 @@ class TestGetStartDate(unittest.TestCase, TestGetDate):
     def _decorate(self, context, val):
         context.startDate = val
 
-class TestGetEndDate(unittest.TestCase, TestGetDate):
+class TestGetEndDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_end_date
         return get_end_date(object, default)
@@ -257,7 +269,7 @@ class TestGetEndDate(unittest.TestCase, TestGetDate):
     def _decorate(self, context, val):
         context.endDate = val
 
-class TestGetPublicationDate(unittest.TestCase, TestGetDate):
+class TestGetPublicationDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_publication_date
         return get_publication_date(object, default)
