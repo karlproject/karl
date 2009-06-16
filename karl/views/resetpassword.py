@@ -64,6 +64,9 @@ def reset_request_view(context, request):
             form.is_valid = True
 
             address = converted['email']
+            if address:
+                address = address.lower()
+                
             search = getAdapter(context, ICatalogSearch)
             count, docids, resolver = search(
                 interfaces=[IProfile], email=[address])
