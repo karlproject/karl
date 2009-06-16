@@ -264,6 +264,13 @@
   />
   
   <view
+    for="karl.models.interfaces.IProfile"
+    name="delete.html"
+    view=".people.delete_profile_view"
+    permission="delete"
+  />  
+  
+  <view
     for="karl.models.interfaces.ICommunityContent"
     name="delete.html"
     view=".resource.delete_resource_view"

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -24,7 +24,7 @@ from karl import testing as karltesting
 class EditProfileTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
 
@@ -65,7 +65,7 @@ class EditProfileTests(unittest.TestCase):
         form = renderer.form.rendered_form
         self.failUnless("http://spacelabstudio.com" in form)
         self.failUnless('enctype="multipart/form-data"' in form)
-        
+
     def test_submitted_invalid(self):
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
         request = testing.DummyRequest({'controlls.submitted':1})
@@ -79,7 +79,7 @@ class EditProfileTests(unittest.TestCase):
 
     def test_submitted_valid(self):
         testing.registerDummySecurityPolicy('userid')
-        from karl.models.interfaces import IObjectModifiedEvent 
+        from karl.models.interfaces import IObjectModifiedEvent
         from karl.models.interfaces import IObjectWillBeModifiedEvent
         from zope.interface import Interface
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
@@ -92,18 +92,18 @@ class EditProfileTests(unittest.TestCase):
         context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
-        self.assertEqual(response.location, 
+        self.assertEqual(response.location,
                          'http://example.com/?status_message=Profile%20edited')
         del profile_data["photo"]
         for k, v in profile_data.items():
             self.assertEqual(getattr(context, k), v)
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
-        
+
     def test_upload_photo(self):
         from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         testing.registerDummySecurityPolicy('userid')
-        from karl.models.interfaces import IObjectModifiedEvent 
+        from karl.models.interfaces import IObjectModifiedEvent
         from karl.models.interfaces import IObjectWillBeModifiedEvent
         from zope.interface import Interface
         from karl.testing import DummyUpload
@@ -115,11 +115,11 @@ class EditProfileTests(unittest.TestCase):
         from karl.views.tests.test_file import DummyImageFile
         testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
                                 IContentFactory)
-        
+
         params = profile_data.copy()
         params['form.submitted'] = '1'
         params['photo'] = DummyUpload(
-            filename="test.jpg", 
+            filename="test.jpg",
             mimetype="image/jpeg",
             data=dummy_photo)
         params['photo.static'] = ''
@@ -128,17 +128,17 @@ class EditProfileTests(unittest.TestCase):
         context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
-        
+
         self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo)
-        self.assertEqual(response.location, 
+        self.assertEqual(response.location,
                          'http://example.com/?status_message=Profile%20edited')
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
-        
+
     def test_reupload_photo(self):
         from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         testing.registerDummySecurityPolicy('userid')
-        from karl.models.interfaces import IObjectModifiedEvent 
+        from karl.models.interfaces import IObjectModifiedEvent
         from karl.models.interfaces import IObjectWillBeModifiedEvent
         from zope.interface import Interface
         from karl.testing import DummyUpload
@@ -150,11 +150,11 @@ class EditProfileTests(unittest.TestCase):
         from karl.views.tests.test_file import DummyImageFile
         testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
                                 IContentFactory)
-        
+
         params = profile_data.copy()
         params['form.submitted'] = '1'
         params['photo'] = DummyUpload(
-            filename="test.jpg", 
+            filename="test.jpg",
             mimetype="image/jpeg",
             data=dummy_photo)
         request = testing.DummyRequest(params)
@@ -162,13 +162,13 @@ class EditProfileTests(unittest.TestCase):
         context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
-        
+
         self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo)
-        self.assertEqual(response.location, 
+        self.assertEqual(response.location,
                          'http://example.com/?status_message=Profile%20edited')
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
-        
+
         prev_len = len(dummy_photo)
         dummy_photo2 = dummy_photo * 2
         self.assertEqual(len(dummy_photo) * 2, len(dummy_photo2))
@@ -193,7 +193,7 @@ class EditProfileTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertRaises(KeyError, context.__getitem__, "photo.jpg")
-        
+
 class ShowProfileTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -258,22 +258,22 @@ class ShowProfileTests(unittest.TestCase):
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
-        
+
         community1 = DummyCommunity()
         community1.title = "Community 1"
-        
+
         communities = community1.__parent__
         communities["community2"] = community2 = DummyCommunity()
         community2.title = "Community 2"
         users.add("userid", "userid", "password",
                   ["group.community:community:members",
                    "group.community:community2:moderators"])
-    
+
         site = communities.__parent__
         site.users = users
         site["profiles"] = profiles = DummyModel()
         profiles["userid"] = context
-        
+
         self._callFUT(context, request)
         self.assertEqual(renderer.communities, [
             {"title": "Community 1",
@@ -297,22 +297,22 @@ class ShowProfileTests(unittest.TestCase):
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
-        
+
         community1 = DummyCommunity()
         community1.title = "Community 1"
-        
+
         communities = community1.__parent__
         communities["community2"] = community2 = DummyCommunity()
         community2.title = "Community 2"
         users.add("userid", "userid", "password",
                   ["group.community:community:members",
                    "group.community:community2:moderators"])
-    
+
         site = communities.__parent__
         site.users = users
         site["profiles"] = profiles = DummyModel()
         profiles["userid"] = context
-        
+
         self._callFUT(context, request)
         self.assertEqual(renderer.communities, [])
 
@@ -489,9 +489,9 @@ class RecentContentTests(unittest.TestCase):
 class ManageCommunitiesTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
         from karl.testing import DummyUsers
-        
+
         # Set up dummy skel
         site = testing.DummyModel()
         self.users = site.users = DummyUsers()
@@ -503,7 +503,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         community1.members_group_name = "community1_members"
         community1.moderators_group_name = "community1_moderators"
         self.community1 = community1
-        
+
         community2 = communities["community2"] = testing.DummyModel()
         community2.title = "Test Community 2"
         community2.member_names = set(['b'])
@@ -511,7 +511,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         community2.members_group_name = "community2_members"
         community2.moderators_group_name = "community2_moderators"
         self.community2 = community2
-        
+
         community3 = communities["community3"] = testing.DummyModel()
         community3.title = "Test Community 3"
         community3.member_names = set(['b'])
@@ -519,18 +519,18 @@ class ManageCommunitiesTests(unittest.TestCase):
         community3.members_group_name = "community3_members"
         community3.moderators_group_name = "community3_moderators"
         self.community3 = community3
-        
+
         from karl.testing import DummyProfile
         profiles = site["profiles"] = testing.DummyModel()
         self.profile = profiles["a"] = DummyProfile()
-                                                   
+
     def tearDown(self):
         cleanUp()
-        
+
     def _callFUT(self, context, request):
         from karl.views.people import manage_communities_view
         return manage_communities_view(context, request)
-    
+
     def test_show_form(self):
         renderer = testing.registerDummyRenderer(
             'templates/manage_communities.pt')
@@ -538,11 +538,11 @@ class ManageCommunitiesTests(unittest.TestCase):
             url="http://example.com/profiles/a/manage_communities.html")
         self.profile.set_alerts_preference("community2", 1)
         self._callFUT(self.profile, request)
-        
-        self.assertEqual(renderer.post_url, 
+
+        self.assertEqual(renderer.post_url,
             "http://example.com/profiles/a/manage_communities.html")
         self.assertEqual(2, len(renderer.communities))
-        
+
         community1 = renderer.communities.pop(0)
         self.assertEqual("community1", community1["name"])
         self.assertEqual("Test Community 1", community1["title"])
@@ -550,7 +550,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertFalse(community1["alerts_pref"][1]["selected"])
         self.assertFalse(community1["alerts_pref"][2]["selected"])
         self.assertTrue(community1["may_leave"])
-        
+
         community2 = renderer.communities.pop(0)
         self.assertEqual("community2", community2["name"])
         self.assertEqual("Test Community 2", community2["title"])
@@ -564,11 +564,11 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        
+
         request.params["form.cancel"] = "cancel"
         response = self._callFUT(self.profile, request)
         self.assertEqual("http://example.com/profiles/a/", response.location)
-        
+
     def test_submit_alert_prefs(self):
         renderer = testing.registerDummyRenderer(
             'templates/manage_communities.pt')
@@ -579,14 +579,14 @@ class ManageCommunitiesTests(unittest.TestCase):
         request.params["form.submitted"] = "submit"
         request.params["alerts_pref_community1"] = str(IProfile.ALERT_NEVER)
         request.params["alerts_pref_community2"] = str(IProfile.ALERT_DIGEST)
-        
-        self.assertEqual(IProfile.ALERT_IMMEDIATELY, 
+
+        self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          self.profile.get_alerts_preference("community1"))
         self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          self.profile.get_alerts_preference("community2"))
         response = self._callFUT(self.profile, request)
-        
-        self.assertEqual(IProfile.ALERT_NEVER, 
+
+        self.assertEqual(IProfile.ALERT_NEVER,
                          self.profile.get_alerts_preference("community1"))
         self.assertEqual(IProfile.ALERT_DIGEST,
                          self.profile.get_alerts_preference("community2"))
@@ -605,12 +605,12 @@ class ManageCommunitiesTests(unittest.TestCase):
 
         self.failUnless("a" in self.community1.member_names)
         response = self._callFUT(self.profile, request)
-        self.assertEqual( [("a", "community1_members")], 
+        self.assertEqual( [("a", "community1_members")],
                           self.users.removed_groups)
         self.assertEqual(
             "http://example.com/profiles/a/?status_message=Community+preferences+updated.",
             response.location)
-        
+
     def test_leave_community_sole_moderator(self):
         renderer = testing.registerDummyRenderer(
             'templates/manage_communities.pt')
@@ -770,6 +770,54 @@ class ChangePasswordViewTests(unittest.TestCase):
         self.assertEqual(msg.mfrom, "admin@example.com")
 
 
+class TestDeleteProfileView(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.people import delete_profile_view
+        return delete_profile_view(context, request)
+
+    def test_noconfirm(self):
+        context = DummyProfile(firstname='Mori', lastname='Turi')
+        context.title = 'Context'
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/delete_profile.pt')
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '200 OK')
+
+    def test_confirm_not_deleting_own_profile(self):
+        from karl.testing import DummyUsers
+        parent = testing.DummyModel()
+        users = parent.users = DummyUsers()
+        context = DummyProfile()
+        parent['userid'] = context
+        testing.registerDummySecurityPolicy('admin')
+        request = testing.DummyRequest(params={'confirm':'1'})
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location,
+                         'http://example.com/?status_message='
+                         'Deleted+profile%3A+userid')
+        self.failIf('userid' in parent)
+        self.assertEqual(users.removed_users, ['userid'])
+
+    def test_confirm_deleting_own_profile(self):
+        from karl.testing import DummyUsers
+        parent = testing.DummyModel()
+        users = parent.users = DummyUsers()
+        context = DummyProfile()
+        parent['userid'] = context
+        testing.registerDummySecurityPolicy('userid')
+        request = testing.DummyRequest(params={'confirm':'1'})
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.failIf('userid' in parent)
+        self.assertEqual(users.removed_users, ['userid'])
+
 profile_data = {
     'firstname':'firstname',
     'lastname':'lastname',
@@ -793,17 +841,17 @@ class DummyProfile(testing.DummyModel):
         if self.get(name, None) is not None:
             raise KeyError(u"An object named %s already exists" % name)
         testing.DummyModel.__setitem__(self, name, value)
-        
+
     def get_photo(self):
         for name in self.keys():
             if name.startswith("photo"):
                 return self[name]
         return None
-        
+
 class DummyLetterManager:
     def __init__(self, context):
         self.context = context
-        
+
     def get_info(self, request):
         return {}
 

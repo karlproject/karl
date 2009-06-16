@@ -18,13 +18,7 @@
 import email.message
 import urllib
 
-from webob.exc import HTTPFound
-from zope.component import getMultiAdapter
-from zope.component import getUtility
-from zope.component.event import objectEventNotify
-
 from formencode import Invalid
-
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
@@ -33,31 +27,33 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.lemonade.interfaces import IContent
 from repoze.sendmail.interfaces import IMailDelivery
+from repoze.who.plugins.zodb.users import get_sha_password
+from webob.exc import HTTPFound
+from zope.component.event import objectEventNotify
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
-
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
-from karl.models.interfaces import IGridEntryInfo
-
-from karl.views import baseforms
-from karl.views.tags import get_tags_client_data
-
-from karl.views.api import TemplateAPI
-
 from karl.utils import find_communities
+from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
 from karl.utils import find_vocabularies
 from karl.utils import get_setting
-from karl.views.utils import convert_to_script
-from karl.views.utils import handle_photo_upload
-from karl.views.utils import CustomInvalid
+from karl.views import baseforms
+from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
+from karl.views.login import logout_view
+from karl.views.tags import get_tags_client_data
+from karl.views.utils import convert_to_script
+from karl.views.utils import CustomInvalid
+from karl.views.utils import handle_photo_upload
 
-from repoze.who.plugins.zodb.users import get_sha_password
 
 def edit_profile_view(context, request):
     form = EditProfileForm(request.POST, submit="form.submitted",
@@ -538,3 +534,29 @@ class ChangePasswordForm(baseforms.BaseForm):
     password = baseforms.password
     password_confirm = baseforms.password_confirm
     chained_validators = baseforms.chained_validators
+
+def delete_profile_view(context, request):
+
+    confirm = request.params.get('confirm')
+    if confirm:
+        parent = context.__parent__
+        name = context.__name__
+        find_users(context).remove(name)
+        del parent[name]
+
+        if authenticated_userid(request) == name:
+            return logout_view(context, request, reason='User removed')
+        query = {'status_message': 'Deleted profile: %s' % name}
+        location = model_url(parent, request, query=query)
+
+        return HTTPFound(location=location)
+
+    page_title = 'Delete Profile for %s %s' % (context.firstname,
+                                               context.lastname)
+    api = TemplateAPI(context, request, page_title)
+
+    # Get a layout
+    return render_template_to_response(
+        'templates/delete_profile.pt',
+        api=api,
+        )

@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #387390:  add / enable delete profile view, deleting the corresponding
+  user as well.
+
 - Added optional 'reason' argument to 'logout_view', to enable overriding
   the header value passed explaining why the user landed on the login form.
   Use this argument when returning the logout response from another view.

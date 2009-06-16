@@ -184,21 +184,12 @@ class DummyMailer(list):
 
 class DummyUsers:
     def __init__(self, community=None):
+        self.removed_users = []
         self.removed_groups = []
         self.added_groups = []
         self.community = community
         self._by_id = {}
         self._by_login = {}
-
-    def add_group(self, userid, group_name):
-        self.added_groups.append((userid, group_name))
-        if (self.community is not None and 
-            hasattr(self.community, "moderators_group_name") and 
-            hasattr(self.community, "members_group_name")):
-            if group_name == self.community.moderators_group_name:
-                self.community.moderator_names.add(userid)
-            elif group_name == self.community.members_group_name:
-                self.community.member_names.add(userid)
 
     def add(self, userid, login, password, groups, encrypted=False):
         self.added = (userid, login, password, groups)
@@ -219,6 +210,19 @@ class DummyUsers:
                     self.community.moderator_names.add(userid)
                 elif group_name == self.community.members_group_name:
                     self.community.member_names.add(userid)
+
+    def remove(self, userid):
+        self.removed_users.append(userid)
+
+    def add_group(self, userid, group_name):
+        self.added_groups.append((userid, group_name))
+        if (self.community is not None and 
+            hasattr(self.community, "moderators_group_name") and 
+            hasattr(self.community, "members_group_name")):
+            if group_name == self.community.moderators_group_name:
+                self.community.moderator_names.add(userid)
+            elif group_name == self.community.members_group_name:
+                self.community.member_names.add(userid)
 
     def remove_group(self, userid, group_name):
         self.removed_groups.append((userid, group_name))
