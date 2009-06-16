@@ -197,7 +197,7 @@ def get_email(object, default):
     email = getattr(object, 'email', None)
     if email is None:
         return default
-    return email
+    return email.lower()
 
 def get_allowed_to_view(object, default):
     return principals_allowed_by_permission(object, 'view')
