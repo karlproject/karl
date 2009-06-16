@@ -357,3 +357,47 @@ class Test_edit_acl_view(unittest.TestCase):
         self._callFUT(context, request)
 
         self.assertEqual(context.__acl__, acl)
+
+    def test_submitted_at_root_reindexes_acl(self):
+        context = testing.DummyModel()
+        context.docid = 1
+        catalog = context.catalog = DummyCatalog()
+        index = catalog['allowed'] = DummyIndex()
+        acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
+                                              no_inherit=False)
+        request = testing.DummyRequest()
+        request.POST['form.add'] = 'X'
+        request.POST['verb'] = 'Allow'
+        request.POST['principal'] = 'wylma'
+        request.POST['permissions'] = 'view'
+
+        self._callFUT(context, request)
+
+        self.assertEqual(index._reindexed, (1, context))
+
+    def test_submitted_not_at_root_reindexes_acl(self):
+        parent = testing.DummyModel()
+        context = parent['child'] = testing.DummyModel()
+        context.docid = 1
+        catalog = parent.catalog = DummyCatalog()
+        index = catalog['allowed'] = DummyIndex()
+        acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
+                                              no_inherit=False)
+        request = testing.DummyRequest()
+        request.POST['form.add'] = 'X'
+        request.POST['verb'] = 'Allow'
+        request.POST['principal'] = 'wylma'
+        request.POST['permissions'] = 'view'
+
+        self._callFUT(context, request)
+
+        self.assertEqual(index._reindexed, (1, context))
+
+
+class DummyCatalog(dict):
+    pass
+
+class DummyIndex:
+    _reindexed = None
+    def reindex_doc(self, docid, object):
+        self._reindexed = (docid, object)

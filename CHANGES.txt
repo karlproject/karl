@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #387974:  Made 'edit_acl.html' view reindex context in the 'allowed'
+  index.
+
 3.0 (2009-06-15)
 ----------------
 

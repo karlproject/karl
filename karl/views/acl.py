@@ -21,12 +21,13 @@ from webob.exc import HTTPFound
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
 from karl.security.policy import NO_INHERIT
+from karl.utils import find_catalog
 
 COMMA_WS = re.compile(r'[\s,]+')
 
 def edit_acl_view(context, request):
 
-    acl = getattr(context, '__acl__', [])
+    acl = original_acl = getattr(context, '__acl__', [])
     if acl and acl[-1] == NO_INHERIT:
         acl = acl[:-1]
         epilog = [NO_INHERIT]
@@ -38,36 +39,44 @@ def edit_acl_view(context, request):
         if index > 0:
             new = acl[:]
             new[index-1], new[index] = new[index], new[index-1]
-            context.__acl__ = new + epilog
+            acl = new
 
-    if 'form.move_down' in request.POST:
+    elif 'form.move_down' in request.POST:
         index = int(request.POST['index'])
         if index < len(acl) - 1:
             new = acl[:]
             new[index+1], new[index] = new[index], new[index+1]
-            context.__acl__ = new + epilog
+            acl = new
 
-    if 'form.remove' in request.POST:
+    elif 'form.remove' in request.POST:
         index = int(request.POST['index'])
         new = acl[:]
         del new[index]
-        context.__acl__ = new + epilog
+        acl = new
 
-    if 'form.add' in request.POST:
+    elif 'form.add' in request.POST:
         verb = request.POST['verb']
         principal = request.POST['principal']
         permissions = tuple(filter(None,
                               COMMA_WS.split(request.POST['permissions'])))
         new = acl[:]
         new.append((verb, principal, permissions))
-        context.__acl__ = new + epilog
+        acl = new
 
-    if 'form.inherit' in request.POST:
+    elif 'form.inherit' in request.POST:
         no_inherit = request.POST['inherit'] == 'disabled'
         if no_inherit:
-            context.__acl__ = acl + [NO_INHERIT]
+            epilog = [NO_INHERIT]
         else:
-            context.__acl__ = acl
+            epilog = []
+
+    acl = acl + epilog
+
+    if acl != original_acl:
+        context.__acl__ = acl
+        catalog = find_catalog(context)
+        if catalog is not None:
+            catalog['allowed'].reindex_doc(context.docid, context)
 
     parent = context.__parent__
     parent_acl = []
