@@ -15,6 +15,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+__version__ = '3.1'
+
 import os
 
 from ez_setup import use_setuptools
@@ -58,7 +60,7 @@ requires = [
     ]
 
 setup(name='karl',
-      version='3.1-dev',
+      version=__version__,
       description='karl',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
