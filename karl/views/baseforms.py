@@ -231,7 +231,8 @@ class UniqueEmail(validators.Email):
                 
             # Search catalog for matching emails
             search = getAdapter(context, ICatalogSearch)
-            result = search(interfaces=[IProfile], email=[value], limit=1)
+            result = search(interfaces=[IProfile], email=[value.lower()], 
+                            limit=1)
             n = result[0]
             if n:
                 raise Invalid(
