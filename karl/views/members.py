@@ -708,7 +708,6 @@ def invite_new_user_view(context, request):
             addresses = converted['email_addresses']
             random_id = getUtility(IRandomId)
         
-            addrs = converted['email_addresses']
             html_body = converted['text']
 
             for email_address in addresses:
