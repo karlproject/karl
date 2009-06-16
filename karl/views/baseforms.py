@@ -116,9 +116,13 @@ class NotOneOf(validators.UnicodeString):
 class TextAreaToEmails(validators.UnicodeString):
 
     def _to_python(self, value, state):
+        if hasattr(state, 'emails'):
+            existing = state.emails
+        else:
+            existing = ()
         v1 = TextAreaToList(strip=True, not_empty=True)
         lines = v1.to_python(value, state)
-        v2 = ForEach(validators.Email(), NotOneOf(known_values=state.emails))
+        v2 = ForEach(validators.Email(), NotOneOf(known_values=existing))
         return v2.to_python(lines)
 
 class Taglist(validators.FancyValidator):
