@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #387974:  Made 'edit_acl.html' view reindex context in the 'allowed'
+  index, as well as invalidating any cached catalog queries.
+
 3.1 (2009-06-16)
 ----------------
 

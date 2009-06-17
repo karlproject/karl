@@ -374,6 +374,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self._callFUT(context, request)
 
         self.assertEqual(index._reindexed, (1, context))
+        self.failUnless(catalog._invalidated)
 
     def test_submitted_not_at_root_reindexes_acl(self):
         parent = testing.DummyModel()
@@ -392,10 +393,14 @@ class Test_edit_acl_view(unittest.TestCase):
         self._callFUT(context, request)
 
         self.assertEqual(index._reindexed, (1, context))
+        self.failUnless(catalog._invalidated)
 
 
 class DummyCatalog(dict):
-    pass
+    _invalidated = False
+
+    def invalidate(self):
+        self._invalidated = True
 
 class DummyIndex:
     _reindexed = None

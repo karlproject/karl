@@ -77,6 +77,7 @@ def edit_acl_view(context, request):
         catalog = find_catalog(context)
         if catalog is not None:
             catalog['allowed'].reindex_doc(context.docid, context)
+            catalog.invalidate()
 
     parent = context.__parent__
     parent_acl = []
