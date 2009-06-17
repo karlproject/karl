@@ -4880,18 +4880,45 @@ var enableOldStyleDropdowns = function () {
 $.widget('ui.karlstatusbox', {
     
     _init: function() {
-        var self = this;
-        // bind the behavior events
-        this.element
-            .bind('clear.karlstatusbox', function(e) {self._clear();})
-            .bind('append.karlstatusbox', function(e, message) {self._append(message);});
+        // initialize the queue
+        this.queue = [];
     },
 
-    _clear: function() {
-        this.element.empty();
+    /*
+     * Public methods
+     **/
+
+    /* Clear all messages, or all messages with a given queueCategory */
+    clear: function(/*optional*/ queueCategory) {
+        if (queueCategory === undefined) {
+            // shortcut: clear all items
+            this.element.empty();
+            this.queue = [];
+        } else {
+            // Clear items of the given category
+            var newQueue = [];
+            $(this.queue).each(function() {
+                // The element may have been deleted (by closebutton),
+                // but we don't check for this, since remove() works
+                // safe with elements already removed.
+                if (this.queueCategory == queueCategory) {
+                    this.item.remove();
+                } else {
+                    // keep item in queue
+                    newQueue.push(this);
+                }
+            });
+            this.queue = newQueue;
+        }
     },
 
-    _append: function(message) {
+    /* Append a message */
+    append: function(message, /*optional*/ queueCategory) {
+        // default queue category is null.
+        if (queueCategory === undefined) {
+            queueCategory = null;
+        }
+        // Append the item
         var item = $('<div class="' + this.options.clsItem + '"></div>');
         item.append($('<div class="message"></div>').append(message));
         if (this.options.hasCloseButton) {
@@ -4902,9 +4929,33 @@ $.widget('ui.karlstatusbox', {
                         })
             );
         }
-        item.append('<div class="clear"></div>');
+        // clearing floats
+        if (jQuery.browser.msie) {
+            item.addClass('clear-ie-container');
+        } else {
+            item.append('<div class="clear"></div>');
+        }
         this.element.append(item);
+        // Remember it on the queue
+        this.queue.push({
+            item: item,
+            queueCategory: queueCategory
+        });
+    },
+
+    /* Append a message after clearing previous messages.
+     * If queueCategory is specified, only the messages added with the
+     * same category are cleared. */
+    clearAndAppend: function(message, /*optional*/ queueCategory) {
+        this.clear(queueCategory);
+        this.append(message, queueCategory);
     }
+
+
+    /*
+     * Private methods
+     **/
+
 
 });
 
@@ -5185,11 +5236,11 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
     },
 
     _clearStatus: function() {
-        this.statusbox.trigger('clear.karlstatusbox');
+        this.statusbox.karlstatusbox('clear');
     },
 
     _appendStatus: function(message) {
-        this.statusbox.trigger('append.karlstatusbox', message);
+        this.statusbox.karlstatusbox('append', message);
     },
 
     _appendStatusWithBubble: function(message, bubble) {
@@ -5197,14 +5248,10 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // to avoid collision in case it gets submitted in form
         bubble = $(bubble).clone()
         bubble.find('input').remove()
-        this._appendStatus( 
-                            $('<span class="message-span"></span>')
-                                .text(message)
-                            .after(
-                                $('<span class="closebutton-span"></span>')
-                                    .append(bubble)
-                            )
-                        );
+        var fullmessage = $('<span class="message-span"></span><span class="bubble-span"></span>');
+        fullmessage.eq(0).text(message);
+        fullmessage.eq(1).append(bubble);
+        this._appendStatus(fullmessage);
         // bind the bubble's closebutton
         var item = this.statusbox.find('>:last-child');
         $('.closebutton', bubble)
