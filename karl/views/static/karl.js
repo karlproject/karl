@@ -180,7 +180,12 @@ $.widget('ui.karlstatusbox', {
                         })
             );
         }
-        item.append('<div class="clear"></div>');
+        // clearing floats
+        if (jQuery.browser.msie) {
+            item.addClass('clear-ie-container');
+        } else {
+            item.append('<div class="clear"></div>');
+        }
         this.element.append(item);
         // Remember it on the queue
         this.queue.push({

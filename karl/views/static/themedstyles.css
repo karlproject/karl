@@ -688,6 +688,10 @@ ul#header-menu img {
     display: block;
     clear: both;
 }
+.clear-ie-container {
+    height: 1%;
+    overflow: hidden;
+}
 
 .kscreentitle:after {
     content: '.';
