@@ -321,7 +321,7 @@
         //<![CDATA[
         $(document).ready(function() {
             // make the pager bar ui styles alive
-            $('.messageBoard a.ui-state-default')
+            $('.content-listing a.ui-state-default')
                 .hover(
                     function() {
                         $(this).addClass('ui-state-hover');

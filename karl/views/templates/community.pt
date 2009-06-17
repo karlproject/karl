@@ -21,6 +21,7 @@
 	 tal:condition="api.context.text != u''">
       <span tal:replace="structure api.context.text"/>
     </div>
+    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper">
       <h3>Recent Activity</h3>
       <table class="content-listing">
