@@ -494,14 +494,10 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // to avoid collision in case it gets submitted in form
         bubble = $(bubble).clone()
         bubble.find('input').remove()
-        this._appendStatus( 
-                            $('<span class="message-span"></span>')
-                                .text(message)
-                            .after(
-                                $('<span class="closebutton-span"></span>')
-                                    .append(bubble)
-                            )
-                        );
+        var fullmessage = $('<span class="message-span"></span><span class="bubble-span"></span>');
+        fullmessage.eq(0).text(message);
+        fullmessage.eq(1).append(bubble);
+        this._appendStatus(fullmessage);
         // bind the bubble's closebutton
         var item = this.statusbox.find('>:last-child');
         $('.closebutton', bubble)

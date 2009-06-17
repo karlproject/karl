@@ -330,7 +330,7 @@ ul.autobox-hldr li.autobox-input input {
 .statusbox-item span.message-span {
     float: left;
 }
-.statusbox-item span.closebutton-span {
+.statusbox-item span.bubble-span {
     float: left;
     margin: 0px 8px 0px 8px;
 }
