@@ -458,7 +458,7 @@ class RecentContentTests(unittest.TestCase):
 
     def test_with_content(self):
         search_args = {}
-        def searcher(context, request):
+        def searcher(context):
             def search(**args):
                 search_args.update(args)
                 doc1 = testing.DummyModel(title='doc1')
@@ -469,7 +469,7 @@ class RecentContentTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from repoze.bfg.testing import registerAdapter
         from zope.interface import Interface
-        registerAdapter(searcher, (Interface, Interface), ICatalogSearch)
+        registerAdapter(searcher, (Interface), ICatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
         testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
                                 IGridEntryInfo)
@@ -639,8 +639,7 @@ class ShowProfilesViewTests(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
         context = testing.DummyModel()

@@ -35,14 +35,14 @@ class TestGetCatalogBatch(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         searchkw = {}
-        def dummy_catalog_search(context, request):
+        def dummy_catalog_search(context):
             def resolver(x):
                 return x
             def search(**kw):
                 searchkw.update(kw)
                 return len(batch), batch, resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface, Interface),
+        testing.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         return searchkw
 
@@ -252,14 +252,14 @@ class TestGetCatalogBatchGrid(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         searchkw = {}
-        def dummy_catalog_search(context, request):
+        def dummy_catalog_search(context):
             def resolver(x):
                 return x
             def search(**kw):
                 searchkw.update(kw)
                 return len(batch), batch, resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface, Interface),
+        testing.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         return searchkw
 

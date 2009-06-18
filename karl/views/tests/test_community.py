@@ -234,8 +234,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                                 IGridEntryInfo)
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 2)
         self.assertEqual(renderer.actions, [
@@ -266,8 +265,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                                 IGridEntryInfo)
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerDummySecurityPolicy('userid')
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 1)
@@ -384,8 +382,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         from karl.models.adapters import CatalogSearch
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def test_not_confirmed(self):
         from karl.testing import registerLayoutProvider

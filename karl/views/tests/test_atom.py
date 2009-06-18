@@ -64,8 +64,7 @@ class CommunityAtomViewTests(unittest.TestCase):
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerModels({'/foo':foo})
         context.catalog = catalog
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         self._callFUT(context, request)
         
 class DummyAtomEntry(object):

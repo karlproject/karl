@@ -29,7 +29,6 @@ from simplejson import JSONEncoder
 
 from webob.exc import HTTPFound
 from zope.component import getUtility
-from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -837,7 +836,7 @@ def jquery_member_search_view(context, request):
         sort_index='title',
         limit=20,
         )
-    searcher = getMultiAdapter((context, request), ICatalogSearch)
+    searcher = ICatalogSearch(context)
     total, docids, resolver = searcher(**query)
     profiles = filter(None, map(resolver, docids))
     records = [dict(

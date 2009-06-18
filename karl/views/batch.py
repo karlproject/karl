@@ -17,7 +17,7 @@
 
 """Catalog results batching functions"""
 
-from zope.component import getMultiAdapter
+from zope.component import getAdapter
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.bfg.url import urlencode
@@ -76,7 +76,7 @@ def get_catalog_batch(context, request, **kw):
         # the reverse parameter is only useful when there's a sort index
         kw['reverse'] = reverse
 
-    searcher = getMultiAdapter((context, request), ICatalogSearch)
+    searcher = ICatalogSearch(context)
     total, docids, resolver = searcher(**kw)
 
     batch = []

@@ -35,7 +35,6 @@ from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
 from webob.exc import HTTPBadRequest
 from webob import Response
-from zope.component import getMultiAdapter
 from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
@@ -73,7 +72,7 @@ def interface_id(t):
 
 def _iter_userids(context, request, profile_text):
     """Yield userids given a profile text search string."""
-    search = getMultiAdapter((context, request), ICatalogSearch)
+    search = ICatalogSearch(context)
     num, docids, resolver = search(
         interfaces=[IProfile], texts=profile_text)
     for docid in docids:

@@ -1,5 +1,3 @@
-from zope.component import getMultiAdapter
-
 from zope.interface import directlyProvides
 from zope.interface import implements
 
@@ -58,7 +56,7 @@ class GroupSearch:
     def __call__(self):
         criteria = self._makeCriteria()
         criteria['limit'] = self.limit
-        searcher = getMultiAdapter((self.context, self.request), ICatalogSearch)
+        searcher = ICatalogSearch(self.context)
         num, docids, resolver = searcher(**criteria)
         return num, docids, resolver
 

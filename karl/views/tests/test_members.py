@@ -47,12 +47,12 @@ class ShowMembersViewTests(unittest.TestCase):
         searchkw = {}
         def resolver(docid):
             return d.get(docid)
-        def dummy_catalog_search(context, request):
+        def dummy_catalog_search(context):
             def search(**kw):
                 searchkw.update(kw)
                 return 2, [1,2], resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface, Interface),
+        testing.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -939,11 +939,11 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         def resolver(docid):
             d = {1:profile_1, 2:profile_2, 3:profile_3}
             return d.get(docid)
-        def dummy_catalog_search(context, request):
+        def dummy_catalog_search(context):
             def search(**kw):
                 return 3, [1,2,3], resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface, Interface),
+        testing.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
         self.assertEqual(response.body, '[{"text": "firstname lastname", "id": "b"}, {"text": "firstname lastname", "id": "c"}]')

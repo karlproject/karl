@@ -41,8 +41,7 @@ class ShowCommunitiesViewTests(unittest.TestCase):
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
         context = testing.DummyModel()
@@ -67,8 +66,7 @@ class ShowCommunitiesViewTests(unittest.TestCase):
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface, Interface),
-                                ICatalogSearch)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
         testing.registerDummySecurityPolicy('admin',

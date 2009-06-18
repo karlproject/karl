@@ -421,7 +421,7 @@ def show_profiles_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Grab the data for the two listings, main communities and portlet
-    search = getMultiAdapter((context, request), ICatalogSearch)
+    search = ICatalogSearch(context)
 
     query = dict(sort_index='title', interfaces=[IProfile], limit=5)
 

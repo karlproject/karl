@@ -265,7 +265,6 @@ class DummyUpload(object):
 class DummySearchAdapter:
     def __init__(self, context, request=None):
         self.context = context
-        self.request = request
 
     def __call__(self, **kw):
         if kw.get('texts') == 'the':

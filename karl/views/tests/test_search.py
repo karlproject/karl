@@ -39,7 +39,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '400 Bad Request')
@@ -119,7 +119,7 @@ class SearchResultsViewTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict())
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummyEmptySearch, (Interface, Interface),
+        testing.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
         renderer = testing.registerDummyRenderer('templates/searchresults.pt')
         response = self._callFUT(context, request)
@@ -133,7 +133,7 @@ class SearchResultsViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from webob.exc import HTTPBadRequest
-        testing.registerAdapter(DummyEmptySearch, (Interface, Interface),
+        testing.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
         self.assertRaises(HTTPBadRequest, self._callFUT, context, request)
 
@@ -145,7 +145,7 @@ class SearchResultsViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         renderer = testing.registerDummyRenderer('templates/searchresults.pt')
         response = self._callFUT(context, request)
@@ -167,7 +167,7 @@ class SearchResultsViewTests(unittest.TestCase):
             params=MultiDict({'body':'yo', 'kind':'People'}))
         from karl.models.interfaces import ICatalogSearch
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         renderer = testing.registerDummyRenderer('templates/searchresults.pt')
         response = self._callFUT(context, request)
@@ -186,7 +186,7 @@ class SearchResultsViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         renderer = testing.registerDummyRenderer('templates/searchresults.pt')
         response = self._callFUT(context, request)
@@ -202,7 +202,7 @@ class SearchResultsViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(ParseErrorSearch, (Interface, Interface),
+        testing.registerAdapter(ParseErrorSearch, (Interface),
                                 ICatalogSearch)
         renderer = testing.registerDummyRenderer('templates/searchresults.pt')
         response = self._callFUT(context, request)
@@ -224,7 +224,7 @@ class GetBatchTests(unittest.TestCase):
     def test_without_kind_with_terms(self):
         from webob import MultiDict
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo'}))
@@ -235,7 +235,7 @@ class GetBatchTests(unittest.TestCase):
     def test_without_kind_without_terms(self):
         from webob import MultiDict
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface, Interface),
+        testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         request = testing.DummyRequest(params=MultiDict({}))
         context = testing.DummyModel()
@@ -315,13 +315,13 @@ class MakeQueryTests(unittest.TestCase):
         profile.__name__ = 'admin'
 
         class ProfileSearch:
-            def __init__(self, context, request):
+            def __init__(self, context):
                 pass
             def __call__(self, **kw):
                 searched_for.update(kw)
                 return 1, [1], lambda x: profile
 
-        testing.registerAdapter(ProfileSearch, (Interface, Interface),
+        testing.registerAdapter(ProfileSearch, (Interface),
                                 ICatalogSearch)
         query, terms = self._callFUT({'creator': 'Ad'})
         self.assertEquals(searched_for,
@@ -389,19 +389,19 @@ class AdvancedSearchViewTests(unittest.TestCase):
 
 
 class DummySearch:
-    def __init__(self, context, request):
+    def __init__(self, context):
         pass
     def __call__(self, **kw):
         return 1, [1], lambda x: dummycontent
 
 class DummyEmptySearch:
-    def __init__(self, context, request):
+    def __init__(self, context):
         pass
     def __call__(self, **kw):
         return 0, [], lambda x: None
 
 class ParseErrorSearch:
-    def __init__(self, context, request):
+    def __init__(self, context):
         pass
     def __call__(self, texts, **kw):
         from zope.index.text.parsetree import ParseError
