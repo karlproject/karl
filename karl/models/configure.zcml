@@ -94,6 +94,14 @@
       handler=".subscribers.reindex_profile"/>
 
   <subscriber
+      for="karl.models.interfaces.IUserAddedGroup"
+      handler=".subscribers.reindex_profile_after_group_change"/>
+
+  <subscriber
+      for="karl.models.interfaces.IUserRemovedGroup"
+      handler=".subscribers.reindex_profile_after_group_change"/>
+
+  <subscriber
       for=".interfaces.ICatalogQueryEvent"
       handler=".subscribers.log_query"/>
 
