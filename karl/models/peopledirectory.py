@@ -114,6 +114,12 @@ class PeopleDirectory(Folder):
         self.update_indexes()
         self.order = ()  # order of sections
 
+        # Set up a default configuration
+        self['all-karl'] = section = PeopleSection('All KARL')
+        section['all-karl'] = report = PeopleReport('All KARL')
+        report.set_columns(['name', 'organization', 'location', 'email'])
+        self.set_order(['all-karl'])
+
     def set_order(self, order):
         self.order = tuple(order)
 
@@ -164,9 +170,11 @@ class PeopleCategory(PersistentMapping):
 class PeopleSection(Folder):
     implements(IPeopleSection)
 
-    def __init__(self, title, tab_title):
+    def __init__(self, title, tab_title=None):
         super(PeopleSection, self).__init__()
         self.title = title
+        if tab_title is None:
+            tab_title = title
         self.tab_title = tab_title
         self.columns = ()  # a sequence of PeopleSectionColumns
 
@@ -193,8 +201,10 @@ class PeopleSectionColumn(PeopleReportGroup):
 class PeopleReport(Persistent):
     implements(IPeopleReport)
 
-    def __init__(self, title, link_title, css_class):
+    def __init__(self, title, link_title=None, css_class=''):
         self.title = title
+        if link_title is None:
+            link_title = title
         self.link_title = link_title
         self.css_class = css_class
         self.filters = PersistentMapping()  # {category ID -> [value]}
