@@ -79,6 +79,21 @@
       handler=".subscribers.alpha_removed"/>
 
   <subscriber
+      for="karl.models.interfaces.IProfile
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.unindex_profile"/>
+
+  <subscriber
+      for="karl.models.interfaces.IProfile
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.index_profile"/>
+
+  <subscriber
+      for="karl.models.interfaces.IProfile
+           karl.models.interfaces.IObjectModifiedEvent"
+      handler=".subscribers.reindex_profile"/>
+
+  <subscriber
       for=".interfaces.ICatalogQueryEvent"
       handler=".subscribers.log_query"/>
 
@@ -149,13 +164,33 @@
     provides=".interfaces.ICatalogSearch"
     factory=".adapters.CatalogSearch"
   />
-  
+
   <adapter
     for="zope.interface.Interface"
     provides=".interfaces.ICatalogSearch"
     factory=".adapters.CatalogSearch"
     />
-    
+
+  <!-- XXX This should also be deprecated -->
+  <adapter
+    for=".interfaces.IPeopleReport
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.models.interfaces.ICatalogSearch"
+    factory=".adapters.PeopleDirectoryCatalogSearch"
+  />
+
+  <adapter
+    for=".interfaces.IPeopleReport"
+    provides="karl.models.interfaces.ICatalogSearch"
+    factory=".adapters.PeopleDirectoryCatalogSearch"
+  />
+
+  <adapter
+      for=".interfaces.IPeopleReport"
+      provides=".interfaces.ILetterManager"
+      factory=".adapters.PeopleReportLetterManager"
+     />
+
   <adapter
     for="zope.interface.Interface
          repoze.bfg.interfaces.IRequest"
@@ -193,6 +228,11 @@
   <lemonade:content
       factory=".profile.ProfilesFolder"
       type=".interfaces.IProfiles"
+      />
+
+  <lemonade:content
+      factory=".peopledirectory.PeopleDirectory"
+      type=".interfaces.IPeopleDirectory"
       />
 
   <lemonade:content

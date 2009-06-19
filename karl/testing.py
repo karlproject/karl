@@ -40,7 +40,7 @@ dummy_vocabularies = {
     }
 
 
-class DummyCatalog:
+class DummyCatalog(dict):
     def __init__(self, *maps):
         self.document_map = DummyDocumentMap(*maps)
         self.queries = []

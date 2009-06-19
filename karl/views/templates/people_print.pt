@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <head>
+    <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
+  </head>
+  <style type="text/css">
+    #print-wrapper {
+        width: 850px;
+        font-size: 12pt;
+    }
+    #logo {
+        float: left;
+        width: 190px;
+    }
+    #page-title {
+        margin-left: 200px;
+        font-size: 14pt;
+        text-align: right;
+        padding-top: 2px;
+    }
+    table {
+    }
+    th {
+        background-color: #e4e9eb;
+        color: #333333;
+        padding: 3px 0px;
+    }
+    td {
+        margin: 0px;
+        padding: 2px 5px;
+    }
+    tr {
+        margin: 0px;
+    }
+    tr.even {
+        background-color: #f0f2f4;
+    }
+  </style>
+
+  <body onLoad="window.focus(); window.print();">
+    <div id="print-wrapper">
+    <div id="header-top">
+      <div class="content" id="top-controls">
+        <span id="logo">
+          <img src="${api.static_url}/images/logo.gif" alt=""/>
+        </span>
+        <h1 id="page-title">${api.page_title}</h1>
+        <div style="clear: both"></div>
+      </div>
+      <div class="visualClear"></div>
+    </div>
+    <div id="main">
+      <table>
+        <thead>
+          <tal:columns repeat="column header">
+          <th>${column}</th>
+          </tal:columns>
+        </thead>
+        <tbody>
+          <tal:rows repeat="row rows">
+          <tr class="${repeat['row'].odd() and 'even' or 'odd'}">
+            <td tal:repeat="cell row">${cell}</td>
+          </tr>
+          </tal:rows>
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </body>
+</html>

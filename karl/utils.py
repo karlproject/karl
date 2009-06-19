@@ -71,6 +71,13 @@ def find_vocabularies(context):
     site = find_site(context)
     return site.vocabularies
 
+def find_peopledirectory_catalog(context):
+    site = find_site(context)
+    people = site.get('people', None)
+    if not people:
+        return None
+    return getattr(people, 'catalog', None)
+
 def get_setting(context, setting_name, default=None):
     # Grab data off the site root, or wherever we later put it, for
     # site settings.

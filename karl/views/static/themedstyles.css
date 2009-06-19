@@ -643,6 +643,112 @@ ul#header-menu img {
 }
 
 /*
+** People directory
+*/
+
+ul#peopledir-tabs {
+    padding: 3px 0 3px 1em;
+    margin: 0;
+    margin-top: 1em;
+    border-bottom: 1px solid #CECECE;
+    list-style: none;
+}
+ul#peopledir-tabs li {
+    list-style: none;
+    margin: 0;
+    display: inline;
+}
+ul#peopledir-tabs li a {
+    padding: 3px 2em;
+    margin-left: 3px;
+    border: 1px solid #CECECE;
+    border-bottom: none;
+    background: #e6e6f2;
+    text-decoration: none;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+ul#peopledir-tabs li a:hover {
+    background-color: White;
+    text-decoration: none;
+}
+ul#peopledir-tabs li.selected a {
+    background: white;
+    border-bottom: 1px solid white;
+}
+
+#peopledir-content-wrapper {
+    border: 1px solid #CECECE;
+    border-top: none;
+    padding: 2em 10px 1em;
+}
+
+#peopledir-section h3 {
+    margin-left: 0px;
+    margin-top: 10px;
+}
+
+#peopledir-section ul, li {
+    list-style:none;
+    padding-left: 0px;
+    margin-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#peopledir-section a.priority {
+    padding-bottom: 5px;
+    font-style: italic;
+    font-weight: bold;
+    display: block;
+}
+
+#peopledir-actions li {
+    float: left;
+    margin: 2px;
+    
+}
+
+#peopledir-screentitle {
+    width: 600px;
+    display: inline;
+}
+
+#peopledir-actions {
+    width: 100px;
+    clear: both;
+    float: right;
+}
+
+#peopledir-actions ul {
+    margin: 0px;
+}
+
+#peopledir-actions .ui-icon {
+    height: 16px;
+    width: 16px;
+    margin: 0 4px
+}
+
+#peopledir-letterbox-wrapper {
+    background: #F0F2F4 none repeat scroll 0 0;
+    border: 1px solid #CECECE;
+    font-size: 0.9em;
+}
+
+#peopledir-letterbox-wrapper .kalphabetlisting {
+    margin-bottom: 0px;
+    padding: 3px 10px;
+}
+
+#peopledir-search-box-wrapper {
+    border: 1px solid #CECECE;
+    border-top: 0px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/*
 ** CONTENT STYLES
 */
 

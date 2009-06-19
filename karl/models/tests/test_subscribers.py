@@ -462,6 +462,122 @@ class ProfileRemovedTests(unittest.TestCase):
         self.assertEqual(parent.email_to_name.get('phreddy@example.com'),
                          None)
 
+class TestIndexProfile(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, event):
+        from karl.models.subscribers import index_profile
+        return index_profile(object, event)
+
+    def test_content_object_no_catalog(self):
+        model = testing.DummyModel()
+        self._callFUT(model, None) # doesnt blow up
+
+    def test_content_object(self):
+        from karl.testing import DummyCatalog
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IProfile
+        from repoze.bfg.traversal import model_path
+        model = testing.DummyModel()
+        model['people'] = testing.DummyModel()
+        path = model_path(model)
+        directlyProvides(model, IProfile)
+        catalog = DummyCatalog()
+        model['people'].catalog = catalog
+        self._callFUT(model, None)
+        self.assertEqual(catalog.document_map.added, [(None, path)])
+        self.assertEqual(catalog.indexed, [model])
+        self.assertEqual(model.docid, 1)
+
+    def test_content_object_w_existing_docid(self):
+        from karl.testing import DummyCatalog
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IProfile
+        from repoze.bfg.traversal import model_path
+        model = testing.DummyModel()
+        model['people'] = testing.DummyModel()
+        path = model_path(model)
+        directlyProvides(model, IProfile)
+        catalog = DummyCatalog()
+        model['people'].catalog = catalog
+        model.docid = 123
+        self._callFUT(model, None)
+        self.assertEqual(catalog.document_map.added, [(123, path)])
+        self.assertEqual(catalog.indexed, [model])
+
+    def test_noncontent_object(self):
+        from karl.testing import DummyCatalog
+        model = testing.DummyModel()
+        model['people'] = testing.DummyModel()
+        catalog = DummyCatalog()
+        model['people'].catalog = catalog
+        self._callFUT(model, None)
+        self.assertEqual(catalog.document_map.added, [])
+        self.assertEqual(catalog.indexed, [])
+
+class TestUnindexProfile(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, event):
+        from karl.models.subscribers import unindex_profile
+        return unindex_profile(object, event)
+
+    def test_content_object_no_catalog(self):
+        model = testing.DummyModel()
+        self._callFUT(model, None) # doesnt blow up
+
+    def test_content_object(self):
+        model = testing.DummyModel()
+        model['people'] = testing.DummyModel()
+        from repoze.bfg.traversal import model_path
+        path = model_path(model)
+        from karl.testing import DummyCatalog
+        catalog = DummyCatalog({1:path})
+        model['people'].catalog = catalog
+        self._callFUT(model, None)
+        # 1 is repeated here because the DummyCatalog returns the map
+        # above as the query result and we unindex the results but we
+        # also unindex '1' as a result of it being the object passed
+        # in to unindex_profile
+        self.assertEqual(catalog.unindexed, [1, 1])
+        self.assertEqual(catalog.document_map.removed, [1, 1])
+
+class TestReindexProfile(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, event):
+        from karl.models.subscribers import reindex_profile
+        return reindex_profile(object, event)
+
+    def test_content_object_no_catalog(self):
+        model = testing.DummyModel()
+        self._callFUT(model, None) # doesnt blow up
+
+    def test_content_object(self):
+        model = testing.DummyModel()
+        model['people'] = testing.DummyModel()
+        from repoze.bfg.traversal import model_path
+        path = model_path(model)
+        from karl.testing import DummyCatalog
+        catalog = DummyCatalog({1:path})
+        model['people'].catalog = catalog
+        self._callFUT(model, None)
+        self.assertEqual(catalog.unindexed, [1])
+        self.assertEqual(catalog.indexed, [model])
+
+
 class QueryLoggerTests(unittest.TestCase):
 
     def setUp(self):

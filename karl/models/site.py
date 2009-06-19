@@ -41,6 +41,7 @@ from repoze.who.plugins.zodb.users import Users
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import ISite
+from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
@@ -229,6 +230,8 @@ class Site(Folder):
         self['profiles'] = profiles
         communities = create_content(ICommunities)
         self['communities'] = communities
+        people = create_content(IPeopleDirectory)
+        self['people'] = people
         self.users = KARLUsers(self)
         self.tags = Tags(self)
         self.sessions = SessionDataManager(3600, 5)

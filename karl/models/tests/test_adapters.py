@@ -125,6 +125,36 @@ class TestCatalogSearch(unittest.TestCase):
         num, docids, resolver = adapter()
         self.assertEqual(resolver(123), None)
 
+class TestPeopleDirectoryCatalogSearch(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.models.adapters import PeopleDirectoryCatalogSearch
+        return PeopleDirectoryCatalogSearch
+
+    def _makeOne(self, context):
+        adapter = self._getTargetClass()(context)
+        return adapter
+
+    def test_it(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        site = testing.DummyModel()
+        directlyProvides(site, ISite)
+        peopledir = testing.DummyModel()
+        site['people'] = peopledir
+        site['people'].catalog = karltesting.DummyCatalog({})
+        context = testing.DummyModel()
+        site['obj'] = context
+        adapter = self._makeOne(context)
+        num, docids, resolver = adapter()
+        self.assertEqual(num, 0)
+        self.assertEqual(list(docids), [])
+
 class TestTagQuery(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -312,6 +342,86 @@ class TestLetterManager(unittest.TestCase):
         self.assertEqual(letters[0]['href'],
                          'http://example.com?titlestartswith=A')
         self.assertEqual(letters[0]['is_current'], True)
+
+
+class TestPeopleReportLetterManager(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.models.adapters import PeopleReportLetterManager
+        return PeopleReportLetterManager
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_get_info(self):
+        obj = self._makeOne(None)
+
+        # stub the get_active_letters method
+        def get_active_letters():
+            return set(['A', 'B'])
+        obj.get_active_letters = get_active_letters
+
+        request = testing.DummyRequest({'lastnamestartswith': 'B'})
+        letters = obj.get_info(request)
+        self.assertEqual(len(letters), 26)
+        self.assertEqual(letters[0]['name'], 'A')
+        self.assertEqual(letters[0]['css_class'], 'notcurrent')
+        self.assertEqual(letters[0]['href'],
+                        'http://example.com?lastnamestartswith=A')
+        self.assertEqual(letters[0]['is_current'], False)
+        self.assertEqual(letters[1]['name'], 'B')
+        self.assertEqual(letters[1]['css_class'], 'current')
+        self.assertEqual(letters[1]['href'],
+                        'http://example.com?lastnamestartswith=B')
+        self.assertEqual(letters[1]['is_current'], True)
+        self.assertEqual(letters[2]['name'], 'C')
+        self.assertEqual(letters[2]['css_class'], 'notcurrent')
+        self.assertEqual(letters[2]['href'], None)
+        self.assertEqual(letters[2]['is_current'], False)
+
+    def test_no_filters(self):
+        site = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(site, ISite)
+        site['people'] = testing.DummyModel()
+        site['people'].catalog = karltesting.DummyCatalog()
+        index = DummyFieldIndex({'A': None, 'M': None})
+        site['people'].catalog['lastnamestartswith'] = index
+
+        report = testing.DummyModel(filters={})
+        site['report'] = report
+        obj = self._makeOne(report)
+        active = obj.get_active_letters()
+        self.assertEqual(active, set(['A', 'M']))
+
+    def test_with_filter(self):
+        site = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(site, ISite)
+        site['people'] = testing.DummyModel()
+        site['people'].catalog = karltesting.DummyCatalog({2: None, 3: None})
+        from BTrees import family32
+        index = DummyFieldIndex({
+            'A': family32.IO.TreeSet([1]),
+            'B': family32.IO.TreeSet([2, 5]),
+            'C': family32.IO.TreeSet([3]),
+            'D': family32.IO.TreeSet([4, 6]),
+            })
+        index.family = family32
+        site['people'].catalog['lastnamestartswith'] = index
+
+        report = testing.DummyModel(filters={'office': ['nyc']})
+        site['report'] = report
+        obj = self._makeOne(report)
+        active = obj.get_active_letters()
+        self.assertEqual(active, set(['B', 'C']))
 
 
 class TestCommunityInfo(unittest.TestCase):
@@ -565,3 +675,7 @@ class DummyToolFactory:
 
 class DummyInterface(Interface):
     pass
+
+class DummyFieldIndex:
+    def __init__(self, data={}):
+        self._fwd_index = data

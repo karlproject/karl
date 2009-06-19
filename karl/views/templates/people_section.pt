@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="peopledir-title">${peopledir.title}</h1>
+    <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
+      <li tal:repeat="tab peopledir_tabs"
+        class="${tab['selected'] and 'selected' or ''}">
+        <a href="${tab['href']}">${tab['title']}</a>
+      </li>
+    </ul>
+    <div id="peopledir-content-wrapper">
+        <h1>${api.page_title}</h1>
+        <table id="peopledir-section" class="columns">
+        <tbody>
+        <tr>
+        <td valign="top" width="50%" tal:repeat="column column_html"
+            tal:content="structure column">
+        </td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+
+  </div>
+</html>

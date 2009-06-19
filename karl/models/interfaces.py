@@ -122,9 +122,9 @@ class IProfile(IFolder, IPeople):
     email = Attribute(u"User's email address.")
     phone = Attribute(u"User's phone number.")
     extension = Attribute(u"User's phone extension.")
-    department = Attribute(u"User's department.")
+    department = Attribute(u"User's department.")  # XXX redundant with categories?
     position = Attribute(u"User's position.")
-    organization = Attribute(u"User's organization")
+    organization = Attribute(u"User's organization")  # XXX redundant with categories?
     location = Attribute(u"User's location.")
     country = Attribute(u"User's country.")
     website = Attribute(u"User's website url.")
@@ -134,6 +134,12 @@ class IProfile(IFolder, IPeople):
     office = Attribute(u"User's office.")
     room_no = Attribute(u"User's room number.")
     biography = Attribute(u"User's biography.")
+
+    categories = Attribute(
+        u"A dictionary that maps category key to a list of "
+        u"category value identifier strings. "
+        u"Example: {'departments': ['finance']}. "
+        u"Typical keys: 'entities', 'offices', 'departments', 'other'")
 
     password_reset_key = Attribute(
         u"Key for confirming password reset.  "
@@ -376,9 +382,53 @@ class IIntranet(IFolder):
     """ Mark an intranet community to attach views """
     taggedValue('name', 'Intranet')
 
-
 class IAttachmentPolicy(Interface):
     """Policy controlling attachments"""
 
     def support():
         """Return true if the given object should support attachments"""
+
+class IPeopleDirectory(IFolder):
+    """Searchable directory of profiles.
+
+    Contains IPeopleSection objects.
+    """
+    title = Attribute("Directory title")
+    categories = Attribute("Mapping of category ID to PeopleCategory")
+    catalog = Attribute("Catalog of profiles")
+    order = Attribute("Sequence of section IDs to display as tabs")
+
+class IPeopleSection(IFolder):
+    """Section of the people directory.
+
+    Contains IPeopleReport objects.
+    """
+    title = Attribute("Section title")
+    tab_title = Attribute("Title to put on the section tab")
+    columns = Attribute("Sequence of IPeopleReportGroups")
+
+    def set_columns(columns):
+        """Set the sequence of IPeopleReportGroups for this section"""
+
+class IPeopleReportGroup(Interface):
+    """A group of reports displayed in a section"""
+    title = Attribute("Report group title")
+    reports = Attribute("Sequence of IPeopleReports and IPeopleReportGroups")
+
+    def set_reports(reports):
+        """Set the sequence of IPeopleReports and IPeopleReportGroups"""
+
+class IPeopleReport(Interface):
+    """A report about people"""
+    title = Attribute("Report title")
+    link_title = Attribute("Title to use for the link to the report")
+    css_class = Attribute("CSS class of the link to the report")
+    filters = Attribute("Reduces the content of the report.  "
+        "Maps category ID to a list of values.")
+    columns = Attribute("IDs of columns to display in the report.")
+
+    def set_filter(catid, values):
+        """Add a profile category value filter to this report."""
+
+    def set_columns(columns):
+        """Set the IDs of columns to display"""

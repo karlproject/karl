@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="peopledir-title">${peopledir.title}</h1>
+    <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
+      <li tal:repeat="tab peopledir_tabs"
+        class="${tab['selected'] and 'selected' or ''}">
+        <a href="${tab['href']}">${tab['title']}</a>
+      </li>
+    </ul>
+    <div id="peopledir-content-wrapper">
+
+      <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
+
+      <!--div metal:use-macro="peopledir_api.snippets.macros['peopledirhcards']" /-->
+      <div>
+        <a class="rightFloatLink" title="Show table"
+            href="${tabular_url}">Tabular View</a>
+        <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
+        <div style="clear: both"></div>
+      </div>
+
+      <div class="profilesWrapper">
+        <tal:row_loop tal:repeat="row rows">
+          <tal:profile_loop tal:repeat="cell row">
+            <div tal:define="profile cell['profile']"
+                 tal:attributes="class 'photoProfile%s' % (
+                     repeat['cell'].end and ' photoProfileEndRow' or '')">
+              <div class="photoProfileImage">
+                <a title="${profile.title}" href="${cell['url']}">
+                  <img height="100" width="75" alt="${profile.title}" src="${cell['photo_url']}"/>
+                </a>
+              </div>
+              <div class="profileInfoBox">
+                <div>
+                  <a title="${profile.title}" href="${cell['url']}">${profile.title}</a>
+                </div>
+                <div>${profile.position}</div>
+                <div class="profileNoWrap">
+                  <div>${profile.organization}</div>
+                  <div>${profile.location}</div>
+                  <div>${profile.phone}
+                    <span tal:condition="profile.extension and profile.extension.strip()">
+                      x ${profile.extension}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div style="clear:both"></div>
+            </div>
+          </tal:profile_loop>
+          <div class="visual-clear"></div>
+        </tal:row_loop>
+      </div>
+
+      <div style="clear:both"></div>
+
+      <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+      <table tal:condition="batch_info['batching_required']" width="100%">
+        <tr class="ui-grid-footer">
+          <th class="ui-widget-header">
+            <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+            </div>
+          </th>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+</html>

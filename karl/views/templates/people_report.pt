@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="peopledir-title">${peopledir.title}</h1>
+    <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
+      <li tal:repeat="tab peopledir_tabs"
+        class="${tab['selected'] and 'selected' or ''}">
+        <a href="${tab['href']}">${tab['title']}</a>
+      </li>
+    </ul>
+    <div id="peopledir-content-wrapper">
+
+      <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
+
+      <!--div metal:use-macro="peopledir_api.snippets.macros['peopledirhcards']" /-->
+      <div>
+        <a class="rightFloatLink" title="Show pictures"
+            href="${pictures_url}">Picture View</a>
+        <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
+        <div style="clear: both"></div>
+      </div>
+
+      <div id="reportgrid"></div>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // get karl_client_data.grid_data
+            var grid_data = window.karl_client_data && karl_client_data.grid_data || {};
+            if (!grid_data.records) {
+                throw 'karl_client_data.grid_data not specified or has no records.';
+            }
+            // get global page data
+            var here_url = $("#karl-here-url")[0].content;
+            // bind the widget
+            $("#reportgrid").karlgrid({
+                url: here_url + "jquery_grid",
+                limit: grid_data.batchSize,
+                height: 300,
+                width: grid_data.width,
+                pagination: true,
+                sortColumn: grid_data.sortColumn,
+                sortDirection: grid_data.sortDirection,
+                initialState: grid_data
+            });
+        });
+        //]]>
+      </script>
+
+    </div>
+  </div>
+</html>

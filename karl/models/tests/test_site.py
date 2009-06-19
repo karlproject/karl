@@ -131,8 +131,11 @@ class SiteTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import ICommunities
         from karl.models.interfaces import IProfiles
+        from karl.models.interfaces import IPeopleDirectory
         registerContentFactory(lambda *x: testing.DummyModel(), ICommunities)
         registerContentFactory(lambda *x: testing.DummyModel(), IProfiles)
+        registerContentFactory(lambda *x: testing.DummyModel(),
+            IPeopleDirectory)
 
     def _makeOne(self):
         return self._getTargetClass()()
@@ -174,7 +177,7 @@ class SiteTests(unittest.TestCase):
         self.failUnless('communities' in site)
         self.failUnless('profiles' in site)
         self.failUnless(hasattr(site, 'catalog'))
-        self.failUnless('communities' in site)
+        self.failUnless('people' in site)
 
 class TestGetTextRepr(unittest.TestCase):
     def setUp(self):

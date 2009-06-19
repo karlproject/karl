@@ -7,6 +7,8 @@ Unreleased
 - LP #387974:  Made 'edit_acl.html' view reindex context in the 'allowed'
   index, as well as invalidating any cached catalog queries.
 
+- Added a simpler people directory implementation to the KARL core.
+
 3.1 (2009-06-16)
 ----------------
 

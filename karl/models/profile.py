@@ -69,6 +69,7 @@ class Profile(Folder):
         self.home_path = None
         self._alert_prefs = PersistentMapping()
         self._pending_alerts = PersistentList()
+        self.categories = PersistentMapping()
         self.password_reset_key = None
         self.password_reset_time = None
 
@@ -128,6 +129,28 @@ class ProfilesFolder(Folder):
 @implementer(ITextIndexData)
 @adapter(IProfile)
 def profile_textindexdata(profile):
-    """Provides the userid and full name for the text index"""
-    return lambda: u'%s %s %s' % (
-        profile.__name__, profile.firstname, profile.lastname)
+    """Provides info for the text index"""
+    text = []
+    for attr in (
+        '__name__',
+        "firstname",
+        "lastname",
+        "email",
+        "phone",
+        "extension",
+        "department",
+        "position",
+        "organization",
+        "location",
+        "country",
+        "website",
+        "languages",
+        "office",
+        "room_no",
+        "biography",
+        ):
+        v = getattr(profile, attr, None)
+        if v:
+            text.append(unicode(v))
+    text = '\n'.join(text)
+    return lambda: text

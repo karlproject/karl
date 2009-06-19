@@ -55,6 +55,15 @@ class TestUtilFunctions(unittest.TestCase):
         cf = context['communities'] = testing.DummyModel()
         self.failUnless(find_communities(context) is cf)
 
+    def test_find_peopledirectory_catalog(self):
+        from karl.utils import find_peopledirectory_catalog
+        context = testing.DummyModel()
+        self.assertEqual(find_peopledirectory_catalog(context), None)
+        people = context['people'] = testing.DummyModel()
+        people.catalog = testing.DummyModel()
+        self.failUnless(
+            find_peopledirectory_catalog(context) is people.catalog)
+
     def test_get_session(self):
         from karl.utils import get_session
         context = testing.DummyModel()

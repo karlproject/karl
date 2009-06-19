@@ -89,6 +89,7 @@ setup(name='karl',
       karlerrorpage = karl.errorpage:ErrorPageFilter
       [console_scripts]
       jsconcat = karl.scripts.jsconcat:main
+      peopleconf = karl.scripts.peopleconf:main
       """
       )
 

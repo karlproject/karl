@@ -561,6 +561,42 @@
       </ul>
 
     </div>
-      
+
+    <div metal:define-macro="peopledir-report-head">
+      <div id="peopledir-actions">
+        <ul class="ui-widget ui-helper-clearfix">
+          <li class="ui-state-default ui-corner-all" title="Print">
+            <a class="button-print" href="${print_url}" title="Print">
+                <span class="ui-icon ui-icon-print">Print</span>
+            </a>
+          </li>
+          <li class="ui-state-default ui-corner-all" title="Export as CSV">
+            <a class="button-export-csv" href="${csv_url}" title="Export as CSV">
+                <span class="ui-icon ui-icon-circle-arrow-s">Export as CSV</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <h1 class="peopledir-screentitle">${api.page_title}
+      </h1>
+      <div id="peopledir-letterbox-wrapper">
+        <div metal:use-macro="api.snippets.macros['letter_box']"/>
+      </div>
+      <div id="peopledir-search-box-wrapper">
+        <div id="peopledir-search-box">
+          <form method="get" action="${api.view_url}">
+            <fieldset>
+              <div class="field">
+                <label for="body">Search</label>
+                <input type="text" name="body" value="" />
+                <input type="submit" value="Go" />
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
   </body>
 </html>

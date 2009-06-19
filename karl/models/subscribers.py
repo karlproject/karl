@@ -30,7 +30,9 @@ from repoze.lemonade.content import is_content
 
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IProfile
 from karl.utils import find_catalog
+from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_tags
 
 from karl.utils import find_users
@@ -158,6 +160,46 @@ def profile_removed(obj, event):
     parent = obj.__parent__
     name = obj.__name__
     _remove_email(parent, name)
+
+def index_profile(obj, event):
+    """ Index profile (an IObjectAddedEvent subscriber) """
+    catalog = find_peopledirectory_catalog(obj)
+    if catalog is not None:
+        for node in postorder(obj):
+            if IProfile.providedBy(node):
+                path = model_path(node)
+                docid = getattr(node, 'docid', None)
+                if docid is None:
+                    docid = node.docid = catalog.document_map.add(path)
+                else:
+                    catalog.document_map.add(path, docid)
+                catalog.index_doc(docid, node)
+
+def unindex_profile(obj, event):
+    """ Unindex profile (an IObjectWillBeRemovedEvent subscriber) """
+    catalog = find_peopledirectory_catalog(obj)
+    if catalog is not None:
+        path = model_path(obj)
+        path_docid = catalog.document_map.docid_for_address(path)
+        num, docids = catalog.search(path=path)
+        for docid in docids:
+            # unindex any children of the path first
+            catalog.unindex_doc(docid)
+            catalog.document_map.remove_docid(docid)
+        if path_docid is not None:
+            # and then finally the parent
+            catalog.unindex_doc(path_docid)
+            catalog.document_map.remove_docid(path_docid)
+
+def reindex_profile(obj, event):
+    """ Reindex a single piece of profile (non-recursive); an
+    IObjectModifed event subscriber """
+    catalog = find_peopledirectory_catalog(obj)
+    if catalog is not None:
+        path = model_path(obj)
+        docid = catalog.document_map.docid_for_address(path)
+        catalog.unindex_doc(docid)
+        catalog.index_doc(docid, obj)
 
 
 class QueryLogger(object):

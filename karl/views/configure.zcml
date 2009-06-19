@@ -361,6 +361,52 @@
     for="karl.models.interfaces.IAttachmentsFolder"
     view=".redirect_up.redirect_up_view"
     />
-    
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".peopledirectory.peopledirectory_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleSection"
+    view=".peopledirectory.section_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.report_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.jquery_grid_view"
+    permission="view"
+    name="jquery_grid"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.csv_view"
+    permission="view"
+    name="csv"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.print_view"
+    permission="view"
+    name="print.html"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.picture_view"
+    permission="view"
+    name="picture_view.html"
+  />
+
 </configure>
-  
+

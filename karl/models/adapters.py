@@ -33,6 +33,7 @@ from karl.utils import get_content_type_name
 from karl.utils import find_catalog
 from karl.utils import find_profiles
 from karl.utils import find_tags
+from karl.utils import find_peopledirectory_catalog
 
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
@@ -67,6 +68,15 @@ class CatalogSearch(object):
                 logger and logger.warn('Model missing: %s' % path)
                 return None
         return num, docids, resolver
+
+class PeopleDirectoryCatalogSearch(CatalogSearch):
+    """ Catalog search from the PeopleDirectory catalog """
+    def __init__(self, context, request=None):
+        # XXX request argument is not used, is left in for backwards
+        #     compatability.  Should be phased out.
+        self.context = context
+        self.catalog = find_peopledirectory_catalog(context)
+
 
 class GridEntryInfo(object):
     implements(IGridEntryInfo)
@@ -304,9 +314,10 @@ class LetterManager(object): # abstract adapter class, requires iface attr
         self.context = context
 
     def delta(self, delta):
-        if not getattr(self.context, 'title', None):
+        value = getattr(self.context, 'title', None)
+        if not value:
             return False
-        firstletter = self.context.title[0].upper()
+        firstletter = value[0].upper()
         storage = find_interface(self.context, self.iface)
         if storage is None:
             return False
@@ -358,3 +369,63 @@ class CommunityLetterManager(LetterManager):
 class ProfileLetterManager(LetterManager):
     iface = IProfiles
 
+class PeopleReportLetterManager(object):
+    implements(ILetterManager)
+
+    def __init__(self, context):
+        self.context = context
+
+    def get_active_letters(self):
+        report = self.context
+        catalog = find_peopledirectory_catalog(report)
+
+        # Use the lastnamestartswith index directly for speed.
+        index = catalog['lastnamestartswith']
+        if not report.filters:
+            # Any letter in the index will suffice.  This is a fast
+            # common case.
+            # XXX using undocumented _fwd_index attribute
+            return set(index._fwd_index.keys())
+
+        # Perform a catalog search, but don't resolve any paths.
+        kw = {}
+        for catid, values in report.filters.items():
+            kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
+        total, docids = catalog.search(**kw)
+
+        # Intersect the search result docids with the docid set
+        # for each letter.
+        docid_set = index.family.IO.Set(docids)
+        active = set()
+        intersection = index.family.IO.intersection
+        for letter in string.uppercase:
+            # XXX using undocumented _fwd_index attribute
+            letter_set = index._fwd_index.get(letter)
+            if letter_set is None:
+                continue
+            if intersection(letter_set, docid_set):
+                active.add(letter)
+        return active
+
+    def get_info(self, request):
+        current = request.params.get('lastnamestartswith', None)
+        fmt = request.path_url + "?lastnamestartswith=%s"
+        letters = []
+        active = self.get_active_letters()
+
+        for letter in string.uppercase:
+            if letter in active:
+                href = fmt % letter
+            else:
+                href = None
+            if letter == current:
+                css_class = 'current'
+            else:
+                css_class = 'notcurrent'
+            letters.append({
+                'name': letter,
+                'href': href,
+                'css_class': css_class,
+                'is_current': letter == current,
+                })
+        return letters
