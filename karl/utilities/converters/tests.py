@@ -12,7 +12,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -68,6 +68,18 @@ class BaseConverterTests(unittest.TestCase):
     def test_isAvailable_valid_depends_on(self):
         converter = self._makeOne(depends_on='ls')
         self.assertEqual(converter.isAvailable(), 'yes')
+
+    def test_hanging_converter(self):
+        from karl.utilities.converters.baseconverter import BaseConverter
+        class HangingConverter(BaseConverter):
+            content_type = "Up Your Nose"
+            content_description = "With a Rubber Hose"
+            def convert(self):
+                # Will hang waiting on stdin
+                return self.execute('grep . 2>/dev/null')
+
+        out = HangingConverter().convert()
+        self.assertEqual(0, len(out.read()))
 
 class ConverterTests(unittest.TestCase):
 

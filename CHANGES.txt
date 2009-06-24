@@ -9,6 +9,11 @@ Unreleased
 
 - Added a simpler people directory implementation to the KARL core.
 
+- For text index converters that use external programs, added a timeout thread
+  to kill hanging processes.  Process is considered hanging after 5 seconds.
+  This is to work around an error in wvConvert such that it will hang
+  indefinitely for certain inputs.
+
 3.1 (2009-06-16)
 ----------------
 
@@ -18,12 +23,12 @@ Unreleased
 - Added optional 'reason' argument to 'logout_view', to enable overriding
   the header value passed explaining why the user landed on the login form.
   Use this argument when returning the logout response from another view.
-  
+
 - LP #385580: Have the "Back to Parent" link not be full width on the <a>
 
 - LP #385268: Email index is converted to lower case to facilitate case
   insensitive search.
-  
+
 - LP #385636: Better handling of existing users in invite new users form.
 
 3.0 (2009-06-15)
@@ -36,9 +41,9 @@ Unreleased
 
 - Consolidated three showtag views to use same code.
 
-- Filter items in showtag view according to view permission of authenticated 
+- Filter items in showtag view according to view permission of authenticated
   user.
-  
+
 - Make sure new user profiles get initialized with __acl__.
 
 osi-production-20090611 (2009-06-11)
@@ -78,7 +83,7 @@ osi-production-20090603 (2009-06-03)
 - Use get_setting instead of looking ISettings.
 
 - LP #382576: Use 'method="get"' in the advanced search form.  Also, gather
-  vars for batching from either POST or GET submissions. 
+  vars for batching from either POST or GET submissions.
 
 - grid: Fix initial sorting direction, and direction on the first click.
 

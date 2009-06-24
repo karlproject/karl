@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -18,7 +18,9 @@
 import os
 from subprocess import Popen
 from subprocess import PIPE
+import threading
 import tempfile
+import time
 
 from zope.interface import implements
 from karl.utilities.converters.interfaces import IConverter
@@ -31,6 +33,7 @@ class BaseConverter:
 
     content_type = None
     content_description = None
+    timeout = 5
 
     implements(IConverter)
 
@@ -44,22 +47,26 @@ class BaseConverter:
     def execute(self, com):
         out = tempfile.TemporaryFile()
         PO = Popen(com, shell=True, stdout=out, close_fds=True)
+        timeout = _ProcTimeout(PO, timeout=self.timeout)
+        timeout.start()
         PO.communicate()
+        timeout.stop()
+        timeout.join()
         out.seek(0)
         return out
 
-    def getDescription(self):   
+    def getDescription(self):
         return self.content_description
 
-    def getType(self):          
+    def getType(self):
         return self.content_type
 
-    def getDependency(self):    
+    def getDependency(self):
         return getattr(self, 'depends_on', None)
 
-    def __call__(self, s):      
+    def __call__(self, s):
         return self.convert(s)
-   
+
     def isAvailable(self):
 
         depends_on = self.getDependency()
@@ -83,3 +90,44 @@ class BaseConverter:
         else:
             return 'always'
 
+
+class _ProcTimeout(threading.Thread):
+    """
+    Implements a timeout on a running subprocess.  Polls subprocess on a
+    separate thread to see if it has finished running.  If process has not
+    finished by the time the timeout has expired, it then attempts to terminate
+    the process.
+
+    Some external converter programs (wvConvert) have been known to hang
+    indefinitely with certain inputs.
+    """
+    def __init__(self, process, poll_interval=.01, timeout=5):
+        super(_ProcTimeout, self).__init__()
+        self.process = process
+        self.poll_interval = poll_interval
+        self.timeout = timeout
+        self._run = True
+
+    def run(self):
+        start_time = time.time()
+        process = self.process
+        poll_interval = self.poll_interval
+        timeout = self.timeout
+        time.sleep(poll_interval)
+        while self._run and not process.poll():
+            elapsed = time.time() - start_time
+            if hasattr(process, "terminate"): # >=2.6
+                if elapsed > timeout * 2:
+                    process.kill()
+                elif elapsed > timeout:
+                    process.terminate()
+            else: # < 2.6
+                # Screw windows
+                if elapsed > timeout * 2:
+                    os.system("kill -KILL %d" % process.pid)
+                elif elapsed > timeout:
+                    os.system("kill %d" % process.pid)
+            time.sleep(poll_interval)
+
+    def stop(self):
+        self._run = False
