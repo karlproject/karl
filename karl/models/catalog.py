@@ -25,7 +25,7 @@ class CachingCatalog(Catalog):
     def __init__(self):
         super(CachingCatalog, self).__init__()
         self.generation = Length(0)
-        
+
     def clear(self):
         self.invalidate()
         super(CachingCatalog, self).clear()
@@ -47,12 +47,20 @@ class CachingCatalog(Catalog):
         super(CachingCatalog, self).__setitem__(*arg, **kw)
 
     def search(self, *arg, **kw):
+        use_cache = True
+
+        if 'use_cache' in kw:
+            use_cache = kw.pop('use_cache')
+
         if 'NO_CATALOG_CACHE' in self.os.environ:
-            return self._search(*arg, **kw)
+            use_cache = False
 
         if 'tags' in kw:
             # The tags index changes without invalidating the catalog,
             # so don't cache any query involving the tags index.
+            use_cache = False
+
+        if not use_cache:
             return self._search(*arg, **kw)
 
         cache = queryUtility(ICatalogSearchCache)
@@ -74,12 +82,12 @@ class CachingCatalog(Catalog):
             # invalidated
             cache.clear()
             cache.generation = genval
-            
+
         if cache.get(key) is None:
             num, docids = self._search(*arg, **kw)
             # we need to unroll here; a btree-based structure may have
             # a reference to its connection
-            docids = list(docids) 
+            docids = list(docids)
             cache[key] = (num, docids)
 
         return cache.get(key)

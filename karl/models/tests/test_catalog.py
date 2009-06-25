@@ -37,7 +37,7 @@ class TestCachingCatalog(unittest.TestCase):
         catalog = self._makeOne()
         catalog.clear()
         self.assertEqual(cache, {})
-        
+
     def test_index_doc(self):
         cache = DummyCache({1:1})
         self._registerCache(cache)
@@ -51,7 +51,7 @@ class TestCachingCatalog(unittest.TestCase):
         catalog = self._makeOne()
         catalog.reindex_doc(1,1)
         self.assertEqual(cache, {})
-        
+
     def test_unindex_doc(self):
         cache = DummyCache({1:1})
         self._registerCache(cache)
@@ -160,7 +160,7 @@ class TestCachingCatalog(unittest.TestCase):
         catalog.invalidate()
         self.assertEqual(catalog.generation.value, 1)
         self.assertEqual(cache.generation, 1)
-        
+
     def test_invalidate_generation_gt_sys_maxint(self):
         from BTrees.Length import Length
         import sys
@@ -188,6 +188,16 @@ class TestCachingCatalog(unittest.TestCase):
         self.assertEqual(type(event.duration), float)
         self.assertEqual(event.result, result)
 
+    def test_search_use_cache_is_false(self):
+        cache = DummyCache({})
+        self._registerCache(cache)
+        catalog = self._makeOne()
+        catalog['dummy'] = DummyIndex()
+        catalog.index_doc(1,1)
+        result = catalog.search(dummy=1,use_cache=False)
+        self.assertEqual(result, (3, [1,2,3]))
+        self.assertEqual(len(cache), 0)
+
 from repoze.catalog.interfaces import ICatalogIndex
 from zope.interface import implements
 
@@ -195,13 +205,13 @@ class DummyIndex:
     implements(ICatalogIndex)
     def __init__(self):
         self.indexed = {}
-        
+
     def index_doc(self, docid, val):
         self.indexed[docid] = val
 
     def apply(self, *arg, **kw):
         return [1,2,3]
-        
+
 class DummyCache(dict):
     generation = 0
-    
+

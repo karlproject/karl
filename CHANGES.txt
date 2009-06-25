@@ -16,6 +16,9 @@ Unreleased
 - Updated OSI logo.
   https://bugs.launchpad.net/karl3/+bug/390868
 
+- Add 'use_cache' kw argument to CachingCatalog to disable cache for particular
+  searches.
+
 3.2 (2009-06-24)
 ----------------
 
