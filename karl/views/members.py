@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -55,8 +55,6 @@ from karl.security.interfaces import ISecurityWorkflow
 from karl.utilities.interfaces import IRandomId
 
 from karl.utils import find_profiles
-from karl.utils import find_vocabularies
-
 from karl.utils import find_users
 from karl.utils import get_setting
 
@@ -78,7 +76,7 @@ def _get_manage_actions(community, request):
 def _get_common_email_info(community, community_href):
     info = {}
     info['system_name'] = get_setting(community, 'system_name')
-    info['system_email_domain'] = get_setting(community, 
+    info['system_email_domain'] = get_setting(community,
                                               'system_email_domain')
     info['from_name'] = '%s invitation' % info['system_name']
     info['from_email'] = 'invitation@%s' % info['system_email_domain']
@@ -118,9 +116,9 @@ def show_members_view(context, request):
     hp = request.params.has_key('hide_pictures')
     mu = model_url(context, request)
     submenu = [
-        {'label': 'Show Pictures', 
+        {'label': 'Show Pictures',
          'href': mu, 'make_link': hp},
-        {'label': 'Hide Pictures', 
+        {'label': 'Hide Pictures',
          'href': mu + '?hide_pictures', 'make_link': not(hp)},
         ]
 
@@ -151,7 +149,7 @@ def show_members_view(context, request):
         derived['is_moderator'] = entry.__name__ in moderator_names
         # Chameleon's tal:repeat and repeat variable support for
         # things like index is pretty iffy.  Fix the entry info to
-        # supply the CSS class information. 
+        # supply the CSS class information.
         derived['css_class'] = 'photoProfile'
         if derived['is_moderator']:
             derived['css_class'] += ' moderator'
@@ -179,7 +177,7 @@ def show_members_view(context, request):
         members=member_info,
         batch_info=member_batch,
         hide_pictures=hp,
-        )        
+        )
 
 
 from formencode.schema import Schema
@@ -200,8 +198,8 @@ class ManageMembersForm(baseforms.BaseForm):
     members = ForEach(ManageMembersEntry())
     invitations = ForEach(ManageMembersEntry())
 
-def _send_moderators_changed_email(community, 
-                                   community_href, 
+def _send_moderators_changed_email(community,
+                                   community_href,
                                    new_moderators,
                                    old_moderators,
                                    cur_moderators,
@@ -210,7 +208,7 @@ def _send_moderators_changed_email(community,
     subject_fmt = 'Change in moderators for %s'
     subject = subject_fmt % info['c_title']
     body_template = get_template('templates/email_moderators_changed.pt')
-    
+
     profiles = find_profiles(community)
     all_moderators = cur_moderators | prev_moderators
     to_profiles = [profiles[name] for name in all_moderators]
@@ -230,10 +228,10 @@ def _send_moderators_changed_email(community,
         cur_moderators=[profiles[name].title for name in cur_moderators],
         prev_moderators=[profiles[name].title for name in prev_moderators]
         )
-    
+
     if isinstance(body, unicode):
         body = body.encode("UTF-8")
-        
+
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
     message = msg.as_string()
@@ -251,7 +249,7 @@ def manage_members_view(context, request):
     community_href = model_url(community, request)
     actions = _get_manage_actions(community, request)
 
-    form = ManageMembersForm(request.POST, submit='form.submitted', 
+    form = ManageMembersForm(request.POST, submit='form.submitted',
                            cancel='form.cancel')
 
     if form.cancel in form.formdata:
@@ -266,7 +264,7 @@ def manage_members_view(context, request):
             c_moderators = converted['moderators']
             c_members = converted['members']
             c_invitations = converted['invitations']
-    
+
             # Now process any changes.  These are highly specific, so
             # let's make sure the flow of control is obvious.
             # Invariant: Don't allow removal of the last moderator.
@@ -279,15 +277,15 @@ def manage_members_view(context, request):
                     users.remove_group(name, community.members_group_name)
                     profile = profiles[name]
                     results.append('Removed moderator %s' % profile.title)
-    
+
                 elif not action['is_moderator']:
                     if not action['is_moderator']:
                         name = action['id']
                         users.remove_group(name,community.moderators_group_name)
                         profile = profiles[name]
-                        results.append('%s is no longer a moderator' % 
+                        results.append('%s is no longer a moderator' %
                                        profile.title)
-                            
+
             for action in c_members:
                 name = action['id']
                 if action['remove']:
@@ -299,7 +297,7 @@ def manage_members_view(context, request):
                         users.add_group(name, community.moderators_group_name)
                         profile = profiles[name]
                         results.append('%s is now a moderator' % profile.title)
-                        
+
             for action in c_invitations:
                 name = action['id']
                 invitation = context.get(name)
@@ -309,13 +307,13 @@ def manage_members_view(context, request):
                     elif action['resend_info']:
                         _send_invitation_email(request, community, community_href,
                                                invitation)
-                        
+
             if not community.moderator_names:
                 raise Invalid(
                     "Must leave at least one moderator for community.",
                     None, None
                 )
-            
+
             cur_moderators = community.moderator_names
             new_moderators = cur_moderators - prev_moderators
             old_moderators = prev_moderators - cur_moderators
@@ -328,7 +326,7 @@ def manage_members_view(context, request):
             location = model_url(context, request, "manage.html",
                                  query={"status_message": status_message})
             return HTTPFound(location=location)
-        
+
         except Invalid, e:
             # Since we've already monkeyed with our model graph, we need
             # to abort transaction to undo changes.
@@ -391,7 +389,7 @@ def manage_members_view(context, request):
         entries=entries,
         results=results,
         fielderrors={},
-        )        
+        )
 
 class AddExistingUserForm(baseforms.BaseForm):
     users = baseforms.users
@@ -400,7 +398,7 @@ class AddExistingUserForm(baseforms.BaseForm):
 def _send_aeu_emails(community, community_href, profiles, text):
     # To make reading the add_existing_user_view easier, move the mail
     # delivery part here.
-    
+
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'You have been added to the %s community'
     subject = subject_fmt % info['c_title']
@@ -422,10 +420,10 @@ def _send_aeu_emails(community, community_href, profiles, text):
             community_description=info['c_description'],
             personal_message=html_body,
             )
-        
+
         if isinstance(body, unicode):
             body = body.encode("UTF-8")
-            
+
         msg.set_payload(body, "UTF-8")
         msg.set_type('text/html')
         message = msg.as_string()
@@ -442,7 +440,7 @@ def add_existing_user_view(context, request):
     profiles = find_profiles(context)
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = AddExistingUserForm(request.POST, submit='form.submitted', 
+    form = AddExistingUserForm(request.POST, submit='form.submitted',
                                cancel='form.cancel')
 
     # Handle form submission
@@ -473,7 +471,7 @@ def add_existing_user_view(context, request):
         if profile is not None:
             return _add_existing_users(context, community, [profile,],
                                        "", request)
-    
+
     # Render the form and shove some default values in
     page_title = 'Add Existing %s Users' % system_name
     api = TemplateAPI(context, request, page_title)
@@ -514,9 +512,9 @@ def _add_existing_users(context, community, profiles, text, request):
     if n == 1:
         msg = 'One member added and email sent.'
     else:
-        fmt = '%s members added and emails sent.' 
+        fmt = '%s members added and emails sent.'
         msg = fmt % len(profiles)
-    location = model_url(context, request, 'manage.html', 
+    location = model_url(context, request, 'manage.html',
                          query={'status_message': msg})
     return HTTPFound(location=location)
 
@@ -561,29 +559,28 @@ def _send_ai_email(community, community_href, username, profile):
         community_description=info['c_description'],
         username=username,
         )
-    
+
     if isinstance(body, unicode):
         body = body.encode("UTF-8")
-        
+
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
     message = msg.as_string()
     mailer.send(info['mfrom'], [profile.email,], message)
-    
+
 
 def accept_invitation_view(context, request):
     """ Process invitation, add KARL user, add member to community """
     assert IInvitation.providedBy(context), \
            "Context is expected to be an IInvitation."
-    
+
     system_name = get_setting(context, 'system_name')
     min_pw_length = get_setting(context, 'min_pw_length')
     community = find_interface(context, ICommunity)
     community_name = community.title
-    vocabularies = find_vocabularies(context)
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = AcceptInvitationForm(request.POST, submit='form.submitted', 
+    form = AcceptInvitationForm(request.POST, submit='form.submitted',
                                 cancel='form.cancel')
 
     if form.cancel in form.formdata:
@@ -593,8 +590,7 @@ def accept_invitation_view(context, request):
         try:
             profiles = find_profiles(context)
             state = baseforms.AppState(profiles=profiles,
-                                       vocabularies=vocabularies,
-                                       min_pw_length=min_pw_length) 
+                                       min_pw_length=min_pw_length)
             converted = form.to_python(form.fieldvalues, state)
             form.is_valid = True
             users = find_users(context)
@@ -650,13 +646,12 @@ def accept_invitation_view(context, request):
     photo = {}
     photo["url"] =  api.app_url + "/static/images/defaultUser.gif"
     photo["may_delete"] = False
-    
+
     form_html = render_template(
         'templates/form_accept_invitation.pt',
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,
-        vocabularies=vocabularies,
         terms_text=terms_text,
         privacy_text=privacy_text,
         api=api,
@@ -672,7 +667,7 @@ def accept_invitation_view(context, request):
         community_name=community_name,
         )
 
-        
+
 class InviteNewUsersForm(baseforms.BaseForm):
     email_addresses = baseforms.email_addresses
     text = baseforms.text
@@ -687,7 +682,7 @@ def invite_new_user_view(context, request):
     actions = _get_manage_actions(community, request)
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = InviteNewUsersForm(request.POST, submit='form.submitted', 
+    form = InviteNewUsersForm(request.POST, submit='form.submitted',
                               cancel='form.cancel')
 
     ninvited = nadded = nignored = 0
@@ -704,7 +699,7 @@ def invite_new_user_view(context, request):
             random_id = getUtility(IRandomId)
             html_body = converted['text']
             members = community.member_names | community.moderator_names
-            
+
             search = ICatalogSearch(context)
 
             for email_address in addresses:
@@ -713,23 +708,23 @@ def invite_new_user_view(context, request):
                     email=email_address.lower(),
                     interfaces=[IProfile,],
                     )
-                
+
                 if total:
                     # User is already a member of Karl
                     profile = resolver(docids[0])
-                    
+
                     if profile.__name__ in members:
                         # User is a member of this community, do nothing
                         nignored += 1
-                    
+
                     else:
                         # User is in Karl but not in this community--just add
-                        # them to the community as though we had used the 
+                        # them to the community as though we had used the
                         # add existing user form.
-                        _add_existing_users(context, community, [profile,], 
+                        _add_existing_users(context, community, [profile,],
                                             html_body, request)
                         nadded += 1
-            
+
                 else:
                     # Invite new user to Karl
                     invitation = create_content(
@@ -742,8 +737,8 @@ def invite_new_user_view(context, request):
                         if name not in context:
                             context[name] = invitation
                             break
-                    
-                    _send_invitation_email(request, community, community_href, 
+
+                    _send_invitation_email(request, community, community_href,
                                            invitation)
                     ninvited += 1
 
@@ -753,20 +748,20 @@ def invite_new_user_view(context, request):
                     status = 'One user invited.  '
                 else:
                     status = '%d users invited.  ' % ninvited
-                    
+
             if nadded:
                 if nadded == 1:
                     status += 'One existing Karl user added to community.  '
                 else:
-                    status += ('%d existing Karl users added to community.  ' 
+                    status += ('%d existing Karl users added to community.  '
                                % nadded)
             if nignored:
                 if nignored == 1:
                     status += 'One user already member.'
                 else:
                     status += '%d users already members.' % nignored
-                    
-            location = model_url(context, request, 'manage.html', 
+
+            location = model_url(context, request, 'manage.html',
                                  query={'status_message': status})
             return HTTPFound(location=location)
 
@@ -793,16 +788,16 @@ def invite_new_user_view(context, request):
         api=api,
         actions=actions,
         form=form,
-        )        
+        )
 
 def _send_invitation_email(request, community, community_href, invitation):
     mailer = getUtility(IMailDelivery)
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Please join the %s community at %s'
-    info['subject'] = subject_fmt % (info['c_title'], 
+    info['subject'] = subject_fmt % (info['c_title'],
                                      info['system_name'])
     body_template = get_template('templates/email_invite_new.pt')
-    
+
     msg = Message()
     msg['From'] = info['mfrom']
     msg['To'] = invitation.email
@@ -816,10 +811,10 @@ def _send_invitation_email(request, community, community_href, invitation):
         invitation_url=model_url(invitation.__parent__, request,
                                  invitation.__name__)
         )
-    
+
     if isinstance(body, unicode):
         body = body.encode("UTF-8")
-        
+
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
     message = msg.as_string()
@@ -842,7 +837,7 @@ def jquery_member_search_view(context, request):
     records = [dict(
                 id = profile.__name__,
                 text = profile.firstname + ' ' + profile.lastname,
-                ) 
+                )
             for profile in profiles
             if profile.__name__ not in community_member_names ]
     result = JSONEncoder().encode(records)

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; withoutg even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -60,8 +60,8 @@ class ShowMembersViewTests(unittest.TestCase):
         request = testing.DummyRequest(params={'hide_pictures':True})
         renderer = testing.registerDummyRenderer('templates/show_members.pt')
         self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'), 
-                   ('Add Existing', 'add_existing.html'), 
+        actions = [('Manage Members', 'manage.html'),
+                   ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
         self.assertEqual(renderer.actions, actions)
         self.assertEqual(len(renderer.members), 2)
@@ -96,7 +96,7 @@ class AddExistingUserViewTests(unittest.TestCase):
         admin = testing.DummyModel()
         admin.email = 'admin@example.com'
         context['profiles']['admin'] = admin
-        
+
         return context
 
     def test_cancelled(self):
@@ -114,8 +114,8 @@ class AddExistingUserViewTests(unittest.TestCase):
             'templates/form_add_existing_user.pt',
             renderer=StringTemplateRenderer('<form>fake</form>'))
         self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'), 
-                   ('Add Existing', 'add_existing.html'), 
+        actions = [('Manage Members', 'manage.html'),
+                   ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
         self.assertEqual(renderer.actions, actions)
 
@@ -176,7 +176,7 @@ class AddExistingUserViewTests(unittest.TestCase):
         request = testing.DummyRequest(md)
         context = self._getContext()
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery) 
+        testing.registerUtility(mailer, IMailDelivery)
         response = self._callFUT(context, request)
         self.assertEqual(context.users.added_groups, [('admin','members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
@@ -189,7 +189,7 @@ class AddExistingUserViewTests(unittest.TestCase):
         request.POST = {}
         context = self._getContext()
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery) 
+        testing.registerUtility(mailer, IMailDelivery)
         response = self._callFUT(context, request)
         self.assertEqual(context.users.added_groups, [('admin','members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
@@ -206,7 +206,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.members import accept_invitation_view
         return accept_invitation_view(context, request)
-    
+
     def test_cancelled(self):
         from zope.interface import directlyProvides
         from zope.interface import alsoProvides
@@ -215,7 +215,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         directlyProvides(context, ICommunity)
         context.title = 'Some Community Title'
-        context.vocabularies = {}
         alsoProvides(context, IInvitation)
         request = testing.DummyRequest(params={'form.cancel':'1'})
         response = self._callFUT(context, request)
@@ -229,7 +228,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         directlyProvides(context, ICommunity)
         context.title = 'Some Community Title'
-        context.vocabularies = {'countries':[]}
         alsoProvides(context, IInvitation)
         formfields = testing.registerDummyRenderer('templates/formfields.pt')
         form = testing.registerDummyRenderer(
@@ -248,7 +246,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         directlyProvides(context, ICommunity)
         context.title = 'Some Community Title'
-        context.vocabularies = {'countries':[]}
         alsoProvides(context, IInvitation)
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
@@ -271,8 +268,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
         fred = testing.DummyModel()
         context['profiles']['fred'] = fred
         directlyProvides(fred, IInvitation)
-        
-        context.vocabularies = {'countries':[]}
+
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
         form = testing.registerDummyRenderer(
@@ -298,10 +294,10 @@ class AcceptInvitationViewTests(unittest.TestCase):
         from zope.interface import directlyProvides
         from repoze.lemonade.testing import registerContentFactory
         from repoze.sendmail.interfaces import IMailDelivery
-        
+
         registerContentFactory(DummyContent, IProfile)
         mailer = karltesting.DummyMailer()
-        
+
         testing.registerUtility(mailer, IMailDelivery)
         context = testing.DummyModel()
         context.members_group_name = 'members'
@@ -311,14 +307,13 @@ class AcceptInvitationViewTests(unittest.TestCase):
         context.title = "Community Title"
         context.description = "Community Description"
         directlyProvides(context, ICommunity)
-        
+
         context['profiles'] = testing.DummyModel()
         fred = testing.DummyModel()
         context['profiles']['fred'] = fred
         fred.email = context.email
         directlyProvides(fred, IInvitation)
-        
-        context.vocabularies = {'countries':[]}
+
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
         form = testing.registerDummyRenderer(
@@ -362,10 +357,10 @@ class AcceptInvitationViewTests(unittest.TestCase):
         self.failUnless( ('a', '1') in response.headerlist )
         self.assertEquals(1, len(mailer))
         self.assertEquals(mailer[0].mto, ["jim@example.com",])
-        
+
         # Make sure ISecurityWorkflow.setInitialState() called
         self.failUnless(hasattr(context['profiles']['jim'], 'initial_state'))
-        
+
 class InviteNewUserViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -391,7 +386,7 @@ class InviteNewUserViewTests(unittest.TestCase):
         admin = testing.DummyModel()
         admin.email = 'admin@example.com'
         context['profiles']['admin'] = admin
-        
+
         return context
 
     def test_notsubmitted(self):
@@ -400,8 +395,8 @@ class InviteNewUserViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/invite_new_user.pt')
         self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'), 
-                   ('Add Existing', 'add_existing.html'), 
+        actions = [('Manage Members', 'manage.html'),
+                   ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
         self.assertEqual(renderer.actions, actions)
 
@@ -501,7 +496,7 @@ class InviteNewUserViewTests(unittest.TestCase):
           'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'
                          )
         self.failIf('A'*6 in context)
-        self.assertEqual(context.users.added_groups, 
+        self.assertEqual(context.users.added_groups,
                          [('a', 'group:community:members')])
 
     def test_submitted_ok_in_community(self):
@@ -540,7 +535,7 @@ class InviteNewUserViewTests(unittest.TestCase):
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, [])
-        
+
 class ManageMembersViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -582,8 +577,8 @@ class ManageMembersViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/manage_members.pt')
         self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'), 
-                   ('Add Existing', 'add_existing.html'), 
+        actions = [('Manage Members', 'manage.html'),
+                   ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
         self.assertEqual(renderer.actions, actions)
         self.assertEqual(renderer.entries['moderators'],
@@ -600,7 +595,7 @@ class ManageMembersViewTests(unittest.TestCase):
                            'title': 'foo@example.com',
                            'sortkey': 'foo@example.com'}])
         self.assertEqual(0, len(mailer))
-        
+
     def test_manage_members_remove_sole_moderator(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -634,10 +629,10 @@ class ManageMembersViewTests(unittest.TestCase):
                                         'moderators-0.remove':'1'})
         renderer = testing.registerDummyRenderer('templates/manage_members.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(response.location, 
+        self.assertEqual(response.location,
             'http://example.com/communities/community/manage.html?error_message=Must+leave+at+least+one+moderator+for+community.'
         )
-        
+
     def test_manage_members_remove_second_moderator(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -672,7 +667,7 @@ class ManageMembersViewTests(unittest.TestCase):
         self.assertEqual(users.removed_groups,
                          [(u'b', 'moderators'), (u'b', 'members')] )
         self.assertEqual(1, len(mailer))
-        
+
     def test_manage_members_remove_member(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -706,7 +701,7 @@ class ManageMembersViewTests(unittest.TestCase):
         # he is removed
         self.assertEqual(users.removed_groups, [(u'a', 'members')])
         self.assertEqual(0, len(mailer))
-        
+
     def test_manage_members_make_member_moderator_already_moderator(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -741,7 +736,7 @@ class ManageMembersViewTests(unittest.TestCase):
         self.assertEqual(users.added_groups, [])
         self.assertEqual(users.removed_groups, [])
         self.assertEqual(0, len(mailer))
-        
+
     def test_manage_members_make_member_moderator_not_already_moderator(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -775,7 +770,7 @@ class ManageMembersViewTests(unittest.TestCase):
         # he is now a moderator
         self.assertEqual(users.added_groups, [(u'a', 'moderators')])
         self.assertEqual(1, len(mailer))
-        
+
     def test_manage_members_make_member_remove_moderator_from_member(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -809,7 +804,7 @@ class ManageMembersViewTests(unittest.TestCase):
         # he is no longer a moderator
         self.assertEqual(users.removed_groups, [(u'b', 'moderators')])
         self.assertEqual(1, len(mailer))
-        
+
     def test_manage_members_remove_invitation(self):
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import IInvitation
@@ -837,7 +832,7 @@ class ManageMembersViewTests(unittest.TestCase):
         self._callFUT(context, request)
         # the invitation is removed
         self.failIf('invitation' in context)
-        
+
     def test_manage_members_resend_invitation(self):
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import IInvitation
@@ -854,7 +849,7 @@ class ManageMembersViewTests(unittest.TestCase):
         profiles['a'] = karltesting.DummyProfile()
         profiles['b'] = karltesting.DummyProfile()
         profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com', 
+        invitation = testing.DummyModel(email='foo@example.com',
                                         message='Hello there')
         directlyProvides(invitation, IInvitation)
         site = context.__parent__.__parent__
@@ -871,7 +866,7 @@ class ManageMembersViewTests(unittest.TestCase):
                                         })
         renderer = testing.registerDummyRenderer('templates/manage_members.pt')
         self._callFUT(context, request)
-        
+
         self.assertEqual(1, len(mailer))
         self.assertEqual(['foo@example.com',], mailer[0].mto)
 
@@ -891,7 +886,7 @@ class ManageMembersViewTests(unittest.TestCase):
         profiles['a'] = karltesting.DummyProfile()
         profiles['b'] = karltesting.DummyProfile()
         profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com', 
+        invitation = testing.DummyModel(email='foo@example.com',
                                         message='Hello there')
         directlyProvides(invitation, IInvitation)
         site = context.__parent__.__parent__
@@ -908,9 +903,9 @@ class ManageMembersViewTests(unittest.TestCase):
                                         'invitations-0.remove':'1'})
         renderer = testing.registerDummyRenderer('templates/manage_members.pt')
         self._callFUT(context, request)
-        
+
         self.assertEqual(0, len(mailer))
-        
+
 class TestJqueryMemberSearchView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -961,13 +956,13 @@ class StringTemplateRenderer(testing.DummyTemplateRenderer):
     ``registerDummyRenderer``.  It has a helper function (``assert_``)
     that makes it possible to make an assertion which compares data
     passed to the renderer by the view function against expected
-    key/value pairs. 
+    key/value pairs.
     """
 
     def __init__(self, string_response=''):
         testing.DummyTemplateRenderer.__init__(self)
         self.string_response = string_response
-        
+
     def __call__(self, **kw):
         self._received.update(kw)
         return self.string_response
@@ -987,14 +982,14 @@ def dummy_search(results):
         def __init__(self, context, request=None):
             self.context = context
             self.request = request
-    
+
         def __call__(self, **kw):
             search = []
             for k,v in kw.items():
                 key = '%s=%s' % (k,v)
                 if key in results:
                     search.extend(results[key])
-                    
+
             return len(search), search, lambda x: x
 
     return DummySearchAdapter
@@ -1002,5 +997,5 @@ def dummy_search(results):
 def registerCatalogSearch(results={}):
     from repoze.bfg.testing import registerAdapter
     from zope.interface import Interface
-    from karl.models.interfaces import ICatalogSearch 
+    from karl.models.interfaces import ICatalogSearch
     registerAdapter(dummy_search(results), (Interface,), ICatalogSearch)

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -53,7 +53,7 @@ def find_community(context):
 
 def find_communities(context):
     return find_site(context).get('communities')
-    
+
 def find_intranet(context):
     # Find the ancestor that has IIntranet, e.g. /osi/someoffice
     return find_interface(context, IIntranet)
@@ -67,10 +67,6 @@ def find_intranets(context):
 
     return []
 
-def find_vocabularies(context):
-    site = find_site(context)
-    return site.vocabularies
-
 def find_peopledirectory_catalog(context):
     site = find_site(context)
     people = site.get('people', None)
@@ -83,7 +79,7 @@ def get_setting(context, setting_name, default=None):
     # site settings.
     site = find_site(context)
     return getattr(site, setting_name, default)
-    
+
 def get_content_type_name(resource):
     content_iface = get_content_type(resource)
     return content_iface.getTaggedValue('name')

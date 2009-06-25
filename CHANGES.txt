@@ -9,6 +9,10 @@ Unreleased
   "lemonade" index has the "max age" feature which made this fork
   necessary).
 
+- Removed concept of "vocabularies" as a persistently stored thing with
+  indirection.  Placed countries data in core karl package as const data.
+  https://bugs.launchpad.net/karl3/+bug/391246
+
 3.2 (2009-06-24)
 ----------------
 

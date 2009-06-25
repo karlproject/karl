@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
@@ -55,14 +55,14 @@
       <textarea id="message" name="message" rows="5" cols="60"
 		class="karltextareafield"></textarea>
     </fieldset>
-    
+
     <fieldset metal:define-macro="description-field"
 	      tal:define="error fielderrors['description']|None"
 	      class="${error and 'fieldError' or ''}"
 	      id="description-field">
       <label class="required">Description</label>
-      <div class="fieldHelp">This description will appear in search 
-	results and on the community listing page. Please limit your 
+      <div class="fieldHelp">This description will appear in search
+	results and on the community listing page. Please limit your
 	description to 100 words or less.</div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <textarea id="description" name="description" rows="5" cols="60"
@@ -74,13 +74,13 @@
 	      class="${error and 'fieldError' or ''}"
 	      id="sharing-field">
       <label class="required">Is this community private?</label>
-      <div class="fieldHelp">If you designate this community private, 
-	    only invited members will be able to view items posted to 
+      <div class="fieldHelp">If you designate this community private,
+	    only invited members will be able to view items posted to
 	    the community.</div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <div class="karlselectionradiofield">
 	    <input type="radio" name="sharing" id="sharing_0" class="noborder"
-	       value="false" checked="checked" />	
+	       value="false" checked="checked" />
 	    <label for="sharing_0">Public</label>
 	    <input type="radio" name="sharing" id="sharing_1" class="noborder"
 	       value="true" />
@@ -134,7 +134,7 @@
                     dialog.old_value = new_value;
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
     <fieldset metal:define-macro="resource-sharing-field"
@@ -143,14 +143,14 @@
 	      tal:condition="show_is_private|True"
 	      id="resource-sharing-field">
       <label class="required">Is this private?</label>
-      <div class="fieldHelp">Items marked as private can only be seen by 
+      <div class="fieldHelp">Items marked as private can only be seen by
 	members of this community.</div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <div class="karlselectionradiofield">
-	<input type="radio" name="sharing" id="sharing_0" 
-	       class="noborder" value="false" checked="checked" />	
+	<input type="radio" name="sharing" id="sharing_0"
+	       class="noborder" value="false" checked="checked" />
 	<label for="sharing_0">Public</label>
-	<input type="radio" name="sharing" id="sharing_1" 
+	<input type="radio" name="sharing" id="sharing_1"
 	       class="noborder" value="true" />
 	<label for="sharing_1">Private</label>
       </div>
@@ -161,15 +161,15 @@
 	      class="${error and 'fieldError' or ''}"
 	      id="tools-field">
       <label>Tools</label>
-      <div class="fieldHelp">Select which tools to enable on 
+      <div class="fieldHelp">Select which tools to enable on
 	this community.</div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <ul class="karlcheckboxlist" id="tools">
 	<li tal:repeat="tool tools">
-          <input tal:condition="tool['state']" type="checkbox" 
-		 name="${tool['name']}" value="${tool['title']}" 
+          <input tal:condition="tool['state']" type="checkbox"
+		 name="${tool['name']}" value="${tool['title']}"
 		 checked="checked" class="noborder" />
-          <input tal:condition="not tool['state']" type="checkbox" 
+          <input tal:condition="not tool['state']" type="checkbox"
 		 name="${tool['name']}" value="${tool['title']}" class="noborder"  />
 	  <label for="${tool['name']}">${tool['title']}</label>
 	</li>
@@ -379,8 +379,8 @@
       <div tal:condition="error" class="errorMessage">${error}</div>
       <select name="country" size="1">
         <option value="">Select...</option>
-	<option value="${c[0]}" 
-		tal:repeat="c vocabularies['countries']">${c[1]}</option>
+	<option value="${c[0]}"
+		tal:repeat="c api.countries">${c[1]}</option>
       </select>
     </fieldset>
 
@@ -393,7 +393,7 @@
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input name="department"/>
     </fieldset>
- 
+
     <fieldset metal:define-macro="position-field"
 	      tal:define="error fielderrors['position']|None"
 	      class="${error and 'fieldError' or ''}"
@@ -451,10 +451,10 @@
 	  <input type="checkbox" name="photo_delete" class="noborder"/> delete photo
 	</div>
       </div>
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect 
+        <!-- XXX Browser scaling with fixed dims will not preserve aspect
                  ratio. -->
         <img tal:condition="photo.url|None"
-	     height="100" width="75" 
+	     height="100" width="75"
              src="${photo.url}"
           style="width: 75px; float: left;"
 	  align="right"/>
@@ -470,15 +470,15 @@
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input name="caption" style="width: 490px"/>
     </fieldset>
-    
-    <fieldset id="terms_and_conditions-field" 
+
+    <fieldset id="terms_and_conditions-field"
 	      metal:define-macro="terms_and_conditions-field"
 	      tal:define="error fielderrors['terms_and_conditions']|None"
 	      class="${error and 'fieldError' or ''}">
       <label class="required">Terms and Conditions</label>
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
-      <input type="checkbox" class="noborder" id="acceptterms" 
+      <input type="checkbox" class="noborder" id="acceptterms"
 	     value="true" name="terms_and_conditions"/>
       <label style="font-weight: normal;" for="acceptterms">
         I accept the KARL
@@ -507,17 +507,17 @@
                     e.preventDefault();
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
-    <fieldset id="accept_privacy_policy-field" 
+    <fieldset id="accept_privacy_policy-field"
               metal:define-macro="accept_privacy_policy-field"
 	      tal:define="error fielderrors['accept_privacy_policy']|None"
 	      class="${error and 'fieldError' or ''}">
       <label class="required">Accept Privacy Policy</label>
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
-      <input type="checkbox" class="noborder" id="acceptterms" 
+      <input type="checkbox" class="noborder" id="acceptterms"
 	     value="true" name="accept_privacy_policy"/>
       <label style="font-weight: normal;" for="acceptterms">
         I accept the KARL
@@ -546,11 +546,11 @@
                     e.preventDefault();
                 });
         });
-      </script>  
+      </script>
 
     </fieldset>
 
-    <fieldset id="attachment-field" 
+    <fieldset id="attachment-field"
 	      metal:define-macro="attachment-field"
 	      tal:define="error fielderrors['attachment']|None"
               tal:condition="api.support_attachments"
@@ -572,7 +572,7 @@
                 .karlmultiupload({
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
     <fieldset metal:define-macro="tags-field"
@@ -606,10 +606,10 @@
             });
         });
         //]]>
-      </script>  
+      </script>
     </fieldset>
 
-    <fieldset id="sendalert-field" 
+    <fieldset id="sendalert-field"
               metal:define-macro="sendalert-field"
 	      tal:define="error fielderrors['sendalert']|None"
 	      class="${error and 'fieldError' or ''}">
@@ -641,13 +641,13 @@
                 .karldatetimepicker({
                 })
                 .bind('change.karldatetimepicker', function() {
-                    $('#endDate').karldatetimepicker('limitMinMax', 
+                    $('#endDate').karldatetimepicker('limitMinMax',
                             // add one hour
-                            new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000), 
+                            new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
                             null);
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
     <fieldset metal:define-macro="end_date-field"
@@ -668,7 +668,7 @@
                     $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
     <fieldset metal:define-macro="publication-date-field"
@@ -689,9 +689,9 @@
                     $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
                 });
         });
-      </script>  
+      </script>
     </fieldset>
-    
+
     <fieldset metal:define-macro="add-file-field"
           tal:define="error fielderrors['file']|None"
 	      class="${error and 'fieldError' or ''}"
@@ -712,7 +712,7 @@
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <div class="sif-widget">
-        <input id="file_nochange" class="sif-nochange noborder" type="radio" 
+        <input id="file_nochange" class="sif-nochange noborder" type="radio"
               checked="checked" value="nochange" name="file-dummyoption"/>
         <label for="file_nochange">Keep existing file</label>
         <br />
@@ -731,13 +731,13 @@
                 .karlsingleupload({
                 });
         });
-      </script>  
+      </script>
     </fieldset>
 
 
     <fieldset metal:define-macro="form-submit"
 	      id="submitcancel-field">
-      <input type="submit" name="form.submitted" value="submit" 
+      <input type="submit" name="form.submitted" value="submit"
 	     class="submit"/>
       <input type="submit" name="form.cancel" value="cancel"
 	     class="button"

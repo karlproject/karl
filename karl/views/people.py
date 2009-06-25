@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -33,6 +33,7 @@ from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 
+from karl.consts import countries
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import ICatalogSearch
@@ -43,7 +44,6 @@ from karl.utils import find_communities
 from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
-from karl.utils import find_vocabularies
 from karl.utils import get_setting
 from karl.views import baseforms
 from karl.views.api import TemplateAPI
@@ -61,27 +61,25 @@ def edit_profile_view(context, request):
 
     if form.cancel in form.formdata:
         return HTTPFound(location=model_url(context, request))
-            
-    vocabularies = find_vocabularies(context)
+
     if form.submit in form.formdata:
         try:
-            state = baseforms.AppState(vocabularies=vocabularies,
-                                       context=context)
-            
+            state = baseforms.AppState(context=context)
+
             converted = form.to_python(form.fieldvalues, state)
             form.is_valid = True
 
             objectEventNotify(ObjectWillBeModifiedEvent(context))
-            
+
             # Handle simple fields
             for name in form.simple_field_names:
                 setattr(context, name, converted.get(name))
-            
+
             handle_photo_upload(context, converted)
-            
+
             # Emit a modified event for recataloging
             objectEventNotify(ObjectModifiedEvent(context))
-    
+
             path = model_url(context, request)
             msg = '?status_message=Profile%20edited'
             return HTTPFound(location=path+msg)
@@ -95,7 +93,7 @@ def edit_profile_view(context, request):
 
         # pre-fill form with model values
         fill_values = form.from_python(context)
-        
+
     page_title = 'Edit ' + context.title
     api = TemplateAPI(context, request, page_title)
 
@@ -108,7 +106,7 @@ def edit_profile_view(context, request):
     else:
         display_photo["url"] = api.app_url + "/static/images/defaultUser.gif"
         display_photo["may_delete"] = False
-        
+
     # Enable hiding of certain fields via CSS descendent selectors
     if api.user_is_staff:
         staff_role_classname = 'k3_staff_role'
@@ -128,11 +126,10 @@ def edit_profile_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
-        vocabularies=vocabularies,
         photo=display_photo,
         staff_role_classname=staff_role_classname,
     )
- 
+
     form.rendered_form = form.merge(form_html, fill_values)
 
 
@@ -141,7 +138,7 @@ def edit_profile_view(context, request):
         form=form,
         api=api,
         staff_change_password_url=staff_change_password_url,
-        )        
+        )
 
 class EditProfileForm(baseforms.BaseForm):
     simple_field_names = [
@@ -161,7 +158,7 @@ class EditProfileForm(baseforms.BaseForm):
         "room_no",
         "biography",
     ]
-    
+
     firstname = baseforms.firstname
     lastname = baseforms.lastname
     email = baseforms.email
@@ -177,19 +174,19 @@ class EditProfileForm(baseforms.BaseForm):
     photo = baseforms.photo
     photo_delete = baseforms.photo_delete
     biography = baseforms.biography
-    
+
     def from_python(self, context, state=None):
         # Convert model object to dict and then call super method
         model_values = {}
         for name in self.simple_field_names:
             if hasattr(context, name):
                 model_values[name] = getattr(context, name)
-                
+
         model_values["photo"] = context.get("photo", None)
         model_values["photo_delete"] = False
-        
+
         return super(EditProfileForm, self).from_python(model_values, state)
-        
+
 def get_profile_actions(profile, request):
     actions = []
     editable = authenticated_userid(request) == profile.__name__
@@ -197,18 +194,18 @@ def get_profile_actions(profile, request):
         actions.append(('Edit', 'edit_profile.html'))
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
-   
+
     return actions
 
 def show_profile_view(context, request):
     """Show a profile with actions if the current user"""
     page_title = 'View Profile'
     api = TemplateAPI(context, request, page_title)
-  
+
     # Create display values from model object
     profile = {}
-    for name in [name for name in context.__dict__.keys() 
-                 if not name.startswith("_")]:        
+    for name in [name for name in context.__dict__.keys()
+                 if not name.startswith("_")]:
         profile_value = getattr(context, name)
         if profile_value is not None:
             # Don't produce u'None'
@@ -218,17 +215,16 @@ def show_profile_view(context, request):
 
     if profile.has_key("languages"):
         profile["languages"] = context.languages
-    
+
     if profile.has_key("department"):
         profile["department"] = context.department
-        
+
     if profile.has_key("country"):
         # translate from country code to country name
-        vocabularies = find_vocabularies(context)
         country_code = profile["country"]
-        country = vocabularies["countries_dict"].get(country_code, u'')
+        country = countries.as_dict.get(country_code, u'')
         profile["country"] = country
-        
+
     # Display portrait
     photo = context.get_photo()
     display_photo = {}
@@ -334,54 +330,54 @@ def recent_content_view(context, request):
 def may_leave(userid, community):
     # May not leave community if a moderator
     return userid not in community.moderator_names
-    
+
     # Alternatively, may not leave community if *sole* moderator
     # may_leave = len(community.moderator_names) > 1 or \
     #           userid not in community.moderator_names
-    
+
 def manage_communities_view(context, request):
     assert IProfile.providedBy(context)
-    
+
     page_title = 'Manage Communities'
     api = TemplateAPI(context, request, page_title)
-    
+
     users = find_users(context)
     communities_folder = find_communities(context)
     userid = context.__name__
-    
+
     # Handle cancel
     if request.params.get("form.cancel", False):
         return HTTPFound(location=model_url(context, request))
-        
+
     # Handle form submission
     if request.params.get("form.submitted", False):
         for key in request.params:
             if key.startswith("leave_"):
                 community_name = key[6:]
                 community = communities_folder[community_name]
-                
+
                 # Not concerned about catching this exception, since checkbox
                 # should not have been displayed in form unless user allowed
                 # to leave.  Assert merely guards integrity of the system.
                 assert may_leave(userid, community)
-        
+
                 if userid in community.moderator_names:
                     users.remove_group(userid, community.moderators_group_name)
                 if userid in community.member_names:
                     users.remove_group(userid, community.members_group_name)
-                
+
             elif key.startswith("alerts_pref_"):
                 community_name = key[12:]
                 preference = int(request.params.get(key))
                 context.set_alerts_preference(community_name, preference)
-                
+
         path = model_url(context, request)
         msg = '?status_message=Community+preferences+updated.'
         return HTTPFound(location=path+msg)
 
     communities = []
     for community in communities_folder.values():
-        if (userid in community.member_names or 
+        if (userid in community.member_names or
             userid in community.moderator_names):
             alerts_pref = context.get_alerts_preference(community.__name__)
             display_community = {
@@ -403,10 +399,10 @@ def manage_communities_view(context, request):
                 'may_leave': may_leave(userid, community),
             }
             communities.append(display_community)
-            
+
     if len(communities) > 1:
         communities.sort(key=lambda x: x["title"])
-        
+
     return render_template_to_response(
         'templates/manage_communities.pt',
         api=api,
@@ -414,7 +410,7 @@ def manage_communities_view(context, request):
         post_url=request.url,
         formfields=api.formfields,
     )
-        
+
 def show_profiles_view(context, request):
 
     page_title = 'KARL Profiles'
@@ -488,10 +484,10 @@ def change_password_view(context, request):
                 login=user['login'],
                 password=converted['password'],
             )
-            
+
             if isinstance(body, unicode):
                 body = body.encode("UTF-8")
-                
+
             mail.set_payload(body, "UTF-8")
             mail.set_type("text/html")
 

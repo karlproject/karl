@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -30,6 +30,7 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
+from karl.consts import countries
 from karl.utils import find_catalog
 from karl.utils import find_intranet
 from karl.utils import find_intranets
@@ -59,7 +60,8 @@ class TemplateAPI(object):
     _intranets_info = None
     _current_intranet = None
     _home_url = None
-    
+    countries = countries
+
     def __init__(self, context, request, page_title=None):
         self.context = context
         self.request = request
@@ -93,7 +95,7 @@ class TemplateAPI(object):
         """
         if self.community_info is None:
             return False
-        
+
         community = self.community_info.context
         if context is community:
             return False
@@ -187,9 +189,9 @@ class TemplateAPI(object):
 
     def set_status_message(self, value):
         self._status_message = value
-        
+
     status_message = property(get_status_message, set_status_message)
-    
+
     _error_message = None
     def get_error_message(self):
         if self._error_message:
@@ -198,7 +200,7 @@ class TemplateAPI(object):
 
     def set_error_message(self, value):
         self._error_message = value
-        
+
     error_message = property(get_error_message, set_error_message)
 
     @property
@@ -231,7 +233,7 @@ class TemplateAPI(object):
                 if content_iface == ICommunity:
                     intranets_info.append({
                             'title': entry.title,
-                            'edit_href': model_url(entry, self.request, 
+                            'edit_href': model_url(entry, self.request,
                                                    'edit_intranet.html'),
                             'intranet_href': model_url(entry, self.request),
                             })

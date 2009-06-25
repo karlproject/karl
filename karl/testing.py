@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -27,18 +27,6 @@ from repoze.bfg.testing import registerUtility
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
-
-dummy_vocabularies = {
-    'departments': [
-        {'id': u'department1', 'title': u'Department 1',},
-        ],
-
-    'countries': [
-        ('DU', 'Durham'),
-        ('CH', 'Chapel Hill'),
-        ],
-    }
-
 
 class DummyCatalog(dict):
     def __init__(self, *maps):
@@ -99,10 +87,10 @@ class DummyDocumentMap:
 
     def remove_docid(self, docid):
         self.removed.append(docid)
-        
+
 class DummyProfile(DummyModel):
     implements(IProfile)
-    
+
     title = 'title'
     firstname = 'firstname'
     lastname = 'lastname'
@@ -112,14 +100,14 @@ class DummyProfile(DummyModel):
     extension = 'extension'
     department = 'department1'
     location = 'location'
-    
+
     def __init__(self, *args, **kw):
         DummyModel.__init__(self)
         for item in kw.items():
             setattr(self, item[0], item[1])
         self._alert_prefs = {}
         self._pending_alerts = []
-        
+
     @property
     def email(self):
         return "%s@x.org" % self.__name__
@@ -128,16 +116,16 @@ class DummyProfile(DummyModel):
         return None
 
     def get_alerts_preference(self, community_name):
-        return self._alert_prefs.get(community_name, 
+        return self._alert_prefs.get(community_name,
                                      IProfile.ALERT_IMMEDIATELY)
-    
+
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
             IProfile.ALERT_IMMEDIATELY,
             IProfile.ALERT_DIGEST,
             IProfile.ALERT_NEVER):
             raise ValueError("Invalid preference.")
-        
+
         self._alert_prefs[community_name] = preference
 
 class DummyRoot(DummyModel):
@@ -154,8 +142,7 @@ class DummyRoot(DummyModel):
         self[u'communities'] = DummyModel()
         self.system_name = u"karl3test"
         self.system_email_domain = u"karl3.example.com"
-        self.vocabularies = dummy_vocabularies
-        
+
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
@@ -178,7 +165,7 @@ class DummyMailer(list):
             self.mto = mto
             self.msg = msg
             assert isinstance(msg, str)
-            
+
     def send(self, mfrom, mto, msg):
         self.append(self.DummyMessage(mfrom, mto, msg))
 
@@ -202,8 +189,8 @@ class DummyUsers:
         self._by_login[login] = userinfo
         self._by_id[userid] = userinfo
 
-        if (self.community is not None and 
-            hasattr(self.community, "moderators_group_name") and 
+        if (self.community is not None and
+            hasattr(self.community, "moderators_group_name") and
             hasattr(self.community, "members_group_name")):
             for group_name in groups:
                 if group_name == self.community.moderators_group_name:
@@ -216,8 +203,8 @@ class DummyUsers:
 
     def add_group(self, userid, group_name):
         self.added_groups.append((userid, group_name))
-        if (self.community is not None and 
-            hasattr(self.community, "moderators_group_name") and 
+        if (self.community is not None and
+            hasattr(self.community, "moderators_group_name") and
             hasattr(self.community, "members_group_name")):
             if group_name == self.community.moderators_group_name:
                 self.community.moderator_names.add(userid)
@@ -227,8 +214,8 @@ class DummyUsers:
     def remove_group(self, userid, group_name):
         self.removed_groups.append((userid, group_name))
 
-        if (self.community is not None and 
-            hasattr(self.community, "moderators_group_name") and 
+        if (self.community is not None and
+            hasattr(self.community, "moderators_group_name") and
             hasattr(self.community, "members_group_name")):
             if group_name == self.community.moderators_group_name:
                 self.community.moderator_names.remove(userid)
@@ -249,9 +236,9 @@ class DummyUsers:
     def change_password(self, userid, password):
         from repoze.who.plugins.zodb.users import get_sha_password
         self._by_id[userid]["password"] = get_sha_password(password)
-    
+
 class DummyUpload(object):
-    """Simulates an HTTP upload.  Suitable for assigning as the value to 
+    """Simulates an HTTP upload.  Suitable for assigning as the value to
     to a dummy request form parameter.
     """
     def __init__(self, filename="test.txt",
@@ -348,7 +335,7 @@ class DummySecurityWorkflow:
 
 def registerLayoutProvider():
     from karl.views.interfaces import ILayoutProvider
-    ad = registerAdapter(DummyLayoutProvider, 
+    ad = registerAdapter(DummyLayoutProvider,
                          (Interface, Interface),
                          ILayoutProvider)
 
@@ -356,7 +343,7 @@ def registerTagbox():
     from karl.models.interfaces import ITagQuery
     registerAdapter(DummyTagQuery, (Interface, Interface),
                     ITagQuery)
-    
+
 def registerAddables():
     from karl.views.interfaces import IFolderAddables
     registerAdapter(DummyFolderAddables, (Interface, Interface),
@@ -375,7 +362,7 @@ def registerCatalogSearch():
                     ICatalogSearch)
     registerAdapter(DummySearchAdapter, (Interface,),
                     ICatalogSearch)
-    
+
 def registerSecurityWorkflow():
     from karl.security.interfaces import ISecurityWorkflow
     registerAdapter(DummySecurityWorkflow, (Interface,),

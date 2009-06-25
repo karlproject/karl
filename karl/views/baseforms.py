@@ -12,9 +12,9 @@ from copy import deepcopy
 import re
 import time
 import datetime
-from karl.models.image import mimetypes as image_mimetypes
-
 from zope.component import getAdapter
+from karl.consts import countries
+from karl.models.image import mimetypes as image_mimetypes
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 
@@ -33,7 +33,6 @@ class HTMLValidator(validators.UnicodeString):
             raise Invalid(msg, value, state)
         return clean
 
-# Simulate getting some vocabularies
 class UsernameLookup(validators.UnicodeString):
 
     def _to_python(self, value, state):
@@ -52,10 +51,7 @@ class UsernameLookup(validators.UnicodeString):
 class CountriesLookup(validators.UnicodeString):
 
     def _to_python(self, value, state):
-        vocabularies = state.vocabularies
-        countries = vocabularies['countries']
-        country_ids = [i[0] for i in countries]
-        if value not in country_ids:
+        if value not in countries.as_dict:
             msg = 'Unknown country code of %s' % value
             raise Invalid(msg, value, state)
         return value
@@ -77,7 +73,7 @@ class TextAreaToList(validators.UnicodeString):
 
     def _from_python(self, value, state):
         return "\n".join(value)
-    
+
 class UserProfileLookup(validators.UnicodeString):
 
     def _to_python(self, value, state):
@@ -151,12 +147,12 @@ class Photo(validators.FieldStorageUploadConverter):
             raise Invalid(self.invalid_message, value, state)
 
         return super(Photo, self)._to_python(value, state)
-        
+
 class DateTime(validators.FancyValidator):
     """Convert dates"""
     datetime_format = '%m/%d/%Y %H:%M'
     round_minutes = 15
-    
+
     messages = {
         'invalid': _("Invalid date. Date must have a format mm/dd/yyyy, HH:MM." \
                      "<br>Example: 3/21/2009 18:30"),
@@ -201,7 +197,7 @@ class StartEndFields(validators.FormValidator):
     messages = {
         'invalid': _("End date must follow start date."),
         }
-    
+
     def validate_python(self, field_dict, state):
         start = field_dict[self.start_field]
         end = field_dict[self.end_field]
@@ -221,7 +217,7 @@ class UniqueEmail(validators.Email):
     """ Performs email validation, also insuring email address does not
     conflict with another user's email address.
     """
-    
+
     def validate_python(self, value, state):
         super(UniqueEmail, self).validate_python(value, state)
 
@@ -232,10 +228,10 @@ class UniqueEmail(validators.Email):
             if prev == value:
                 # Nothing's changed, no need to check
                 return
-                
+
             # Search catalog for matching emails
             search = getAdapter(context, ICatalogSearch)
-            result = search(interfaces=[IProfile], email=[value.lower()], 
+            result = search(interfaces=[IProfile], email=[value.lower()],
                             limit=1)
             n = result[0]
             if n:
@@ -306,7 +302,7 @@ class BaseForm(Schema):
     filter_extra_fields = True
     is_valid = None
 
-    def __init__(self, formdata, submit='form.submitted', 
+    def __init__(self, formdata, submit='form.submitted',
                  cancel='form.cancel'):
         Schema.__init__(self)
         self.defaults = {}

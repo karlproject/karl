@@ -40,7 +40,6 @@ class EditProfileTests(unittest.TestCase):
         context.title = "Eddie"
         site = karltesting.DummyRoot()
         site['profiles']['ed'] = context
-        site.vocabularies = karltesting.dummy_vocabularies
         site.staff_change_password_url = 'http://pw.example.com'
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
@@ -57,7 +56,6 @@ class EditProfileTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile(email='me@example.com')
-        context.vocabularies = karltesting.dummy_vocabularies
         context.website = "http://spacelabstudio.com"
         context.title = "Eddie"
         context.__name__ = 'ed'
@@ -70,7 +68,6 @@ class EditProfileTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
         request = testing.DummyRequest({'controlls.submitted':1})
         context = DummyProfile(email='me@example.com')
-        context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         context.__name__ = 'ed'
         self._callFUT(context, request)
@@ -89,7 +86,6 @@ class EditProfileTests(unittest.TestCase):
         params['form.submitted'] = '1'
         request = testing.DummyRequest(params)
         context = DummyProfile()
-        context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -125,7 +121,6 @@ class EditProfileTests(unittest.TestCase):
         params['photo.static'] = ''
         request = testing.DummyRequest(params)
         context = DummyProfile()
-        context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
 
@@ -159,7 +154,6 @@ class EditProfileTests(unittest.TestCase):
             data=dummy_photo)
         request = testing.DummyRequest(params)
         context = DummyProfile()
-        context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
 
@@ -188,7 +182,6 @@ class EditProfileTests(unittest.TestCase):
         request = testing.DummyRequest(params)
         context = DummyProfile()
         context["photo.jpg"] = testing.DummyModel()
-        context.vocabularies = karltesting.dummy_vocabularies
         context.title = "Eddie"
         response = self._callFUT(context, request)
 
