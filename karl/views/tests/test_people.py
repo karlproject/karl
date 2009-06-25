@@ -25,8 +25,8 @@ class EditProfileTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
-        from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
+        karltesting.registerCatalogSearch()
+        karltesting.registerSettings()
 
     def tearDown(self):
         cleanUp()
@@ -651,6 +651,7 @@ class ShowProfilesViewTests(unittest.TestCase):
 class ChangePasswordViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        karltesting.registerSettings()
 
     def tearDown(self):
         cleanUp()
@@ -731,7 +732,6 @@ class ChangePasswordViewTests(unittest.TestCase):
         context.email = 'me@example.com'
         parent.users = DummyUsers()
         parent.users.add('me', 'me', self._old_password(), [])
-        parent.admin_email = 'admin@example.com'
 
         request = testing.DummyRequest({
             'form.submitted': 1,

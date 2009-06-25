@@ -20,6 +20,8 @@ Unreleased
   searches.
   https://bugs.launchpad.net/karl3/+bug/384841
 
+- Moved settings such as 'system_email_domain' to osi.ini.
+
 3.2 (2009-06-24)
 ----------------
 

@@ -140,8 +140,19 @@ class DummyRoot(DummyModel):
         for dummy in dummies:
             self[u'profiles'][0] = DummyModel(title=dummy[1])
         self[u'communities'] = DummyModel()
-        self.system_name = u"karl3test"
-        self.system_email_domain = u"karl3.example.com"
+
+class DummySettings:
+    reload_templates = True
+    system_name = "karl3test"
+    system_email_domain = "karl3.example.com"
+    min_pw_length = '8'
+    admin_email = 'admin@example.com'
+    staff_change_password_url = 'http://pw.example.com'
+    forgot_password_url = 'http://login.example.com/resetpassword'
+    offline_app_url = "http://offline.example.com/app"
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
 
 class DummyAdapter:
     def __init__(self, context, request):
@@ -367,3 +378,8 @@ def registerSecurityWorkflow():
     from karl.security.interfaces import ISecurityWorkflow
     registerAdapter(DummySecurityWorkflow, (Interface,),
                     ISecurityWorkflow)
+
+def registerSettings():
+    from repoze.bfg.interfaces import ISettings
+    settings = DummySettings()
+    registerUtility(settings, ISettings)

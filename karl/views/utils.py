@@ -287,7 +287,7 @@ class CustomInvalid(Invalid):
         self.error_dict = error_dict
 
 def check_upload_size(context, obj, field_name):
-    max_size = get_setting(context, 'upload_limit', 0)
+    max_size = int(get_setting(context, 'upload_limit', 0))
     if max_size and obj.size > max_size:
         msg = 'File size exceeds KARL upload limit of %d.' % max_size
         raise CustomInvalid({field_name: msg})

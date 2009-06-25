@@ -18,7 +18,9 @@
 import calendar
 
 from zope.component import queryAdapter
+from zope.component import queryUtility
 
+from repoze.bfg.interfaces import ISettings
 from repoze.bfg.traversal import find_root
 from repoze.bfg.traversal import find_interface
 from repoze.lemonade.content import get_content_type
@@ -75,10 +77,9 @@ def find_peopledirectory_catalog(context):
     return getattr(people, 'catalog', None)
 
 def get_setting(context, setting_name, default=None):
-    # Grab data off the site root, or wherever we later put it, for
-    # site settings.
-    site = find_site(context)
-    return getattr(site, setting_name, default)
+    # Grab a setting from ISettings.  (context is ignored.)
+    settings = queryUtility(ISettings)
+    return getattr(settings, setting_name, default)
 
 def get_content_type_name(resource):
     content_iface = get_content_type(resource)

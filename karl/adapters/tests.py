@@ -519,11 +519,8 @@ class MailinDispatcherTests(unittest.TestCase):
 class TestOfflineContextURL(unittest.TestCase):
     def setUp(self):
         cleanUp()
-
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.testing import registerUtility
-        settings = DummySettings(app_url="http://example.com/app")
-        registerUtility(settings, ISettings)
+        from karl.testing import registerSettings
+        registerSettings()
 
     def tearDown(self):
         cleanUp()
@@ -535,26 +532,23 @@ class TestOfflineContextURL(unittest.TestCase):
     def test_it(self):
         from repoze.bfg.testing import DummyModel
         context = DummyModel()
-        context.app_url = 'http://example.com/app/'
         url = self._make_one(context)
-        self.assertEqual(url(), 'http://example.com/app/')
+        self.assertEqual(url(), 'http://offline.example.com/app/')
 
     def test_it_again(self):
         from repoze.bfg.testing import DummyModel
         parent = DummyModel()
-        parent.app_url = 'http://example.com/'
         context = parent['foo'] = DummyModel()
         url = self._make_one(context)
-        self.assertEqual(url(), 'http://example.com/foo')
+        self.assertEqual(url(), 'http://offline.example.com/app/foo')
 
     def test_it_w_feeling(self):
         from repoze.bfg.testing import DummyModel
         parent = DummyModel()
-        parent.app_url = 'http://www.example.com'
         foo = parent['foo'] = DummyModel()
         context = foo['bar'] = DummyModel()
         url = self._make_one(context)
-        self.assertEqual(url(), 'http://www.example.com/foo/bar')
+        self.assertEqual(url(), 'http://offline.example.com/app/foo/bar')
 
 
 class DummyMessage:
@@ -599,9 +593,3 @@ class DummyMessage:
 
     def get_payload(self, i=None, decode=False):
         return self.payload
-    
-class DummySettings:
-    def __init__(self, **kw):
-        for k, v in kw.items():
-            setattr(self, k, v)
-            

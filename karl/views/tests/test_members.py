@@ -208,6 +208,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
         return accept_invitation_view(context, request)
 
     def test_cancelled(self):
+        karltesting.registerSettings()
         from zope.interface import directlyProvides
         from zope.interface import alsoProvides
         from karl.models.interfaces import IInvitation
@@ -221,6 +222,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_notsubmitted(self):
+        karltesting.registerSettings()
         from zope.interface import directlyProvides
         from zope.interface import alsoProvides
         from karl.models.interfaces import IInvitation
@@ -239,6 +241,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
         self.failUnless(renderer.form)
 
     def test_submitted_failvalidation(self):
+        karltesting.registerSettings()
         from zope.interface import directlyProvides
         from zope.interface import alsoProvides
         from karl.models.interfaces import IInvitation
@@ -258,6 +261,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
         self.failUnless(form.fielderrors)
 
     def test_submitted_username_exists(self):
+        karltesting.registerSettings()
         from zope.interface import directlyProvides
         from karl.models.interfaces import IInvitation
         context = testing.DummyModel()
@@ -288,6 +292,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
                          'Username fred already exists')
 
     def test_submitted_success(self):
+        karltesting.registerSettings()
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import IInvitation
         from karl.models.interfaces import IProfile

@@ -19,8 +19,8 @@ class OfflineContextURL(object):
     mail-in, which is a console app, we don't have a request.
     
     Instead of relying on a request object to figure out our base url, we
-    look up an ISettings utility and ask it for a setting called 'app_url',
-    which is the base url for this Karl instance.
+    look up an ISettings utility and ask it for a setting called
+    'offline_app_url', which is the base url for this Karl instance.
     """
     implements(IContextURL)
     
@@ -35,7 +35,9 @@ class OfflineContextURL(object):
         raise NotImplementedError
     
     def __call__(self):
-        app_url = get_setting(self.model, 'app_url', 'https://karl.soros.org')
+        app_url = get_setting(self.model, 'offline_app_url')
+        if not app_url:
+            raise ValueError('offline_app_url is not set')
         if app_url.endswith('/'):
             app_url = app_url[:-1]
         path = model_path(self.model)

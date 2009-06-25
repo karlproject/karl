@@ -134,7 +134,7 @@ class PasswordChecker(validators.UnicodeString):
 
     def _to_python(self, value, state):
         # Check password length against the site configuration policy
-        if len(value) < state.min_pw_length:
+        if len(value) < int(state.min_pw_length):
             fmt = "Password must be at least %s characters"
             msg = fmt % state.min_pw_length
             raise Invalid(msg, value, state)

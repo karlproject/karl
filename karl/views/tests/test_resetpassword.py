@@ -22,6 +22,8 @@ from repoze.bfg import testing
 class ResetRequestViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        from karl.testing import registerSettings
+        registerSettings()
 
     def tearDown(self):
         cleanUp()
@@ -65,7 +67,6 @@ class ResetRequestViewTests(unittest.TestCase):
         from karl.testing import DummyUsers
 
         context = testing.DummyModel()
-        context.forgot_password_url = 'http://login.example.com/resetpassword'
         context.users = DummyUsers()
         context.users.add('me', 'me', 'password', ['group.KarlStaff'])
 
@@ -87,7 +88,6 @@ class ResetRequestViewTests(unittest.TestCase):
         from karl.testing import DummyUsers
 
         context = testing.DummyModel()
-        context.forgot_password_url = 'http://login.example.com/resetpassword'
         context.admin_email = 'admin@example.com'
         context.users = DummyUsers()
         context.users.add('me', 'me', 'password', [])
@@ -152,6 +152,8 @@ class ResetSentViewTests(unittest.TestCase):
 class ResetConfirmViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        from karl.testing import registerSettings
+        registerSettings()
 
     def tearDown(self):
         cleanUp()

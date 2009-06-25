@@ -575,7 +575,7 @@ def accept_invitation_view(context, request):
            "Context is expected to be an IInvitation."
 
     system_name = get_setting(context, 'system_name')
-    min_pw_length = get_setting(context, 'min_pw_length')
+    min_pw_length = int(get_setting(context, 'min_pw_length'))
     community = find_interface(context, ICommunity)
     community_name = community.title
 
