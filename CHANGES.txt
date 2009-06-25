@@ -13,6 +13,9 @@ Unreleased
   indirection.  Placed countries data in core karl package as const data.
   https://bugs.launchpad.net/karl3/+bug/391246
 
+- Updated OSI logo.
+  https://bugs.launchpad.net/karl3/+bug/390868
+
 3.2 (2009-06-24)
 ----------------
 
