@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- https://bugs.launchpad.net/bugs/391234 : use a non-forked version of
+  the repoze.who auth_tkt plugin (repoze.who 1.0.15, now in the
+  "lemonade" index has the "max age" feature which made this fork
+  necessary).
+
 3.2 (2009-06-24)
 ----------------
 

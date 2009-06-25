@@ -28,7 +28,7 @@
                size="30" tal:attributes="value password|nothing" />
 	<a href="${api.app_url}/reset_request.html">I forgot my password</a>
 	<div class="field loginLeftPadding discreet">
-          <input type="checkbox" name="osi.whoplugins.auth_tkt.max_age" id="remember" 
+          <input type="checkbox" name="max_age" id="remember" 
 		 class="noborder" value="315360000"/> <!-- Ten years -->
           <label for="remember">Remember me on this computer</label>
 	</div>
