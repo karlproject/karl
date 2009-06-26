@@ -2,7 +2,7 @@
 
   <utility
       provides="repoze.bfg.interfaces.ISecurityPolicy"
-      factory=".policy.RepozeWhoKARLSecurityPolicy"
+      factory="repoze.bfg.security.WhoInheritingACLSecurityPolicy"
       />
 
 </configure>

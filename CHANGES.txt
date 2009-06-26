@@ -22,6 +22,9 @@ Unreleased
 
 - Moved settings such as 'system_email_domain' to osi.ini.
 
+- Stop using a custom KarlSecurityPolicy; this policy was identical to
+  the WhoInheritingACLSecurityPolicy in repoze.bfg 0.8+.  Use that one
+  instead.
 
 3.2 (2009-06-24)
 ----------------
