@@ -316,15 +316,24 @@ class TestSetCreated(unittest.TestCase):
         self.assertEqual(model.created, 'abc')
         self.assertEqual(model.modified, 'def')
 
-    def test_with_icommunity(self):
+    def test_ignores_non_community_content_modified(self):
         root = testing.DummyModel()
-        root.content_modified = None
+        model = testing.DummyModel()
+        event = testing.DummyModel(name='phred', parent=root, object=model)
+        self._callFUT(model, event)
+        self.failIf('content_modified' in root.__dict__)
+
+    def test_updates_community_content_modified(self):
+        root = testing.DummyModel()
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunity
         directlyProvides(root, ICommunity)
-        model = testing.DummyModel(__parent__=root)
-        self._callFUT(model, None)
-        self.assertNotEqual(root.content_modified, None)
+        # bogus:  __parent__ is not yet set on obj in IObjectWillBeAddedEvent
+        #model = testing.DummyModel(__parent__=root)
+        model = testing.DummyModel()
+        event = testing.DummyModel(name='phred', parent=root, object=model)
+        self._callFUT(model, event)
+        self.failUnless('content_modified' in root.__dict__)
 
 class TestDeleteCommunity(unittest.TestCase):
     def setUp(self):

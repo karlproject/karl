@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #392561:  get 'content_modified' set correctly on communities when
+  adding content.
+
 - LP #391234:  Use a non-forked version of the repoze.who auth_tkt plugin
   (repoze.who 1.0.15, now in the "lemonade" index has the "max age" feature
   which made this fork necessary).

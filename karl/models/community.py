@@ -30,6 +30,7 @@ class Community(Folder):
     _members_group = 'group.community:%s:members'
     _moderators_group = 'group.community:%s:moderators'
     default_tool = '' # means default tab (overview)
+    content_modified = None # will be set by subscriber
 
     def __init__(self, title, description, text=u'', creator=u''):
 
@@ -41,7 +42,6 @@ class Community(Folder):
         else:
             self.text = unicode(text)            
         self.creator = creator
-        self.content_modified = datetime.now()
         self['members'] = members = Members()
 
     @property

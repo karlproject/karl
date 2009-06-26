@@ -115,13 +115,15 @@ def set_created(obj, event):
                 node.modified = now
             if not getattr(node, 'created', None):
                 node.created = now
-    _modify_community(obj, now)
+    parent = getattr(event, 'parent', None)
+    if parent is not None:
+        _modify_community(parent, now)
 
 def _modify_community(obj, when):
     # manage content_modified on community whenever a piece of content
     # in a community is changed
     community = find_interface(obj, ICommunity)
-    if community is not None and community is not obj:
+    if community is not None:
          community.content_modified = when
 
 def delete_community(obj, event):
