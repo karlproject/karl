@@ -4,23 +4,21 @@ karl package Changelog
 Unreleased
 ----------
 
-- https://bugs.launchpad.net/bugs/391234 : use a non-forked version of
-  the repoze.who auth_tkt plugin (repoze.who 1.0.15, now in the
-  "lemonade" index has the "max age" feature which made this fork
-  necessary).
+- LP #391234:  Use a non-forked version of the repoze.who auth_tkt plugin
+  (repoze.who 1.0.15, now in the "lemonade" index has the "max age" feature
+  which made this fork necessary).
+  
+- LP #391246:  Removed concept of "vocabularies" as a persistently stored
+  thing with indirection.  Placed countries data in core karl package as
+  const data.
 
-- Removed concept of "vocabularies" as a persistently stored thing with
-  indirection.  Placed countries data in core karl package as const data.
-  https://bugs.launchpad.net/karl3/+bug/391246
+- LP #390868:  Updated OSI logo.
 
-- Updated OSI logo.
-  https://bugs.launchpad.net/karl3/+bug/390868
-
-- Add 'use_cache' kw argument to CachingCatalog to disable cache for particular
-  searches.
-  https://bugs.launchpad.net/karl3/+bug/384841
+- LP #384841:  Add 'use_cache' kw argument to CachingCatalog to disable
+  cache for particular searches.
 
 - Moved settings such as 'system_email_domain' to osi.ini.
+
 
 3.2 (2009-06-24)
 ----------------
@@ -35,37 +33,45 @@ Unreleased
   This is to work around an error in wvConvert such that it will hang
   indefinitely for certain inputs.
 
+
 3.1 (2009-06-16)
 ----------------
 
-- LP #387390:  add / enable delete profile view, deleting the corresponding
+- LP #387390:  Add / enable delete profile view, deleting the corresponding
   user as well.
 
-- Added optional 'reason' argument to 'logout_view', to enable overriding
-  the header value passed explaining why the user landed on the login form.
-  Use this argument when returning the logout response from another view.
+- LP #336714:  Added optional 'reason' argument to 'logout_view', to enable
+  overriding the header value passed explaining why the user landed on the
+  login form.  Use this argument when returning the logout response from
+  another view.
 
-- LP #385580: Have the "Back to Parent" link not be full width on the <a>
+- LP #385580:  Have the "Back to Parent" link not be full width on the <a>.
 
-- LP #385268: Email index is converted to lower case to facilitate case
+- LP #385268:  Email index is converted to lower case to facilitate case
   insensitive search.
 
 - LP #385636: Better handling of existing users in invite new users form.
 
+
 3.0 (2009-06-15)
 ----------------
 
-- Intersect text index search results last for advanced search,
-  hopefully improving relevance ranking.
+- LP #384096: Intersect text index search results last for advanced search,
+  improving relevance ranking.
 
 - Micro-speedups for "communities" page.
 
-- Consolidated three showtag views to use same code.
+- LP 386110:
 
-- Filter items in showtag view according to view permission of authenticated
-  user.
+  o Filter items in showtag view according to view permission of
+    authenticated user.
 
-- Make sure new user profiles get initialized with __acl__.
+  o Consolidated three showtag views to use same code.
+
+  o Fix double slashes in profile view.
+
+  o Make sure new user profiles get initialized with __acl__.
+
 
 osi-production-20090611 (2009-06-11)
 ------------------------------------
@@ -73,6 +79,7 @@ osi-production-20090611 (2009-06-11)
 - Temporarily revert commit to use "natural" order of text index
   committed in osi-production-20090610 because caused search queries
   to ignore catalog security info.
+
 
 osi-production-20090610 (2009-06-10)
 ------------------------------------
@@ -88,11 +95,13 @@ osi-production-20090610 (2009-06-10)
 
 - Improved performance of member search widget in add_member_view
 
+
 osi-production-20090608 (2009-06-08)
 ------------------------------------
 
 - Switched to using a multi-adapter for footer (replaces hard-wired OSI
   branding).
+
 
 osi-production-20090603 (2009-06-03)
 ------------------------------------
@@ -134,10 +143,12 @@ osi-production-20090603 (2009-06-03)
 - tagsearch: Fix tagsearch result list to never wrap, and extend its length
   for longer search results.
 
+
 osi-production-20090531 (2009-05-31)
 ------------------------------------
 
 - No changes to this package.
+
 
 osi-production-20090528 (2009-05-28)
 ------------------------------------
