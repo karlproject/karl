@@ -265,7 +265,7 @@ def show_community_view(context, request):
     if not(user in context.member_names or user in context.moderator_names):
         actions.append(('Join', 'join.html'))
 
-    if has_permission('delete', context, request):
+    if has_permission('moderate', context, request):
         actions.append(('Delete', 'delete.html'))
 
     recent_items = []
