@@ -27,18 +27,17 @@ from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
+from karl.scripting import get_default_config
+from karl.scripting import open_root
 from karl.security.policy import NO_INHERIT
 from karl.utils import find_profiles
 from karl.views.peopledirectory import COLUMNS
 from lxml import etree
-from paste.deploy import loadapp
-from repoze.bfg.registry import registry_manager
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Deny
 from repoze.bfg.traversal import model_path
 import optparse
 import os
-import sys
 import transaction
 
 class ParseError(Exception):
@@ -211,8 +210,8 @@ def reindex(peopledir):
 
 def main():
     parser = optparse.OptionParser(description=__doc__)
-    parser.add_option('-c', '--config', dest='config',
-        help='Path to configuration file (defaults to peopleconf.ini)',
+    parser.add_option('-C', '--config', dest='config',
+        help='Path to configuration file (defaults to etc/karl.ini)',
         metavar='FILE')
     parser.add_option('--dry-run', dest='dryrun',
         action='store_true', default=False,
@@ -221,18 +220,10 @@ def main():
     if args:
         parser.error("Too many parameters: %s" % repr(args))
 
-    if options.config is None:
-        # we assume that the console script lives in the 'bin' dir of a
-        # sandbox or buildout, and that the .ini file lives in the 'etc'
-        # directory of the sandbox or buildout
-        here = os.path.dirname(sys.executable)
-        options.config = os.path.join(here, os.pardir, 'etc', 'peopleconf.ini')
-
-    config = os.path.abspath(options.config)
-    app = loadapp('config:%s' % config, name='zodb')
-    environ = {}
-    registry_manager.set(app.registry)
-    root = app.root_policy(environ)
+    config = options.config
+    if config is None:
+        config = get_default_config()
+    root, closer = open_root(config)
 
     cp = ConfigParser()
     cp.read(config)

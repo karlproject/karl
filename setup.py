@@ -88,8 +88,16 @@ setup(name='karl',
       timeit = karl.timeit:main
       karlerrorpage = karl.errorpage:ErrorPageFilter
       [console_scripts]
+      addlicense = karl.scripts.addlicense:main
+      debug = karl.scripts.debug:main
+      evolve = karl.scripts.evolve:main
+      export_usage_metadata = karl.scripts.export_usage_metadata:main
       jsconcat = karl.scripts.jsconcat:main
+      karlctl = karl.scripts.karlctl:main
+      mkprivate = karl.scripts.mkprivate:main
       peopleconf = karl.scripts.peopleconf:main
+      reindex_catalog = karl.scripts.reindex_catalog:main
+      update_feeds = karl.scripts.update_feeds:main
       """
       )
 

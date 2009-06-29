@@ -20,13 +20,16 @@ Unreleased
 - LP #384841:  Add 'use_cache' kw argument to CachingCatalog to disable
   cache for particular searches.
 
-- LP #391377: Moved settings such as 'system_email_domain' to osi.ini.
+- LP #391377: Moved settings such as 'system_email_domain' to karl.ini.
 
 - Stop using a custom KarlSecurityPolicy; this policy was identical to
   the WhoInheritingACLSecurityPolicy in repoze.bfg 0.8+.  Use that one
   instead.
 
 - LP #388096: Made a link to the community delete operation.
+
+- LP #391247: Moved console scripts from the osi package to the karl
+  package.  Also added karl/scripting.py and renamed osi.ini to karl.ini.
 
 3.2 (2009-06-24)
 ----------------
