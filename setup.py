@@ -90,6 +90,7 @@ setup(name='karl',
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
       debug = karl.scripts.debug:main
+      digest = karl.scripts.digest:main
       evolve = karl.scripts.evolve:main
       export_usage_metadata = karl.scripts.export_usage_metadata:main
       jsconcat = karl.scripts.jsconcat:main
