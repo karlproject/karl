@@ -236,10 +236,11 @@ class ShowCommunityViewTests(unittest.TestCase):
                                 ICommunityInfo)
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 2)
+        self.assertEqual(len(renderer.actions), 3)
         self.assertEqual(renderer.actions, [
             ('Edit', 'edit.html'),
             ('Join', 'join.html'),
+            ('Delete', 'delete.html'),
         ])
         recent_items = renderer.recent_items
 
@@ -268,9 +269,10 @@ class ShowCommunityViewTests(unittest.TestCase):
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerDummySecurityPolicy('userid')
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 1)
+        self.assertEqual(len(renderer.actions), 2)
         self.assertEqual(renderer.actions, [
             ('Edit', 'edit.html'),
+            ('Delete', 'delete.html'),
         ])
         
 class RedirectCommunityViewTests(unittest.TestCase):

@@ -264,7 +264,10 @@ def show_community_view(context, request):
     # If user has permission to see this view then has permission to join.
     if not(user in context.member_names or user in context.moderator_names):
         actions.append(('Join', 'join.html'))
-    
+
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+
     recent_items = []
     recent_items_batch = get_recent_items_batch(context, request)
     for item in recent_items_batch["entries"]:
