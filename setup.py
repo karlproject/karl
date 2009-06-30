@@ -91,7 +91,6 @@ setup(name='karl',
       addlicense = karl.scripts.addlicense:main
       debug = karl.scripts.debug:main
       digest = karl.scripts.digest:main
-      evolve = karl.scripts.evolve:main
       export_usage_metadata = karl.scripts.export_usage_metadata:main
       jsconcat = karl.scripts.jsconcat:main
       karlctl = karl.scripts.karlctl:main
