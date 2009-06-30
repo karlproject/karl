@@ -17,7 +17,6 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 
@@ -112,18 +111,6 @@ class TestSiteView(unittest.TestCase):
         self.assertEqual(response.location,
             "http://example.com/communities/community/foo/some_view.html")
 
-class TestStaticView(unittest.TestCase):
-    def _callFUT(self, context, request):
-        from karl.views.site import static_view
-        return static_view(context, request)
-
-    def test_it(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        request.get_response = lambda *arg, **kw: 'foo'
-        response = self._callFUT(context, request)
-        self.assertEqual(response, 'foo')
-    
 class DummyMatch(testing.DummyModel):
     title = "somematch"
 
