@@ -141,7 +141,7 @@ class DummyRoot(DummyModel):
             self[u'profiles'][0] = DummyModel(title=dummy[1])
         self[u'communities'] = DummyModel()
 
-class DummySettings:
+class DummySettings(dict):
     reload_templates = True
     system_name = "karl3test"
     system_email_domain = "karl3.example.com"
@@ -152,7 +152,16 @@ class DummySettings:
     offline_app_url = "http://offline.example.com/app"
 
     def __init__(self, **kw):
-        self.__dict__.update(kw)
+        for k, v in self.__class__.__dict__.items():
+            self[k] = v
+        for k, v in kw.items():
+            self[k] = v
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
 
 class DummyAdapter:
     def __init__(self, context, request):
