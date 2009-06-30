@@ -31,6 +31,8 @@ Unreleased
 - LP #391247: Moved console scripts from the osi package to the karl
   package.  Also added karl/scripting.py and renamed osi.ini to karl.ini.
 
+- LP #391251: Moved osi/utilities to the karl package.
+
 3.2 (2009-06-24)
 ----------------
 

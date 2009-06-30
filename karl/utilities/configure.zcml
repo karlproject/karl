@@ -13,10 +13,16 @@
       component=".karldates.convert"
       />
 
-  <!--utility
+  <utility
+      provides="karl.utilities.interfaces.IMailinTextScrubber"
+      component=".textscrub.text_scrubber"
+      name="karl.utilities.textscrub:text_scrubber"
+      />
+
+  <utility
     factory="karl.utilities.mailer.mail_delivery_factory"
     provides="repoze.sendmail.interfaces.IMailDelivery"
-  /-->
+  />
 
   <utility
     component=".randomid.friendly_random_id"
