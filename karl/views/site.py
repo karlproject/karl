@@ -19,11 +19,10 @@
 
 import os
 
-from paste import urlparser
 from webob.exc import HTTPFound
 
-from repoze.bfg.wsgi import wsgiapp
 from repoze.bfg.url import model_url
+from repoze.bfg.view import static
 
 from karl.views.utils import get_user_home
 
@@ -31,11 +30,8 @@ from karl.views.utils import get_user_home
 ##from karl.models.interfaces import IOthers
 
 here = os.path.abspath(os.path.dirname(__file__))
-static = urlparser.StaticURLParser(here, cache_max_age=3600)
 
-@wsgiapp
-def static_view(environ, start_response):
-    return static(environ, start_response)
+static_view = static('static')
 
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)
