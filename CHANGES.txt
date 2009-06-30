@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Forward compat: use the "repoze.bfg.view.static" helper rather than rolling 
+  our own view to serve static files in karl.views.site.
+
 - LP #392561:  get 'content_modified' set correctly on communities when
   adding content.
 
