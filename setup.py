@@ -95,6 +95,7 @@ setup(name='karl',
       export_usage_metadata = karl.scripts.export_usage_metadata:main
       jsconcat = karl.scripts.jsconcat:main
       karlctl = karl.scripts.karlctl:main
+      mailin = karl.scripts.mailin:main
       mkprivate = karl.scripts.mkprivate:main
       peopleconf = karl.scripts.peopleconf:main
       reindex_catalog = karl.scripts.reindex_catalog:main
