@@ -1,6 +1,5 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <!-- Publish static resources under /static/ -->
   <view
     for="*"
     view=".acl.edit_acl_view"
