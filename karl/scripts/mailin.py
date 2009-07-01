@@ -25,8 +25,9 @@ from karl.scripting import open_root
 from karl.utilities.mailin import MailinRunner
 import optparse
 import os
+import sys
 
-def main(argv, factory=MailinRunner, root=None):
+def main(argv=sys.argv, factory=MailinRunner, root=None):
     parser = optparse.OptionParser(
         description=__doc__,
         usage="%prog [options] maildir_root",
@@ -89,4 +90,4 @@ def main(argv, factory=MailinRunner, root=None):
     runner()
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
