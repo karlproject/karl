@@ -151,5 +151,7 @@ class MailinRunner:
                 self.pending.sql.commit()
                 transaction.commit()
         except Exception:
-            os.system("touch %s/.error" % self.maildir_root)
+            error_file = os.path.join(self.maildir_root, 'Maildir', '.error')
+            with open(error_file, 'w') as f:
+                print >>f, time.asctime()
             raise
