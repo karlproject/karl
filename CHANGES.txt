@@ -38,6 +38,11 @@ Unreleased
 
 - Graceful handling if invalid 'To:' address in mailin.
 
+- Mailin can now signal that it is wedged by writing a file, '.error', to
+  its Maildir when it encounters an error.  This is easier to set up monitoring
+  for than scraping the logs.  Humans will still need to read the logs when
+  an error is found.
+
 3.2 (2009-06-24)
 ----------------
 
