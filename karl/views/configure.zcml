@@ -407,5 +407,11 @@
     name="picture_view.html"
   />
 
+  <view
+    for="*"
+    view=".error.raise_error"
+    name="raise_error.html"
+  />
+
 </configure>
 
