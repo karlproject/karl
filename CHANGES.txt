@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- Forward compat: use the "repoze.bfg.view.static" helper rather than rolling 
+- Forward compat: use the "repoze.bfg.view.static" helper rather than rolling
   our own view to serve static files in karl.views.site.
 
 - LP #392561:  get 'content_modified' set correctly on communities when
@@ -13,7 +13,7 @@ Unreleased
 - LP #391234:  Use a non-forked version of the repoze.who auth_tkt plugin
   (repoze.who 1.0.15, now in the "lemonade" index has the "max age" feature
   which made this fork necessary).
-  
+
 - LP #391246:  Removed concept of "vocabularies" as a persistently stored
   thing with indirection.  Placed countries data in core karl package as
   const data.
@@ -35,6 +35,8 @@ Unreleased
   package.  Also added karl/scripting.py and renamed osi.ini to karl.ini.
 
 - LP #391251: Moved osi/utilities to the karl package.
+
+- Graceful handling if invalid 'To:' address in mailin.
 
 3.2 (2009-06-24)
 ----------------

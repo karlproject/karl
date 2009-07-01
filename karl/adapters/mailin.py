@@ -35,9 +35,9 @@ class MailinDispatcher(object):
     def getCommunityId(self, email):
         """ See IMailinDispatcher.
         """
-        before, after = email.split('@') 
-        if self.isCommunity(before):
-            return before
+        community_id = email.split('@',1)[0]
+        if self.isCommunity(community_id):
+            return community_id
 
     def getAuthor(self, email):
         """ See IMailinDispatcher.

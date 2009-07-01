@@ -184,6 +184,29 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['author'], 'extant')
         self.assertEqual(info['subject'], 'subject')
 
+    def test_crackHeaders_reply_invalid_to_addr(self):
+        context = self._makeContext()
+        profile = self._makeContext()
+        profile.__name__ = 'extant'
+        by_email = {'extant@example.com': profile}
+        pf = context['profiles'] = self._makeContext()
+        pf.getProfileByEmail = lambda email: by_email.get(email)
+        context['communities'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('undisclosed-recipients:;',)
+        message.from_ = ('extant@example.com',)
+        message.subject = 'subject'
+
+        info = mailin.crackHeaders(message)
+        self.failUnless(info['bounce'])
+        self.assertEqual(info['reason'], 'no community')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.assertEqual(info['in_reply_to'], None)
+        self.assertEqual(info['author'], 'extant')
+        self.assertEqual(info['subject'], 'subject')
+
     def test_crackHeaders_reply_ok(self):
         context = self._makeContext()
         profile = self._makeContext()
@@ -528,7 +551,7 @@ class TestOfflineContextURL(unittest.TestCase):
     def _make_one(self, model):
         from karl.adapters.url import OfflineContextURL
         return OfflineContextURL(model, None)
-    
+
     def test_it(self):
         from repoze.bfg.testing import DummyModel
         context = DummyModel()
