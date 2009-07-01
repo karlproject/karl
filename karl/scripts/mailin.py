@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -171,7 +171,7 @@ class MailinRunner:
             path = catalog.document_map.address_for_docid(docid)
             item = find_model(self.root, path)
             target = item
-        
+
         IMailinHandler(target).handle(message, info, text, attachments)
 
     def bounceMessage(self, message, info):
@@ -198,31 +198,36 @@ class MailinRunner:
         return not info['bounce']
 
     def __call__(self):
-        processed = bounced = 0
-        self.section('Processing mail-in content', '=')
-        if self.verbosity > 0:
-            print 'Maildir root:   ', self.maildir_root
-            print 'Pending queue:  ', self.pq_file
-            print 'ZODB URI:       ', self.zodb_uri
-            print '=' * 65
-        self.setup()
+        try:
+            processed = bounced = 0
+            self.section('Processing mail-in content', '=')
+            if self.verbosity > 0:
+                print 'Maildir root:   ', self.maildir_root
+                print 'Pending queue:  ', self.pq_file
+                print 'ZODB URI:       ', self.zodb_uri
+                print '=' * 65
+            self.setup()
 
-        while self.pending:
-            message_id = list(self.pending.pop())[0]
-            if self.handleMessage(message_id):
-                processed += 1
-            else:
-                bounced += 1
+            while self.pending:
+                message_id = list(self.pending.pop())[0]
+                if self.handleMessage(message_id):
+                    processed += 1
+                else:
+                    bounced += 1
 
-        if self.verbosity > 0:
-            print '=' * 65
-            print 'Processed %d messages' % processed
-            print 'Bounced %d messages' % bounced
-            print 
-        if not self.dry_run:
-            import transaction
-            self.pending.sql.commit()
-            transaction.commit()
+            if self.verbosity > 0:
+                print '=' * 65
+                print 'Processed %d messages' % processed
+                print 'Bounced %d messages' % bounced
+                print
+            if not self.dry_run:
+                import transaction
+                self.pending.sql.commit()
+                transaction.commit()
+
+        except Exception:
+            os.system("touch %s/.error" % self.maildir_root)
+            raise
 
 def main():
     MailinRunner(sys.argv)()
