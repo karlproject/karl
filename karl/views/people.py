@@ -375,6 +375,8 @@ def manage_communities_view(context, request):
         msg = '?status_message=Community+preferences+updated.'
         return HTTPFound(location=path+msg)
 
+    # XXX Iterating over every community in the system isn't a particularly
+    #     efficient solution.  Should use catalog.
     communities = []
     for community in communities_folder.values():
         if (userid in community.member_names or
