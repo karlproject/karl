@@ -413,5 +413,9 @@
     name="raise_error.html"
   />
 
+  <forbidden
+    view=".forbidden.forbidden"
+    />
+
 </configure>
 

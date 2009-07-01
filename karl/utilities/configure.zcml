@@ -30,11 +30,6 @@
   />
 
   <utility
-    component=".forbidden.Forbidden"
-    provides="repoze.bfg.interfaces.IUnauthorizedAppFactory"
-  />
-
-  <utility
     factory=".alerts.Alerts"
     provides=".interfaces.IAlerts"
     />
