@@ -22,7 +22,6 @@
 from traceback import format_exc
 
 from webob import Request
-from webob import Response
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
@@ -61,7 +60,7 @@ class ErrorPageFilter(object):
                 
             traceback_info = format_exc()
             resp = render_template_to_response(
-                'views/templates/wsgi_errormsg.pt',
+                'karl.views:templates/wsgi_errormsg.pt',
                 error_message='General KARL Error',
                 error_text=GENERAL_MESSAGE,
                 static_url=static_url,
@@ -84,7 +83,7 @@ class ErrorPageFilter(object):
                 )
             error_text = NOTFOUND_MESSAGE if status == 404 else GENERAL_MESSAGE
             resp = render_template_to_response(
-                'views/templates/wsgi_errormsg.pt',
+                'karl.views:templates/wsgi_errormsg.pt',
                 error_message='Not Found',
                 static_url=static_url,
                 error_text=error_text,
