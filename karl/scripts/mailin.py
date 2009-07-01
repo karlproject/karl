@@ -204,7 +204,6 @@ class MailinRunner:
             if self.verbosity > 0:
                 print 'Maildir root:   ', self.maildir_root
                 print 'Pending queue:  ', self.pq_file
-                print 'ZODB URI:       ', self.zodb_uri
                 print '=' * 65
             self.setup()
 
