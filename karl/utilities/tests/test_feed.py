@@ -18,17 +18,22 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-class UpdateFeedTests(unittest.TestCase):
+class UpdateFeedsTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _config_filename(self):
+    def _callFUT(self, site, parse, **kw):
+        from karl.utilities.feed import update_feeds
+        from cStringIO import StringIO
         import os
-        return os.path.join(
+        out = StringIO()
+        config_filename = os.path.join(
             os.path.dirname(__file__), 'feedtests', 'testfeeds.ini')
+        update_feeds(site, config_filename, out=out, parse=parse, **kw)
+        return out.getvalue()
 
     def test_first_update(self):
         # first update will create container and get feeds
@@ -40,13 +45,9 @@ class UpdateFeedTests(unittest.TestCase):
         registerContentFactory(DummyModel, IFeedsContainer)
         registerContentFactory(DummyFeed, IFeed)
 
-        from cStringIO import StringIO
-        out = StringIO()
+        out = self._callFUT(site, parse=FakeFeedParser)
 
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), out=out, parse=FakeFeedParser)
-
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "200 (ok)\n")
 
@@ -64,19 +65,15 @@ class UpdateFeedTests(unittest.TestCase):
         feed.feed_modified = "yesterday"
         site = {'feeds': {'example.com': feed}}
 
-        from cStringIO import StringIO
-        out = StringIO()
-
         parsers = []
         def parse(*args, **kw):
             res = FakeFeedParser(*args, **kw)
             parsers.append(res)
             return res
 
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), out=out, parse=parse)
+        out = self._callFUT(site, parse=parse)
 
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "304 (unchanged)\n")
         self.assertEquals(parsers[0].etag, 'tagyoureit')
@@ -88,19 +85,15 @@ class UpdateFeedTests(unittest.TestCase):
         feed.feed_modified = "yesterday"
         site = {'feeds': {'example.com': feed}}
 
-        from cStringIO import StringIO
-        out = StringIO()
-
         parsers = []
         def parse(*args, **kw):
             res = FakeFeedParser(*args, **kw)
             parsers.append(res)
             return res
 
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), force=True, out=out, parse=parse)
+        out = self._callFUT(site, parse=parse, force=True)
 
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "200 (ok)\n")
 
@@ -108,35 +101,27 @@ class UpdateFeedTests(unittest.TestCase):
         feed = DummyFeed('Example')
         site = {'feeds': {'example.com': feed}}
 
-        from cStringIO import StringIO
-        out = StringIO()
-
         def parse(uri):
             p = FakeFeedParser(uri)
             p['status'] = 410
             return p
 
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), out=out, parse=parse)
+        out = self._callFUT(site, parse=parse)
 
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "410 (gone)\n")
         self.assertEquals(feed.old_uri, 'http://example.com/atom.xml')
         self.assertEquals(feed.new_uri, None)
 
         # now try to fetch again
-        out = StringIO()
-        update(site, self._config_filename(), out=out, parse=parse)
-        self.assertEquals(out.getvalue(),
+        out = self._callFUT(site, parse=parse)
+        self.assertEquals(out,
             "Warning: Feed 'example.com' is gone. Skipping.\n")
 
     def test_feed_moved(self):
         feed = DummyFeed('Example')
         site = {'feeds': {'example.com': feed}}
-
-        from cStringIO import StringIO
-        out = StringIO()
 
         def parse(uri):
             p = FakeFeedParser(uri)
@@ -145,19 +130,17 @@ class UpdateFeedTests(unittest.TestCase):
                 p['href'] = "http://example.com/rss2.xml"
             return p
 
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), out=out, parse=parse)
+        out = self._callFUT(site, parse=parse)
 
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "301 (moved)\n")
         self.assertEquals(feed.old_uri, 'http://example.com/atom.xml')
         self.assertEquals(feed.new_uri, "http://example.com/rss2.xml")
 
         # now try to fetch again
-        out = StringIO()
-        update(site, self._config_filename(), out=out, parse=parse)
-        self.assertEquals(out.getvalue(),
+        out = self._callFUT(site, parse=parse)
+        self.assertEquals(out,
             "Warning: Feed 'example.com' has moved to "
             "http://example.com/rss2.xml.\n"
             "Please update the feed configuration file.\n"
@@ -168,12 +151,7 @@ class UpdateFeedTests(unittest.TestCase):
         feed = DummyFeed('Example')
         site = {'feeds': {'example.com': feed}}
 
-        from cStringIO import StringIO
-        out = StringIO()
-
-        # first populate the feed storage
-        from karl.scripts.update_feeds import update
-        update(site, self._config_filename(), out=out, parse=FakeFeedParser)
+        self._callFUT(site, parse=FakeFeedParser)
 
         feed = site['feeds']['example.com']
         self.assertEquals(3, len(feed.entries))
@@ -187,10 +165,9 @@ class UpdateFeedTests(unittest.TestCase):
             p.bozo_exception = IOError('publisher failed Turing test')
             return p
 
-        out = StringIO()
-        update(site, self._config_filename(), out=out, parse=parse)
+        out = self._callFUT(site, parse=parse)
 
-        self.assertEquals(out.getvalue(),
+        self.assertEquals(out,
             "Getting feed 'example.com' from http://example.com/atom.xml... "
             "200 (ok)\n"
             "Warning for feed 'example.com': publisher failed Turing test\n"
