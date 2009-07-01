@@ -89,15 +89,7 @@ setup(name='karl',
       karlerrorpage = karl.errorpage:ErrorPageFilter
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
-      debug = karl.scripts.debug:main
-      digest = karl.scripts.digest:main
       jsconcat = karl.scripts.jsconcat:main
-      karlctl = karl.scripts.karlctl:main
-      mailin = karl.scripts.mailin:main
-      mkprivate = karl.scripts.mkprivate:main
-      peopleconf = karl.scripts.peopleconf:main
-      reindex_catalog = karl.scripts.reindex_catalog:main
-      update_feeds = karl.scripts.update_feeds:main
       """
       )
 

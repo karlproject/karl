@@ -31,8 +31,8 @@ Unreleased
 
 - LP #388096: Made a link to the community delete operation.
 
-- LP #391247: Moved console scripts from the osi package to the karl
-  package.  Also added karl/scripting.py and renamed osi.ini to karl.ini.
+- LP #391247: Refactored console scripts to make them easier to test
+  and maintain.  Renamed osi.ini to karl.ini.
 
 - LP #391251: Moved osi/utilities to the karl package.
 
