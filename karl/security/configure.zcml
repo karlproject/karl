@@ -1,9 +1,11 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <utility
-      provides="repoze.bfg.interfaces.ISecurityPolicy"
-      factory="repoze.bfg.security.WhoInheritingACLSecurityPolicy"
-      />
+  <repozewho1authenticationpolicy
+      identifier_name="auth_tkt"
+      callback=".policy.get_groups"
+   />
+
+   <aclauthorizationpolicy/>
 
 </configure>
 

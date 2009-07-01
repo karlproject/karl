@@ -57,3 +57,7 @@ class ACLChecker(object):
                             return False
         return False
     
+def get_groups(identity, request):
+    if 'groups' in identity:
+        return identity['groups']
+
