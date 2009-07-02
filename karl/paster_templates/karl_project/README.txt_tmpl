@@ -1,0 +1,19 @@
+README
+======
+
+This package provides a starting point for local customizations
+of KARL.
+
+
+Running the Server
+------------------
+
+This package provides the main application entry point for Paste.
+
+
+Database Population
+-------------------
+
+On starting up the server for the first time, or when ever running
+the ``bin/startover`` script, this package creates the initial content
+of the KARL site in the root of the database.

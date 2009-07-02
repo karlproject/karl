@@ -90,6 +90,8 @@ setup(name='karl',
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
       jsconcat = karl.scripts.jsconcat:main
+      [paste.paster_create_template]
+      karl_project=karl.paster:KARLProjectTemplate
       """
       )
 
