@@ -41,6 +41,7 @@ def main(argv=sys.argv):
     grid_dir = os.path.join(static_dir, 'jquery-ui', 'grid', 'ui')
     autobox_dir = os.path.join(static_dir, 'jquery-ui', 'autobox2')
     karl_dir = static_dir
+    tinymce_dir = os.path.join(static_dir, 'tiny_mce')
 
     packed_dir = os.path.join(static_dir, 'packed')
 
@@ -57,9 +58,27 @@ def main(argv=sys.argv):
             filesindir(karl_dir, 'karl.js'),
             ):
         f.write(file(fname).read())
-        
     f.close()
     print "Successfully produced resource", karl_ui_js
+
+
+    # the tinymce resource must be in the tinymce dir,
+    # because it traverses for resources from there.
+    tiny_mce_js = os.path.join(tinymce_dir, 'tiny_mce_gzip.js')
+    f = file(tiny_mce_js, 'w')
+    for fname in itertools.chain(
+            filesindir(tinymce_dir, 'tiny_mce.js'),
+            filesindir(tinymce_dir, 'langs/en.js'),
+            filesindir(tinymce_dir, 'themes/advanced/editor_template.js'),
+            filesindir(tinymce_dir, 'themes/advanced/langs/en.js'),
+            filesindir(tinymce_dir, 'plugins/paste/editor_plugin.js'),
+            filesindir(tinymce_dir, 'plugins/wicked/editor_plugin.js'),
+            filesindir(tinymce_dir, 'plugins/wicked/langs/en.js'),
+            ):
+        f.write(file(fname).read())
+    f.close()
+    print "Successfully produced resource", tiny_mce_js
+
 
 if __name__ == '__main__':
     main()
