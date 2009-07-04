@@ -72,7 +72,10 @@ def main(argv=sys.argv):
             filesindir(tinymce_dir, 'themes/advanced/editor_template.js'),
             filesindir(tinymce_dir, 'themes/advanced/langs/en.js'),
             filesindir(tinymce_dir, 'plugins/paste/editor_plugin.js'),
-            filesindir(tinymce_dir, 'plugins/wicked/editor_plugin.js'),
+            # XXX Starting with tinymce 3.2.4.1, the concatenated source
+            # fails on IE7.
+            ##filesindir(tinymce_dir, 'plugins/wicked/editor_plugin.js'),
+            filesindir(tinymce_dir, 'plugins/wicked/editor_plugin_src.js'),
             filesindir(tinymce_dir, 'plugins/wicked/langs/en.js'),
             ):
         f.write(file(fname).read())
