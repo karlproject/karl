@@ -3,6 +3,13 @@ karl package Changelog
 
 Unreleased
 ----------
+
+- LP #391264: Added an administrator-level user edit view.
+
+
+3.3 (2009-07-06)
+----------------
+
 - Add fault tolerance to mail-in for message bodies with unknown non-unicode
   character encodings.
 
@@ -49,8 +56,6 @@ Unreleased
   its Maildir when it encounters an error.  This is easier to set up monitoring
   for than scraping the logs.  Humans will still need to read the logs when
   an error is found.
-
-- LP #391264: Added an administrator-level user edit view.
 
 3.2 (2009-06-24)
 ----------------
