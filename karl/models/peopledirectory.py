@@ -21,14 +21,17 @@ from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IProfile
+from karl.models.site import get_acl
 from karl.models.site import get_allowed_to_view
 from karl.models.site import get_lastfirst
+from karl.models.site import get_path
 from karl.models.site import get_textrepr
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from repoze.catalog.document import DocumentMap
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
+from repoze.catalog.indexes.path2 import CatalogPathIndex2
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.folder import Folder
 from zope.interface import implements
@@ -128,6 +131,8 @@ class PeopleDirectory(Folder):
             'lastfirst': CatalogFieldIndex(get_lastfirst),
             'lastnamestartswith': CatalogFieldIndex(get_lastname_firstletter),
             'texts': CatalogTextIndex(get_textrepr),
+            # path index is needed for profile deletion
+            'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
             'allowed': CatalogKeywordIndex(get_allowed_to_view),
 
             # provide indexes for sorting reports
