@@ -145,7 +145,7 @@ class DummySettings(dict):
     reload_templates = True
     system_name = "karl3test"
     system_email_domain = "karl3.example.com"
-    min_pw_length = '8'
+    min_pw_length = 8
     admin_email = 'admin@example.com'
     staff_change_password_url = 'http://pw.example.com'
     forgot_password_url = 'http://login.example.com/resetpassword'

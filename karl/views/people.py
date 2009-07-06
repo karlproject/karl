@@ -220,7 +220,7 @@ def admin_edit_profile_view(context, request):
 
     if form.submit in form.formdata:
         try:
-            min_pw_length = int(get_setting(context, 'min_pw_length'))
+            min_pw_length = get_setting(context, 'min_pw_length')
             state = baseforms.AppState(
                 context=context, min_pw_length=min_pw_length)
 
@@ -593,7 +593,7 @@ def change_password_view(context, request):
 
     if form.submit in form.formdata:
         try:
-            min_pw_length = int(get_setting(context, 'min_pw_length'))
+            min_pw_length = get_setting(context, 'min_pw_length')
             state = baseforms.AppState(min_pw_length=min_pw_length)
             converted = form.to_python(form.fieldvalues, state)
             form.is_valid = True
