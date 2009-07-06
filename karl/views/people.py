@@ -220,7 +220,9 @@ def admin_edit_profile_view(context, request):
 
     if form.submit in form.formdata:
         try:
-            state = baseforms.AppState(context=context)
+            min_pw_length = int(get_setting(context, 'min_pw_length'))
+            state = baseforms.AppState(
+                context=context, min_pw_length=min_pw_length)
 
             converted = form.to_python(form.fieldvalues, state)
             form.is_valid = True
@@ -241,6 +243,9 @@ def admin_edit_profile_view(context, request):
                 else:
                     if group in user_groups:
                         users.remove_user_from_group(userid, group)
+
+            if converted['password']:
+                users.change_password(userid, converted['password'])
 
             # Handle simple fields
             for name in form.simple_field_names:
@@ -314,6 +319,9 @@ class AdminEditProfileForm(EditProfileForm):
     login = baseforms.login
     home_path = validators.UnicodeString(strip=True)
     simple_field_names = EditProfileForm.simple_field_names + ['home_path']
+    password = baseforms.PasswordChecker(strip=True)
+    password_confirm = validators.UnicodeString(strip=True)
+    chained_validators = baseforms.chained_validators
 
 def get_profile_actions(profile, request):
     actions = []

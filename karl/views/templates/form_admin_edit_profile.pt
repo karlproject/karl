@@ -11,6 +11,8 @@
       <fieldset metal:use-macro="formfields.macros['login-field']"/>
       <fieldset metal:use-macro="formfields.macros['group-fields']"/>
       <fieldset metal:use-macro="formfields.macros['home-path-field']"/>
+      <fieldset metal:use-macro="formfields.macros['reset-password-field']"/>
+      <fieldset metal:use-macro="formfields.macros['reset-password_confirm-field']"/>
 
       <fieldset metal:use-macro="formfields.macros['firstname-field']"/>
       <fieldset metal:use-macro="formfields.macros['lastname-field']"/>

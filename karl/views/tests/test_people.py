@@ -294,6 +294,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'ed',
             'home_path': '',
+            'password': '',
+            'password_confirm': '',
             })
         request = testing.DummyRequest(params)
         context = DummyProfile()
@@ -334,6 +336,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'ed',
             'home_path': '',
+            'password': '',
+            'password_confirm': '',
             })
         params['photo'] = DummyUpload(
             filename="test.jpg",
@@ -377,6 +381,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'ed',
             'home_path': '',
+            'password': '',
+            'password_confirm': '',
             })
         params['photo'] = DummyUpload(
             filename="test.jpg",
@@ -416,6 +422,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'ed',
             'home_path': '',
+            'password': '',
+            'password_confirm': '',
             })
         params['photo_delete'] = '1'
         request = testing.DummyRequest(params)
@@ -438,6 +446,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'zed',
             'home_path': '',
+            'password': '',
+            'password_confirm': '',
             })
         request = testing.DummyRequest(params)
         context = DummyProfile()
@@ -459,6 +469,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'login': 'zed',
             'home_path': '',
             'groupfield-group-KarlLovers': 'on',
+            'password': '',
+            'password_confirm': '',
             })
         request = testing.DummyRequest(params)
         context = DummyProfile()
@@ -480,6 +492,8 @@ class AdminEditProfileTests(unittest.TestCase):
             'form.submitted': '1',
             'login': 'ed',
             'home_path': '/zzz',
+            'password': '',
+            'password_confirm': '',
             })
         request = testing.DummyRequest(params)
         context = DummyProfile()
@@ -492,6 +506,30 @@ class AdminEditProfileTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(context.home_path, '/zzz')
+
+    def test_change_password(self):
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '',
+            'password': 'abcdefgh',
+            'password_confirm': 'abcdefgh',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        from repoze.who.plugins.zodb.users import get_sha_password
+        pw = get_sha_password('abcdefgh')
+        self.assertEqual(users.get_by_id('ed')['password'], pw)
 
 
 class ShowProfileTests(unittest.TestCase):

@@ -3,22 +3,7 @@
 
   <div metal:fill-slot="content">
 
-    <h1 class="kscreentitle">Edit Profile and User Information</h1>
-
-    <div tal:condition="not api.user_is_staff">
-      <p>
-        <a href="${api.here_url}change_password.html">
-        Click here to change the password.
-        </a>.
-      </p>
-    </div>
-
-    <div tal:condition="api.user_is_staff">
-        <p>
-        Staff members' user information is managed centrally.
-        See the central system to change the password.
-        </p>
-    </div>
+    <h1 class="kscreentitle">Edit User and Profile Information</h1>
 
     <div tal:content="structure form.rendered_form"></div>
 

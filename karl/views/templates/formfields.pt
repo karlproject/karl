@@ -300,6 +300,29 @@
       <input name="password_confirm" type="password"/>
     </fieldset>
 
+    <fieldset metal:define-macro="reset-password-field"
+              tal:define="error fielderrors['password']|None"
+              class="${error and 'fieldError' or ''}"
+              id="password-field">
+      <label>Reset Password</label>
+      <div class="fieldHelp">
+        Enter a new password for the user here,
+        or leave blank to leave the password unchanged.
+      </div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password" type="password"/>
+    </fieldset>
+
+    <fieldset metal:define-macro="reset-password_confirm-field"
+              tal:define="error fielderrors['password_confirm']|None"
+              class="${error and 'fieldError' or ''}"
+              id="confirm-password-field">
+      <label>Confirm Reset Password</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="password_confirm" type="password"/>
+    </fieldset>
+
     <fieldset metal:define-macro="title-field"
 	      tal:define="error fielderrors['title']|None"
 	      class="${error and 'fieldError' or ''}"
