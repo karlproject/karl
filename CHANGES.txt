@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.3 (2009-07-06)
+----------------
 - Add fault tolerance to mail-in for message bodies with unknown non-unicode
   character encodings.
 
