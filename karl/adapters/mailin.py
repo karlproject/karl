@@ -142,7 +142,17 @@ class MailinDispatcher(object):
             data = part.get_payload(decode=1)
             if mimetype.startswith('text/'):
                 charset = part.get_content_charset() or 'utf-8'
-                data = data.decode(charset)
+                try:
+                    data = data.decode(charset)
+                except UnicodeDecodeError:
+                    # At this point we've run out of options in terms of
+                    # determining what the character encoding of this text
+                    # might be.  We will decode as though it is latin-1--if
+                    # the character encoding is not actually latin-1, some of
+                    # the characters will be mistranslated, but we at least
+                    # avoid a show-stopping UnicodeDecodeError.
+                    data = data.decode('latin-1')
+
             if filename is not None:
                 attachments.append((filename, mimetype, data))
             elif text is None and mimetype.startswith('text/plain'):

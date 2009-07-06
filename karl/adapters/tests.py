@@ -539,6 +539,17 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][0], 'cnlybnq')
         self.assertEqual(_called_with[0][1], 'text/plain')
 
+    def test_crackPayload_bad_encoding(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.payload = 'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s'
+        message.content_type = 'text/plain'
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s')
+        self.assertEqual(len(attachments), 0)
+
 class TestOfflineContextURL(unittest.TestCase):
     def setUp(self):
         cleanUp()

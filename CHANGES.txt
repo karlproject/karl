@@ -3,6 +3,8 @@ karl package Changelog
 
 Unreleased
 ----------
+- Add fault tolerance to mail-in for message bodies with unknown non-unicode
+  character encodings.
 
 - Add a ``karl_project`` paster template (unfinished) in order to
   bootstrap a KARL customization.  The code used is an amalgam of
