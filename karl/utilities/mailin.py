@@ -138,6 +138,8 @@ class MailinRunner:
 
             while self.pending:
                 message_id = list(self.pending.pop())[0]
+                if self.verbosity > 0:
+                    print 'Processing message:', message_id
                 if self.handleMessage(message_id):
                     processed += 1
                 else:
