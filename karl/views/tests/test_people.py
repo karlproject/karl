@@ -40,7 +40,6 @@ class EditProfileTests(unittest.TestCase):
         context.title = "Eddie"
         site = karltesting.DummyRoot()
         site['profiles']['ed'] = context
-        site.staff_change_password_url = 'http://pw.example.com'
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
 
@@ -58,7 +57,8 @@ class EditProfileTests(unittest.TestCase):
         context = DummyProfile(email='me@example.com')
         context.website = "http://spacelabstudio.com"
         context.title = "Eddie"
-        context.__name__ = 'ed'
+        site = testing.DummyModel()
+        site['ed'] = context
         self._callFUT(context, request)
         form = renderer.form.rendered_form
         self.failUnless("http://spacelabstudio.com" in form)
@@ -69,7 +69,8 @@ class EditProfileTests(unittest.TestCase):
         request = testing.DummyRequest({'controlls.submitted':1})
         context = DummyProfile(email='me@example.com')
         context.title = "Eddie"
-        context.__name__ = 'ed'
+        site = testing.DummyModel()
+        site['ed'] = context
         self._callFUT(context, request)
         self.failUnless(renderer.form.submit)
         self.failIf(renderer.form.is_valid)
@@ -90,8 +91,9 @@ class EditProfileTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
                          'http://example.com/?status_message=Profile%20edited')
-        del profile_data["photo"]
         for k, v in profile_data.items():
+            if k == 'photo':
+                continue
             self.assertEqual(getattr(context, k), v)
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
@@ -122,6 +124,7 @@ class EditProfileTests(unittest.TestCase):
         request = testing.DummyRequest(params)
         context = DummyProfile()
         context.title = "Eddie"
+        
         response = self._callFUT(context, request)
 
         self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo)
@@ -187,6 +190,310 @@ class EditProfileTests(unittest.TestCase):
 
         self.assertRaises(KeyError, context.__getitem__, "photo.jpg")
 
+
+class AdminEditProfileTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        karltesting.registerCatalogSearch()
+        karltesting.registerSettings()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.people import admin_edit_profile_view
+        return admin_edit_profile_view(context, request)
+
+    def test_not_submitted(self):
+        context = DummyProfile(email='ed3@example.com')
+        context.title = "Eddie"
+        site = karltesting.DummyRoot()
+        site['profiles']['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/admin_edit_profile.pt')
+
+        response = self._callFUT(context, request)
+
+        self.failIf(response.location)
+        self.failUnless(renderer.form.is_valid is None)
+
+    def test_form_group_fields(self):
+        context = DummyProfile(email='ed3@example.com')
+        context.title = "Eddie"
+        site = karltesting.DummyRoot()
+        site['profiles']['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", ['group.KarlAdmin'])
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/form_admin_edit_profile.pt')
+
+        self._callFUT(context, request)
+
+        self.assertEqual(renderer.group_fields, [
+            {
+                'fieldname': 'groupfield-group-KarlAdmin',
+                'group': 'group.KarlAdmin',
+                'title': 'KarlAdmin',
+            },
+            {
+                'fieldname': 'groupfield-group-KarlLovers',
+                'group': 'group.KarlLovers',
+                'title': 'KarlLovers',
+            },
+            ])
+
+    def test_form_fill(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin_edit_profile.pt')
+        request = testing.DummyRequest()
+        context = DummyProfile(email='me@example.com')
+        context.website = "http://spacelabstudio.com"
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        self._callFUT(context, request)
+        form = renderer.form.rendered_form
+        self.failUnless("http://spacelabstudio.com" in form)
+        self.failUnless('enctype="multipart/form-data"' in form)
+
+    def test_submitted_invalid(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin_edit_profile.pt')
+        request = testing.DummyRequest({'controlls.submitted':1})
+        context = DummyProfile(email='me@example.com')
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        self._callFUT(context, request)
+        self.failUnless(renderer.form.submit)
+        self.failIf(renderer.form.is_valid)
+
+    def test_submitted_valid(self):
+        testing.registerDummySecurityPolicy('userid')
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.models.interfaces import IObjectWillBeModifiedEvent
+        from zope.interface import Interface
+        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        L2 = testing.registerEventListener((Interface,
+                                           IObjectWillBeModifiedEvent))
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+                         'http://example.com/ed/?status_message=User%20edited')
+        for k, v in profile_data.items():
+            if k == 'photo':
+                continue
+            self.assertEqual(getattr(context, k), v)
+        self.assertEqual(len(L), 2)
+        self.assertEqual(len(L2), 2)
+
+    def test_upload_photo(self):
+        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
+        testing.registerDummySecurityPolicy('userid')
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.models.interfaces import IObjectWillBeModifiedEvent
+        from zope.interface import Interface
+        from karl.testing import DummyUpload
+        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        L2 = testing.registerEventListener((Interface,
+                                           IObjectWillBeModifiedEvent))
+        from repoze.lemonade.interfaces import IContentFactory
+        from karl.models.interfaces import IImageFile
+        from karl.views.tests.test_file import DummyImageFile
+        testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
+                                IContentFactory)
+
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '',
+            })
+        params['photo'] = DummyUpload(
+            filename="test.jpg",
+            mimetype="image/jpeg",
+            data=dummy_photo)
+        params['photo.static'] = ''
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo)
+        self.assertEqual(response.location,
+            'http://example.com/ed/?status_message=User%20edited')
+        self.assertEqual(len(L), 2)
+        self.assertEqual(len(L2), 2)
+
+    def test_reupload_photo(self):
+        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
+        testing.registerDummySecurityPolicy('userid')
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.models.interfaces import IObjectWillBeModifiedEvent
+        from zope.interface import Interface
+        from karl.testing import DummyUpload
+        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        L2 = testing.registerEventListener((Interface,
+                                           IObjectWillBeModifiedEvent))
+        from repoze.lemonade.interfaces import IContentFactory
+        from karl.models.interfaces import IImageFile
+        from karl.views.tests.test_file import DummyImageFile
+        testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
+                                IContentFactory)
+
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '',
+            })
+        params['photo'] = DummyUpload(
+            filename="test.jpg",
+            mimetype="image/jpeg",
+            data=dummy_photo)
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo)
+        self.assertEqual(response.location,
+            'http://example.com/ed/?status_message=User%20edited')
+        self.assertEqual(len(L), 2)
+        self.assertEqual(len(L2), 2)
+
+        prev_len = len(dummy_photo)
+        dummy_photo2 = dummy_photo * 2
+        self.assertEqual(len(dummy_photo) * 2, len(dummy_photo2))
+        params['photo'] = DummyUpload(
+            filename="test.jpg",
+            mimetype="image/jpeg",
+            data=dummy_photo2)
+        request = testing.DummyRequest(params)
+        response = self._callFUT(context, request)
+        self.assertEqual(context["photo.jpg"].stream.read(), dummy_photo2)
+
+    def test_delete_photo(self):
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '',
+            })
+        params['photo_delete'] = '1'
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context["photo.jpg"] = testing.DummyModel()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        self.assertRaises(KeyError, context.__getitem__, "photo.jpg")
+
+    def test_change_login(self):
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'zed',
+            'home_path': '',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        self.assertEqual(users.get_by_id('ed')['login'], 'zed')
+
+    def test_change_groups(self):
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'zed',
+            'home_path': '',
+            'groupfield-group-KarlLovers': 'on',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", ['group.KarlAdmin'])
+        response = self._callFUT(context, request)
+
+        self.assertEqual(users.added_groups, [('ed', 'group.KarlLovers')])
+        self.assertEqual(users.removed_groups, [('ed', 'group.KarlAdmin')])
+
+    def test_change_home_path(self):
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '/zzz',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        response = self._callFUT(context, request)
+
+        self.assertEqual(context.home_path, '/zzz')
+
+
 class ShowProfileTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -220,7 +527,7 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("userid", "userlogin", "password", [])
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 3)
-        self.assertEqual(renderer.actions[0][1], 'edit_profile.html')
+        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
         self.assertEqual(renderer.actions[1][1], 'manage_communities.html')
         self.assertEqual(renderer.actions[2][1], 'manage_tags.html')
 
@@ -238,7 +545,8 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("userid", "userlogin", "password", [])
         context.users.add("chris", "chrislogin", "password", [])
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 0)
+        self.assertEqual(len(renderer.actions), 1)
+        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
 
     def test_communities(self):
         self._registerTagbox()

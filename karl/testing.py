@@ -150,6 +150,7 @@ class DummySettings(dict):
     staff_change_password_url = 'http://pw.example.com'
     forgot_password_url = 'http://login.example.com/resetpassword'
     offline_app_url = "http://offline.example.com/app"
+    selectable_groups = 'group.KarlAdmin group.KarlLovers'
 
     def __init__(self, **kw):
         for k, v in self.__class__.__dict__.items():
@@ -221,7 +222,7 @@ class DummyUsers:
     def remove(self, userid):
         self.removed_users.append(userid)
 
-    def add_group(self, userid, group_name):
+    def add_user_to_group(self, userid, group_name):
         self.added_groups.append((userid, group_name))
         if (self.community is not None and
             hasattr(self.community, "moderators_group_name") and
@@ -230,8 +231,9 @@ class DummyUsers:
                 self.community.moderator_names.add(userid)
             elif group_name == self.community.members_group_name:
                 self.community.member_names.add(userid)
+    add_group = add_user_to_group
 
-    def remove_group(self, userid, group_name):
+    def remove_user_from_group(self, userid, group_name):
         self.removed_groups.append((userid, group_name))
 
         if (self.community is not None and
@@ -242,6 +244,7 @@ class DummyUsers:
             elif group_name == self.community.members_group_name:
                 if userid in self.community.member_names:
                     self.community.member_names.remove(userid)
+    remove_group = remove_user_from_group
 
     def get_by_id(self, userid):
         if self._by_id.has_key(userid):
@@ -256,6 +259,12 @@ class DummyUsers:
     def change_password(self, userid, password):
         from repoze.who.plugins.zodb.users import get_sha_password
         self._by_id[userid]["password"] = get_sha_password(password)
+
+    def change_login(self, userid, new_login):
+        user = self._by_id[userid]
+        del self._by_login[user['login']]
+        self._by_login[new_login] = user
+        user['login'] = new_login
 
 class DummyUpload(object):
     """Simulates an HTTP upload.  Suitable for assigning as the value to

@@ -216,7 +216,14 @@
     name="edit_profile.html"
     permission="edit"
   />
-  
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.admin_edit_profile_view"
+    name="admin_edit_profile.html"
+    permission="administer"
+  />
+
   <view
     for="karl.models.interfaces.IProfile"
     view=".people.change_password_view"

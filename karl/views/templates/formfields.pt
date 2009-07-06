@@ -310,6 +310,44 @@
       <input name="title" style="width: 490px"/>
     </fieldset>
 
+    <fieldset metal:define-macro="login-field"
+              tal:define="error fielderrors['login']|None"
+              class="${error and 'fieldError' or ''}"
+              id="login-field">
+      <label class="required">Login</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="login"/>
+    </fieldset>
+
+    <div metal:define-macro="group-fields" class="group-fields">
+      <h3>Group Memberships</h3>
+      <div tal:repeat="field group_fields" class="group-field">
+        <fieldset tal:define="error fielderrors[field['fieldname']]|None"
+            class="${error and 'fieldError' or ''}"
+            id="${field['fieldname']}-fieldset" style="margin: 0 1em;">
+          <div class="fieldHelp"></div>
+          <div tal:condition="error" class="errorMessage">${error}</div>
+          <input name="${field['fieldname']}" id="${field['fieldname']}"
+            type="checkbox"/>
+          <label for="${field['fieldname']}">
+            ${field['title']}
+          </label>
+        </fieldset>
+      </div>
+    </div>
+
+    <fieldset metal:define-macro="home-path-field"
+              tal:define="error fielderrors['home_path']|None"
+              class="${error and 'fieldError' or ''}"
+              id="home-path-field">
+      <label>Home Path</label>
+      <div class="fieldHelp">The first page to show after logging in.  Leave
+        blank to show a community or the community list.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="home_path"/>
+    </fieldset>
+
     <fieldset metal:define-macro="firstname-field"
 	      tal:define="error fielderrors['firstname']|None"
 	      class="${error and 'fieldError' or ''}"

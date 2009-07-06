@@ -19,6 +19,7 @@ import email.message
 import urllib
 
 from formencode import Invalid
+from formencode import validators
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
@@ -187,14 +188,143 @@ class EditProfileForm(baseforms.BaseForm):
 
         return super(EditProfileForm, self).from_python(model_values, state)
 
+def admin_edit_profile_view(context, request):
+    form = AdminEditProfileForm(request.POST, submit="form.submitted",
+                           cancel="form.cancel")
+
+    group_fields = []
+    for group in get_setting(context, "selectable_groups").split():
+        if group.startswith('group.'):
+            title = group[6:]
+        else:
+            title = group
+        # make the field name compatible with CSS
+        fieldname = 'groupfield-%s' % group.replace('.', '-')
+        group_fields.append({
+            'group': group,
+            'fieldname': fieldname,
+            'title': title,
+            })
+
+    for field in group_fields:
+        validator = validators.Bool(if_missing=False, default=False)
+        form.add_field(field['fieldname'], validator)
+
+    users = find_users(context)
+    userid = context.__name__
+    user = users.get_by_id(userid)
+    user_groups = set(user['groups'])
+
+    if form.cancel in form.formdata:
+        return HTTPFound(location=model_url(context, request))
+
+    if form.submit in form.formdata:
+        try:
+            state = baseforms.AppState(context=context)
+
+            converted = form.to_python(form.fieldvalues, state)
+            form.is_valid = True
+
+            objectEventNotify(ObjectWillBeModifiedEvent(context))
+
+            try:
+                users.change_login(userid, converted['login'])
+            except ValueError, e:
+                raise CustomInvalid({'login': str(e)})
+
+            for field in group_fields:
+                group = field['group']
+                fieldname = field['fieldname']
+                if converted[fieldname]:
+                    if group not in user_groups:
+                        users.add_user_to_group(userid, group)
+                else:
+                    if group in user_groups:
+                        users.remove_user_from_group(userid, group)
+
+            # Handle simple fields
+            for name in form.simple_field_names:
+                setattr(context, name, converted.get(name))
+
+            handle_photo_upload(context, converted)
+
+            # Emit a modified event for recataloging
+            objectEventNotify(ObjectModifiedEvent(context))
+
+            path = model_url(context, request)
+            msg = '?status_message=User%20edited'
+            return HTTPFound(location=path+msg)
+
+        except Invalid, e:
+            fielderrors = e.error_dict
+            fill_values = form.fieldvalues
+            form.is_valid = False
+    else:
+        fielderrors = {}
+
+        # pre-fill form with model values
+        fill_values = form.from_python(context)
+        fill_values['login'] = user['login']
+
+        for field in group_fields:
+            group = field['group']
+            fieldname = field['fieldname']
+            fill_values[fieldname] = group in user_groups
+
+    page_title = 'Edit ' + context.title
+    api = TemplateAPI(context, request, page_title)
+
+    # Display portrait
+    photo = context.get_photo()
+    display_photo = {}
+    if photo is not None:
+        display_photo["url"] = model_url(photo, request)
+        display_photo["may_delete"] = True
+    else:
+        display_photo["url"] = api.app_url + "/static/images/defaultUser.gif"
+        display_photo["may_delete"] = False
+
+    # Enable hiding of certain fields via CSS descendent selectors
+    if 'group.KarlStaff' in user_groups:
+        staff_role_classname = 'k3_staff_role'
+    else:
+        staff_role_classname = 'k3_nonstaff_role'
+
+    form_html = render_template(
+        'templates/form_admin_edit_profile.pt',
+        post_url=request.url,
+        formfields=api.formfields,
+        fielderrors=fielderrors,
+        api=api,
+        photo=display_photo,
+        staff_role_classname=staff_role_classname,
+        group_fields=group_fields,
+    )
+
+    checkboxes = set(field['fieldname'] for field in group_fields)
+    form.rendered_form = form.merge(form_html, fill_values, checkboxes)
+
+    return render_template_to_response(
+        'templates/admin_edit_profile.pt',
+        form=form,
+        api=api,
+        )
+
+class AdminEditProfileForm(EditProfileForm):
+    login = baseforms.login
+    home_path = validators.UnicodeString(strip=True)
+    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
+
 def get_profile_actions(profile, request):
     actions = []
-    editable = authenticated_userid(request) == profile.__name__
-    if editable:
+    same_user = (authenticated_userid(request) == profile.__name__)
+    if has_permission('administer', profile, request):
+        actions.append(('Edit', 'admin_edit_profile.html'))
+    elif same_user:
         actions.append(('Edit', 'edit_profile.html'))
+    if same_user:
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
-
     return actions
 
 def show_profile_view(context, request):

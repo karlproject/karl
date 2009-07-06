@@ -319,7 +319,7 @@ class BaseForm(Schema):
         for key, value in self.formdata.items():
             self.fieldvalues[key] = value
 
-    def merge(self, htmlstring, fieldvalues):
+    def merge(self, htmlstring, fieldvalues, checkboxes=()):
         # Merge in field values, either from the default or from what
         # they typed in.
 
@@ -333,6 +333,10 @@ class BaseForm(Schema):
 
         schema_field_names = self.fields.keys()
         for field_name, field_value in fieldvalues.items():
+            if field_name in checkboxes:
+                form.fields[field_name] = bool(field_value)
+                continue
+
             fv = field_value
             if isinstance(fv, str):
                 # Reverse the encoding performed by UnicodeString.

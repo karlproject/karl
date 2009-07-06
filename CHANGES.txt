@@ -50,6 +50,8 @@ Unreleased
   for than scraping the logs.  Humans will still need to read the logs when
   an error is found.
 
+- LP #391264: Added an administrator-level user edit view.
+
 3.2 (2009-06-24)
 ----------------
 
