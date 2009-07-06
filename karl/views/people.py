@@ -330,6 +330,8 @@ def get_profile_actions(profile, request):
         actions.append(('Edit', 'admin_edit_profile.html'))
     elif same_user:
         actions.append(('Edit', 'edit_profile.html'))
+    if has_permission('delete', profile, request) and not same_user:
+        actions.append(('Delete', 'delete.html'))
     if same_user:
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))

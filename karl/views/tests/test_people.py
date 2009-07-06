@@ -583,8 +583,9 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("userid", "userlogin", "password", [])
         context.users.add("chris", "chrislogin", "password", [])
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 1)
+        self.assertEqual(len(renderer.actions), 2)
         self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
+        self.assertEqual(renderer.actions[1][1], 'delete.html')
 
     def test_communities(self):
         self._registerTagbox()
