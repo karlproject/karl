@@ -151,8 +151,8 @@ class MailinRunner:
                 print 'Bounced %d messages' % bounced
                 print
             if not self.dry_run:
-                self.pending.sql.commit()
                 transaction.commit()
+                self.pending.sql.commit()
         except Exception:
             error_file = os.path.join(self.maildir_root, 'Maildir', '.error')
             with open(error_file, 'w') as f:

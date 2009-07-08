@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #394355: Don't commit changes to sqlite "pending messages" table if
+  ZODB raises a conflict error.
+
 - LP #391264: Added an administrator-level user edit view.
 
 - LP #391259: Added an administrator-level user add view.
