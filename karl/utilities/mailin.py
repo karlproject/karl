@@ -138,34 +138,28 @@ class MailinRunner:
             return False
 
     def __call__(self):
-        try:
-            processed = bounced = 0
-            self.section('Processing mail-in content', '=')
-            if self.verbosity > 0:
-                print 'Maildir root:   ', self.maildir_root
-                print 'Pending queue:  ', self.pq_file
-                print '=' * 65
-            self.setup()
+        processed = bounced = 0
+        self.section('Processing mail-in content', '=')
+        if self.verbosity > 0:
+            print 'Maildir root:   ', self.maildir_root
+            print 'Pending queue:  ', self.pq_file
+            print '=' * 65
+        self.setup()
 
-            while self.pending:
-                message_id = list(self.pending.pop())[0]
-                if self.verbosity > 0:
-                    print 'Processing message:', message_id
-                if self.handleMessage(message_id):
-                    processed += 1
-                else:
-                    bounced += 1
-
+        while self.pending:
+            message_id = list(self.pending.pop())[0]
             if self.verbosity > 0:
-                print '=' * 65
-                print 'Processed %d messages' % processed
-                print 'Bounced %d messages' % bounced
-                print
-            if not self.dry_run:
-                transaction.commit()
-                self.pending.sql.commit()
-        except Exception:
-            error_file = os.path.join(self.maildir_root, 'Maildir', '.error')
-            with open(error_file, 'w') as f:
-                print >>f, time.asctime()
-            raise
+                print 'Processing message:', message_id
+            if self.handleMessage(message_id):
+                processed += 1
+            else:
+                bounced += 1
+
+        if self.verbosity > 0:
+            print '=' * 65
+            print 'Processed %d messages' % processed
+            print 'Bounced %d messages' % bounced
+            print
+        if not self.dry_run:
+            transaction.commit()
+            self.pending.sql.commit()
