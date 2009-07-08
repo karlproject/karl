@@ -5,6 +5,9 @@
 
   <div metal:fill-slot="content">
 
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
     <h1 class="peopledir-title">${peopledir.title}</h1>
     <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
       <li tal:repeat="tab peopledir_tabs"

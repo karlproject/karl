@@ -678,6 +678,21 @@ class PrintViewTests(unittest.TestCase):
         self.assertEqual(list(renderer.rows), [])
 
 
+class AddUserViewTests(unittest.TestCase):
+
+    def _callFUT(self, context, response):
+        from karl.views.peopledirectory import add_user_view
+        return add_user_view(context, response)
+
+    def test_it(self):
+        context = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+            'http://example.com/profiles/add.html')
+
+
 class ReportColumnTests(unittest.TestCase):
 
     def _getTargetClass(self):

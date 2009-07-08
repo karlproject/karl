@@ -26,6 +26,7 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
+from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.sendmail.interfaces import IMailDelivery
 from repoze.who.plugins.zodb.users import get_sha_password
@@ -41,6 +42,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
+from karl.security.interfaces import ISecurityWorkflow
 from karl.utils import find_communities
 from karl.utils import find_site
 from karl.utils import find_tags
@@ -188,10 +190,7 @@ class EditProfileForm(baseforms.BaseForm):
 
         return super(EditProfileForm, self).from_python(model_values, state)
 
-def admin_edit_profile_view(context, request):
-    form = AdminEditProfileForm(request.POST, submit="form.submitted",
-                           cancel="form.cancel")
-
+def get_group_fields(context):
     group_fields = []
     for group in get_setting(context, "selectable_groups").split():
         if group.startswith('group.'):
@@ -205,7 +204,13 @@ def admin_edit_profile_view(context, request):
             'fieldname': fieldname,
             'title': title,
             })
+    return group_fields
 
+def admin_edit_profile_view(context, request):
+    form = AdminEditProfileForm(request.POST, submit="form.submitted",
+                           cancel="form.cancel")
+
+    group_fields = get_group_fields(context)
     for field in group_fields:
         validator = validators.Bool(if_missing=False, default=False)
         form.add_field(field['fieldname'], validator)
@@ -698,3 +703,94 @@ def delete_profile_view(context, request):
         'templates/delete_profile.pt',
         api=api,
         )
+
+def add_user_view(context, request):
+    form = AddUserForm(request.POST, submit="form.submitted",
+        cancel="form.cancel")
+
+    group_fields = get_group_fields(context)
+    for field in group_fields:
+        validator = validators.Bool(if_missing=False, default=False)
+        form.add_field(field['fieldname'], validator)
+
+    if form.cancel in form.formdata:
+        return HTTPFound(location=model_url(context, request))
+
+    if form.submit in form.formdata:
+        try:
+            min_pw_length = get_setting(context, 'min_pw_length')
+            state = baseforms.AppState(
+                context=context, min_pw_length=min_pw_length)
+
+            converted = form.to_python(form.fieldvalues, state)
+            form.is_valid = True
+
+            userid = converted['login']
+            users = find_users(context)
+            if users.get_by_id(userid) is not None or userid in context:
+                raise CustomInvalid(
+                    {'login': "User ID '%s' already exists" % userid})
+
+            groups = []
+            for field in group_fields:
+                fieldname = field['fieldname']
+                if converted[fieldname]:
+                    groups.append(field['group'])
+
+            users.add(userid, userid, converted['password'], groups)
+
+            kw = {}
+            for k, v in converted.items():
+                if k in ('login', 'password', 'password_confirm',
+                        'photo', 'photo_delete'):
+                    continue
+                if k.startswith('groupfield-'):
+                    continue
+                kw[k] = v
+            profile = create_content(IProfile, **kw)
+
+            context[userid] = profile
+
+            # Set up workflow
+            security_adapter = ISecurityWorkflow(profile)
+            security_adapter.setInitialState(**converted)
+
+            handle_photo_upload(profile, converted)
+
+            location = model_url(profile, request)
+            return HTTPFound(location=location)
+
+        except Invalid, e:
+            fielderrors = e.error_dict
+            form.is_valid = False
+    else:
+        fielderrors = {}
+
+    page_title = 'Add User'
+    api = TemplateAPI(context, request, page_title)
+
+    form_html = render_template(
+        'templates/form_add_user.pt',
+        post_url=request.url,
+        formfields=api.formfields,
+        fielderrors=fielderrors,
+        api=api,
+        group_fields=group_fields,
+    )
+
+    checkboxes = set(field['fieldname'] for field in group_fields)
+    form.rendered_form = form.merge(form_html, form.fieldvalues, checkboxes)
+
+    return render_template_to_response(
+        'templates/add_user.pt',
+        form=form,
+        api=api,
+        )
+
+class AddUserForm(EditProfileForm):
+    login = baseforms.login
+    home_path = validators.UnicodeString(strip=True)
+    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
+    password = baseforms.password
+    password_confirm = baseforms.password_confirm
+    chained_validators = baseforms.chained_validators

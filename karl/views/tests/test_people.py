@@ -190,6 +190,32 @@ class EditProfileTests(unittest.TestCase):
 
         self.assertRaises(KeyError, context.__getitem__, "photo.jpg")
 
+class GetGroupFieldsTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self):
+        from karl.views.people import get_group_fields
+        return get_group_fields(None)
+
+    def test_it(self):
+        karltesting.registerSettings()
+        gf = self._callFUT()
+        self.assertEqual(gf, [
+            {
+                'fieldname': 'groupfield-group-KarlAdmin',
+                'group': 'group.KarlAdmin',
+                'title': 'KarlAdmin',
+            },
+            {
+                'fieldname': 'groupfield-group-KarlLovers',
+                'group': 'group.KarlLovers',
+                'title': 'KarlLovers',
+            },
+            ])
 
 class AdminEditProfileTests(unittest.TestCase):
     def setUp(self):
@@ -1156,6 +1182,138 @@ class TestDeleteProfileView(unittest.TestCase):
         self.assertEqual(response.status, '401 Unauthorized')
         self.failIf('userid' in parent)
         self.assertEqual(users.removed_users, ['userid'])
+
+class AddUserTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        karltesting.registerSettings()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.people import add_user_view
+        return add_user_view(context, request)
+
+    def test_not_submitted(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/add_user.pt')
+        response = self._callFUT(context, request)
+        self.failIf(response.location)
+        self.failUnless(renderer.form.is_valid is None)
+
+    def test_submitted_invalid(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest({'form.submitted': True})
+        renderer = testing.registerDummyRenderer(
+            'templates/add_user.pt')
+        response = self._callFUT(context, request)
+        self.failUnless(renderer.form.submit)
+        self.failIf(renderer.form.is_valid)
+
+    def test_submitted_valid(self):
+        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerCatalogSearch()
+        karltesting.registerSecurityWorkflow()
+        from karl.models.profile import Profile
+        from karl.models.interfaces import IProfile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Profile, IProfile)
+
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '/path/for/ed',
+            'password': 'abcdefgh',
+            'password_confirm': 'abcdefgh',
+            'groupfield-group-KarlLovers': 'on',
+            })
+        request = testing.DummyRequest(params)
+        site = testing.DummyModel()
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        response = self._callFUT(site, request)
+        self.assertEqual(response.location, 'http://example.com/ed/')
+        user = users.get_by_id('ed')
+        self.assert_(user is not None)
+        self.assert_(site['ed'] is not None)
+        self.assertEqual(user['groups'], ['group.KarlLovers'])
+
+    def test_submitted_with_photo(self):
+        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerCatalogSearch()
+        karltesting.registerSecurityWorkflow()
+        from karl.models.profile import Profile
+        from karl.models.interfaces import IProfile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Profile, IProfile)
+
+        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
+        from repoze.lemonade.interfaces import IContentFactory
+        from karl.models.interfaces import IImageFile
+        from karl.views.tests.test_file import DummyImageFile
+        testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
+                                IContentFactory)
+
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '/path/for/ed',
+            'password': 'abcdefgh',
+            'password_confirm': 'abcdefgh',
+            })
+        from karl.testing import DummyUpload
+        params['photo'] = DummyUpload(
+            filename="test.jpg",
+            mimetype="image/jpeg",
+            data=dummy_photo)
+        params['photo.static'] = ''
+        request = testing.DummyRequest(params)
+        site = testing.DummyModel()
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        response = self._callFUT(site, request)
+
+        self.assertEqual(response.location, 'http://example.com/ed/')
+        profile = site['ed']
+        self.assertEqual(profile["photo.jpg"].stream.read(), dummy_photo)
+
+    def test_submitted_conflicting_userid(self):
+        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerCatalogSearch()
+        karltesting.registerSecurityWorkflow()
+        from karl.models.profile import Profile
+        from karl.models.interfaces import IProfile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Profile, IProfile)
+
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': '/path/for/ed',
+            'password': 'abcdefgh',
+            'password_confirm': 'abcdefgh',
+            'groupfield-group-KarlLovers': 'on',
+            })
+        request = testing.DummyRequest(params)
+        site = testing.DummyModel()
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        form_renderer = testing.registerDummyRenderer(
+            'templates/form_add_user.pt')
+        renderer = testing.registerDummyRenderer(
+            'templates/add_user.pt')
+        response = self._callFUT(site, request)
+
+        self.assertEqual(renderer.form.is_valid, False)
+        self.assertEqual(form_renderer.fielderrors,
+            {'login': u"User ID 'ed' already exists"})
 
 profile_data = {
     'firstname':'firstname',

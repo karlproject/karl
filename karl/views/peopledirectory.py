@@ -20,6 +20,7 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
+from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
@@ -32,6 +33,7 @@ from repoze.bfg.traversal import lineage
 from repoze.bfg.url import model_url
 from simplejson import JSONEncoder
 from webob import Response
+from webob.exc import HTTPFound
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 from zope.index.text.parsetree import ParseError
@@ -90,6 +92,13 @@ def render_report_group(group, request, css_class=''):
     res.append('</ul>')
     return '\n'.join(res)
 
+def get_actions(context, request):
+    actions = []
+    profiles = find_profiles(context)
+    if has_permission('administer', profiles, request):
+        actions.append(('Add User', 'add.html'))
+    return actions
+
 def section_view(context, request):
     if not context.columns:
         if len(context) == 1:
@@ -110,6 +119,7 @@ def section_view(context, request):
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs,
         column_html=column_html,
+        actions=get_actions(context, request),
         )
 
 def report_view(context, request):
@@ -140,6 +150,7 @@ def report_view(context, request):
         csv_url=csv_url,
         pictures_url=pictures_url,
         qualifiers=qualifiers,
+        actions=get_actions(context, request),
         )
 
 def jquery_grid_view(context, request):
@@ -356,6 +367,10 @@ def print_view(context, request):
         header=header,
         rows=dumper,
     )
+
+def add_user_view(context, request):
+    profiles = find_profiles(context)
+    return HTTPFound(location=model_url(profiles, request, 'add.html'))
 
 
 class ReportColumn(object):

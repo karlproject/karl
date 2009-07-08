@@ -49,6 +49,7 @@ class Profile(Folder):
                  room_no='',
                  biography='',
                  data=None,
+                 home_path=None,
                 ):
         super(Profile, self).__init__(data)
         self.firstname = firstname
@@ -66,7 +67,7 @@ class Profile(Folder):
         self.office = office
         self.room_no = room_no
         self.biography = biography
-        self.home_path = None
+        self.home_path = home_path
         self._alert_prefs = PersistentMapping()
         self._pending_alerts = PersistentList()
         self.categories = PersistentMapping()

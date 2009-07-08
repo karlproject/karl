@@ -218,6 +218,13 @@
   />
 
   <view
+    for="karl.models.interfaces.IProfiles"
+    view=".people.add_user_view"
+    name="add.html"
+    permission="administer"
+  />
+
+  <view
     for="karl.models.interfaces.IProfile"
     view=".people.admin_edit_profile_view"
     name="admin_edit_profile.html"
@@ -380,6 +387,13 @@
     permission="view"
     />
 
+  <!-- this view redirects to /profiles/add.html -->
+  <view
+    for="karl.models.interfaces.IPeopleSection"
+    view=".peopledirectory.add_user_view"
+    name="add.html"
+    />
+
   <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.report_view"
@@ -413,6 +427,13 @@
     permission="view"
     name="picture_view.html"
   />
+
+  <!-- this view redirects to /profiles/add.html -->
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.add_user_view"
+    name="add.html"
+    />
 
   <view
     for="*"

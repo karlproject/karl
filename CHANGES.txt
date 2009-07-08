@@ -6,6 +6,8 @@ Unreleased
 
 - LP #391264: Added an administrator-level user edit view.
 
+- LP #391259: Added an administrator-level user add view.
+
 
 3.3 (2009-07-06)
 ----------------

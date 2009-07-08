@@ -508,7 +508,7 @@
 	<div style="padding-top: 0.5em;">
 	  <input type="file" name="photo"/>
 	</div>
-	<div tal:condition="photo.may_delete">
+	<div tal:condition="photo.may_delete|False">
 	  <input type="checkbox" name="photo_delete" class="noborder"/> delete photo
 	</div>
       </div>
