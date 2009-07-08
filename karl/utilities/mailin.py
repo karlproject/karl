@@ -22,6 +22,14 @@ within that folder.
 """
 from __future__ import with_statement
 
+import datetime
+import os
+import re
+import sys
+import time
+import traceback
+import transaction
+
 from karl.adapters.interfaces import IMailinDispatcher
 from karl.adapters.interfaces import IMailinHandler
 from karl.utils import find_catalog
@@ -30,12 +38,6 @@ from karl.utils import hex_to_docid
 from repoze.bfg.traversal import find_model
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
-import datetime
-import os
-import re
-import sys
-import time
-import transaction
 
 
 #BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
@@ -108,23 +110,32 @@ class MailinRunner:
 
     def handleMessage(self, message_id):
         # return 'True' if processed, 'False' if bounced.
-        message = self.mailstore[message_id]
-        info = self.dispatcher.crackHeaders(message)
-        if info['bounce']:
-            self.bounceMessage(message, info)
-            self.log('BOUNCED', message_id, info['reason'])
+        try:
+            message = self.mailstore[message_id]
+            info = self.dispatcher.crackHeaders(message)
+            if info['bounce']:
+                self.bounceMessage(message, info)
+                self.log('BOUNCED', message_id, info['reason'])
+                if self.verbosity > 1:
+                    print 'Bounced  : %s\n  %s' % (message_id, info['reason'])
+            else:
+                text, attachments = self.dispatcher.crackPayload(message)
+                self.processMessage(message, info, text, attachments)
+                extra = ['%s:%s' % (x, info.get(x))
+                            for x in ('community', 'in_reply_to', 'tool', 'author')
+                                if info.get(x) is not None]
+                self.log('PROCESSED', message_id, ','.join(extra))
+                if self.verbosity > 1:
+                    print 'Processed: %s\n  %s' % (message_id, ','.join(extra))
+            return not info['bounce']
+        except:
+            error_msg = traceback.format_exc()
+            self.pending.quarantine(message_id, error_msg)
+            self.log('QUARANTINED', message_id, error_msg)
             if self.verbosity > 1:
-                print 'Bounced  : %s\n  %s' % (message_id, info['reason'])
-        else:
-            text, attachments = self.dispatcher.crackPayload(message)
-            self.processMessage(message, info, text, attachments)
-            extra = ['%s:%s' % (x, info.get(x))
-                        for x in ('community', 'in_reply_to', 'tool', 'author')
-                            if info.get(x) is not None]
-            self.log('PROCESSED', message_id, ','.join(extra))
-            if self.verbosity > 1:
-                print 'Processed: %s\n  %s' % (message_id, ','.join(extra))
-        return not info['bounce']
+                print 'Quarantined: ', message_id
+                print error_msg
+            return False
 
     def __call__(self):
         try:
