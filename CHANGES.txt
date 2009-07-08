@@ -11,6 +11,10 @@ Unreleased
 
 - LP #391259: Added an administrator-level user add view.
 
+- LP #397030: Use quarantine for messages that fail to process during mail-in.
+
+- Got rid kludgy '.error' file for mail-in, since the quarantine renders it
+  obsolete.
 
 3.3 (2009-07-06)
 ----------------
