@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #389511: KARL doesn’t handle embeding YouTube or Brightcove videos.
+
+- LP #383666: Paste from Word to blog posts emails content but drops from
+  blogentry
+
 - LP #394355: Don't commit changes to sqlite "pending messages" table if
   ZODB raises a conflict error.
 
