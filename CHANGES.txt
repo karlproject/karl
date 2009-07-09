@@ -9,6 +9,9 @@ Unreleased
 - LP #383666: Paste from Word to blog posts emails content but drops from
   blogentry
 
+3.4 (2009-07-09)
+----------------
+
 - LP #394355: Don't commit changes to sqlite "pending messages" table if
   ZODB raises a conflict error.
 
