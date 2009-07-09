@@ -4839,7 +4839,7 @@ var loadTinyMCE = function loadTinyMCE() {
             theme_advanced_buttons2: '',
             theme_advanced_buttons3: '',
             plugins: plugins,
-            extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode],script[src]",
+            extended_valid_elements: "object[classid|codebase|width|height|id],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|bgcolor],script[src]",
             relative_urls : false,
             forced_root_block : 'p'
         });  
