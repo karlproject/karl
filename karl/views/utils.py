@@ -255,7 +255,7 @@ def get_user_home(context, request):
             
     return communities, []
     
-def handle_photo_upload(context, form, thumbnail=False):
+def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
     upload = form.get("photo", None)
     if upload is not None:
         upload_file = upload.file
@@ -276,6 +276,8 @@ def handle_photo_upload(context, form, thumbnail=False):
                 upload_file, upload_type = make_thumbnail(
                     upload_file, upload_type)
             except IOError, e:
+                if not handle_exc:
+                    raise
                 transaction.get().doom()
                 raise CustomInvalid({"photo": str(e)})
 
@@ -309,7 +311,7 @@ def handle_photo_upload(context, form, thumbnail=False):
             del context[photo.__name__]
 
 def make_thumbnail(upload_file, upload_type, max_width=75, max_height=100):
-    img = Image.open(upload_file)
+    img = Image.open(upload_file).convert('RGB')
     width, height = img.size
 
     if (width == max_width and
