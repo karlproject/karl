@@ -336,6 +336,40 @@ class TestHandlePhotoUpload(unittest.TestCase):
         self.assertTrue('photo.jpg' in context)
         self.assertTrue('source_photo' in context)
 
+    def test_invalid_image(self):
+        from cStringIO import StringIO
+        from formencode import Invalid
+        from karl.models.interfaces import IImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        def make_image(upload_file, upload_type):
+            res = testing.DummyModel()
+            res.extension = 'jpg'
+            res.size = 1
+            return res
+        registerContentFactory(make_image, IImageFile)
+        context = testing.DummyModel()
+        context.get_photo = lambda: None
+        form = {'photo': DummyUpload(StringIO("not-an-image"), 'image/jpeg')}
+        self.assertRaises(Invalid, self._callFUT,
+            context, form, thumbnail=True)
+
+    def test_empty_image(self):
+        from cStringIO import StringIO
+        from formencode import Invalid
+        from karl.models.interfaces import IImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        def make_image(upload_file, upload_type):
+            res = testing.DummyModel()
+            res.extension = 'jpg'
+            res.size = 1
+            return res
+        registerContentFactory(make_image, IImageFile)
+        context = testing.DummyModel()
+        context.get_photo = lambda: None
+        form = {'photo': DummyUpload(StringIO(""), 'image/jpeg')}
+        self.assertRaises(Invalid, self._callFUT,
+            context, form, thumbnail=True)
+
     def test_delete_photo(self):
         context = testing.DummyModel()
         photo = context['photo.jpg'] = testing.DummyModel()
