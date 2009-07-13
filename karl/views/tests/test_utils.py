@@ -352,6 +352,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         form = {'photo': DummyUpload(StringIO("not-an-image"), 'image/jpeg')}
         self.assertRaises(Invalid, self._callFUT,
             context, form, thumbnail=True)
+        self.assertFalse('source_photo' in context)
 
     def test_empty_image(self):
         from cStringIO import StringIO
@@ -369,6 +370,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         form = {'photo': DummyUpload(StringIO(""), 'image/jpeg')}
         self.assertRaises(Invalid, self._callFUT,
             context, form, thumbnail=True)
+        self.assertFalse('source_photo' in context)
 
     def test_delete_photo(self):
         context = testing.DummyModel()

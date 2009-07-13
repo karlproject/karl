@@ -267,17 +267,19 @@ def handle_photo_upload(context, form, thumbnail=False):
 
             # save the source photo (in case we later decide to use
             # a different thumbnail size)
-            if 'source_photo' in context:
-                del context['source_photo']
-            context['source_photo'] = create_content(
-                IImageFile, upload_file, upload_type)
+            source_photo = create_content(IImageFile, upload_file, upload_type)
             upload_file.seek(0)
 
+            # make the thumbnail
             try:
                 upload_file, upload_type = make_thumbnail(
                     upload_file, upload_type)
             except IOError, e:
                 raise CustomInvalid({"photo": str(e)})
+
+            if 'source_photo' in context:
+                del context['source_photo']
+            context['source_photo'] = source_photo
 
         photo = context.get_photo()
         if photo is None:
