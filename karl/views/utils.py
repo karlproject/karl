@@ -38,6 +38,7 @@ from karl.models.image import mimetypes as image_mimetypes
 from simplejson import JSONEncoder
 from textwrap import dedent
 from PIL import Image
+import transaction
 
 _convert_to_dashes = re.compile(r"""[\s/:"']""") # ' damn you emacs
 _safe_char_check = re.compile(r"[\w.-]+$")
@@ -275,6 +276,7 @@ def handle_photo_upload(context, form, thumbnail=False):
                 upload_file, upload_type = make_thumbnail(
                     upload_file, upload_type)
             except IOError, e:
+                transaction.get().doom()
                 raise CustomInvalid({"photo": str(e)})
 
             if 'source_photo' in context:
@@ -355,4 +357,5 @@ def check_upload_size(context, obj, field_name):
     max_size = int(get_setting(context, 'upload_limit', 0))
     if max_size and obj.size > max_size:
         msg = 'File size exceeds KARL upload limit of %d.' % max_size
+        transaction.get().doom()
         raise CustomInvalid({field_name: msg})
