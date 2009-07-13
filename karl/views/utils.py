@@ -18,6 +18,7 @@
 """Useful functions that appear in several places in the KARL UI"""
 import os
 import re
+from cStringIO import StringIO
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import traverse
@@ -32,9 +33,11 @@ from karl.utils import find_users
 from karl.utils import get_setting
 
 from karl.models.interfaces import IImageFile
+from karl.models.image import mimetypes as image_mimetypes
 
 from simplejson import JSONEncoder
 from textwrap import dedent
+from PIL import Image
 
 _convert_to_dashes = re.compile(r"""[\s/:"']""") # ' damn you emacs
 _safe_char_check = re.compile(r"[\w.-]+$")
@@ -251,27 +254,37 @@ def get_user_home(context, request):
             
     return communities, []
     
-def handle_photo_upload(context, form):
+def handle_photo_upload(context, form, thumbnail=False):
     upload = form.get("photo", None)
     if upload is not None:
         assert upload.type
+        if thumbnail:
+            try:
+                upload_file, upload_type = make_thumbnail(
+                    upload.file, upload.type)
+            except IOError, e:
+                raise CustomInvalid({"photo": str(e)})
+        else:
+            upload_file = upload.file
+            upload_type = upload.type
+
         photo = context.get_photo()
         if photo is None:
             photo = create_content(
                 IImageFile,
-                upload.file,
-                upload.type
+                upload_file,
+                upload_type
             )
             name = "photo.%s" % photo.extension
             context[name] = photo
 
         else:
-            if photo.mimetype != upload.type:
+            if photo.mimetype != upload_type:
                 del context[photo.__name__]
-                photo.mimetype = upload.type
+                photo.mimetype = upload_type
                 name = "photo.%s" % photo.extension
                 context[name] = photo
-            photo.upload(upload.file)
+            photo.upload(upload_file)
         check_upload_size(context, photo, 'photo')
 
     # Handle delete photo (ignore if photo also uploaded)
@@ -280,6 +293,47 @@ def handle_photo_upload(context, form):
         if photo is not None:
             del context[photo.__name__]
 
+def make_thumbnail(upload_file, upload_type, max_width=75, max_height=100):
+    if not hasattr(upload_file, 'seek'):
+        upload_file = StringIO(upload_file.read())
+    img = Image.open(upload_file)
+    width, height = img.size
+
+    if (width == max_width and
+            height == max_height and
+            upload_type in image_mimetypes):
+        # already the right size and format
+        upload_file.seek(0)
+        return upload_file, upload_type
+
+    # scale
+    image_ratio = float(width) / float(height)
+    container_ratio = float(max_width) / float(max_height)
+    if image_ratio >= container_ratio:
+        # wide image
+        width = int(max_height * image_ratio)
+        height = max_height
+    else:
+        # tall image
+        width = max_width
+        height = int(max_width / image_ratio)
+    img = img.resize((width, height), Image.ANTIALIAS)
+
+    # crop
+    if width > max_width:
+        margin = (width - max_width) / 2
+        img = img.crop((margin, 0, margin + max_width, height))
+        width = max_width
+    if height > max_height:
+        margin = (height - max_height) / 2
+        img = img.crop((0, margin, width, margin + max_height))
+        height = max_height
+
+    upload_file = StringIO()
+    img.save(upload_file, 'JPEG', quality=90)
+    upload_file.seek(0)
+    upload_type = 'image/jpeg'
+    return upload_file, upload_type
 
 class CustomInvalid(Invalid):
 

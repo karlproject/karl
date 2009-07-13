@@ -78,7 +78,7 @@ def edit_profile_view(context, request):
             for name in form.simple_field_names:
                 setattr(context, name, converted.get(name))
 
-            handle_photo_upload(context, converted)
+            handle_photo_upload(context, converted, thumbnail=True)
 
             # Emit a modified event for recataloging
             objectEventNotify(ObjectModifiedEvent(context))
@@ -256,7 +256,7 @@ def admin_edit_profile_view(context, request):
             for name in form.simple_field_names:
                 setattr(context, name, converted.get(name))
 
-            handle_photo_upload(context, converted)
+            handle_photo_upload(context, converted, thumbnail=True)
 
             # Emit a modified event for recataloging
             objectEventNotify(ObjectModifiedEvent(context))
@@ -755,7 +755,7 @@ def add_user_view(context, request):
             security_adapter = ISecurityWorkflow(profile)
             security_adapter.setInitialState(**converted)
 
-            handle_photo_upload(profile, converted)
+            handle_photo_upload(profile, converted, thumbnail=True)
 
             location = model_url(profile, request)
             return HTTPFound(location=location)

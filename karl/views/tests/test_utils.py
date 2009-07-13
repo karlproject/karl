@@ -257,9 +257,146 @@ class TestGetUserHome(unittest.TestCase):
         self.failUnless(target is community)
         self.assertEqual(extra_path, [])
 
+class TestHandlePhotoUpload(unittest.TestCase):
+
+    def _callFUT(self, context, form, thumbnail=False):
+        from karl.views.utils import handle_photo_upload
+        return handle_photo_upload(context, form, thumbnail=thumbnail)
+
+    def test_change_photo_same_type(self):
+        from cStringIO import StringIO
+        from karl.models.tests.test_image import one_pixel_jpeg
+        context = testing.DummyModel()
+        photo = context['photo.jpg'] = testing.DummyModel()
+        photo.mimetype = 'image/jpeg'
+        photo.extension = 'jpg'
+        photo.size = 1
+        uploaded = []
+        def upload(upload_file):
+            uploaded.append(upload_file)
+        photo.upload = upload
+        context.get_photo = lambda: photo
+        form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
+        self._callFUT(context, form)
+        self.assertEqual(len(uploaded), 1)
+        self.assertEqual(photo.__name__, 'photo.jpg')
+
+    def test_change_photo_new_type(self):
+        from cStringIO import StringIO
+        from karl.models.tests.test_image import one_pixel_jpeg
+        context = testing.DummyModel()
+        photo = context['photo.png'] = testing.DummyModel()
+        photo.mimetype = 'image/png'
+        photo.extension = 'jpg'  # fake a dynamic attribute
+        photo.size = 1
+        uploaded = []
+        def upload(upload_file):
+            uploaded.append(upload_file)
+        photo.upload = upload
+        context.get_photo = lambda: photo
+        form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
+        self._callFUT(context, form)
+        self.assertEqual(len(uploaded), 1)
+        self.assertEqual(photo.__name__, 'photo.jpg')
+
+    def test_new_photo(self):
+        from cStringIO import StringIO
+        from karl.models.tests.test_image import one_pixel_jpeg
+        from karl.models.interfaces import IImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        def make_image(upload_file, upload_type):
+            res = testing.DummyModel()
+            res.extension = 'jpg'
+            res.size = 1
+            return res
+        registerContentFactory(make_image, IImageFile)
+
+        context = testing.DummyModel()
+        context.get_photo = lambda: None
+        form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
+        self._callFUT(context, form)
+        self.assertTrue('photo.jpg' in context)
+
+    def test_thumbnail_photo(self):
+        from cStringIO import StringIO
+        from karl.models.tests.test_image import one_pixel_jpeg
+        from karl.models.interfaces import IImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        def make_image(upload_file, upload_type):
+            res = testing.DummyModel()
+            res.extension = 'jpg'
+            res.size = 1
+            return res
+        registerContentFactory(make_image, IImageFile)
+
+        context = testing.DummyModel()
+        context.get_photo = lambda: None
+        form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
+        self._callFUT(context, form, thumbnail=True)
+        self.assertTrue('photo.jpg' in context)
+
+    def test_delete_photo(self):
+        context = testing.DummyModel()
+        photo = context['photo.jpg'] = testing.DummyModel()
+        photo.mimetype = 'image/jpeg'
+        photo.extension = 'jpg'
+        photo.size = 1
+        context.get_photo = lambda: photo
+        form = {'photo_delete': 'yes'}
+        self.assertTrue('photo.jpg' in context)
+        self._callFUT(context, form)
+        self.assertFalse('photo.jpg' in context)
+
+class TestMakeThumbnail(unittest.TestCase):
+
+    def _callFUT(self, upload_file, upload_type):
+        from karl.views.utils import make_thumbnail
+        return make_thumbnail(upload_file, upload_type)
+
+    def test_wide(self):
+        from PIL import Image
+        from cStringIO import StringIO
+        img = Image.new('RGB', (500, 150))
+        src = StringIO()
+        img.save(src, 'PNG')
+        src.seek(0)
+        f, t = self._callFUT(src, 'image/png')
+        img2 = Image.open(f)
+        self.assertEqual(img2.size, (75, 100))
+        self.assertEqual(t, 'image/jpeg')
+
+    def test_tall(self):
+        from PIL import Image
+        from cStringIO import StringIO
+        img = Image.new('RGB', (150, 500))
+        src = StringIO()
+        img.save(src, 'PNG')
+        src.seek(0)
+        f, t = self._callFUT(src, 'image/png')
+        img2 = Image.open(f)
+        self.assertEqual(img2.size, (75, 100))
+        self.assertEqual(t, 'image/jpeg')
+
+    def test_small(self):
+        from PIL import Image
+        from cStringIO import StringIO
+        img = Image.new('RGB', (50, 50))
+        src = StringIO()
+        img.save(src, 'PNG')
+        src.seek(0)
+        f, t = self._callFUT(src, 'image/png')
+        img2 = Image.open(f)
+        self.assertEqual(img2.size, (75, 100))
+        self.assertEqual(t, 'image/jpeg')
+
 class DummyCatalog:
     def _search(self, **kw):
         return 1, [1], lambda x: x
+
+class DummyUpload:
+    def __init__(self, file, type):
+        self.file = file
+        self.type = type
     
 def dummy_traverser_factory(root):
     def traverser(environ):
