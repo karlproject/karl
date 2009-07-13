@@ -9,7 +9,9 @@ Unreleased
 - LP #383666: Paste from Word to blog posts emails content but drops from
   blogentry
 
-- Scale and crop uploaded profile photos to fit 75 x 100.
+- LP #398914: Scale and crop uploaded profile photos to fit 75 x 100.
+  The original image uploads are available under the name
+  "source_photo", for example, /profiles/admin/source_photo .
 
 3.4 (2009-07-09)
 ----------------

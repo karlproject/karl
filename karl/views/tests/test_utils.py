@@ -334,6 +334,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
         self._callFUT(context, form, thumbnail=True)
         self.assertTrue('photo.jpg' in context)
+        self.assertTrue('source_photo' in context)
 
     def test_delete_photo(self):
         context = testing.DummyModel()
@@ -388,6 +389,18 @@ class TestMakeThumbnail(unittest.TestCase):
         img2 = Image.open(f)
         self.assertEqual(img2.size, (75, 100))
         self.assertEqual(t, 'image/jpeg')
+
+    def test_no_change(self):
+        from PIL import Image
+        from cStringIO import StringIO
+        img = Image.new('RGB', (75, 100))
+        src = StringIO()
+        img.save(src, 'PNG')
+        src.seek(0)
+        f, t = self._callFUT(src, 'image/png')
+        img2 = Image.open(f)
+        self.assertEqual(img2.size, (75, 100))
+        self.assertEqual(t, 'image/png')
 
 class DummyCatalog:
     def _search(self, **kw):

@@ -257,16 +257,27 @@ def get_user_home(context, request):
 def handle_photo_upload(context, form, thumbnail=False):
     upload = form.get("photo", None)
     if upload is not None:
-        assert upload.type
+        upload_file = upload.file
+        upload_type = upload.type
+        assert upload_type
+
         if thumbnail:
+            if not hasattr(upload_file, 'seek'):
+                upload_file = StringIO(upload_file.read())
+
+            # save the source photo (in case we later decide to use
+            # a different thumbnail size)
+            if 'source_photo' in context:
+                del context['source_photo']
+            context['source_photo'] = create_content(
+                IImageFile, upload_file, upload_type)
+            upload_file.seek(0)
+
             try:
                 upload_file, upload_type = make_thumbnail(
-                    upload.file, upload.type)
+                    upload_file, upload_type)
             except IOError, e:
                 raise CustomInvalid({"photo": str(e)})
-        else:
-            upload_file = upload.file
-            upload_type = upload.type
 
         photo = context.get_photo()
         if photo is None:
@@ -294,8 +305,6 @@ def handle_photo_upload(context, form, thumbnail=False):
             del context[photo.__name__]
 
 def make_thumbnail(upload_file, upload_type, max_width=75, max_height=100):
-    if not hasattr(upload_file, 'seek'):
-        upload_file = StringIO(upload_file.read())
     img = Image.open(upload_file)
     width, height = img.size
 
