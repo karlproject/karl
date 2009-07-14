@@ -256,6 +256,8 @@ class IGridEntryInfo(Interface):
     created = Attribute("")
     creator_title = Attribute("")
     creator_url = Attribute("")
+    modified_by_title = Attribute("")
+    modified_by_url = Attribute("")
 
 class ICommunityInfo(Interface):
     """ An adapter for obtaining information about a single community """

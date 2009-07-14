@@ -87,7 +87,8 @@ class GridEntryInfo(object):
     _creator_title = None
     _creator_url = None
     _profiles = None
-    _profile = None
+    _profile = None  # profile of creator
+    _modified_by_profile = None
 
     def __init__(self, context, request):
         self.context = context
@@ -143,6 +144,25 @@ class GridEntryInfo(object):
         return self._creator_url
 
         return self.context.creator
+
+    @property
+    def modified_by_profile(self):
+        if self._modified_by_profile is None:
+            modified_by = getattr(self.context, 'modified_by', None)
+            if modified_by is None:
+                modified_by = self.context.creator
+            if self._profiles is None:
+                self._profiles = find_profiles(self.context)
+            self._modified_by_profile = self._profiles.get(modified_by, None)
+        return self._modified_by_profile
+
+    @property
+    def modified_by_title(self):
+        return self.modified_by_profile.title
+
+    @property
+    def modified_by_url(self):
+        return model_url(self.modified_by_profile, self.request)
 
 class TagQuery(object):
     implements(ITagQuery)

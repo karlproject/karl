@@ -13,6 +13,9 @@ Unreleased
   The original image uploads are available under the name
   "source_photo", for example, /profiles/admin/source_photo .
 
+- LP #390767: In the recent activity list, show the person who edited,
+  rather than the original creator.
+
 3.4 (2009-07-09)
 ----------------
 

@@ -35,7 +35,7 @@
             <th class="cldate">Date</th>
             <th class="cltitle">Title</th>
             <th class="cltype">Type</th>
-            <th class="clauthor">Author</th>
+            <th class="clauthor">Modified By</th>
           </tr>
         </thead>
         <tbody>
@@ -46,7 +46,7 @@
             </td>
             <td class="cltype">${ri.type}</td>
             <td class="clauthor">
-              <a href="${ri.creator_url}">${ri.creator_title}</a>
+              <a href="${ri.modified_by_url}">${ri.modified_by_title}</a>
             </td>
           </tr>
         </tbody>
