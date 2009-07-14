@@ -1,0 +1,28 @@
+Installing Karl3 for development
+================================
+
+The following steps will get you up and running with Karl immediately::
+
+   $ virtualenv -p python2.5 --no-site-packages .
+   $ source bin/activate
+   $ cd src/karl
+   $ python setup.py develop
+   $ cd ../karl.content
+   $ python setup.py develop
+   $ cd ../{{package}}
+   $ python setup.py develop
+   $ cd ../..
+   $ bin/supervisord
+
+At this point you should have a running Karl instance at::
+
+  http://localhost:8000/
+
+It is often useful to run Karl in the foreground during development or initial
+testing::
+
+  $ bin/supervisorctl stop karl
+  $ bin/paster serve etc/karl.ini
+
+
+

@@ -1,0 +1,9 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <utility
+      provides="karl.utilities.interfaces.IMailinTextScrubber"
+      component=".mailin.text_scrubber"
+      name="{{package}}.mailin.text_scrubber"
+      />
+
+</configure>

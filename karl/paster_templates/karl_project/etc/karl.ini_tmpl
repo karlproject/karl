@@ -1,0 +1,46 @@
+[DEFAULT]
+debug = true
+zodb_uri = zeo://localhost:8886/?blob_dir=%(here)s/../var/blobs&shared_blob_dir=true&connection_cache_size=300000&zeo_cache_size=512MB
+
+[app:karl]
+use = egg:{{package}}#make_app
+reload_templates = %(debug)s
+js_devel_mode = false
+static_postfix = /static
+mail_queue_path = %(here)s/../var/mail_queue
+
+[filter:errorlog]
+use = egg:repoze.errorlog#errorlog
+path = /__error_log__
+keep = 20
+ignore =
+    paste.httpexceptions:HTTPUnauthorized
+    paste.httpexceptions:HTTPNotFound
+    paste.httpexceptions:HTTPFound
+
+[filter:who]
+use = egg:repoze.who#config
+config_file = %(here)s/who.ini
+#log_file = stdout
+#log_level = debug
+
+[filter:browserid]
+use = egg:repoze.browserid#browserid
+secret_key = $h4sh3m#g00d$
+
+[pipeline:main]
+pipeline =
+    egg:Paste#evalerror
+    egg:repoze.zodbconn#closer
+    errorlog
+    egg:repoze.retry#retry
+    egg:repoze.tm2#tm
+    egg:Paste#registry
+    who
+    browserid
+    karl
+
+[server:main]
+use = egg:Paste#http
+host = 0.0.0.0
+port = 8000

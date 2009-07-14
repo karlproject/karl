@@ -1,0 +1,119 @@
+import transaction
+
+from repoze.bfg.router import make_app as bfg_make_app
+from repoze.bfg.traversal import model_path
+from repoze.bfg.security import Allow
+from repoze.bfg.security import Authenticated
+from repoze.bfg.testing import DummyRequest
+from repoze.lemonade.content import create_content
+from repoze.who.plugins.zodb.users import Users
+from repoze.zodbconn.finder import PersistentApplicationFinder
+
+from karl.models.site import Site
+from karl.models.interfaces import IProfile
+from karl.security.interfaces import ISecurityWorkflow
+from karl.security.policy import ADMINISTRATOR_PERMS
+from karl.security.policy import GUEST_PERMS
+from karl.views.communities import add_community_view
+
+def asbool(s):
+    s = str(s).strip()
+    return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
+
+def populate(root, do_transaction_begin=True):
+    if do_transaction_begin:
+        transaction.begin()
+
+    site = root['site'] = Site()
+    site.__acl__ = [
+        (Allow, Authenticated, GUEST_PERMS),
+        (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
+        ]
+
+    # If a catalog database exists and does not already contain a catalog,
+    # put the site-wide catalog in the catalog database.
+    main_conn = root._p_jar
+    try:
+        catalog_conn = main_conn.get_connection('catalog')
+    except KeyError:
+        # No catalog connection defined.  Put the catalog in the
+        # main database.
+        pass
+    else:
+        catalog_root = catalog_conn.root()
+        if 'catalog' not in catalog_root:
+            catalog_root['catalog'] = site.catalog
+            catalog_conn.add(site.catalog)
+            main_conn.add(site)
+
+    # the ZODB root isn't a Folder, so it doesn't send events that
+    # would cause the root Site to be indexed
+    docid = site.catalog.document_map.add(model_path(site))
+    site.catalog.index_doc(docid, site)
+    site.docid = docid
+
+    profiles = site['profiles']
+    users = site.users
+
+    for login, firstname, lastname, email, groups in [
+            ('admin', 'Ad','Min','admin@example.com', ('group.KarlAdmin',)),
+            ('affiliate1', 'Aff', 'Illiate', 'affiliate1@example.com', ()),
+        ]:
+        users.add(login, login, login, groups)
+        profile = profiles[login] = create_content(IProfile,
+                                                   firstname=firstname,
+                                                   lastname=lastname,
+                                                   email=email,
+                                                  )
+        ISecurityWorkflow(profile).setInitialState()
+
+    # tool factory wants a dummy request
+    class FauxPost(dict):
+        def getall(self, key):
+            return self.get(key, ())
+    request = DummyRequest()
+    request.environ['repoze.who.identity'] = {
+            'repoze.who.userid': 'admin',
+            'groups': ('group.KarlAdmin',),
+           }
+    request.POST = FauxPost(request.POST)
+    request.POST['title'] = 'default'
+    request.POST['description'] = 'Created by startup script'
+    request.POST['text'] = '<p>Default <em>values</em> in here.</p>'
+    request.POST['sharing'] = False
+    request.POST['blog'] = True
+    request.POST['wiki'] = True
+    request.POST['calendar'] = True
+    request.POST['files'] = True
+    request.POST['form.submitted'] = True
+
+    communities = site['communities']
+    add_community_view(communities, request)
+    communities['default'].title = 'Default Community'
+
+
+def appmaker(root):
+    if not root.has_key('site'):
+        populate(root)
+        transaction.commit()
+    return root['site']
+
+def make_app(global_config, **kw):
+    import {{package}}
+    # paster app config callback
+    zodb_uri = global_config.get('zodb_uri')
+    if zodb_uri is None:
+        raise ValueError('zodb_uri must not be None')
+    get_root = PersistentApplicationFinder(zodb_uri, appmaker)
+
+    # Coerce a value out of the [app:karl] section in the INI file
+    jquery_dev_mode = kw.get('jquery_dev_mode', False)
+    kw['jquery_dev_mode'] = asbool(jquery_dev_mode)
+
+    app = bfg_make_app(get_root, {{package}}, options=kw)
+    return app
+
+def find_users(root):
+    if not 'site' in root:
+        return Users()
+    return root['site'].users
