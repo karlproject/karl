@@ -609,6 +609,19 @@ class TestGridEntryInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.url, 'http://example.com/')
 
+    def test_comment_url(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        commentfolder = testing.DummyModel()
+        grandparent = testing.DummyModel()
+        grandparent['commentfolder'] = commentfolder
+        commentfolder['0123'] = context
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IComment
+        directlyProvides(context, IComment)
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.url, 'http://example.com/#comment-0123')
+
     def test_type(self):
         from zope.interface import taggedValue
         from zope.interface import directlyProvides

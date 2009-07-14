@@ -360,9 +360,10 @@
             <a name="comments" id="comments">Comments</a>
       </h2>
 
-      <div class="blogComment" tal:repeat="comment comments">
+      <div tal:repeat="comment comments">
+       <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
+       <div class="blogComment">
 
-        <a name="BlogComment-1" id="BlogComment-1"></a>
         <div class="commentManagement">
           <a href="#" class="quo-paste">quote</a>
           <tal:ifeditable
@@ -395,6 +396,7 @@
             </span>
         </div>
 
+       </div>
       </div>
     </div>
 

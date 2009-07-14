@@ -16,6 +16,8 @@ Unreleased
 - LP #390767: In the recent activity list, show the person who edited,
   rather than the original creator.
 
+- LP #396581: Most links to a comment should show the comment in context.
+
 3.4 (2009-07-09)
 ----------------
 

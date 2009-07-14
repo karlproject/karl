@@ -36,6 +36,7 @@ from karl.utils import find_tags
 from karl.utils import find_peopledirectory_catalog
 
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IToolFactory
 from karl.models.interfaces import ICommunityInfo
@@ -101,7 +102,14 @@ class GridEntryInfo(object):
     @property
     def url(self):
         if self._url is None:
-            self._url = model_url(self.context, self.request)
+            if IComment.providedBy(self.context):
+                # show the comment in context of its grandparent.
+                # (its parent is a comments folder.)
+                parent = self.context.__parent__.__parent__
+                self._url = '%s#comment-%s' % (
+                    model_url(parent, self.request), self.context.__name__)
+            else:
+                self._url = model_url(self.context, self.request)
         return self._url
 
     @property
