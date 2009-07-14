@@ -111,8 +111,6 @@ class IProfiles(IFolder):
         o Return None if no match is found.
         """
 
-# XXX This is getting to be pretty OSI specific.  OSI should maybe have
-#     their own IProfile that isn't part of generic Karl.
 class IProfile(IFolder, IPeople):
     """ User profile """
     taggedValue('name', 'Profile')
@@ -120,6 +118,10 @@ class IProfile(IFolder, IPeople):
     firstname = Attribute(u"User's first name.")
     lastname = Attribute(u"User's last name.")
     email = Attribute(u"User's email address.")
+
+    # XXX The fields below (phone through biography) are OSI specific
+    # and probably should be removed from here.  It's possible that
+    # they don't need to be documented as interface attributes at all.
     phone = Attribute(u"User's phone number.")
     extension = Attribute(u"User's phone extension.")
     department = Attribute(u"User's department.")  # XXX redundant with categories?
@@ -129,12 +131,12 @@ class IProfile(IFolder, IPeople):
     country = Attribute(u"User's country.")
     website = Attribute(u"User's website url.")
     languages = Attribute(u"User's spoken languages.")
-    home_path = Attribute(u"Path to user's home model, possibly including "
-                          u"view.  May be None.")
-    office = Attribute(u"User's office.")
+    office = Attribute(u"User's office.")  # XXX redundant with categories?
     room_no = Attribute(u"User's room number.")
     biography = Attribute(u"User's biography.")
 
+    home_path = Attribute(u"Path to user's home model, possibly including "
+                          u"view.  May be None.")
     categories = Attribute(
         u"A dictionary that maps category key to a list of "
         u"category value identifier strings. "
