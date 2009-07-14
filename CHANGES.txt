@@ -18,6 +18,8 @@ Unreleased
 
 - LP #396581: Most links to a comment should show the comment in context.
 
+- LP #397196: Added a page that links to admin tools (/static/admin.html)
+
 3.4 (2009-07-09)
 ----------------
 
