@@ -57,7 +57,7 @@ requires = [
     'repoze.workflow',
     'feedparser',
     'zope.testing', # fwd compat when not directly relied on by BFG
-    'PIL',
+    'PILwoTk',
     ]
 
 setup(name='karl',
