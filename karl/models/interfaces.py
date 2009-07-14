@@ -29,6 +29,7 @@ class ICommunityContent(IContent):
     """
     sendalert = Attribute(u'Should community members be notified on creation?.')
     creator = Attribute(u'Creating userid')
+    modified_by = Attribute(u'ID of user who last modified the object')
     title = Attribute(u'Title of content')
 
 class IGroupSearchFactory(Interface):
