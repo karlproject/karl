@@ -20,6 +20,8 @@ Unreleased
 
 - LP #397196: Added a page that links to admin tools (/static/admin.html)
 
+- LP #399396: Fix styling on list items.
+
 3.4 (2009-07-09)
 ----------------
 
