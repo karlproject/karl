@@ -8,6 +8,14 @@ reload_templates = %(debug)s
 js_devel_mode = false
 static_postfix = /static
 mail_queue_path = %(here)s/../var/mail_queue
+system_name = KARL
+#system_email_domain = ????
+#admin_email = ????
+#offline_app_url = ????
+min_pw_length = 8
+
+# upload limit is in bytes; 0 means unlimited
+upload_limit = 0
 
 # for the mailin_monitor utility
 #pending_db_path=/path/to/Maildir/pending.db
