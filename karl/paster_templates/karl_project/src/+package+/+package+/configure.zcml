@@ -5,6 +5,7 @@
 
   <include package=".utilities" />
   <include package=".views" />
+  <include package="repoze.mailin.monitor"/>
 
   <adapter for="karl.models.interfaces.ISite"
            provides="karl.adapters.interfaces.IMailinDispatcher"

@@ -17,6 +17,7 @@ requires = [
     'markdown2',
     'repoze.errorlog',
     'repoze.mailin',
+    'repoze.mailin.monitor',
     'repoze.evolution',
     'supervisor',
     ]
