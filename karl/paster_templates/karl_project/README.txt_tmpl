@@ -24,7 +24,11 @@ your web browser::
   http://osi.agendaless.com/bfgsvn/karl/tags/
   http://osi.agendaless.com/bfgsvn/karl.content/tags/
 
-You can also just use `svn co` to grab these and put them anywhere you like.
+Once you have edited the externals you can do `svn up` to suck down the `karl`
+and `karl.content` packages.
+
+Alternatively, you can just use `svn co` to grab these and put them anywhere
+you like.
 
 The following steps will get you up and running with Karl immediately.
 $KARL_HOME is assumed to be the directory where this README.txt is found::
