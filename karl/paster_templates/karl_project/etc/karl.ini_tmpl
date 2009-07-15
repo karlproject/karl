@@ -9,6 +9,10 @@ js_devel_mode = false
 static_postfix = /static
 mail_queue_path = %(here)s/../var/mail_queue
 
+# for the mailin_monitor utility
+#pending_db_path=/path/to/Maildir/pending.db
+#maildir_path=/path/to
+
 [filter:errorlog]
 use = egg:repoze.errorlog#errorlog
 path = /__error_log__
