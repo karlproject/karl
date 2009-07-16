@@ -34,7 +34,6 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 
-from repoze.lemonade.listitem import get_listitems
 from repoze.sendmail.interfaces import IMailDelivery
 
 from formencode import validators
