@@ -2708,6 +2708,7 @@ pre {
 }
 
 #events_portlet li {
+    list-style: none;
     margin-bottom: 6px;
 }
 #events_portlet .event_title {
