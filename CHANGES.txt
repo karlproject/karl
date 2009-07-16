@@ -24,6 +24,8 @@ Unreleased
 
 - LP #399396: Fix styling on list items.
 
+- LP #399408: Reformat Network Events portlet to better display long titles
+
 3.4 (2009-07-09)
 ----------------
 
