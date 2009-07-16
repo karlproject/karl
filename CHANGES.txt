@@ -9,8 +9,6 @@ Unreleased
 3.5 (2009-07-16)
 ----------------
 
-- LP #389511: KARL doesn’t handle embeding YouTube or Brightcove videos.
-
 - LP #383666: Paste from Word to blog posts emails content but drops from
   blogentry
 
