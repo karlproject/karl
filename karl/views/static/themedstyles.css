@@ -2702,12 +2702,16 @@ pre {
 }
 
 /* Layout the portlets on the home page */
-#events_portlet td {
-    text-align:left;
-    vertical-align: top;
+#events_portlet {
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+#events_portlet li {
+    margin-bottom: 6px;
 }
 #events_portlet .event_title {
-    width:75%
+    padding-left: 20px;
 }
 #events_portlet {
     width:95%
