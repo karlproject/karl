@@ -437,7 +437,7 @@
           <tr tal:repeat="peopleinfo api.recent_items[0:5]">
             <td class="name">
               <span class="splitIntoWords">
-                <span tal:repeat="word peopleinfo.creator_title.split(' ')">${word}</span>
+                <span tal:repeat="word peopleinfo.modified_by_title.split(' ')">${word}</span>
               </span>
             </td>
             <td class="type">
