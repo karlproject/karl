@@ -660,6 +660,20 @@ class TestGridEntryInfo(unittest.TestCase):
         self.assertEqual(adapter.creator_title,
                          'Dummy creator')
 
+    def test_creator_without_title(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        creator = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['creator'] = creator
+        context.creator = 'creator'
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.creator_title,
+                         'no profile title')
+
     def test_creator_url(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
@@ -673,6 +687,58 @@ class TestGridEntryInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.creator_url, 
                          'http://example.com/profiles/creator/')
+
+    def test_modified_by_title(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        profile = testing.DummyModel(title='Test User')
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['testuser'] = profile
+        context.modified_by = 'testuser'
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_title, 'Test User')
+
+    def test_modified_by_without_title(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        profile = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['testuser'] = profile
+        context.modified_by = 'testuser'
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_title, 'no profile title')
+
+    def test_modified_by_without_profile(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        profile = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        context.modified_by = 'testuser'
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_title, 'no profile title')
+
+    def test_modified_by_url(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        profile = testing.DummyModel(title='Test User')
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['testuser'] = profile
+        context.modified_by = 'testuser'
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_url,
+                         'http://example.com/profiles/testuser/')
 
 from zope.interface import Interface
 

@@ -166,7 +166,7 @@ class GridEntryInfo(object):
 
     @property
     def modified_by_title(self):
-        return self.modified_by_profile.title
+        return getattr(self.modified_by_profile, 'title', 'no profile title')
 
     @property
     def modified_by_url(self):
