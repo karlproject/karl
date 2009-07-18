@@ -38,9 +38,7 @@ class ResetRequestViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/reset_request.pt')
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit not in form.formdata)
-        self.assertEqual(form.is_valid, None)
+        self.failIf(renderer.fielderrors)
 
     def test_unknown_email(self):
         context = testing.DummyModel()
@@ -48,17 +46,12 @@ class ResetRequestViewTests(unittest.TestCase):
             'form.submitted': True,
             'email': 'bogus@example.com',
             })
-        form_renderer = testing.registerDummyRenderer(
-            'templates/form_reset_request.pt')
         renderer = testing.registerDummyRenderer(
             'templates/reset_request.pt')
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit in form.formdata)
-        self.assertEqual(form.is_valid, False)
-        self.assertEqual(form_renderer.fielderrors,
+        self.assertEqual(renderer.fielderrors,
             {'email':
              'KARL has no account with the email address: bogus@example.com'}
              )
@@ -177,9 +170,7 @@ class ResetConfirmViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/reset_confirm.pt')
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit not in form.formdata)
-        self.assertEqual(form.is_valid, None)
+        self.failIf(renderer.fielderrors)
 
     def test_password_mismatch(self):
         context = testing.DummyModel()
@@ -190,15 +181,10 @@ class ResetConfirmViewTests(unittest.TestCase):
             'password': 'newnewnew',
             'password_confirm': 'winwinwin',
             })
-        form_renderer = testing.registerDummyRenderer(
-            'templates/form_reset_confirm.pt')
         renderer = testing.registerDummyRenderer(
             'templates/reset_confirm.pt')
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit in form.formdata)
-        self.assertEqual(form.is_valid, False)
-        self.assertEqual(form_renderer.fielderrors,
+        self.assertEqual(renderer.fielderrors,
             {'password_confirm': u'Fields do not match'})
 
     def test_no_such_login(self):
@@ -212,15 +198,10 @@ class ResetConfirmViewTests(unittest.TestCase):
             'password': 'newnewnew',
             'password_confirm': 'newnewnew',
             })
-        form_renderer = testing.registerDummyRenderer(
-            'templates/form_reset_confirm.pt')
         renderer = testing.registerDummyRenderer(
             'templates/reset_confirm.pt')
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit in form.formdata)
-        self.assertEqual(form.is_valid, False)
-        self.assertEqual(form_renderer.fielderrors,
+        self.assertEqual(renderer.fielderrors,
             {'login': 'No such user account exists'})
 
     def test_no_such_profile(self):
@@ -236,15 +217,10 @@ class ResetConfirmViewTests(unittest.TestCase):
             'password': 'newnewnew',
             'password_confirm': 'newnewnew',
             })
-        form_renderer = testing.registerDummyRenderer(
-            'templates/form_reset_confirm.pt')
         renderer = testing.registerDummyRenderer(
             'templates/reset_confirm.pt')
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit in form.formdata)
-        self.assertEqual(form.is_valid, False)
-        self.assertEqual(form_renderer.fielderrors,
+        self.assertEqual(renderer.fielderrors,
             {'login': 'No such profile exists'})
 
     def test_reset_with_no_key_set(self):

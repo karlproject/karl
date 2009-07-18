@@ -33,18 +33,19 @@ from zope.component import queryMultiAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
+from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
 from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
+from karl.views.form import render_form_to_response
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
@@ -60,6 +61,7 @@ from karl.utils import get_setting
 
 from karl.views import baseforms
 from karl.views.interfaces import IInvitationBoilerplate
+from karl.views.utils import handle_photo_upload
 
 
 def _get_manage_actions(community, request):
@@ -180,7 +182,7 @@ def show_members_view(context, request):
         )
 
 
-from formencode.schema import Schema
+from formencode import Schema
 from formencode import variabledecode
 from formencode import ForEach
 
@@ -190,9 +192,7 @@ class ManageMembersEntry(Schema):
     resend_info = baseforms.resend_info
     remove = baseforms.remove_entry
 
-class ManageMembersForm(baseforms.BaseForm):
-    allow_extra_fields = True
-    filter_extra_fields = True
+class ManageMembersForm(FormSchema):
     pre_validators = [variabledecode.NestedVariables()]
     moderators = ForEach(ManageMembersEntry())
     members = ForEach(ManageMembersEntry())
@@ -249,18 +249,16 @@ def manage_members_view(context, request):
     community_href = model_url(community, request)
     actions = _get_manage_actions(community, request)
 
-    form = ManageMembersForm(request.POST, submit='form.submitted',
-                           cancel='form.cancel')
-
-    if form.cancel in form.formdata:
+    form = ManageMembersForm()
+    if 'form.cancel' in request.params:
         return HTTPFound(location=model_url(context, request))
 
     profiles = find_profiles(community)
     status_message=None
     results = []
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.params:
         try:
-            converted = form.to_python(request.POST)
+            converted = form.validate(request.POST)
             c_moderators = converted['moderators']
             c_members = converted['members']
             c_invitations = converted['invitations']
@@ -391,7 +389,7 @@ def manage_members_view(context, request):
         fielderrors={},
         )
 
-class AddExistingUserForm(baseforms.BaseForm):
+class AddExistingUserForm(FormSchema):
     users = baseforms.users
     text = baseforms.text
 
@@ -440,25 +438,20 @@ def add_existing_user_view(context, request):
     profiles = find_profiles(context)
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = AddExistingUserForm(request.POST, submit='form.submitted',
-                               cancel='form.cancel')
+    usernames=request.POST.getall('users')
+    form = AddExistingUserForm(usernames = usernames, profiles=profiles)
 
     # Handle form submission
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.params:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.params:
         try:
-            state = baseforms.AppState(
-                profiles=profiles, usernames=request.POST.getall('users'))
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             return _add_existing_users(context, community, converted['users'],
                                        converted['text'], request)
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
     else:
         fielderrors = {}
 
@@ -476,19 +469,14 @@ def add_existing_user_view(context, request):
     page_title = 'Add Existing %s Users' % system_name
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_add_existing_user.pt',
+    return render_form_to_response(
+        'templates/add_existing_user.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,
         api=api,
-        )
-    form.rendered_form = form.merge(form_html, form.fieldvalues)
-
-    return render_template_to_response(
-        'templates/add_existing_user.pt',
-        api=api,
-        form=form,
         system_name=system_name,
         community_name=community.title,
         actions=actions,
@@ -518,8 +506,7 @@ def _add_existing_users(context, community, profiles, text, request):
                          query={'status_message': msg})
     return HTTPFound(location=location)
 
-# Define a form schema, make an instance
-class AcceptInvitationForm(baseforms.BaseForm):
+class AcceptInvitationForm(FormSchema):
     username = baseforms.username
     password = baseforms.password
     password_confirm = baseforms.password_confirm
@@ -574,25 +561,21 @@ def accept_invitation_view(context, request):
     assert IInvitation.providedBy(context), \
            "Context is expected to be an IInvitation."
 
+    profiles = find_profiles(context)
     system_name = get_setting(context, 'system_name')
     min_pw_length = get_setting(context, 'min_pw_length')
     community = find_interface(context, ICommunity)
     community_name = community.title
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = AcceptInvitationForm(request.POST, submit='form.submitted',
-                                cancel='form.cancel')
+    form = AcceptInvitationForm(profiles=profiles, min_pw_length=min_pw_length)
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.params:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.params:
         try:
-            profiles = find_profiles(context)
-            state = baseforms.AppState(profiles=profiles,
-                                       min_pw_length=min_pw_length)
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
+            converted = form.validate(request.POST)
             users = find_users(context)
             username = converted['username']
             password = converted['password']
@@ -619,6 +602,8 @@ def accept_invitation_view(context, request):
                 )
             profiles[username] = profile
             ISecurityWorkflow(profile).setInitialState()
+            handle_photo_upload(profile, converted, thumbnail=True)
+
             del context.__parent__[context.__name__]
             url = model_url(community, request,
                             query={'status_message':'Welcome!'})
@@ -627,9 +612,15 @@ def accept_invitation_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
+            fill_values = request.POST.copy()
+            try:
+                del fill_values['photo'] # rendering cant deal with photo
+            except KeyError:
+                pass
     else:
         fielderrors = {}
+        # hack to make chained validators work
+        fill_values = {'password':'', 'password_confirm':''}
 
     # Get text for two dialogs.  We get this from content in
     # /offices/files, named with a special name.
@@ -647,34 +638,27 @@ def accept_invitation_view(context, request):
     photo["url"] =  api.app_url + "/static/images/defaultUser.gif"
     photo["may_delete"] = False
 
-    form_html = render_template(
-        'templates/form_accept_invitation.pt',
+    return render_form_to_response(
+        'templates/accept_invitation.pt',
+        form,
+        fill_values,
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,
         terms_text=terms_text,
         privacy_text=privacy_text,
-        api=api,
         photo=photo,
-        )
-    form.rendered_form = form.merge(form_html, form.fieldvalues)
-
-    return render_template_to_response(
-        'templates/accept_invitation.pt',
         api=api,
-        form=form,
         system_name=system_name,
         community_name=community_name,
         )
 
-
-class InviteNewUsersForm(baseforms.BaseForm):
+class InviteNewUsersForm(FormSchema):
     email_addresses = baseforms.email_addresses
     text = baseforms.text
 
 def invite_new_user_view(context, request):
     """ Invite a new user to join KARL and thus this community. """
-
     system_name = get_setting(context, 'system_name')
 
     community = find_interface(context, ICommunity)
@@ -682,19 +666,16 @@ def invite_new_user_view(context, request):
     actions = _get_manage_actions(community, request)
 
     fieldwidgets = get_template('templates/formfields.pt')
-    form = InviteNewUsersForm(request.POST, submit='form.submitted',
-                              cancel='form.cancel')
+    form = InviteNewUsersForm()
 
     ninvited = nadded = nignored = 0
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.params:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.params:
         try:
-            state = baseforms.AppState()
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
+            converted = form.validate(request.POST)
             addresses = converted['email_addresses']
             random_id = getUtility(IRandomId)
             html_body = converted['text']
@@ -767,27 +748,21 @@ def invite_new_user_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
     else:
         fielderrors = {}
 
-    # Render the form and shove some default values in
     page_title = 'Invite New KARL Users'
     api = TemplateAPI(context, request, page_title)
-    form_html = render_template(
-        'templates/form_invite_new_users.pt',
+
+    return render_form_to_response(
+        'templates/invite_new_user.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,
         api=api,
-        )
-    form.rendered_form = form.merge(form_html, form.fieldvalues)
-
-    return render_template_to_response(
-        'templates/invite_new_user.pt',
-        api=api,
         actions=actions,
-        form=form,
         )
 
 def _send_invitation_email(request, community, community_href, invitation):

@@ -357,3 +357,4 @@ class BaseForm(Schema):
         merged_form_html = tostring(form)
 
         return merged_form_html
+

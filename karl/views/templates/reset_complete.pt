@@ -7,7 +7,8 @@
 
     <p>Click the button below to log in with your new password.</p>
 
-    <form method="post" action="${api.app_url}/login">
+    <form method="post" action="${api.app_url}/login"
+         xml:id="contentform">
         <input type="hidden" name="login" value="${login}" />
         <input type="hidden" name="password" value="${password}" />
         <input type="hidden" name="form.submitted" value="1" />

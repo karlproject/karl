@@ -23,10 +23,12 @@ from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views import baseforms
+from karl.views.form import render_form_to_response
 from karl.views.utils import CustomInvalid
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import model_url
+from repoze.enformed import FormSchema
 from repoze.sendmail.interfaces import IMailDelivery
 from webob.exc import HTTPFound
 from zope.component import getAdapter
@@ -46,22 +48,19 @@ except ImportError:
 max_reset_timedelta = datetime.timedelta(3)  # days
 
 
-class ResetRequestForm(baseforms.BaseForm):
+class ResetRequestForm(FormSchema):
     email = baseforms.email()
 
-
 def reset_request_view(context, request):
-    form = ResetRequestForm(
-        request.POST, submit="form.submitted", cancel="form.cancel")
+    
+    form = ResetRequestForm()
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            state = baseforms.AppState()
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
+            converted = form.validate(request.POST)
 
             address = converted['email']
             if address:
@@ -134,28 +133,19 @@ def reset_request_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = form.fieldvalues
-            form.is_valid = False
     else:
         fielderrors = {}
-        fill_values = {}
 
     page_title = 'Forgot Password Request'
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_reset_request.pt',
+    return render_form_to_response(
+        'templates/reset_request.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
-        api=api,
-    )
-
-    form.rendered_form = form.merge(form_html, fill_values)
-
-    return render_template_to_response(
-        'templates/reset_request.pt',
-        form=form,
         api=api,
         )
 
@@ -169,13 +159,11 @@ def reset_sent_view(context, request):
         email=request.params.get('email'),
         )
 
-
-class ResetConfirmForm(baseforms.BaseForm):
+class ResetConfirmForm(FormSchema):
     login = baseforms.login
     password = baseforms.password
     password_confirm = baseforms.password_confirm
     chained_validators = baseforms.chained_validators
-
 
 def reset_confirm_view(context, request):
     key = request.params.get('key')
@@ -187,18 +175,15 @@ def reset_confirm_view(context, request):
             api=api,
             )
 
-    form = ResetConfirmForm(
-        request.POST, submit="form.submitted", cancel="form.cancel")
+    min_pw_length = get_setting(context, 'min_pw_length')
+    form = ResetConfirmForm(min_pw_length=min_pw_length)
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            min_pw_length = get_setting(context, 'min_pw_length')
-            state = baseforms.AppState(min_pw_length=min_pw_length)
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
+            converted = form.validate(request.POST)
 
             users = find_users(context)
             user = users.get_by_login(converted['login'])
@@ -247,27 +232,22 @@ def reset_confirm_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = form.fieldvalues
-            form.is_valid = False
+            fill_values = request.POST
     else:
         fielderrors = {}
-        fill_values = {}
+        # need to fill in these fields for the chained validator
+        # to work properly during non-submitted rendering
+        fill_values = {'password':'', 'password_confirm':''}
 
     page_title = 'Reset Password'
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_reset_confirm.pt',
+    return render_form_to_response(
+        'templates/reset_confirm.pt',
+        form,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
-        api=api,
-    )
-
-    form.rendered_form = form.merge(form_html, fill_values)
-
-    return render_template_to_response(
-        'templates/reset_confirm.pt',
-        form=form,
         api=api,
         )

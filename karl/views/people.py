@@ -26,6 +26,7 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
+from repoze.enformed import FormSchema
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.sendmail.interfaces import IMailDelivery
@@ -44,7 +45,6 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
 from karl.security.interfaces import ISecurityWorkflow
 from karl.utils import find_communities
-from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
 from karl.utils import get_setting
@@ -56,22 +56,17 @@ from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import CustomInvalid
 from karl.views.utils import handle_photo_upload
-
+from karl.views.form import render_form_to_response
 
 def edit_profile_view(context, request):
-    form = EditProfileForm(request.POST, submit="form.submitted",
-                           cancel="form.cancel")
+    form = EditProfileForm(context=context)
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            state = baseforms.AppState(context=context)
-
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             objectEventNotify(ObjectWillBeModifiedEvent(context))
 
             # Handle simple fields
@@ -89,13 +84,8 @@ def edit_profile_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = form.fieldvalues
-            form.is_valid = False
     else:
         fielderrors = {}
-
-        # pre-fill form with model values
-        fill_values = form.from_python(context)
 
     page_title = 'Edit ' + context.title
     api = TemplateAPI(context, request, page_title)
@@ -123,27 +113,20 @@ def edit_profile_view(context, request):
         urllib.quote_plus(api.here_url)
         )
 
-    form_html = render_template(
-        'templates/form_edit_profile.pt',
+    return render_form_to_response(
+        'templates/edit_profile.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
         photo=display_photo,
         staff_role_classname=staff_role_classname,
-    )
-
-    form.rendered_form = form.merge(form_html, fill_values)
-
-
-    return render_template_to_response(
-        'templates/edit_profile.pt',
-        form=form,
-        api=api,
         staff_change_password_url=staff_change_password_url,
         )
 
-class EditProfileForm(baseforms.BaseForm):
+class EditProfileForm(FormSchema):
     simple_field_names = [
         "firstname",
         "lastname",
@@ -178,8 +161,12 @@ class EditProfileForm(baseforms.BaseForm):
     photo_delete = baseforms.photo_delete
     biography = baseforms.biography
 
-    def from_python(self, context, state=None):
+    def from_python(self, values, state=None):
         # Convert model object to dict and then call super method
+        if state is None:
+            state = self._state
+        context = state.context
+
         model_values = {}
         for name in self.simple_field_names:
             if hasattr(context, name):
@@ -187,6 +174,7 @@ class EditProfileForm(baseforms.BaseForm):
 
         model_values["photo"] = context.get("photo", None)
         model_values["photo_delete"] = False
+        model_values.update(values)
 
         return super(EditProfileForm, self).from_python(model_values, state)
 
@@ -207,9 +195,9 @@ def get_group_fields(context):
     return group_fields
 
 def admin_edit_profile_view(context, request):
-    form = AdminEditProfileForm(request.POST, submit="form.submitted",
-                           cancel="form.cancel")
-
+    min_pw_length = get_setting(context, 'min_pw_length')
+    form = AdminEditProfileForm(min_pw_length=min_pw_length,
+                                context=context)
     group_fields = get_group_fields(context)
     for field in group_fields:
         validator = validators.Bool(if_missing=False, default=False)
@@ -220,18 +208,12 @@ def admin_edit_profile_view(context, request):
     user = users.get_by_id(userid)
     user_groups = set(user['groups'])
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            min_pw_length = get_setting(context, 'min_pw_length')
-            state = baseforms.AppState(
-                context=context, min_pw_length=min_pw_length)
-
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             objectEventNotify(ObjectWillBeModifiedEvent(context))
 
             try:
@@ -267,13 +249,12 @@ def admin_edit_profile_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = form.fieldvalues
-            form.is_valid = False
+            fill_values = request.POST
     else:
         fielderrors = {}
 
         # pre-fill form with model values
-        fill_values = form.from_python(context)
+        fill_values = form.from_python({})
         fill_values['login'] = user['login']
 
         for field in group_fields:
@@ -300,8 +281,10 @@ def admin_edit_profile_view(context, request):
     else:
         staff_role_classname = 'k3_nonstaff_role'
 
-    form_html = render_template(
-        'templates/form_admin_edit_profile.pt',
+    return render_form_to_response(
+        'templates/admin_edit_profile.pt',
+        form,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
@@ -309,15 +292,6 @@ def admin_edit_profile_view(context, request):
         photo=display_photo,
         staff_role_classname=staff_role_classname,
         group_fields=group_fields,
-    )
-
-    checkboxes = set(field['fieldname'] for field in group_fields)
-    form.rendered_form = form.merge(form_html, fill_values, checkboxes)
-
-    return render_template_to_response(
-        'templates/admin_edit_profile.pt',
-        form=form,
-        api=api,
         )
 
 class AdminEditProfileForm(EditProfileForm):
@@ -592,19 +566,14 @@ def show_profiles_view(context, request):
         )
 
 def change_password_view(context, request):
-    form = ChangePasswordForm(request.POST, submit="form.submitted",
-                              cancel="form.cancel")
-
-    if form.cancel in form.formdata:
+    min_pw_length = get_setting(context, 'min_pw_length')
+    form = ChangePasswordForm(min_pw_length=min_pw_length)
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            min_pw_length = get_setting(context, 'min_pw_length')
-            state = baseforms.AppState(min_pw_length=min_pw_length)
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             users = find_users(context)
             userid = context.__name__
             user = users.get_by_id(userid)
@@ -648,31 +617,23 @@ def change_password_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
     else:
         fielderrors = {}
 
     page_title = 'Change Password'
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_change_password.pt',
+    return render_form_to_response(
+        'templates/change_password.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
-    )
-
-    # never prefill this form
-    form.rendered_form = form_html
-
-    return render_template_to_response(
-        'templates/change_password.pt',
-        form=form,
-        api=api,
         )
 
-class ChangePasswordForm(baseforms.BaseForm):
+class ChangePasswordForm(FormSchema):
     old_password = baseforms.old_password
     password = baseforms.password
     password_confirm = baseforms.password_confirm
@@ -705,26 +666,19 @@ def delete_profile_view(context, request):
         )
 
 def add_user_view(context, request):
-    form = AddUserForm(request.POST, submit="form.submitted",
-        cancel="form.cancel")
-
+    min_pw_length = get_setting(context, 'min_pw_length')
+    form = AddUserForm(context=context, min_pw_length=min_pw_length)
     group_fields = get_group_fields(context)
     for field in group_fields:
         validator = validators.Bool(if_missing=False, default=False)
         form.add_field(field['fieldname'], validator)
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            min_pw_length = get_setting(context, 'min_pw_length')
-            state = baseforms.AppState(
-                context=context, min_pw_length=min_pw_length)
-
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             userid = converted['login']
             users = find_users(context)
             if users.get_by_id(userid) is not None or userid in context:
@@ -762,28 +716,26 @@ def add_user_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
+            fill_values = request.POST.copy()
+            try:
+                del fill_values['photo'] # rendering cant deal with photo
+            except KeyError:
+                pass
     else:
         fielderrors = {}
+        fill_values = {}
 
     page_title = 'Add User'
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_add_user.pt',
+    return render_form_to_response(
+        'templates/add_user.pt',
+        form,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
-        api=api,
         group_fields=group_fields,
-    )
-
-    checkboxes = set(field['fieldname'] for field in group_fields)
-    form.rendered_form = form.merge(form_html, form.fieldvalues, checkboxes)
-
-    return render_template_to_response(
-        'templates/add_user.pt',
-        form=form,
         api=api,
         )
 

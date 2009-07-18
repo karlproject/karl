@@ -102,17 +102,18 @@ class AddExistingUserViewTests(unittest.TestCase):
     def test_cancelled(self):
         context = testing.DummyModel()
         request = testing.DummyRequest(params={'form.cancel':'1'})
+        from webob import MultiDict
+        request.POST = MultiDict({})
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_notsubmitted(self):
         context = self._getContext()
         request = testing.DummyRequest()
+        from webob import MultiDict
+        request.POST = MultiDict({})
         renderer = testing.registerDummyRenderer(
             'templates/add_existing_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/form_add_existing_user.pt',
-            renderer=StringTemplateRenderer('<form>fake</form>'))
         self._callFUT(context, request)
         actions = [('Manage Members', 'manage.html'),
                    ('Add Existing', 'add_existing.html'),
@@ -122,29 +123,18 @@ class AddExistingUserViewTests(unittest.TestCase):
     def test_submitted_invalid(self):
         tn = 'templates/add_existing_user.pt'
         renderer = testing.registerDummyRenderer(tn)
-        renderer2 = testing.registerDummyRenderer(
-            'templates/form_add_existing_user.pt',
-            renderer=StringTemplateRenderer('<form>fake</form>'))
         from webob import MultiDict
         request = testing.DummyRequest(MultiDict({'form.submitted':1}))
         context = self._getContext()
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.cancel not in form.formdata)
-        self.assert_(form.submit in form.formdata)
-        self.assertEqual(renderer.form.is_valid, False)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_bad_profile(self):
         # This is when a username comes in that doesn't match a
         # profile
         from repoze.sendmail.interfaces import IMailDelivery
-
         renderer = testing.registerDummyRenderer(
             'templates/add_existing_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/form_add_existing_user.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="users"/><input name="text"/></form>'))
         from webob import MultiDict
         md = MultiDict({
                 'form.submitted':1,
@@ -156,17 +146,13 @@ class AddExistingUserViewTests(unittest.TestCase):
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
         response = self._callFUT(context, request)
-        self.failUnless('users' in renderer2.fielderrors)
+        self.failUnless('users' in renderer.fielderrors)
 
     def test_submitted_success(self):
         from repoze.sendmail.interfaces import IMailDelivery
 
         renderer = testing.registerDummyRenderer(
             'templates/add_existing_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/form_add_existing_user.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="users"/><input name="text"/></form>'))
         from webob import MultiDict
         md = MultiDict({
                 'form.submitted':1,
@@ -186,7 +172,8 @@ class AddExistingUserViewTests(unittest.TestCase):
     def test_submitted_via_get(self):
         from repoze.sendmail.interfaces import IMailDelivery
         request = testing.DummyRequest({"user_id": "admin"})
-        request.POST = {}
+        from webob import MultiDict
+        request.POST = MultiDict({})
         context = self._getContext()
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
@@ -232,13 +219,11 @@ class AcceptInvitationViewTests(unittest.TestCase):
         context.title = 'Some Community Title'
         alsoProvides(context, IInvitation)
         formfields = testing.registerDummyRenderer('templates/formfields.pt')
-        form = testing.registerDummyRenderer(
-            'templates/form_accept_invitation.pt')
         renderer = testing.registerDummyRenderer(
             'templates/accept_invitation.pt')
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.failUnless(renderer.form)
+        self.assertEqual(renderer.fielderrors, {})
 
     def test_submitted_failvalidation(self):
         karltesting.registerSettings()
@@ -252,13 +237,11 @@ class AcceptInvitationViewTests(unittest.TestCase):
         alsoProvides(context, IInvitation)
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        form = testing.registerDummyRenderer(
-            'templates/form_accept_invitation.pt')
         renderer = testing.registerDummyRenderer(
             'templates/accept_invitation.pt')
         request = testing.DummyRequest({'form.submitted':'1'})
         response = self._callFUT(context, request)
-        self.failUnless(form.fielderrors)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_username_exists(self):
         karltesting.registerSettings()
@@ -275,8 +258,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
 
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        form = testing.registerDummyRenderer(
-            'templates/form_accept_invitation.pt')
         renderer = testing.registerDummyRenderer(
             'templates/accept_invitation.pt')
         request = testing.DummyRequest({'form.submitted':'1',
@@ -288,7 +269,7 @@ class AcceptInvitationViewTests(unittest.TestCase):
                                         'terms_and_conditions':'1',
                                         'accept_privacy_policy':'1'})
         response = self._callFUT(fred, request)
-        self.assertEqual(form.fielderrors['username'].msg,
+        self.assertEqual(renderer.fielderrors['username'].msg,
                          'Username fred already exists')
 
     def test_submitted_success(self):
@@ -321,8 +302,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
 
         formfields = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        form = testing.registerDummyRenderer(
-            'templates/form_accept_invitation.pt')
         renderer = testing.registerDummyRenderer(
             'templates/accept_invitation.pt')
         request = testing.DummyRequest({'form.submitted':'1',
@@ -413,14 +392,10 @@ class InviteNewUserViewTests(unittest.TestCase):
 
     def test_submitted_bademail(self): # broken
         from repoze.sendmail.interfaces import IMailDelivery
-        renderer1 = testing.registerDummyRenderer(
+        renderer = testing.registerDummyRenderer(
             'templates/invite_new_user.pt')
         renderer2 = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        renderer3 = testing.registerDummyRenderer(
-            'templates/form_invite_new_users.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="email_addresses"/><input name="text"/></form>'))
         request = testing.DummyRequest({
                 'form.submitted':1,
                 'email_addresses': u'yo\n',
@@ -430,7 +405,9 @@ class InviteNewUserViewTests(unittest.TestCase):
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
         response = self._callFUT(context, request)
-        self.assertEqual(renderer1.form.is_valid, False)
+        errors = renderer.fielderrors
+        self.assertEqual(str(errors['email_addresses']),
+                         'Errors:\nAn email address must contain a single @')
 
     def test_submitted_ok_new_to_karl(self):
         from repoze.sendmail.interfaces import IMailDelivery
@@ -441,10 +418,6 @@ class InviteNewUserViewTests(unittest.TestCase):
             'templates/invite_new_user.pt')
         renderer2 = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        renderer3 = testing.registerDummyRenderer(
-            'templates/form_invite_new_users.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="email_addresses"/><input name="text"/></form>'))
         request = testing.DummyRequest({
                 'form.submitted':1,
                 'email_addresses': u'yo@plope.com\n',
@@ -476,10 +449,6 @@ class InviteNewUserViewTests(unittest.TestCase):
             'templates/invite_new_user.pt')
         renderer2 = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        renderer3 = testing.registerDummyRenderer(
-            'templates/form_invite_new_users.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="email_addresses"/><input name="text"/></form>'))
         request = testing.DummyRequest({
                 'form.submitted':1,
                 'email_addresses': u'a@x.org\n',
@@ -513,10 +482,6 @@ class InviteNewUserViewTests(unittest.TestCase):
             'templates/invite_new_user.pt')
         renderer2 = testing.registerDummyRenderer(
             'templates/formfields.pt')
-        renderer3 = testing.registerDummyRenderer(
-            'templates/form_invite_new_users.pt',
-            renderer=StringTemplateRenderer(
-            '<form><input name="email_addresses"/><input name="text"/></form>'))
         request = testing.DummyRequest({
                 'form.submitted':1,
                 'email_addresses': u'a@x.org\n',

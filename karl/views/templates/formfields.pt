@@ -9,7 +9,7 @@
  <body>
 
    <div metal:define-macro="formerror"
-	tal:condition="fielderrors.keys()"
+	tal:condition="fielderrors"
 	class="portalMessage">Please correct the indicated errors.</div>
 
     <fieldset metal:define-macro="users-field"

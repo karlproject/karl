@@ -13,8 +13,14 @@
     add to your community. The short message below is included along
     with the text of your invite.</p>
 
-    <span tal:replace="structure form.rendered_form"/>
-
+    <form method="post" action="${post_url}" class="k3_genericForm"
+          xml:id="contentform" name="save">
+      <div metal:use-macro="formfields.macros['formerror']"/>
+      <fieldset metal:use-macro="formfields.macros['email_addresses-field']"/>
+      <fieldset metal:use-macro="formfields.macros['text-field']"/>
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+    </form>
+    
   </div>
 
 </div>

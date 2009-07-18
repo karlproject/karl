@@ -48,6 +48,7 @@ requires = [
     'repoze.whoplugins.zodb',
     'repoze.session',
     'repoze.browserid',
+    'repoze.enformed',
     'lxml',
     'nose',
     'FormEncode',

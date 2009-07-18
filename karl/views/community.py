@@ -33,6 +33,7 @@ from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
+from repoze.enformed import FormSchema
 
 from repoze.sendmail.interfaces import IMailDelivery
 
@@ -60,9 +61,9 @@ from karl.views.utils import convert_to_script
 from karl.views.batch import get_catalog_batch_grid
 from karl.views import baseforms
 from karl.views.tags import set_tags
+from karl.views.form import render_form_to_response
 
-
-class EditCommunityForm(baseforms.BaseForm):
+class EditCommunityForm(FormSchema):
     title = baseforms.title
     tags = baseforms.tags
     description = baseforms.description
@@ -70,24 +71,59 @@ class EditCommunityForm(baseforms.BaseForm):
     sharing = baseforms.sharing
 
 def edit_community_view(context, request):
-
-    system_name = get_setting(context, 'system_name')
-    form = EditCommunityForm(request.POST, submit='form.submitted', 
-                             cancel='form.cancel')
-
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
+    system_name = get_setting(context, 'system_name')
     security_adapter = getAdapter(context, ISecurityWorkflow)
     available_tools = getMultiAdapter((context, request), IToolAddables)()
+    tags_list = request.POST.getall('tags')
+    edit_form = EditCommunityForm(tags_list=tags_list)
+    fieldvalues = request.POST
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            tags_list = request.POST.getall('tags')
-            state = baseforms.AppState(tags_list=tags_list)
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
+            converted = edit_form.validate(request.POST)
+        except Invalid, e:
+            fielderrors = e.error_dict
+            # Get the default list of tools into sequence of dicts AND
+            # set checked state based on what the user typed in before
+            # invalidation.
+            tools = []
+            default_tools = [
+                {'title': 'Overview', 'name': '', 
+                 'selected': (not context.default_tool)},
+                ]
+            for info in available_tools:
+                s = request.params.has_key(info['name'])
+                tools.append(
+                    {'name': info['name'], 'title': info['title'], 
+                     'state': s}
+                    )
+                if info['component'].is_present(context, request):
+                    # Add this to the list of choices for
+                    # default_tool, but first find out if it should be
+                    # selected.
+                    selected = False
+                    if request.params['default_tool'] == info['name']:
+                        selected = True
+                    elif context.default_tool == info['name']:
+                        selected = True
+                    default_tools.append(
+                        {'name': info['name'], 'title': info['title'],
+                         'selected': selected}
+                        )
 
+            # provide client data for rendering current tags in the tagbox.
+            # We arrived here because the form is invalid.
+            tagbox_records = [dict(tag=tag) for tag in
+                              request.POST.getall('tags')]
+            # We still need the adapter for the docid
+            # (XXX or, could we get docid without the adapter?)
+            tagquery = getMultiAdapter((context, request), ITagQuery)
+            tagbox_docid = tagquery.docid
+
+        else:
             # *will be* modified event
             objectEventNotify(ObjectWillBeModifiedEvent(context))
 
@@ -115,58 +151,15 @@ def edit_community_view(context, request):
             location = model_url(context, request)
             return HTTPFound(location=location)
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            form.is_valid = False
-            # Get the default list of tools into sequence of dicts AND
-            # set checked state based on what the user typed in before
-            # invalidation.
-            tools = []
-            default_tools = [
-                {'title': 'Overview', 'name': '', 
-                 'selected': (not context.default_tool)},
-                ]
-            for info in available_tools:
-                state = request.params.has_key(info['name'])
-                tools.append(
-                    {'name': info['name'], 'title': info['title'], 
-                     'state': state}
-                    )
-                if info['component'].is_present(context, request):
-                    # Add this to the list of choices for
-                    # default_tool, but first find out if it should be
-                    # selected.
-                    selected = False
-                    if request.params['default_tool'] == info['name']:
-                        selected = True
-                    elif context.default_tool == info['name']:
-                        selected = True
-                    default_tools.append(
-                        {'name': info['name'], 'title': info['title'],
-                         'selected': selected}
-                        )
-
-            # provide client data for rendering current tags in the tagbox.
-            # We arrived here because the form is invalid.
-            tagbox_records = [dict(tag=tag) for tag in
-                              form.formdata.getall('tags')]
-            # We still need the adapter for the docid
-            # (XXX or, could we get docid without the adapter?)
-            tagquery = getMultiAdapter((context, request), ITagQuery)
-            tagbox_docid = tagquery.docid
-
     else:
         fielderrors = {}
-        state = baseforms.AppState()
-
-        values = dict(
+        fieldvalues = dict(
             title=context.title,
             description=context.description,
             text=context.text,
             )
-        values.update(security_adapter.getStateMap())
-        form.fieldvalues = form.from_python(values, state)
-
+        fieldvalues.update(security_adapter.getStateMap())
+        
         # Get the default list of tools into a sequence of dicts
         tools = []
         default_tools = [
@@ -202,24 +195,18 @@ def edit_community_view(context, request):
     page_title = 'Edit ' + context.title
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_edit_community.pt',
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        tools=tools,
-        default_tools=default_tools,
-        form=form,
-        api=api,
-        )
-    form.rendered_form = form.merge(form_html, form.fieldvalues)
-
-    return render_template_to_response(
+    return render_form_to_response(
         'templates/edit_community.pt',
-        api=api,
-        form=form,
-        system_name=system_name,
-        head_data=convert_to_script(client_json_data),
+        edit_form,
+        fieldvalues,
+        post_url=request.url,
+        formfields = api.formfields,
+        fielderrors = fielderrors,
+        tools = tools,
+        default_tools = default_tools,
+        api = api,
+        system_name = system_name,
+        head_data = convert_to_script(client_json_data),
         )
 
 def get_recent_items_batch(community, request, size=10):

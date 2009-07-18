@@ -46,34 +46,20 @@ class EditProfileTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.failIf(response.location)
-        self.failUnless(renderer.form.is_valid is None)
+        self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.staff_change_password_url,
             'http://pw.example.com?username=ed&email=ed3%40example.com'
             '&came_from=http%3A%2F%2Fexample.com%2Fprofiles%2Fed%2F')
 
-    def test_form_fill(self):
-        renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
-        request = testing.DummyRequest()
-        context = DummyProfile(email='me@example.com')
-        context.website = "http://spacelabstudio.com"
-        context.title = "Eddie"
-        site = testing.DummyModel()
-        site['ed'] = context
-        self._callFUT(context, request)
-        form = renderer.form.rendered_form
-        self.failUnless("http://spacelabstudio.com" in form)
-        self.failUnless('enctype="multipart/form-data"' in form)
-
     def test_submitted_invalid(self):
         renderer = testing.registerDummyRenderer('templates/edit_profile.pt')
-        request = testing.DummyRequest({'controlls.submitted':1})
+        request = testing.DummyRequest({'form.submitted':1})
         context = DummyProfile(email='me@example.com')
         context.title = "Eddie"
         site = testing.DummyModel()
         site['ed'] = context
         self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid(self):
         testing.registerDummySecurityPolicy('userid')
@@ -246,7 +232,7 @@ class AdminEditProfileTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.failIf(response.location)
-        self.failUnless(renderer.form.is_valid is None)
+        self.failIf(renderer.fielderrors)
 
     def test_form_group_fields(self):
         context = DummyProfile(email='ed3@example.com')
@@ -258,7 +244,7 @@ class AdminEditProfileTests(unittest.TestCase):
         users.add("ed", "ed", "password", ['group.KarlAdmin'])
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/form_admin_edit_profile.pt')
+            'templates/admin_edit_profile.pt')
 
         self._callFUT(context, request)
 
@@ -275,27 +261,10 @@ class AdminEditProfileTests(unittest.TestCase):
             },
             ])
 
-    def test_form_fill(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin_edit_profile.pt')
-        request = testing.DummyRequest()
-        context = DummyProfile(email='me@example.com')
-        context.website = "http://spacelabstudio.com"
-        context.title = "Eddie"
-        site = testing.DummyModel()
-        site['ed'] = context
-        from karl.testing import DummyUsers
-        users = site.users = DummyUsers()
-        users.add("ed", "ed", "password", [])
-        self._callFUT(context, request)
-        form = renderer.form.rendered_form
-        self.failUnless("http://spacelabstudio.com" in form)
-        self.failUnless('enctype="multipart/form-data"' in form)
-
     def test_submitted_invalid(self):
         renderer = testing.registerDummyRenderer(
             'templates/admin_edit_profile.pt')
-        request = testing.DummyRequest({'controlls.submitted':1})
+        request = testing.DummyRequest({'form.submitted':1})
         context = DummyProfile(email='me@example.com')
         context.title = "Eddie"
         site = testing.DummyModel()
@@ -304,8 +273,7 @@ class AdminEditProfileTests(unittest.TestCase):
         users = site.users = DummyUsers()
         users.add("ed", "ed", "password", [])
         self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid(self):
         testing.registerDummySecurityPolicy('userid')
@@ -1043,7 +1011,7 @@ class ChangePasswordViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/change_password.pt')
         response = self._callFUT(context, request)
         self.failIf(response.location)
-        self.failUnless(renderer.form.is_valid is None)
+        self.failIf(renderer.fielderrors)
 
     def test_submitted_incomplete(self):
         context = DummyProfile()
@@ -1052,8 +1020,7 @@ class ChangePasswordViewTests(unittest.TestCase):
             })
         renderer = testing.registerDummyRenderer('templates/change_password.pt')
         self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_wrong_old_password(self):
         from karl.testing import DummyUsers
@@ -1071,8 +1038,7 @@ class ChangePasswordViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/change_password.pt')
 
         self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_new_password_mismatch(self):
         from karl.testing import DummyUsers
@@ -1090,8 +1056,7 @@ class ChangePasswordViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/change_password.pt')
 
         self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_success(self):
         from karl.testing import DummyUsers
@@ -1202,7 +1167,7 @@ class AddUserTests(unittest.TestCase):
             'templates/add_user.pt')
         response = self._callFUT(context, request)
         self.failIf(response.location)
-        self.failUnless(renderer.form.is_valid is None)
+        self.failIf(renderer.fielderrors)
 
     def test_submitted_invalid(self):
         context = testing.DummyModel()
@@ -1210,8 +1175,7 @@ class AddUserTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/add_user.pt')
         response = self._callFUT(context, request)
-        self.failUnless(renderer.form.submit)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid(self):
         testing.registerDummySecurityPolicy('userid')
@@ -1305,14 +1269,11 @@ class AddUserTests(unittest.TestCase):
         from karl.testing import DummyUsers
         users = site.users = DummyUsers()
         users.add("ed", "ed", "password", [])
-        form_renderer = testing.registerDummyRenderer(
-            'templates/form_add_user.pt')
         renderer = testing.registerDummyRenderer(
             'templates/add_user.pt')
         response = self._callFUT(site, request)
 
-        self.assertEqual(renderer.form.is_valid, False)
-        self.assertEqual(form_renderer.fielderrors,
+        self.assertEqual(renderer.fielderrors,
             {'login': u"User ID 'ed' already exists"})
 
 profile_data = {

@@ -11,7 +11,7 @@
     community's moderators.</p>
 
     <form method="post" action="${post_url}" class="k3_genericForm" 
-          name="save">
+          xml:id="contentform" name="save">
       <fieldset metal:use-macro="formfields.macros['message-field']"/>
       <fieldset metal:use-macro="formfields.macros['form-submit']"/>
      </form>

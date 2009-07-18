@@ -12,7 +12,14 @@
     href="mailto:${api.settings.admin_email}">Site Administrator</a>.
     </p>
 
-    <div tal:content="structure form.rendered_form"></div>
+    <form method="post" action="${post_url}" class="k3_genericForm"
+          xml:id="contentform" enctype="multipart/form-data" name="save">
+      
+      <div metal:use-macro="formfields.macros['formerror']"/>
+      
+      <fieldset metal:use-macro="formfields.macros['email-field']"/>
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+    </form>
 
   </div>
 </html>

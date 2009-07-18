@@ -50,7 +50,6 @@ class EditCommunityViewTests(unittest.TestCase):
     def test_not_submitted(self):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.testing import registerListItem
-        from zope.interface import Interface
         tool_factory = DummyToolFactory(present=True)
         registerListItem(IToolFactory, tool_factory, 'foo')
         context = testing.DummyModel()
@@ -60,14 +59,14 @@ class EditCommunityViewTests(unittest.TestCase):
         context.text = 'text'
         context.default_tool = 'overview'
         request = testing.DummyRequest()
+        from webob import MultiDict
+        request.POST = MultiDict({})
         renderer = testing.registerDummyRenderer(
             'templates/edit_community.pt')
         self._register()
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit not in form.formdata)
-        self.assertEqual(form.is_valid, None)
-        self.assertEqual(form.fieldvalues['title'], 'thetitle')
+        self.assertEqual(renderer.fielderrors, {})
+        self.assertEqual(renderer.fieldvalues['title'], 'thetitle')
 
     def test_submitted_invalid(self):
         from webob import MultiDict
@@ -84,9 +83,7 @@ class EditCommunityViewTests(unittest.TestCase):
         registerListItem(IToolFactory, tool_factory, 'foo')
         self._register()
         self._callFUT(context, request)
-        form = renderer.form
-        self.assert_(form.submit in form.formdata)
-        self.failIf(form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid_sharingchange(self):
         from webob import MultiDict
@@ -110,12 +107,13 @@ class EditCommunityViewTests(unittest.TestCase):
                       'default_tool': 'files',
                       }),
             )
+        request.POST = request.params
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         L2 = testing.registerEventListener((Interface,
                                             IObjectWillBeModifiedEvent))
         self._register()
         renderer = testing.registerDummyRenderer(
-            'templates/form_edit_community.pt')
+            'templates/edit_community.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.title, u'Thetitle yo')
@@ -153,7 +151,7 @@ class EditCommunityViewTests(unittest.TestCase):
                                             IObjectWillBeModifiedEvent))
         self._register()
         renderer = testing.registerDummyRenderer(
-            'templates/form_edit_community.pt')
+            'templates/edit_community.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.title, u'Thetitle yo')
@@ -166,7 +164,6 @@ class EditCommunityViewTests(unittest.TestCase):
 
     def test_submitted_changetools(self):
         from webob import MultiDict
-        from zope.interface import Interface
         from repoze.bfg.testing import registerDummySecurityPolicy
         from karl.models.interfaces import IToolFactory
         from karl.testing import DummyCatalog
@@ -188,7 +185,7 @@ class EditCommunityViewTests(unittest.TestCase):
         calendar_tool_factory = DummyToolFactory(present=False)
         self._register()
         renderer = testing.registerDummyRenderer(
-            'templates/form_edit_community.pt')
+            'templates/edit_community.pt')
         testing.registerUtility(calendar_tool_factory, IToolFactory,
                                 name='calendar')
         response = self._callFUT(context, request)

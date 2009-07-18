@@ -5,7 +5,39 @@
 
     <h1 class="kscreentitle">Add User</h1>
 
-    <div tal:content="structure form.rendered_form"></div>
+  <form method="post" action="${post_url}" class="k3_genericForm"
+	xml:id="contentform" enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <div>
+
+      <fieldset metal:use-macro="formfields.macros['login-field']"/>
+      <fieldset metal:use-macro="formfields.macros['group-fields']"/>
+      <fieldset metal:use-macro="formfields.macros['home-path-field']"/>
+      <fieldset metal:use-macro="formfields.macros['password-field']"/>
+      <fieldset metal:use-macro="formfields.macros['password_confirm-field']"/>
+
+      <fieldset metal:use-macro="formfields.macros['firstname-field']"/>
+      <fieldset metal:use-macro="formfields.macros['lastname-field']"/>
+      <fieldset metal:use-macro="formfields.macros['email-field']"/>
+      <fieldset metal:use-macro="formfields.macros['phone-field']"/>
+      <fieldset metal:use-macro="formfields.macros['extension-field']"/>
+      <fieldset metal:use-macro="formfields.macros['department-field']"/>
+      <fieldset metal:use-macro="formfields.macros['position-field']"/>
+      <fieldset metal:use-macro="formfields.macros['organization-field']"/>
+      <fieldset metal:use-macro="formfields.macros['location-field']"/>
+      <fieldset metal:use-macro="formfields.macros['country-field']"/>
+      <fieldset metal:use-macro="formfields.macros['website-field']"/>
+      <fieldset metal:use-macro="formfields.macros['languages-field']"/>
+      <fieldset metal:use-macro="formfields.macros['biography-field']"/>
+      <fieldset metal:use-macro="formfields.macros['photo-field']"/>
+    
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+
+    </div>
+
+  </form>
 
   </div>
 </html>

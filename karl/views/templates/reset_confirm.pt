@@ -9,7 +9,25 @@
     Please provide a new password.
     </p>
 
-    <div tal:content="structure form.rendered_form"></div>
+  <form method="post" action="${post_url}" class="k3_genericForm"
+        xml:id="contentform" enctype="multipart/form-data" name="save">
 
-  </div>
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <fieldset tal:define="error fielderrors['login']|None"
+              class="${error and 'fieldError' or ''}"
+              id="login-field">
+      <label class="required">Username</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="login"/>
+    </fieldset>
+
+    <fieldset metal:use-macro="formfields.macros['new-password-field']"/>
+    <fieldset metal:use-macro="formfields.macros['new-password_confirm-field']"/>
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+</div>
+
 </html>

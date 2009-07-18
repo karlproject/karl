@@ -32,6 +32,7 @@ from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
 
 from repoze.bfg.url import model_url
+from repoze.enformed import FormSchema
 
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import IToolAddables
@@ -40,11 +41,11 @@ from karl.views.batch import get_catalog_batch_grid
 from karl.views import baseforms
 from karl.views.utils import convert_to_script
 from karl.views.tags import set_tags
+from karl.views.form import render_form_to_response
 
 from karl.utils import find_users
 from karl.utils import get_setting
 
-from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
 from karl.models.interfaces import ICommunityInfo
@@ -123,7 +124,7 @@ def get_my_communities(communities_folder, request):
 
 
 from formencode import validators
-class AddCommunityForm(baseforms.BaseForm):
+class AddCommunityForm(FormSchema):
     title = baseforms.title
     description = baseforms.description
     text = validators.UnicodeString(strip=True)
@@ -133,21 +134,17 @@ class AddCommunityForm(baseforms.BaseForm):
 def add_community_view(context, request):
 
     system_name = get_setting(context, 'system_name')
-    form = AddCommunityForm(request.POST, submit='form.submitted', 
-                            cancel='form.cancel')
+    tags_list=request.POST.getall('tags')
+    form = AddCommunityForm(tags_list=tags_list)
 
-    if form.cancel in form.formdata:
+    if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
     available_tools = getMultiAdapter((context, request), IToolAddables)()
 
-    if form.submit in form.formdata:
+    if 'form.submitted' in request.POST:
         try:
-            state = baseforms.AppState(tags_list=request.POST.getall('tags'))
-
-            converted = form.to_python(form.fieldvalues, state)
-            form.is_valid = True
-
+            converted = form.validate(request.POST)
             # Now add the community
             try:
                 name = make_name(context, converted['title'])
@@ -203,7 +200,6 @@ def add_community_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            form.is_valid = False
             # Get the default list of tools into sequence of dicts AND
             # set checked state based on what the user typed in before
             # invalidation.
@@ -217,7 +213,7 @@ def add_community_view(context, request):
             # provide client data for rendering current tags in the tagbox.
             # We arrived here because the form is invalid.
             tagbox_records = [dict(tag=tag) for tag in
-                              form.formdata.getall('tags')]
+                              request.POST.getall('tags')]
 
     else:
         fielderrors = {}
@@ -247,20 +243,15 @@ def add_community_view(context, request):
     page_title = 'Add Community'
     api = TemplateAPI(context, request, page_title)
 
-    form_html = render_template(
-        'templates/form_add_community.pt',
+    return render_form_to_response(
+        'templates/add_community.pt',
+        form,
+        request.POST,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
         tools=tools,
         api=api,
-        )
-    form.rendered_form = form.merge(form_html, form.fieldvalues)
-
-    return render_template_to_response(
-        'templates/add_community.pt',
-        api=api,
-        form=form,
         system_name=system_name,
         head_data=convert_to_script(client_json_data),
         )

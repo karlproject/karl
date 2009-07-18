@@ -33,7 +33,6 @@ class ShowCommunitiesViewTests(unittest.TestCase):
         return show_communities_view(context, request)
 
     def test_it(self):
-        from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import ILetterManager
@@ -107,17 +106,21 @@ class AddCommunityViewTests(unittest.TestCase):
 
     def test_cancelled(self):
         context = testing.DummyModel()
-        request = testing.DummyRequest(params={'form.cancel':'1'})
+        from webob import MultiDict
+        request = testing.DummyRequest()
+        request.POST = request.params = MultiDict({'form.cancel':'1'})
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_not_submitted(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        from webob import MultiDict
+        request.POST = request.params = MultiDict({})
         renderer = testing.registerDummyRenderer(
             'templates/add_community.pt')
         self._callFUT(context, request)
-        self.assert_(renderer.form.submit not in renderer.form.formdata)
+        self.failIf(renderer.fielderrors)
 
     def test_submitted_invalid(self):
         context = testing.DummyModel()
@@ -128,8 +131,7 @@ class AddCommunityViewTests(unittest.TestCase):
         from karl.models.interfaces import IToolFactory
         testing.registerUtility(None, IToolFactory, name='mytoolfactory')
         self._callFUT(context, request)
-        self.assert_(renderer.form.submit in renderer.form.formdata)
-        self.failIf(renderer.form.is_valid)
+        self.failUnless(renderer.fielderrors)
 
     def test_community_exists(self):
         context = testing.DummyModel()
