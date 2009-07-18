@@ -49,6 +49,9 @@ from karl.views.utils import get_user_home
 
 from repoze.bfg.traversal import find_interface
 
+import time
+_start_time = int(time.time())
+
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
 
@@ -83,6 +86,8 @@ class TemplateAPI(object):
         # number, or to "pipeline" resources on a different URL path.
         full_static_path = getattr(settings, 'full_static_path', False)
         if full_static_path:
+            if '%d' in full_static_path:
+                full_static_path = full_static_path % _start_time
             self.static_url = full_static_path
         self.page_title = page_title
 
