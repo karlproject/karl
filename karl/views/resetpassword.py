@@ -119,7 +119,7 @@ def reset_request_view(context, request):
             
             if isinstance(body, unicode):
                 body = body.encode("UTF-8")
-                
+
             mail.set_payload(body, "UTF-8")
             mail.set_type("text/html")
 
@@ -133,8 +133,10 @@ def reset_request_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
     else:
         fielderrors = {}
+        fill_values = {}
 
     page_title = 'Forgot Password Request'
     api = TemplateAPI(context, request, page_title)
@@ -142,7 +144,7 @@ def reset_request_view(context, request):
     return render_form_to_response(
         'templates/reset_request.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
@@ -232,7 +234,7 @@ def reset_confirm_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = request.POST
+            fill_values = form.convert(request.POST)
     else:
         fielderrors = {}
         # need to fill in these fields for the chained validator

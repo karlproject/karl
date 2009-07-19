@@ -84,8 +84,14 @@ def edit_profile_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
+            try:
+                del fill_values['photo'] # filler cant handle photo field
+            except KeyError:
+                pass
     else:
         fielderrors = {}
+        fill_values = {}
 
     page_title = 'Edit ' + context.title
     api = TemplateAPI(context, request, page_title)
@@ -116,7 +122,7 @@ def edit_profile_view(context, request):
     return render_form_to_response(
         'templates/edit_profile.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
@@ -249,7 +255,11 @@ def admin_edit_profile_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = request.POST
+            fill_values = form.convert(request.POST)
+            try:
+                del fill_values['photo'] # filler cant handle photo field
+            except KeyError:
+                pass
     else:
         fielderrors = {}
 
@@ -617,7 +627,11 @@ def change_password_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
     else:
+        # fill_values not empty to work around chained validator
+        # for password and password_confirm
+        fill_values = {'password':'', 'password_confirm':''}
         fielderrors = {}
 
     page_title = 'Change Password'
@@ -626,7 +640,7 @@ def change_password_view(context, request):
     return render_form_to_response(
         'templates/change_password.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,
@@ -716,7 +730,7 @@ def add_user_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = request.POST.copy()
+            fill_values = form.convert(request.POST)
             try:
                 del fill_values['photo'] # rendering cant deal with photo
             except KeyError:

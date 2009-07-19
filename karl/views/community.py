@@ -77,15 +77,42 @@ def edit_community_view(context, request):
     system_name = get_setting(context, 'system_name')
     security_adapter = getAdapter(context, ISecurityWorkflow)
     available_tools = getMultiAdapter((context, request), IToolAddables)()
+
     tags_list = request.POST.getall('tags')
-    edit_form = EditCommunityForm(tags_list=tags_list)
-    fieldvalues = request.POST
+    form = EditCommunityForm(tags_list=tags_list)
 
     if 'form.submitted' in request.POST:
         try:
-            converted = edit_form.validate(request.POST)
+            converted = form.validate(request.POST)
+            # *will be* modified event
+            objectEventNotify(ObjectWillBeModifiedEvent(context))
+
+            security_adapter.updateState(**converted)
+
+            context.title = converted['title']
+            context.description = converted['description']
+            context.text = converted['text']
+            context.default_tool = request.params['default_tool']
+
+            # Save the tags on it
+            set_tags(context, request, converted['tags'])
+
+            for info in available_tools:
+                component = info['component']
+                present = component.is_present(context, request)
+                if (not present) and info['name'] in request.params:
+                    component.add(context, request)
+                if present and (info['name'] not in request.params):
+                    component.remove(context, request)
+
+            # *modified* event
+            objectEventNotify(ObjectModifiedEvent(context))
+
+            location = model_url(context, request)
+            return HTTPFound(location=location)
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
             # Get the default list of tools into sequence of dicts AND
             # set checked state based on what the user typed in before
             # invalidation.
@@ -123,42 +150,14 @@ def edit_community_view(context, request):
             tagquery = getMultiAdapter((context, request), ITagQuery)
             tagbox_docid = tagquery.docid
 
-        else:
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-
-            security_adapter.updateState(**converted)
-
-            context.title = converted['title']
-            context.description = converted['description']
-            context.text = converted['text']
-            context.default_tool = request.params['default_tool']
-
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
-
-            for info in available_tools:
-                component = info['component']
-                present = component.is_present(context, request)
-                if (not present) and info['name'] in request.params:
-                    component.add(context, request)
-                if present and (info['name'] not in request.params):
-                    component.remove(context, request)
-
-            # *modified* event
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            return HTTPFound(location=location)
-
     else:
         fielderrors = {}
-        fieldvalues = dict(
+        fill_values = dict(
             title=context.title,
             description=context.description,
             text=context.text,
             )
-        fieldvalues.update(security_adapter.getStateMap())
+        fill_values.update(security_adapter.getStateMap())
         
         # Get the default list of tools into a sequence of dicts
         tools = []
@@ -197,8 +196,8 @@ def edit_community_view(context, request):
 
     return render_form_to_response(
         'templates/edit_community.pt',
-        edit_form,
-        fieldvalues,
+        form,
+        fill_values,
         post_url=request.url,
         formfields = api.formfields,
         fielderrors = fielderrors,

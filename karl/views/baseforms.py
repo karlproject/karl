@@ -123,6 +123,9 @@ class TextAreaToEmails(validators.UnicodeString):
 
 class Taglist(validators.FancyValidator):
     """ Converter to return sequence of strings for each tagbox tag """
+    # XXX This validator probably shouldn't exist
+    def _from_python(self, value, state):
+        return ' '.join(state.tags_list)
 
     def _to_python(self, value, state):
         # For now we just return the contents from the state.  But

@@ -200,6 +200,7 @@ def add_community_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
             # Get the default list of tools into sequence of dicts AND
             # set checked state based on what the user typed in before
             # invalidation.
@@ -217,6 +218,7 @@ def add_community_view(context, request):
 
     else:
         fielderrors = {}
+        fill_values = {}
 
         # Get the default list of tools into a sequence of dicts
 
@@ -246,7 +248,7 @@ def add_community_view(context, request):
     return render_form_to_response(
         'templates/add_community.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=api.formfields,
         fielderrors=fielderrors,

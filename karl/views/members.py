@@ -452,8 +452,10 @@ def add_existing_user_view(context, request):
                                        converted['text'], request)
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
     else:
         fielderrors = {}
+        fill_values = {}
 
     # Handle userid passed in via GET request
     # Moderator would get here by clicking a link in an email to grant a
@@ -472,7 +474,7 @@ def add_existing_user_view(context, request):
     return render_form_to_response(
         'templates/add_existing_user.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,
@@ -612,7 +614,7 @@ def accept_invitation_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            fill_values = request.POST.copy()
+            fill_values = form.convert(request.POST)
             try:
                 del fill_values['photo'] # rendering cant deal with photo
             except KeyError:
@@ -748,7 +750,9 @@ def invite_new_user_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
     else:
+        fill_values = {}
         fielderrors = {}
 
     page_title = 'Invite New KARL Users'
@@ -757,7 +761,7 @@ def invite_new_user_view(context, request):
     return render_form_to_response(
         'templates/invite_new_user.pt',
         form,
-        request.POST,
+        fill_values,
         post_url=request.url,
         formfields=fieldwidgets,
         fielderrors=fielderrors,

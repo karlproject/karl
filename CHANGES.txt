@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Use "repoze.enformed" package to do form validation and rendering;
+  "form" templates are now inlined into their constituent "real"
+  templates.
 
 3.5.1 (2009-07-17)
 ------------------
