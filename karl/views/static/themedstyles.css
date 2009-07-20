@@ -1848,7 +1848,7 @@ img#login-gradient {
     margin: 1em 0 1.5em;
 }
 body#login-wrapper h1.kscreentitle {
-    background: transparent url(images/logo.gif) 50% 0% no-repeat;
+    background: transparent url(custom/logo.gif) 50% 0% no-repeat;
     border: 0;
     margin: 0;
     padding: 0;
