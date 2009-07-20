@@ -7,39 +7,12 @@ of KARL.
 Installation
 ============
 
-It is necessary, first, to grab copies of the `karl` and `karl.content`
-packages, currently distributed only via subversion.  If this package is in
-subversion it might be useful to load these as externals in the src directory::
-
-  $ svn propedit svn:externals src
-
-This will open your favorite editor.  Enter something like this::
-
-  karl http://osi.agendaless.com/bfgsvn/karl/tags/{latest}
-  karl.content http://osi.agendaless.com/bfgsvn/karl.content/tags/{latest}
-
-To see what the latest tags are for each package, you can visit these urls in
-your web browser::
-
-  http://osi.agendaless.com/bfgsvn/karl/tags/
-  http://osi.agendaless.com/bfgsvn/karl.content/tags/
-
-Once you have edited the externals you can do `svn up` to suck down the `karl`
-and `karl.content` packages.
-
-Alternatively, you can just use `svn co` to grab these and put them anywhere
-you like.
-
 The following steps will get you up and running with Karl immediately.
 $KARL_HOME is assumed to be the directory where this README.txt is found::
 
   $ cd $KARL_HOME
   $ virtualenv --no-site-packages .
   $ source bin/activate
-  $ cd /path/to/checked/out/karl
-  $ python setup.py develop (or install)
-  $ cd /path/to/checked/out/karl.content
-  $ python setup.py develop (or install)
   $ cd $KARL_HOME/src/{{package}}
   $ python setup.py develop
 
