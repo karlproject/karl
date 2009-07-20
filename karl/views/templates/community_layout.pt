@@ -27,7 +27,7 @@
           <div class="content" id="top-controls">
             <span id="logo">
               <a href="${api.home_url}">
-                <img src="${api.static_url}/images/logo.gif" alt=""/>
+                <img src="${api.static_url}/custom/logo.gif" alt=""/>
               </a>
             </span>
             <div metal:use-macro="api.snippets.macros['livesearch_box']"/>

@@ -81,6 +81,7 @@
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/1.7/themes/base/ui.all.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/autobox2/jquery.ui.autobox.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/ui.custom.css" type="text/css"/>
+      <link rel="stylesheet" type="text/css" href="${api.static_url}/custom/custom.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
     </metal:resources>
 
