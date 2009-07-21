@@ -784,6 +784,7 @@ ul#peopledir-tabs li.selected a {
 #peopledir-actions li {
   float: left;
   margin: 2px;
+  list-style: none;
 }
 #peopledir-actions .ui-icon {
   height: 16px;
