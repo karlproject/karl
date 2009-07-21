@@ -13,6 +13,8 @@ Unreleased
   "form" templates are now inlined into their constituent "real"
   templates.
 
+- Made FakeEmailDelivery quiet by default.
+
 3.5.1 (2009-07-17)
 ------------------
 
