@@ -8,8 +8,9 @@
   />
 
   <!-- Publish static resources under /static/ : we use a route here
-   with a custom factory to avoid opening a ZODB connection
-   unnecessarily -->
+   with a custom root factory to avoid opening a ZODB connection
+   unnecessarily for each static resource (the default root factory
+   retrieves a root object from ZODB ) -->
 
   <route
     name="static"
