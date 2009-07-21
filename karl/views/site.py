@@ -37,8 +37,9 @@ version_match = re.compile(r'^r\d{10,19}$').match
 def versioning_static_view(context, request):
     # if the first element in the subpath is the version number, strip
     # it out of the subpath (see views/api.py static_url)
-    if request.subpath and version_match(request.subpath[0]):
-        request.subpath = request.subpath[1:]
+    subpath = request.subpath
+    if subpath and version_match(subpath[0]):
+        request.subpath = subpath[1:]
     return static_view(context, request)
 
 def site_view(context, request):
