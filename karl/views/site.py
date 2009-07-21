@@ -29,7 +29,8 @@ from karl.views.utils import get_user_home
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-static_view = static('static')
+# one year
+static_view = static('static', cache_max_age=157680000)
 
 version_match = re.compile(r'^r\d{10,19}$').match
 # version number is "r" plus an intified timetime, e.g. r1234567890
