@@ -43,7 +43,7 @@
     <div id="header-top">
       <div class="content" id="top-controls">
         <span id="logo">
-          <img src="${api.static_url}/custom/logo.gif" alt=""/>
+          <img src="${api.logo_url}" alt=""/>
         </span>
         <h1 id="page-title">${api.page_title}</h1>
         <div style="clear: both"></div>

@@ -356,6 +356,11 @@ class TemplateAPI(object):
     def support_attachments(self):
         return support_attachments(self.context)
 
+    @property
+    def logo_url(self):
+        logo_path = get_setting(self.context, 'logo_path', 'custom/logo.gif')
+        return '%s/%s' % (self.static_url, logo_path)
+
 
 class SettingsReader:
     """Convenience for reading settings in templates"""

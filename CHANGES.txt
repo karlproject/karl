@@ -21,6 +21,9 @@ Unreleased
 - Better fault tolerance when killing processes using Python < 2.6 via
   utilities.baseconverter._ProcTimeout
 
+- Made the name of the logo image configurable (so that it can be a PNG
+  rather than a GIF).
+
 3.5.1 (2009-07-17)
 ------------------
 

@@ -200,6 +200,22 @@ class TemplateAPITests(unittest.TestCase):
         api = self._makeOne(context, request)
         self.assertEqual(api.render_footer(), 'FOOTER')
 
+    def test_default_logo_url(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        api = self._makeOne(context, request)
+        self.assertEqual(api.logo_url, api.static_url + '/custom/logo.gif')
+
+    def test_custom_logo_url(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        from repoze.bfg.interfaces import ISettings
+        settings = karltesting.DummySettings()
+        settings.logo_path = 'mylogo.png'
+        testing.registerUtility(settings, ISettings)
+        api = self._makeOne(context, request)
+        self.assertEqual(api.logo_url, api.static_url + '/mylogo.png')
+
 class DummyTagQuery:
     def __init__(self, context, request):
         self.tagusers = ['a']
