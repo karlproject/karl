@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+- Reorganize and cleanup CSS to reduce file size and complexity
 
 - Use a start-time versioned URL for static resources.  This implies
   that the "static_postfix" setting is no longer required (the version

@@ -56,13 +56,6 @@ input.inputField {
     width: 30em;
 }
 
-/*#outer {position: relative; text-align: center;}
-
-#middle {position: absolute; top: 50%; text-align: center;}
-
-* html #inner {top: -50%; width:700px;}*/
-
-* html #inner {width: 700px;}
 * html body#login-wrapper h1.kscreentitle {
   height /**/: 32px;
   overflow: hidden;
