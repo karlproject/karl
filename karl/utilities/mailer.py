@@ -19,9 +19,9 @@ def mail_delivery_factory(os=os): # accepts 'os' for unit test purposes
     for use by this application.
     """
     settings = queryUtility(ISettings)
-    
+
     # If settings utility not present, we are probably testing and should
-    # suppress sending mail.  Can also be set explicitly in environment 
+    # suppress sending mail.  Can also be set explicitly in environment
     # variable
     suppress_mail = boolean(os.environ.get('SUPPRESS_MAIL', ''))
 
@@ -50,9 +50,9 @@ def mail_delivery_factory(os=os): # accepts 'os' for unit test purposes
 class FakeMailDelivery:
     implements(IMailDelivery)
 
-    def __init__(self, quiet=False):
+    def __init__(self, quiet=True):
         self.quiet = quiet
-        
+
     def send(self, mfrom, mto, msg):
         if not self.quiet:
             print 'From:', mfrom
