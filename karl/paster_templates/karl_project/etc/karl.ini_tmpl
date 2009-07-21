@@ -16,6 +16,12 @@ min_pw_length = 8
 # upload limit is in bytes; 0 means unlimited
 upload_limit = 0
 
+people_path = people
+selectable_groups =
+    group.KarlStaff
+    group.KarlUserAdmin
+    group.KarlAdmin
+
 # for the mailin_monitor utility
 #pending_db_path=/path/to/Maildir/pending.db
 #maildir_path=/path/to
@@ -42,7 +48,7 @@ secret_key = $h4sh3m#g00d$
 [pipeline:main]
 pipeline =
     egg:Paste#evalerror
-    egg:repoze.zodbconn#closer
+    egg:repoze.zodbconn#connector
     errorlog
     egg:repoze.retry#retry
     egg:repoze.tm2#tm
