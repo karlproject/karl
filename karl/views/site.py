@@ -27,9 +27,6 @@ from repoze.bfg.view import static
 
 from karl.views.utils import get_user_home
 
-##from karl.models.interfaces import IFiles
-##from karl.models.interfaces import IOthers
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 static_view = static('static')
