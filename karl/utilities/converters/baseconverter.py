@@ -122,11 +122,17 @@ class _ProcTimeout(threading.Thread):
                 elif elapsed > timeout:
                     process.terminate()
             else: # < 2.6
-                # Screw windows
+                # Will (hopefully) fail quietly on Windows
+                # Occasionally it seems that process.poll() tells us we are
+                # still running even when we're not, so we check the error
+                # status code from os.system() and break out if there is an
+                # error, usually because there is no such process.
                 if elapsed > timeout * 2:
-                    os.system("kill -KILL %d" % process.pid)
+                    if os.system("kill -KILL %d > /dev/null 2>&1" % process.pid) != 0:
+                        break
                 elif elapsed > timeout:
-                    os.system("kill %d" % process.pid)
+                    if os.system("kill %d > /dev/null 2>&1" % process.pid) != 0:
+                        break
             time.sleep(poll_interval)
 
     def stop(self):
