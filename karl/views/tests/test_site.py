@@ -111,6 +111,29 @@ class TestSiteView(unittest.TestCase):
         self.assertEqual(response.location,
             "http://example.com/communities/community/foo/some_view.html")
 
+class TestVersioningStaticView(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from karl.views.site import versioning_static_view
+        return versioning_static_view(context, request)
+
+    def test_with_version(self):
+        request = testing.DummyRequest()
+        request.subpath = ('r1234567890', 'abcdef', 'test.css')
+        request.copy = lambda: request
+        request.get_response = lambda app: None
+        context = testing.DummyModel()
+        self._callFUT(context, request)
+        self.assertEqual(request.subpath, ('abcdef', 'test.css',))
+
+    def test_without_version(self):
+        request = testing.DummyRequest()
+        request.subpath = ('abcdef', 'test.css')
+        request.copy = lambda: request
+        request.get_response = lambda app: None
+        context = testing.DummyModel()
+        self._callFUT(context, request)
+        self.assertEqual(request.subpath, ('abcdef', 'test.css',))
+
 class DummyMatch(testing.DummyModel):
     title = "somematch"
 

@@ -78,8 +78,7 @@ class TemplateAPI(object):
         settings = queryUtility(ISettings)
         self.js_devel_mode = settings and getattr(settings,
                                                   'js_devel_mode', None)
-        static_postfix = getattr(settings, 'static_postfix', '/static')
-        self.static_url = app_url + static_postfix
+        self.static_url = '%s/static/r%s' % (app_url, _start_time)
 
         # Provide a setting in the INI to fully control the entire URL
         # to the static.  This is when the proxy runs a different port

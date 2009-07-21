@@ -6,7 +6,6 @@ zodb_uri = zeo://localhost:8886/?blob_dir=%(here)s/../var/blobs&shared_blob_dir=
 use = egg:{{package}}#make_app
 reload_templates = %(debug)s
 js_devel_mode = false
-static_postfix = /static
 mail_queue_path = %(here)s/../var/mail_queue
 system_name = KARL
 #system_email_domain = ????

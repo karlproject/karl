@@ -18,6 +18,7 @@
 """Publish static resources under /static/"""
 
 import os
+import re
 
 from webob.exc import HTTPFound
 
@@ -32,6 +33,16 @@ from karl.views.utils import get_user_home
 here = os.path.abspath(os.path.dirname(__file__))
 
 static_view = static('static')
+
+version_match = re.compile(r'^r\d{10,19}$').match
+# version number is "r" plus an intified timetime, e.g. r1234567890
+
+def versioning_static_view(context, request):
+    # if the first element in the subpath is the version number, strip
+    # it out of the subpath (see views/api.py static_url)
+    if request.subpath and version_match(request.subpath[0]):
+        request.subpath = request.subpath[1:]
+    return static_view(context, request)
 
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)

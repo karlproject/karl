@@ -10,7 +10,7 @@
   <!-- Publish static resources under /static/ -->
   <view
     for="karl.models.interfaces.ISite"
-    view=".site.static_view"
+    view=".site.versioning_static_view"
     name="static"
   />
   

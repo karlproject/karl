@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- Use a start-time versioned URL for static resources.  This implies
+  that the "static_postfix" setting is no longer required (the version
+  number is generated and consumed by the system itself, rather than
+  requiring a version number to be set in configuration).
+
 - Use "repoze.enformed" package to do form validation and rendering;
   "form" templates are now inlined into their constituent "real"
   templates.
