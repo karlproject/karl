@@ -7,11 +7,16 @@
     permission="administer"
   />
 
-  <!-- Publish static resources under /static/ -->
-  <view
-    for="karl.models.interfaces.ISite"
-    view=".site.versioning_static_view"
+  <!-- Publish static resources under /static/ : we use a route here
+   with a custom factory to avoid opening a ZODB connection
+   unnecessarily -->
+
+  <route
     name="static"
+    path="/static*subpath"
+    view_for=".site.StaticRootFactory"
+    view=".site.versioning_static_view"
+    factory=".site.StaticRootFactory"
   />
   
   <!-- Redirect requests to site root, to correct URL -->

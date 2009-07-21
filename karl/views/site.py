@@ -45,3 +45,8 @@ def versioning_static_view(context, request):
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)
     return HTTPFound(location=model_url(home, request, *extra_path))
+
+class StaticRootFactory(object):
+    def __init__(self, environ):
+        pass
+    
