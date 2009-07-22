@@ -358,7 +358,7 @@ class TemplateAPI(object):
 
     @property
     def logo_url(self):
-        logo_path = get_setting(self.context, 'logo_path', 'custom/logo.gif')
+        logo_path = get_setting(self.context, 'logo_path', 'images/logo.gif')
         return '%s/%s' % (self.static_url, logo_path)
 
 
