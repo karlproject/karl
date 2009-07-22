@@ -107,8 +107,13 @@
 
 			ed.onSetContent.add(function() {
                             var content = $(ed.getBody());
-                            content.find('embed').each(function() {
+                            content.find('embed,object').each(function() {
                                 var embed = $(this);
+                                // If we are an embed inside an object, do not process
+                                if (embed.is('embed') && embed.parent().is('object')) {
+                                    return;
+                                }
+                                // Do the transformation
                                 var embed_text = $('<div />').append(embed.clone()).html();
                                 var result = $('<img />')
                                     .attr('src', t.url + '/img/trans.gif')
