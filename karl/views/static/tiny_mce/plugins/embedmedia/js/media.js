@@ -60,6 +60,8 @@ function insertMedia() {
     // update snippet
     var snippet = fetchSnippetFromForm();
     var parms = snippet.getParms();
+    if (! parms.width) parms.width = 100;
+    if (! parms.height) parms.height = 100;
 
     f.width.value = parms.width;
     f.height.value = parms.height;
@@ -88,6 +90,8 @@ function changeEmbed() {
     var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
     snippet.setContent(f.embed.value);
     var parms = snippet.getParms();
+    if (! parms.width) parms.width = 100;
+    if (! parms.height) parms.height = 100;
     f.width.value = parms.width || '';
     f.height.value = parms.height || '';
     // update preview
