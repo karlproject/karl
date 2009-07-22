@@ -2,12 +2,6 @@ tinyMCEPopup.requireLangPack();
 
 var oldWidth, oldHeight, ed, url;
 
-/*
-if (url = tinyMCEPopup.getParam("media_external_list_url"))
-    document.write('<script language="javascript" type="text/javascript" src="' + tinyMCEPopup.editor.documentBaseURI.toAbsolute(url) + '"></script>');
-*/
-
-
 function init() {
     var pl = "", f, val;
     var type = "flash", fe, i;
@@ -21,19 +15,6 @@ function init() {
     if (/mceItemFlash/.test(ed.dom.getAttrib(fe, 'class'))) {
         pl = fe.title;
     }
-
-
-    //document.getElementById('bgcolor_pickcontainer').innerHTML = getColorPickerHTML('bgcolor_pick','bgcolor');
-
-    //var html = getMediaListHTML('medialist','src','media','media');
-    //if (html == "")
-    //    document.getElementById("linklistrow").style.display = 'none';
-    //else
-    //    document.getElementById("linklistcontainer").innerHTML = html;
-
-    // Resize some elements
-    //if (isVisible('filebrowser'))
-    //    document.getElementById('embed').style.width = '230px';
 
     /*
     // Setup form
@@ -105,14 +86,8 @@ function insertMedia() {
         .attr('height', f.height.value);
         //.attr('align', f.align.options[f.align.selectedIndex].value);
     h = $('<div />').append(result).html();
-    /*
-    h = f.embed.value; 
-    */
 
-	tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
-
-
-        //ed.execCommand('mceInsertContent', false, h);
+    tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
 
     tinyMCEPopup.close();
 }
@@ -125,19 +100,6 @@ function updatePreview() {
 
     generatePreview();
 }
-
-/*
-function serializeParameters() {
-    var d = document, f = d.forms[0], s = '';
-
-    var encoded = $('<div />').append(content).html();
-    var result = $('<img />').
-    alert(s);
-    //s = s.length > 0 ? s.substring(0, s.length - 1) : s;
-
-    return s;
-}
-*/
 
 function setBool(pl, p, n) {
     if (typeof(pl[n]) == "undefined")
@@ -191,114 +153,6 @@ function jsEncode(s) {
 
 function generatePreview(c) {
     return;
-
-
-    var f = document.forms[0], p = document.getElementById('prev'), h = '', cls, pl, n, type, codebase, wp, hp, nw, nh;
-
-    p.innerHTML = '<!-- x --->';
-
-    nw = parseInt(f.width.value);
-    nh = parseInt(f.height.value);
-
-    if (f.width.value != "" && f.height.value != "") {
-        if (f.constrain.checked) {
-            if (c == 'width' && oldWidth != 0) {
-                wp = nw / oldWidth;
-                nh = Math.round(wp * nh);
-                f.height.value = nh;
-            } else if (c == 'height' && oldHeight != 0) {
-                hp = nh / oldHeight;
-                nw = Math.round(hp * nw);
-                f.width.value = nw;
-            }
-        }
-    }
-
-    if (f.width.value != "")
-        oldWidth = nw;
-
-    if (f.height.value != "")
-        oldHeight = nh;
-
-    // After constrain
-    pl = serializeParameters();
-
-    switch (f.media_type.options[f.media_type.selectedIndex].value) {
-        case "flash":
-            cls = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
-            codebase = 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0';
-            type = 'application/x-shockwave-flash';
-            break;
-
-        case "shockwave":
-            cls = 'clsid:166B1BCA-3F9C-11CF-8075-444553540000';
-            codebase = 'http://download.macromedia.com/pub/shockwave/cabs/director/sw.cab#version=8,5,1,0';
-            type = 'application/x-director';
-            break;
-
-        case "qt":
-            cls = 'clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B';
-            codebase = 'http://www.apple.com/qtactivex/qtplugin.cab#version=6,0,2,0';
-            type = 'video/quicktime';
-            break;
-
-        case "wmp":
-            cls = ed.getParam('media_wmp6_compatible') ? 'clsid:05589FA1-C356-11CE-BF01-00AA0055595A' : 'clsid:6BF52A52-394A-11D3-B153-00C04F79FAA6';
-            codebase = 'http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=5,1,52,701';
-            type = 'application/x-mplayer2';
-            break;
-
-        case "rmp":
-            cls = 'clsid:CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA';
-            codebase = 'http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=5,1,52,701';
-            type = 'audio/x-pn-realaudio-plugin';
-            break;
-    }
-
-    if (pl == '') {
-        p.innerHTML = '';
-        return;
-    }
-
-    pl = tinyMCEPopup.editor.plugins.media._parse(pl);
-
-    if (!pl.src) {
-        p.innerHTML = '';
-        return;
-    }
-
-    pl.src = tinyMCEPopup.editor.documentBaseURI.toAbsolute(pl.src);
-    pl.width = !pl.width ? 100 : pl.width;
-    pl.height = !pl.height ? 100 : pl.height;
-    pl.id = !pl.id ? 'obj' : pl.id;
-    pl.name = !pl.name ? 'eobj' : pl.name;
-    pl.align = !pl.align ? '' : pl.align;
-
-    // Avoid annoying warning about insecure items
-    if (!tinymce.isIE || document.location.protocol != 'https:') {
-        h += '<object classid="' + cls + '" codebase="' + codebase + '" width="' + pl.width + '" height="' + pl.height + '" id="' + pl.id + '" name="' + pl.name + '" align="' + pl.align + '">';
-
-        for (n in pl) {
-            h += '<param name="' + n + '" value="' + pl[n] + '">';
-
-            // Add extra url parameter if it's an absolute URL
-            if (n == 'src' && pl[n].indexOf('://') != -1)
-                h += '<param name="url" value="' + pl[n] + '" />';
-        }
-    }
-
-    h += '<embed type="' + type + '" ';
-
-    for (n in pl)
-        h += n + '="' + pl[n] + '" ';
-
-    h += '></embed>';
-
-    // Avoid annoying warning about insecure items
-    if (!tinymce.isIE || document.location.protocol != 'https:')
-        h += '</object>';
-
-    p.innerHTML = "<!-- x --->" + h;
 }
 
 tinyMCEPopup.onInit.add(init);
