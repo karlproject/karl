@@ -63,6 +63,56 @@ function init() {
     generatePreview();
 }
 
+
+var EmbedSnippet = function EmbedSnippet() {};
+$.extend(EmbedSnippet.prototype, {
+
+    setContent: function(html) {
+        this.wrapper = $('<div />');
+        var wrapper = this.wrapper;
+        wrapper.append(html);
+        this.root = wrapper.children();
+        var root = this.root;
+        // detect type
+        this.emtype = null;
+        if (root.is('object')) {
+            var inside = root.find('embed');
+            if (inside) {
+                this.emtype = 'object+embed';
+                this.inside = inside;
+            }
+        }
+        // cascade
+        return this;
+    },
+
+    getContent: function() {
+        return this.wrapper.html();
+    },
+
+    getParms: function() {
+        return {
+            width: this.root.attr('width'),
+            height: this.root.attr('height')
+        };
+    },
+
+    setParms: function(parms) {
+        if (this.emtype == 'object+embed') {
+            parms.width && this.root.attr('width', parms.width); 
+            parms.height && this.root.attr('height', parms.height); 
+            parms.width && this.inside.attr('width', parms.width); 
+            parms.height && this.inside.attr('height', parms.height); 
+        } else {
+            parms.width && this.root.attr('width', parms.width); 
+            parms.height && this.root.attr('height', parms.height); 
+        }
+        return this;
+    }
+
+});
+
+
 function insertMedia() {
     var fe, f = document.forms[0], h;
 
