@@ -13,7 +13,7 @@ function init() {
 
     fe = ed.selection.getNode();
     if (/mceItemFlash/.test(ed.dom.getAttrib(fe, 'class'))) {
-        var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
+        var snippet = tinyMCEPopup.editor.plugins.embedmedia.newEmbedSnippet();
         snippet.setContent(fe.title);
         snippet.setParms({
             width: ed.dom.getAttrib(fe, 'width'),
@@ -37,7 +37,7 @@ function init() {
 function fetchSnippetFromForm() {
     // fetch snippet from the form
     var f = document.forms[0];
-    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
+    var snippet = tinyMCEPopup.editor.plugins.embedmedia.newEmbedSnippet();
     snippet
         .setContent(f.embed.value);
         //.setParms({
@@ -88,7 +88,7 @@ function insertMedia() {
 function changeEmbed() {
     var f = document.forms[0];
     // update snippet
-    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
+    var snippet = tinyMCEPopup.editor.plugins.embedmedia.newEmbedSnippet();
     snippet.setContent(f.embed.value);
     var parms = snippet.getParms();
     if (! parms.width) parms.width = 100;
@@ -102,7 +102,7 @@ function changeEmbed() {
 function changeDimension(dim) {
     var f = document.forms[0];
     // update snippet
-    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
+    var snippet = tinyMCEPopup.editor.plugins.embedmedia.newEmbedSnippet();
     snippet.setContent(f.embed.value);
     var oldparms = snippet.getParms(); 
     oldparms.width = oldparms.width ? parseInt(oldparms.width) : 0;
@@ -177,9 +177,10 @@ function jsEncode(s) {
 function generatePreview() {
     var snippet = fetchSnippetFromForm();
     $('#prev')
-        .html(snippet.getContent())
-        .css('width', parseInt(snippet.getParms().width) + 4)
-        .css('height', parseInt(snippet.getParms().height) + 4);
+        .html(snippet.getContent());
+    // XXX problems with resizing on ie
+        //.css('width', parseInt(snippet.getParms().width) + 4)
+        //.css('height', parseInt(snippet.getParms().height) + 4);
 }
 
 tinyMCEPopup.onInit.add(init);
