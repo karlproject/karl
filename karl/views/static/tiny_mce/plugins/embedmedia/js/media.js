@@ -70,7 +70,8 @@ function insertMedia() {
 
     var result = $('<img />')
         .attr('src', tinyMCEPopup.getWindowArg("plugin_url") + '/img/trans.gif')
-        .attr('class', 'mceItemFlash')
+        .addClass('mceItemFlash')
+        .addClass('mceMarker-embedmedia')
         .attr('title', snippet.getContent())
         .attr('width', parms.width)
         .attr('height', parms.height);

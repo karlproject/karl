@@ -113,6 +113,7 @@
                                 var result = $('<img />')
                                     .attr('src', t.url + '/img/trans.gif')
                                     .addClass('mceItemFlash')
+                                    .addClass('mceMarker-embedmedia')
                                     .attr('title', embed_text)
                                     .attr('width', embed.attr('width'))
                                     .attr('height', embed.attr('height'));
@@ -132,7 +133,8 @@
 
 			ed.onPostProcess.add(function(ed, o) {
                             var content = $(o.content);
-                            content.find('img').each(function() {
+                            // this class is never removed
+                            content.find('img.mceMarker-embedmedia').each(function() {
                                 var img = $(this);
                                 var result = img.attr('title');
                                 // update width, height
