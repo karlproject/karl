@@ -306,9 +306,6 @@ class DummyFolderAddables(DummyAdapter):
 class DummyFolderCustomizer(DummyAdapter):
     markers = []
 
-class DummyShowSendalert(DummyAdapter):
-    show_sendalert = True
-
 class DummyLayoutProvider(DummyAdapter):
     template_fn = 'templates/community_layout.fn'
 
