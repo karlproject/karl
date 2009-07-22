@@ -76,8 +76,8 @@
 			ed.addCommand('mceEmbedMedia', function() {
 				ed.windowManager.open({
 					file : url + '/media.htm',
-					width : 430 + parseInt(ed.getLang('embedmedia.delta_width', 0)),
-					height : 470 + parseInt(ed.getLang('embedmedia.delta_height', 0)),
+					width : 480 + parseInt(ed.getLang('embedmedia.delta_width', 0)),
+					height : 500 + parseInt(ed.getLang('embedmedia.delta_height', 0)),
 					inline : 1
 				}, {
 					plugin_url : url

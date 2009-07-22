@@ -7,7 +7,7 @@
 #embed { width: 320px; height: 100px; }
 #class { width: 120px }
 #prev { margin: 0; border: 1px solid black; width: 380px; height: 230px; overflow: auto }
-.panel_wrapper div.current { height: 480px; overflow: auto }
+.panel_wrapper div.current { height: 420px; overflow: auto }
 #flash_options, #shockwave_options, #qt_options, #wmp_options, #rmp_options { display: none }
 .mceAddSelectValue { background-color: #DDDDDD }
 #qt_starttime, #qt_endtime, #qt_fov, #qt_href, #qt_moveid, #qt_moviename, #qt_node, #qt_pan, #qt_qtsrc, #qt_qtsrcchokespeed, #qt_target, #qt_tilt, #qt_urlsubstituten, #qt_volume { width: 70px }
