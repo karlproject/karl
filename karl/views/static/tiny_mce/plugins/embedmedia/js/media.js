@@ -60,7 +60,9 @@ function init() {
     */
 
     TinyMCE_EditableSelects.init();
-    generatePreview();
+
+    // update the parameters and preview based on the embedded test
+    changeEmbed();
 }
 
 
@@ -112,6 +114,18 @@ $.extend(EmbedSnippet.prototype, {
 
 });
 
+function fetchSnippetFromForm() {
+    // fetch snippet from the form
+    var f = document.forms[0];
+    var snippet = new EmbedSnippet();
+    snippet
+        .setContent(f.embed.value);
+        //.setParms({
+        //    width: f.width.value || undefined,
+        //    height: f.height.value || undefined
+        //});
+    return snippet;
+};
 
 function insertMedia() {
     var fe, f = document.forms[0], h;
@@ -123,17 +137,23 @@ function insertMedia() {
         return false;
     }
 
-    f.width.value = f.width.value == "" ? 100 : f.width.value;
-    f.height.value = f.height.value == "" ? 100 : f.height.value;
+    //var snippet = new EmbedSnippet();
+
+    // update snippet
+    var snippet = fetchSnippetFromForm();
+    var parms = snippet.getParms();
+
+    f.width.value = parms.width;
+    f.height.value = parms.height;
 
     fe = ed.selection.getNode();
 
     var result = $('<img />')
         .attr('src', tinyMCEPopup.getWindowArg("plugin_url") + '/img/trans.gif')
         .attr('class', 'mceItemFlash')
-        .attr('title', f.embed.value)
-        .attr('width', f.width.value)
-        .attr('height', f.height.value);
+        .attr('title', snippet.getContent())
+        .attr('width', parms.width)
+        .attr('height', parms.height);
         //.attr('align', f.align.options[f.align.selectedIndex].value);
     h = $('<div />').append(result).html();
 
@@ -142,12 +162,40 @@ function insertMedia() {
     tinyMCEPopup.close();
 }
 
-function updatePreview() {
-    var f = document.forms[0], type;
+function changeEmbed() {
+    var f = document.forms[0];
+    // update snippet
+    var snippet = new EmbedSnippet();
+    snippet.setContent(f.embed.value);
+    var parms = snippet.getParms();
+    f.width.value = parms.width || '';
+    f.height.value = parms.height || '';
+    // update preview
+    generatePreview();
+}
 
-    f.width.value = f.width.value || '320';
-    f.height.value = f.height.value || '240';
-
+function changeDimension(dim) {
+    var f = document.forms[0];
+    // update snippet
+    var snippet = new EmbedSnippet();
+    snippet.setContent(f.embed.value);
+    var oldparms = snippet.getParms(); 
+    oldparms.width = oldparms.width ? parseInt(oldparms.width) : 0;
+    oldparms.height = oldparms.height ? parseInt(oldparms.height) : 0;
+    var parms = {};
+    parms[dim] = f[dim].value ? parseInt(f[dim].value) : 0;
+    // Is ratio fixed?
+    if (f.constrain.checked) {
+        var otherdim = (dim == 'width') ? 'height' : 'width';
+        if (oldparms.width && oldparms.height) {
+            parms[otherdim] = f[otherdim].value = 
+                Math.round((oldparms[otherdim] / oldparms[dim]) * parms[dim]);
+        }
+    }
+    // set the parms on the snippet code 
+    snippet.setParms(parms);
+    f.embed.value = snippet.getContent();
+    // update preview
     generatePreview();
 }
 
@@ -201,8 +249,13 @@ function jsEncode(s) {
     return s;
 }
 
-function generatePreview(c) {
-    return;
+function generatePreview() {
+    var snippet = fetchSnippetFromForm();
+    var dumdum = 'Y';
+    $('#prev')
+        .html(snippet.getContent())
+        .css('width', parseInt(snippet.getParms().width))
+        .css('height', parseInt(snippet.getParms().height));
 }
 
 tinyMCEPopup.onInit.add(init);

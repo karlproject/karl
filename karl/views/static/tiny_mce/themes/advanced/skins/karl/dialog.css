@@ -10,6 +10,7 @@ scrollbar-highlight-color:#F0F0EE;
 scrollbar-shadow-color:#F0F0EE;
 scrollbar-track-color:#F5F5F5;
 background:#F0F0EE;
+color:black;
 padding:0;
 margin:8px 8px 0 8px;
 }
@@ -26,7 +27,7 @@ legend {color:#2B6FB6; font-weight:bold;}
 label.msg {display:none;}
 label.invalid {color:#EE0000; display:inline;}
 input.invalid {border:1px solid #EE0000;}
-input {background:#FFF; border:1px solid #CCC;}
+input {background:#FFF; color:black; border:1px solid #CCC;}
 input, select, textarea {font-family:Verdana, Arial, Helvetica, sans-serif; font-size:10px;}
 input, select, textarea {border:1px solid #808080;}
 input.radio {border:1px none #000000; background:transparent; vertical-align:middle;}
