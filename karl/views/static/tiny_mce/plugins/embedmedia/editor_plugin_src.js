@@ -83,8 +83,6 @@
 			};
 
 			ed.onPostProcess.add(function(ed, o) {
-                            var content = $(o.content);
-
                             o.content = o.content.replace(/<img[^>]+>/g, function(img) {
 				var cl = getAttr(img, 'class');
                                 // this class is never removed
@@ -100,7 +98,6 @@
                                 }
                                 return img;
                             });
-
 			});
 
 		},
@@ -125,7 +122,17 @@
                                 if (inside) {
                                     this.emtype = 'object+embed';
                                     this.inside = inside;
+                                    // remove bad attributes. (Important: 
+                                    // will explode flash if left in)
+                                    if (inside.attr('mce_src')) {
+                                        inside.removeAttr('mce_src');
+                                    }
                                 }
+                            }
+                            // remove bad attributes. (Important: 
+                            // will explode flash if left in)
+                            if (root.attr('mce_src')) {
+                                root.removeAttr('mce_src');
                             }
                             // cascade
                             return this;

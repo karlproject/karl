@@ -66,8 +66,6 @@ function insertMedia() {
     f.width.value = parms.width;
     f.height.value = parms.height;
 
-    fe = ed.selection.getNode();
-
     var result = $('<img />')
         .attr('src', tinyMCEPopup.getWindowArg("plugin_url") + '/img/trans.gif')
         .addClass('mceItemFlash')
@@ -78,7 +76,10 @@ function insertMedia() {
         //.attr('align', f.align.options[f.align.selectedIndex].value);
     h = $('<div />').append(result).html();
 
-    tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
+    //tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
+    
+    ed.execCommand('mceInsertContent', false, h);
+
     
     ed.execCommand('mceRepaint');
     

@@ -17,7 +17,8 @@ var createLiveForms = function createLiveForms() {
             if(node.tagName.toLowerCase() == 'form') {
                 node.onsubmit = function (e) {
                     tinyMCE.triggerSave();
-                    el.value = tinyMCE.get(el.id).getContent();
+                    ////var editor = tinyMCE.get(el.id)
+                    ////el.value = editor.getContent();
                 };
                 break;
             }
