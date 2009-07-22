@@ -175,7 +175,6 @@ function jsEncode(s) {
 
 function generatePreview() {
     var snippet = fetchSnippetFromForm();
-    var dumdum = 'Y';
     $('#prev')
         .html(snippet.getContent())
         .css('width', parseInt(snippet.getParms().width) + 4)
