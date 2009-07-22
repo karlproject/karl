@@ -84,22 +84,23 @@
 
 			ed.onPostProcess.add(function(ed, o) {
                             var content = $(o.content);
-                            // this class is never removed
-                            content.find('img.mceMarker-embedmedia').each(function() {
-                                var img = $(this);
-                                var result = img.attr('title');
-                                // update width, height
-                                var snippet = t.newEmbedSnippet();
-                                snippet.setContent(result);
-                                snippet.setParms({
-                                    width: img.attr('width'),
-                                    height: img.attr('height')
-                                });
-                                // replace the image
-                                img.replaceWith(snippet.getContent());
+
+                            o.content = o.content.replace(/<img[^>]+>/g, function(img) {
+				var cl = getAttr(img, 'class');
+                                // this class is never removed
+                                if (cl == 'mceMarker-embedmedia') {
+                                    // update width, height
+                                    var snippet = t.newEmbedSnippet();
+                                    snippet.setContent(getAttr(img, 'title'));
+                                    snippet.setParms({
+                                        width: getAttr(img, 'width'),
+                                        height: getAttr(img, 'height')
+                                    });
+                                    img = snippet.getContent();
+                                }
+                                return img;
                             });
-                            // stringify back content...
-                            o.content = $('<div />').append(content).html();
+
 			});
 
 		},
