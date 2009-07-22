@@ -13,51 +13,19 @@ function init() {
 
     fe = ed.selection.getNode();
     if (/mceItemFlash/.test(ed.dom.getAttrib(fe, 'class'))) {
-        pl = fe.title;
+        var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
+        snippet.setContent(fe.title);
+        snippet.setParms({
+            width: ed.dom.getAttrib(fe, 'width'),
+            height: ed.dom.getAttrib(fe, 'height')
+        });
+        pl = snippet.getContent();
     }
 
-    /*
     // Setup form
     if (pl != "") {
-        pl = tinyMCEPopup.editor.plugins.media._parse(pl);
-
-                //setBool(pl, 'flash', 'play');
-                //setBool(pl, 'flash', 'loop');
-                //setBool(pl, 'flash', 'menu');
-                //setBool(pl, 'flash', 'swliveconnect');
-                //setStr(pl, 'flash', 'quality');
-                //setStr(pl, 'flash', 'scale');
-                //setStr(pl, 'flash', 'salign');
-                //setStr(pl, 'flash', 'wmode');
-                //setStr(pl, 'flash', 'base');
-                //setStr(pl, 'flash', 'flashvars');
-
-        setStr(pl, null, 'embed');
-        setStr(pl, null, 'id');
-        setStr(pl, null, 'name');
-        //setStr(pl, null, 'vspace');
-        //setStr(pl, null, 'hspace');
-        //setStr(pl, null, 'bgcolor');
-        //setStr(pl, null, 'align');
-        setStr(pl, null, 'width');
-        setStr(pl, null, 'height');
-
-        if ((val = ed.dom.getAttrib(fe, "width")) != "")
-            pl.width = f.width.value = val;
-
-        if ((val = ed.dom.getAttrib(fe, "height")) != "")
-            pl.height = f.height.value = val;
-
-        oldWidth = pl.width ? parseInt(pl.width) : 0;
-        oldHeight = pl.height ? parseInt(pl.height) : 0;
-    } else
-        oldWidth = oldHeight = 0;
-
-    //selectByValue(f, 'media_type', type);
-    ////changedType(type);
-    //updateColor('bgcolor_pick', 'bgcolor');
-
-    */
+        f.embed.value = pl;
+    }
 
     TinyMCE_EditableSelects.init();
 
@@ -66,58 +34,10 @@ function init() {
 }
 
 
-var EmbedSnippet = function EmbedSnippet() {};
-$.extend(EmbedSnippet.prototype, {
-
-    setContent: function(html) {
-        this.wrapper = $('<div />');
-        var wrapper = this.wrapper;
-        wrapper.append(html);
-        this.root = wrapper.children();
-        var root = this.root;
-        // detect type
-        this.emtype = null;
-        if (root.is('object')) {
-            var inside = root.find('embed');
-            if (inside) {
-                this.emtype = 'object+embed';
-                this.inside = inside;
-            }
-        }
-        // cascade
-        return this;
-    },
-
-    getContent: function() {
-        return this.wrapper.html();
-    },
-
-    getParms: function() {
-        return {
-            width: this.root.attr('width'),
-            height: this.root.attr('height')
-        };
-    },
-
-    setParms: function(parms) {
-        if (this.emtype == 'object+embed') {
-            parms.width && this.root.attr('width', parms.width); 
-            parms.height && this.root.attr('height', parms.height); 
-            parms.width && this.inside.attr('width', parms.width); 
-            parms.height && this.inside.attr('height', parms.height); 
-        } else {
-            parms.width && this.root.attr('width', parms.width); 
-            parms.height && this.root.attr('height', parms.height); 
-        }
-        return this;
-    }
-
-});
-
 function fetchSnippetFromForm() {
     // fetch snippet from the form
     var f = document.forms[0];
-    var snippet = new EmbedSnippet();
+    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
     snippet
         .setContent(f.embed.value);
         //.setParms({
@@ -136,8 +56,6 @@ function insertMedia() {
         tinyMCEPopup.alert(ed.getLang('invalid_data'));
         return false;
     }
-
-    //var snippet = new EmbedSnippet();
 
     // update snippet
     var snippet = fetchSnippetFromForm();
@@ -158,14 +76,16 @@ function insertMedia() {
     h = $('<div />').append(result).html();
 
     tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
-
+    
+    ed.execCommand('mceRepaint');
+    
     tinyMCEPopup.close();
 }
 
 function changeEmbed() {
     var f = document.forms[0];
     // update snippet
-    var snippet = new EmbedSnippet();
+    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
     snippet.setContent(f.embed.value);
     var parms = snippet.getParms();
     f.width.value = parms.width || '';
@@ -177,7 +97,7 @@ function changeEmbed() {
 function changeDimension(dim) {
     var f = document.forms[0];
     // update snippet
-    var snippet = new EmbedSnippet();
+    var snippet = new tinyMCEPopup.editor.plugins.embedmedia.EmbedSnippet();
     snippet.setContent(f.embed.value);
     var oldparms = snippet.getParms(); 
     oldparms.width = oldparms.width ? parseInt(oldparms.width) : 0;
@@ -254,8 +174,8 @@ function generatePreview() {
     var dumdum = 'Y';
     $('#prev')
         .html(snippet.getContent())
-        .css('width', parseInt(snippet.getParms().width))
-        .css('height', parseInt(snippet.getParms().height));
+        .css('width', parseInt(snippet.getParms().width) + 4)
+        .css('height', parseInt(snippet.getParms().height) + 4);
 }
 
 tinyMCEPopup.onInit.add(init);

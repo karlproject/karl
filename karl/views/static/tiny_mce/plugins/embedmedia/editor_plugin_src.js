@@ -12,11 +12,64 @@
 		init : function(ed, url) {
 			var t = this;
 			
+                        // manipulation of embed snippets
+                        var EmbedSnippet = function EmbedSnippet() {};
+                        $.extend(EmbedSnippet.prototype, {
+
+                            setContent: function(html) {
+                                this.wrapper = $('<div />');
+                                var wrapper = this.wrapper;
+                                wrapper.append(html);
+                                this.root = wrapper.children();
+                                var root = this.root;
+                                // detect type
+                                this.emtype = null;
+                                if (root.is('object')) {
+                                    var inside = root.find('embed');
+                                    if (inside) {
+                                        this.emtype = 'object+embed';
+                                        this.inside = inside;
+                                    }
+                                }
+                                // cascade
+                                return this;
+                            },
+
+                            getContent: function() {
+                                return this.wrapper.html();
+                            },
+
+                            getParms: function() {
+                                return {
+                                    width: this.root.attr('width'),
+                                    height: this.root.attr('height')
+                                };
+                            },
+
+                            setParms: function(parms) {
+                                if (this.emtype == 'object+embed') {
+                                    parms.width && this.root.attr('width', parms.width); 
+                                    parms.height && this.root.attr('height', parms.height); 
+                                    parms.width && this.inside.attr('width', parms.width); 
+                                    parms.height && this.inside.attr('height', parms.height); 
+                                } else {
+                                    parms.width && this.root.attr('width', parms.width); 
+                                    parms.height && this.root.attr('height', parms.height); 
+                                }
+                                return this;
+                            }
+
+                        });
+                        // give access to the class from the popup
+                        t.EmbedSnippet = EmbedSnippet;
+
+
+
 			t.editor = ed;
 			t.url = url;
 
-			function isMediaElm(n) {
-				return /^(mceItemFlash|mceItemShockWave|mceItemWindowsMedia|mceItemQuickTime|mceItemRealMedia)$/.test(n.className);
+			function isMedia(n) {
+				return /^mceItemFlash$/.test(n.className);
 			};
 
 			// Register commands
@@ -35,24 +88,17 @@
 			ed.addButton('embedmedia', {title : 'media.desc', cmd : 'mceEmbedMedia'});
 
 			ed.onNodeChange.add(function(ed, cm, n) {
-				cm.setActive('embedmedia', n.nodeName == 'IMG' && isMediaElm(n));
+				cm.setActive('embedmedia', n.nodeName == 'IMG' && isMedia(n));
 			});
 
 			ed.onInit.add(function() {
-				var lo = {
-					mceItemFlash : 'flash',
-					mceItemShockWave : 'shockwave',
-					mceItemWindowsMedia : 'windowsmedia',
-					mceItemQuickTime : 'quicktime',
-					mceItemRealMedia : 'realmedia'
-				};
 
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(url + "/css/content.css");
                               
 				if (ed && ed.plugins.contextmenu) {
 					ed.plugins.contextmenu.onContextMenu.add(function(th, m, e) {
-						if (e.nodeName == 'IMG' && /mceItem(Flash|ShockWave|WindowsMedia|QuickTime|RealMedia)/.test(e.className)) {
+						if (e.nodeName == 'IMG' && /mceItemFlash/.test(e.className)) {
 							m.add({title : 'media.edit', icon : 'media', cmd : 'mceEmbedMedia'});
 						}
 					});
@@ -89,7 +135,15 @@
                             content.find('img').each(function() {
                                 var img = $(this);
                                 var result = img.attr('title');
-                                img.replaceWith(result);
+                                // update width, height
+                                var snippet = new t.EmbedSnippet();
+                                snippet.setContent(result);
+                                snippet.setParms({
+                                    width: img.attr('width'),
+                                    height: img.attr('height')
+                                });
+                                // replace the image
+                                img.replaceWith(snippet.getContent());
                             });
                             // stringify back content...
                             o.content = $('<div />').append(content).html();
@@ -106,16 +160,6 @@
 				version : tinymce.majorVersion + "." + tinymce.minorVersion
 			};
 		}
-
-                /*
-		_parse : function(s) {
-			return tinymce.util.JSON.parse('{' + s + '}');
-		},
-
-		_serialize : function(o) {
-			return tinymce.util.JSON.serialize(o).replace(/[{}]/g, '');
-		}
-                */
 
 	});
 
