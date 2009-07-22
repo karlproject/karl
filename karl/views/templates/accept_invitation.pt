@@ -10,6 +10,8 @@
       <p>You cannot accept an invitation while logged in. Please 
 	<a href="${api.app_url}/logout">log out</a> first. </p>
 
+      <form xml:id="contentform"></form>
+
     </tal:block>
     <tal:block condition="api.userid is None">
 
