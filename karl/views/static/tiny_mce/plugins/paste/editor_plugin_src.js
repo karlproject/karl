@@ -184,6 +184,7 @@
 			var ed = this.editor, h = o.content, process, stripClass;
 
 			//console.log('Before preprocess:' + o.content);
+                        alert('Before preprocess:' + o.content);
 
 			function process(items) {
 				each(items, function(v) {

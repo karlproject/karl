@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>{#media_dlg.title}</title>
+  <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+  <script type="text/javascript" src="../../../packed/jquery-1.3.2.js"></script>
+  <script type="text/javascript" src="js/media.js"></script>
+  <script type="text/javascript" src="../../utils/mctabs.js"></script>
+  <script type="text/javascript" src="../../utils/validate.js"></script>
+  <script type="text/javascript" src="../../utils/form_utils.js"></script>
+  <script type="text/javascript" src="../../utils/editable_selects.js"></script>
+  <link href="css/media.css" rel="stylesheet" type="text/css" />
+</head>
+<body style="display: none">
+    <form onsubmit="insertMedia();return false;" action="#">
+    <div class="tabs">
+      <ul>
+        <li id="general_tab" class="current"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');generatePreview();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
+      </ul>
+    </div>
+
+    <div class="panel_wrapper">
+      <div id="general_panel" class="panel current">
+        <fieldset>
+          <legend>{#media_dlg.general}</legend>
+
+          <table border="0" cellpadding="4" cellspacing="0">
+              <tr>
+              <td><label for="src">{#media_dlg.embed}</label></td>
+                <td>
+                    <textarea id="embed" name="embed" type="text" class="mceFocus" onchange="generatePreview();"></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="width">{#media_dlg.size}</label></td>
+                <td>
+                  <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td><input type="text" id="width" name="width" value="" class="size" onchange="generatePreview('width');" /> x <input type="text" id="height" name="height" value="" class="size"  onchange="generatePreview('height');" /></td>
+                      <td>&nbsp;&nbsp;<input id="constrain" type="checkbox" name="constrain" class="checkbox" /></td>
+                      <td><label id="constrainlabel" for="constrain">{#media_dlg.constrain_proportions}</label></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend>{#media_dlg.preview}</legend>
+          <div id="prev"></div>
+        </fieldset>
+      </div>
+
+    </div>
+
+    <div class="mceActionPanel">
+      <div style="float: left">
+        <input type="submit" id="insert" name="insert" value="{#insert}" />
+      </div>
+
+      <div style="float: right">
+        <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+      </div>
+    </div>
+  </form>
+</body>
+</html>

@@ -214,3 +214,6 @@
 .karlSkin span.mce_pagebreak {background-position:0 -40px}
 .karlSkin .mce_spellchecker span.mceAction {background-position:-540px -20px}
 
+/* use sprite of media button */
+.karlSkin span.mce_embedmedia {background-position:-320px -20px}
+
