@@ -1,14 +1,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
-     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.anonymous_layout.macros['master']">
 
   <div metal:fill-slot="content">
- 
+
     <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
 
     <form name="formLogin" method="post" action="${app_url}/login">
-     
+
       <fieldset class="field">
 
 	<span class="loginLabelWrapper">
@@ -28,7 +28,7 @@
                size="30" tal:attributes="value password|nothing" />
 	<a href="${api.app_url}/reset_request.html">I forgot my password</a>
 	<div class="field loginLeftPadding discreet">
-          <input type="checkbox" name="max_age" id="remember" 
+          <input type="checkbox" name="max_age" id="remember"
 		 class="noborder" value="315360000"/> <!-- Ten years -->
           <label for="remember">Remember me on this computer</label>
 	</div>
@@ -77,13 +77,13 @@
         });
 
         //]]>
-      </script>  
- 
+      </script>
+
       <div class="formControlls loginLeftPadding">
-        <input type="hidden" name="came_from" id="came_from" 
+        <input type="hidden" name="came_from" id="came_from"
                value="${came_from}"/>
         <input type="hidden" name="form.submitted" value="1" />
-        <input type="image" src="static/images/btn-signin.gif"
+        <input type="image" src="${api.static_url}/images/btn-signin.gif"
                name="image" class="button" />
 
       </div>

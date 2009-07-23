@@ -14,7 +14,7 @@
         <input type="hidden" name="form.submitted" value="1" />
         <input type="hidden" name="came_from" id="came_from"
                value="${api.app_url}"/>
-        <input type="image" src="static/images/btn-signin.gif"
+        <input type="image" src="${api.static_url}/images/btn-signin.gif"
                 name="image" class="button" />
     </form>
 

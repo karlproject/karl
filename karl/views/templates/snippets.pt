@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal">
   <head>
@@ -113,7 +113,7 @@
          tal:replace="api.status_message" /></div>
 
     <!-- status box that works together with ui.karlstatusbox -->
-    <div metal:define-macro="karl_status_message" 
+    <div metal:define-macro="karl_status_message"
          class="statusbox">
       <div class="portalMessage"
          tal:condition="api.status_message"><span
@@ -128,7 +128,7 @@
               });
         });
         //]]>
-      </script>  
+      </script>
     </div>
 
     <div metal:define-macro="error_message" class="portalErrorMessage"
@@ -139,7 +139,7 @@
       <ul class="menubar">
             <tal:block repeat="action api.actions_to_menu(actions)">
           <li class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
-            <a href="${api.here_url}${action[1]}" 
+            <a href="${api.here_url}${action[1]}"
               class="${action[2] and 'karldropdown-heading' or ''}">${action[0]}</a>
             <tal:submenu condition="action[2]">
               <ul class="karldropdown-menu">
@@ -158,7 +158,7 @@
             $(".karldropdown").karldropdown({});
         });
         //]]>
-      </script>  
+      </script>
     </metal:actions_box>
 
     <dl metal:define-macro="my_communities_portlet" class="tag_page_side"
@@ -194,28 +194,28 @@
             });
         });
         //]]>
-      </script>  
+      </script>
     </metal:table>
 
 
     <div metal:define-macro="rss_icon" style="margin-top:20px;text-align:right"
          tal:condition="feed_url|None">
       <a href="${feed_url}">
-        <img src="${api.app_url}/static/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+        <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
           id="RSSIcon"/>
       </a>
     </div>
 
     <div class="chparent_wrapper" metal:define-macro="backto_link" tal:condition="backto|False">
       <a class="chparent" href="${backto['href']}" id="backto">
-        <img src="${api.app_url}/static/images/arrow_up.jpg" height="15"
+        <img src="${api.static_url}/images/arrow_up.jpg" height="15"
              width="15" alt="Up to"/> Back to ${backto['title']} </a>
     </div>
 
     <div metal:define-macro="download_file">
       <div style="margin-top: 2em;">
         <img width="32" height="32" border="0" alt="."
-          src="${api.app_url}/static/images/${fileinfo.mimeinfo.large_icon_name}"/>
+          src="${api.static_url}/images/${fileinfo.mimeinfo.large_icon_name}"/>
         <a style="padding-left: 0.2em;"
           href="${api.here_url}dl/${api.context.filename}">Click here
           to download the file</a>
@@ -233,10 +233,10 @@
     </div>
 
     <div metal:define-macro="livesearch_box" id="searchbox">
-      <form action="${api.app_url}/searchresults.html" 
+      <form action="${api.app_url}/searchresults.html"
                     method="get" id="ff" name="ff">
         <fieldset>
-          <input id="livesearch-input" name="body" 
+          <input id="livesearch-input" name="body"
                  type="text" autocomplete="off"/>
           <a id="livesearch-button" href="javascript: document.ff.submit()"></a>
         </fieldset>
@@ -257,11 +257,11 @@
         </div>
         <div class="spotlight-groupitems">
           <div tal:repeat="item group.results" class="spotlight-item spotlight-record">
-            <a title="${item.title}" href="${item.href}" 
+            <a title="${item.title}" href="${item.href}"
                class="spotlight-link spotlight-option type-${group.name}">${item.title}</a>
           </div>
           <div tal:condition="group.results" class="spotlight-grouplink">
-            <a class="spotlight-option" 
+            <a class="spotlight-option"
                href="/searchresults.html?body=&amp;kind=${group.name}&amp;offset:int=0">Show All</a>
           </div>
           <div tal:condition="not group.results" class="spotlight-item">
@@ -283,7 +283,7 @@
         <p>${entry['description']}</p>
         <p class="kbyline">${entry['type']}
           <span tal:condition="entry.get('tagusers_href', False)"> |
-            Tagged by 
+            Tagged by
             <a href="${entry['tagusers_href']}">${entry['tagusers_count']}</a>
           </span>
             | ${entry['href']}</p>
@@ -303,7 +303,7 @@
     </div>
 
     <div metal:define-macro="batching">
-      <div tal:condition="batch_info.batching_required" 
+      <div tal:condition="batch_info.batching_required"
            class="kpagination_frame">
         <div class="kpagination_totals">
         <a tal:condition="batch_info.previous_batch"
@@ -317,9 +317,9 @@
         <span tal:condition="not batch_info.next_batch">No more entries</span>
         </div>
       </div>
-      
+
     </div>
-    
+
     <script metal:define-macro="gridstyle_batching_script" language="javascript" type="text/javascript">
         //<![CDATA[
         $(document).ready(function() {
@@ -335,7 +335,7 @@
                 );
         });
         //]]>
-    </script>  
+    </script>
 
     <metal:gridstyle_batching metal:define-macro="gridstyle_batching">
       <span class="ui-grid-footer-text ui-grid-limits">
@@ -358,7 +358,7 @@
     <div metal:define-macro="show_comments" tal:condition="comments">
       <div class="addCommentButton" style="float: right;">
         <a href="#addcomment">add comment</a>
-      </div>      
+      </div>
       <h2>
             <a name="comments" id="comments">Comments</a>
       </h2>
@@ -371,13 +371,13 @@
           <a href="#" class="quo-paste">quote</a>
           <tal:ifeditable
              tal:condition="comment['edit_url'] is not None">
-            | <a class="k3_edit_comment" 
-                 href="${comment['edit_url']}">edit</a> | 
-            <a class="k3_delete_comment" 
+            | <a class="k3_edit_comment"
+                 href="${comment['edit_url']}">edit</a> |
+            <a class="k3_delete_comment"
                href="${comment['delete_url']}">delete</a>
           </tal:ifeditable>
         </div>
-          
+
         <span class="portraid">
               <img width="75" height="100" src="${comment['portrait_url']}" />
         </span>
@@ -394,7 +394,7 @@
                  src="${api.static_url}/images/${attachment.mimeinfo.small_icon_name}"
                  title="${attachment.title}" />
                <a href="${attachment.url}/dl">${attachment.title}</a>
-               (<a href="${attachment.url}" 
+               (<a href="${attachment.url}"
                    title="Click to Tag, Edit or Delete attachment">#</a>)
             </span>
         </div>
@@ -407,7 +407,7 @@
       <div class="batchNavigation">
         <span style="padding-right:0em" tal:condition="previous">
           <a href="${previous['href']}">&lt;&lt; ${previous['title']}</a>
-        </span> 
+        </span>
         <span tal:condition="previous and next">|</span>
         <span tal:condition="next">
           <a href="${next['href']}">${next['title']} &gt;&gt;</a>
@@ -537,7 +537,7 @@
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
        ><tal:x tal:content="crumbs|default">KARL / Tags</tal:x> /
-         <input id="tag-field" class="tag_field" type="text" 
+         <input id="tag-field" class="tag_field" type="text"
                 name="jumptag" value="${tag}" size="20" />
        </form>
       </h2>
