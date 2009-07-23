@@ -204,7 +204,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.logo_url, api.static_url + '/custom/logo.gif')
+        self.assertEqual(api.logo_url, api.static_url + '/images/logo.gif')
 
     def test_custom_logo_url(self):
         context = testing.DummyModel()
