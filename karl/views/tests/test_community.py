@@ -67,6 +67,7 @@ class EditCommunityViewTests(unittest.TestCase):
         self._callFUT(context, request)
         self.assertEqual(renderer.fielderrors, {})
         self.assertEqual(renderer.fieldvalues['title'], 'thetitle')
+        self.assertEqual(renderer.show_sharing_warning, True)
 
     def test_submitted_invalid(self):
         from webob import MultiDict

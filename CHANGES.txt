@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Allow communities to be transitioned from private to public; show a
+  warning when someone clicks the public button if the private button
+  is already clicked.
 
 3.6 (2009-07-23)
 ----------------

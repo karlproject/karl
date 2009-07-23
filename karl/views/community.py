@@ -205,6 +205,7 @@ def edit_community_view(context, request):
         default_tools = default_tools,
         api = api,
         system_name = system_name,
+        show_sharing_warning = True,
         head_data = convert_to_script(client_json_data),
         )
 

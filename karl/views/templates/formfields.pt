@@ -88,10 +88,13 @@
       </div>
       <div class="dialogContent">
         <p>
-        Private communities can never be made public, are you sure?
+        Changing a private community into a public one may expose
+        sensitive community information.  Are you sure you want to do
+        this?
         </p>
       </div>
-      <script language="javascript" type="text/javascript">
+      <script language="javascript" type="text/javascript" 
+          tal:condition="show_sharing_warning|False">
         $(document).ready(function() {
             // create the dialog from the embedded content
             var dialog = $('#sharing-field .dialogContent')
@@ -104,14 +107,14 @@
                         "Ok": function() {
                             $(this).karldialog('close');
                             // change the value really.
-                            $('#sharing_1').attr('checked', 'checked');
+                            $('#sharing_0').attr('checked', 'checked');
                             //$(this).karldialog().old_value = 'true';
                             dialog.old_value = 'true';
                         }
                     }
                 });
             // bind the click to open the dialog
-            $('input#sharing_1')
+            $('input#sharing_0')
                 .click(function(e) {
                     // Since we use click instead of change (we want the dialog
                     // open immediately, even on IE),
@@ -123,12 +126,12 @@
                       dialog.karldialog('open');
                       // In addition to preventdefault,
                       // also change the value back (needed for IE)
-                      $('#sharing_0').attr('checked', 'checked');
+                      $('#sharing_1').attr('checked', 'checked');
                     }
                     // Prevent it from happening.
                     e.preventDefault();
                 });
-            $('input#sharing_0')
+            $('input#sharing_1')
                 .click(function(e) {
                     var new_value = $('#sharing-field .karlselectionradiofield input:checked').val();
                     dialog.old_value = new_value;
