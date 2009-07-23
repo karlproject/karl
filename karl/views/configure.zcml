@@ -2,6 +2,18 @@
 
   <view
     for="*"
+    view=".zodbinfo.show_zodbinfo"
+    name="zodbinfo.html"
+  />
+
+  <view
+    for="*"
+    view=".ok.ok"
+    name="ok.html"
+  />
+
+  <view
+    for="*"
     view=".acl.edit_acl_view"
     name="edit_acl.html"
     permission="administer"
