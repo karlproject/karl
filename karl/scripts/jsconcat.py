@@ -77,6 +77,7 @@ def main(argv=sys.argv):
             ##filesindir(tinymce_dir, 'plugins/wicked/editor_plugin.js'),
             filesindir(tinymce_dir, 'plugins/wicked/editor_plugin_src.js'),
             filesindir(tinymce_dir, 'plugins/wicked/langs/en.js'),
+            filesindir(tinymce_dir, 'plugins/spellchecker/editor_plugin.js'),
             filesindir(tinymce_dir, 'plugins/embedmedia/editor_plugin_src.js'),
             ):
         f.write(file(fname).read())

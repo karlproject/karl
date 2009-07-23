@@ -43,6 +43,7 @@
         <script src="${api.static_url}/tiny_mce/plugins/paste/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tiny_mce/plugins/wicked/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tiny_mce/plugins/wicked/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tiny_mce/plugins/spellchecker/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tiny_mce/plugins/embedmedia/editor_plugin_src.js" type="text/javascript"></script>
         <!--
         <script src="${api.static_url}/jquery/src/core.js" type="text/javascript">//</script>
