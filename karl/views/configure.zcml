@@ -344,6 +344,14 @@
   <!-- XXX This accompanies site.py and stays in karl.views -->
   <view
     for="karl.models.interfaces.ISite"
+    view=".spellcheck.tinymce_spellcheck_view"
+    permission="view"
+    name="tinymce_spellcheck"
+  />
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
     view=".search.jquery_livesearch_view"
     permission="view"
     name="jquery_livesearch"
