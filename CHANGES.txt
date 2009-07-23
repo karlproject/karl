@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.6 (2009-07-23)
+----------------
 
 - LP #400732: Reorganize and cleanup CSS to reduce file size and
   complexity.
@@ -11,6 +11,9 @@ Unreleased
   that the "static_postfix" setting is no longer required (the version
   number is generated and consumed by the system itself, rather than
   requiring a version number to be set in configuration).
+
+- Use a 5 year static resource expiration time to work around browser
+  caching bugs.
 
 - Use "repoze.enformed" package to do form validation and rendering;
   "form" templates are now inlined into their constituent "real"
