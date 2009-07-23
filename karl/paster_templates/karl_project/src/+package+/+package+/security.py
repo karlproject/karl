@@ -64,9 +64,6 @@ community = StateMachine('security_state', initial_state='public')
 
 class CommunityTransitions(object):
     """ Two states, 'public' and 'private', with no inheritance.
-
-    o N.B.:  No transition out of 'private':  once a community is made
-             private, there is no going back.
     """
     def to_private(self, from_state, to_state, action, ob):
         community = find_community(ob)
@@ -98,8 +95,8 @@ class CommunityTransitions(object):
 c_trans = CommunityTransitions()
 
 community.add('initial', 'public', 'public', c_trans.to_public)
+community.add('private', 'public', 'public', c_trans.to_public)
 community.add('public', 'public', 'public', c_trans.do_nothing)
-# N.B.:  no transition from 'private' to 'public'!
 
 community.add('initial', 'private', 'private', c_trans.to_private)
 community.add('private', 'private', 'private', c_trans.do_nothing)

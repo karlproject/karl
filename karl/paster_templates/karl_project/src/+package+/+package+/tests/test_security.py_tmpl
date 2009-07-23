@@ -127,13 +127,12 @@ class CommunityWorkflowTests(unittest.TestCase, ConformsToISecurityWorkflow):
         workflow.updateState(sharing='true')
         self.assertEqual(context.security_state, 'private')
 
-    def test_updateState_private_sharing_False_raises(self):
-        from repoze.workflow.statemachine import StateMachineError
+    def test_updateState_private_sharing_False_does_transition(self):
         context = self._makeContext()
         context.security_state = 'private'
         workflow = self._makeOne(context)
-        self.assertRaises(StateMachineError,
-                          workflow.updateState, sharing='false')
+        workflow.updateState(sharing='false')
+        self.assertEqual(context.security_state, 'public')
 
     def test_updateState_public_sharing_True_does_transition(self):
         context = self._makeContext()
@@ -177,12 +176,12 @@ class CommunityWorkflowTests(unittest.TestCase, ConformsToISecurityWorkflow):
         workflow.execute('public')
         self.assertEqual(context.security_state, 'public')
 
-    def test_execute_private_to_public_raises(self):
-        from repoze.workflow.statemachine import StateMachineError
+    def test_execute_private_to_public(self):
         context = self._makeContext()
         workflow = self._makeOne(context)
         context.security_state = 'private'
-        self.assertRaises(StateMachineError, workflow.execute, 'public')
+        workflow.execute('public')
+        self.assertEqual(context.security_state, 'public')
 
 class CommunityContentTransitionsTests(unittest.TestCase):
     def _getTargetClass(self):
