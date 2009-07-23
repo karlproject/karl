@@ -48,6 +48,19 @@ class TestMailDeliveryFactory(unittest.TestCase):
         delivery = self._callFUT()
         self.assertEqual(delivery.queuePath, '/var/tmp')
 
+    def test_with_white_list(self):
+        from repoze.bfg.interfaces import ISettings
+        from karl.utilities.mailer import WhiteListMailDelivery
+        settings = DummySettings()
+        from tempfile import NamedTemporaryFile
+        f = NamedTemporaryFile()
+        try:
+            settings.mail_white_list = f.name
+            testing.registerUtility(settings, ISettings)
+            delivery = self._callFUT()
+            self.assertEqual(delivery.__class__, WhiteListMailDelivery)
+        finally:
+            f.close()
 
 class TestWhiteListMailDelivery(unittest.TestCase):
     tmp_name = '/tmp/white_list.txt'
