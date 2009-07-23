@@ -103,7 +103,7 @@ def edit_profile_view(context, request):
         display_photo["url"] = model_url(photo, request)
         display_photo["may_delete"] = True
     else:
-        display_photo["url"] = api.app_url + "/static/images/defaultUser.gif"
+        display_photo["url"] = api.static_url + "/images/defaultUser.gif"
         display_photo["may_delete"] = False
 
     # Enable hiding of certain fields via CSS descendent selectors
@@ -282,7 +282,7 @@ def admin_edit_profile_view(context, request):
         display_photo["url"] = model_url(photo, request)
         display_photo["may_delete"] = True
     else:
-        display_photo["url"] = api.app_url + "/static/images/defaultUser.gif"
+        display_photo["url"] = api.static_url + "/images/defaultUser.gif"
         display_photo["may_delete"] = False
 
     # Enable hiding of certain fields via CSS descendent selectors

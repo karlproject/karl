@@ -637,7 +637,7 @@ def accept_invitation_view(context, request):
     page_title = 'Accept Invitation'
     api = TemplateAPI(context, request, page_title)
     photo = {}
-    photo["url"] =  api.app_url + "/static/images/defaultUser.gif"
+    photo["url"] =  api.static_url + "/images/defaultUser.gif"
     photo["may_delete"] = False
 
     return render_form_to_response(
