@@ -4807,13 +4807,17 @@ var loadTinyMCE = function loadTinyMCE() {
         mark('plugins/paste/editor_plugin');
         mark('plugins/wicked/editor_plugin');
         mark('plugins/wicked/langs/en');
+        mark('plugins/spellchecker/editor_plugin');
         mark('plugins/embedmedia/editor_plugin');
+
         // See if the wiki plugin needs to be enabled.
         var widget_data = window.karl_client_data && karl_client_data.text || {};
         var plugins = 'paste,embedmedia';
         if (widget_data.enable_wiki_plugin) {
             plugins += ',wicked';
         }
+        plugins += ',spellchecker'
+
         // Do the init.
         tinyMCE.init({
             theme: 'advanced',
@@ -4837,13 +4841,16 @@ var loadTinyMCE = function loadTinyMCE() {
             paste_unindented_list_class : "unindentedList",
             paste_convert_headers_to_strong : true,
             theme_advanced_toolbar_location: 'top',
-            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, addwickedlink, delwickedlink',
+            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, addwickedlink, delwickedlink, spellchecker',
             theme_advanced_buttons2: '',
             theme_advanced_buttons3: '',
             plugins: plugins,
             extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
             relative_urls : false,
-            forced_root_block : 'p'
+            forced_root_block : 'p',
+            spellchecker_rpc_url: "/tinymce_spellcheck",
+            spellchecker_languages : "+English=en"
+            
         });  
     } else {
         // XXX raise an error here?
