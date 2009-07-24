@@ -29,11 +29,12 @@ class SecuredStateMachine(StateMachine):
                 'No transition from %r using transition %r'
                     % (state, transition_id))
         permission = kw['permission']
-        if not has_permission(permission, context, request):
-            raise StateMachineError(
-                '%s permission required for transition %r' % (
-                permission, transition_id)
-                )
+        if request is not None:
+            if not has_permission(permission, context, request):
+                raise StateMachineError(
+                    '%s permission required for transition %r' % (
+                    permission, transition_id)
+                    )
         self.before_transition(state, newstate, transition_id, context, **kw)
         transition_fn(state, newstate, transition_id, context, **kw)
         self.after_transition(state, newstate, transition_id, context, **kw)

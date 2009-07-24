@@ -2,7 +2,7 @@ from zope.interface import Interface
 
 class ISecurityWorkflow(Interface):
 
-    def setInitialState(**kw):
+    def setInitialState(request, **kw):
         """ Put the object into the correct initial state.
 
         o 'kw', if passed, will be form variables from the constructor form.
@@ -10,7 +10,7 @@ class ISecurityWorkflow(Interface):
         o Set the ACL accordingly.
         """
 
-    def updateState(**kw):
+    def updateState(request, **kw):
         """ Update the object's state, based on form variables.
 
         o 'kw', if passed, will be form variables from an edit form.
@@ -23,7 +23,7 @@ class ISecurityWorkflow(Interface):
         """ Return a map of form variables representing the object state.
         """
 
-    def execute(transition_id):
+    def execute(request, transition_id):
         """ Move the object into a security state using 'transition_id'.
 
         o Set the ACL accordingly.
