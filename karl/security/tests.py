@@ -1,4 +1,5 @@
 import unittest
+from repoze.bfg import testing
 
 class TestACLPathCache(unittest.TestCase):
 
@@ -249,6 +250,109 @@ class TestACLChecker(unittest.TestCase):
         result = checker(data)
         self.assertEqual(list(result), [])
 
+class TestSecuredStateMachine(unittest.TestCase):
+    def _getTargetClass(self):
+        from osi.security import SecuredStateMachine
+        return SecuredStateMachine
 
+    def _makeOne(self, state_attr, states=None, initial_state=None):
+        return self._getTargetClass()(state_attr, states, initial_state)
 
-    
+    def test_add_with_permission(self):
+        machine = self._makeOne('state')
+        machine.add('private', 'publish', 'public', None, permission='add')
+        self.assertEqual(
+            machine.states,
+            {('private', 'publish'): ('public', None, {'permission': 'add'})}
+            )
+
+    def test_add_without_permission(self):
+        machine = self._makeOne('state')
+        machine.add('private', 'publish', 'public', None)
+        self.assertEqual(
+            machine.states,
+            {('private', 'publish'): ('public', None, {'permission': 'view'})}
+            )
+
+    def test_secured_transition_info_permissive(self):
+        machine = self._makeOne('state')
+        machine.add('private', 'publish', 'public', None)
+        machine.add('private', 'reject', 'rejected', None)
+        testing.registerDummySecurityPolicy(permissive=True)
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        transitions = machine.secured_transition_info(context, request,
+                                                      'private')
+        self.assertEqual(len(transitions), 2)
+        self.assertEqual(transitions[0]['permission'], 'view')
+        self.assertEqual(transitions[1]['permission'], 'view')
+
+    def test_secured_transition_info_not_permissive(self):
+        machine = self._makeOne('state')
+        machine.add('private', 'publish', 'public', None)
+        machine.add('private', 'reject', 'rejected', None)
+        testing.registerDummySecurityPolicy(permissive=False)
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        transitions = machine.secured_transition_info(context, request,
+                                                      'private')
+        self.assertEqual(len(transitions), 0)
+
+    def test_secured_execute_permitted(self):
+        args = []
+        def dummy(state, newstate, transition_id, context, **kw):
+            args.append((state, newstate, transition_id, context, kw))
+        states = {('pending', 'publish'): ('published', dummy,
+                                           {'permission':'add'}),
+                  ('pending', 'reject'): ('private', dummy,
+                                          {'permission':'add'}),
+                  ('published', 'retract'): ('pending', dummy,
+                                             {'permission':'add'}),
+                  ('private', 'submit'): ('pending', dummy,
+                                          {'permission':'add'}),
+                  ('pending', None): ('published', dummy,
+                                      {'permission':'add'}),}
+        sm = self._makeOne('state', states=states, initial_state='pending')
+        testing.registerDummySecurityPolicy(permissive=True)
+        request = testing.DummyRequest()
+        ob = testing.DummyModel()
+        sm.secured_execute(ob, request, 'publish')
+        self.assertEqual(ob.state, 'published')
+        sm.secured_execute(ob, request, 'retract')
+        self.assertEqual(ob.state, 'pending')
+        sm.secured_execute(ob, request, 'reject')
+        self.assertEqual(ob.state, 'private')
+        sm.secured_execute(ob, request, 'submit')
+        self.assertEqual(ob.state, 'pending')
+        # catch-all
+        sm.secured_execute(ob, request, None)
+        self.assertEqual(ob.state, 'published')
+        self.assertEqual(len(args), 5)
+        self.assertEqual(args[0], ('pending', 'published', 'publish', ob,
+                                   {'permission':'add'}))
+        self.assertEqual(args[1], ('published', 'pending', 'retract', ob,
+                                   {'permission':'add'}))
+        self.assertEqual(args[2], ('pending', 'private', 'reject', ob,
+                                   {'permission':'add'}))
+        self.assertEqual(args[3], ('private', 'pending', 'submit', ob,
+                                   {'permission':'add'}))
+        self.assertEqual(args[4], ('pending', 'published', None, ob,
+                                   {'permission':'add'}))
+        from repoze.workflow.statemachine import StateMachineError
+        self.assertRaises(StateMachineError, sm.secured_execute, ob, request,
+                          'nosuch')
+
+    def test_secured_execute_not_permitted(self):
+        args = []
+        def dummy(state, newstate, transition_id, context, **kw):
+            args.append((state, newstate, transition_id, context, kw))
+        states = {('pending', 'publish'): ('published', dummy,
+                                           {'permission':'add'}),}
+
+        sm = self._makeOne('state', states=states, initial_state='pending')
+        testing.registerDummySecurityPolicy(permissive=False)
+        request = testing.DummyRequest()
+        ob = testing.DummyModel()
+        from repoze.workflow.statemachine import StateMachineError
+        self.assertRaises(StateMachineError, sm.secured_execute,
+                          ob, request, 'publish')
