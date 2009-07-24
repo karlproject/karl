@@ -271,21 +271,22 @@ class TestSecuredStateMachine(unittest.TestCase):
         machine.add('private', 'publish', 'public', None)
         self.assertEqual(
             machine.states,
-            {('private', 'publish'): ('public', None, {'permission': 'view'})}
+            {('private', 'publish'): ('public', None, {'permission': None})}
             )
 
     def test_secured_transition_info_permissive(self):
         machine = self._makeOne('state')
         machine.add('private', 'publish', 'public', None)
-        machine.add('private', 'reject', 'rejected', None)
+        machine.add('private', 'reject', 'rejected', None, permission='add')
         testing.registerDummySecurityPolicy(permissive=True)
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        transitions = machine.secured_transition_info(context, request,
-                                                      'private')
+        transitions = sorted(
+            machine.secured_transition_info(context, request,
+                                            'private'))
         self.assertEqual(len(transitions), 2)
-        self.assertEqual(transitions[0]['permission'], 'view')
-        self.assertEqual(transitions[1]['permission'], 'view')
+        self.assertEqual(transitions[0]['permission'], None)
+        self.assertEqual(transitions[1]['permission'], 'add')
 
     def test_secured_transition_info_not_permissive(self):
         machine = self._makeOne('state')
@@ -356,3 +357,16 @@ class TestSecuredStateMachine(unittest.TestCase):
         from repoze.workflow.statemachine import StateMachineError
         self.assertRaises(StateMachineError, sm.secured_execute,
                           ob, request, 'publish')
+
+    def test_secured_execute_request_is_None(self):
+        args = []
+        def dummy(state, newstate, transition_id, context, **kw):
+            args.append((state, newstate, transition_id, context, kw))
+        states = {('pending', 'publish'): ('published', dummy,
+                                           {'permission':'add'}),}
+
+        sm = self._makeOne('state', states=states, initial_state='pending')
+        testing.registerDummySecurityPolicy(permissive=False)
+        ob = testing.DummyModel()
+        sm.secured_execute(ob, None, 'publish')
+        self.assertEqual(ob.state, 'published')

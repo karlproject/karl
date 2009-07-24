@@ -7,7 +7,7 @@ _marker = object()
 class SecuredStateMachine(StateMachine):
     def add(self, state, transition_id, newstate, transition_fn, **kw):
         if not 'permission' in kw:
-            kw['permission'] = 'view'
+            kw['permission'] = None
         return StateMachine.add(self, state, transition_id, newstate,
                                 transition_fn, **kw)
 
@@ -29,7 +29,7 @@ class SecuredStateMachine(StateMachine):
                 'No transition from %r using transition %r'
                     % (state, transition_id))
         permission = kw['permission']
-        if request is not None:
+        if request is not None and permission is not None:
             if not has_permission(permission, context, request):
                 raise StateMachineError(
                     '%s permission required for transition %r' % (
