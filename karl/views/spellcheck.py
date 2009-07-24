@@ -17,6 +17,7 @@
 
 """Spelling check view used by TinyMCE editor"""
 
+from karl.utilities.interfaces import ISpellChecker
 from karl.utilities.spelling import SpellChecker
 from karl.utilities.spelling import SpellCheckError
 from karl.utils import get_setting
@@ -26,7 +27,7 @@ from webob.exc import HTTPBadRequest
 from webob.exc import HTTPMethodNotAllowed
 from webob.exc import HTTPServiceUnavailable
 from webob import Response
-
+from zope.component import queryUtility
 
 def tinymce_spellcheck_view(context, request):
     methodcall, language, words = _parse_tinymce_request(request)
@@ -37,8 +38,9 @@ def tinymce_spellcheck_view(context, request):
         return _make_tinymce_response(error="Language is not supported")
                                     
     # initialize spellchecker
-    try:
-        spellchecker = SpellChecker(settings['executable'], language)
+    klass = queryUtility(ISpellChecker, default=SpellChecker)
+    try:                                            
+        spellchecker = klass(settings['executable'], language)
     except SpellCheckError, why:
         return _make_tinymce_response(error=why[0])
 

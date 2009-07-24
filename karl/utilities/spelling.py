@@ -19,10 +19,14 @@ import os
 import signal
 import subprocess
 import re
+from zope.interface import implements
+from karl.utilities.interfaces import ISpellChecker
 
 class SpellChecker:
-    UNKNOWN = re.compile(r'^& (.*?) \d* \d*: (.*)$', re.U)
-    UNKNOWN_NO_REPLACEMENT = re.compile(r'^\# (.*?) \d*.*$', re.U)
+    implements(ISpellChecker)
+
+    _UNKNOWN = re.compile(r'^& (.*?) \d* \d*: (.*)$', re.U)
+    _UNKNOWN_NO_REPLACEMENT = re.compile(r'^\# (.*?) \d*.*$', re.U)
 
     _subprocess = None
 
@@ -96,7 +100,7 @@ class SpellChecker:
             return result # nothing to do
 
         line = ' '.join(set(list_of_words))
-
+        
         try:
             self._writeline(line)
             while True:
@@ -104,10 +108,10 @@ class SpellChecker:
                 if not resline.strip():
                     break
                 if resline.strip() != '*':
-                    match = self.UNKNOWN.match(resline)
+                    match = self._UNKNOWN.match(resline)
                     have_replacement = True
                     if not match:
-                        match = self.UNKNOWN_NO_REPLACEMENT.match(resline)
+                        match = self._UNKNOWN_NO_REPLACEMENT.match(resline)
                         have_replacement = False
                     assert match, 'Unknown formatted line: %s' % resline
                     word = match.group(1)

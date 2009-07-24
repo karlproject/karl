@@ -16,11 +16,81 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 from karl import testing as karltesting
+from zope.testing.cleanup import cleanUp
+from zope.interface import implements
+from karl.utilities.interfaces import ISpellChecker
+import simplejson
+
+class TinyMceSpellCheckViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        testing.registerUtility(DummySpellChecker, iface=ISpellChecker)
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.spellcheck import tinymce_spellcheck_view
+        return tinymce_spellcheck_view(context, request)
+
+    def test_renders_error_response_for_unsupported_language(self):
+        rpc_request = {'id':None, 'method':'checkWords', 
+                       'params':['za',['foo','bar']]}
+        json = simplejson.JSONEncoder().encode(rpc_request)
+
+        request = testing.DummyRequest(method='POST', body=json)
+        response = self._callFUT(testing.DummyModel(), request)
+
+        self.assertEquals(response.status, '200 OK')
+        from_json = simplejson.JSONDecoder().decode(response.body)
+        self.assertEquals(from_json['id'], None)
+        self.assertEquals(from_json['result'], [])
+        self.assertEquals(from_json['error'], 'Language is not supported')
+    
+    def test_renders_misspelled_words_for_checkWords_request(self):
+        rpc_request = {'id':None, 'method':'checkWords', 
+                       'params':['en',['foo','bar']]}
+        json = simplejson.JSONEncoder().encode(rpc_request)
+
+        request = testing.DummyRequest(method='POST', body=json)
+        response = self._callFUT(testing.DummyModel(), request)
+
+        self.assertEquals(response.status, '200 OK')
+        from_json = simplejson.JSONDecoder().decode(response.body)
+        self.assertEquals(from_json['id'], None)
+        self.assertEquals(from_json['result'], ['foo', 'bar'])
+        self.assertEquals(from_json['error'], None)
+        
+    def test_renders_suggestions_for_getSuggestions_request(self):
+        rpc_request = {'id':None, 'method':'getSuggestions', 
+                       'params':['en','foo']}
+        json = simplejson.JSONEncoder().encode(rpc_request)
+
+        request = testing.DummyRequest(method='POST', body=json)
+        response = self._callFUT(testing.DummyModel(), request)
+
+        self.assertEquals(response.status, '200 OK')
+        from_json = simplejson.JSONDecoder().decode(response.body)
+        self.assertEquals(from_json['id'], None)
+        self.assertEquals(from_json['result'], ['foo','foo','foo'])
+        self.assertEquals(from_json['error'], None)
 
 
+class DummySpellChecker:
+    implements(ISpellChecker)
+
+    def __init__(self, executable, language):
+        pass
+        
+    def find_misspelled_words(self, list_of_words, max_words=None):
+        return list_of_words        
+
+    def suggestions_for_word(self, word, max_suggestions=None):
+        return [word, word, word]
+        
+    
 class TinyMceRequestParsingTests(unittest.TestCase):
     def _callFUT(self, request):
         from karl.views.spellcheck import _parse_tinymce_request
@@ -110,6 +180,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
         self.assertEqual(methodcall, 'getSuggestions')
         self.assertEqual(lang, 'en')
         self.assertEqual(words, ['hello'])
+
 
 class TinyMceResponseBuildingTests(unittest.TestCase):
     def _callFUT(self, **kargs):
