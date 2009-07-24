@@ -184,7 +184,7 @@ def add_community_view(context, request):
             context[name] = community
 
             acl_adapter = getAdapter(community, ISecurityWorkflow)
-            acl_adapter.setInitialState(**converted)
+            acl_adapter.setInitialState(request, **converted)
 
             # Save the tags on it.
             set_tags(community, request, converted['tags'])

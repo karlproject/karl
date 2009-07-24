@@ -603,7 +603,7 @@ def accept_invitation_view(context, request):
                 languages=converted['languages']
                 )
             profiles[username] = profile
-            ISecurityWorkflow(profile).setInitialState()
+            ISecurityWorkflow(profile).setInitialState(request)
             handle_photo_upload(profile, converted, thumbnail=True)
 
             del context.__parent__[context.__name__]

@@ -87,7 +87,7 @@ def edit_community_view(context, request):
             # *will be* modified event
             objectEventNotify(ObjectWillBeModifiedEvent(context))
 
-            security_adapter.updateState(**converted)
+            security_adapter.updateState(request, **converted)
 
             context.title = converted['title']
             context.description = converted['description']

@@ -344,10 +344,10 @@ class DummySecurityWorkflow:
     def __init__(self, context):
         self.context = context
 
-    def setInitialState(self, **kw):
+    def setInitialState(self, request, **kw):
         self.context.initial_state = kw.copy()
 
-    def updateState(self, **kw):
+    def updateState(self, request, **kw):
         if kw.get('sharing') in ('true', True):
             self.context.transition_id = 'private'
         elif kw.get('sharing') in ('false', False):
@@ -356,7 +356,7 @@ class DummySecurityWorkflow:
     def getStateMap(self):
         return {}
 
-    def execute(self, transition_id):
+    def execute(self, request, transition_id):
         self.context.transition_id = transition_id
 
 def registerLayoutProvider():

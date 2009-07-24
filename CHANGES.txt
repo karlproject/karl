@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Use the newer ISecurityWorkflow API (pass request in to all relevant
+  methods).
+
 - Allow communities to be transitioned from private to public; show a
   warning when someone clicks the public button if the private button
   is already clicked.

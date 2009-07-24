@@ -353,10 +353,10 @@ class DummySecurityWorkflow:
     def __init__(self, context):
         self.context = context
 
-    def setInitialState(self, **kw):
+    def setInitialState(self, request, **kw):
         self.context.sharing = kw['sharing']
 
-    def execute(self, transition_id):
+    def execute(self, request, transition_id):
         self.context.transition_id = transition_id
 
 class DummyToolAddables(DummyAdapter):

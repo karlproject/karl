@@ -721,7 +721,7 @@ def add_user_view(context, request):
 
             # Set up workflow
             security_adapter = ISecurityWorkflow(profile)
-            security_adapter.setInitialState(**converted)
+            security_adapter.setInitialState(request, **converted)
 
             handle_photo_upload(profile, converted, thumbnail=True)
 

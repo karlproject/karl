@@ -442,7 +442,7 @@ class DummySecurityWorkflow:
     def __init__(self, context):
         self.context = context
 
-    def updateState(self, **kw):
+    def updateState(self, request, **kw):
         if kw['sharing']:
             self.context.transition_id = 'private'
         else:
