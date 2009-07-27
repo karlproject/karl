@@ -44,10 +44,18 @@ def delete_resource_view(context, request):
     # Get a layout
     layout_provider = getMultiAdapter((context, request), ILayoutProvider)
     layout = layout_provider('community')
+    
+    # LP #399337, Add warning on delete of Folder with content inside
+    num_children = 0
+    from repoze.bfg.traversal import find_interface
+    from karl.content.interfaces import ICommunityFolder
+    if find_interface(context, ICommunityFolder):
+        num_children = len(context)
 
     return render_template_to_response(
         'templates/delete_resource.pt',
         api=api,
         layout=layout,
+        num_children=num_children,
         )
 

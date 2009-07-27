@@ -7,6 +7,10 @@
 
     <div class="deleteMessage">
       <p>Do you really want to delete <strong> ${api.context.title} </strong>?</p>
+      <p tal:condition="num_children == 1" style="color: red">Warning: There is ${num_children} 
+      item in this folder.</p>
+      <p tal:condition="num_children > 1" style="color: red">Warning: There are ${num_children} 
+      items in this folder.</p>
       <p><a href="?confirm=1" class="context">ok</a>&#160;<a href="${api.here_url}"
           class="standalone">cancel</a></p>
     </div>
