@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+
 - LP #403648: Fix right margin in IE on anonymous layout
 
 - Use the newer ISecurityWorkflow API (pass request in to all relevant
@@ -11,6 +12,9 @@ Unreleased
 - Allow communities to be transitioned from private to public; show a
   warning when someone clicks the public button if the private button
   is already clicked.
+
+- LP #404205: Renamed the "All KARL" tab to "All".  Overrideable in
+  peopledirectory.xml.
 
 3.6 (2009-07-23)
 ----------------

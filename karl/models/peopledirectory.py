@@ -118,10 +118,10 @@ class PeopleDirectory(Folder):
         self.order = ()  # order of sections
 
         # Set up a default configuration
-        self['all-karl'] = section = PeopleSection('All KARL')
-        section['all-karl'] = report = PeopleReport('All KARL')
+        self['all'] = section = PeopleSection('All')
+        section['all'] = report = PeopleReport('All')
         report.set_columns(['name', 'organization', 'location', 'email'])
-        self.set_order(['all-karl'])
+        self.set_order(['all'])
 
     def set_order(self, order):
         self.order = tuple(order)
