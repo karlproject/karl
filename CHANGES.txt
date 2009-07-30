@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #403648: Fix right margin in IE on anonymous layout
 
 - Use the newer ISecurityWorkflow API (pass request in to all relevant
   methods).
