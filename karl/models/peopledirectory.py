@@ -26,6 +26,7 @@ from karl.models.site import get_allowed_to_view
 from karl.models.site import get_lastfirst
 from karl.models.site import get_path
 from karl.models.site import get_textrepr
+from karl.utils import find_users
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from repoze.catalog.document import DocumentMap
@@ -104,6 +105,14 @@ def get_position(obj, default):
         return default
     return res.lower()
 
+def get_groups(obj, default):
+    if not IProfile.providedBy(obj):
+        return default
+    users = find_users(obj)
+    user = users.get_by_id(obj.__name__)
+    if user:
+        return user.get('groups', default)
+    return default
 
 class PeopleDirectory(Folder):
     implements(IPeopleDirectory)
@@ -134,6 +143,7 @@ class PeopleDirectory(Folder):
             # path index is needed for profile deletion
             'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
             'allowed': CatalogKeywordIndex(get_allowed_to_view),
+            'groups': CatalogKeywordIndex(get_groups),
 
             # provide indexes for sorting reports
             'department': CatalogFieldIndex(get_department),
@@ -212,8 +222,12 @@ class PeopleReport(Persistent):
             link_title = title
         self.link_title = link_title
         self.css_class = css_class
+        self.groups = ()  # group names
         self.filters = PersistentMapping()  # {category ID -> [value]}
         self.columns = ()  # column IDs
+
+    def set_groups(self, groups):
+        self.groups = tuple(groups)
 
     def set_filter(self, catid, values):
         self.filters[catid] = tuple(values)

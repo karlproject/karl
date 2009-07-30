@@ -288,6 +288,7 @@ class JqueryGridViewTests(unittest.TestCase):
         report = testing.DummyModel(
             title='Report A',
             columns=['name'],
+            groups=None,
             filters={}
             )
         request = testing.DummyRequest({'start': 0, 'limit': 10})
@@ -480,7 +481,10 @@ class GetReportQueryTests(unittest.TestCase):
         return get_report_query(report, request)
 
     def test_it(self):
-        report = testing.DummyModel(filters={'office': ['nyc']})
+        report = testing.DummyModel(
+            groups=['group.KarlStaff'],
+            filters={'office': ['nyc']},
+            )
         request = testing.DummyRequest({
             'lastnamestartswith': 'L',
             'body': 'a b*',
@@ -488,6 +492,7 @@ class GetReportQueryTests(unittest.TestCase):
         kw = self._callFUT(report, request)
         self.assertEqual(kw, {
             'allowed': {'operator': 'or', 'query': []},
+            'groups': ['group.KarlStaff'],
             'category_office': {'operator': 'or', 'query': ['nyc']},
             'lastnamestartswith': 'L',
             'texts': 'a b**',
@@ -808,6 +813,7 @@ class DummyReport(testing.DummyModel):
             title='Report A',
             link_title='A',
             columns=['name'],
+            groups=None,
             filters={}
             )
 

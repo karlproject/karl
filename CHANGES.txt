@@ -13,8 +13,9 @@ Unreleased
   warning when someone clicks the public button if the private button
   is already clicked.
 
-- LP #404205: Renamed the "All KARL" tab to "All".  Overrideable in
-  peopledirectory.xml.
+- LP #404205: For the new people directory, renamed the unconfigured
+  "All KARL" tab to "All".  Use peopledirectory.xml to configure it.
+  Also added the ability to filter reports by user group membership.
 
 3.6 (2009-07-23)
 ----------------

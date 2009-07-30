@@ -77,6 +77,35 @@ class TestDiscriminatorFunctions(unittest.TestCase):
         obj.position = None
         self.assertEqual(get_position(obj, 0), 0)
 
+    def test_get_groups_for_profile(self):
+        from karl.models.peopledirectory import get_groups
+        from karl.testing import DummyUsers
+        obj = DummyProfile()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        site.users.add('testuser', 'testuser', '', ['group1'])
+        self.assertEqual(get_groups(obj, 0), ['group1'])
+
+    def test_get_groups_for_non_profile(self):
+        from karl.models.peopledirectory import get_groups
+        from karl.testing import DummyUsers
+        obj = testing.DummyModel()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        site.users.add('testuser', 'testuser', '', ['group1'])
+        self.assertEqual(get_groups(obj, 0), 0)
+
+    def test_get_groups_for_nonexistent_user(self):
+        from karl.models.peopledirectory import get_groups
+        from karl.testing import DummyUsers
+        obj = DummyProfile()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        self.assertEqual(get_groups(obj, 0), 0)
+
 class TestProfileCategoryGetter(unittest.TestCase):
 
     def test_non_profile(self):

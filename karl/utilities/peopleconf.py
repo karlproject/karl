@@ -84,6 +84,14 @@ def parse_report(people, elem):
     link_title = elem.get('link-title', title)
     css_class = elem.get('class', 'general')
     obj = PeopleReport(title, link_title, css_class)
+
+    groups = None
+    e = elem.find('groups')
+    if e is not None:
+        groups = e.get('names', '').split()
+    if groups:
+        obj.set_groups(groups)
+
     for e in elem.findall('filter'):
         catid = e.get('category')
         values = e.get('values', '').split()
@@ -96,6 +104,7 @@ def parse_report(people, elem):
             if v not in pc:
                 raise ParseError("No such category value: %s" % v, e)
         obj.set_filter(catid, values)
+
     columns = None
     e = elem.find('columns')
     if e is not None:
@@ -106,6 +115,7 @@ def parse_report(people, elem):
         if not colid in COLUMNS:
             raise ParseError("No such column defined: %s" % colid, e)
     obj.set_columns(columns)
+
     return reportid, obj
 
 def parse_reports(people, parent_elem, reportmap):

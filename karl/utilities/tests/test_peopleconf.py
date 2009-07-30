@@ -162,6 +162,7 @@ class ParseReportTests(unittest.TestCase):
     def test_complete(self):
         xml = """
         <report id="r1" title="Report One" link-title="One">
+            <groups names="group.KarlStaff group.KarlAdmin"/>
             <filter category="office" values="nyc la"/>
             <filter category="department" values="toys"/>
             <columns ids="name email"/>
@@ -175,6 +176,7 @@ class ParseReportTests(unittest.TestCase):
         self.assertEqual(reportid, 'r1')
         self.assertEqual(obj.title, 'Report One')
         self.assertEqual(obj.link_title, 'One')
+        self.assertEqual(obj.groups, ('group.KarlStaff', 'group.KarlAdmin'))
         self.assertEqual(obj.filters, {
             'department': ('toys',),
             'office': ('nyc', 'la'),
@@ -193,7 +195,7 @@ class ParseReportTests(unittest.TestCase):
         from karl.utilities.peopleconf import ParseError
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
-    def test_no_values(self):
+    def test_no_category_values(self):
         xml = """
         <report id="r1">
             <filter category="office" values=""/>

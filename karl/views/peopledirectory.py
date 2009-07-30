@@ -268,6 +268,8 @@ def get_search_qualifiers(request):
 def get_report_query(report, request):
     """Produce query parameters for a catalog search"""
     kw = {}
+    if report.groups:
+        kw['groups'] = report.groups
     for catid, values in report.filters.items():
         kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
     principals = effective_principals(request)
