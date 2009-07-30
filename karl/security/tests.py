@@ -252,7 +252,7 @@ class TestACLChecker(unittest.TestCase):
 
 class TestSecuredStateMachine(unittest.TestCase):
     def _getTargetClass(self):
-        from osi.security import SecuredStateMachine
+        from karl.security.workflow import SecuredStateMachine
         return SecuredStateMachine
 
     def _makeOne(self, state_attr, states=None, initial_state=None):
