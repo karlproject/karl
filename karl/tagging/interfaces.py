@@ -213,6 +213,9 @@ class ITaggingEngine(Interface):
         o Return the number of tags renamed.
         """
 
+    def reassign(olduser, newuser):
+        """Assign all tags owned by olduser to newuser."""
+
     def normalize(normalizer):
         """Normalize tagnames with the given normalizer function
 

@@ -661,6 +661,24 @@ class TagsTests(unittest.TestCase):
         self.failIf('bedrock' in engine.getTags())
         self.failUnless('Bedrock' in engine.getTags())
 
+    def test_reassign_to_new_user(self):
+        engine = self._makeOne()
+        self._populate(engine)
+        engine.reassign('bharney', 'phony')
+        self.assertTrue('neighbor' in engine.getTags())
+        self.assertTrue('phred' in engine.getUsers())
+        self.assertTrue('phony' in engine.getUsers())
+        self.assertFalse('bharney' in engine.getUsers())
+
+    def test_reassign_to_existing_user(self):
+        engine = self._makeOne()
+        self._populate(engine)
+        engine.reassign('bharney', 'phred')
+        self.assertTrue('neighbor' in engine.getTags())
+        self.assertTrue('phred' in engine.getUsers())
+        self.assertFalse('phony' in engine.getUsers())
+        self.assertFalse('bharney' in engine.getUsers())
+
     def test_normalize_default(self):
         engine = self._makeOne()
         engine.update(13, 'phred', ('BEDROCK', 'DINOSAUR'))

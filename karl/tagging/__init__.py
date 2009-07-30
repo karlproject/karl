@@ -324,6 +324,19 @@ class Tags(Persistent):
             del self._name_to_tagids[old]
         return len(tagIds)
 
+    def reassign(self, olduser, newuser):
+        """ See ITaggingEngine.
+        """
+        old_ids = self._user_to_tagids[olduser]
+        if newuser in self._user_to_tagids:
+            self._user_to_tagids[newuser].update(old_ids)
+        else:
+            self._user_to_tagids[newuser] = old_ids
+        del self._user_to_tagids[olduser]
+        for tagid in old_ids:
+            tagobj = self._tagid_to_obj[tagid]
+            tagobj.user = unicode(newuser)
+
     def normalize(self, normalizer=None):
         """ See ITaggingEngine.
         """
