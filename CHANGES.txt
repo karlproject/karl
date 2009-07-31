@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #407445: Provide rounded corners on tag boxes in IE
+
 - LP #403648: Fix right margin in IE on anonymous layout
 
 - Use the newer ISecurityWorkflow API (pass request in to all relevant

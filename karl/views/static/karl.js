@@ -439,8 +439,12 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             cachedrecord.count--;
             this._updateBox(cached);
         } else {
+            // hide first to work with rounded corners in IE (using DD_roundies)
+            li.css("display", "none");
+
             // Else proceed with deletion 
             $.ui.autobox3.prototype._delBox.call(this, li);
+            
             // And delete it from the cache too
             delete this.bubbles[tagkey];
         }
@@ -1737,6 +1741,9 @@ $(document).ready(function() {
     
     // Enable old style dropdowns
     enableOldStyleDropdowns();
+
+    // rounded corners in IE on tags
+    DD_roundies.addRule('.bit-box', '6px');
 
 }); // END document ready handler
 

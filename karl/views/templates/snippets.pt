@@ -69,6 +69,7 @@
         <script src="${api.static_url}/jquery-ui/1.7/ui/effects.fold.js" type="text/javascript">//</script>
         <script src="${api.static_url}/jquery-ui/1.7/ui/ui.datepicker.js" type="text/javascript">//</script>
         <script src="${api.static_url}/jquery-ui/1.7/ui/ui.dialog.js">//</script>
+        <script src="${api.static_url}/DD_roundies.src.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
       </tal:resources>
 

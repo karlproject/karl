@@ -87,6 +87,17 @@ span.sortingArrows {
     width:195px;
 }
 
+* html .statusbox-item {
+  height: 26px;
+}
+/* rounded corners fix */
+* html li.bit-box {
+  padding: 1px 15px 4px 6px !important;
+}
+* html ul.autobox-hldr {
+  height: 23px;
+}
+
 /* accompanies ui.custom.css */
 .autobox-input input {
     margin-top: -1px !important;

@@ -55,6 +55,7 @@ def main(argv=sys.argv):
             filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
             filesindir(ui_dir, 'effects.core.js', 'effects.pulsate.js', 'effects.fold.js',
                                 'ui.datepicker.js', 'ui.dialog.js'),
+            filesindir(karl_dir, 'DD_roundies.js'),
             filesindir(karl_dir, 'karl.js'),
             ):
         f.write(file(fname).read())
