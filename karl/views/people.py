@@ -285,12 +285,6 @@ def admin_edit_profile_view(context, request):
         display_photo["url"] = api.static_url + "/images/defaultUser.gif"
         display_photo["may_delete"] = False
 
-    # Enable hiding of certain fields via CSS descendent selectors
-    if 'group.KarlStaff' in user_groups:
-        staff_role_classname = 'k3_staff_role'
-    else:
-        staff_role_classname = 'k3_nonstaff_role'
-
     return render_form_to_response(
         'templates/admin_edit_profile.pt',
         form,
@@ -300,7 +294,6 @@ def admin_edit_profile_view(context, request):
         fielderrors=fielderrors,
         api=api,
         photo=display_photo,
-        staff_role_classname=staff_role_classname,
         group_fields=group_fields,
         )
 

@@ -11,7 +11,7 @@
 
     <div metal:use-macro="formfields.macros['formerror']"/>
 
-    <div class="${staff_role_classname}">
+    <div>
 
       <fieldset metal:use-macro="formfields.macros['login-field']"/>
       <fieldset metal:use-macro="formfields.macros['group-fields']"/>
