@@ -442,7 +442,7 @@
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <select name="country" size="1">
-        <option value="">Select...</option>
+        <option value="" selected="selected">Select...</option>
 	<option value="${c[0]}"
 		tal:repeat="c api.countries">${c[1]}</option>
       </select>
