@@ -36,11 +36,9 @@
             if (!grid_data.records) {
                 throw 'karl_client_data.grid_data not specified or has no records.';
             }
-            // get global page data
-            var here_url = $("#karl-here-url")[0].content;
             // bind the widget
             $("#reportgrid").karlgrid({
-                url: here_url + "jquery_grid",
+                url: grid_data.fetch_url,
                 limit: grid_data.batchSize,
                 height: 300,
                 width: grid_data.width,

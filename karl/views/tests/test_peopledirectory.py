@@ -518,6 +518,7 @@ class GetGridDataTests(unittest.TestCase):
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
         self.assertEqual(grid_data, {
+            'fetch_url': 'http://example.com/s1/r1/jquery_grid',
             'sortColumn': 'name',
             'records': [],
             'sortDirection': 'asc',
@@ -545,6 +546,29 @@ class GetGridDataTests(unittest.TestCase):
         grid_data = self._callFUT(report, request, start=21, limit=10)
         self.assertEqual(len(grid_data['records']), 4)
         self.assertEqual(grid_data['totalRecords'], 25)
+
+    def test_letter_and_text_search(self):
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        def searcher(context, request=None):
+            def resolve(docid):
+                return testing.DummyModel(title='Profile %d' % docid)
+            def search(**kw):
+                return (25, range(25), resolve)
+            return search
+        testing.registerAdapter(searcher, (Interface, Interface),
+            ICatalogSearch)
+        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+
+        report = DummyReport()
+        request = testing.DummyRequest({
+            'lastnamestartswith': 'A',
+            'body': 'stuff',
+            })
+        grid_data = self._callFUT(report, request, start=21, limit=10)
+        self.assertEqual(grid_data['fetch_url'],
+            'http://example.com/s1/r1/jquery_grid?'
+            'lastnamestartswith=A&body=stuff')
 
     def test_bad_text_search(self):
         from karl.models.interfaces import ICatalogSearch

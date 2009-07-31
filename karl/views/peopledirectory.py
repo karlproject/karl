@@ -311,7 +311,18 @@ def get_grid_data(context, request, start=0, limit=12,
         record = [col.render_html(profile, request) for col in columns]
         records.append(record)
 
+    copy_params = []
+    for param in ('lastnamestartswith', 'body'):
+        if param in request.params:
+            copy_params.append((param, request.params[param]))
+    if copy_params:
+        kw = {'query': copy_params}
+    else:
+        kw = {}
+    fetch_url = model_url(context, request, 'jquery_grid', **kw)
+
     payload = dict(
+        fetch_url=fetch_url,
         columns=columns_jsdata,
         records=records,
         totalRecords=batch['total'],
