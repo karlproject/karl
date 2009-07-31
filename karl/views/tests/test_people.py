@@ -479,13 +479,14 @@ class AdminEditProfileTests(unittest.TestCase):
         self.assertEqual(users.added_groups, [('ed', 'group.KarlLovers')])
         self.assertEqual(users.removed_groups, [('ed', 'group.KarlAdmin')])
 
-    def test_change_home_path(self):
+    def test_change_home_path_valid(self):
+        testing.registerModels({'zzz': testing.DummyModel()})
         testing.registerDummySecurityPolicy('userid')
         params = profile_data.copy()
         params.update({
             'form.submitted': '1',
             'login': 'ed',
-            'home_path': '/zzz',
+            'home_path': 'zzz',
             'password': '',
             'password_confirm': '',
             })
@@ -499,7 +500,32 @@ class AdminEditProfileTests(unittest.TestCase):
         users.add("ed", "ed", "password", [])
         response = self._callFUT(context, request)
 
-        self.assertEqual(context.home_path, '/zzz')
+        self.assertEqual(context.home_path, 'zzz')
+
+    def test_change_home_path_invalid(self):
+        testing.registerModels({})
+        testing.registerDummySecurityPolicy('userid')
+        params = profile_data.copy()
+        params.update({
+            'form.submitted': '1',
+            'login': 'ed',
+            'home_path': 'zzz',
+            'password': '',
+            'password_confirm': '',
+            })
+        request = testing.DummyRequest(params)
+        context = DummyProfile()
+        context.title = "Eddie"
+        site = testing.DummyModel()
+        site['ed'] = context
+        from karl.testing import DummyUsers
+        users = site.users = DummyUsers()
+        users.add("ed", "ed", "password", [])
+        renderer = testing.registerDummyRenderer(
+            'templates/admin_edit_profile.pt')
+        self._callFUT(context, request)
+        self.failUnless(renderer.fielderrors)
+        self.assertTrue('home_path' in renderer.fielderrors)
 
     def test_change_password(self):
         testing.registerDummySecurityPolicy('userid')

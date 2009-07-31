@@ -21,7 +21,7 @@ Unreleased
   survive pagination.
 
 - Partial solution to LP #407017: disable autocomplete in
-  admin_edit_profile.html
+  admin_edit_profile.html and validate changes to home_path.
 
 3.6 (2009-07-23)
 ----------------

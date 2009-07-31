@@ -17,6 +17,8 @@ from karl.consts import countries
 from karl.models.image import mimetypes as image_mimetypes
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
+from karl.utils import find_site
+from repoze.bfg.traversal import find_model
 
 valid_username_re = re.compile(r'[\w-]+$')
 
@@ -241,6 +243,28 @@ class UniqueEmail(validators.Email):
                 raise Invalid(
                     "Email address is already in use by another user.",
                      value, state)
+
+class HomePath(validators.UnicodeString):
+    """Validates a home path field value
+    """
+
+    def validate_python(self, value, state):
+        super(HomePath, self).validate_python(value, state)
+
+        context = getattr(state, "context", None)
+        if value and context:
+            site = find_site(context)
+            try:
+                target = find_model(site, value)
+            except KeyError, e:
+                raise Invalid(
+                    "Path not found: %s" % value,
+                    value, state)
+            else:
+                if target is site:
+                    raise Invalid(
+                        "Home path must not point to the site root",
+                        value, state)
 
 # Make some re-usable fields
 login = validators.UnicodeString(not_empty=True, strip=True)

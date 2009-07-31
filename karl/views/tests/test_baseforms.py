@@ -139,6 +139,46 @@ class TestUniqueEmailValidator(unittest.TestCase):
         val = UniqueEmail()
         self.assertRaises(Invalid, val.to_python, "chris@example.org", state)
     
+class TestHomePathValidator(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_valid(self):
+        from karl.views.baseforms import AppState
+        from karl.views.baseforms import HomePath
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import registerModels
+        registerModels({'item0': DummyModel()})
+        state = AppState(context=DummyModel())
+        val = HomePath()
+        val.to_python("item0", state)
+
+    def test_invalid_path(self):
+        from karl.views.baseforms import AppState
+        from karl.views.baseforms import HomePath
+        from repoze.bfg.testing import DummyModel
+        from formencode.validators import Invalid
+        from repoze.bfg.testing import registerModels
+        registerModels({})
+        state = AppState(context=DummyModel())
+        val = HomePath()
+        self.assertRaises(Invalid, val.to_python, "item0", state)
+
+    def test_avoid_circular_redirect(self):
+        from karl.views.baseforms import AppState
+        from karl.views.baseforms import HomePath
+        from repoze.bfg.testing import DummyModel
+        from formencode.validators import Invalid
+        from repoze.bfg.testing import registerModels
+        site = DummyModel()
+        registerModels({'//': site})
+        state = AppState(context=site)
+        val = HomePath()
+        self.assertRaises(Invalid, val.to_python, "//", state)
+
 class DummyCatalogSearch(object):
     def __init__(self, context):
         self.context = context

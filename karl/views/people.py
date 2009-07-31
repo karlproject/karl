@@ -306,7 +306,7 @@ def admin_edit_profile_view(context, request):
 
 class AdminEditProfileForm(EditProfileForm):
     login = baseforms.login
-    home_path = validators.UnicodeString(strip=True)
+    home_path = baseforms.HomePath(strip=True)
     simple_field_names = EditProfileForm.simple_field_names + ['home_path']
     password = baseforms.PasswordChecker(strip=True)
     password_confirm = validators.UnicodeString(strip=True)
