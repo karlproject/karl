@@ -20,6 +20,9 @@ Unreleased
 - LP #405361: Selecting a letter in the new people directory did not
   survive pagination.
 
+- Partial solution to LP #407017: disable autocomplete in
+  admin_edit_profile.html
+
 3.6 (2009-07-23)
 ----------------
 
