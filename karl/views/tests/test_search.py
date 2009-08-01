@@ -102,6 +102,45 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         self.assertEqual(results[1]['title'], 'yo')
         self.assertEqual(response.content_type, 'application/x-json')
 
+    def test_with_prefix_match(self):
+        terms = []
+        def dummy_factory(context, request, term):
+            terms.append(term)
+            def results():
+                return 0, [], None
+            return results
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory, 'dummy1',
+                         title='Dummy1', sort_key=1)
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        dummycontent = testing.DummyModel()
+        request.params = {
+            'val': 'somesearch',
+            }
+        self._callFUT(context, request)
+        self.assertEqual(terms, ['somesearch*'])
+
+    def test_with_phrase_match(self):
+        terms = []
+        def dummy_factory(context, request, term):
+            terms.append(term)
+            def results():
+                return 0, [], None
+            return results
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory, 'dummy1',
+                         title='Dummy1', sort_key=1)
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        dummycontent = testing.DummyModel()
+        request.params = {
+            'val': 'some search',
+            }
+        self._callFUT(context, request)
+        self.assertEqual(terms, ['"some search"'])
 
 class SearchResultsViewTests(unittest.TestCase):
     def setUp(self):

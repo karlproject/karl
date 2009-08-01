@@ -258,13 +258,16 @@ def jquery_livesearch_view(context, request):
     # Prefix search is with a wildcard at the end
     searchterm = request.params.get('val', None)
 
-    if searchterm is None:
+    if not searchterm:
         # The request forgot to send the key we use to do a search, so
         # make a friendly error message.  Important for the unit test.
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
+    
+    if ' ' in searchterm:
+        searchterm = '"%s"' % searchterm # phrase match for phrases
     else:
-        searchterm = searchterm + '*'
+        searchterm = searchterm + '*' # prefix match for single words
 
     records = LivesearchResults()
     principals = effective_principals(request)
@@ -284,6 +287,7 @@ def jquery_livesearch_view(context, request):
 
     for listitem in get_listitems(IGroupSearchFactory):
         utility = listitem['component']
+        
 
         factory = utility(context, request, searchterm)
 
