@@ -355,6 +355,7 @@ def delete_community_view(context, request):
         'templates/delete_resource.pt',
         api=api,
         layout=layout,
+        num_children=0,
         )
 
 class CommunitySidebar(object):
