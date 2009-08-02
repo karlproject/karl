@@ -19,6 +19,13 @@
     permission="administer"
   />
 
+  <view
+    for="*"
+    view=".acl.acl_tree_view"
+    name="acl_tree.html"
+    permission="administer"
+  />
+
   <!-- Publish static resources under /static/ : we use a route here
    with a custom root factory to avoid opening a ZODB connection
    unnecessarily for each static resource (the default root factory

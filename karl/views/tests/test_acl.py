@@ -395,6 +395,42 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(index._reindexed, (1, context))
         self.failUnless(catalog._invalidated)
 
+class Test_acl_tree_view(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.acl import acl_tree_view
+        return acl_tree_view(context, request)
+
+    def test_it(self):
+        class DummyModel(testing.DummyModel):
+            def _p_deactivate(self):
+                self.deactivated = True
+        from repoze.folder.interfaces import IFolder
+        from zope.interface import directlyProvides
+        request = testing.DummyRequest()
+        context2 = DummyModel()
+        context2.__acl__ = ['Allow', 'fred', ('read',)]
+        context = DummyModel()
+        context['context2'] = context2
+        directlyProvides(context, IFolder)
+        renderer = testing.registerDummyRenderer('templates/acl_tree.pt')
+        self._callFUT(context, request)
+        self.assertEqual(len(renderer.acls), 2)
+        context_acl = renderer.acls[0]
+        self.assertEqual(context_acl,
+                         {'path': '/', 'acl': None, 'name': None, 'offset': 0})
+        context2_acl = renderer.acls[1]
+        self.assertEqual(context2_acl,
+                         {'path': '/context2',
+                          'acl': ['Allow', 'fred', ('read',)],
+                          'name': 'context2', 'offset': 1})
+        self.assertEqual(context.deactivated, True)
+        self.assertEqual(context2.deactivated, True)
 
 class DummyCatalog(dict):
     _invalidated = False

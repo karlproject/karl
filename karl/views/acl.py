@@ -16,9 +16,15 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+import bisect
 
-from webob.exc import HTTPFound
+from webob import Response
+
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.traversal import model_path
+from repoze.bfg.traversal import find_model
+
+from repoze.folder.interfaces import IFolder
 
 from karl.security.policy import NO_INHERIT
 from karl.utils import find_catalog
@@ -107,3 +113,34 @@ def edit_acl_view(context, request):
                                        local_acl=local_acl,
                                        inheriting=inheriting,
                                       )
+
+def make_acls(node, acls=None, offset=0):
+    if acls is None:
+        acls = []
+    path = model_path(node)
+    acl = getattr(node, '__acl__', None)
+    folderish = IFolder.providedBy(node)
+    name = node.__name__
+    has_children = False
+    if folderish:
+        has_children = bool(len(node))
+    if (folderish and has_children) or acl is not None:
+        acls.append({'offset':offset, 'path':path, 'acl':acl, 'name':name})
+    if folderish:
+        children = list(node.items())
+        children.sort()
+        for childname, child in children:
+            make_acls(child, acls, offset+1)
+    node._p_deactivate()
+    return acls
+
+def acl_tree_view(context, request):
+    acls = make_acls(context)
+    return render_template_to_response(
+        'templates/acl_tree.pt',
+        acls = acls)
+
+
+    
+
+    
