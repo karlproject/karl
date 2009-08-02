@@ -5,9 +5,12 @@
 
  <div tal:repeat="acl acls"
       style="padding-left: ${acl['offset']*20}px">
-    <a tal:condition="acl['acl']" 
-       href="${acl['path']}/edit_acl.html">${acl['name']}</a>
+    <span tal:condition="acl['acl']" tal:omit-tag="">
+    <a 
+       href="${acl['url']}edit_acl.html">${acl['name']}</a> 
+     </span>
     <span tal:condition="not acl['acl']">${acl['name']}</span>
+    <span tal:condition="acl['security_state']">(${acl['security_state']})</span>
  </div>
 
 </div>

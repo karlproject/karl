@@ -415,6 +415,7 @@ class Test_acl_tree_view(unittest.TestCase):
         request = testing.DummyRequest()
         context2 = DummyModel()
         context2.__acl__ = ['Allow', 'fred', ('read',)]
+        context2.security_state = 'fred-ish'
         context = DummyModel()
         context['context2'] = context2
         directlyProvides(context, IFolder)
@@ -423,12 +424,20 @@ class Test_acl_tree_view(unittest.TestCase):
         self.assertEqual(len(renderer.acls), 2)
         context_acl = renderer.acls[0]
         self.assertEqual(context_acl,
-                         {'path': '/', 'acl': None, 'name': None, 'offset': 0})
+                         {'path': '/',
+                          'acl': None,
+                          'name': '/',
+                          'offset': 0,
+                          'url':'http://example.com/',
+                          'security_state':None})
         context2_acl = renderer.acls[1]
         self.assertEqual(context2_acl,
                          {'path': '/context2',
                           'acl': ['Allow', 'fred', ('read',)],
-                          'name': 'context2', 'offset': 1})
+                          'name': 'context2',
+                          'offset': 1,
+                          'url':'http://example.com/context2/',
+                          'security_state':'fred-ish'})
         self.assertEqual(context.deactivated, True)
         self.assertEqual(context2.deactivated, True)
 

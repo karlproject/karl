@@ -16,13 +16,10 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-import bisect
-
-from webob import Response
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
+from repoze.bfg.url import model_url
 
 from repoze.folder.interfaces import IFolder
 
@@ -114,28 +111,31 @@ def edit_acl_view(context, request):
                                        inheriting=inheriting,
                                       )
 
-def make_acls(node, acls=None, offset=0):
+def make_acls(node, request, acls=None, offset=0):
     if acls is None:
         acls = []
     path = model_path(node)
+    url = model_url(node, request)
     acl = getattr(node, '__acl__', None)
     folderish = IFolder.providedBy(node)
-    name = node.__name__
+    name = node.__name__ or '/'
     has_children = False
+    security_state = getattr(node, 'security_state', None)
     if folderish:
         has_children = bool(len(node))
     if (folderish and has_children) or acl is not None:
-        acls.append({'offset':offset, 'path':path, 'acl':acl, 'name':name})
+        acls.append({'offset':offset, 'path':path, 'acl':acl, 'name':name,
+                     'security_state':security_state, 'url':url})
     if folderish:
         children = list(node.items())
         children.sort()
         for childname, child in children:
-            make_acls(child, acls, offset+1)
+            make_acls(child, request, acls, offset+1)
     node._p_deactivate()
     return acls
 
 def acl_tree_view(context, request):
-    acls = make_acls(context)
+    acls = make_acls(context, request)
     return render_template_to_response(
         'templates/acl_tree.pt',
         acls = acls)
