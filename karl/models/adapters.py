@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -137,7 +137,7 @@ class GridEntryInfo(object):
         if self._profile is None:
             self._profile = self._profiles.get(self.context.creator, None)
         if self._creator_title is None:
-            self._creator_title = getattr(self._profile, "title", 
+            self._creator_title = getattr(self._profile, "title",
                                           "no profile title")
         return self._creator_title
 
@@ -150,8 +150,6 @@ class GridEntryInfo(object):
         if self._creator_url is None:
             self._creator_url = model_url(self._profile, self.request)
         return self._creator_url
-
-        return self.context.creator
 
     @property
     def modified_by_profile(self):
@@ -322,7 +320,7 @@ class CommunityInfo(object):
     @property
     def community_tags(self):
         """ Return data for tags portlet on community pages
-        
+
         o Return the top five, sorted in reverse order by count.
         """
         if self.tags is None:
