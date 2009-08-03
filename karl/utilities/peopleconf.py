@@ -85,12 +85,12 @@ def parse_report(people, elem):
     css_class = elem.get('class', 'general')
     obj = PeopleReport(title, link_title, css_class)
 
-    groups = None
-    e = elem.find('groups')
+    query = None
+    e = elem.find('query')
     if e is not None:
-        groups = e.get('names', '').split()
-    if groups:
-        obj.set_groups(groups)
+        query = eval(e.text.strip())
+    if query:
+        obj.set_query(query)
 
     for e in elem.findall('filter'):
         catid = e.get('category')

@@ -114,6 +114,15 @@ def get_groups(obj, default):
         return user.get('groups', default)
     return default
 
+def is_staff(obj, default):
+    groups = get_groups(obj, default)
+    if groups is default:
+        return default
+    if groups and 'groups.KarlStaff' in groups:
+        return True
+    else:
+        return False
+
 class PeopleDirectory(Folder):
     implements(IPeopleDirectory)
     title = 'People'
@@ -143,6 +152,7 @@ class PeopleDirectory(Folder):
             # path index is needed for profile deletion
             'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
             'allowed': CatalogKeywordIndex(get_allowed_to_view),
+            'is_staff': CatalogFieldIndex(is_staff),
             'groups': CatalogKeywordIndex(get_groups),
 
             # provide indexes for sorting reports
@@ -222,12 +232,12 @@ class PeopleReport(Persistent):
             link_title = title
         self.link_title = link_title
         self.css_class = css_class
-        self.groups = ()  # group names
+        self.query = None  # a dictionary of catalog query params
         self.filters = PersistentMapping()  # {category ID -> [value]}
         self.columns = ()  # column IDs
 
-    def set_groups(self, groups):
-        self.groups = tuple(groups)
+    def set_query(self, query):
+        self.query = query
 
     def set_filter(self, catid, values):
         self.filters[catid] = tuple(values)

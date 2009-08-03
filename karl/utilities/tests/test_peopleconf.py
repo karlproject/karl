@@ -162,7 +162,7 @@ class ParseReportTests(unittest.TestCase):
     def test_complete(self):
         xml = """
         <report id="r1" title="Report One" link-title="One">
-            <groups names="group.KarlStaff group.KarlAdmin"/>
+            <query>{'is_staff': True}</query>
             <filter category="office" values="nyc la"/>
             <filter category="department" values="toys"/>
             <columns ids="name email"/>
@@ -176,7 +176,7 @@ class ParseReportTests(unittest.TestCase):
         self.assertEqual(reportid, 'r1')
         self.assertEqual(obj.title, 'Report One')
         self.assertEqual(obj.link_title, 'One')
-        self.assertEqual(obj.groups, ('group.KarlStaff', 'group.KarlAdmin'))
+        self.assertEqual(obj.query, {'is_staff': True})
         self.assertEqual(obj.filters, {
             'department': ('toys',),
             'office': ('nyc', 'la'),

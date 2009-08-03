@@ -17,7 +17,11 @@ Unreleased
 
 - LP #404205: For the new people directory, renamed the unconfigured
   "All KARL" tab to "All".  Use peopledirectory.xml to configure it.
-  Also added the ability to filter reports by user group membership.
+  Also added the ability to filter reports by arbitrary (but fixed)
+  catalog query parameters.
+
+- LP #408156: Added a catalog index that makes it possible to show
+  only non-staff in a people directory report.
 
 - LP #405361: Selecting a letter in the new people directory did not
   survive pagination.

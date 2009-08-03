@@ -268,8 +268,8 @@ def get_search_qualifiers(request):
 def get_report_query(report, request):
     """Produce query parameters for a catalog search"""
     kw = {}
-    if report.groups:
-        kw['groups'] = report.groups
+    if report.query:
+        kw.update(report.query)
     for catid, values in report.filters.items():
         kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
     principals = effective_principals(request)
@@ -311,14 +311,7 @@ def get_grid_data(context, request, start=0, limit=12,
         record = [col.render_html(profile, request) for col in columns]
         records.append(record)
 
-    copy_params = []
-    for param in ('lastnamestartswith', 'body'):
-        if param in request.params:
-            copy_params.append((param, request.params[param]))
-    if copy_params:
-        kw = {'query': copy_params}
-    else:
-        kw = {}
+    kw, _ = get_search_qualifiers(request)
     fetch_url = model_url(context, request, 'jquery_grid', **kw)
 
     payload = dict(

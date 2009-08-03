@@ -106,6 +106,45 @@ class TestDiscriminatorFunctions(unittest.TestCase):
         site.users = DummyUsers()
         self.assertEqual(get_groups(obj, 0), 0)
 
+    def test_is_staff_for_staff(self):
+        from karl.models.peopledirectory import is_staff
+        from karl.testing import DummyUsers
+        obj = DummyProfile()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        site.users.add('testuser', 'testuser', '', ['groups.KarlStaff'])
+        self.assertEqual(is_staff(obj, ()), True)
+
+    def test_is_staff_for_non_staff(self):
+        from karl.models.peopledirectory import is_staff
+        from karl.testing import DummyUsers
+        obj = DummyProfile()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        site.users.add('testuser', 'testuser', '', [])
+        self.assertEqual(is_staff(obj, ()), False)
+
+    def test_is_staff_for_non_profile(self):
+        from karl.models.peopledirectory import is_staff
+        from karl.testing import DummyUsers
+        obj = testing.DummyModel()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        site.users.add('testuser', 'testuser', '', [])
+        self.assertEqual(is_staff(obj, ()), ())
+
+    def test_is_staff_for_nonexistent_user(self):
+        from karl.models.peopledirectory import is_staff
+        from karl.testing import DummyUsers
+        obj = DummyProfile()
+        site = testing.DummyModel()
+        site['testuser'] = obj
+        site.users = DummyUsers()
+        self.assertEqual(is_staff(obj, ()), ())
+
 class TestProfileCategoryGetter(unittest.TestCase):
 
     def test_non_profile(self):
@@ -276,6 +315,11 @@ class TestPeopleReport(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleReport
         verifyObject(IPeopleReport, self._makeOne())
+
+    def test_set_query(self):
+        obj = self._makeOne()
+        obj.set_query({'x': 'y'})
+        self.assertEqual(obj.query, {'x': 'y'})
 
     def test_set_filter(self):
         obj = self._makeOne()

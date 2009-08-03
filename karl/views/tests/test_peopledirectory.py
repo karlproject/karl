@@ -288,7 +288,7 @@ class JqueryGridViewTests(unittest.TestCase):
         report = testing.DummyModel(
             title='Report A',
             columns=['name'],
-            groups=None,
+            query=None,
             filters={}
             )
         request = testing.DummyRequest({'start': 0, 'limit': 10})
@@ -482,7 +482,7 @@ class GetReportQueryTests(unittest.TestCase):
 
     def test_it(self):
         report = testing.DummyModel(
-            groups=['group.KarlStaff'],
+            query={'groups': ['group.KarlStaff']},
             filters={'office': ['nyc']},
             )
         request = testing.DummyRequest({
@@ -568,7 +568,7 @@ class GetGridDataTests(unittest.TestCase):
         grid_data = self._callFUT(report, request, start=21, limit=10)
         self.assertEqual(grid_data['fetch_url'],
             'http://example.com/s1/r1/jquery_grid?'
-            'lastnamestartswith=A&body=stuff')
+            'body=stuff&lastnamestartswith=A')
 
     def test_bad_text_search(self):
         from karl.models.interfaces import ICatalogSearch
@@ -837,7 +837,7 @@ class DummyReport(testing.DummyModel):
             title='Report A',
             link_title='A',
             columns=['name'],
-            groups=None,
+            query=None,
             filters={}
             )
 
