@@ -29,6 +29,8 @@ Unreleased
 - Partial solution to LP #407017: disable autocomplete in
   admin_edit_profile.html and validate changes to home_path.
 
+- Added reverse look up for countries.
+
 - LP #407510: Show all fields in admin_edit_profile.html.
 
 3.6 (2009-07-23)

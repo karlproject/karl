@@ -21,6 +21,11 @@ class Countries(list):
         self.extend(l)
         self.as_dict = dict(l)
 
+        rdict = {}
+        for code, country in l:
+            rdict[country] = code
+        self.as_rdict = rdict
+
 countries = Countries([
     ('AF', 'Afghanistan'),
     ('AL', 'Albania'),
