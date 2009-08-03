@@ -118,7 +118,7 @@ def is_staff(obj, default):
     groups = get_groups(obj, default)
     if groups is default:
         return default
-    if groups and 'groups.KarlStaff' in groups:
+    if groups and 'group.KarlStaff' in groups:
         return True
     else:
         return False

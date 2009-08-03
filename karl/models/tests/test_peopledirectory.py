@@ -113,7 +113,7 @@ class TestDiscriminatorFunctions(unittest.TestCase):
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
-        site.users.add('testuser', 'testuser', '', ['groups.KarlStaff'])
+        site.users.add('testuser', 'testuser', '', ['group.KarlStaff'])
         self.assertEqual(is_staff(obj, ()), True)
 
     def test_is_staff_for_non_staff(self):
