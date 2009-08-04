@@ -163,7 +163,7 @@ def parse_section(people, section_elem):
             raise ParseError('Unrecognized element', e)
     return columns, reportmap
 
-def peopleconf(peopledir, tree):
+def peopleconf(peopledir, tree, force_reindex=False):
     # tree is an lxml.etree element.
     peopledir.categories.clear()
     for cat_elem in tree.findall('categories/category'):
@@ -194,7 +194,7 @@ def peopleconf(peopledir, tree):
     peopledir.set_order(section_order)
 
     need_reindex = peopledir.update_indexes()
-    if need_reindex:
+    if need_reindex or force_reindex:
         reindex(peopledir)
 
 def reindex(peopledir):

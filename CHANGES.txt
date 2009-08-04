@@ -6,6 +6,9 @@ Unreleased
 
 - Removed OSI-specific change password link logic from edit_profile view.
 
+- The peopleconf utility now has the option to force reindexing of the
+  people directory catalog.
+
 3.7 (2009-08-04)
 ----------------
 

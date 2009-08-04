@@ -433,9 +433,9 @@ class ParseSectionTests(unittest.TestCase):
 
 class PeopleConfTests(unittest.TestCase):
 
-    def _callFUT(self, peopledir, elem):
+    def _callFUT(self, peopledir, elem, **kw):
         from karl.utilities.peopleconf import peopleconf
-        return peopleconf(peopledir, elem)
+        return peopleconf(peopledir, elem, **kw)
 
     def test_all(self):
         xml = """
@@ -471,6 +471,28 @@ class PeopleConfTests(unittest.TestCase):
         self.assertEqual(peopledir['everyone'].__acl__,
             [('Allow', 'bob', 'view')])
         self.assertEqual(list(peopledir['everyone'].keys()), ['ny'])
+
+    def test_force_reindex(self):
+        from karl.testing import DummyCatalog
+        xml = """
+        <peopledirectory>
+            <sections>
+                <section id="everyone" title="Everyone">
+                    <report id="everyone" title="Everyone">
+                        <columns ids="name email"/>
+                    </report>
+                </section>
+            </sections>
+        </peopledirectory>
+        """
+        elem = parse_xml(xml)
+        site = testing.DummyModel()
+        peopledir = DummyPeopleDirectory()
+        peopledir.catalog = DummyCatalog()
+        site['people'] = peopledir
+        profiles = testing.DummyModel()
+        site['profiles'] = profiles
+        self._callFUT(peopledir, elem, force_reindex=True)
 
 
 class ReindexTests(unittest.TestCase):
