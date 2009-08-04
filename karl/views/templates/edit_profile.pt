@@ -5,7 +5,7 @@
 
     <h1 class="kscreentitle">Edit Profile</h1>
 
-    <div tal:condition="not api.user_is_staff">
+    <div>
         <p>
         Use the following form to edit your profile information. If
         you would like to delete your KARL account and remove yourself
@@ -14,16 +14,6 @@
         account</a> link and say <em>yes</em> to the confirmation
         window. If you would like to change your password, please click
         <a href="${api.here_url}change_password.html">Change Password</a>.
-        </p>
-    </div>
-
-    <div tal:condition="api.user_is_staff">
-        <p>
-        As a staff member, your user information is managed centrally.
-        If you notice something wrong, please send an email to <a
-        href="mailto:${api.settings.admin_email}">${api.settings.admin_email}</a>.
-        If would you like to change your password, please click
-        <a href="${staff_change_password_url}">Change Password</a>.
         </p>
     </div>
 
@@ -48,7 +38,7 @@
       <fieldset metal:use-macro="formfields.macros['languages-field']"/>
       <fieldset metal:use-macro="formfields.macros['biography-field']"/>
       <fieldset metal:use-macro="formfields.macros['photo-field']"/>
-    
+
       <fieldset metal:use-macro="formfields.macros['form-submit']"/>
 
     </div>
