@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.7 (2009-08-04)
+----------------
 
 - LP #407445: Provide rounded corners on tag boxes in IE
 
