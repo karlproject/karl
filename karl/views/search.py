@@ -90,6 +90,7 @@ def make_query(context, request):
     body = params.get('body')
     if body:
         query['texts'] = body
+        query['sort_index'] = 'texts'
         terms.append(body)
 
     creator = params.get('creator')

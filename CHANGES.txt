@@ -33,6 +33,8 @@ Unreleased
 
 - LP #407510: Show all fields in admin_edit_profile.html.
 
+- Enabled text relevance ranking in search results.
+
 3.6 (2009-07-23)
 ----------------
 

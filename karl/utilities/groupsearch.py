@@ -69,7 +69,7 @@ class GroupSearch:
         # this is always assumed to be a global search; it does no
         # path filtering
         criteria = {}
-        criteria['sort_index'] = 'title'
+        criteria['sort_index'] = 'texts'
         criteria['texts'] = self.term
         criteria['interfaces'] = {'query':self.interfaces, 'operator':'or'}
         criteria['allowed'] = {'query':principals, 'operator':'or'}

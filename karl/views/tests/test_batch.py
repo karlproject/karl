@@ -63,21 +63,6 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(searchkw['reverse'], False)
         self.assertEqual(searchkw['sort_index'], 'modified_date')
 
-    def test_with_texts_and_no_sort_index_adds_index_query_order(self):
-        searchkw = self._register([1,2,3])
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        info = self._callFUT(context, request, texts='abc', other2='hello',
-                             other1='yo')
-        self.assertEqual(len(searchkw), 4)
-        self.assertEqual(searchkw['texts'], 'abc')
-        self.assertEqual(searchkw['other1'], 'yo')
-        self.assertEqual(searchkw['other2'], 'hello')
-        index_query_order = searchkw['index_query_order']
-        self.assertEqual(len(index_query_order), 3)
-        self.assertEqual(index_query_order[-1], 'texts')
-        self.assertEqual(info['sort_index'], None)
-
     def test_with_texts_and_index_query_order(self):
         searchkw = self._register([1,2,3])
         context = testing.DummyModel()

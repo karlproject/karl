@@ -337,7 +337,11 @@ class MakeQueryTests(unittest.TestCase):
     def test_body_field(self):
         from repoze.lemonade.interfaces import IContent
         query, terms = self._callFUT({'body': 'yo'})
-        self.assertEqual(query, {'texts': 'yo', 'interfaces': [IContent]})
+        self.assertEqual(query, {
+            'texts': 'yo',
+            'interfaces': [IContent],
+            'sort_index': 'texts',
+            })
         self.assertEqual(terms, ['yo'])
 
     def test_creator_field(self):

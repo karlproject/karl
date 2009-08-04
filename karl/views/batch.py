@@ -35,46 +35,16 @@ def get_catalog_batch(context, request, **kw):
     reverse = kw.pop('reverse', False)
     reverse = bool(int(request.params.get('reverse', reverse)))
 
-    if (('texts' in kw) and ('index_query_order' not in kw) and
-        (sort_index is None)):
-        # Currently the catalog implementation does not allow using a
-        # text index as a sort_index parameter.  Once the catalog
-        # supports using a text index as a sort index, this hack can
-        # go away.  The hack is thus: if we cause the results from the
-        # text index query to be intersected *last* with the other
-        # results from other indexes named by this query, we'll get
-        # better relevance ranking (the catalog used a
-        # "weightedIntersection" call to intersect results from
-        # indexes).
-
-        # If this search uses the "texts" index and the criteria
-        # doesn't already specify an "index_query_order" or a
-        # "sort_index" (a sort index makes the index_query_order
-        # irrelevant feature-wise), pass an "index_query_order"
-        # parameter naming each index used by the criteria, making
-        # sure that the "texts" index is queried last.  This ensures
-        # that "texts" is the last index queried. Note that the
-        # "index_query_order" logic in repoze.catalog ignores anything
-        # in the provided sequence that isn't actually an index name,
-        # so we don't try to clean things out of index_query_order
-        # like "sort_index", "reverse" and so on.  This hack won't
-        # change the results, only the ordering of the results.
-        order = kw.keys()
-        order.remove('texts')
-        order.append('texts')
-        kw['index_query_order'] = order
-
-    else:
-        # XXX Asserting a default 'modified' sort order here is
-        # fragrant.  It's unclear which callers depend on the behavior
-        # and which don't.  Most callers probably don't even know we
-        # do this.  We should make this each caller's responsibility
-        # instead of embedding this policy here.
-        if sort_index is None:
-            sort_index = 'modified_date'
-        kw['sort_index'] = sort_index
-        # the reverse parameter is only useful when there's a sort index
-        kw['reverse'] = reverse
+    # XXX Asserting a default 'modified' sort order here is
+    # fragrant.  It's unclear which callers depend on the behavior
+    # and which don't.  Most callers probably don't even know we
+    # do this.  We should make this each caller's responsibility
+    # instead of embedding this policy here.
+    if sort_index is None:
+        sort_index = 'modified_date'
+    kw['sort_index'] = sort_index
+    # the reverse parameter is only useful when there's a sort index
+    kw['reverse'] = reverse
 
     searcher = ICatalogSearch(context)
     total, docids, resolver = searcher(**kw)
