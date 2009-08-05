@@ -14,6 +14,8 @@ Unreleased
   "private, must-revalidate", which seems to be the generally
   recommended header for dynamic apps.
 
+- LP #409499: Reference Manual delete produces TypeError
+
 3.7 (2009-08-04)
 ----------------
 

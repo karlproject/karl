@@ -26,6 +26,7 @@ from repoze.bfg.url import model_url
 from karl.views.interfaces import ILayoutProvider
 
 from karl.views.api import TemplateAPI
+from repoze.folder.interfaces import IFolder
 
 def delete_resource_view(context, request):
 
@@ -44,12 +45,10 @@ def delete_resource_view(context, request):
     # Get a layout
     layout_provider = getMultiAdapter((context, request), ILayoutProvider)
     layout = layout_provider('community')
-    
+
     # LP #399337, Add warning on delete of Folder with content inside
     num_children = 0
-    from repoze.bfg.traversal import find_interface
-    from karl.content.interfaces import ICommunityFolder
-    if find_interface(context, ICommunityFolder):
+    if IFolder.providedBy(context):
         num_children = len(context)
 
     return render_template_to_response(

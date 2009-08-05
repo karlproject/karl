@@ -50,3 +50,19 @@ class TestDeleteResourceView(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/?status_message=Deleted+Child')
         self.failIf('child' in parent)
+
+    def test_warn_for_folder_containing_children(self):
+        from repoze.folder.interfaces import IFolder
+        from zope.interface import alsoProvides
+        parent = testing.DummyModel()
+        parent.title = 'Parent'
+        alsoProvides(parent, IFolder)
+        child = testing.DummyModel()
+        child.title = 'Child'
+        parent['child'] = child
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/delete_resource.pt')
+        response = self._callFUT(parent, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.num_children, 1)
