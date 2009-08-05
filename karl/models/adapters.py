@@ -423,9 +423,9 @@ class PeopleReportLetterManager(object):
 
         # Intersect the search result docids with the docid set
         # for each letter.
-        docid_set = index.family.IO.Set(docids)
+        docid_set = index.family.IF.Set(docids)
         active = set()
-        intersection = index.family.IO.intersection
+        intersection = index.family.IF.intersection
         for letter in string.uppercase:
             # XXX using undocumented _fwd_index attribute
             letter_set = index._fwd_index.get(letter)

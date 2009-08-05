@@ -409,10 +409,10 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         site['people'].catalog = karltesting.DummyCatalog({2: None, 3: None})
         from BTrees import family32
         index = DummyFieldIndex({
-            'A': family32.IO.TreeSet([1]),
-            'B': family32.IO.TreeSet([2, 5]),
-            'C': family32.IO.TreeSet([3]),
-            'D': family32.IO.TreeSet([4, 6]),
+            'A': family32.IF.TreeSet([1]),
+            'B': family32.IF.TreeSet([2, 5]),
+            'C': family32.IF.TreeSet([3]),
+            'D': family32.IF.TreeSet([4, 6]),
             })
         index.family = family32
         site['people'].catalog['lastnamestartswith'] = index
