@@ -9,6 +9,11 @@ Unreleased
 - The peopleconf utility now has the option to force reindexing of the
   people directory catalog.
 
+- LP #409408: IE refuses to download files over HTTPS when the
+  Cache-Control header specifies no-cache or no-store.  Switched to
+  "private, must-revalidate", which seems to be the generally
+  recommended header for dynamic apps.
+
 3.7 (2009-08-04)
 ----------------
 

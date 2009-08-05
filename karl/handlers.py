@@ -8,5 +8,4 @@ def add_no_cache_headers(event):
         if not has_header(response.headerlist, 'Cache-Control'):
             response.headerlist.append(
                 ('Cache-Control',
-                 'max-age=0, must-revalidate, no-cache, no-store'))
-        
+                 'private, must-revalidate'))
