@@ -394,13 +394,13 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         index = DummyFieldIndex({'A': None, 'M': None})
         site['people'].catalog['lastnamestartswith'] = index
 
-        report = testing.DummyModel(filters={})
+        report = testing.DummyModel(filters={}, query=None)
         site['report'] = report
         obj = self._makeOne(report)
         active = obj.get_active_letters()
         self.assertEqual(active, set(['A', 'M']))
 
-    def test_with_filter(self):
+    def test_with_filter_and_query(self):
         site = testing.DummyModel()
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
@@ -417,11 +417,18 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         index.family = family32
         site['people'].catalog['lastnamestartswith'] = index
 
-        report = testing.DummyModel(filters={'office': ['nyc']})
+        report = testing.DummyModel(
+            filters={'office': ['nyc']},
+            query={'is_staff': True},
+            )
         site['report'] = report
         obj = self._makeOne(report)
         active = obj.get_active_letters()
         self.assertEqual(active, set(['B', 'C']))
+        self.assertEqual(site['people'].catalog.queries, [{
+            'is_staff': True,
+            'category_office': {'operator': 'or', 'query': ['nyc']},
+            }])
 
 
 class TestCommunityInfo(unittest.TestCase):

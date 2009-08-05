@@ -407,7 +407,7 @@ class PeopleReportLetterManager(object):
 
         # Use the lastnamestartswith index directly for speed.
         index = catalog['lastnamestartswith']
-        if not report.filters:
+        if not report.filters and not report.query:
             # Any letter in the index will suffice.  This is a fast
             # common case.
             # XXX using undocumented _fwd_index attribute
@@ -415,6 +415,8 @@ class PeopleReportLetterManager(object):
 
         # Perform a catalog search, but don't resolve any paths.
         kw = {}
+        if report.query:
+            kw.update(report.query)
         for catid, values in report.filters.items():
             kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
         total, docids = catalog.search(**kw)
