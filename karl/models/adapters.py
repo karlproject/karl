@@ -429,7 +429,7 @@ class PeopleReportLetterManager(object):
         for letter in string.uppercase:
             # XXX using undocumented _fwd_index attribute
             letter_set = index._fwd_index.get(letter)
-            if letter_set is None:
+            if not letter_set:
                 continue
             if intersection(letter_set, docid_set):
                 active.add(letter)
