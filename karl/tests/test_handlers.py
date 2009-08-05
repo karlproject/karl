@@ -12,7 +12,7 @@ class TestAddNoCacheHeaders(unittest.TestCase):
         self._callFUT(event)
         self.assertEqual(
             headers,
-            [('Cache-Control','max-age=0, must-revalidate, no-cache, no-store')]
+            [('Cache-Control','private, must-revalidate')]
         )
 
     def test_it_with_header(self):
