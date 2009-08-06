@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.8 (2009-08-06)
+----------------
 
 - Removed OSI-specific change password link logic from edit_profile view.
 
