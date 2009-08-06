@@ -6,7 +6,8 @@
     <h1 class="kscreentitle">Add User</h1>
 
   <form method="post" action="${post_url}" class="k3_genericForm"
-	xml:id="contentform" enctype="multipart/form-data" name="save">
+	xml:id="contentform" enctype="multipart/form-data" name="save"
+        autocomplete="off">
 
     <div metal:use-macro="formfields.macros['formerror']"/>
 

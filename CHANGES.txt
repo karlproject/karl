@@ -16,6 +16,9 @@ Unreleased
 
 - LP #409499: Reference Manual delete produces TypeError
 
+- Disabled browser form autocomplete in the add user form (without this,
+  the browser fills the password field with the current user's password).
+
 3.7 (2009-08-04)
 ----------------
 
