@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #409495: Fix broken General KARL Error Screen in IE
+
 - Disabled browser form autocomplete in the add user form (without this,
   the browser fills the password field with the current user's password).
 
