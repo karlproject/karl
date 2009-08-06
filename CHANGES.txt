@@ -4,6 +4,12 @@ karl package Changelog
 Unreleased
 ----------
 
+- Disabled browser form autocomplete in the add user form (without this,
+  the browser fills the password field with the current user's password).
+
+3.8 (2009-08-06)
+----------------
+
 - Removed OSI-specific change password link logic from edit_profile view.
 
 - The peopleconf utility now has the option to force reindexing of the
@@ -16,8 +22,6 @@ Unreleased
 
 - LP #409499: Reference Manual delete produces TypeError
 
-- Disabled browser form autocomplete in the add user form (without this,
-  the browser fills the password field with the current user's password).
 
 3.7 (2009-08-04)
 ----------------
