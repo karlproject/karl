@@ -124,6 +124,17 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b", "c"], sender.calls[0]["toaddrs"])
 
+    def test_case_insensitive(self):
+        from karl.utilities.mailer import WhiteListMailDelivery
+        sender = DummyMailDelivery()
+        self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
+
+        delivery = WhiteListMailDelivery(sender)
+        delivery.send("a", ["b@example.com", "C@EXAMPLE.COM"], "message")
+        self.assertEqual(1, len(sender.calls))
+        self.assertEqual(
+            ["b@example.com", "C@EXAMPLE.COM"], sender.calls[0]["toaddrs"])
+
 class DummyMailDelivery(object):
     def __init__(self):
         self.calls = []

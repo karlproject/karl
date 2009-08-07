@@ -11,6 +11,8 @@ Unreleased
 
 - Log more info about dropped email messages.
 
+- Made the mail white list case-insensitive.
+
 3.8 (2009-08-06)
 ----------------
 

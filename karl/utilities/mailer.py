@@ -70,7 +70,7 @@ class WhiteListMailDelivery(object):
         if white_list_fn:
             with open(white_list_fn) as f:
                 self.white_list = set(
-                    unicode(line.strip()) for line in f.readlines())
+                    unicode(line.strip()).lower() for line in f.readlines())
         else:
             self.white_list = None
 
@@ -82,7 +82,8 @@ class WhiteListMailDelivery(object):
 
     def send(self, fromaddr, toaddrs, message):
         if self.white_list is not None:
-            toaddrs = [addr for addr in toaddrs if addr in self.white_list]
+            toaddrs = [addr for addr in toaddrs
+                if addr.lower() in self.white_list]
         if toaddrs:
             self.md.send(fromaddr, toaddrs, message)
 
