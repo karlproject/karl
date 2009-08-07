@@ -9,6 +9,8 @@ Unreleased
 - Disabled browser form autocomplete in the add user form (without this,
   the browser fills the password field with the current user's password).
 
+- Log more info about dropped email messages.
+
 3.8 (2009-08-06)
 ----------------
 

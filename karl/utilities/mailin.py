@@ -115,7 +115,8 @@ class MailinRunner:
             info = self.dispatcher.crackHeaders(message)
             if info['bounce']:
                 self.bounceMessage(message, info)
-                self.log('BOUNCED', message_id, info['reason'])
+                self.log('BOUNCED', message_id,
+                    '%s %s' % (info['reason'], repr(info)))
                 if self.verbosity > 1:
                     print 'Bounced  : %s\n  %s' % (message_id, info['reason'])
             else:
