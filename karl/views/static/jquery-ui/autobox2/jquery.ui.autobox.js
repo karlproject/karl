@@ -465,6 +465,7 @@ $.extend($.ui.autobox3, {
         selectHoverable: '> li',
         // if specified, a query starts at minimum this many characters
         minQueryLength: 0,
+        minQueryNotice: null,
         // maximum width of the search container
         maxSearchContainerWidth: 400
     }

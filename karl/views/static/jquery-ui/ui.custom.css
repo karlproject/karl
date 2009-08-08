@@ -205,7 +205,7 @@ li.bit-box.nondeleteable {
 
 ul.livesearch-list {
   position: absolute;
-  width: 448px;
+  width: 448px !important;
   margin: 0;
   padding: 0;
   list-style-type: none;
@@ -238,6 +238,16 @@ ul.livesearch-list li.hasheader {
   border-collapse: collapse;
   padding-top: 3px;
 }
+ul.livesearch-list li.notice {
+  border-bottom: 1px solid #e6e6e6;
+  padding: 4px 0;
+}
+ul.livesearch-list li.notice a {
+  background: url('/static/images/livesearch_info.png') 5px center no-repeat;
+  color: #555;
+  cursor: default;
+}
+
 ul.livesearch-list .header {
   padding: 3px 10px 3px 10px;
   font-weight: bold;

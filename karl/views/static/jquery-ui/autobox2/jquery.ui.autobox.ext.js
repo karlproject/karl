@@ -67,13 +67,39 @@
     return { getList: function(input, hash) {
       var val = input.val();
       var minQueryLength = this.options.minQueryLength;
-      if (minQueryLength && (! val || val.length < minQueryLength)) return false;
-      if (val.match(/^\s*$/)) return false;
-      miniRM.getJSON(ajax, "val=" + val, function(json) {
-          if(hash){ json=$(json).filter(function(){  return !hash[this.text]; }); }
-          input.trigger("updateList", [json]);
-      });
-    } };
+      var minQueryNotice = this.options.minQueryNotice; 
+
+      function tooShort(word, minQueryLength) {
+        return minQueryLength && (! word || word.length < minQueryLength);
+      }
+
+      // filter words by short/long
+      var words = val.replace(/\s+/, " ").split(" "), short = [], long = [];
+      for (i = 0, j = words.length; i < j; i++) {
+        var word = words[i];
+        if (word == "") continue;
+        tooShort(word, minQueryLength) ? short.push(word) : long.push(word);        
+      }
+      val = long.join(" ");
+
+      // only send request if we have a long word
+      if (long.length > 0) {
+        miniRM.getJSON(ajax, "val=" + val, function(json) {
+          if (hash) { 
+            if (short.length > 0 && minQueryNotice) { 
+              json.unshift(minQueryNotice); 
+            }
+            json = $(json).filter(function(){ return !hash[this.text]; });
+            input.trigger("updateList", [json]);
+          }
+        });
+        
+      // only short words - show notice
+      } else if (short.length > 0 && minQueryNotice) {
+        input.trigger("updateList", [[minQueryNotice]]);
+      }
+
+    }};
   };
 
   $.ui.autobox.ext.templateText = function(opt) {

@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #408946: Give visual LS feedback and pause on multiple words
+
 - LP #409495: Fix broken General KARL Error Screen in IE
 
 - Disabled browser form autocomplete in the add user form (without this,

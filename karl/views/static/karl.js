@@ -1558,6 +1558,7 @@ $.widget('ui.karldropdown', {
 
         // needed to control the item hovers
         this.current_item = null;
+        this.padding_left = 0;
     },
 
     _locate: function() {
@@ -1698,7 +1699,9 @@ $(document).ready(function() {
         match: function(typed) { return true; },
         insertText: function(obj) { return obj.title },
         wrapper: '<ul class="livesearch-list"></ul>',
-        templateText: '<li class="<%= rowclass %>"><%= pre %><div class="item"><a href="<%= href %>"><%= title %></a></div><%= post %></li>'
+        templateText: '<li class="<%= rowclass %>"><%= pre %><div class="item"><a href="<%= href %>"><%= title %></a></div><%= post %></li>', 
+        minQueryNotice: {"pre": "", "post": "", "header": "", "href": "#", "rowclass": "notice",
+                         "title":  "Words must contain at least 3 characters to narrow the search"}
     });
 
     var tagbox_data = window.karl_client_data && karl_client_data.tagbox || {};
