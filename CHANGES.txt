@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.9 (2009-08-11)
+----------------
 
 - LP #408946: Give visual LS feedback and pause on multiple words
 
