@@ -403,7 +403,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
         text, attachments = mailin.crackPayload(message)
 
-        self.assertEqual(text, None)
+        self.failUnless('not found' in text)
         self.assertEqual(len(attachments), 0)
 
     def test_crackPayload_single(self):
@@ -495,7 +495,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
         text, attachments = mailin.crackPayload(message)
 
-        self.assertEqual(text, None)
+        self.failUnless('not found' in text)
         self.assertEqual(len(attachments), 2)
         filename, mimetype, data = attachments[0]
         self.assertEqual(filename, 'file1.bin')

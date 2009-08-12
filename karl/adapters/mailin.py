@@ -162,4 +162,10 @@ class MailinDispatcher(object):
         if text is not None and self.text_scrubber is not None:
             scrubber = getUtility(IMailinTextScrubber, self.text_scrubber)
             text = scrubber(text, text_mimetype)
+
+        if text is None:
+            text = ("Message body not found.  Incoming email message must "
+                    "contain a plain text representation.  HTML-only email "
+                    "is not supported.")
+
         return text, attachments

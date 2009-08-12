@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #412478 In mail-in, replace empty message body with warning message.
 
 3.9 (2009-08-11)
 ----------------
