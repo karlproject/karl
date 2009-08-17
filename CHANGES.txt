@@ -1,15 +1,12 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
-
-- LP #414799 Scrubbed 'KARL' from UI.
-
 3.11 (2009-08-17)
 -----------------
 
 - LP #414799 Made system name configurable in Karl error page wsgi middleware.
+
+- LP #414799 Scrubbed 'KARL' from UI.
 
 3.10 (2009-08-12)
 -----------------
