@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- LP #414799 Scrubbed 'KARL' from code.
+- LP #414799 Scrubbed 'KARL' from UI.
 
 3.11 (2009-08-17)
 -----------------
