@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #414799 Made system name configurable in Karl error page wsgi middleware.
 
 3.10 (2009-08-12)
 -----------------

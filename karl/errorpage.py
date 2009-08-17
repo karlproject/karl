@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -26,22 +26,24 @@ from webob import Request
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
 GENERAL_MESSAGE = """
-KARL encountered an application error.  Please click 
+%(system_name)s encountered an application error.  Please click
 the link below to return to the KARL home page.
 """
 NOTFOUND_MESSAGE = """
-KARL was unable to find the content at this URL."""
+%(system_name)s was unable to find the content at this URL."""
 
 class ErrorPageFilter(object):
     """ Simple middleware to provide pretty error pages """
 
-    def __init__(self, app, global_config, 
-                 static_url, home_url, errorlog_url=None):
+    def __init__(self, app, global_config,
+                 static_url, home_url, errorlog_url=None,
+                 system_name='KARL'):
         self.app = app
         self._static_url = static_url
         self._home_url = home_url
         self._errorlog_url = errorlog_url
-        
+        self._system_name = system_name
+
     def __call__(self, environ, start_response):
 
         req = Request(environ)
@@ -57,11 +59,11 @@ class ErrorPageFilter(object):
                 errorlog_url = req.relative_url(
                     self._errorlog_url, to_application=True
                 )
-                
+
             traceback_info = format_exc()
             resp = render_template_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
-                error_message='General KARL Error',
+                error_message='General Error',
                 error_text=GENERAL_MESSAGE,
                 static_url=static_url,
                 errorlog_url=errorlog_url,
@@ -82,6 +84,7 @@ class ErrorPageFilter(object):
                     self._errorlog_url, to_application=True
                 )
             error_text = NOTFOUND_MESSAGE if status == 404 else GENERAL_MESSAGE
+            error_text %= {'system_name': self._system_name}
             resp = render_template_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
                 error_message='Not Found',
