@@ -89,6 +89,7 @@ class TemplateAPI(object):
                 full_static_path = full_static_path % _start_time
             self.static_url = full_static_path
         self.page_title = page_title
+        self.system_name = get_setting(context, 'system_name', 'KARL')
 
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') == 'public'

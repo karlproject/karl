@@ -8,7 +8,7 @@
     <div>
         <p>
         Use the following form to edit your profile information. If
-        you would like to delete your KARL account and remove yourself
+        you would like to delete your ${api.system_name} account and remove yourself
         from all communities, click this <a
         href="${api.here_url}delete.html" id="deleteuserlink">delete
         account</a> link and say <em>yes</em> to the confirmation

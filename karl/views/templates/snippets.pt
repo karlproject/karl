@@ -2,7 +2,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal">
   <head>
-    <title>KARL Macros</title>
+    <title>Macros</title>
   </head>
 
   <body>
@@ -472,12 +472,12 @@
       <form id="tag-form" action="" method="post"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-      ><tal:x tal:content="crumbs|default">KARL / Tags</tal:x> /
+      ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
        <input id="tag-field" class="tag_field" type="text" name="tag"
               size="20" /></form>
      </h2>
 
-     <p>This is the KARL tag cloud - a list of tags where size reflect
+     <p>This is the ${api.system_name} tag cloud - a list of tags where size reflect
      popularity.</p>
 
      <span tal:repeat="e entries"
@@ -498,13 +498,13 @@
       <form id="tag-form" action="" method="post"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-      ><tal:x tal:content="crumbs|default">KARL / Tags</tal:x> /
+      ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
        <input id="tag-field" class="tag_field" type="text" name="tag"
               size="20" />
       </form>
      </h2>
 
-     <p>This page shows all the tags applied across KARL, with a
+     <p>This page shows all the tags applied across ${api.system_name}, with a
        count of each tag.</p>
 
      <table border="0" cellpadding="6" cellspacing="0">
@@ -548,7 +548,7 @@
        <form id="tag-form" action="showtag"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-       ><tal:x tal:content="crumbs|default">KARL / Tags</tal:x> /
+       ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
          <input id="tag-field" class="tag_field" type="text"
                 name="jumptag" value="${tag}" size="20" />
        </form>
