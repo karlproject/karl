@@ -472,7 +472,8 @@
       <form id="tag-form" action="" method="post"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-      ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
+      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
        <input id="tag-field" class="tag_field" type="text" name="tag"
               size="20" /></form>
      </h2>
@@ -498,7 +499,8 @@
       <form id="tag-form" action="" method="post"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-      ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
+      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
        <input id="tag-field" class="tag_field" type="text" name="tag"
               size="20" />
       </form>
@@ -548,7 +550,8 @@
        <form id="tag-form" action="showtag"
             onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                       return true"
-       ><tal:x tal:content="crumbs|default">${api.system_name} / Tags</tal:x> /
+       ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
          <input id="tag-field" class="tag_field" type="text"
                 name="jumptag" value="${tag}" size="20" />
        </form>
