@@ -32,7 +32,7 @@ class AddTagsTests(unittest.TestCase):
     def _callFUT(self, context, request, values):
         from karl.views.tags import add_tags
         return add_tags(context, request, values)
-    
+
     def test_w_no_values(self):
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
@@ -44,7 +44,7 @@ class AddTagsTests(unittest.TestCase):
 
         self.assertEqual(tags.getTags_called_with, None)
         self.assertEqual(tags.updated, None)
-    
+
     def test_w_string(self):
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
@@ -57,7 +57,7 @@ class AddTagsTests(unittest.TestCase):
         self.assertEqual(tags.getTags_called_with,
                          (('docid',), ('userid',), None))
         self.assertEqual(tags.updated, ('docid', 'userid', ['foo']))
-    
+
     def test_no_existing_values(self):
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
@@ -71,7 +71,7 @@ class AddTagsTests(unittest.TestCase):
                          (('docid',), ('userid',), None))
         self.assertEqual(tags.updated,
                          ('docid', 'userid', ['foo', 'bar']))
-    
+
     def test_w_existing_values(self):
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()

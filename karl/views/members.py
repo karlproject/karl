@@ -77,7 +77,7 @@ def _get_manage_actions(community, request):
 
 def _get_common_email_info(community, community_href):
     info = {}
-    info['system_name'] = get_setting(community, 'system_name')
+    info['system_name'] = get_setting(community, 'system_name', 'KARL')
     info['system_email_domain'] = get_setting(community,
                                               'system_email_domain')
     info['from_name'] = '%s invitation' % info['system_name']
@@ -431,7 +431,7 @@ def _send_aeu_emails(community, community_href, profiles, text):
 def add_existing_user_view(context, request):
     """ Add an existing KARL3 user. """
 
-    system_name = get_setting(context, 'system_name')
+    system_name = get_setting(context, 'system_name', 'KARL')
 
     community = find_interface(context, ICommunity)
     actions = _get_manage_actions(community, request)
@@ -564,7 +564,7 @@ def accept_invitation_view(context, request):
            "Context is expected to be an IInvitation."
 
     profiles = find_profiles(context)
-    system_name = get_setting(context, 'system_name')
+    system_name = get_setting(context, 'system_name', 'KARL')
     min_pw_length = get_setting(context, 'min_pw_length')
     community = find_interface(context, ICommunity)
     community_name = community.title
@@ -661,7 +661,7 @@ class InviteNewUsersForm(FormSchema):
 
 def invite_new_user_view(context, request):
     """ Invite a new user to join KARL and thus this community. """
-    system_name = get_setting(context, 'system_name')
+    system_name = get_setting(context, 'system_name', 'KARL')
 
     community = find_interface(context, ICommunity)
     community_href = model_url(community, request)
@@ -755,7 +755,7 @@ def invite_new_user_view(context, request):
         fill_values = {}
         fielderrors = {}
 
-    page_title = 'Invite New KARL Users'
+    page_title = 'Invite New %s Users' % system_name
     api = TemplateAPI(context, request, page_title)
 
     return render_form_to_response(

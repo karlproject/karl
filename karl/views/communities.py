@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -55,8 +55,8 @@ from karl.models.interfaces import ICommunity
 from karl.security.interfaces import ISecurityWorkflow
 
 def show_communities_view(context, request):
-
-    page_title = 'KARL Communities'
+    system_name = get_setting(context, 'system_name', 'KARL')
+    page_title = '%s Communities' % system_name
     actions = []
 
     if has_permission('create', context, request):
@@ -133,7 +133,7 @@ class AddCommunityForm(FormSchema):
 
 def add_community_view(context, request):
 
-    system_name = get_setting(context, 'system_name')
+    system_name = get_setting(context, 'system_name', 'KARL')
     tags_list=request.POST.getall('tags')
     form = AddCommunityForm(tags_list=tags_list)
 
@@ -165,7 +165,7 @@ def add_community_view(context, request):
 
             # required to use moderators_group_name and
             # members_group_name
-            community.__name__ = name 
+            community.__name__ = name
 
             for toolinfo in available_tools:
                 if toolinfo['name'] in request.POST.keys():
@@ -191,7 +191,7 @@ def add_community_view(context, request):
 
             # Adding a community should take you to the Add Existing
             # User screen, so the moderator can include some users.
-            location = model_url(community, request, 
+            location = model_url(community, request,
                                  'members', 'add_existing.html')
             location = location + "?status_message=Community%20added"
 
@@ -236,7 +236,7 @@ def add_community_view(context, request):
     client_json_data = dict(
         tags_field = dict(
             # There is no document right now, so we leave docid empty.
-            # This will cause the count links become non-clickable. 
+            # This will cause the count links become non-clickable.
             records = tagbox_records,
             ),
     )

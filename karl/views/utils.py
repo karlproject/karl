@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -139,13 +139,13 @@ def make_name(context, title, raise_error=True):
 
 def make_unique_name(context, title):
     """Make a correct __name__ that is unique in the context.
-    
+
     Try until an empty name is found (or be debunked by a
     conflict error).
     """
     postfix = ''
     counter = 1
-    while True:    
+    while True:
         try:
             return make_name(context, title + postfix)
         except ValueError:
@@ -158,9 +158,9 @@ def make_unique_name(context, title):
 def basename_of_filepath(title):
     """
     At least on Windows under IE, title holds the full path, e.g.::
-    
+
        /communities/test1/files/c:\Documents and Settings\admin\Desktop\somefile.doc
-    
+
     We need to just get the last part.
 
     usage::
@@ -201,35 +201,35 @@ def _get_user_home_path(context, request):
     userid = authenticated_userid(request)
     if userid is None:
         return None, None
-    
+
     site = find_site(context)
     profiles = find_profiles(site)
     profile =  profiles.get(userid, None)
     if profile is None:
         return None, None
-    
+
     home_path = getattr(profile, 'home_path', None)
     if home_path:
         # OSI sets this to a single space to mean None
         home_path = home_path.strip()
     if not home_path:
         return None, None
-        
+
     tdict = traverse(site, home_path)
     target = tdict['context']
     view_name = tdict['view_name']
     subpath = tdict['subpath']
-    
+
     if view_name:
         subpath.insert(0, view_name)
-    
+
     return target, subpath
 
 def get_user_community_names(context, request):
     userid = authenticated_userid(request)
     if userid is None:
         return []
-    
+
     users = find_users(context)
     user = users.get_by_id(userid)
     community_names = set()
@@ -244,7 +244,7 @@ def get_user_home(context, request):
     home, extra_path = _get_user_home_path(context, request)
     if home is not None:
         return home, extra_path
-    
+
     # If user is member of only one community, home is that community
     communities = find_communities(context)
     community_names = get_user_community_names(context, request)
@@ -252,9 +252,9 @@ def get_user_home(context, request):
         community = communities.get(community_names.pop(), None)
         if community is not None:
             return community, []
-            
+
     return communities, []
-    
+
 def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
     upload = form.get("photo", None)
     if upload is not None:
@@ -358,6 +358,6 @@ class CustomInvalid(Invalid):
 def check_upload_size(context, obj, field_name):
     max_size = int(get_setting(context, 'upload_limit', 0))
     if max_size and obj.size > max_size:
-        msg = 'File size exceeds KARL upload limit of %d.' % max_size
+        msg = 'File size exceeds upload limit of %d.' % max_size
         transaction.get().doom()
         raise CustomInvalid({field_name: msg})
