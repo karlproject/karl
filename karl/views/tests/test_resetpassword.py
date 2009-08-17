@@ -53,7 +53,7 @@ class ResetRequestViewTests(unittest.TestCase):
         self._callFUT(context, request)
         self.assertEqual(renderer.fielderrors,
             {'email':
-             'KARL has no account with the email address: bogus@example.com'}
+             'karl3test has no account with the email address: bogus@example.com'}
              )
 
     def test_karl_staff(self):
@@ -113,9 +113,9 @@ class ResetRequestViewTests(unittest.TestCase):
         msg = mailer.pop()
         self.assertEqual(msg.mto, ['me@example.com'])
         self.assertEqual(msg.mfrom, "admin@example.com")
-        
+
         from base64 import decodestring
-        url = ('http://example.com/reset_confirm.html?key=%s' % 
+        url = ('http://example.com/reset_confirm.html?key=%s' %
              profile.password_reset_key)
         header, body = msg.msg.split("\n\n", 1)
         body = decodestring(body)

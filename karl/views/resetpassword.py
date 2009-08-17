@@ -52,8 +52,9 @@ class ResetRequestForm(FormSchema):
     email = baseforms.email()
 
 def reset_request_view(context, request):
-    
+
     form = ResetRequestForm()
+    system_name = get_setting(context, 'system_name', 'KARL')
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
@@ -65,7 +66,7 @@ def reset_request_view(context, request):
             address = converted['email']
             if address:
                 address = address.lower()
-                
+
             search = getAdapter(context, ICatalogSearch)
             count, docids, resolver = search(
                 interfaces=[IProfile], email=[address])
@@ -83,7 +84,8 @@ def reset_request_view(context, request):
                 break
             else:
                 raise CustomInvalid({"email":
-                    "KARL has no account with the email address: %s" % address})
+                    "%s has no account with the email address: %s" %
+                    (system_name, address)})
 
             groups = user['groups']
             if groups and 'group.KarlStaff' in groups:
@@ -108,15 +110,16 @@ def reset_request_view(context, request):
             # send email
             mail = email.message.Message()
             admin_email = get_setting(context, 'admin_email')
-            mail["From"] = "KARL Administrator <%s>" % admin_email
+            mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
             mail["To"] = "%s <%s>" % (profile.title, profile.email)
-            mail["Subject"] = "KARL Password Reset Request"
+            mail["Subject"] = "%s Password Reset Request" % system_name
             body = render_template(
                 "templates/email_reset_password.pt",
                 login=user['login'],
                 reset_url=reset_url,
+                system_name=system_name,
             )
-            
+
             if isinstance(body, unicode):
                 body = body.encode("UTF-8")
 

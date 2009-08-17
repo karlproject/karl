@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -38,6 +38,7 @@ from karl.utils import find_catalog
 from karl.utils import find_profiles
 from karl.utils import find_tags
 from karl.utils import get_content_type_name
+from karl.utils import get_setting
 
 from karl.views.api import TemplateAPI
 
@@ -51,7 +52,7 @@ def get_tags_client_data(context, request):
         head_data=convert_to_script(dict(
             tags_field = get_tags_client_data(context, request),
             # ... data for more widgets
-            # ... 
+            # ...
             ))
 
     """
@@ -184,19 +185,19 @@ def showtag_view(context, request, template='templates/showtag.pt',
             users = (user,)
         else:
             users = None
-        for docid in tags.getItems(tags=(tag,), users=users, 
-                                   community=community, 
+        for docid in tags.getItems(tags=(tag,), users=users,
+                                   community=community,
                                    ):
             # XXX Need to wire in batching
             address = dm.address_for_docid(int(docid))
             if address is None:
                 raise KeyError(docid)
             resource = find_model(context, address)
-            
+
             # Skip documents which aren't viewable by authenticated user
             if not has_permission('view', resource, request):
                 continue
-            
+
             # Do a secondary query for each result to find the
             # per-user info
             users = tags.getUsers(tags=(tag,), items=(docid,),
@@ -206,7 +207,7 @@ def showtag_view(context, request, template='templates/showtag.pt',
             else:
                 tuh = '%s people' % len(users)
 
-            tuhref = model_url(context, request, 'tagusers.html', 
+            tuhref = model_url(context, request, 'tagusers.html',
                                query={'tag': tag, 'docid': docid})
             entry = {
                 'title': resource.title,
@@ -227,20 +228,22 @@ def showtag_view(context, request, template='templates/showtag.pt',
 
     if crumb_title:
         # XXX Would context.title be a bit nicer for displaying to user?
-        args['crumbs'] = 'KARL / %s / %s' % (crumb_title, context.__name__)
-        
-    return render_template_to_response(template, **args)        
+        system_name = get_setting(context, 'system_name', 'KARL')
+        args['crumbs'] = '%s / %s / %s' % (
+            system_name, crumb_title, context.__name__)
+
+    return render_template_to_response(template, **args)
 
 def community_showtag_view(context, request):
     """Show a page for a particular community tag."""
-    return showtag_view(context, request, 
+    return showtag_view(context, request,
                         template='templates/community_showtag.pt',
                         community=context.__name__,
                         crumb_title='Communities')
 
 def profile_showtag_view(context, request):
     """Show a page for a particular user tag."""
-    return showtag_view(context, request, 
+    return showtag_view(context, request,
                         template='templates/profile_showtag.pt',
                         user=context.__name__,
                         crumb_title='Profiles')
@@ -313,11 +316,12 @@ def community_tag_cloud_view(context, request):
     else:
         entries = ()
 
+    system_name = get_setting(context, 'system_name', 'KARL')
     return render_template_to_response(
         'templates/community_tagcloud.pt',
         api=api,
         entries=entries,
-        crumbs='KARL / Communities / %s' % context.__name__,
+        crumbs='%s / Communities / %s' % (system_name, context.__name__),
         )
 
 
@@ -331,7 +335,7 @@ def tag_listing_view(context, request):
     else:
         entries = [{'name': x[0], 'count': x[1]} for x in tags.getFrequency()]
         entries.sort(key=lambda x: x['name'])
-        
+
     return render_template_to_response(
         'templates/taglisting.pt',
         api=api,
@@ -351,11 +355,12 @@ def community_tag_listing_view(context, request):
                         for x in tags.getFrequency(community=context.__name__)]
         entries.sort(key=lambda x: x['name'])
 
+    system_name = get_setting(context, 'system_name', 'KARL')
     return render_template_to_response(
         'templates/community_taglisting.pt',
         api=api,
         entries=entries,
-        crumbs='KARL / Communities / %s' % context.__name__,
+        crumbs='%s / Communities / %s' % (system_name, context.__name__),
         )
 
 
@@ -373,11 +378,12 @@ def profile_tag_listing_view(context, request):
                                                    user=context.__name__)]
         entries.sort(key=lambda x: x['name'])
 
+    system_name = get_setting(context, 'system_name', 'KARL')
     return render_template_to_response(
         'templates/profile_taglisting.pt',
         api=api,
         entries=entries,
-        crumbs='KARL / Profiles / %s' % context.__name__,
+        crumbs='%s / Profiles / %s' % (system_name, context.__name__),
         )
 
 def tag_users_view(context, request):

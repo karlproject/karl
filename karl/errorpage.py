@@ -27,7 +27,7 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 
 GENERAL_MESSAGE = """
 %(system_name)s encountered an application error.  Please click
-the link below to return to the KARL home page.
+the link below to return to the %(system_name)s home page.
 """
 NOTFOUND_MESSAGE = """
 %(system_name)s was unable to find the content at this URL."""

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -74,7 +74,7 @@ def edit_community_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    system_name = get_setting(context, 'system_name')
+    system_name = get_setting(context, 'system_name', 'KARL')
     security_adapter = getAdapter(context, ISecurityWorkflow)
     available_tools = getMultiAdapter((context, request), IToolAddables)()
 
@@ -118,13 +118,13 @@ def edit_community_view(context, request):
             # invalidation.
             tools = []
             default_tools = [
-                {'title': 'Overview', 'name': '', 
+                {'title': 'Overview', 'name': '',
                  'selected': (not context.default_tool)},
                 ]
             for info in available_tools:
                 s = request.params.has_key(info['name'])
                 tools.append(
-                    {'name': info['name'], 'title': info['title'], 
+                    {'name': info['name'], 'title': info['title'],
                      'state': s}
                     )
                 if info['component'].is_present(context, request):
@@ -158,18 +158,18 @@ def edit_community_view(context, request):
             text=context.text,
             )
         fill_values.update(security_adapter.getStateMap())
-        
+
         # Get the default list of tools into a sequence of dicts
         tools = []
         default_tools = [
-            {'title': 'Overview', 'name': '', 
+            {'title': 'Overview', 'name': '',
              'selected': (not context.default_tool)},
             ]
         for info in available_tools:
             component = info['component']
             present = component.is_present(context, request)
             tools.append(
-                {'name': info['name'], 'title': info['title'], 
+                {'name': info['name'], 'title': info['title'],
                  'state': present}
                 )
             if present:
@@ -225,7 +225,7 @@ def redirect_community_view(context, request):
     if not default_tool:
         default_tool = 'view.html'
     return HTTPFound(location=model_url(context, request, default_tool))
-    
+
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
 
@@ -278,12 +278,12 @@ def join_community_view(context, request):
 
     """
     assert ICommunity.providedBy(context)
-    
+
     # Get logged in user
     profiles = find_profiles(context)
     user = authenticated_userid(request)
     profile = profiles[user]
-    
+
     # Handle form submission
     if "form.submitted" in request.POST:
         message = request.POST.get("message", "")
@@ -306,19 +306,19 @@ def join_community_view(context, request):
             profile_url=profile_url,
             accept_url=accept_url
         )
-        
+
         if isinstance(body, unicode):
             body = body.encode("UTF-8")
-            
+
         mail.set_payload(body, "UTF-8")
         mail.set_type("text/html")
-        
+
         recipients = [p.email for p in moderators]
         mailer = getUtility(IMailDelivery)
         mailer.send(profile.email, recipients, mail.as_string())
-        
+
         status_message = "Your request has been sent to the moderators."
-        location = model_url(context, request, 
+        location = model_url(context, request,
                              query={"status_message": status_message})
 
         return HTTPFound(location=location)
@@ -334,7 +334,7 @@ def join_community_view(context, request):
         post_url=model_url(context, request, "join.html"),
         formfields=api.formfields,
     )
-    
+
 def delete_community_view(context, request):
 
     page_title = 'Delete ' + context.title

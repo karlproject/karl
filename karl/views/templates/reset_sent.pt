@@ -9,7 +9,7 @@
     instructions.</strong></p>
 
     <p>
-    If you know your username and password, please log in to KARL by
+    If you know your username and password, please log in to ${api.system_name} by
     clicking the following link.  If you need additional help, please
     email the <a
     href="mailto:${api.settings.admin_email}">Site Administrator</a>.

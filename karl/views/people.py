@@ -536,8 +536,8 @@ def manage_communities_view(context, request):
     )
 
 def show_profiles_view(context, request):
-
-    page_title = 'KARL Profiles'
+    system_name = get_setting(context, 'system_name', 'KARL')
+    page_title = '%s Profiles' % system_name
     api = TemplateAPI(context, request, page_title)
 
     # Grab the data for the two listings, main communities and portlet
@@ -593,15 +593,18 @@ def change_password_view(context, request):
             users.change_password(userid, converted['password'])
 
             # send email
+            system_name = get_setting(context, 'system_name', 'KARL')
             mail = email.message.Message()
             admin_email = get_setting(context, 'admin_email')
-            mail["From"] = "KARL Administrator <%s>" % admin_email
+            mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
             mail["To"] = "%s <%s>" % (context.title, context.email)
-            mail["Subject"] = "KARL Password Change Notification"
+            mail["Subject"] = "%s Password Change Notification" % system_name
+            system_name = get_setting(context, 'system_name', 'KARL')
             body = render_template(
                 "templates/email_change_password.pt",
                 login=user['login'],
                 password=converted['password'],
+                system_name=system_name,
             )
 
             if isinstance(body, unicode):

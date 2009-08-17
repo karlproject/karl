@@ -4,7 +4,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal">
  <head>
-   <title>KARL3 Forms Macros</title>
+   <title>Forms Macros</title>
  </head>
  <body>
 
@@ -545,7 +545,7 @@
       <input type="checkbox" class="noborder" id="acceptterms"
 	     value="true" name="terms_and_conditions"/>
       <label style="font-weight: normal;" for="acceptterms">
-        I accept the KARL
+        I accept the ${api.system_name}
         <a class="dialogLink" href="#">Terms and Conditions</a>
       </label>
       <div title="Terms and Conditions" class="dialogContent"
@@ -584,7 +584,7 @@
       <input type="checkbox" class="noborder" id="acceptterms"
 	     value="true" name="accept_privacy_policy"/>
       <label style="font-weight: normal;" for="acceptterms">
-        I accept the KARL
+        I accept the ${api.system_name}
         <a class="dialogLink" href="#">Privacy Policy</a>
       </label>
       <div title="Privacy Policy" class="dialogContent"
