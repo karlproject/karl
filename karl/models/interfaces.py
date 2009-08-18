@@ -27,7 +27,6 @@ from repoze.lemonade.interfaces import IContent
 class ICommunityContent(IContent):
     """ Base interface for content which is within a community.
     """
-    sendalert = Attribute(u'Should community members be notified on creation?.')
     creator = Attribute(u'Creating userid')
     modified_by = Attribute(u'ID of user who last modified the object')
     title = Attribute(u'Title of content')
