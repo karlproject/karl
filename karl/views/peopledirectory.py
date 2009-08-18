@@ -359,7 +359,7 @@ def csv_view(context, request):
     response.content_type = 'application/x-csv'
     # suggest a filename based on the report name
     response.headers.add('Content-Disposition',
-        'attachment;filename=%s.csv' % context.__name__)
+        'attachment;filename=%s.csv' % str(context.__name__))
     return response
 
 def print_view(context, request):
