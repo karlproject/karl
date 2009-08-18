@@ -20,8 +20,9 @@ import optparse
 import logging
 from {{package}}.scripting import get_default_config
 from {{package}}.scripting import open_root
+from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
-from zope.component import getUtility
+from zope.component import queryUtility
 
 def main():
     parser = optparse.OptionParser(description=__doc__)
@@ -44,7 +45,7 @@ def main():
         config = get_default_config()
     root, closer = open_root(config)
 
-    getUtility(IAlerts).send_digests(root)
+    queryUtility(IAlerts, default=Alerts()).send_digests(root)
 
 if __name__ == '__main__':
     main()

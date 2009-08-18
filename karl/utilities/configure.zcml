@@ -29,11 +29,6 @@
     provides=".interfaces.IRandomId"
   />
 
-  <utility
-    factory=".alerts.Alerts"
-    provides=".interfaces.IAlerts"
-    />
-    
   <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"

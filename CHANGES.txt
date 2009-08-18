@@ -9,6 +9,9 @@ Unreleased
 
 - LP #399427 Removed send_alert field from ICommunityContent interface.
 
+- LP #399427 Allow use of default for Alerts utility, making registration
+  unnecessary except to shim in a dummy test implementation in unittests.
+
 3.11 (2009-08-17)
 -----------------
 
