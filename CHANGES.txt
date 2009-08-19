@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.12 (2009-08-19)
+-----------------
 
 - LP #413137 Export as CSV was producing a unicode header; WSGI only accepts
   byte strings.
