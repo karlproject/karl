@@ -106,6 +106,7 @@ class EditCommunityViewTests(unittest.TestCase):
                       'text':'thetext',
                       'sharing':False,
                       'default_tool': 'files',
+                      'tags': 'thetesttag',
                       }),
             )
         request.POST = request.params
