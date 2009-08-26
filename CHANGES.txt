@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.13 (2009-08-26)
+-----------------
 
 - Ignore emails with a header that indicates they were auto-generated,
   such as out of office replies.  Like Mailman, Karl now looks for the
