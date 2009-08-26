@@ -4,7 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Ignore emails with a header that indicates they were auto-generated,
+  such as out of office replies.  Like Mailman, Karl now looks for the
+  non-standard Precedence header and the new, standardized
+  Auto-Submitted field.
 
 3.12 (2009-08-19)
 -----------------

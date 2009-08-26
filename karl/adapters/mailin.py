@@ -55,6 +55,21 @@ class MailinDispatcher(object):
                 'in_reply_to': None,
                }
 
+        # Like Mailman, if a message has "Precedence: bulk|junk|list",
+        # discard it.  The Precedence header is non-standard, yet
+        # widely supported.
+        precedence = message.get('Precedence', '').lower()
+        if precedence in ('bulk', 'junk', 'list'):
+            info['reason'] = 'Precedence: %s' % precedence
+            return info
+
+        # rfc3834 is the standard way to discard automated responses, but
+        # it is not yet widely supported.
+        auto_submitted = message.get('Auto-Submitted', '').lower()
+        if auto_submitted.startswith('auto'):
+            info['reason'] = 'Auto-Submitted: %s' % auto_submitted
+            return info
+
         to = self.getAddrList(message, 'To')
         if not to:
             info['reason'] = 'missing To:'

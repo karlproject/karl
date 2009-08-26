@@ -99,6 +99,28 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getAuthor('extant@example.com'), 'extant')
 
+    def test_crackHeaders_precedence(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.to = ('community@example.com',)
+        message.from_ = ('extant@example.com',)
+        message.precedence = 'bulk'
+
+        info = mailin.crackHeaders(message)
+        self.failUnless(info['bounce'])
+        self.assertEqual(info['reason'], 'Precedence: bulk')
+
+    def test_crackHeaders_auto_submitted(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.to = ('community@example.com',)
+        message.from_ = ('extant@example.com',)
+        setattr(message, 'auto-submitted', 'auto-generated')
+
+        info = mailin.crackHeaders(message)
+        self.failUnless(info['bounce'])
+        self.assertEqual(info['reason'], 'Auto-Submitted: auto-generated')
+
     def test_crackHeaders_no_To(self):
         mailin = self._makeOne()
         message = DummyMessage()
@@ -607,6 +629,10 @@ class DummyMessage:
     def __getitem__(self, key):
         key = self._munge(key)
         return getattr(self, key)
+
+    def get(self, key, default=None):
+        key = self._munge(key)
+        return getattr(self, key, default)
 
     def walk(self):
         if isinstance(self.payload, basestring):
