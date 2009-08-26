@@ -35,17 +35,13 @@ class IMailinDispatcher(Interface):
         """
 
     def crackHeaders(message):
-        """ Return a mapping showing whether a message should be bounced.
+        """Return a mapping specifying where the message should be posted.
 
-        o Mapping will contain at minimum this keys:
+        If the message should not be posted, the mapping will contain
+        an 'error' key describing why.
 
-          - 'bounce':  should the message be bounced?
-
-        o If 'bounce' is true, mapping will contain the following keys:
-
-          - 'reason':  if so, why?
-
-        o If 'bounce' is false, mapping will contain the following keys:
+        If there is no error, the mapping will contain at least the
+        following keys:
 
           - 'community':  what community contains the target for the message?
 
@@ -57,6 +53,9 @@ class IMailinDispatcher(Interface):
           - 'author':  login ID of the author.
 
           - 'subject':  the message's subject line.
+
+        Even if 'error' is set, the mapping may contain enough of those
+        keys for a moderator to override and post the message anyway.
         """
 
     def crackPayload(message):

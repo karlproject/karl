@@ -113,12 +113,13 @@ class MailinRunner:
         try:
             message = self.mailstore[message_id]
             info = self.dispatcher.crackHeaders(message)
-            if info['bounce']:
+            if info.get('error'):
                 self.bounceMessage(message, info)
                 self.log('BOUNCED', message_id,
                     '%s %s' % (info['reason'], repr(info)))
                 if self.verbosity > 1:
                     print 'Bounced  : %s\n  %s' % (message_id, info['reason'])
+                return False
             else:
                 text, attachments = self.dispatcher.crackPayload(message)
                 self.processMessage(message, info, text, attachments)
@@ -128,7 +129,7 @@ class MailinRunner:
                 self.log('PROCESSED', message_id, ','.join(extra))
                 if self.verbosity > 1:
                     print 'Processed: %s\n  %s' % (message_id, ','.join(extra))
-            return not info['bounce']
+                return True
         except:
             error_msg = traceback.format_exc()
             self.pending.quarantine(message_id, error_msg)

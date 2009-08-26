@@ -99,276 +99,206 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getAuthor('extant@example.com'), 'extant')
 
-    def test_crackHeaders_precedence(self):
+    def test_getAutomationIndicators_precedence(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('community@example.com',)
-        message.from_ = ('extant@example.com',)
         message.precedence = 'bulk'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'Precedence: bulk')
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'Precedence: bulk')
 
-    def test_crackHeaders_auto_submitted(self):
+    def test_getAutomationIndicators_auto_submitted(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('community@example.com',)
-        message.from_ = ('extant@example.com',)
         setattr(message, 'auto-submitted', 'auto-generated')
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'Auto-Submitted: auto-generated')
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'Auto-Submitted: auto-generated')
 
-    def test_crackHeaders_no_To(self):
+    def test_getMessageTarget_no_To(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'missing To:')
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'no community specified')
 
-    def test_crackHeaders_no_From(self):
+    def test_getMessageAuthorAndSubject_no_From(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('community@example.com',)
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'missing From:')
+        info = mailin.getMessageAuthorAndSubject(message)
+        self.assertEqual(info['error'], 'missing From:')
 
-    def test_crackHeaders_multiple_From(self):
+    def test_getMessageAuthorAndSubject_multiple_From(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('community@example.com',)
         message.from_ = ('member1@example.com',
                          'member2@example.com',
                         )
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'multiple From:')
+        info = mailin.getMessageAuthorAndSubject(message)
+        self.assertEqual(info['error'], 'multiple From:')
 
-    def test_crackHeaders_no_subject(self):
-        mailin = self._makeOne()
+    def test_getMessageAuthorAndSubject_no_subject(self):
+        context = self._makeContext()
+        profile = self._makeContext()
+        profile.__name__ = 'extant'
+        by_email = {'extant@example.com': profile}
+        pf = context['profiles'] = self._makeContext()
+        pf.getProfileByEmail = lambda email: by_email.get(email)
+        mailin = self._makeOne(context)
         message = DummyMessage()
-        message.to = ('community@example.com',)
         message.from_ = ('extant@example.com',)
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'missing Subject:')
+        info = mailin.getMessageAuthorAndSubject(message)
+        self.assertEqual(info['error'], 'missing Subject:')
 
-    def test_crackHeaders_vacation(self):
+    def test_getAutomationIndicators_vacation(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('community@example.com',)
-        message.from_ = ('extant@example.com',)
         message.subject = 'Out of Office AutoReply'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'vacation message')
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'vacation message')
 
-    def test_crackHeaders_bad_author(self):
+    def test_getMessageAuthorAndSubject_bad_author(self):
         context = self._makeContext()
         by_email = {}
         pf = context['profiles'] = self._makeContext()
         pf.getProfileByEmail = lambda email: by_email.get(email)
         mailin = self._makeOne(context)
         message = DummyMessage()
-        message.to = ('community@example.com',)
         message.from_ = ('nonesuch@example.com',)
         message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'author not found')
+        info = mailin.getMessageAuthorAndSubject(message)
+        self.assertEqual(info['error'], 'author not found')
 
-    def test_crackHeaders_reply_invalid_community(self):
+    def test_getMessageTarget_reply_invalid_community(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('nonesuch+tool-12345@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'invalid community: nonesuch')
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid community: nonesuch')
         self.assertEqual(info['community'], 'nonesuch')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_reply_invalid_to_addr(self):
+    def test_getMessageTarget_reply_invalid_to_addr(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('undisclosed-recipients:;',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'no community')
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'no community specified')
         self.assertEqual(info['community'], None)
         self.assertEqual(info['tool'], None)
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_reply_ok(self):
+    def test_getMessageTarget_reply_ok(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('testing+tool-12345@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
-        message.content_type = 'text/plain'
 
-        info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'])
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_reply_ok_community_with_hyphen(self):
+    def test_getMessageTarget_reply_ok_community_with_hyphen(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         cf['with-hyphen'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('with-hyphen+tool-12345@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
-        message.content_type = 'text/plain'
 
-        info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'])
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'with-hyphen')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_tool_invalid_community(self):
+    def test_getMessageTarget_tool_invalid_community(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('nonesuch+tool@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'invalid community: nonesuch')
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid community: nonesuch')
         self.assertEqual(info['community'], 'nonesuch')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_tool_ok(self):
+    def test_getMessageTarget_tool_ok(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('testing+tool@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'])
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('errors'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_tool_ok_community_with_hyphen(self):
+    def test_getMessageTarget_tool_ok_community_with_hyphen(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         cf['with-hyphen'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('with-hyphen+tool@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'], info)
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('errors'), info)
         self.assertEqual(info['community'], 'with-hyphen')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
-    def test_crackHeaders_default_invalid_community(self):
+    def test_getMessageTarget_default_invalid_community(self):
         context = self._makeContext()
-        profile = self._makeContext()
-        profile.__name__ = 'extant'
-        by_email = {'extant@example.com': profile}
-        pf = context['profiles'] = self._makeContext()
-        pf.getProfileByEmail = lambda email: by_email.get(email)
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
         message.to = ('nonesuch@example.com',)
-        message.from_ = ('extant@example.com',)
-        message.subject = 'subject'
 
-        info = mailin.crackHeaders(message)
-        self.failUnless(info['bounce'])
-        self.assertEqual(info['reason'], 'no community')
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'no community specified')
         self.assertEqual(info['community'], None)
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
+
+    def test_crackHeaders_no_To(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        info = mailin.crackHeaders(message)
+        self.assertEqual(info['error'], 'no community specified')
+
+    def test_crackHeaders_no_From(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('testing+tool-12345@example.com',)
+
+        info = mailin.crackHeaders(message)
+        self.assertEqual(info['error'], 'missing From:')
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
 
     def test_crackHeaders_default_ok(self):
         context = self._makeContext()
@@ -387,7 +317,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.subject = 'subject'
 
         info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'])
+        self.failIf(info.get('errors'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
@@ -412,7 +342,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.subject = 'subject'
 
         info = mailin.crackHeaders(message)
-        self.failIf(info['bounce'])
+        self.failIf(info.get('errors'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)

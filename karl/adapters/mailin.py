@@ -47,101 +47,143 @@ class MailinDispatcher(object):
         if profile is not None:
             return profile.__name__
 
-    def crackHeaders(self, message):
-        """ See IMailinDispatcher.
-        """
-        info = {'bounce': True,
-                'tool': self.default_tool,
-                'in_reply_to': None,
-               }
+    def getMessageTarget(self, message):
+        """Return a mapping describing the target of a message.
 
+        The mapping will contain 'community', 'tool', and 'in_reply_to'.
+        It will also contain 'to' for debugging purposes.  It will
+        contain 'error' if the target can not be identified.
+        """
+        info = {
+            'community': None,
+            'tool': self.default_tool,
+            'in_reply_to': None,
+            }
+
+        to = self.getAddrList(message, 'To')
+        info['to'] = to
+        cc = self.getAddrList(message, 'Cc')
+
+        for realname, email in to + cc:
+
+            match = REPLY_REGX.search(email)
+            if match:
+                community = match.group('community')
+                info['community'] = community
+                info['tool'] = match.group('tool')
+                info['in_reply_to'] = match.group('reply')
+                if not self.isCommunity(community):
+                    info['error'] = 'invalid community: %s' % community
+                return info
+
+            match = TOOL_REGX.search(email)
+            if match:
+                community = match.group('community')
+                info['community'] = community
+                info['tool'] = match.group('tool')
+                if not self.isCommunity(community):
+                    info['error'] = 'invalid community: %s' % community
+                return info
+
+            community = self.getCommunityId(email)
+            if community is not None:
+                info['community'] = community
+                return info
+
+        info['error'] = 'no community specified'
+        return info
+
+    def getMessageAuthorAndSubject(self, message):
+        """Return a mapping describing the author and subject of a message.
+
+        If there is no error, the mapping will contain 'author' (a
+        profile ID) and 'subject'.  It will also contain 'from' for
+        debugging purposes.
+
+        If an error occurs, the mapping will contain 'error' and
+        may contain 'from', 'author', and 'subject'.
+        """
+        info = {}
+
+        fromaddrs = self.getAddrList(message, 'From')
+        if len(fromaddrs) == 0:
+            info['error'] = 'missing From:'
+            return info
+
+        if len(fromaddrs) > 1:
+            info['error'] = 'multiple From:'
+            return info
+
+        info['from'] = fromaddrs
+
+        realname, email = fromaddrs[0]
+
+        author = self.getAuthor(email)
+        if not author:
+            info['error'] = 'author not found'
+            return info
+
+        info['author'] = author
+
+        subject = message['Subject']
+        if not subject:
+            info['error'] = 'missing Subject:'
+            return info
+
+        info['subject'] = subject
+
+        return info
+
+    def getAutomationIndicators(self, message):
+        """Look for headers that indicate automated email.
+
+        If the message appears to be automated rather than written
+        by a person, this method returns a mapping containing 'error'.
+        Otherwise an empty mapping is returned.
+        """
+        info = {}
         # Like Mailman, if a message has "Precedence: bulk|junk|list",
         # discard it.  The Precedence header is non-standard, yet
         # widely supported.
         precedence = message.get('Precedence', '').lower()
         if precedence in ('bulk', 'junk', 'list'):
-            info['reason'] = 'Precedence: %s' % precedence
+            info['error'] = 'Precedence: %s' % precedence
             return info
 
         # rfc3834 is the standard way to discard automated responses, but
         # it is not yet widely supported.
         auto_submitted = message.get('Auto-Submitted', '').lower()
         if auto_submitted.startswith('auto'):
-            info['reason'] = 'Auto-Submitted: %s' % auto_submitted
+            info['error'] = 'Auto-Submitted: %s' % auto_submitted
             return info
 
-        to = self.getAddrList(message, 'To')
-        if not to:
-            info['reason'] = 'missing To:'
-            return info
-
-        info['to'] = to
-
-        fromaddrs = self.getAddrList(message, 'From')
-        if len(fromaddrs) == 0:
-            info['reason'] = 'missing From:'
-            return info
-
-        if len(fromaddrs) > 1:
-            info['reason'] = 'multiple From:'
-            return info
-
-        info['from'] = fromaddrs
-
-        subject = message['Subject']
-        if not subject:
-            info['reason'] = 'missing Subject:'
-            return info
-
-        info['subject'] = subject
-
-        subject_lower = subject.lower()
+        subject_lower = message.get('Subject', '').lower()
         if 'autoreply' in subject_lower or 'out of office' in subject_lower:
-            info['reason'] = 'vacation message'
+            info['error'] = 'vacation message'
             return info
 
-        realname, email = fromaddrs[0]
+        return info
 
-        author = self.getAuthor(email)
-        if not author:
-            info['reason'] = 'author not found'
+    def crackHeaders(self, message):
+        """ See IMailinDispatcher.
+        """
+        # First, get all necessary info for addressing a community.
+        # This is important for allowing moderators to see all email
+        # addressed to their community, even if some email can't be
+        # posted for other reasons.
+        info = self.getMessageTarget(message)
+        if info.get('error'):
             return info
 
-        info['author'] = author
+        # Next, add the necessary info for creating an object from the
+        # message.
+        info.update(self.getMessageAuthorAndSubject(message))
+        if info.get('error'):
+            return info
 
-        cc = self.getAddrList(message, 'Cc')
-        for realname, email in to + cc:
+        # Finally, look for issues that a moderator can choose to ignore.
+        info.update(self.getAutomationIndicators(message))
 
-            match = REPLY_REGX.search(email)
-            if match:
-                community = info['community'] = match.group('community')
-                info['tool'] = match.group('tool')
-                info['in_reply_to'] = match.group('reply')
-                if not self.isCommunity(community):
-                    info['reason'] = 'invalid community: %s' % community
-                else:
-                    info['bounce'] = False
-                return info
-
-            match = TOOL_REGX.search(email)
-            if match:
-                community = info['community'] = match.group('community')
-                info['tool'] = match.group('tool')
-                if not self.isCommunity(community):
-                    info['reason'] = 'invalid community: %s' % community
-                # XXX ACL check
-                else:
-                    info['bounce'] = False
-
-                return info
-
-            community = info['community'] = self.getCommunityId(email)
-            if community is not None:  # validity checked in 'getCommunityId'
-                # XXX ACL check
-                info['bounce'] = False
-                return info
-
-        info['reason'] =  'no community'
         return info
 
     def crackPayload(self, message):
