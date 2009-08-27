@@ -116,9 +116,9 @@ class MailinRunner:
             if info.get('error'):
                 self.bounceMessage(message, info)
                 self.log('BOUNCED', message_id,
-                    '%s %s' % (info['reason'], repr(info)))
+                    '%s %s' % (info['error'], repr(info)))
                 if self.verbosity > 1:
-                    print 'Bounced  : %s\n  %s' % (message_id, info['reason'])
+                    print 'Bounced  : %s\n  %s' % (message_id, info['error'])
                 return False
             else:
                 text, attachments = self.dispatcher.crackPayload(message)
