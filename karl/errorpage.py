@@ -64,7 +64,8 @@ class ErrorPageFilter(object):
             resp = render_template_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
                 error_message='General Error',
-                error_text=GENERAL_MESSAGE,
+                error_text=GENERAL_MESSAGE %
+                           {'system_name': self._system_name},
                 static_url=static_url,
                 errorlog_url=errorlog_url,
                 home_url=home_url,

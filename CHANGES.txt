@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fixed error message in error page middleware.
 
 3.13 (2009-08-26)
 -----------------
