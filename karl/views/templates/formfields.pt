@@ -723,6 +723,20 @@
       </div>
     </fieldset>
 
+    <fieldset metal:define-macro="virtual-calendar-field"
+              tal:define="error fielderrors['virtual_calendar']|None"
+              class="${error and 'fieldError' or ''}"
+              id="virtual-calendar-field">
+      <label>Calendar</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <select name="virtual_calendar" size="1">
+        <option value="" selected="selected">Select...</option>
+        <option value="${name}"
+                tal:repeat="name virtual_calendars">${name}</option>
+      </select>
+    </fieldset>
+
     <fieldset metal:define-macro="start_date-field"
 	      tal:define="error fielderrors['startDate']|None"
 	      class="${error and 'fieldError' or ''}"
