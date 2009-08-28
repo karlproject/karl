@@ -30,15 +30,18 @@ class EditCommunityViewTests(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow()
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
+
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
         from zope.interface import Interface
-        from karl.security.interfaces import ISecurityWorkflow
-        testing.registerAdapter(DummySecurityWorkflow, (Interface,),
-                                ISecurityWorkflow)
         from karl.views.interfaces import IToolAddables
         testing.registerAdapter(DummyToolAddables, (Interface, Interface),
                                 IToolAddables)
@@ -64,10 +67,10 @@ class EditCommunityViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/edit_community.pt')
         self._register()
+        workflow = self._registerDummyWorkflow()
         self._callFUT(context, request)
         self.assertEqual(renderer.fielderrors, {})
         self.assertEqual(renderer.fieldvalues['title'], 'thetitle')
-        self.assertEqual(renderer.show_sharing_warning, True)
 
     def test_submitted_invalid(self):
         from webob import MultiDict
@@ -78,6 +81,7 @@ class EditCommunityViewTests(unittest.TestCase):
                                                   'default_tool':'foo'}))
         renderer = testing.registerDummyRenderer(
             'templates/edit_community.pt')
+        self._registerDummyWorkflow()
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.testing import registerListItem
         tool_factory = DummyToolFactory(present=True)
@@ -104,7 +108,7 @@ class EditCommunityViewTests(unittest.TestCase):
                       'title':u'Thetitle yo',
                       'description':'thedescription',
                       'text':'thetext',
-                      'sharing':False,
+                      'security_state':'public',
                       'default_tool': 'files',
                       'tags': 'thetesttag',
                       }),
@@ -116,6 +120,7 @@ class EditCommunityViewTests(unittest.TestCase):
         self._register()
         renderer = testing.registerDummyRenderer(
             'templates/edit_community.pt')
+        workflow = self._registerDummyWorkflow()
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.title, u'Thetitle yo')
@@ -124,7 +129,7 @@ class EditCommunityViewTests(unittest.TestCase):
         self.assertEqual(context.default_tool, 'files')
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
-        self.assertEqual(context.transition_id, 'public')
+        self.assertEqual(workflow.transitioned[0]['to_state'], 'public')
 
     def test_submitted_valid_nosharingchange(self):
         from webob import MultiDict
@@ -144,7 +149,7 @@ class EditCommunityViewTests(unittest.TestCase):
                       'title':u'Thetitle yo',
                       'description':'thedescription',
                       'text':'thetext',
-                      'sharing':True,
+                      'security_state':'private',
                       'default_tool': 'files',
                       }),
             )
@@ -154,6 +159,7 @@ class EditCommunityViewTests(unittest.TestCase):
         self._register()
         renderer = testing.registerDummyRenderer(
             'templates/edit_community.pt')
+        workflow = self._registerDummyWorkflow()
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.title, u'Thetitle yo')
@@ -162,7 +168,7 @@ class EditCommunityViewTests(unittest.TestCase):
         self.assertEqual(context.default_tool, 'files')
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
-        self.assertEqual(context.transition_id, 'private')
+        self.assertEqual(workflow.transitioned[0]['to_state'], 'private')
 
     def test_submitted_changetools(self):
         from webob import MultiDict
@@ -170,6 +176,7 @@ class EditCommunityViewTests(unittest.TestCase):
         from karl.models.interfaces import IToolFactory
         from karl.testing import DummyCatalog
         registerDummySecurityPolicy('userid')
+        workflow = self._registerDummyWorkflow()
         context = testing.DummyModel(title='oldtitle')
         context.catalog = DummyCatalog()
         request = testing.DummyRequest(
@@ -177,7 +184,7 @@ class EditCommunityViewTests(unittest.TestCase):
                       'title':u'Thetitle yo',
                       'description':'thedescription',
                       'text':'thetext',
-                      'sharing':True,
+                      'security_state':'public',
                       'calendar':'calendar',
                       'default_tool': 'overview',
                       }),
@@ -439,19 +446,6 @@ class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
 
-class DummySecurityWorkflow:
-    def __init__(self, context):
-        self.context = context
-
-    def updateState(self, request, **kw):
-        if kw['sharing']:
-            self.context.transition_id = 'private'
-        else:
-            self.context.transition_id = 'public'
-
-    def getStateMap(self):
-        return {}
-
 class DummyGridEntryAdapter(object):
     def __init__(self, context, request):
         self.context = context
@@ -462,3 +456,24 @@ class DummyToolAddables(DummyAdapter):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.listitem import get_listitems
         return get_listitems(IToolFactory)
+
+class DummyWorkflow:
+    state_attr = 'security_state'
+    initial_state = 'initial'
+    def __init__(self, state_info=('public', 'private')):
+        self.transitioned = []
+        self._state_info = state_info
+
+    def state_info(self, context, request):
+        return self._state_info
+    
+    def transition_to_state(self, content, request, to_state, context=None,
+                            guards=(), skip_same=True):
+        self.transitioned.append({'to_state':to_state, 'content':content,
+                                  'request':request, 'guards':guards,
+                                  'context':context, 'skip_same':skip_same})
+
+    def state_of(self, content):
+        return getattr(content, self.state_attr, None)
+
+        

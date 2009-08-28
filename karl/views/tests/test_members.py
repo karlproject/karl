@@ -280,6 +280,8 @@ class AcceptInvitationViewTests(unittest.TestCase):
         from zope.interface import directlyProvides
         from repoze.lemonade.testing import registerContentFactory
         from repoze.sendmail.interfaces import IMailDelivery
+        from repoze.workflow.testing import registerDummyWorkflow
+        workflow = registerDummyWorkflow('security')
 
         registerContentFactory(DummyContent, IProfile)
         mailer = karltesting.DummyMailer()
@@ -331,8 +333,6 @@ class AcceptInvitationViewTests(unittest.TestCase):
         plugin = DummyPlugin()
         plugins = {'auth_tkt':plugin}
         request.environ['repoze.who.plugins'] = plugins
-        from karl.testing import registerSecurityWorkflow
-        registerSecurityWorkflow()
         response = self._callFUT(fred, request)
         self.assertEqual(users.added, ('jim', 'jim', u'password', ['members']))
         self.failUnless('jim' in context['profiles'])
@@ -342,8 +342,8 @@ class AcceptInvitationViewTests(unittest.TestCase):
         self.assertEquals(1, len(mailer))
         self.assertEquals(mailer[0].mto, ["jim@example.com",])
 
-        # Make sure ISecurityWorkflow.setInitialState() called
-        self.failUnless(hasattr(context['profiles']['jim'], 'initial_state'))
+        # Make sure workflow.initialize() called
+        self.assertEqual(workflow.initialized, [context['profiles']['jim']])
 
 class InviteNewUserViewTests(unittest.TestCase):
     def setUp(self):

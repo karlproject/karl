@@ -32,7 +32,7 @@
       </fieldset>
       
       
-      <fieldset metal:use-macro="formfields.macros['sharing-field']"/>
+      <fieldset metal:use-macro="formfields.macros['security-state-field']"/>
       <fieldset metal:use-macro="formfields.macros['tools-field']"/>
       <fieldset metal:use-macro="formfields.macros['form-submit']"/>
     </form>

@@ -1204,12 +1204,13 @@ class AddUserTests(unittest.TestCase):
         self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid(self):
-        testing.registerDummySecurityPolicy('userid')
-        karltesting.registerCatalogSearch()
-        karltesting.registerSecurityWorkflow()
         from karl.models.profile import Profile
         from karl.models.interfaces import IProfile
         from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerCatalogSearch()
+        workflow = registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
 
         params = profile_data.copy()
@@ -1231,8 +1232,11 @@ class AddUserTests(unittest.TestCase):
         self.assert_(user is not None)
         self.assert_(site['ed'] is not None)
         self.assertEqual(user['groups'], ['group.KarlLovers'])
+        self.assertEqual(len(workflow.initialized), 1)
 
     def test_submitted_with_photo(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
         testing.registerDummySecurityPolicy('userid')
         karltesting.registerCatalogSearch()
         karltesting.registerSecurityWorkflow()

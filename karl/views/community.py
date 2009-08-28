@@ -18,7 +18,6 @@
 import email.message
 
 from zope.component.event import objectEventNotify
-from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.interface import implements
@@ -48,7 +47,7 @@ from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ITagQuery
 
-from karl.security.interfaces import ISecurityWorkflow
+from repoze.workflow import get_workflow
 
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -62,32 +61,43 @@ from karl.views.batch import get_catalog_batch_grid
 from karl.views import baseforms
 from karl.views.tags import set_tags
 from karl.views.form import render_form_to_response
+from karl.security.workflow import get_security_states
+from karl.views.baseforms import security_state as security_state_field
 
 class EditCommunityForm(FormSchema):
     title = baseforms.title
     tags = baseforms.tags
     description = baseforms.description
     text = validators.UnicodeString(strip=True)
-    sharing = baseforms.sharing
 
 def edit_community_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
     system_name = get_setting(context, 'system_name', 'KARL')
-    security_adapter = getAdapter(context, ISecurityWorkflow)
+    workflow = get_workflow(ICommunity, 'security', context)
     available_tools = getMultiAdapter((context, request), IToolAddables)()
 
     tags_list = request.POST.getall('tags')
     form = EditCommunityForm(tags_list=tags_list)
+
+    if workflow is None:
+        security_states = []
+    else:
+        security_states = get_security_states(workflow, context, request)
+
+    if security_states:
+        form.add_field('security_state', security_state_field)
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
             # *will be* modified event
             objectEventNotify(ObjectWillBeModifiedEvent(context))
-
-            security_adapter.updateState(request, **converted)
+            if workflow is not None:
+                if 'security_state' in converted:
+                    workflow.transition_to_state(context, request,
+                                                 converted['security_state'])
 
             context.title = converted['title']
             context.description = converted['description']
@@ -152,12 +162,16 @@ def edit_community_view(context, request):
 
     else:
         fielderrors = {}
+        if workflow is None:
+            security_state = ''
+        else:
+            security_state = workflow.state_of(context)
         fill_values = dict(
             title=context.title,
             description=context.description,
             text=context.text,
+            security_state = security_state,
             )
-        fill_values.update(security_adapter.getStateMap())
 
         # Get the default list of tools into a sequence of dicts
         tools = []
@@ -205,8 +219,8 @@ def edit_community_view(context, request):
         default_tools = default_tools,
         api = api,
         system_name = system_name,
-        show_sharing_warning = True,
         head_data = convert_to_script(client_json_data),
+        security_states = security_states,
         )
 
 def get_recent_items_batch(community, request, size=10):

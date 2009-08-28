@@ -159,6 +159,39 @@
       </div>
     </fieldset>
 
+    <fieldset metal:define-macro="security-state-field"
+	      tal:define="error fielderrors['security_state']|None"
+	      class="${error and 'fieldError' or ''}"
+              tal:condition="security_states"
+	      id="state-sharing-field">
+      <label class="required">Is this private?</label>
+      <div class="fieldHelp">Items marked as private can only be seen by
+        members of this community.</div>
+
+      <div tal:condition="error" class="errorMessage">${error}</div>
+
+      <div class="karlselectionradiofield" >
+
+        <span tal:repeat="state security_states" tal:omit-tag="">
+          <input name="security_state"
+                 type="radio"
+                 class="noborder"
+                 tal:condition="state['transitions'] or state['current']"
+                 value="${state['name']}"
+                 checked="${state['current']}">${state['title']}</input>
+          <input name="security_state"
+                 type="radio"
+                 class="noborder"
+                 disabled="true"
+                 tal:condition="not (state['transitions'] or state['current'])"
+                 value="${state['name']}"
+                 checked="${state['current']}">${state['title']}</input>
+        </span>
+
+      </div>
+
+    </fieldset>
+
     <fieldset metal:define-macro="tools-field"
 	      tal:define="error fielderrors['tools']|None"
 	      class="${error and 'fieldError' or ''}"

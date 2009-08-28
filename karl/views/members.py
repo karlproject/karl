@@ -38,6 +38,7 @@ from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
+from repoze.workflow import get_workflow
 from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
@@ -52,7 +53,6 @@ from karl.models.interfaces import IProfile
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IInvitation
 
-from karl.security.interfaces import ISecurityWorkflow
 from karl.utilities.interfaces import IRandomId
 
 from karl.utils import find_profiles
@@ -603,7 +603,9 @@ def accept_invitation_view(context, request):
                 languages=converted['languages']
                 )
             profiles[username] = profile
-            ISecurityWorkflow(profile).setInitialState(request)
+            workflow = get_workflow(IProfile, 'security')
+            if workflow is not None:
+                workflow.initialize(profile)
             handle_photo_upload(profile, converted, thumbnail=True)
 
             del context.__parent__[context.__name__]

@@ -24,6 +24,7 @@ from repoze.bfg.url import model_url
 from repoze.folder.interfaces import IFolder
 
 from karl.security.policy import NO_INHERIT
+from karl.security.workflow import postorder
 from karl.utils import find_catalog
 
 COMMA_WS = re.compile(r'[\s,]+')
@@ -76,11 +77,15 @@ def edit_acl_view(context, request):
     acl = acl + epilog
 
     if acl != original_acl:
+        context.__custom_acl__ = acl # added so we can find customized obs later
         context.__acl__ = acl
         catalog = find_catalog(context)
         if catalog is not None:
-            catalog['allowed'].reindex_doc(context.docid, context)
-            catalog.invalidate()
+            allowed = catalog.get('allowed')
+            if allowed is not None:
+                for node in postorder(context):
+                    allowed.reindex_doc(node.docid, node)
+                catalog.invalidate()
 
     parent = context.__parent__
     parent_acl = []

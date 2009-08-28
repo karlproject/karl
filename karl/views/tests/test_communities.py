@@ -103,6 +103,11 @@ class AddCommunityViewTests(unittest.TestCase):
         from karl.views.interfaces import IToolAddables
         testing.registerAdapter(DummyToolAddables, (Interface, Interface),
                                 IToolAddables)
+    def _registerDummyWorkflow(self):
+        wf = DummyWorkflow()
+        from repoze.workflow.testing import registerDummyWorkflow
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
     def test_cancelled(self):
         context = testing.DummyModel()
@@ -119,6 +124,7 @@ class AddCommunityViewTests(unittest.TestCase):
         request.POST = request.params = MultiDict({})
         renderer = testing.registerDummyRenderer(
             'templates/add_community.pt')
+        workflow = self._registerDummyWorkflow()
         self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
 
@@ -130,10 +136,12 @@ class AddCommunityViewTests(unittest.TestCase):
             'templates/add_community.pt')
         from karl.models.interfaces import IToolFactory
         testing.registerUtility(None, IToolFactory, name='mytoolfactory')
+        workflow = self._registerDummyWorkflow()
         self._callFUT(context, request)
         self.failUnless(renderer.fielderrors)
 
     def test_community_exists(self):
+        workflow = self._registerDummyWorkflow()
         context = testing.DummyModel()
         context['thecommunity'] = testing.DummyModel()
         from webob import MultiDict
@@ -143,21 +151,20 @@ class AddCommunityViewTests(unittest.TestCase):
                       'description':'thedescription',
                       'text':'thetext',
                       'blog': 'Blog',
-                      'sharing':'false',
+                      'security_state':'public',
                       }),
             )
         response = self._callFUT(context, request)
         self.failUnless(response.location.startswith(
             'http://example.com/?status_message=The%20name'))
+        self.assertEqual(workflow.transitioned, [])
         
     def test_submitted_public(self):
-        from zope.interface import Interface
         from zope.interface import directlyProvides
         from karl.models.interfaces import ISite
         from webob import MultiDict
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import IToolFactory
-        from karl.security.interfaces import ISecurityWorkflow
         from repoze.lemonade.interfaces import IContentFactory
         context = testing.DummyModel()
         directlyProvides(context, ISite)
@@ -167,6 +174,7 @@ class AddCommunityViewTests(unittest.TestCase):
             _tagged.append((item, user, tags))
         tags.update = _update
         testing.registerDummySecurityPolicy('userid')
+        workflow = self._registerDummyWorkflow()
         request = testing.DummyRequest(
             params = MultiDict({
                       'form.submitted':1,
@@ -174,7 +182,7 @@ class AddCommunityViewTests(unittest.TestCase):
                       'description':'thedescription',
                       'text':'thetext',
                       'blog': 'Blog',
-                      'sharing': 'false',
+                      'security_state': 'private',
                       'tags': 'foo',
                       }),
             )
@@ -182,8 +190,6 @@ class AddCommunityViewTests(unittest.TestCase):
             'templates/add_community.pt')
         testing.registerAdapter(lambda *arg: DummyCommunity, (ICommunity,),
                                 IContentFactory)
-        testing.registerAdapter(DummySecurityWorkflow, (Interface,),
-                                ISecurityWorkflow)
         dummy_tool_factory = DummyToolFactory()
         testing.registerUtility(dummy_tool_factory, IToolFactory, name='blog')
         context.users = karltesting.DummyUsers({})
@@ -200,27 +206,24 @@ class AddCommunityViewTests(unittest.TestCase):
             [('userid', 'moderators'), ('userid', 'members') ] 
         )
         self.assertEqual(dummy_tool_factory.added, True)
-        self.failIf(community.sharing)
         self.assertEqual(len(_tagged), 1)
         self.assertEqual(_tagged[0][0], None)
         self.assertEqual(_tagged[0][1], 'userid')
         self.assertEqual(_tagged[0][2], ['foo'])
+        self.assertEqual(workflow.transitioned[0]['to_state'], 'private')
 
     def test_submitted_private(self):
-        from zope.interface import Interface
-        from karl.security.interfaces import ISecurityWorkflow
-        testing.registerAdapter(DummySecurityWorkflow, (Interface,),
-                                ISecurityWorkflow)
         context = testing.DummyModel()
         testing.registerDummySecurityPolicy('userid')
         from webob import MultiDict
+        workflow = self._registerDummyWorkflow()
         request = testing.DummyRequest(
             params = MultiDict({'form.submitted':1,
                       'title':u'Thetitle yo',
                       'description':'thedescription',
                       'text':'thetext',
                       'blog': 'Blog',
-                      'sharing':'true',
+                      'security_state':'public',
                       }),
             )
         renderer = testing.registerDummyRenderer(
@@ -246,7 +249,7 @@ class AddCommunityViewTests(unittest.TestCase):
             [('userid', 'moderators'), ('userid', 'members') ] 
         )
         self.assertEqual(dummy_tool_factory.added, True)
-        self.failUnless(community.sharing)
+        self.assertEqual(workflow.transitioned[0]['to_state'], 'public')
 
 class TestGetCommunityGroups(unittest.TestCase):
     def _callFUT(self, principals):
@@ -364,3 +367,24 @@ class DummyToolAddables(DummyAdapter):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.listitem import get_listitems
         return get_listitems(IToolFactory)
+
+class DummyWorkflow:
+    state_attr = 'security_state'
+    initial_state = 'initial'
+    def __init__(self, state_info=('public', 'private')):
+        self.transitioned = []
+        self._state_info = state_info
+
+    def state_info(self, context, request):
+        return self._state_info
+    
+    def transition_to_state(self, content, request, to_state, context=None,
+                            guards=(), skip_same=True):
+        self.transitioned.append({'to_state':to_state, 'content':content,
+                                  'request':request, 'guards':guards,
+                                  'context':context, 'skip_same':skip_same})
+
+    def state_of(self, content):
+        return getattr(content, self.state_attr, None)
+
+        

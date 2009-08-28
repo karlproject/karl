@@ -395,6 +395,41 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(index._reindexed, (1, context))
         self.failUnless(catalog._invalidated)
 
+    def test_submitted_sets___custom_acl__(self):
+        context = testing.DummyModel()
+        context.docid = 1
+        catalog = context.catalog = DummyCatalog()
+        index = catalog['allowed'] = DummyIndex()
+        acl = context.__acl__ = []
+        request = testing.DummyRequest()
+        request.POST['form.add'] = 'X'
+        request.POST['verb'] = 'Allow'
+        request.POST['principal'] = 'wylma'
+        request.POST['permissions'] = 'view'
+        self._callFUT(context, request)
+        expected = [('Allow', 'wylma', ('view',))] 
+        self.assertEqual(context.__custom_acl__, expected)
+        self.assertEqual(context.__acl__, expected)
+
+    def test_submitted_reindexes_children(self):
+        context = testing.DummyModel()
+        context.docid = 1
+        child = context['child'] = testing.DummyModel()
+        child.docid = 2
+        catalog = context.catalog = DummyCatalog()
+        index = catalog['allowed'] = DummyIndex()
+        acl = context.__acl__ = []
+        request = testing.DummyRequest()
+        request.POST['form.add'] = 'X'
+        request.POST['verb'] = 'Allow'
+        request.POST['principal'] = 'wylma'
+        request.POST['permissions'] = 'view'
+
+        self._callFUT(context, request)
+
+        self.assertEqual(index._reindexed, (1, context), (2, child))
+        self.failUnless(catalog._invalidated)
+
 class Test_acl_tree_view(unittest.TestCase):
     def setUp(self):
         cleanUp()

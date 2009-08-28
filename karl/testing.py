@@ -390,9 +390,8 @@ def registerCatalogSearch():
                     ICatalogSearch)
 
 def registerSecurityWorkflow():
-    from karl.security.interfaces import ISecurityWorkflow
-    registerAdapter(DummySecurityWorkflow, (Interface,),
-                    ISecurityWorkflow)
+    from repoze.workflow.testing import registerDummyWorkflow
+    return registerDummyWorkflow('security')
 
 def registerSettings():
     from repoze.bfg.interfaces import ISettings

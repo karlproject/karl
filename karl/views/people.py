@@ -26,6 +26,7 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
+from repoze.workflow import get_workflow
 from repoze.enformed import FormSchema
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
@@ -43,7 +44,6 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
-from karl.security.interfaces import ISecurityWorkflow
 from karl.utils import find_communities
 from karl.utils import find_tags
 from karl.utils import find_users
@@ -679,6 +679,9 @@ def add_user_view(context, request):
     min_pw_length = get_setting(context, 'min_pw_length')
     form = AddUserForm(context=context, min_pw_length=min_pw_length)
     group_fields = get_group_fields(context)
+
+    workflow = get_workflow(IProfile, 'security', context)
+
     for field in group_fields:
         validator = validators.Bool(if_missing=False, default=False)
         form.add_field(field['fieldname'], validator)
@@ -715,9 +718,8 @@ def add_user_view(context, request):
 
             context[userid] = profile
 
-            # Set up workflow
-            security_adapter = ISecurityWorkflow(profile)
-            security_adapter.setInitialState(request, **converted)
+            if workflow is not None:
+                workflow.initialize(profile)
 
             handle_photo_upload(profile, converted, thumbnail=True)
 

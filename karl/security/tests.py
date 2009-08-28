@@ -370,3 +370,248 @@ class TestSecuredStateMachine(unittest.TestCase):
         ob = testing.DummyModel()
         sm.secured_execute(ob, None, 'publish')
         self.assertEqual(ob.state, 'published')
+
+class TestPostorder(unittest.TestCase):
+    def _callFUT(self, node):
+        from karl.security.workflow import postorder
+        return postorder(node)
+
+    def test_None_node(self):
+        result = list(self._callFUT(None))
+        self.assertEqual(result, [None])
+        
+    def test_IFolder_node_no_children(self):
+        from repoze.folder.interfaces import IFolder
+        from zope.interface import directlyProvides
+        model = testing.DummyModel()
+        directlyProvides(model, IFolder)
+        result = list(self._callFUT(model))
+        self.assertEqual(result, [model])
+
+    def test_IFolder_node_nonfolder_children(self):
+        from repoze.folder.interfaces import IFolder
+        from zope.interface import directlyProvides
+        model = testing.DummyModel()
+        one = testing.DummyModel()
+        two = testing.DummyModel()
+        model['one'] = one
+        model['two'] = two
+        directlyProvides(model, IFolder)
+        result = list(self._callFUT(model))
+        self.assertEqual(result, [two, one, model])
+
+    def test_IFolder_node_folder_children(self):
+        from repoze.folder.interfaces import IFolder
+        from zope.interface import directlyProvides
+        L = [] # "deactivated" list
+        model = testing.DummyModel(_p_deactivate=lambda *x: L.append('model'))
+        one = testing.DummyModel(_p_deactivate=lambda *x: L.append('one'))
+        two = testing.DummyModel(_p_deactivate=lambda *x: L.append('two'))
+        self.assertEqual(L, [])
+        directlyProvides(two, IFolder)
+        model['one'] = one
+        model['two'] = two
+        three = testing.DummyModel(_p_deactivate=lambda *x: L.append('three'))
+        four = testing.DummyModel()
+        two['three'] = three
+        two['four'] = four
+        directlyProvides(model, IFolder)
+        result = list(self._callFUT(model))
+        self.assertEqual(result, [four, three, two, one, model])
+        self.assertEqual(L, ['three', 'two', 'one', 'model'])
+
+class TestResetSecurityWorkflow(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+        
+    def _callFUT(self, root):
+        L = []
+        output = L.append
+        from karl.security.workflow import reset_security_workflow
+        reset_security_workflow(root, output)
+        return L
+
+    def test_donothing(self):
+        root = testing.DummyModel()
+        L = self._callFUT(root)
+        self.assertEqual(L, ['updated 0 content objects'])
+        
+    def test_object_is_reset(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from repoze.lemonade.interfaces import IContent
+        workflow = registerDummyWorkflow('security')
+        from zope.interface import directlyProvides
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        registerContentFactory(testing.DummyModel, IFoo)
+        root = testing.DummyModel()
+        directlyProvides(root, (IContent, IFoo))
+        root.state = 'state'
+        L = self._callFUT(root)
+        self.assertEqual(workflow.resetted, [root])
+        self.assertEqual(L, ['updated 1 content objects'])
+        
+    def test_object_with_custom_acl_matches_object_acl(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from repoze.lemonade.interfaces import IContent
+        workflow = registerDummyWorkflow('security')
+        from zope.interface import directlyProvides
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        registerContentFactory(testing.DummyModel, IFoo)
+        root = testing.DummyModel()
+        root.state = 'state'
+        acl = []
+        root.__acl__ = acl
+        root.__custom_acl__ = acl
+        directlyProvides(root, (IContent, IFoo))
+        L = self._callFUT(root)
+        self.assertEqual(workflow.resetted, [])
+        self.assertEqual(L, ['updated 0 content objects'])
+        
+    def test_object_with_custom_acl_different_than_object_acl(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from repoze.lemonade.interfaces import IContent
+        workflow = registerDummyWorkflow('security')
+        from zope.interface import directlyProvides
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        registerContentFactory(testing.DummyModel, IFoo)
+        root = testing.DummyModel()
+        root.state = 'state'
+        root.__acl__ = ['123']
+        root.__custom_acl__ = []
+        directlyProvides(root, (IContent, IFoo))
+        L = self._callFUT(root)
+        self.assertEqual(workflow.resetted, [root])
+        self.assertEqual(L, ['updated 1 content objects'])
+            
+class Test_has_custom_acl(unittest.TestCase):
+    def _callFUT(self, ob):
+        from karl.security.workflow import has_custom_acl
+        return has_custom_acl(ob)
+
+    def test_it_no_custom_acl(self):
+        self.assertEqual(self._callFUT(None), False)
+
+    def test_it_old_custom_acl(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        ob.__acl__ = [123]
+        ob.__custom_acl__ = [456]
+        self.assertEqual(self._callFUT(ob), False)
+        
+    def test_it_current_custom_acl(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        ob.__acl__ = [123]
+        ob.__custom_acl__ = [123]
+        self.assertEqual(self._callFUT(ob), True)
+        
+        
+class Test_get_security_states(unittest.TestCase):
+    def _callFUT(self, workflow, context=None, request=None):
+        from karl.security.workflow import get_security_states
+        return get_security_states(workflow, context, request)
+
+    def test_it_with_custom_acl(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        ob.__acl__ = [123]
+        ob.__custom_acl__ = [123]
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return ['123']
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+        
+    def test_it_without_custom_acl_two_states(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return ['123', '456']
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), ['123',
+                                                                    '456'])
+
+    def test_it_without_custom_acl_single_state(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return ['123']
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+
+class Test_acl_diff(unittest.TestCase):
+    def _callFUT(self, ob, acl):
+        from karl.security.workflow import acl_diff
+        return acl_diff(ob, acl)
+
+    def test_call_no_diff_has_acl(self):
+        ob = DummyContent()
+        ob.__acl__ = {}
+        result = self._callFUT(ob, {})
+        self.assertEqual(result, (None, None))
+
+    def test_call_no_diff_has_no_acl(self):
+        ob = DummyContent()
+        result = self._callFUT(ob, {})
+        self.assertEqual(result, (None, None))
+        
+    def test_call_diff_left(self):
+        ob = DummyContent()
+        ob.__acl__ = [('Allow', 'foo', ('bar',))]
+        result = self._callFUT(ob, {})
+        self.assertEqual(result, ('', 'Allow foo bar'))
+        
+    def test_call_diff_right(self):
+        ob = DummyContent()
+        ob.__acl__ = []
+        result = self._callFUT(ob, [('Allow', 'foo', ('bar',))])
+        self.assertEqual(result, ('Allow foo bar', ''))
+        
+    def test_call_diff_both(self):
+        ob = DummyContent()
+        ob.__acl__ = [('Allow', 'baz', ('buz'))]
+        result = self._callFUT(ob, [('Allow', 'foo', ('bar',))])
+        self.assertEqual(result, ('Allow foo bar', 'Allow baz buz'))
+
+class Test_ace_repr(unittest.TestCase):
+    def _callFUT(self, ace):
+        from karl.security.workflow import ace_repr
+        return ace_repr(ace)
+
+    def test_with_permissions_iter(self):
+        result = self._callFUT(('Allow', 'foo', ('buz',)))
+        self.assertEqual(result, 'Allow foo buz')
+
+    def test_with_permissions_not_iter(self):
+        result = self._callFUT(('Allow', 'foo', 'buz'))
+        self.assertEqual(result, 'Allow foo buz')
+
+    def test_with_permissions_all(self):
+        from karl.security.policy import ALL
+        result = self._callFUT(('Allow', 'foo', ALL))
+        self.assertEqual(result, 'Allow foo ALL')
+
+    def test_multiple_permissions(self):
+        result = self._callFUT(('Allow', 'foo', ('edit', 'delete', 'view')))
+        self.assertEqual(result, 'Allow foo delete, edit, view')
+
+
+class DummyContent:
+    pass
+

@@ -30,7 +30,7 @@
                   class="mceEditor karlrichtextfield"></textarea>
       </fieldset>
       
-      <fieldset metal:use-macro="formfields.macros['sharing-field']"/>
+      <fieldset metal:use-macro="formfields.macros['security-state-field']"/>
       <fieldset metal:use-macro="formfields.macros['tools-field']"/>
       
       <fieldset tal:define="error fielderrors['default_tool']|None"

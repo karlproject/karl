@@ -22,12 +22,14 @@ from webob.exc import HTTPFound
 from formencode import Invalid
 
 from zope.component import getMultiAdapter
-from zope.component import getAdapter
+from zope.component import getSiteManager
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
+
+from repoze.workflow import get_workflow
 
 from repoze.lemonade.content import create_content
 
@@ -42,17 +44,18 @@ from karl.views import baseforms
 from karl.views.utils import convert_to_script
 from karl.views.tags import set_tags
 from karl.views.form import render_form_to_response
+from karl.views.baseforms import security_state as security_state_field
 
 from karl.utils import find_users
 from karl.utils import get_setting
+
+from karl.security.workflow import get_security_states
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
-
-from karl.security.interfaces import ISecurityWorkflow
 
 def show_communities_view(context, request):
     system_name = get_setting(context, 'system_name', 'KARL')
@@ -128,7 +131,6 @@ class AddCommunityForm(FormSchema):
     title = baseforms.title
     description = baseforms.description
     text = validators.UnicodeString(strip=True)
-    sharing = baseforms.sharing
     tags = baseforms.tags
 
 def add_community_view(context, request):
@@ -136,6 +138,17 @@ def add_community_view(context, request):
     system_name = get_setting(context, 'system_name', 'KARL')
     tags_list=request.POST.getall('tags')
     form = AddCommunityForm(tags_list=tags_list)
+    sm = getSiteManager()
+    workflow = get_workflow(ICommunity, 'security', context)
+
+    if workflow is None:
+        security_states = []
+    else:
+        security_states = get_security_states(workflow, None, request)
+
+    if security_states:
+        form.add_field('security_state', security_state_field)
+    
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
@@ -182,9 +195,10 @@ def add_community_view(context, request):
                 users.add_group(userid, group_name)
 
             context[name] = community
-
-            acl_adapter = getAdapter(community, ISecurityWorkflow)
-            acl_adapter.setInitialState(request, **converted)
+            if workflow is not None:
+                if 'security_state' in converted:
+                    workflow.transition_to_state(community, request,
+                                                 converted['security_state'])
 
             # Save the tags on it.
             set_tags(community, request, converted['tags'])
@@ -219,6 +233,11 @@ def add_community_view(context, request):
     else:
         fielderrors = {}
         fill_values = {}
+        if workflow is None:
+            security_state = ''
+        else:
+            security_state = workflow.initial_state
+        fill_values['security_state'] = security_state
 
         # Get the default list of tools into a sequence of dicts
 
@@ -256,6 +275,7 @@ def add_community_view(context, request):
         api=api,
         system_name=system_name,
         head_data=convert_to_script(client_json_data),
+        security_states = security_states,
         )
 
 community_name_regex = re.compile(

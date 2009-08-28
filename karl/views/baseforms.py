@@ -312,6 +312,7 @@ sharing = validators.StringBool(not_empty=True)
 start_date = DateTime()
 end_date = DateTime()
 publication_date = DateTime()
+security_state = validators.UnicodeString(strip=True)
 
 start_end_constraints =  [StartEndFields(
                           start_field='startDate', end_field='endDate')]

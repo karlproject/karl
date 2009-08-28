@@ -18,7 +18,6 @@
 import time
 
 from zope.component import getMultiAdapter
-from repoze.bfg.interfaces import IView
 
 from webob import Response
 from zope.interface import implements
@@ -49,7 +48,7 @@ def format_datetime(d):
 class AtomFeed(object):
     """ Atom/xml view.
     """
-    implements(IView, IAtomFeed)
+    implements(IAtomFeed)
     _entries = None
     _template = "templates/atomfeed.pt"
     _subtitle = u"Recent Items"

@@ -361,3 +361,4 @@ def check_upload_size(context, obj, field_name):
         msg = 'File size exceeds upload limit of %d.' % max_size
         transaction.get().doom()
         raise CustomInvalid({field_name: msg})
+
