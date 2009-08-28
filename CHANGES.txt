@@ -6,6 +6,8 @@ Unreleased
 
 - Fixed error message in error page middleware.
 
+- Merged 'chrism_workflow' branch.
+
 3.13 (2009-08-26)
 -----------------
 
