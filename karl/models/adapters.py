@@ -332,6 +332,11 @@ class CommunityInfo(object):
             result.append({'tag': tag, 'count': count})
         return result
 
+    @property
+    def moderator(self):
+        username = authenticated_userid(self.request)
+        return username in self.context.moderator_names
+
 
 class LetterManager(object): # abstract adapter class, requires iface attr
     implements(ILetterManager)

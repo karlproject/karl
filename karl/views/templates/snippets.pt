@@ -177,7 +177,9 @@
       id="my-communities-portlet">
       <dt>My Communities</dt>
       <dd tal:repeat="my_community my_communities">
-        <a href="${my_community.url}">${my_community.title}</a>
+        <strong tal:omit-tag="not my_community.moderator">
+          <a href="${my_community.url}">${my_community.title}</a>
+        </strong>
       </dd>
     </dl>
 

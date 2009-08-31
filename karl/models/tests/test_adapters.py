@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -74,7 +74,7 @@ class TestDeprecatedCatalogSearch(unittest.TestCase):
         adapter = self._makeOne(context, request)
         num, docids, resolver = adapter()
         self.assertEqual(resolver(123), None)
-        
+
 class TestCatalogSearch(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -263,7 +263,7 @@ class TestLetterManager(unittest.TestCase):
         adapter = self._makeOne(context)
         result = adapter.delta(-1)
         self.assertEqual(result, False)
-        
+
     def test_delta_storage_not_none_noalpha(self):
         context = testing.DummyModel()
         context.title = 'title'
@@ -308,7 +308,7 @@ class TestLetterManager(unittest.TestCase):
         self.assertEqual(letters[0]['css_class'], 'notcurrent')
         self.assertEqual(letters[0]['href'], None)
         self.assertEqual(letters[0]['is_current'], False)
-        
+
     def test_get_info_alpha(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
@@ -442,7 +442,7 @@ class TestCommunityInfo(unittest.TestCase):
     def _makeCommunity(self, **kw):
         community = testing.DummyModel(title='title', description='description')
         return community
-    
+
     def test_class_conforms_to_ICommunityInfo(self):
         from zope.interface.verify import verifyClass
         from karl.models.interfaces import ICommunityInfo
@@ -479,7 +479,7 @@ class TestCommunityInfo(unittest.TestCase):
                          {'url': 'http://example.com/tab',
                           'css_class': '', 'name': 'ONE'}
                          )
-        
+
     def test_tabs_requestcontext_is_not_community(self):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.testing import registerListItem
@@ -506,7 +506,7 @@ class TestCommunityInfo(unittest.TestCase):
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.description, 'description')
-        
+
     def test_title(self):
         context = self._makeCommunity()
         context.title = 'title'
@@ -576,6 +576,24 @@ class TestCommunityInfo(unittest.TestCase):
         self.assertEqual(tags[2], {'tag': 'quxxy', 'count': 4})
         self.assertEqual(tags[3], {'tag': 'foo', 'count': 3})
         self.assertEqual(tags[4], {'tag': 'spam', 'count': 2})
+
+    def test_is_moderator(self):
+        context = self._makeCommunity()
+        context.moderator_names = ['dummy', 'foo']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('dummy')
+        adapter = self._makeOne(context, request)
+
+        self.assertEqual(adapter.moderator, True)
+
+    def test_is_not_moderator(self):
+        context = self._makeCommunity()
+        context.moderator_names = ['foo', 'bar']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('dummy')
+        adapter = self._makeOne(context, request)
+
+        self.assertEqual(adapter.moderator, False)
 
 class DummyTags:
     _called_with = None
@@ -692,7 +710,7 @@ class TestGridEntryInfo(unittest.TestCase):
         profiles['creator'] = creator
         context.creator = 'creator'
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.creator_url, 
+        self.assertEqual(adapter.creator_url,
                          'http://example.com/profiles/creator/')
 
     def test_modified_by_title(self):

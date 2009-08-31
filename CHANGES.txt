@@ -8,6 +8,9 @@ Unreleased
 
 - Merged 'chrism_workflow' branch.
 
+- LP #418695 Bold communities for which logged in user is moderator in "My
+  communities" portlet.
+
 3.13 (2009-08-26)
 -----------------
 
