@@ -21,7 +21,7 @@ from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 class TestClientJsonData(unittest.TestCase):
-    
+
     def test_client_json_data(self):
         from karl.views.utils import convert_to_script
         client_json_data = {}
@@ -69,7 +69,7 @@ class TestMakeName(unittest.TestCase):
         from karl.views.utils import make_name
         context = {}
         self.assertEqual(make_name(context, "foo.bar"), "foo.bar")
-        self.assertEqual(make_name(context, "Harry 'Bigfoot' Henderson"), 
+        self.assertEqual(make_name(context, "Harry 'Bigfoot' Henderson"),
                          "harry-bigfoot-henderson")
         self.assertEqual(make_name(context, "Which one?"), "which-one")
         self.assertEqual(make_name(context, "One/Two/Three"), "one-two-three")
@@ -104,10 +104,10 @@ class TestMakeName(unittest.TestCase):
 class TestGetUserHome(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
-        
+
     def test_not_logged_in(self):
         from karl.views.utils import get_user_home
         testing.registerDummySecurityPolicy()
@@ -117,7 +117,7 @@ class TestGetUserHome(unittest.TestCase):
         target, extra_path = get_user_home(context, request)
         self.failUnless(target is communities)
         self.assertEqual(extra_path, [])
-        
+
     def test_no_communities(self):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
@@ -126,14 +126,14 @@ class TestGetUserHome(unittest.TestCase):
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         profiles = context["profiles"] = testing.DummyModel()
-        profile = profiles["userid"] = DummyProfile()        
+        profile = profiles["userid"] = DummyProfile()
         users = context.users = DummyUsers()
         users.add("userid", "userid", "password", [])
         request = testing.DummyRequest()
         target, extra_path = get_user_home(context, request)
         self.failUnless(target is communities)
         self.assertEqual(extra_path, [])
-        
+
     def test_one_community(self):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
@@ -143,15 +143,15 @@ class TestGetUserHome(unittest.TestCase):
         communities = context["communities"] = testing.DummyModel()
         community = communities["community"] = testing.DummyModel()
         profiles = context["profiles"] = testing.DummyModel()
-        profile = profiles["userid"] = DummyProfile()        
+        profile = profiles["userid"] = DummyProfile()
         users = context.users = DummyUsers()
-        users.add("userid", "userid", "password", 
+        users.add("userid", "userid", "password",
                   ["group.community:community:members",])
         request = testing.DummyRequest()
         target, extra_path = get_user_home(context, request)
         self.failUnless(target is community)
         self.assertEqual(extra_path, [])
-        
+
     def test_many_communities(self):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
@@ -162,14 +162,14 @@ class TestGetUserHome(unittest.TestCase):
         profiles = context["profiles"] = testing.DummyModel()
         profile = profiles["userid"] = DummyProfile()
         users = context.users = DummyUsers()
-        users.add("userid", "userid", "password", 
+        users.add("userid", "userid", "password",
                   ["group.community:community:members",
                    "group.community:community2:members"])
         request = testing.DummyRequest()
         target, extra_path = get_user_home(context, request)
         self.failUnless(target is communities)
         self.assertEqual(extra_path, [])
-        
+
     def test_user_home_path(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -187,20 +187,20 @@ class TestGetUserHome(unittest.TestCase):
         testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
-        
+
         from karl.views.utils import get_user_home
         request = testing.DummyRequest()
-        
+
         # Test from site root
         target, extra_path = get_user_home(site, request)
         self.failUnless(foo is target)
         self.assertEqual([], extra_path)
-        
+
         # Test from arbitrary point in tree
         target, extra_path = get_user_home(c, request)
         self.failUnless(foo is target)
         self.assertEqual([], extra_path)
-        
+
     def test_user_home_path_w_view(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -218,15 +218,15 @@ class TestGetUserHome(unittest.TestCase):
         testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
-        
+
         from karl.views.utils import get_user_home
         request = testing.DummyRequest()
-        
+
         # Test from site root
         target, extra_path = get_user_home(site, request)
         self.failUnless(foo is target)
         self.assertEqual(['view.html'], extra_path)
-        
+
         # Test from arbitrary point in tree
         target, extra_path = get_user_home(c, request)
         self.failUnless(foo is target)
@@ -250,7 +250,7 @@ class TestGetUserHome(unittest.TestCase):
         )
 
         users = context.users = DummyUsers()
-        users.add("userid", "userid", "password", 
+        users.add("userid", "userid", "password",
                   ["group.community:community:members",])
         request = testing.DummyRequest()
         target, extra_path = get_user_home(context, request)
@@ -438,6 +438,31 @@ class TestMakeThumbnail(unittest.TestCase):
         self.assertEqual(img2.size, (75, 100))
         self.assertEqual(t, 'image/png')
 
+class TestConvertEntities(unittest.TestCase):
+    def _callFUT(self, s):
+        from karl.views.utils import convert_entities
+        return convert_entities(s)
+
+    def test_convert_entities(self):
+        expected = "You &#38; are &#160; my sunshine."
+        outcome = self._callFUT("You &amp; are &nbsp; my sunshine.")
+        self.assertEqual(outcome, expected)
+
+    def test_bad_entity(self):
+        expected = "I have &foobar; for breakfast."
+        outcome = self._callFUT(expected)
+        self.assertEqual(outcome, expected)
+
+    def test_numeric_entity(self):
+        expected = "I have &#38; for breakfast."
+        outcome = self._callFUT(expected)
+        self.assertEqual(outcome, expected)
+
+    def test_non_entities(self):
+        expected = "I have &; &&; &#; for breakfast."
+        outcome = self._callFUT(expected)
+        self.assertEqual(outcome, expected)
+
 class DummyCatalog:
     def _search(self, **kw):
         return 1, [1], lambda x: x
@@ -446,7 +471,7 @@ class DummyUpload:
     def __init__(self, file, type):
         self.file = file
         self.type = type
-    
+
 def dummy_traverser_factory(root):
     def traverser(environ):
         parts = environ["PATH_INFO"][1:].split("/")
