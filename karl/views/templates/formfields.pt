@@ -726,6 +726,7 @@
     <fieldset metal:define-macro="virtual-calendar-field"
               tal:define="error fielderrors['virtual_calendar']|None"
               class="${error and 'fieldError' or ''}"
+              tal:attributes="style (not virtual_calendars) and 'display: none;' or None"
               id="virtual-calendar-field">
       <label>Calendar</label>
       <div class="fieldHelp"></div>
