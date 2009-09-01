@@ -14,6 +14,8 @@ Unreleased
 - LP #422571 Added convert_entities function to karl.views.utils.  Updated atom
   entry adapters to convert entities in content.
 
+- LP #422571 HTML in atom feed entries is no longer escaped.
+
 3.13 (2009-08-26)
 -----------------
 
