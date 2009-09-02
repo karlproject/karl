@@ -371,7 +371,10 @@ class DummyToolAddables(DummyAdapter):
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
-    def __init__(self, state_info=('public', 'private')):
+    def __init__(self, state_info=[
+        {'name':'public', 'transitions':['private']},
+        {'name':'private', 'transitions':['public']},
+        ]):
         self.transitioned = []
         self._state_info = state_info
 

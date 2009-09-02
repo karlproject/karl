@@ -531,29 +531,51 @@ class Test_get_security_states(unittest.TestCase):
         ob = Dummy()
         ob.__acl__ = [123]
         ob.__custom_acl__ = [123]
+        states = [{'transitions':[1], 'current':True}]
         class DummyWorkflow:
             def state_info(self, context, request):
-                return ['123']
+                return states
         self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
         
     def test_it_without_custom_acl_two_states(self):
         class Dummy:
             pass
         ob = Dummy()
+        states = [{'transitions':[1], 'current':False},
+                  {'transitions':[2], 'current':False}]
         class DummyWorkflow:
             def state_info(self, context, request):
-                return ['123', '456']
-        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), ['123',
-                                                                    '456'])
+                return states
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), states)
 
-    def test_it_without_custom_acl_single_state(self):
+    def test_it_without_custom_acl_no_transitions(self):
         class Dummy:
             pass
         ob = Dummy()
         class DummyWorkflow:
             def state_info(self, context, request):
-                return ['123']
+                return [{'transitions':[], 'current':False}]
         self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+
+    def test_it_single_state_only(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return [{'current':True}]
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+
+    def test_it_current_state_used_without_transitions(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        states = [{'current':True},
+                  {'current':False, 'transitions':['123']}]
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return states
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), states)
 
 class Test_acl_diff(unittest.TestCase):
     def _callFUT(self, ob, acl):

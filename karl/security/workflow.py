@@ -97,10 +97,19 @@ def get_security_states(workflow, context, request):
     if has_custom_acl(context):
         return []
     states = workflow.state_info(context, request)
-    # if there's only one state, hide the state widget
-    if len(states) == 1:
+    newstates = []
+    for state in states:
+        # if this is the current state, it's automatically a valid state
+        if state.get('current'):
+            newstates.append(state)
+        else:
+            # only states with transitions into themselves from the current
+            # state should be considered
+            if state['transitions']:
+                newstates.append(state)
+    if len(newstates) == 1:
         return []
-    return states
+    return newstates
     
 def ace_repr(ace):
     action = ace[0]
