@@ -4,46 +4,62 @@
 
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
+  <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1>${api.page_title}</h1>
+  <h1>${api.page_title}</h1>
 
-    <p>You can receive email notifications for new items posted to the Blog,
-    Calendar, and Files sections of your communities.  If you quit a community,
-    you will no longer be able to participate in (or possibly even view) 
-    resources related to that community.</p>
+  <p>You can receive email notifications for new items posted to the Blog,
+  Calendar, and Files sections of your communities.  If you quit a community,
+  you will no longer be able to participate in (or possibly even view)
+  resources related to that community.</p>
 
-    <form method="post" action="${post_url}" class="k3_genericForm">
+  <form method="post" action="${post_url}" class="k3_genericForm">
 
-      <table class="content-listing">
-        <thead>
-          <tr>
-            <th>Community</th>
-            <th>Receive Alerts</th>
-            <th>Quit Community</th>
-          </tr>
-        </thead>
-        <tbody>
-	  <tr tal:repeat="c communities">
-	    <td tal:content="c.title">Community Title</td>
-	    <td>
-	      <select name="alerts_pref_${c.name}">
-		<option tal:repeat="o c.alerts_pref"
-		        value="${o.value}" selected="${o.selected}"
-			tal:attributes="selected o.selected">
-		  ${o.label}
-		</option>
-	      </select>
-	    </td>
-	    <td>
-	      <input tal:condition="c.may_leave" type="checkbox"
-		     name="leave_${c.name}" value="True"/>
-	    </td>
-	  </tr>
-        </tbody>
-      </table>
-      <fieldset metal:use-macro="formfields.macros['form-submit']"/>      
-    </form>
+  <table class="content-listing">
+    <thead>
+      <tr>
+        <th>Community</th>
+        <th>Receive Alerts</th>
+        <th>Quit Community</th>
+      </tr>
+    </thead>
+    <tbody>
+  <tr tal:repeat="c communities">
+    <td tal:content="c.title">Community Title</td>
+    <td>
+      <select name="alerts_pref_${c.name}">
+    <option tal:repeat="o c.alerts_pref"
+      value="${o.value}" selected="${o.selected}"
+    tal:attributes="selected o.selected">
+    ${o.label}
+    </option>
+      </select>
+    </td>
+    <td>
+      <input tal:condition="c.may_leave" type="checkbox"
+        name="leave_${c.name}" value="True"/>
+    </td>
+  </tr>
+    </tbody>
+  </table>
+
+  <p>Depending on the speed of your internet connection you may prefer to
+  have attachments in alerts sent as links in your email or you prefer to
+  have the files themselves attached to your email.</p>
+
+  <div>
+    <input type="radio" name="attachments" value="link"
+           checked="${attachments == 'link'}"/>
+    Send links to attachments.
+  </div>
+  <div>
+    <input type="radio" name="attachments" value="attach"
+           checked="${attachments == 'attach'}"/>
+    Attach files to alert email.
+  </div>
+
+  <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+</form>
 
   </div>
 

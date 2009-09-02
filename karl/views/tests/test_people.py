@@ -110,7 +110,7 @@ class EditProfileTests(unittest.TestCase):
         request = testing.DummyRequest(params)
         context = DummyProfile()
         context.title = "Eddie"
-        
+
         response = self._callFUT(context, request)
 
         self.assertTrue(len(context["photo.jpg"].stream.read()) > 0)
@@ -883,6 +883,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         from karl.testing import DummyProfile
         profiles = site["profiles"] = testing.DummyModel()
         self.profile = profiles["a"] = DummyProfile()
+        self.profile.alert_attachments = 'link'
 
     def tearDown(self):
         cleanUp()
@@ -981,6 +982,24 @@ class ManageCommunitiesTests(unittest.TestCase):
         request.params["leave_community2"] = "True"
 
         self.assertRaises(AssertionError, self._callFUT, self.profile, request)
+
+    def test_set_alert_attachments_attach(self):
+        request = testing.DummyRequest()
+        request.params["form.submitted"] = "submit"
+        request.params["attachments"] = "attach"
+
+        self.assertEqual(self.profile.alert_attachments, "link")
+        self._callFUT(self.profile, request)
+        self.assertEqual(self.profile.alert_attachments, "attach")
+
+    def test_set_alert_attachments_link(self):
+        request = testing.DummyRequest()
+        request.params["form.submitted"] = "submit"
+        request.params["attachments"] = "link"
+
+        self.profile.alert_attachments = "attach"
+        self._callFUT(self.profile, request)
+        self.assertEqual(self.profile.alert_attachments, "link")
 
 class ShowProfilesViewTests(unittest.TestCase):
     def setUp(self):

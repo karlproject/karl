@@ -32,7 +32,9 @@ class Profile(Folder):
 
     implements(IProfile)
 
-    def __init__(self, 
+    alert_attachments = 'link'
+
+    def __init__(self,
                  firstname = '',
                  lastname = '',
                  email = '',
@@ -77,7 +79,7 @@ class Profile(Folder):
     @property
     def creator(self):
         return self.__name__
- 
+
     @property
     def title(self):
         return unicode(
@@ -92,28 +94,28 @@ class Profile(Folder):
         return None
 
     def get_alerts_preference(self, community_name):
-        return self._alert_prefs.get(community_name, 
+        return self._alert_prefs.get(community_name,
                                      IProfile.ALERT_IMMEDIATELY)
-    
+
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
             IProfile.ALERT_IMMEDIATELY,
             IProfile.ALERT_DIGEST,
             IProfile.ALERT_NEVER):
             raise ValueError("Invalid preference.")
-        
+
         self._alert_prefs[community_name] = preference
-        
+
 class CaseInsensitiveOOBTree(OOBTree):
     def __getitem__(self, name):
         return super(CaseInsensitiveOOBTree, self).__getitem__(name.lower())
-        
+
     def __setitem__(self, name, value):
-        return super(CaseInsensitiveOOBTree, self).__setitem__(name.lower(), 
+        return super(CaseInsensitiveOOBTree, self).__setitem__(name.lower(),
                                                                value)
     def get(self, name, default=None):
         return super(CaseInsensitiveOOBTree, self).get(name.lower(), default)
-    
+
 class ProfilesFolder(Folder):
 
     implements(IProfiles)

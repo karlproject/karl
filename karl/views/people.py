@@ -493,6 +493,8 @@ def manage_communities_view(context, request):
                 preference = int(request.params.get(key))
                 context.set_alerts_preference(community_name, preference)
 
+        context.alert_attachments = request.params.get('attachments', 'link')
+
         path = model_url(context, request)
         msg = '?status_message=Community+preferences+updated.'
         return HTTPFound(location=path+msg)
@@ -533,6 +535,7 @@ def manage_communities_view(context, request):
         communities=communities,
         post_url=request.url,
         formfields=api.formfields,
+        attachments=context.alert_attachments,
     )
 
 def show_profiles_view(context, request):
