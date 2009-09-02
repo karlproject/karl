@@ -15,7 +15,7 @@
       <uri>${entry.author.uri}</uri>
     </author>
     <content type="html" tal:condition="entry.content"
-             tal:content="structure entry.content">
+             tal:content="entry.content">
         Content
     </content>
   </entry>
