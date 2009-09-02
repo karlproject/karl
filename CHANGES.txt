@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Hide all states in workflow UI that aren't current and have no valid
+  exit transitions.
+
 - Fixed error message in error page middleware.
 
 - Merged 'chrism_workflow' branch.
