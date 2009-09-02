@@ -41,7 +41,7 @@ class CommunityAtomViewTests(unittest.TestCase):
         from karl.views.interfaces import IAtomEntry
         testing.registerAdapter(DummyAtomEntry, (Interface, Interface),
                                 IAtomEntry)
-        
+
     def _callFUT(self, context, request):
         from karl.views.atom import community_atom_view
         self._register()
@@ -57,25 +57,22 @@ class CommunityAtomViewTests(unittest.TestCase):
         foo = testing.DummyModel()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/atom.pt')
-        from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerModels({'/foo':foo})
         context.catalog = catalog
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         self._callFUT(context, request)
-        
+
 class DummyAtomEntry(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        
+
     title = "Entry Title"
     uri = "http://example.com/entry"
     published = datetime.datetime(1975, 07, 07, 07, 55)
     updated = datetime.datetime(2009, 04, 15, 16, 11)
     author = {"name": "Chris", "uri": "http://example.com/profiles/chris/"}
     content = "Some text."
-    
