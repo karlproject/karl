@@ -1,13 +1,13 @@
 <feed xmlns="http://www.w3.org/2005/Atom"
       xmlns:tal="http://xml.zope.org/namespaces/tal">
   <title>${view.title}</title>
-  <link href="${view.link}"></link>
+  <link href="${view.link}" rel="self"></link>
   <subtitle>${view.subtitle}</subtitle>
   <id>${view.id}</id>
   <updated>${view.updated}</updated>
   <entry tal:repeat="entry view.entries">
     <title>${entry.title}</title>
-    <link href="${entry.uri}"></link>
+    <link href="${entry.uri}" rel="self"></link>
     <id>${entry.uri}</id>
     <published>${entry.published}</published>
     <updated>${entry.updated}</updated>

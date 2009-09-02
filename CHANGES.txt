@@ -14,6 +14,10 @@ Unreleased
 - LP #422571 Added convert_entities function to karl.views.utils.  Updated atom
   entry adapters to convert entities in content.
 
+- LP #422572 Made some changes to atom feed based on feed validator
+  recommendations: Added "updated" element to feed.  Added rel="self" attribute
+  to "link" elements.
+
 3.13 (2009-08-26)
 -----------------
 
