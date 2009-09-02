@@ -50,11 +50,13 @@ class CommunityAtomViewTests(unittest.TestCase):
     def test_it(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunity
+        import datetime
         context = testing.DummyModel(title='thetitle')
         directlyProvides(context, ICommunity)
         context.member_names = context.moderator_names = set()
         context.title = "Community"
         foo = testing.DummyModel()
+        foo.modified = datetime.datetime(2009, 9, 2, 10, 28, 0)
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/atom.pt')
         from karl.models.interfaces import ICatalogSearch

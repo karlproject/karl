@@ -99,6 +99,16 @@ class AtomFeed(object):
         return self._entries
 
     @property
+    def updated(self):
+        models = self._entry_models
+        if models:
+            modified = models.pop(0).modified
+            for model in models:
+                modified = max(modified, model.modified)
+            return format_datetime(modified)
+        return format_datetime(self.context.modified)
+
+    @property
     def _entry_models(self):
         """Provides actual content objects that need to be adapted to atom feed
         entries.

@@ -4,6 +4,7 @@
   <link href="${view.link}"></link>
   <subtitle>${view.subtitle}</subtitle>
   <id>${view.id}</id>
+  <updated>${view.updated}</updated>
   <entry tal:repeat="entry view.entries">
     <title>${entry.title}</title>
     <link href="${entry.uri}"></link>
