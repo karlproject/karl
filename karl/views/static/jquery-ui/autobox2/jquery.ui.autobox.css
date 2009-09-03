@@ -27,7 +27,6 @@ ul.autobox-hldr {
   border: 1px solid #999;
   overflow: hidden;
   height: auto !important;
-  height: 1%;
   padding: 4px 5px 0;
   font: 11px "Lucida Grande", "Verdana";
 }
