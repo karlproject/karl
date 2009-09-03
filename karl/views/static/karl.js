@@ -1083,9 +1083,15 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
                 
         }
 
-        if(!this.infiniteScrolling)
-            $('.ui-grid-limits', this.footer).html('Result ' + fetchOptions.start + '-' + (fetchOptions.start + fetchOptions.limit) + ' of ' + state.totalRecords);
-
+        if (! this.infiniteScrolling) {
+            // start numbering from 1
+            var firstItem = fetchOptions.start + 1;
+            // last  should not be more than the total records
+            var lastItem = Math.min(fetchOptions.start + fetchOptions.limit, state.totalRecords);
+            $('.ui-grid-limits', this.footer).html('Result ' + 
+                    (firstItem == lastItem ? firstItem : firstItem + '-' + lastItem) + 
+                    ' of ' + state.totalRecords);
+        }
     }
  
 }));
