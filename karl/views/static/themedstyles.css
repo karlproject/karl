@@ -1197,21 +1197,21 @@ dl.eventsListing dd {
 .batchNavigation a:hover {
   text-decoration: none;
 } 
-table#cal {
+table#calendar {
   border: 1px solid #D9D9D9;
   border-style: solid solid none none;
 }
-table#cal td {
+table#calendar td {
   border: solid #D9D9D9 .5px;
 }
-table#cal td.this-day {
+table#calendar td.this-day {
   background-color:#fff6e4;
 }
-table#cal td.other-month,
-table#cal td.this-month {
+table#calendar td.other-month,
+table#calendar td.this-month {
   background: White;
 }
-table#cal span.middot {
+table#calendar span.middot {
   font-weight: bold;
   font-size: 160%;
   vertical-align: middle;
