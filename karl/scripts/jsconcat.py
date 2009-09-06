@@ -36,7 +36,8 @@ def main(argv=sys.argv):
         raise RuntimeError, 'jsconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
 
-    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.7' , 'ui')
+    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.7' , 'ui')  
+    plugins_dir = os.path.join(static_dir, 'jquery-plugins')
     bgiframe_dir = os.path.join(static_dir, 'jquery-ui', 'bgiframe_2.1.1')
     grid_dir = os.path.join(static_dir, 'jquery-ui', 'grid', 'ui')
     autobox_dir = os.path.join(static_dir, 'jquery-ui', 'autobox2')
@@ -55,7 +56,9 @@ def main(argv=sys.argv):
             filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
             filesindir(ui_dir, 'effects.core.js', 'effects.pulsate.js', 'effects.fold.js',
                                 'ui.datepicker.js', 'ui.dialog.js'),
-            filesindir(karl_dir, 'DD_roundies.js'),
+            filesindir(plugins_dir, 'DD_roundies.js'),
+            filesindir(plugins_dir, 'jquery.scrollTo.js'),
+            filesindir(plugins_dir, 'jquery.tools.js'),
             filesindir(karl_dir, 'karl.js'),
             ):
         f.write(file(fname).read())
