@@ -356,9 +356,8 @@
     </script>
 
     <metal:gridstyle_batching metal:define-macro="gridstyle_batching">
-      <span class="ui-grid-footer-text ui-grid-limits">
-        Page ${batch_info['current_page']} of ${batch_info['last_page']}
-      </span>
+      <span class="ui-grid-footer-text ui-grid-limits"
+            tal:content="pager_status_text" />
       <span class="ui-grid-pagination clearafter" tal:content="structure batch_info.gridbatch_snippet"></span>
     </metal:gridstyle_batching>
 
