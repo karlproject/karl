@@ -26,6 +26,8 @@ Unreleased
   there was no bug report.  (15 users in OSI have alert preferences set to
   digest.)
 
+- LP #422586 Enabled alert digests to send attachments via email.
+
 3.13 (2009-08-26)
 -----------------
 

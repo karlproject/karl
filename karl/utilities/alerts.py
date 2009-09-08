@@ -15,7 +15,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import base64
 from email.message import Message
+from email.mime.multipart import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import logging
 import traceback
 from cStringIO import StringIO
@@ -63,13 +68,23 @@ class Alerts(object):
         alert = getMultiAdapter((context, profile, request), IAlert)
         alert.digest = True
         message = alert.message
-        body = message.get_payload()
+
+        # If message has atachments, body will be list of message parts.
+        # First part contains body text, the rest contain attachments.
+        if message.is_multipart():
+            parts = message.get_payload()
+            body = base64.b64decode(parts[0].get_payload())
+            attachments = parts[1:]
+        else:
+            body = base64.b64decode(message.get_payload())
+            attachments = []
 
         profile._pending_alerts.append(
             {"from": message["From"],
              "to": message["To"],
              "subject": message["Subject"],
-             "body": body})
+             "body": body,
+             "attachments": attachments})
 
     def send_digests(self, context):
         mailer = getUtility(IMailDelivery)
@@ -89,21 +104,33 @@ class Alerts(object):
             # user's email doesn't block all others
             transaction.manager.begin()
             try:
-                msg = Message()
+                attachments = []
+                for alert in profile._pending_alerts:
+                    attachments += alert['attachments']
+
+                msg = MIMEMultipart() if attachments else Message()
                 msg["From"] = from_addr
                 msg["To"] = "%s <%s>" % (profile.title, profile.email)
                 msg["Subject"] = subject
-                body = template(
+
+                body_text = template(
                     system_name=system_name,
                     alerts=profile._pending_alerts,
                 )
 
-                if isinstance(body, unicode):
-                    body = body.encode("UTF-8")
+                if isinstance(body_text, unicode):
+                    body_text = body_text.encode("UTF-8")
 
-                msg.set_payload(body, "UTF-8")
+                if attachments:
+                    body = MIMEText(body_text, 'html', 'utf-8')
+                    msg.attach(body)
+                else:
+                    msg.set_payload(body_text, "UTF-8")
+                    msg.set_type("text/html")
 
-                msg.set_type("text/html")
+                for attachment in attachments:
+                    msg.attach(attachment)
+
                 mailer.send(sent_from, [profile.email,], msg.as_string())
                 del profile._pending_alerts[:]
                 transaction.manager.commit()

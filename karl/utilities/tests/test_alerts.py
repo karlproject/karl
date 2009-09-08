@@ -162,7 +162,7 @@ class DummyEmailAlertAdapter(object):
         message["From"] = "Karl <test@example.org>"
         message["To"] = "Andy Ex <a@x.org>"
         message["Subject"] = "Testing"
-        message.set_payload("Test email")
+        message.set_payload("Test email", "UTF-8")
         self.message = message
 
 class IDummy(Interface):
