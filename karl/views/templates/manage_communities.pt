@@ -43,19 +43,19 @@
     </tbody>
   </table>
 
-  <p>Depending on the speed of your internet connection you may prefer to
-  have attachments in alerts sent as links in your email or you prefer to
-  have the files themselves attached to your email.</p>
+  <p>Would you like to attach files directly to all email alerts? The default
+  setting provides links to attachments in KARL. Please keep in mind that your
+  selection will apply to ALL your KARL communities.</p>
 
   <div>
     <input type="radio" name="attachments" value="link"
            checked="${attachments == 'link'}"/>
-    Send links to attachments.
+    No (Default, recommended)
   </div>
   <div>
     <input type="radio" name="attachments" value="attach"
            checked="${attachments == 'attach'}"/>
-    Attach files to alert email.
+    Yes
   </div>
 
   <fieldset metal:use-macro="formfields.macros['form-submit']"/>
