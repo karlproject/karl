@@ -104,7 +104,7 @@ class Alerts(object):
                 msg.set_payload(body, "UTF-8")
 
                 msg.set_type("text/html")
-                mailer.send(sent_from, profile.email, msg.as_string())
+                mailer.send(sent_from, [profile.email,], msg.as_string())
                 del profile._pending_alerts[:]
                 transaction.manager.commit()
 

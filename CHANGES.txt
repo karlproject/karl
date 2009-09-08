@@ -21,6 +21,11 @@ Unreleased
   recommendations: Added "updated" element to feed.  Added rel="self" attribute
   to "link" elements.
 
+- Fixed bug discovered in alert digests--email recipients were not being
+  properly passed as a list.  Digests could not have worked at all.  Surprised
+  there was no bug report.  (15 users in OSI have alert preferences set to
+  digest.)
+
 3.13 (2009-08-26)
 -----------------
 
