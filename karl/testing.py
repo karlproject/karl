@@ -100,6 +100,7 @@ class DummyProfile(DummyModel):
     extension = 'extension'
     department = 'department1'
     location = 'location'
+    alert_attachments = 'link'
 
     def __init__(self, *args, **kw):
         DummyModel.__init__(self)
