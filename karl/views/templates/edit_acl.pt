@@ -1,4 +1,4 @@
-<div xmlns="http://www.w3.org/1999/xhtml" 
+<div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal">
 
  <h1 class="kscreentitle">Update Model ACL</h1>
@@ -79,6 +79,19 @@
     <input type="submit" name="form.inherit" value="Update inherit" />
   </form>
  </p>
+
+ <tal:block condition="security_states">
+  <h2>Workflow State</h2>
+  <form action="edit_acl.html" method="post">
+   <select name="security_state">
+    <option tal:repeat="state security_states"
+            value="${state}"
+            selected="state == security_state">${state}</option>
+   </select>
+   <input type="submit" name="form.security_state"
+          value="Update workflow state"/>
+  </form>
+ </tal:block>
 
  <h2> Parent ACL </h2>
  <table border="1" cellpadding="2" cellspacing="2">

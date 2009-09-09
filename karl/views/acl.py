@@ -22,12 +22,29 @@ from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 
 from repoze.folder.interfaces import IFolder
+from repoze.lemonade.content import get_content_type
+from repoze.lemonade.content import is_content
+from repoze.workflow import get_workflow
+from repoze.workflow.interfaces import IWorkflow
 
 from karl.security.policy import NO_INHERIT
+from karl.security.workflow import get_security_states
 from karl.security.workflow import postorder
+from karl.security.interfaces import ISecurityWorkflow
+
 from karl.utils import find_catalog
 
 COMMA_WS = re.compile(r'[\s,]+')
+
+def get_context_workflow(context):
+    """
+    If context is content and part of a workflow will return the workflow.
+    Otherwise returns None.
+    """
+    if is_content(context):
+        print "is content"
+        content_type = get_content_type(context)
+        return get_workflow(content_type, 'security', context)
 
 def edit_acl_view(context, request):
 
@@ -87,6 +104,23 @@ def edit_acl_view(context, request):
                     allowed.reindex_doc(node.docid, node)
                 catalog.invalidate()
 
+    workflow = get_context_workflow(context)
+    if workflow is not None:
+        #assert isinstance(workflow, IWorkflow)
+        if hasattr(context, '__custom_acl__'):
+            security_state = 'CUSTOM'
+            security_states = [s['name'] for s in
+                               workflow.state_info(context, request)]
+            security_states.insert(0, 'CUSTOM')
+        else:
+            security_state = workflow.state_of(context)
+            security_states = [s['name'] for s in
+                               get_security_states(workflow, context, request)]
+
+    else:
+        security_state = None
+        security_states = None
+
     parent = context.__parent__
     parent_acl = []
     while parent is not None:
@@ -110,10 +144,13 @@ def edit_acl_view(context, request):
             break
         local_acl.append(l_ace)
 
+
     return render_template_to_response('templates/edit_acl.pt',
                                        parent_acl=parent_acl or (),
                                        local_acl=local_acl,
                                        inheriting=inheriting,
+                                       security_state=security_state,
+                                       security_states=security_states,
                                       )
 
 def make_acls(node, request, acls=None, offset=0):
@@ -146,6 +183,6 @@ def acl_tree_view(context, request):
         acls = acls)
 
 
-    
 
-    
+
+

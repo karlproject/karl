@@ -407,7 +407,7 @@ class Test_edit_acl_view(unittest.TestCase):
         request.POST['principal'] = 'wylma'
         request.POST['permissions'] = 'view'
         self._callFUT(context, request)
-        expected = [('Allow', 'wylma', ('view',))] 
+        expected = [('Allow', 'wylma', ('view',))]
         self.assertEqual(context.__custom_acl__, expected)
         self.assertEqual(context.__acl__, expected)
 
@@ -429,6 +429,67 @@ class Test_edit_acl_view(unittest.TestCase):
 
         self.assertEqual(index._reindexed, (1, context), (2, child))
         self.failUnless(catalog._invalidated)
+
+    def test_show_no_workflow(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        self._callFUT(context, request)
+        self.assertEqual(renderer.security_state, None)
+        self.assertEqual(renderer.security_states, None)
+
+    def test_show_workflow(self):
+        from repoze.workflow.testing import DummyWorkflow
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        workflow = DummyWorkflow()
+        def state_info(context, request):
+            return [{'name': 'foo', 'current': True, 'transitions': True},
+                    {'name': 'bar', 'current': False, 'transitions': True}]
+        workflow.state_info = state_info
+        def get_dummy_workflow(*args, **kw):
+            return workflow
+        import karl.views.acl
+        old_f = karl.views.acl.get_context_workflow
+        karl.views.acl.get_context_workflow = get_dummy_workflow
+        try:
+            context = testing.DummyModel()
+            context.state = 'foo'
+            directlyProvides(Interface)
+            request = testing.DummyRequest()
+            renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+            self._callFUT(context, request)
+            self.assertEqual(renderer.security_state, 'foo')
+            self.assertEqual(renderer.security_states, ['foo', 'bar'])
+        finally:
+            karl.views.acl.get_context_workflow = old_f
+
+    def test_show_workflow_custom_acl(self):
+        from repoze.workflow.testing import DummyWorkflow
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        workflow = DummyWorkflow()
+        def state_info(context, request):
+            return [{'name': 'foo', 'current': True, 'transitions': True},
+                    {'name': 'bar', 'current': False, 'transitions': True}]
+        workflow.state_info = state_info
+        def get_dummy_workflow(*args, **kw):
+            return workflow
+        import karl.views.acl
+        old_f = karl.views.acl.get_context_workflow
+        karl.views.acl.get_context_workflow = get_dummy_workflow
+        try:
+            context = testing.DummyModel()
+            context.state = 'foo'
+            context.__custom_acl__ = []
+            directlyProvides(Interface)
+            request = testing.DummyRequest()
+            renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+            self._callFUT(context, request)
+            self.assertEqual(renderer.security_state, 'CUSTOM')
+            self.assertEqual(renderer.security_states, ['CUSTOM', 'foo', 'bar'])
+        finally:
+            karl.views.acl.get_context_workflow = old_f
 
 class Test_acl_tree_view(unittest.TestCase):
     def setUp(self):
