@@ -86,7 +86,7 @@
    <select name="security_state">
     <option tal:repeat="state security_states"
             value="${state}"
-            selected="state == security_state">${state}</option>
+            selected="${state == security_state}">${state}</option>
    </select>
    <input type="submit" name="form.security_state"
           value="Update workflow state"/>

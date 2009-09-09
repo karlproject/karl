@@ -491,6 +491,61 @@ class Test_edit_acl_view(unittest.TestCase):
         finally:
             karl.views.acl.get_context_workflow = old_f
 
+    def test_workflow_transition(self):
+        from repoze.workflow.testing import DummyWorkflow
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        workflow = DummyWorkflow()
+        def state_info(context, request):
+            return [{'name': 'foo', 'current': True, 'transitions': True},
+                    {'name': 'bar', 'current': False, 'transitions': True}]
+        workflow.state_info = state_info
+        def get_dummy_workflow(*args, **kw):
+            return workflow
+        import karl.views.acl
+        old_f = karl.views.acl.get_context_workflow
+        karl.views.acl.get_context_workflow = get_dummy_workflow
+        try:
+            context = testing.DummyModel()
+            context.state = 'foo'
+            directlyProvides(Interface)
+            request = testing.DummyRequest()
+            request.POST['form.security_state'] = 1
+            request.POST['security_state'] = 'bar'
+            self._callFUT(context, request)
+            self.assertEqual(workflow.transitioned[0]['to_state'], 'bar')
+        finally:
+            karl.views.acl.get_context_workflow = old_f
+
+    def test_workflow_transition_from_custom(self):
+        from repoze.workflow.testing import DummyWorkflow
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        workflow = DummyWorkflow()
+        def state_info(context, request):
+            return [{'name': 'foo', 'current': True, 'transitions': True},
+                    {'name': 'bar', 'current': False, 'transitions': True}]
+        workflow.state_info = state_info
+        def get_dummy_workflow(*args, **kw):
+            return workflow
+        import karl.views.acl
+        old_f = karl.views.acl.get_context_workflow
+        karl.views.acl.get_context_workflow = get_dummy_workflow
+        try:
+            context = testing.DummyModel()
+            context.state = 'foo'
+            context.__custom_acl__ = []
+            directlyProvides(Interface)
+            request = testing.DummyRequest()
+            request.POST['form.security_state'] = 1
+            request.POST['security_state'] = 'bar'
+            self._callFUT(context, request)
+            self.assertEqual(workflow.transitioned[0]['to_state'], 'bar')
+            self.assertEqual(workflow.resetted, [context,])
+            self.failIf(hasattr(context, '__custom_acl__'))
+        finally:
+            karl.views.acl.get_context_workflow = old_f
+
 class Test_acl_tree_view(unittest.TestCase):
     def setUp(self):
         cleanUp()

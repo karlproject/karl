@@ -25,7 +25,6 @@ from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type
 from repoze.lemonade.content import is_content
 from repoze.workflow import get_workflow
-from repoze.workflow.interfaces import IWorkflow
 
 from karl.security.policy import NO_INHERIT
 from karl.security.workflow import get_security_states
@@ -42,7 +41,6 @@ def get_context_workflow(context):
     Otherwise returns None.
     """
     if is_content(context):
-        print "is content"
         content_type = get_content_type(context)
         return get_workflow(content_type, 'security', context)
 
@@ -91,6 +89,15 @@ def edit_acl_view(context, request):
         else:
             epilog = []
 
+    elif 'form.security_state' in request.POST:
+        new_state = request.POST['security_state']
+        if new_state != 'CUSTOM':
+            workflow = get_context_workflow(context)
+            if hasattr(context, '__custom_acl__'):
+                workflow.reset(context)
+                del context.__custom_acl__
+            workflow.transition_to_state(context, request, new_state)
+
     acl = acl + epilog
 
     if acl != original_acl:
@@ -106,7 +113,6 @@ def edit_acl_view(context, request):
 
     workflow = get_context_workflow(context)
     if workflow is not None:
-        #assert isinstance(workflow, IWorkflow)
         if hasattr(context, '__custom_acl__'):
             security_state = 'CUSTOM'
             security_states = [s['name'] for s in

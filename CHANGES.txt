@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Updated edit_acl view to allow workflow transitions, including re-inserting
+  an object with a previously customized acl back into a proper workflow state.
 
 3.14 (2009-09-08)
 -----------------
