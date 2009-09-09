@@ -274,6 +274,14 @@ def admin_edit_profile_view(context, request):
 
     page_title = 'Edit ' + context.title
     api = TemplateAPI(context, request, page_title)
+    editing_self = authenticated_userid(request) == context.__name__
+    is_staff = users.member_of_group(context.__name__, 'group.KarlStaff')
+    staff_change_password_url = '%s?username=%s&email=%s&came_from=%s' % (
+        get_setting(context, "staff_change_password_url"),
+        urllib.quote_plus(context.__name__),
+        urllib.quote_plus(context.email),
+        urllib.quote_plus(api.here_url)
+        )
 
     # Display portrait
     photo = context.get_photo()
@@ -295,6 +303,9 @@ def admin_edit_profile_view(context, request):
         api=api,
         photo=display_photo,
         group_fields=group_fields,
+        editing_self=editing_self,
+        is_staff=is_staff,
+        staff_change_password_url=staff_change_password_url,
         )
 
 class AdminEditProfileForm(EditProfileForm):

@@ -267,6 +267,9 @@ class DummyUsers:
         self._by_login[new_login] = user
         user['login'] = new_login
 
+    def member_of_group(self, userid, group):
+        return False
+
 class DummyUpload(object):
     """Simulates an HTTP upload.  Suitable for assigning as the value to
     to a dummy request form parameter.

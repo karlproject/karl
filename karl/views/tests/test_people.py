@@ -514,7 +514,7 @@ class AdminEditProfileTests(unittest.TestCase):
             'password_confirm': '',
             })
         request = testing.DummyRequest(params)
-        context = DummyProfile()
+        context = DummyProfile(email='profile@example.org')
         context.title = "Eddie"
         site = testing.DummyModel()
         site['ed'] = context
