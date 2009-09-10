@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #356541 Added better icons for file/folder listings including Folder, 
+  Reference Manual, Page, Calendar Event, and News items. 
+
 - Updated edit_acl view to allow workflow transitions, including re-inserting
   an object with a previously customized acl back into a proper workflow state.
 
