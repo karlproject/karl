@@ -76,8 +76,8 @@ def mime_info(mime_type):
             title = 'Generic File'
 
         info = {
-            'small_icon_name': 'mime.png',
-            'large_icon_name': 'mime.png',
+            'small_icon_name': 'files_file_small.png',
+            'large_icon_name': 'files_file_big.png',
             'title':title
         }
 
