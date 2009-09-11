@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #418701 Add better styling of form buttons
 
 - LP #356541 Added better icons for file/folder listings including Folder, 
   Reference Manual, Page, Calendar Event, and News items. 
