@@ -1691,8 +1691,13 @@ $.extend($.ui.karldropdown, {
 
 // preload active/hover state images
 function initButtons() {
-  $('.button').addClass('active').removeClass('active');
-  $('.button').addClass('hover').removeClass('hover');
+  var active  = new Image(), hover  = new Image(),
+      pActive = new Image(), pHover = new Image();
+
+  active.src  = '/static/images/button_active.png';
+  hover.src   = '/static/images/button_hover.png';
+  pActive.src = '/static/images/button_primary_active.png';
+  pHover.src  = '/static/images/button_primary_hover.png';
 }
 
 /* auto create anon ids (used by calendar) */

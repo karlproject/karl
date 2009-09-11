@@ -2554,15 +2554,13 @@ button.primary_button {
   padding-bottom: 5px;
   background: url("images/button_primary_normal.png") left no-repeat;
 }
-.primary_button:hover, 
-.primary_button.hover {
+.primary_button:hover {
   background: url("images/button_primary_hover.png") right no-repeat; 
 }
 .primary_button:hover span {
   background: url("images/button_primary_hover.png") left no-repeat; 
 }
-.primary_button:active, 
-.primary_button.active {
+.primary_button:active {
   background: url("images/button_primary_active.png") right no-repeat; 
   -ms-background-position-y: 1px; /* ie8 hack */  
 }
@@ -2583,15 +2581,13 @@ button.primary_button {
   padding-bottom: 5px;
   background: url("images/button_normal.png") left no-repeat;
 }
-.normal_button:hover, 
-.normal_button.hover {
+.normal_button:hover {
   background: url("images/button_hover.png") right no-repeat; 
 }
 .normal_button:hover span {
   background: url("images/button_hover.png") left no-repeat; 
 }
-.normal_button:active, 
-.normal_button.active {
+.normal_button:active {
   background: url("images/button_active.png") right no-repeat; 
   -ms-background-position-y: 1px; /* ie8 hack */  
 }
