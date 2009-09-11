@@ -110,18 +110,7 @@ label {
   padding: 1em;
   width: 49em;
 }
-.k3_genericForm .submit, 
-.k3_genericForm .button {
-  font-size: 1em;
-  padding: 0.2em 0.6em;       
-  border: 1px solid #CECECE;
-  background: #F0F2F4;
-  color: #333 !important; 
-}
-.k3_genericForm .submit  {
-  background: #639332;
-  color: White !important;
-}
+
 
 /** =SHARED
 ----------------------------------------------- */
@@ -2510,4 +2499,102 @@ body .cal_hour_event .cal_event_block .time {
 .tooltip .cal_tool_loc {
   font-style: italic;
   color: #666;
+}
+
+
+/** =BUTTONS
+----------------------------------------------- */
+.buttons .button {
+  margin-right: 7px;
+}
+.button { 
+  float: left;
+  margin: 0;
+  border: 0; 
+  padding: 0 14px 0 0; 
+  font-family: Arial, Verdana, sans-serif;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  outline: none;
+}
+.button span { 
+  position: relative; 
+  display: block; 
+  white-space: nowrap; 
+  padding: 0 0 0 14px; 
+}
+button:focus::-moz-focus-inner { 
+  border-color: transparent !important; 
+} 
+button::-moz-focus-inner { 
+  border: none;
+  padding: 0;
+}
+button.icon_button span {
+  padding-left: 8px !important;
+}
+
+/* primary button */
+button.primary_button {
+  font-weight: bold;
+  color: #fff;
+}
+.primary_button,
+.disabled.primary_button:hover { 
+  background: url("images/button_primary_normal.png") right no-repeat; 
+}
+.primary_button span,
+.disabled.primary_button:hover span { 
+  height: 15px; 
+  line-height: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: url("images/button_primary_normal.png") left no-repeat;
+}
+.primary_button:hover, 
+.primary_button.hover {
+  background: url("images/button_primary_hover.png") right no-repeat; 
+}
+.primary_button:hover span {
+  background: url("images/button_primary_hover.png") left no-repeat; 
+}
+.primary_button:active, 
+.primary_button.active {
+  background: url("images/button_primary_active.png") right no-repeat; 
+  -ms-background-position-y: 1px; /* ie8 hack */  
+}
+.primary_button:active span {
+  background: url("images/button_primary_active.png") left no-repeat; 
+}
+
+/* normal button */
+.normal_button,
+.disabled.normal_button:hover { 
+  background: url("images/button_normal.png") right no-repeat; 
+}
+.normal_button span,
+.disabled.normal_button:hover span { 
+  height: 15px; 
+  line-height: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: url("images/button_normal.png") left no-repeat;
+}
+.normal_button:hover, 
+.normal_button.hover {
+  background: url("images/button_hover.png") right no-repeat; 
+}
+.normal_button:hover span {
+  background: url("images/button_hover.png") left no-repeat; 
+}
+.normal_button:active, 
+.normal_button.active {
+  background: url("images/button_active.png") right no-repeat; 
+  -ms-background-position-y: 1px; /* ie8 hack */  
+}
+.normal_button:active span {
+  background: url("images/button_active.png") left no-repeat; 
 }

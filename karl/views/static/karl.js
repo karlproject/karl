@@ -1689,6 +1689,12 @@ $.extend($.ui.karldropdown, {
     }
 });
 
+// preload active/hover state images
+function initButtons() {
+  $('.button').addClass('active').removeClass('active');
+  $('.button').addClass('hover').removeClass('hover');
+}
+
 /* auto create anon ids (used by calendar) */
 jQuery.fn.identify = function() {
     var i = 0;
@@ -1862,6 +1868,9 @@ $(document).ready(function() {
     
     // Enable old style dropdowns
     enableOldStyleDropdowns();
+    
+    // initialize button images
+    if ($('.button')) { initButtons(); }
 
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');

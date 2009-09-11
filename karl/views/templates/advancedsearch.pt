@@ -72,8 +72,9 @@
 
 
       <fieldset>
-	<input type="submit" name="form.submitted" value="submit" 
-	       class="submit"/>
+        <div class="buttons clearafter">
+          <button name="form.submitted" type="submit" class="button primary_button"><span>submit</span></button>
+        </div>
       </fieldset>
 
     </form>

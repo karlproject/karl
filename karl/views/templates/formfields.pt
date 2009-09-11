@@ -849,11 +849,11 @@
 
     <fieldset metal:define-macro="form-submit"
 	      id="submitcancel-field">
-      <input type="submit" name="form.submitted" value="submit"
-	     class="submit"/>
-      <input type="submit" name="form.cancel" value="cancel"
-	     class="button"
-	     style="margin-left:5px"/>
+
+    <div class="buttons clearafter">
+      <button name="form.submitted" type="submit" class="button primary_button"><span>submit</span></button>
+      <button name="form.cancel" type="submit" class="button normal_button"><span>cancel</span></button>
+    </div>
       <style type="text/css">
 	.required {
 	  background-image: url(${api.static_url}/images/required.gif);

@@ -100,3 +100,19 @@ span.sortingArrows {
     margin-top: -1px !important;
 }
 
+/** =BUTTONS
+----------------------------------------------- */
+* html button.button { 
+  position: relative;
+  top: -2px;
+  width: auto; 
+  overflow: visible; 
+}
+* html button.button span { 
+  position: relative;
+  top: 1px;
+  margin-top: 1px; 
+}
+* html button.button img {
+  margin-top: 1px;
+}

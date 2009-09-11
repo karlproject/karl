@@ -83,9 +83,10 @@
         <input type="hidden" name="came_from" id="came_from"
                value="${came_from}"/>
         <input type="hidden" name="form.submitted" value="1" />
-        <input type="image" src="${api.static_url}/images/btn-signin.gif"
-               name="image" class="button" />
 
+        <div class="buttons clearafter">
+          <button name="image" type="submit" class="button primary_button"><span>Sign In</span></button>
+        </div>
       </div>
     </form>
 
