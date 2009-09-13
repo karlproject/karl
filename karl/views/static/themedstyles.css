@@ -2480,7 +2480,7 @@ body .cal_hour_event .cal_event_block .time {
 ----------------------------------------------- */
 .tooltip { 
   display: none; 
-  background: url("/images/cal_tooltip_white.png") no-repeat; 
+  background: url("images/cal_tooltip_white.png") no-repeat; 
   font-size: 110%; 
   height: 61px; 
   width: 140px; 
