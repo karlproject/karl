@@ -37,14 +37,14 @@ class TestMimeInfo(unittest.TestCase):
 
     def test_obtained_from_mimetype_name(self):
         result = self._callFUT('non/existent')
-        self.assertEqual(result['small_icon_name'], 'mime.png')
-        self.assertEqual(result['large_icon_name'], 'mime.png')
+        self.assertEqual(result['small_icon_name'], 'files_file_small.png')
+        self.assertEqual(result['large_icon_name'], 'files_file_big.png')
         self.assertEqual(result['title'], 'Existent')
         
     def test_bad_mimetype_name(self):
         result = self._callFUT('nonexistent')
-        self.assertEqual(result['small_icon_name'], 'mime.png')
-        self.assertEqual(result['large_icon_name'], 'mime.png')
+        self.assertEqual(result['small_icon_name'], 'files_file_small.png')
+        self.assertEqual(result['large_icon_name'], 'files_file_big.png')
         self.assertEqual(result['title'], 'Generic File')
         
     def test_images_exist(self):
