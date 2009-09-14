@@ -61,7 +61,7 @@
         <div class="visualClear"></div>
       </div>
       <div id="main">
-        <div id="center">
+        <div id="center" class="clearafter">
           <div metal:define-slot="content"> Content goes here. </div>
         </div>
       </div>

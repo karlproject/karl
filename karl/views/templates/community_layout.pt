@@ -61,7 +61,7 @@
         <div class="visualClear"></div>
       </div>
       <div id="main">
-        <div id="center" class="community_view">
+        <div id="center" class="clearafter community_view">
           <div class="cheader">
             <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
               <fieldset>
