@@ -12,6 +12,6 @@ class XMLContentSourceTests(unittest.TestCase):
     def test_import(self):
         from karl.sync.xml_source import XMLContentSource
 
-    def test_name(self):
+    def test_path(self):
         o = self._make_one()
-        self.assertEqual(o.name, 'why-radio-is-awesome')
+        self.assertEqual(o.path, 'foo/bar')

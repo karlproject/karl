@@ -15,9 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from xml.sax import make_parser
-from xml.sax.handler import ContentHandler
-from xml.sax.handler import ErrorHandler
+import lxml.etree
 
 from zope.interface import implements
 from karl.sync.interfaces import IContentSource
@@ -25,6 +23,7 @@ from karl.sync.interfaces import IContentSource
 _marker = object()
 
 NAMESPACE = 'http://namespaces.karlproject.org/xml-sync'
+NAMESPACES = {'k': NAMESPACE}
 
 class XMLContentSource(object):
     """
@@ -85,74 +84,10 @@ class XMLContentSource(object):
 
 
     def __init__(self, stream):
-        self.stream = stream
-        self.handler = _SAXHandler(self)
-        parser = make_parser()
-        parser.setFeature('http://xml.org/sax/features/namespaces', True)
-        parser.setContentHandler(self.handler)
-        parser.setErrorHandler(self.handler)
-        self.parser = parser
-
-        parser.parse(stream)
-
-    _name = _marker
+        self.doc = lxml.etree.parse(stream)
+        self.element = self.doc.getroot()
 
     @property
-    def name(self):
-        return self._name
+    def path(self):
+        return self.element.get('path')
 
-class _SAXHandler(ContentHandler, ErrorHandler):
-    def __init__(self, source):
-        self.source = source
-        self.state = _InSourceState(self, self.source)
-
-    def startElementNS(self, name, qname, attrs):
-        namespace, name = name
-        if namespace == NAMESPACE:
-            self.state.startElement(name, attrs)
-
-    def endElementNS(self, name, qname):
-        namespace, name = name
-        if namespace == NAMESPACE:
-            self.state.endElement(name)
-
-    def characters(self, content):
-        self.state.characters(content)
-
-    def error(self, e):
-        raise e
-
-    def warning(self, e):
-        raise e
-
-    def fatalError(self, e):
-        raise e
-
-class _InSourceState(ContentHandler):
-    def __init__(self, handler, source):
-        self.handler = handler
-        self.source = source
-
-    def startElement(self, name, attrs):
-        if name == 'name':
-            self.handler.state = _SetAttributeFromElementValueState(
-                self.handler, self, self.source, '_name'
-            )
-
-class _SetAttributeFromElementValueState(ContentHandler):
-    def __init__(self, handler, parent, source, name):
-        self.handler = handler
-        self.parent = parent
-        self.source = source
-        self.name = name
-        self.value = ''
-
-    def startElement(self, name, attrs):
-        raise Exception("%s element not allowed here" % name)
-
-    def characters(self, content):
-        self.value += content
-
-    def endElement(self, name):
-        setattr(self.source, self.name, self.value)
-        self.handler.state = self.parent
