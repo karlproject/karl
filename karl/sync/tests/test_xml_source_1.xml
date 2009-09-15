@@ -1,5 +1,11 @@
 <?xml version="1.0" ?>
+<!-- 
 
+Ignore the ?oxygen RNGSchema line, it's harmless.  Used 
+by Paul's XML editor.
+
+-->
+<?oxygen RNGSchema="karl_export.rng" type="xml"?>
 <source xmlns="http://namespaces.karlproject.org/xml-sync"
         path="foo/bar">
     <item>

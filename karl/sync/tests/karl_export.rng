@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="http://namespaces.karlproject.org/xml-sync" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <element name="source">
+      <attribute name="path"/>
+      <oneOrMore>
+        <choice>
+          <text/>
+          <element name="item">
+            <element name="id">
+              <text/>
+            </element>
+            <element name="path">
+              <text/>
+            </element>
+            <element name="name">
+              <data type="NCName"/>
+            </element>
+            <element name="type">
+              <data type="NCName"/>
+            </element>
+            <element name="factory-signature">
+              <text/>
+            </element>
+            <element name="workflow-state">
+              <data type="NCName"/>
+            </element>
+            <element name="created">
+              <data type="NMTOKEN"/>
+            </element>
+            <element name="created-by">
+              <data type="NCName"/>
+            </element>
+            <element name="modified">
+              <data type="NMTOKEN"/>
+            </element>
+            <element name="modified-by">
+              <data type="NCName"/>
+            </element>
+            <oneOrMore>
+              <element name="attribute">
+                <attribute name="name">
+                  <data type="NCName"/>
+                </attribute>
+                <optional>
+                  <attribute name="none">
+                    <data type="NCName"/>
+                  </attribute>
+                </optional>
+                <attribute name="type">
+                  <data type="NCName"/>
+                </attribute>
+                <text/>
+              </element>
+            </oneOrMore>
+          </element>
+        </choice>
+      </oneOrMore>
+    </element>
+  </start>
+</grammar>
