@@ -15,16 +15,8 @@
         <data type="anyURI"/>
       </attribute>
       <oneOrMore>
-        <ref name="containerElement"/>
-      </oneOrMore>
-    </element>
-  </define>
-  <define name="containerElement">
-    <element name="container">
-      <ref name="pathElement"/>
-      <zeroOrMore>
         <ref name="itemElement"/>
-      </zeroOrMore>
+      </oneOrMore>
     </element>
   </define>
   <define name="pathElement">
@@ -38,21 +30,17 @@
         <element name="id">
           <text/>
         </element>
-        <element name="path">
-          <text/>
-        </element>
         <element name="name">
           <data type="NCName"/>
         </element>
         <element name="type">
           <data type="NCName"/>
         </element>
-        <element name="factory-signature">
-          <text/>
-        </element>
-        <element name="workflow-state">
-          <data type="NCName"/>
-        </element>
+        <optional>
+          <element name="workflow-state">
+            <data type="NCName"/>
+          </element>
+        </optional>
         <element name="created">
           <data type="dateTime"/>
         </element>
@@ -65,8 +53,21 @@
         <element name="modified-by">
           <data type="NCName"/>
         </element>
+        <zeroOrMore>
+          <ref name="itemElement"/>
+        </zeroOrMore>
         <ref name="attributesElement"/>
       </interleave>
+    </element>
+  </define>
+  <define name="typeElement">
+    <element name="type">
+      <choice>
+        <value>IBlogEntry</value>
+        <value>IProfile</value>
+        <value>IFolder</value>
+        <value>IFile</value>
+      </choice>
     </element>
   </define>
   <define name="attributesElement">
