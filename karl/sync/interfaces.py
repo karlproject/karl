@@ -18,7 +18,6 @@
 from zope.interface import Attribute
 from zope.interface import Interface
 
-
 class IContentSource(Interface):
     """
     Instances of IContentSource expose a datasource from which content can be
@@ -32,15 +31,14 @@ class IContentSource(Interface):
 
     path = Attribute("path",
         """
-        Path string, starting at Karl's root, to a container object which will
-        receive the imported content items. Path, if not None must start with
-        a '/' and resolve to an existing container object. Path may be None if
-        and only if it is not None and absolute for every instance of
-        IContentItem contained by this source.
-        """
+        Path string to a container object which will receive the imported
+        content items. The path is relative to a container object specified as
+        part of the import/sync process, which is not known to the content
+        source. Path may be an empty string, indicating the root container for
+        sync."""
         )
 
-    last_modified = Attribute("path",
+    last_modified = Attribute("last_modified",
         """
         An instance of datetime.datetime which the last time any content in
         this source was modified. If the most recent sync is more recent than
@@ -88,10 +86,9 @@ class IContentItem(Interface):
 
     path = Attribute("path",
         """
-        Path string to container object for this item. If path starts with a
-        '/' it is considered to be absolute, starting at Karl's root.
-        Otherwise it is considered to be relative to the path specified for
-        the containing instance of IContentSource.
+        Path string to container object for this item.  It is considered to be
+        relative to the path specified for the containing instance of
+        IContentSource.
         """
         )
 
@@ -109,7 +106,7 @@ class IContentItem(Interface):
         """
         )
 
-    attributes = Attribute("attribute",
+    attributes = Attribute("attributes",
         """
         Dictionary of name:value pairs of the attributes to be set on this
         content item. Values should be already converted to proper Python
