@@ -6,32 +6,26 @@ by Paul's XML editor.
 
 -->
 <?oxygen RNGSchema="karl_export.rng" type="xml"?>
-<source xmlns="http://namespaces.karlproject.org/xml-sync"
-        path="foo/bar">
-    <item>
-        <id>765b078b-ccd7-4bb0-a197-ec23d03be430</id>
-        <path>wxdu/blog</path>
-        <name>why-radio-is-awesome</name>
-        <type>IBlogEntry</type>
-        <factory-signature>
-          title, text, description, creator,
-          reference=reference
-        </factory-signature>
-        <workflow-state>inherit</workflow-state>
-        <created>2009-09-09T18:28:03-05:00</created>
-        <created-by>crossi</created-by>
-        <modified>2009-09-09T18:28:03-05:00</modified>
-        <modified-by>crossi</modified-by>
-        <attribute name="title" type="text">
-            Why Radio is Awesome
-        </attribute>
-        <attribute name="text" type="text">
-            Radio is awesome because ...
-        </attribute>
-        <attribute name="description" type="text"
-                   none="True"/>
-        <attribute name="creator" type="string">
-            crossi
-        </attribute>
-    </item>    ...
+<source xmlns="http://namespaces.karlproject.org/xml-sync" location="http://foo.com/bar">
+    <container>
+        <path>profiles/</path>
+        <item>
+            <id>765b078b-ccd7-4bb0-a197-ec23d03be430</id>
+            <path>wxdu/blog</path>
+            <name>why-radio-is-awesome</name>
+            <type>IBlogEntry</type>
+            <factory-signature> title, text, description, creator, reference=reference </factory-signature>
+            <workflow-state>inherit</workflow-state>
+            <created>2009-09-09T18:28:03-05:00</created>
+            <created-by>crossi</created-by>
+            <modified-by>crossi</modified-by>
+            <modified>2009-09-09T18:28:03-05:00</modified>
+            <attributes>
+                <attribute name="title" type="text"> Why Radio is Awesome </attribute>
+                <attribute name="text" type="text"> Radio is awesome because ... </attribute>
+                <attribute name="description" type="text" none="True"/>
+                <attribute name="creator" type="string"> crossi </attribute>
+            </attributes>
+        </item>
+    </container>
 </source>
