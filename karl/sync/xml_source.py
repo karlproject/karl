@@ -18,6 +18,7 @@
 import lxml.etree
 
 from zope.interface import implements
+from karl.sync.interfaces import IContentItem
 from karl.sync.interfaces import IContentSource
 
 _marker = object()
@@ -27,67 +28,35 @@ NAMESPACES = {'k': NAMESPACE}
 
 class XMLContentSource(object):
     """
-    A content source which reads an XML stream.  The format of the XML stream
-    is as follows:
+    A content source which reads an XML stream.
 
-    <?xml version="1.0" ?>
-
-    <source xmlns="http://namespaces.karlproject.org/xml-sync"
-            path="foo/bar">
-        <item>
-            <id>765b078b-ccd7-4bb0-a197-ec23d03be430</id>
-            <path>wxdu/blog</path>
-            <name>why-radio-is-awesome</name>
-            <type>IBlogEntry</type>
-            <factory-signature>
-              title, text, description, creator,
-              reference=reference
-            </factory-signature>
-            <workflow-state>inherit</workflow-state>
-            <created>2009-09-09T18:28:03-05:00</created>
-            <created-by>crossi</created-by>
-            <modified>2009-09-09T18:28:03-05:00</modified>
-            <modified-by>crossi</modified-by>
-            <attribute name="title" type="text">
-                Why Radio is Awesome
-            </attribute>
-            <attribute name="text" type="text">
-                Radio is awesome because ...
-            </attribute>
-            <attribute name="description" type="text"
-                       none="True"/>
-            <attribute name="creator" type="string">
-                crossi
-            </attribute>
-        </item>
-        <container path="abc/xyz">
-            <item>
-                ...
-            </item>
-            ...
-        </container>
-        ...
-    </source>
-
-    Attributes are converted from strings to Python objects according to their
-    type.  Possible types are:
-
-      - int
-      - bool
-      - float
-      - timestamp
-      - text
-      - string
-
+    XXX Document xml format.  Currently you can look in test xml files under
+        tests/
     """
     implements(IContentSource)
 
 
     def __init__(self, stream):
         self.doc = lxml.etree.parse(stream)
-        self.element = self.doc.getroot()
+        self.root = self.doc.getroot()
 
     @property
-    def path(self):
-        return self.element.get('path')
+    def location(self):
+        return self.root.get('location')
+
+    @property
+    def items(self):
+        l = []
+        for element in self.root.iterchildren('{%s}item' % NAMESPACE):
+            yield XMLContentItem(element)
+
+class XMLContentItem(object):
+    """
+    XXX
+    """
+    implements(IContentItem)
+
+    def __init__(self, element):
+        self.element = element
+
 
