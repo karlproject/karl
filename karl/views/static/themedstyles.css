@@ -1791,12 +1791,18 @@ div.moderator {
 }
 .cal_actions .cal_download {
   background: url("../images/cal_icons_download.png") 0 0 no-repeat;
-  margin-right: 11px;
+  margin-right: 8px;
   padding-left: 17px;
 }
 .cal_actions .cal_subscribe {
   background: url("../images/cal_icons_rss.png") 0 0 no-repeat;
   padding-left: 18px;
+}
+
+.cal_new_event {
+  float: right;
+  display: inline;
+  margin: 2px 0 0 7px;
 }
 
 .cal_buttons {
