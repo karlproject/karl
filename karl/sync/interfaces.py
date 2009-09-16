@@ -158,3 +158,20 @@ class IContentItem(Interface):
         exist in Karl.
         """
         )
+
+class IGenericContentFactory(Interface):
+    """
+    Normally, with repoze.lemonade you register content type factories as
+    providers for repoze.lemonade.interfaces.IContentFactory that can have an
+    arbitrary signature.  This is difficult for us to deal with if we are to be
+    importing arbitrary content types--how does our tool know the signature for
+    the factory?  To get around this we register factories that provide this
+    interface, which provides a uniform signature for generic factory
+    callables.
+    """
+    def __call__(attrs):
+        """
+        ``attrs`` is a dictionary mapping attribute names to attribute values,
+        for use in constructing a content instance. The callable will return
+        the object created.
+        """
