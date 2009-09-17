@@ -11,7 +11,7 @@ class TestCreateGenericContent(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
-    def tearDwon(self):
+    def tearDown(self):
         cleanUp()
 
     def _call_it(self, iface, attrs):
@@ -31,7 +31,7 @@ class TestCreateGenericContent(unittest.TestCase):
         obj = self._call_it(Interface, attrs)
         self.failUnless(obj.attrs is attrs)
 
-    def test_introspection_no_attrs(self):
+    def test_introspection_no_args(self):
         class Foo(object):
             pass
 
@@ -44,3 +44,21 @@ class TestCreateGenericContent(unittest.TestCase):
 
         o = self._call_it(IFoo, {})
         self.failUnless(isinstance(o, Foo), repr(o))
+
+    def test_introspection_no_args_extra_attrs(self):
+        class Foo(object):
+            pass
+
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Foo, IFoo)
+
+        attrs = dict(a='a', b='b', c='c')
+        o = self._call_it(IFoo, attrs)
+        self.failUnless(isinstance(o, Foo), repr(o))
+        self.assertEqual(o.a, 'a')
+        self.assertEqual(o.b, 'b')
+        self.assertEqual(o.c, 'c')

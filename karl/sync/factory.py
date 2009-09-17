@@ -81,7 +81,7 @@ def create_generic_content(iface, attrs):
     obj = factory(*argvalues, **kwvalues)
 
     # Set any attributes that didn't get passed to the factory
-    for name, value in attrs:
+    for name, value in attrs.items():
         setattr(obj, name, value)
 
     return obj
