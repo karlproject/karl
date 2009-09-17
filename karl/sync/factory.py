@@ -32,6 +32,25 @@ class provides:
     def __init__(self, iface):
         directlyProvides(self, iface)
 
+def _signature(factory):
+    if isinstance(factory, type):
+        # If factory is a class, getargspec blows up because it isn't a
+        # function, even though it is a callable.  We need to grab its
+        # __init__ method, if defined.
+        try:
+            args, _, _, defaults = inspect.getargspec(factory.__init__)
+        except TypeError:
+            # If __init__ method isn't actually defined, it shows up as a
+            # 'wrapper_desriptor' which will cause getargspec to fail with a
+            # type error.  This really means there is no constructor defined
+            # for this type so we have a no arg factory signature.
+            return tuple(), tuple()
+    else:
+        args, _, _, defaults = inspect.getargspec(factory)
+
+    args, kwargs = args[:len(defaults)], args[len(defaults):]
+    return args, kwargs
+
 def create_generic_content(iface, attrs):
     """
     Creates instance of a content type from dictionary of attributes.  ``iface``
@@ -52,8 +71,7 @@ def create_generic_content(iface, attrs):
     # Didn't work, let's introspect repoze.lemonade factory
     attrs = copy.copy(attrs)
     factory = getAdapter(provides(iface), IContentFactory)
-    args, _, _, defaults = inspect.getargspec(factory)
-    args, kwargs = args[:len(defaults)], args[len(defaults):]
+    args, kwargs = _signature(factory)
     argvalues, kwvalues = [], {}
     for name in args:
         argvalues.append(attrs.pop(name))

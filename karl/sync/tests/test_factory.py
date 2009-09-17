@@ -1,4 +1,5 @@
 import unittest
+from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 def FactoryFactory(factory):
@@ -7,6 +8,12 @@ def FactoryFactory(factory):
     return wrapper
 
 class TestCreateGenericContent(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDwon(self):
+        cleanUp()
+
     def _call_it(self, iface, attrs):
         from karl.sync.factory import create_generic_content
         return create_generic_content(iface, attrs)
@@ -23,3 +30,17 @@ class TestCreateGenericContent(unittest.TestCase):
         attrs = object()
         obj = self._call_it(Interface, attrs)
         self.failUnless(obj.attrs is attrs)
+
+    def test_introspection_no_attrs(self):
+        class Foo(object):
+            pass
+
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Foo, IFoo)
+
+        o = self._call_it(IFoo, {})
+        self.failUnless(isinstance(o, Foo), repr(o))
