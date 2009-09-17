@@ -16,7 +16,7 @@ by Paul's XML editor.
     <item>
         <id>765b078b-ccd7-4bb0-a197-ec23d03be430</id>
         <name>why-radio-is-awesome</name>
-        <type>IBlogEntry</type>
+        <type>karl.models.interfaces.IProfile</type>
         <workflow-state>inherit</workflow-state>
         <created>2009-09-09T18:28:03-05:00</created>
         <created-by>crossi</created-by>

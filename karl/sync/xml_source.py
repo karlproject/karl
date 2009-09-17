@@ -18,7 +18,9 @@
 import lxml.etree
 import datetime
 import pytz
+import sys
 import time
+import types
 
 from zope.interface import implements
 from karl.sync.interfaces import IContentItem
@@ -42,6 +44,47 @@ def memoize(f):
 
 def _element_value(node, name):
     return node.xpath('k:' + name, namespaces=NAMESPACES)[0].text
+
+def _module(name):
+    module = sys.modules.get(name, None)
+    if module is None:
+        try:
+            print 'hello: %s' % name
+            module = __import__(name, globals(), locals(), [])
+        except ImportError:
+            return None
+    return module
+
+def _resolve_type(name):
+    def _error():
+        raise ValueError("Cannot resolve type: %s" % name)
+
+    parts = name.split('.')
+    cur = _module(parts.pop(0))
+    if cur is None:
+        _error()
+
+    for part in parts:
+        next = None
+        if type(cur) == types.ModuleType:
+            next = _module('.'.join((cur.__name__,part)))
+        if next is None:
+            next = getattr(cur, part, None)
+        if next is None:
+            _error()
+        cur = next
+
+    return cur
+
+def _parse_date(s):
+    # Whoever decided to make strptime not be able to parse simple numeric
+    # timezone offsets should be punched in the face.
+    s, tzinfo = s[:-6], s[-6:]
+    t = time.strptime(s, '%Y-%m-%dT%H:%M:%S')
+    tzh, tzm = [int(x) for x in tzinfo.split(':')]
+    tz = pytz.FixedOffset(tzh * 60 + tzm)
+    tzinfo = dict(tzinfo=tz)
+    return datetime.datetime(*t[:6], **tzinfo)
 
 class XMLContentSource(object):
     """
@@ -76,16 +119,7 @@ class XMLContentSource(object):
     @property
     @memoize
     def modified(self):
-        v = _element_value(self.root, 'modified')
-
-        # Whoever decided to make strptime not be able to parse simple numeric
-        # timezone offsets should be punched on the face.
-        v, tzinfo = v[:-6], v[-6:]
-        t = time.strptime(v, '%Y-%m-%dT%H:%M:%S')
-        tzh, tzm = [int(x) for x in tzinfo.split(':')]
-        tz = pytz.FixedOffset(tzh * 60 + tzm)
-        tzinfo = dict(tzinfo=tz)
-        return datetime.datetime(*t[:6], **tzinfo)
+        return _parse_date(_element_value(self.root, 'modified'))
 
     @property
     def items(self):
@@ -107,4 +141,43 @@ class XMLContentItem(object):
     def __init__(self, element):
         self.element = element
 
+    @property
+    @memoize
+    def id(self):
+        return _element_value(self.element, 'id')
 
+
+    @property
+    @memoize
+    def name(self):
+        return _element_value(self.element, 'name')
+
+    @property
+    @memoize
+    def type(self):
+        return _resolve_type(_element_value(self.element, 'type'))
+
+    @property
+    @memoize
+    def workflow_state(self):
+        return _element_value(self.element, 'workflow-state')
+
+    @property
+    @memoize
+    def created(self):
+        return _parse_date(_element_value(self.element, 'created'))
+
+    @property
+    @memoize
+    def created_by(self):
+        return _element_value(self.element, 'created-by')
+
+    @property
+    @memoize
+    def modified(self):
+        return _parse_date(_element_value(self.element, 'modified'))
+
+    @property
+    @memoize
+    def modified_by(self):
+        return _element_value(self.element, 'modified-by')
