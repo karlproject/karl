@@ -66,4 +66,21 @@ class XMLContentItemTests(unittest.TestCase):
         from karl.sync.xml_source import XMLContentSource
         return XMLContentSource(stream).items[0]
 
+class MemoizeTests(unittest.TestCase):
+    def test_it(self):
+        from karl.sync.xml_source import memoize
 
+        class Foo(object):
+            count = 0
+
+            @property
+            @memoize
+            def f(self):
+                self.count += 1
+                return self.count
+
+        foo = Foo()
+        self.failIf(hasattr(foo, '_memoize_f'))
+        self.assertEqual(foo.f, 1)
+        self.assertEqual(foo.f, 1) # doesn't increment
+        self.assertEqual(foo._memoize_f, 1)
