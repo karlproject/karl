@@ -29,16 +29,13 @@ class IContentSource(Interface):
         """
         )
 
-    path = Attribute("path",
+    path = Attribute("location",
         """
-        Path string to a container object which will receive the imported
-        content items. The path is relative to a container object specified as
-        part of the import/sync process, which is not known to the content
-        source. Path may be an empty string, indicating the root container for
-        sync."""
+        URL of this data source.
+        """
         )
 
-    last_modified = Attribute("last_modified",
+    modified = Attribute("modified",
         """
         An instance of datetime.datetime which the last time any content in
         this source was modified. If the most recent sync is more recent than
@@ -114,16 +111,6 @@ class IContentItem(Interface):
         """
         )
 
-    factory_signature = Attribute("factory_signature",
-        """
-        Comma seperated list of attributes to pass as arguments to
-        repoze.lemonade factory for this item's content type. Positional
-        arguments are specified first and are just the attribute name. Keyword
-        arguments are the argument key followed by an '=' character, followed
-        by the attribute name to set. Ex: 'foo, bar, content=content'
-        """
-        )
-
     workflow_state = Attribute("workflow_state",
         """
         If a workflow is defined for this item, workflow state will be set to
@@ -145,7 +132,7 @@ class IContentItem(Interface):
         """
         )
 
-    last_modified = Attribute("last_modified",
+    modified = Attribute("modified",
         """
         An instance of datetime.datetime which represents the time of the
         last modification to this content item. Can be used to determine
@@ -153,9 +140,17 @@ class IContentItem(Interface):
         """
         )
 
-    last_modified_by = Attribute("last_modified_by",
-        """User name of user who last modified this content item. User must
+    modified_by = Attribute("last_modified_by",
+        """
+        User name of user who last modified this content item. User must
         exist in Karl.
+        """
+        )
+
+    children = Attribute("children",
+        """
+        Instances of IContentItem contained by this item in the containment
+        hierarchy.
         """
         )
 

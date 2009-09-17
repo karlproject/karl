@@ -1,12 +1,19 @@
 <?xml version="1.0" ?>
-<!-- 
+<!--
 
-Ignore the ?oxygen RNGSchema line, it's harmless.  Used 
+Ignore the ?oxygen RNGSchema line, it's harmless.  Used
 by Paul's XML editor.
 
 -->
 <?oxygen RNGSchema="karl_export.rng" type="xml"?>
-<source xmlns="http://namespaces.karlproject.org/xml-sync" location="http://foo.com/bar">
+<source xmlns="http://namespaces.karlproject.org/xml-sync"
+        location="http://foo.com/bar"
+        incremental="True">
+    <id>abcdef</id>
+    <location>http://example.com/feed</location>
+    <last-modified>2009-09-10T18:28:03-05:00</last-modified>
+    <deleted-item>64071160-f25e-4221-a2d7-cd85b76395fb</deleted-item>
+    <deleted-item>a66af600-718c-4f60-ad78-63dc7018de78</deleted-item>
     <item>
         <id>765b078b-ccd7-4bb0-a197-ec23d03be430</id>
         <name>why-radio-is-awesome</name>
@@ -49,7 +56,7 @@ by Paul's XML editor.
                 <attribute name="title" type="text"> Why Radio is Awesome </attribute>
                 <attribute name="text" type="text"> Radio is awesome because ... </attribute>
                 <attribute name="description" type="text" none="True"/>
-            </attributes>            
-        </item>        
+            </attributes>
+        </item>
     </item>
 </source>
