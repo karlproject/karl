@@ -79,6 +79,18 @@ class XMLContentItemTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         self.assertEqual(o.type, IProfile)
 
+    def test_type_no_sys_modules(self):
+        from karl.models.interfaces import IProfile
+        o = self._make_some().next()
+
+        import sys
+        save_modules = sys.modules
+        sys.modules = {}
+        try:
+            self.assertEqual(o.type, IProfile)
+        finally:
+            sys.modules = save_modules
+
     def test_workflow_state(self):
         o = self._make_some().next()
         self.assertEqual(o.workflow_state, 'inherit')

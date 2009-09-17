@@ -49,8 +49,8 @@ def _module(name):
     module = sys.modules.get(name, None)
     if module is None:
         try:
-            print 'hello: %s' % name
-            module = __import__(name, globals(), locals(), [])
+            module = __import__(name, globals(), locals(),
+                                name.split('.')[:-1])
         except ImportError:
             return None
     return module
