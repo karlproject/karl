@@ -62,3 +62,24 @@ class TestCreateGenericContent(unittest.TestCase):
         self.assertEqual(o.a, 'a')
         self.assertEqual(o.b, 'b')
         self.assertEqual(o.c, 'c')
+
+    def test_instrospection_args(self):
+        class Foo(object):
+            def __init__(self, a, b, c):
+                self._a = a
+                self._b = b
+                self._c = c
+
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(Foo, IFoo)
+
+        attrs = dict(a='a', b='b', c='c')
+        o = self._call_it(IFoo, attrs)
+        self.failUnless(isinstance(o, Foo), repr(o))
+        self.assertEqual(o._a, 'a')
+        self.assertEqual(o._b, 'b')
+        self.assertEqual(o._c, 'c')

@@ -17,6 +17,7 @@
 
 import copy
 import inspect
+import types
 from zope.interface import directlyProvides
 from zope.component import getAdapter
 from zope.component import queryAdapter
@@ -39,6 +40,10 @@ def _signature(factory):
         # __init__ method, if defined.
         try:
             args, _, _, defaults = inspect.getargspec(factory.__init__)
+
+            # First arg is 'self', not needed
+            args.pop(0)
+
         except TypeError:
             # If __init__ method isn't actually defined, it shows up as a
             # 'wrapper_desriptor' which will cause getargspec to fail with a
@@ -48,7 +53,15 @@ def _signature(factory):
     else:
         args, _, _, defaults = inspect.getargspec(factory)
 
-    args, kwargs = args[:len(defaults)], args[len(defaults):]
+        if type(factory) == types.MethodType:
+            # First arg is 'self', not needed
+            args.pop(0)
+
+    if defaults:
+        args, kwargs = args[:len(defaults)], args[len(defaults):]
+    else:
+        kwargs = tuple()
+
     return args, kwargs
 
 def create_generic_content(iface, attrs):
