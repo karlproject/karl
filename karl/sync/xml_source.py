@@ -89,9 +89,14 @@ class XMLContentSource(object):
 
     @property
     def items(self):
-        l = []
         for element in self.root.iterchildren('{%s}item' % NAMESPACE):
             yield XMLContentItem(element)
+
+    @property
+    @memoize
+    def deleted_items(self):
+        return [element.text for element in
+             self.root.iterchildren('{%s}deleted-item' % NAMESPACE)]
 
 class XMLContentItem(object):
     """

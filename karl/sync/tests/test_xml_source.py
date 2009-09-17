@@ -37,6 +37,12 @@ class XMLContentSourceTests(unittest.TestCase):
         o = self._make_one()
         self.assertEqual(2, len(list(o.items)))
 
+    def test_deleted_items(self):
+        o = self._make_one()
+        self.assertEqual(o.deleted_items,
+                         ['64071160-f25e-4221-a2d7-cd85b76395fb',
+                          'a66af600-718c-4f60-ad78-63dc7018de78'])
+
     def test_relaxng_validates(self):
         import lxml.etree
         import pkg_resources

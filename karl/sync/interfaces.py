@@ -154,6 +154,14 @@ class IContentItem(Interface):
         """
         )
 
+    deleted_children = Attribute("deleted_children",
+        """
+        List of ids of children recently deleted from this item.  This is only
+        necessary if doing an incremental update.  Otherwise, deleted children
+        can be communicated implicitly via omission from ``children``.
+        """
+        )
+
 class IGenericContentFactory(Interface):
     """
     Normally, with repoze.lemonade you register content type factories as
