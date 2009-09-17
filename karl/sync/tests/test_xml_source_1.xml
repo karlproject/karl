@@ -10,8 +10,7 @@ by Paul's XML editor.
         location="http://foo.com/bar"
         incremental="True">
     <id>abcdef</id>
-    <location>http://example.com/feed</location>
-    <last-modified>2009-09-10T18:28:03-05:00</last-modified>
+    <modified>2009-09-10T18:28:03-05:00</modified>
     <deleted-item>64071160-f25e-4221-a2d7-cd85b76395fb</deleted-item>
     <deleted-item>a66af600-718c-4f60-ad78-63dc7018de78</deleted-item>
     <item>

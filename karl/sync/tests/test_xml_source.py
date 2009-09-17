@@ -16,6 +16,23 @@ class XMLContentSourceTests(unittest.TestCase):
         o = self._make_one()
         self.assertEqual(o.location, 'http://foo.com/bar')
 
+    def test_incremental(self):
+        o = self._make_one()
+        self.assertTrue(o.incremental)
+
+    def test_id(self):
+        o = self._make_one()
+        self.assertEqual(o.id, 'abcdef')
+
+    def test_modified(self):
+        import datetime
+        import pytz
+        o = self._make_one()
+        expected = datetime.datetime(
+            2009, 9, 10, 18, 28, 3, tzinfo=pytz.FixedOffset(-300)
+        )
+        self.assertEqual(o.modified, expected)
+
     def test_items(self):
         o = self._make_one()
         self.assertEqual(2, len(list(o.items)))
