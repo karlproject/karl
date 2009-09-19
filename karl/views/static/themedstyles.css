@@ -104,11 +104,21 @@ label {
   width: 48em;
 }
 .k3_genericForm .fieldError {
-  background-color: #FFCC00;
-  border: 1px solid #FF8A00;
-  margin: 0pt 0pt 1em;
-  padding: 1em;
   width: 49em;
+  display: inline;
+  background: url("images/field_error_bg.gif") 0 0 no-repeat;
+  margin: 0 0 1em 0;
+  border-bottom: 1px solid #fff;
+  padding: 8px 10px 8px 32px;
+}
+.k3_genericForm .fieldError label {
+  color: #d31616;
+}
+.k3_genericForm .fieldError .errorMessage {
+  font-size: 95%;
+}
+.k3_genericForm .fieldError input {
+  border: 1px solid #eda379;
 }
 
 
@@ -218,23 +228,48 @@ a.standalone:hover {
 .portalMessage, 
 .portalErrorMessage,
 .portalWarningMessage, 
-.portalStopMessage {
-  background: #FFFFAF url('images/info_icon.gif') 5px 50% no-repeat;
-  border: 1px solid #CCCCCC;
-  color: #333333;
+.portalStopMessage, 
+.statusbox-item {
+  background: #fffad8 url('images/message_info_icon.gif') 7px 50% no-repeat;
+  border: 1px solid #f1e186;
+  color: #333;
   font-weight: normal;
   font-size: 1.1em;
   margin: 1em 0em;
-  padding: 0.5em 1em 0.5em 3em;
+  padding: 6px 10px 6px 30px;
   vertical-align: middle;
   width: 47em;
   font-size: 1em;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-topright: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;  
+  -webkit-border-top-right-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
 }
 #inner .portalMessage {
   padding: 0.5em 10px 0.5em 30px;
   width: 438px;
   margin: 0;
+}
+/* also make tag statusbox look nice */
+#tag-inputbox .statusbox-item {
+  padding: 3px 10px 4px 30px;
+  width: auto;
+}  
+#tag-inputbox .message-span {
+  margin-top: 4px; 
+}
+#tag-inputbox a.statusbox-closebutton {
+  margin-top: 8px;
+  text-indent: -9999px;
+}
+.bit-box {
+  margin-top: 2px;
 } 
+
 .discreet {
 	color: #999999;
 	font-size: 0.9em;
