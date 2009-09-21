@@ -78,6 +78,18 @@ class XMLContentItemTests(unittest.TestCase):
         from karl.sync.xml_source import XMLContentSource
         return XMLContentSource(stream).items
 
+
+    def test_class_conforms_to_interface(self):
+        from zope.interface.verify import verifyClass
+        from karl.sync.interfaces import IContentItem
+        from karl.sync.xml_source import XMLContentItem
+        verifyClass(IContentItem, XMLContentItem)
+
+    def test_instance_conforms_to_interface(self):
+        from zope.interface.verify import verifyObject
+        from karl.sync.interfaces import IContentItem
+        verifyObject(IContentItem, self._make_some().next())
+
     def test_id(self):
         o = self._make_some().next()
         self.assertEqual(o.id, '765b078b-ccd7-4bb0-a197-ec23d03be430')
