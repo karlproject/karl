@@ -240,6 +240,18 @@ class AttributeConversionTests(unittest.TestCase):
                                            tzinfo=FixedOffset(-300)))
         self.assertRaises(ValueError, converter, '200909091828030500')
 
+    def test_blob(self):
+        import os
+        import sys
+        here = os.path.dirname(sys.modules[__name__].__file__)
+        here = os.path.abspath(here)
+        url = 'file://%s/test_data.dat' % here
+        converter = self._get_converter('blob')
+        blob = converter(url)
+        self.assertEqual(blob.open().read(), 'some test data\n')
+        self.failUnless(isinstance(blob.open().read(), str))
+        self.assertRaises(ValueError, converter('no where in particular').open )
+
 class MemoizeTests(unittest.TestCase):
     def test_it(self):
         from karl.sync.xml_source import memoize

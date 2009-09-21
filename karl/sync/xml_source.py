@@ -22,6 +22,7 @@ import pytz
 import sys
 import time
 import types
+import urllib2
 
 from zope.interface import implements
 from karl.sync.interfaces import IContentItem
@@ -101,6 +102,13 @@ def _boolean(value):
     except ValueError:
         raise ValueError("Can't convert to boolean: %s" % value)
 
+class _Blob(object):
+    def __init__(self, url):
+        self.url = url
+
+    def open(self):
+        return urllib2.urlopen(self.url)
+
 # XXX Might need to make these pluggable at some point.
 #     Can make these adapters and register with ZCA if need be.
 _attr_converters = {
@@ -110,6 +118,7 @@ _attr_converters = {
     'bytes': base64.b64decode,
     'text': unicode,
     'timestamp': _parse_date,
+    'blob': _Blob,
     # XXX blob/clob external
     }
 
