@@ -85,12 +85,7 @@
   </define>
   <define name="typeElement">
     <element name="type">
-      <choice>
-        <value>IBlogEntry</value>
-        <value>IProfile</value>
-        <value>IFolder</value>
-        <value>IFile</value>
-      </choice>
+      <text/>
     </element>
   </define>
   <define name="attributesElement">
