@@ -57,5 +57,6 @@ by Paul's XML editor.
                 <attribute name="description" type="text" none="True"/>
             </attributes>
         </item>
+        <deleted-item>abc123</deleted-item>
     </item>
 </source>

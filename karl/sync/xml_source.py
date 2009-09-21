@@ -216,3 +216,9 @@ class XMLContentItem(object):
     def children(self):
         for element in self.element.xpath('k:item', namespaces=NAMESPACES):
             yield XMLContentItem(element)
+
+    @property
+    @memoize
+    def deleted_children(self):
+        return [element.text for element in
+             self.element.iterchildren('{%s}deleted-item' % NAMESPACE)]

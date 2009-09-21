@@ -136,6 +136,10 @@ class XMLContentItemTests(unittest.TestCase):
         self.assertEqual(child.id, '234jjlkj3423')
         self.assertEqual(child.name, 'some-doc-in-folder')
 
+    def test_deleted_children(self):
+        o = list(self._make_some())[1]
+        self.assertEqual(o.deleted_children, ['abc123'])
+
 class MemoizeTests(unittest.TestCase):
     def test_it(self):
         from karl.sync.xml_source import memoize

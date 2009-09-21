@@ -7,8 +7,8 @@
     <ref name="sourceElement"/>
   </start>
   <define name="sourceElement">
-    <!-- This is the definition of <source>.  It requires a 'location' 
-    attribute that must be a URL. We then have one or more <container> 
+    <!-- This is the definition of <source>.  It requires a 'location'
+    attribute that must be a URL. We then have one or more <container>
     elements. -->
     <element name="source">
       <attribute name="location">
@@ -78,6 +78,11 @@
         </element>
         <zeroOrMore>
           <ref name="itemElement"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <element name="deleted-item">
+            <text/>
+          </element>
         </zeroOrMore>
         <ref name="attributesElement"/>
       </interleave>
