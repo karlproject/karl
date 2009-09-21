@@ -1,13 +1,25 @@
 import unittest
 
 class XMLContentSourceTests(unittest.TestCase):
+    def _target_class(self):
+        from karl.sync.xml_source import XMLContentSource
+        return XMLContentSource
+
     def _make_one(self, test_file='test_xml_source_1.xml'):
         import pkg_resources
         stream = pkg_resources.resource_stream(__name__, test_file)
         assert stream is not None
+        return self._target_class()(stream)
 
-        from karl.sync.xml_source import XMLContentSource
-        return XMLContentSource(stream)
+    def test_class_conforms_to_interface(self):
+        from zope.interface.verify import verifyClass
+        from karl.sync.interfaces import IContentSource
+        verifyClass(IContentSource, self._target_class())
+
+    def test_instance_conforms_to_interface(self):
+        from zope.interface.verify import verifyObject
+        from karl.sync.interfaces import IContentSource
+        verifyObject(IContentSource, self._make_one())
 
     def test_import(self):
         from karl.sync.xml_source import XMLContentSource

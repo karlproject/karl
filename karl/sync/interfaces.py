@@ -29,12 +29,6 @@ class IContentSource(Interface):
         """
         )
 
-    path = Attribute("location",
-        """
-        URL of this data source.
-        """
-        )
-
     modified = Attribute("modified",
         """
         An instance of datetime.datetime which the last time any content in
@@ -78,14 +72,6 @@ class IContentItem(Interface):
         """
         A globally unique identifier which identifies the content item. Do not
         confuse this with the item's name.
-        """
-        )
-
-    path = Attribute("path",
-        """
-        Path string to container object for this item.  It is considered to be
-        relative to the path specified for the containing instance of
-        IContentSource.
         """
         )
 
