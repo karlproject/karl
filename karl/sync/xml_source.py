@@ -88,12 +88,23 @@ def _parse_date(s):
     return datetime.datetime(*t[:6], **tzinfo)
 
 def _boolean(value):
-    return value in ('t', 'T', 'true', 'True', '1', 'y', 'Y', 'yes', 'Yes')
+    if value is None:
+        return False
+
+    value = value.lower()
+    if value in ('t', 'true', 'y', 'yes'):
+        return True
+    if value in ('f', 'false', 'n', 'no'):
+        return False
+    try:
+        return not not int(value)
+    except ValueError:
+        raise ValueError("Can't convert to boolean: %s" % value)
 
 _attr_converters = {
     'int': int,
     'float': float,
-    'bool': bool,
+    'bool': _boolean,
     'bytes': base64.b64decode,
     'text': unicode,
     # XXX blob/clob external
