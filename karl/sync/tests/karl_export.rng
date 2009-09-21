@@ -14,9 +14,31 @@
       <attribute name="location">
         <data type="anyURI"/>
       </attribute>
+      <optional>
+        <attribute name="incremental">
+          <choice>
+            <value>True</value>
+            <value>False</value>
+          </choice>
+        </attribute>
+      </optional>
+      <interleave>
+        <ref name="idElement"/>
+        <ref name="modifiedElement"/>
+        <zeroOrMore>
+          <element name="deleted-item">
+            <text/>
+          </element>
+        </zeroOrMore>
+      </interleave>
       <oneOrMore>
         <ref name="itemElement"/>
       </oneOrMore>
+    </element>
+  </define>
+  <define name="idElement">
+    <element name="id">
+      <text/>
     </element>
   </define>
   <define name="pathElement">
@@ -24,12 +46,15 @@
       <text/>
     </element>
   </define>
+  <define name="modifiedElement">
+    <element name="modified">
+      <data type="dateTime"/>
+    </element>
+  </define>
   <define name="itemElement">
     <element name="item">
       <interleave>
-        <element name="id">
-          <text/>
-        </element>
+        <ref name="idElement"/>
         <element name="name">
           <data type="NCName"/>
         </element>
@@ -47,9 +72,7 @@
         <element name="created-by">
           <data type="NCName"/>
         </element>
-        <element name="modified">
-          <data type="dateTime"/>
-        </element>
+        <ref name="modifiedElement"/>
         <element name="modified-by">
           <data type="NCName"/>
         </element>
