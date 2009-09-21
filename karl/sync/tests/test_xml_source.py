@@ -119,11 +119,14 @@ class XMLContentItemTests(unittest.TestCase):
         o = self._make_some().next()
         self.assertEqual(o.modified_by, 'crossi')
 
-        #<attributes>
-            #<attribute name="title" type="text"> Why Radio is Awesome </attribute>
-            #<attribute name="text" type="text"> Radio is awesome because ... </attribute>
-            #<attribute name="description" type="text" none="True"/>
-        #</attributes>
+    def test_attributes(self):
+        o = self._make_some().next()
+        attrs = o.attributes
+        for v in attrs.values():
+            self.failUnless(isinstance(v, unicode) or v is None)
+        self.assertEqual(attrs['title'], u'Why Radio is Awesome')
+        self.assertEqual(attrs['text'], u'Radio is awesome because ...')
+        self.assertEqual(attrs['description'], None)
 
 class MemoizeTests(unittest.TestCase):
     def test_it(self):

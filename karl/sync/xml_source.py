@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import base64
 import lxml.etree
 import datetime
 import pytz
@@ -86,6 +87,18 @@ def _parse_date(s):
     tzinfo = dict(tzinfo=tz)
     return datetime.datetime(*t[:6], **tzinfo)
 
+def _boolean(value):
+    return value in ('t', 'T', 'true', 'True', '1', 'y', 'Y', 'yes', 'Yes')
+
+_attr_converters = {
+    'int': int,
+    'float': float,
+    'bool': bool,
+    'bytes': base64.b64decode,
+    'text': unicode,
+    # XXX blob/clob external
+    }
+
 class XMLContentSource(object):
     """
     A content source which reads an XML stream.
@@ -113,8 +126,7 @@ class XMLContentSource(object):
     @property
     @memoize
     def incremental(self):
-        v = self.root.get('incremental')
-        return v in ('t', 'T', 'true', 'True', '1', 'y', 'Y', 'yes', 'Yes')
+        return _boolean(self.root.get('incremental'))
 
     @property
     @memoize
@@ -131,6 +143,7 @@ class XMLContentSource(object):
     def deleted_items(self):
         return [element.text for element in
              self.root.iterchildren('{%s}deleted-item' % NAMESPACE)]
+
 
 class XMLContentItem(object):
     """
@@ -181,3 +194,20 @@ class XMLContentItem(object):
     @memoize
     def modified_by(self):
         return _element_value(self.element, 'modified-by')
+
+    @property
+    @memoize
+    def attributes(self):
+        attrs = {}
+        for element in self.element.xpath('k:attributes/k:attribute',
+                                          namespaces=NAMESPACES):
+            name = element.get('name')
+            if _boolean(element.get('none')):
+                attrs[name] = None
+            else:
+                type = element.get('type')
+                converter = _attr_converters[type]
+                value = converter(element.text)
+                attrs[name] = value
+
+        return attrs

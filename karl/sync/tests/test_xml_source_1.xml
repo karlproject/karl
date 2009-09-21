@@ -23,8 +23,8 @@ by Paul's XML editor.
         <modified-by>crossi</modified-by>
         <modified>2009-09-09T18:28:03-05:00</modified>
         <attributes>
-            <attribute name="title" type="text"> Why Radio is Awesome </attribute>
-            <attribute name="text" type="text"> Radio is awesome because ... </attribute>
+            <attribute name="title" type="text">Why Radio is Awesome</attribute>
+            <attribute name="text" type="text">Radio is awesome because ...</attribute>
             <attribute name="description" type="text" none="True"/>
         </attributes>
     </item>
