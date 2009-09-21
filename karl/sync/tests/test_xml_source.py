@@ -231,6 +231,15 @@ class AttributeConversionTests(unittest.TestCase):
         self.assertEqual(converter('Chris'), u'Chris')
         self.assertEqual(converter(u'Dub revolution'), u'Dub revolution')
 
+    def test_timestamp(self):
+        import datetime
+        from pytz import FixedOffset
+        converter = self._get_converter('timestamp')
+        self.assertEqual(converter('2009-09-09T18:28:03-05:00'),
+                         datetime.datetime(2009, 9, 9, 18, 28, 03,
+                                           tzinfo=FixedOffset(-300)))
+        self.assertRaises(ValueError, converter, '200909091828030500')
+
 class MemoizeTests(unittest.TestCase):
     def test_it(self):
         from karl.sync.xml_source import memoize

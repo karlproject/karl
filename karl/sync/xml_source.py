@@ -101,12 +101,15 @@ def _boolean(value):
     except ValueError:
         raise ValueError("Can't convert to boolean: %s" % value)
 
+# XXX Might need to make these pluggable at some point.
+#     Can make these adapters and register with ZCA if need be.
 _attr_converters = {
     'int': int,
     'float': float,
     'bool': _boolean,
     'bytes': base64.b64decode,
     'text': unicode,
+    'timestamp': _parse_date,
     # XXX blob/clob external
     }
 
