@@ -739,6 +739,11 @@ input#livesearch-input {
 #center div .sections h2 {
 	margin-left: 0px;
 }
+div.center_intranet {
+  margin: 0 0 15px !important; 
+  float: left; 
+  width: 399px;
+}
 
 /** =PEOPLE DIRECTORY
 ----------------------------------------------- */
