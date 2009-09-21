@@ -248,8 +248,22 @@ class AttributeConversionTests(unittest.TestCase):
         url = 'file://%s/test_data.dat' % here
         converter = self._get_converter('blob')
         blob = converter(url)
-        self.assertEqual(blob.open().read(), 'some test data\n')
+        self.assertEqual(blob.open().read(),
+            "Cos\xc3\xac fin\xc3\xac l'amuri di du' pisci sfortunati.")
         self.failUnless(isinstance(blob.open().read(), str))
+        self.assertRaises(ValueError, converter('no where in particular').open )
+
+    def test_clob(self):
+        import os
+        import sys
+        here = os.path.dirname(sys.modules[__name__].__file__)
+        here = os.path.abspath(here)
+        url = 'file://%s/test_data.dat' % here
+        converter = self._get_converter('clob')
+        blob = converter(url)
+        self.assertEqual(blob.open().read(),
+            u"Cos\xec fin\xec l'amuri di du' pisci sfortunati.")
+        self.failUnless(isinstance(blob.open().read(), unicode))
         self.assertRaises(ValueError, converter('no where in particular').open )
 
 class MemoizeTests(unittest.TestCase):

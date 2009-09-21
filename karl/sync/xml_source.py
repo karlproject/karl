@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import base64
+import codecs
 import lxml.etree
 import datetime
 import pytz
@@ -109,6 +110,30 @@ class _Blob(object):
     def open(self):
         return urllib2.urlopen(self.url)
 
+class _Clob(object):
+    def __init__(self, url):
+        self.url = url
+
+    def open(self, encoding='utf-8'):
+        # Supposedly codecs.EncodedFile is supposed to be able to wrap a stream
+        # and read unicode, but I couldn't get it to work--always returns raw
+        # string.
+        # This monkey patch is being peformed to replace just the read method
+        # with a version that decodes the stream and returns unicode, still
+        # allowing access to url.info, in case calling code wants to see http
+        # headers or status code.
+        def decode_read(read_raw):
+            def read(size=-1):
+                data = read_raw(size)
+                if data:
+                    data = unicode(data, encoding)
+                return data
+            return read
+
+        url = urllib2.urlopen(self.url)
+        url.read = decode_read(url.read)
+        return url
+
 # XXX Might need to make these pluggable at some point.
 #     Can make these adapters and register with ZCA if need be.
 _attr_converters = {
@@ -119,7 +144,7 @@ _attr_converters = {
     'text': unicode,
     'timestamp': _parse_date,
     'blob': _Blob,
-    # XXX blob/clob external
+    'clob': _Clob,
     }
 
 class XMLContentSource(object):
