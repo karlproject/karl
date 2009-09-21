@@ -211,3 +211,8 @@ class XMLContentItem(object):
                 attrs[name] = value
 
         return attrs
+
+    @property
+    def children(self):
+        for element in self.element.xpath('k:item', namespaces=NAMESPACES):
+            yield XMLContentItem(element)

@@ -128,6 +128,14 @@ class XMLContentItemTests(unittest.TestCase):
         self.assertEqual(attrs['text'], u'Radio is awesome because ...')
         self.assertEqual(attrs['description'], None)
 
+    def test_children(self):
+        o = list(self._make_some())[1]
+        children = list(o.children)
+        self.assertEqual(len(children), 1)
+        child = children[0]
+        self.assertEqual(child.id, '234jjlkj3423')
+        self.assertEqual(child.name, 'some-doc-in-folder')
+
 class MemoizeTests(unittest.TestCase):
     def test_it(self):
         from karl.sync.xml_source import memoize
