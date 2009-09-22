@@ -38,32 +38,6 @@ class TestClientJsonData(unittest.TestCase):
             window.karl_client_data = {"widget2": ["cc", "dd", {"ee": 4, "ff": 5}], "widget1": {"aa": 1, "bb": [2, 3]}};
             </script>"""))
 
-class TestDebugSearch(unittest.TestCase):
-    def _callFUT(self, context, **kw):
-        from karl.utils import debugsearch
-        return debugsearch(context, **kw)
-
-    def test_it(self):
-        context = testing.DummyModel()
-        context.catalog = DummyCatalog()
-        result = self._callFUT(context)
-        self.assertEqual(result, (1, [1]))
-
-class TestGetSession(unittest.TestCase):
-    def _callFUT(self, context, request):
-        from karl.utils import get_session
-        return get_session(context, request)
-
-    def test_it(self):
-        request = testing.DummyRequest()
-        context = testing.DummyModel()
-        context.sessions = testing.DummyModel()
-        foo = testing.DummyModel()
-        context.sessions['foo'] = foo
-        request.environ = {'repoze.browserid':'foo'}
-        result = self._callFUT(context, request)
-        self.assertEqual(result, foo)
-
 class TestMakeName(unittest.TestCase):
     def test_make_name(self):
         from karl.views.utils import make_name
@@ -462,10 +436,6 @@ class TestConvertEntities(unittest.TestCase):
         expected = "I have &; &&; &#; for breakfast."
         outcome = self._callFUT(expected)
         self.assertEqual(outcome, expected)
-
-class DummyCatalog:
-    def _search(self, **kw):
-        return 1, [1], lambda x: x
 
 class DummyUpload:
     def __init__(self, file, type):

@@ -25,6 +25,7 @@ from repoze.bfg.traversal import find_root
 from repoze.bfg.traversal import find_interface
 from repoze.lemonade.content import get_content_type
 
+from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IIntranets
@@ -86,8 +87,7 @@ def get_content_type_name(resource):
     return content_iface.getTaggedValue('name')
 
 def debugsearch(context, **kw):
-    from karl.models.adapters import CatalogSearch
-    searcher = CatalogSearch(context)
+    searcher = ICatalogSearch(context)
     kw['use_cache'] = False
     num, docids, resolver = searcher(**kw)
     L = []
