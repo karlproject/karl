@@ -59,6 +59,7 @@ requires = [
     'feedparser',
     'zope.testing', # fwd compat when not directly relied on by BFG
     'PILwoTk',
+    'icalendar',
     ]
 
 setup(name='karl',
