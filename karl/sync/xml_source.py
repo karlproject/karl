@@ -156,6 +156,10 @@ def _list_attr_value(element):
     return [_simple_attr_value(item) for item in
             element.xpath('k:item', namespaces=NAMESPACES)]
 
+def _dict_attr_value(element):
+    return dict([(item.get('name'), _simple_attr_value(item)) for item in
+            element.xpath('k:item', namespaces=NAMESPACES)])
+
 class XMLContentSource(object):
     """
     A content source which reads an XML stream.
@@ -266,6 +270,8 @@ class XMLContentItem(object):
                     attrs[name] = _simple_attr_value(element)
                 elif element.tag == '{%s}list' % NAMESPACE:
                     attrs[name] = _list_attr_value(element)
+                elif element.tag == '{%s}dict' % NAMESPACE:
+                    attrs[name] = _dict_attr_value(element)
 
         return attrs
 

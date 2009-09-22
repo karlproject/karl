@@ -31,6 +31,11 @@ by Paul's XML editor.
                 <item type="text">Green</item>
                 <item type="text">Blue</item>
             </list>
+            <dict name="animals">
+                <item name="Clio" type="text">cat</item>
+                <item name="Ginger" type="text">cat</item>
+                <item name="Elsa" type="text">dog</item>
+            </dict>
         </attributes>
     </item>
     <item>

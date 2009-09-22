@@ -150,7 +150,12 @@ class XMLContentItemTests(unittest.TestCase):
         self.assertEqual(attrs['text'],
                          u'La radio \xe8 straordinaria perch\xe9 ...')
         self.assertEqual(attrs['description'], None)
-        self.assertEqual(attrs['colors'], ['Red', 'Green', 'Blue'])
+        self.assertEqual(attrs['colors'], [u'Red', u'Green', u'Blue'])
+        self.assertEqual(attrs['animals'], {
+            'Clio': u'cat',
+            'Ginger': u'cat',
+            'Elsa': u'dog',
+            })
 
     def test_children(self):
         o = list(self._make_some())[1]
