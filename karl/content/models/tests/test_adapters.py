@@ -206,7 +206,7 @@ class TestTitleAndTextIndexData(unittest.TestCase):
                                     )
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, 'thetitle ' * 10 + 'Hi!')
+        self.assertEqual(data, 'thetitle ' * 10 + '\n\nHi!\n\n')
 
 class TestFileTextIndexData(unittest.TestCase):
     def setUp(self):

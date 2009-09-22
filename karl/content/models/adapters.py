@@ -22,7 +22,8 @@ from ZODB.POSException import POSKeyError
 
 from karl.models.interfaces import ITextIndexData
 from karl.utilities.converters.interfaces import IConverter
-from lxml.html import fromstring
+from karl.utilities.converters.entities import convert_entities
+from karl.utilities.converters.stripogram import html2text
 
 import logging
 log = logging.getLogger(__name__)
@@ -59,27 +60,19 @@ def makeFlexibleTextIndexData(attr_weights):
         ATTR_WEIGHT_CLEANER = attr_weights
     return Derived
 
+def extract_text_from_html(text):
+    if not isinstance(text, unicode):
+        text = unicode(text, 'utf-8', 'replace')
+    return html2text(convert_entities(text))
+
 TitleAndDescriptionIndexData = makeFlexibleTextIndexData(
                                 [('title', 10, None),
                                  ('description', 1, None),
                                 ])
 
-def _html_cleaner(text):
-    # XXX It seems this is needed. (?)
-    if not text:
-        text = '<html></html>'
-    text_html = fromstring(text)
-    expr = "//*[text()]"
-    content = []
-    for node in text_html.xpath(expr):
-        text = node.text
-        if text is not None:
-            content.append(text)
-    return ' '.join(content)
-
 TitleAndTextIndexData = makeFlexibleTextIndexData(
                                 [('title', 10, None),
-                                 ('text', 1, _html_cleaner),
+                                 ('text', 1, extract_text_from_html),
                                 ])
 
 def _extract_file_data(context):

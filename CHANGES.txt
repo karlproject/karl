@@ -4,6 +4,12 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #430037 In karl.content.adapters, use functions in
+  ``karl.utilities.converters`` instead of an xslt-using function
+  named ``_html_cleaner``.  The ``_html_cleaner`` was producing
+  incorrect results when fed HTML provided by the rich text input
+  widget.
+
 - Moved "karl.content" into this package (as the content subdirectory).
 
 - LP #418687 Add better looking status messages
