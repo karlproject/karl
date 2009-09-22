@@ -205,11 +205,14 @@ def _next_month(year, month):
 
 def get_calendar_actions(context, request):
     """Return the actions to display when looking at the calendar"""
-    actions = []
-    if has_permission('moderate', context, request):
-        actions.append(
-            ('Settings', 'settings.html'),
-            )
+    actions = []     
+    #
+    # XXX "Settings" temporarily hidden at request of OSI
+    #
+    # if has_permission('moderate', context, request):
+    #     actions.append(
+    #         ('Settings', 'settings.html'),
+    #         )
     if has_permission('create', context, request):
         actions.append(
             ('Add Event', 'add_calendarevent.html'),

@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- The "Settings" page of the existing calendar has been temporarily
+  hidden on the UI until the new calendar is finished.  Requested
+  by Jason Lantz to prevent confusion.
+
 - LP #430037 In karl.content.adapters, use functions in
   ``karl.utilities.converters`` instead of an xslt-using function
   named ``_html_cleaner``.  The ``_html_cleaner`` was producing
