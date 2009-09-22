@@ -40,7 +40,6 @@ class ListViewPresenter(BasePresenter):
         self._init_next_month()
         
         self._init_navigation()
-        self._init_earlier_and_later_links()
 
     def _init_prior_month(self):
         prior = prior_month(self.focus_datetime.year, 
@@ -84,10 +83,6 @@ class ListViewPresenter(BasePresenter):
                                         self.now_datetime.month,
                                         self.now_datetime.day)
         self.navigation = nav
-
-    def _init_earlier_and_later_links(self):
-        self.earlier_events_url = self.navigation.prev_href
-        self.later_events_url   = self.navigation.next_href
 
     def paint_events(self, events):
         days_events = self._make_days_events_dict(events)
