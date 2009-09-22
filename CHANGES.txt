@@ -3,6 +3,9 @@ karl package Changelog
 
 Unreleased
 ----------
+
+- Moved "karl.content" into this package (as the content subdirectory).
+
 - LP #418687 Add better looking status messages
 
 - LP #418701 Add better styling of form buttons
