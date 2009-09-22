@@ -1,0 +1,121 @@
+# Copyright (C) 2008-2009 Open Society Institute
+#               Thomas Moroz: tmoroz@sorosny.org
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License Version 2 as published
+# by the Free Software Foundation.  You may not use, modify or distribute
+# this program under any other version of the GNU General Public License.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+from zope.interface import implements
+from zope.component import queryUtility
+
+from ZODB.POSException import POSKeyError
+
+from karl.models.interfaces import ITextIndexData
+from karl.utilities.converters.interfaces import IConverter
+from lxml.html import fromstring
+
+import logging
+log = logging.getLogger(__name__)
+
+class FlexibleTextIndexData(object):
+
+    implements(ITextIndexData)
+
+    ATTR_WEIGHT_CLEANER = [('title', 10, None),
+                           ('description', 1, None),
+                           ('text', 1, None),
+                          ]
+
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self):
+        parts = []
+        for attr, weight, cleaner in self.ATTR_WEIGHT_CLEANER:
+            if callable(attr):
+                value = attr(self.context)
+            else:
+                value = getattr(self.context, attr, None)
+            if value is not None:
+                if cleaner is not None:
+                    value = cleaner(value)
+                parts.extend([value] * weight)
+        return ' '.join(filter(None, parts))
+
+def makeFlexibleTextIndexData(attr_weights):
+    if not attr_weights:
+        raise ValueError('Must have at least one (attr, weight).')
+    class Derived(FlexibleTextIndexData):
+        ATTR_WEIGHT_CLEANER = attr_weights
+    return Derived
+
+TitleAndDescriptionIndexData = makeFlexibleTextIndexData(
+                                [('title', 10, None),
+                                 ('description', 1, None),
+                                ])
+
+def _html_cleaner(text):
+    # XXX It seems this is needed. (?)
+    if not text:
+        text = '<html></html>'
+    text_html = fromstring(text)
+    expr = "//*[text()]"
+    content = []
+    for node in text_html.xpath(expr):
+        text = node.text
+        if text is not None:
+            content.append(text)
+    return ' '.join(content)
+
+TitleAndTextIndexData = makeFlexibleTextIndexData(
+                                [('title', 10, None),
+                                 ('text', 1, _html_cleaner),
+                                ])
+
+def _extract_file_data(context):
+    converter = queryUtility(IConverter, context.mimetype)
+    if converter is None:
+        return ''
+    try:
+        filename = context.blobfile._current_filename()
+    except POSKeyError, why:
+        if why[0] != 'No blob file':
+            raise
+        return ''
+        
+    try:
+        stream, encoding = converter.convert(filename, encoding=None,
+                                             mimetype=context.mimetype)
+    except Exception, e:
+        # Just won't get indexed
+        log.exception("Error converting file %s" % filename)
+        return ''
+    
+    datum = stream.read(1<<21) # XXX dont read too much into RAM
+    if encoding is not None:
+        try:
+            datum = datum.decode(encoding)
+        except UnicodeDecodeError:
+            # XXX Temporary workaround to get import working
+            # The "encoding" is a lie.  Coerce to ascii.
+            log.error("Converted text is not %s: %s" % 
+                        (encoding, filename))
+            if len(datum) > 0:
+                datum = repr(datum)[2:-2]
+
+    return datum
+
+FileTextIndexData = makeFlexibleTextIndexData(
+                                [('title', 10, None),
+                                 (_extract_file_data, 1, None),
+                                ])

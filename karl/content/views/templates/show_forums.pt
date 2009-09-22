@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <table class="messageBoard content-listing">
+      <thead>
+	<tr>
+          <th>Forum</th>
+          <th>Topics</th>
+          <th>Comments</th>
+          <th>Latest Activity</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr tal:repeat="forum forum_data">
+          <td><a href="${forum.url}">${forum.title}</a></td>
+          <td>${forum.number_of_topics}</td>
+          <td>${forum.number_of_comments}</td>
+          <td>
+            <span tal:condition="forum.latest_activity_url">
+              <a href="${forum.latest_activity_url}">${forum.latest_activity_link}</a>
+              by ${forum.latest_activity_by} on ${forum.latest_activity_at}
+            </span>
+          </td>
+	</tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</html>

@@ -1,0 +1,13 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:tal="http://xml.zope.org/namespaces/tal"
+        xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <div style="margin-top: 2em;">
+    <img width="16" height="16" border="0" alt="."
+        src="${api.static_url}/images/${fileinfo.mimeinfo.small_icon_name}"/>
+    <a style="padding-left: 0.2em;"
+        href="${fileinfo.url}dl/${fileinfo.name}">Click here
+        to download the file</a>
+  </div>
+  <div style="padding-top: 0.3em; padding-left: 3.3em;">Size: ${fileinfo.size} - File type:
+  ${fileinfo.mimeinfo.title}</div>
+</div>

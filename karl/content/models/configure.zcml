@@ -1,0 +1,196 @@
+<configure xmlns="http://namespaces.repoze.org/bfg"
+    xmlns:lemonade="http://namespaces.repoze.org/lemonade">
+
+  <include package="repoze.lemonade.includes" file="meta.zcml"/>
+
+  <!-- default tools available to communities (IToolFactories) -->
+
+  <lemonade:listitem
+     component=".blog.blog_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="blog"
+     title="Blog"
+     description="Blog tool"
+     sort_key="10"
+     />
+
+  <lemonade:listitem
+     component=".wiki.wiki_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="wiki"
+     title="Wiki"
+     description="Wiki tool"
+     sort_key="20"
+     />
+
+  <lemonade:listitem
+     component=".calendar.calendar_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="calendar"
+     title="Calendar"
+     description="Calendar tool"
+     sort_key="30"
+     />
+
+  <lemonade:listitem
+     component=".files.files_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="files"
+     title="Files"
+     description="Files tool"
+     sort_key="40"
+     />
+
+  <lemonade:listitem
+     component=".forum.forums_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="forums"
+     title="Forums"
+     description="Forums tool"
+     sort_key="50"
+     />
+
+  <lemonade:listitem
+     component=".intranets.intranets_tool_factory"
+     provides="karl.models.interfaces.IToolFactory"
+     name="intranets"
+     title="Intranets"
+     description="Intranets tool"
+     sort_key="60"
+     />
+
+  <!-- default content registrations -->
+
+  <lemonade:content
+      factory=".blog.Blog"
+      type="karl.content.interfaces.IBlog"
+      />
+
+  <lemonade:content
+      factory=".blog.BlogEntry"
+      type="karl.content.interfaces.IBlogEntry"
+      />
+   
+  <lemonade:content
+      factory=".calendar.Calendar"
+      type="karl.content.interfaces.ICalendar"
+      />
+
+  <lemonade:content
+      factory=".calendar.CalendarEvent"
+      type="karl.content.interfaces.ICalendarEvent"
+      />
+    
+  <lemonade:content
+      factory=".files.CommunityRootFolder"
+      type="karl.content.interfaces.ICommunityRootFolder"
+      />
+    
+  <lemonade:content
+      factory=".files.CommunityFolder"
+      type="karl.content.interfaces.ICommunityFolder"
+      />
+
+  <lemonade:content
+      factory=".files.CommunityFile"
+      type="karl.content.interfaces.ICommunityFile"
+      />
+
+  <lemonade:content
+      factory=".references.ReferenceManual"
+      type="karl.content.interfaces.IReferenceManual"
+      />
+    
+  <lemonade:content
+      factory=".references.ReferenceSection"
+      type="karl.content.interfaces.IReferenceSection"
+      />
+    
+  <adapter
+      for="karl.content.interfaces.ICommunityFile"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.FileTextIndexData"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IBlogEntry"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndTextIndexData"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICalendarEvent"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndTextIndexData"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceManual"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndDescriptionIndexData"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceSection"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndDescriptionIndexData"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IWikiPage"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndTextIndexData"
+     />
+
+  <adapter
+      for="karl.models.interfaces.IComment"
+      provides="karl.models.interfaces.ITextIndexData"
+      factory=".adapters.TitleAndTextIndexData"
+     />
+
+  <lemonade:content
+      factory=".wiki.Wiki"
+      type="karl.content.interfaces.IWiki"
+      />
+
+  <lemonade:content
+      factory=".wiki.WikiPage"
+      type="karl.content.interfaces.IWikiPage"
+      />
+
+  <lemonade:content
+      factory=".page.Page"
+      type="karl.content.interfaces.IPage"
+      />
+
+  <lemonade:content
+      factory=".news.NewsItem"
+      type="karl.content.interfaces.INewsItem"
+      />
+
+  <lemonade:content
+      factory=".commenting.Comment"
+      type="karl.models.interfaces.IComment"
+      />
+
+  <lemonade:content
+      factory=".forum.ForumsFolder"
+      type="karl.content.interfaces.IForumsFolder"
+      />
+
+  <lemonade:content
+      factory=".forum.Forum"
+      type="karl.content.interfaces.IForum"
+      />
+
+  <lemonade:content
+      factory=".forum.ForumTopic"
+      type="karl.content.interfaces.IForumTopic"
+      />
+
+  <lemonade:content
+      factory=".intranets.IntranetsFolder"
+      type="karl.content.interfaces.IIntranetsTool"
+      />
+
+</configure>

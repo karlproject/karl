@@ -1,0 +1,26 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <table width="70%">
+      <tr tal:repeat="intranet intranets_info">
+	<td>${intranet['title']}</td>
+	<td width="30%">
+	  <a style="padding-right: 20px" href="${intranet['edit_href']}">Edit</a>
+	  <a target="_intranet" href="${intranet['intranet_href']}">Intranet View</a>
+	</td>
+      </tr>
+    </table>
+
+  </div>
+
+</div>

@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <p tal:condition="not digest">
+      --- Reply ABOVE THIS LINE to post a comment ---
+    </p>
+
+    <p>
+      A new <a href="${blogentry_href}">blog comment</a> has been posted by
+      ${creator.title} in the
+      <a href="${community_href}">${community.title}</a> community.
+      <div>
+    ---------------------------------------------------------------
+      </div>
+    </p>
+
+    <h2>RE: ${blogentry.title}</h2>
+
+    <!-- XXX Can "structure" be used with Genshi syntax? -->
+    <span tal:replace="structure context.text"/>
+
+    <p tal:condition="attachments">
+      <div><b>Attachments</b></div>
+      <div tal:repeat="filename attachments">
+        <a href="${attachment_hrefs[filename]}">
+          ${filename}
+        </a>
+      </div>
+    </p>
+
+    <div tal:condition="history[0]">
+      <div>
+    ---------------------------------------------------------------
+      </div>
+
+      <div tal:define="original history[0][0];
+                       comments history[0][1:]">
+        <div tal:define="creator profiles[original.creator]">
+          <h3>Original Blog Entry</h3>
+          <div><b>From:</b> ${creator.title}</div>
+          <div>
+            <b>Date:</b>
+            ${original.created.strftime('%B %d, %Y %I:%M %p')}
+          </div>
+          <p tal:content="structure original.text">
+              Body text.
+          </p>
+        </div>
+
+        <div tal:condition="comments">
+          <div tal:repeat="comment comments">
+            <p>-----</p>
+            <div tal:define="creator profiles[comment.creator]">
+              <b>From:</b> ${creator.title}
+            </div>
+            <div>
+              <b>Date:</b>
+              ${comment.created.strftime('%B %d, %Y %I:%M %p')}
+            </div>
+            <p tal:content="structure comment.text">
+              Comment text.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div tal:condition="not digest">----</div>
+    <p tal:condition="not digest">
+      REPLIES TO THIS MESSAGE WILL BE SENT TO THE COMMUNITY<br/>
+      To view this community, visit: ${community_href}<br/>
+      To stop these alerts, visit: ${manage_preferences_href}<br/>
+    </p>
+  </body>
+</html>

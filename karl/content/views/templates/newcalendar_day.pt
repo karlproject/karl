@@ -1,0 +1,80 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml" 
+	  title="${calendar.title}" href="${calendar.feed_href}"
+	  />
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="calendar.navigation.macros['header']"/>
+
+    <!-- cal legend -->
+    <table class="cal cal_day" cellspacing="0">
+
+      <!-- days -->
+      <tr class="cal_dates">
+        <th>${calendar.title_year}</th>
+        <th class="date">${calendar.title}</th>
+        <th class="last">&nbsp;</th>
+      </tr>
+      <tr class="all_day">
+        <th>all-day</th>
+
+        <td>
+          <div class="all_day_block">
+            <div class="create">
+              <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+            </div>
+
+            <div class="cal_event cal_event_pos_full">
+              <a href="#" class="cal_blue">Dummy Event</a>
+            </div>
+          </div>
+
+        </td>
+        <td class="last">&nbsp;</td>
+      </tr>
+      <tr class="divider">
+        <th>&nbsp;</th>
+        <td>&nbsp;</td>
+        <td class="last">&nbsp;</td>
+      </tr>
+    </table>
+
+    <div class="cal_hours_scroll">
+      <!-- current time bar -->
+      <div class="cal_time" style="display: none">&nbsp;</div>
+
+        <table class="cal cal_scroll cal_day" cellspacing="0">
+          <tr>
+            <!-- time labels -->
+            <th>
+              <div class="cal_stack">
+                <div tal:repeat="hour_ampm calendar.hour_labels" class="cal_time_label">${hour_ampm}</div>
+              </div>
+            </th>
+
+            <!-- time slots -->
+            <td class="cal_fri">
+              <div class="cal_stack">
+                 <div tal:repeat="slot calendar.half_hour_slots" 
+                      class="cal_hour_event ${slot.shade_class} ${slot.hour_class}">
+
+                   <div class="create">
+                     <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+                   </div>
+
+                 </div>
+              </div>
+            </td>        
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>

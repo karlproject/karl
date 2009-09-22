@@ -1,0 +1,52 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <form method="post" action="${post_url}" class="k3_genericForm"
+	  name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+      <fieldset>
+	<label>Markers</label>
+	<div class="fieldHelp">Customize what flavor of folder this is 
+	  by choosing one of the following markers.</div>
+
+	<div>
+	  <input id="reference_manual" name="marker" type="radio" 
+		 value="reference_manual" 
+		 tal:attributes="checked selected=='reference_manual'|None"/>
+	  <label for="reference_manual">Reference Manual</label>
+	</div>
+
+	<div>
+	  <input id="network_events" name="marker" type="radio" 
+		 value="network_events"
+		 tal:attributes="checked selected=='network_events'|None"/>
+	  <label for="network_events">Network Events</label>
+	</div>
+
+	<div>
+	  <input id="network_news" name="marker" type="radio" 
+		 value="network_news"
+		 tal:attributes="checked selected=='network_news'|None"/>
+	  <label for="network_news">Network News</label>
+	</div>
+
+      </fieldset>
+
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+
+    </form>
+
+  </div>
+
+</div>

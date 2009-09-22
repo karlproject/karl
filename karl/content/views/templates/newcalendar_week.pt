@@ -1,0 +1,55 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml" 
+	  title="${calendar.title}" href="${calendar.feed_href}"
+	  />
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="calendar.navigation.macros['header']"/>
+
+    <!-- cal legend -->
+    <table class="cal cal_week ${calendar.today_class}" cellspacing="0">
+      <!-- days -->
+      <tr class="cal_dates">
+        <th>2009</th>
+        <th class="cal_${day.heading}" tal:repeat="day calendar.week">
+          <a href="/day.php">${day.heading}</a>
+        </th>
+        <th class="last">&nbsp;</th>
+      </tr>
+
+      <tr class="all_day">
+        <th>all-day</th>
+
+        <td class="cal_${day.heading}" tal:repeat="day calendar.week">
+        <div class="all_day_block">
+          <div class="create">
+            <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+          </div>
+        </div>
+        </td>
+        <td class="last">&nbsp;</td>   
+      </tr>
+
+      <tr class="divider">
+        <th>&nbsp;</th>
+        <td colspan="7">&nbsp;</td>
+        <td class="last">&nbsp;</td>
+      </tr>
+    </table>
+
+    <div class="cal_hours_scroll">
+
+      <!-- current time bar -->
+      <div class="cal_time" style="display: none">&nbsp;</div>
+    </div>
+
+  </div>
+
+</div>

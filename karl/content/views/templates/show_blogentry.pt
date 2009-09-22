@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <a metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div metal:use-macro="api.snippets.macros['byline']"/>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
+
+    <div class="kbody"
+	 tal:condition="api.context.text != u''">
+      <span tal:replace="structure api.context.text"/>
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['show_attachments']"/>
+
+    <div metal:use-macro="api.snippets.macros['show_comments']"/>
+
+
+    <form method="post" action="${post_url}" class="k3_genericForm"
+	  enctype="multipart/form-data" name="save">
+
+      <fieldset metal:use-macro="formfields.macros['add_comment-field']"/>
+      <fieldset metal:use-macro="formfields.macros['attachment-field']"/>
+      <fieldset metal:use-macro="formfields.macros['sendalert-field']"/>
+	  <div style="display:none">
+      	<fieldset metal:use-macro="formfields.macros['security-state-field']"/>
+      </div>
+      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+    </form>
+  </div>
+
+</html>

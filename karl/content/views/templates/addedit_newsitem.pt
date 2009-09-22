@@ -1,0 +1,29 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+  <form method="post" action="${post_url}" class="k3_genericForm"
+	xml:id="contentform" enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <fieldset metal:use-macro="formfields.macros['title-field']"/>
+    <fieldset metal:use-macro="formfields.macros['tags-field']"/>
+    <fieldset metal:use-macro="formfields.macros['text-field']"/>
+    <fieldset metal:use-macro="formfields.macros['attachment-field']"/>
+    <fieldset metal:use-macro="formfields.macros['photo-field']"/>
+    <fieldset metal:use-macro="formfields.macros['caption-field']"/>
+    <fieldset metal:use-macro="formfields.macros['publication-date-field']"/>
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+
+  </form>
+
+  </div>
+</div>

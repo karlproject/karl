@@ -1,0 +1,114 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml" 
+	  title="${api.page_title}" href="${feed_url}"
+	  />
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+    <div metal:use-macro="api.snippets.macros['submenu']"/>
+
+    <div class="kbody">
+
+      <div class="batchNavigation">
+	<span style="padding-right:0em">
+	  <a href="${previous_month['href']}" id="previous">
+                &lt;&lt; ${previous_month['title']}</a></span> | 
+	<span>
+	  <a href="${next_month['href']}" id="next">${next_month['title']} &gt;&gt;</a>
+	</span>
+      </div>
+               
+      <table id="calendar" summary="Calendar for ${api.page_title}" 
+	     width="95%"
+	     border="0" cellpadding="0" cellspacing="0"
+	     tal:define="rowdata [
+	      {'day': 1, 'day_class': 'this-month', 'day_href': 'x.html', 
+	       'events': [
+	           {'title': 'Entry 1 Long Title', 'href': 'some.html'},
+	           {'title': 'Entry 2', 'href': 'some.html'},
+	           {'title': 'Entry 3', 'href': 'some.html'},
+	           {'title': 'Entry 4', 'href': 'some.html'},
+	           {'title': 'Entry 5', 'href': 'some.html'},
+	                  ]},
+	      {'day': 2, 'day_class': 'other-month', 'day_href': None,
+	      'events': [],},
+	      {'day': 3, 'day_class': 'other-month', 'day_href': None,
+	      'events': [],},
+	      {'day': 4, 'day_class': 'this-month', 'day_href': None,
+	      'events': [],},
+	      {'day': 5, 'day_class': 'this-month', 'day_href': 'x.html', 
+	       'events': [
+	           {'title': 'Entry 1', 'href': 'some.html'},
+	           {'title': 'Entry 2', 'href': 'some.html'},
+	           {'title': 'Entry 3', 'href': 'some.html'},
+	                  ]},
+	      {'day': 6, 'day_class': 'this-day', 'day_href': 'x.html', 
+	       'events': [
+	           {'title': 'Entry 1', 'href': 'some.html'},
+	           {'title': 'Entry 2', 'href': 'some.html'},
+	                  ]},
+	      {'day': 7, 'day_class': 'this-month', 'day_href': 'x.html', 
+	       'events': [
+	           {'title': 'Entry 1', 'href': 'some.html'},
+	                  ]},
+			 ]">
+
+        <tr class="calendar_day_of_week_header">
+          <td>Sun</td>
+          <td>Mon</td>
+          <td>Tues</td>
+          <td>Wed</td>
+          <td>Thurs</td>
+          <td>Fri</td>
+          <td>Sat</td>
+        </tr>
+
+
+        <tr class="calendar_week_row" tal:repeat="week weeks_days">
+          <td height="90" width="90" valign="top" class="${day['day_class']}" 
+	      tal:repeat="day week">
+	    <tal:block condition="not(day['events'])">
+              <div class="calendar_day_header">${day['day']}</div>
+	    </tal:block>
+	    <tal:block condition="day['events']">
+              <a href="${day['day_href']}">
+		<span class="calendar_day_header">${day['day']}</span>
+              </a>
+              <div class="calendar_day_entry" 
+		   tal:repeat="entry day['events'][0:2]"> 
+	      <span class="middot">&middot;</span>
+	      <a href="${entry['href']}" title="${entry['title']}" tal:define="title entry['title']">
+	      <tal:block condition="len(title) > 10">${entry['title'][0:10]}...</tal:block>
+	      <tal:block condition="not(len(title) > 10)">${entry['title']}</tal:block>
+	      </a></div>
+
+              <div class="calendar_day_entry" style="text-align:right;"
+		   tal:condition="len(day['events']) > 2">
+              <a href="${day['day_href']}">+${len(day['events']) - 2} more</a>
+              </div>
+
+	    </tal:block>
+	  </td>
+	</tr>
+
+      </table>
+
+
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['rss_icon']"/>
+
+  </div>
+
+</div>

@@ -1,0 +1,660 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <view
+    for="karl.content.interfaces.IBlog"
+    view=".blog.show_blog_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="add_blogentry.html"
+    view=".blog.add_blogentry_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.IBlogEntry"
+    view=".blog.show_blogentry_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.ICommentsFolder"
+    view=".commenting.add_comment_view"
+    name="add_comment.html"
+    permission="comment"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommentsFolder"
+    view=".commenting.redirect_comments_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.IComment"
+    view=".commenting.show_comment_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.models.interfaces.IComment"
+    name="edit.html"
+    view=".commenting.edit_comment_view"
+    permission="edit"
+  />
+  
+
+  <view
+    for="karl.content.interfaces.IBlogEntry"
+    name="edit.html"
+    view=".blog.edit_blogentry_view"
+    permission="edit"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.monthly_calendar_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".newcalendar.show_day_view"
+    permission="view"
+    name="newday.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".newcalendar.show_week_view"
+    permission="view"
+    name="newweek.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".newcalendar.show_month_view"
+    permission="view"
+    name="newmonth.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".newcalendar.show_list_view"
+    permission="view"
+    name="newlist.html"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.listing_calendar_view"
+    permission="view"
+    name="listing.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="settings.html"
+    view=".calendar_events.calendar_settings_view"
+    permission="moderate"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="add_calendarevent.html"
+    view=".calendar_events.add_calendarevent_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add_calendarevent.html"
+    view=".calendar_events.add_calendarevent_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_calendarevent.html"
+    view=".calendar_events.add_calendarevent_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICalendarEvent"
+    view=".calendar_events.show_calendarevent_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICalendarEvent"
+    name="event.ics"
+    view=".calendar_events.show_calendarevent_ics_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICalendarEvent"
+    name="edit.html"
+    view=".calendar_events.edit_calendarevent_view"
+    permission="create"
+  />
+  
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         karl.models.interfaces.IProfile
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.utilities.interfaces.IAlert"
+    factory=".adapters.CalendarEventAlert"
+    />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view=".files.show_folder_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add_folder.html"
+    view=".files.add_folder_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add_file.html"
+    view=".files.add_file_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add_page.html"
+    view=".page.add_page_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view=".files.show_folder_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view=".files.advanced_folder_view"
+    name="advanced.html"
+    permission="create"
+  />
+
+    
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_folder.html"
+    view=".files.add_folder_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_file.html"
+    view=".files.add_file_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_page.html"
+    view=".page.add_page_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    name="add_file.html"
+    view=".files.add_file_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    name="add_page.html"
+    view=".page.add_page_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="edit.html"
+    view=".files.edit_folder_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.show_file_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    name="edit.html"
+    view=".files.edit_file_view"
+    permission="create"
+  />  
+  
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.download_file_view"
+    name="dl"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add_referencemanual.html"
+    view=".references.add_referencemanual_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_referencemanual.html"
+    view=".references.add_referencemanual_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceManual"
+    view=".references.show_referencemanual_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceManual"
+    view=".references.viewall_referencemanual_view"
+    name="view_all.html"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceManual"
+    view=".references.edit_referencemanual_view"
+    name="edit.html"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceManual"
+    view=".references.add_referencesection_view"
+    name="add_referencesection.html"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    view=".references.show_referencesection_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    view=".references.edit_referencesection_view"
+    name="edit.html"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IForumsFolder"
+    view=".forum.show_forums_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IForum"
+    view=".forum.show_forum_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IForum"
+    view=".forum.edit_forum_view"
+    name="edit.html"
+    permission="edit"
+  />
+
+  <view
+    for="karl.content.interfaces.IForum"
+    name="delete.html"
+    view="karl.views.resource.delete_resource_view"
+    permission="delete"
+  />  
+
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="delete.html"
+    view="karl.views.resource.delete_resource_view"
+    permission="delete"
+  />  
+
+
+  <view
+    for="karl.content.interfaces.IForumsFolder"
+    view=".forum.add_forum_view"
+    name="add_forum.html"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IForum"
+    view=".forum.add_forum_topic_view"
+    name="add_forum_topic.html"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IForumTopic"
+    view=".forum.show_forum_topic_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IForumTopic"
+    view=".forum.edit_forum_topic_view"
+    name="edit.html"
+    permission="edit"
+  />
+
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    view=".wiki.redirect_to_front_page"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="index.html"
+    view=".wiki.redirect_to_front_page"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="add_wikipage.html"
+    view=".wiki.add_wikipage_view"
+    permission="create"
+  />
+  
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.show_wikipage_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    name="edit.html"
+    view=".wiki.edit_wikipage_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.IPage"
+    view=".page.show_page_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.IPage"
+    name="edit.html"
+    view=".page.edit_page_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.INewsItem"
+    view=".newsitem.show_newsitem_view"
+    permission="view"
+  />
+  
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="add_newsitem.html"
+    view=".newsitem.add_newsitem_view"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.INewsItem"
+    name="edit.html"
+    view=".newsitem.edit_newsitem_view"
+    permission="create"
+  />
+
+  <adapter
+      for="karl.content.interfaces.IWikiPage
+           karl.models.interfaces.IProfile
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.WikiPageAlert"
+      />
+      
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="atom.xml"
+    view=".atom.blog_atom_view"
+    permission="view"
+    />
+    
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="atom.xml"
+    view=".atom.calendar_atom_view"
+    permission="view"
+    />
+    
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="atom.xml"
+    view=".atom.wiki_atom_view"
+    permission="view"
+    />
+    
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="atom.xml"
+    view=".atom.community_files_atom_view"
+    permission="view"
+    />
+    
+  <adapter
+    for="karl.content.interfaces.ICommunityContent
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.NullContentAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IBlogEntry
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+    
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.content.views.atom.CalendarEventAtomEntry"
+    />
+    
+  <adapter
+    for="karl.content.interfaces.IReferenceManual
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IWikiPage
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForumTopic
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.content.views.atom.CommunityFileAtomEntry"
+    />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFile
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.FileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IPage
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.PageFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceManual
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.ReferenceManualFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICalendarEvent
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.CalendarEventFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceSection
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.ReferenceSectionFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFolder
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.FileInfo"
+     />
+
+  <adapter
+      for="karl.models.interfaces.ICommunityContent
+           repoze.bfg.interfaces.IRequest"
+      provides=".interfaces.IBylineInfo"
+      factory=".adapters.BylineInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IBlogEntry
+           karl.models.interfaces.IProfile
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.BlogEntryAlert"
+      />
+      
+  <adapter
+      for="karl.models.interfaces.IComment
+           karl.models.interfaces.IProfile
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.BlogCommentAlert"
+      />
+      
+  <adapter
+      for="karl.content.interfaces.ICommunityFile
+           karl.models.interfaces.IProfile
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.CommunityFileAlert"
+      />
+
+  <view
+    for="karl.content.interfaces.IIntranetsTool"
+    view=".intranets.show_intranets_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IIntranetsTool"
+    view=".intranets.add_intranet_view"
+    name="add_intranet.html"
+    permission="administer"
+  />
+
+  <view
+    for="karl.models.interfaces.IIntranet"
+    view=".intranets.edit_intranet_view"
+    name="edit_intranet.html"
+    permission="administer"
+  />
+
+  <view
+    for="karl.models.interfaces.IIntranets"
+    view=".intranets.edit_intranet_root_view"
+    name="edit.html"
+    permission="administer"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.jquery_grid_folder_view"
+    permission="view"
+    name="jquery_grid_list"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.jquery_grid_folder_view"
+    permission="view"
+    name="jquery_grid_list"
+  />
+
+  <adapter
+    for="karl.content.interfaces.IBlog
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.views.interfaces.ISidebar"
+    factory=".blog.BlogSidebar"
+  />
+
+
+</configure>
+  

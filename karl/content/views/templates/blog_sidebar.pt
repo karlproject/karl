@@ -1,0 +1,20 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <div metal:use-macro="api.snippets.macros['tagsportlet']"></div>
+
+  <div id="blogarchiveportlet" class="right-portlet">
+    <h3>ARCHIVE</h3>
+    <table class="portlet-table">
+    	<tbody>
+    		<tr tal:repeat="activity activity_list">
+    			<td class="name">
+    			<a href="${blog_url}?year=${activity.year}&amp;month=${activity.month}">
+          ${activity.month_name} ${activity.year} <strong>(${activity.count})</strong>
+        </a>
+        		</td>
+    		</tr>
+    	</tbody>
+   	</table>
+  </div>
+</div>

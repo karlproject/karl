@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <a metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+
+    <div tal:condition="startDate">
+      <h4>Event Starts</h4>
+      <div>${startDate}</div>
+    </div>
+
+    <div tal:condition="endDate">
+      <h4>Event Ends</h4>
+      <div>${endDate}</div>
+    </div>
+
+    <div tal:condition="api.context.text != u''">
+      <h4>Body</h4>
+      <div class="kbody" >
+	<span tal:replace="structure api.context.text"/>
+      </div>
+    </div>
+
+    <div tal:condition="location">
+      <h4>Location</h4>
+      <div>${location}</div>
+    </div>
+
+    <div tal:condition="contact_name">
+      <h4>Contact Name</h4>
+      <div>${contact_name}</div>
+    </div>
+
+    <div tal:condition="contact_email">
+      <h4>Contact Email</h4>
+      <div>${contact_email}</div>
+    </div>
+
+    <div tal:condition="attendees">
+      <h4>Attendees</h4>
+      <div>${attendees}</div>
+    </div>
+
+    <div>
+      <h4>Attachments</h4>
+      <div metal:use-macro="api.snippets.macros['show_attachments']"/>
+    </div>
+
+
+    <p class="add-to-outlook-link"><a href="@@event.ics">Add to Outlook</a></p>
+
+  </div>
+
+</html>

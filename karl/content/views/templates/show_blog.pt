@@ -1,0 +1,59 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.community_layout.macros['master']">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml"
+	  title="${api.page_title}" href="${feed_url}"
+	  />
+  </span>
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div class="kbody">
+		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
+				tal:repeat="entry entries">
+			<h2>
+          	<a href="${entry['href']}">${entry['title']}</a>
+        	</h2>
+
+			<div class="kbyline">${entry['byline_info'].posted_date}</div>
+
+        	<tal:block condition="entry['description']">
+        		<div tal:content="structure entry['description']"/>
+        	</tal:block>
+
+			<div class="kbyline">Posted
+	  	by <a href="${entry['byline_info'].author_url}">${entry['byline_info'].author_name}</a>
+	  	| <span tal:replace="structure entry['comments_blurb']"/>
+			</div>
+      	</div>
+    </div>
+
+    <div class="batchNavigation" tal:condition="batch_info.batching_required">
+      <span style="padding-right:0em">
+	<a href="${batch_info.previous_batch.url}" title="Go to Later"
+	   tal:condition="batch_info.previous_batch">
+          &lt;&lt; Later posts </a></span>
+      <span tal:condition="batch_info.previous_batch and batch_info.next_batch">|</span>
+      <span>
+	<a href="${batch_info.next_batch.url}" title="Go to Earlier"
+	   tal:condition="batch_info.next_batch"> Earlier
+          posts &gt;&gt;</a></span>
+    </div>
+
+    <div style="margin-top:20px;text-align:right">
+      <a href="mailto:${api.community_info.name}@${system_email_domain}"><img src="${api.static_url}/images/email.gif" border="0" alt="Subscribe"
+          id="RSSIcon"/></a>
+      <a href="${feed_url}"><img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+          id="RSSIcon"/></a>
+    </div>
+
+  </div>
+
+</html>

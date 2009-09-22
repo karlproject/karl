@@ -1,0 +1,26 @@
+<div xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+  <form method="post" action="${post_url}" class="k3_genericForm"
+	enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <fieldset metal:use-macro="formfields.macros['title-field']"/>
+    <fieldset metal:use-macro="formfields.macros['tags-field']"/>
+
+    <fieldset metal:define-macro="description-field"
+	      tal:define="error fielderrors['description']|None"
+	      class="${error and 'fieldError' or ''}">
+      <label>Description</label>
+      <div class="fieldHelp">A summary of the reference manual - subject 
+	and scope.  Will be displayed on every page of the manual.</div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <textarea id="description" name="description" rows="5" cols="60"
+		class="karltextareafield"></textarea>
+    </fieldset>
+
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+</div>

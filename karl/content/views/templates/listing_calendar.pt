@@ -1,0 +1,45 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml" 
+	  title="${api.page_title}" href="${feed_url}"
+	  />
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+    <div metal:use-macro="api.snippets.macros['submenu']"/>
+
+    <div class="kbody">
+
+      <h2 class="eventsListing">${api.page_title}</h2>
+
+      <dl class="eventsListing" tal:repeat="day days_with_events">
+        <dt id="day-${day['day']}">${day['dow']}, ${day['day']}</dt>
+        <dd tal:repeat="event day['events']">
+          <a href="${event['href']}">${event['title']}</a>
+        </dd>
+      </dl>
+    
+      <tal:block condition="not(days_with_events)">
+      <p>
+        There are no events for this month.
+      </p>
+      </tal:block>
+
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['rss_icon']"/>
+
+  </div>
+
+</div>

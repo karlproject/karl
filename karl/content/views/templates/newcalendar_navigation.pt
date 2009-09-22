@@ -1,0 +1,52 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+      <div class="cal_header" metal:define-macro="header">
+        <div class="cal_calendars clearafter" >
+          <!-- choose (Not Implemented)
+          <div class="cal_choose">
+            <label for="">
+              Calendar: 
+            </label>
+            <select>
+              <option class="group">All calendars</option>
+              <option class="group">Default Community</option>
+              <option class="color cal_green">Personal</option>
+              <option class="color cal_blue">Vacation</option>
+              <option class="color cal_red">Meetings</option>
+              <option class="group">NYC Community</option>
+              <option class="color cal_orange">Travel</option>
+            </select>
+            (<a href="#">Setup</a>)
+          </div>
+          -->
+
+          <!-- new event -->
+          <div class="cal_new_event">
+            <a href="${calendar.add_event_url}"><img src="${api.static_url}/images/cal_buttons_event.png" /></a>    
+          </div>
+       
+          <!-- actions -->
+          <div class="cal_actions">
+             <!-- download (Not Implemented)
+             <a class="cal_download" href="#">Download</a>
+             -->
+             <a class="cal_subscribe" href="${calendar.feed_href}">Subscribe</a>
+          </div>
+        </div>
+
+        <!-- buttons -->
+        <div class="cal_buttons clearafter">
+          <div class="cal_nav">
+            <a href="${calendar.navigation.today_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.today_button_img}" /></a>&nbsp;
+            <a href="${calendar.navigation.prev_href}"><img src="${api.static_url}/images/cal_buttons_previous.png" /></a><a href="${calendar.navigation.next_href}"><img src="${api.static_url}/images/cal_buttons_next.png" /></a>
+          </div>
+
+          <div class="cal_scope">
+            <a href="${calendar.navigation.day_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.day_button_img}" /></a><a href="${calendar.navigation.week_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.week_button_img}" /></a><a href="${calendar.navigation.month_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.month_button_img}" /></a><a href="${calendar.navigation.list_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.list_button_img}" /></a>
+          </div>
+        </div>
+      </div>
+
+</div>
+
