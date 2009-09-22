@@ -146,12 +146,11 @@ class XMLContentItemTests(unittest.TestCase):
     def test_attributes(self):
         o = self._make_some().next()
         attrs = o.attributes
-        for v in attrs.values():
-            self.failUnless(isinstance(v, unicode) or v is None)
         self.assertEqual(attrs['title'], u'Why Radio is Awesome')
         self.assertEqual(attrs['text'],
                          u'La radio \xe8 straordinaria perch\xe9 ...')
         self.assertEqual(attrs['description'], None)
+        self.assertEqual(attrs['colors'], ['Red', 'Green', 'Blue'])
 
     def test_children(self):
         o = list(self._make_some())[1]

@@ -147,6 +147,15 @@ _attr_converters = {
     'clob': _Clob,
     }
 
+def _simple_attr_value(element):
+    type = element.get('type')
+    converter = _attr_converters[type]
+    return converter(element.text)
+
+def _list_attr_value(element):
+    return [_simple_attr_value(item) for item in
+            element.xpath('k:item', namespaces=NAMESPACES)]
+
 class XMLContentSource(object):
     """
     A content source which reads an XML stream.
@@ -253,10 +262,10 @@ class XMLContentItem(object):
             if _boolean(element.get('none')):
                 attrs[name] = None
             else:
-                type = element.get('type')
-                converter = _attr_converters[type]
-                value = converter(element.text)
-                attrs[name] = value
+                if element.tag == '{%s}simple' % NAMESPACE:
+                    attrs[name] = _simple_attr_value(element)
+                elif element.tag == '{%s}list' % NAMESPACE:
+                    attrs[name] = _list_attr_value(element)
 
         return attrs
 
