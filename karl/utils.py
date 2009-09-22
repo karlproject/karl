@@ -86,8 +86,10 @@ def get_content_type_name(resource):
     return content_iface.getTaggedValue('name')
 
 def debugsearch(context, **kw):
-    catalog = find_catalog(context)
-    num, docids, resolver = catalog._search(**kw)
+    from karl.models.adapters import CatalogSearch
+    searcher = CatalogSearch(context)
+    kw['use_cache'] = False
+    num, docids, resolver = searcher(**kw)
     L = []
     for docid in docids:
         L.append(resolver(docid))
