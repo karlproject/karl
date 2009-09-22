@@ -98,3 +98,12 @@ def create_generic_content(iface, attrs):
         setattr(obj, name, value)
 
     return obj
+
+def update_generic_content(o, attrs):
+    """
+    XXX: create/update probably need to be integrated into something
+    registerable, rather than IGenericContentFactory which can only handle
+    update.
+    """
+    for name, value in attrs.items():
+        setattr(o, name, value)

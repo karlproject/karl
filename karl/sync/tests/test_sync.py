@@ -98,6 +98,51 @@ class SyncTests(unittest.TestCase):
         self.assertEqual(o.b, 9)
         self.assertEqual(o.c, False)
 
+    def test_update(self):
+        import datetime
+        from pytz import FixedOffset
+        date1 = datetime.datetime(2009, 9, 22, 10, 9, 00,
+                                  tzinfo=FixedOffset(-300))
+        date2 = datetime.datetime(2009, 9, 22, 22, 9, 00,
+                                  tzinfo=FixedOffset(-300))
+        item1 = DummyItem(
+            id='1234',
+            name='foo',
+            type=IDummyContent,
+            workflow_state=None,
+            created=date1,
+            created_by='chris',
+            modified=date1,
+            modified_by='chris',
+            children=[],
+            deleted_children=[],
+            attributes=dict(
+                a='a',
+                b=2,
+                c=True,
+                ),
+            )
+
+        source = DummySource(
+            items=[item1],
+            incremental=False,
+            deleted_items=[]
+            )
+
+        self._make_one(source)()
+
+        context = self.context
+        foo = context['foo']
+        self.assertEqual(foo.a, 'a')
+
+        item1.modified = date2
+        item1.attributes['a'] = 'b'
+        self._make_one(source)()
+
+        self.failUnless(context['foo'] is foo)
+        self.assertEqual(foo.a, 'b')
+
+
 class DummySource(object):
     implements(IContentSource)
 
