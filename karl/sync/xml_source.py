@@ -247,7 +247,7 @@ class XMLContentItem(object):
     @memoize
     def attributes(self):
         attrs = {}
-        for element in self.element.xpath('k:attributes/k:attribute',
+        for element in self.element.xpath('k:attributes/k:*',
                                           namespaces=NAMESPACES):
             name = element.get('name')
             if _boolean(element.get('none')):

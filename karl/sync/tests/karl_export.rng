@@ -101,7 +101,7 @@
     </element>
   </define>
   <define name="attributeElement">
-    <element name="attribute">
+    <element name="simple">
       <attribute name="name"/>
       <attribute name="type"/>
       <optional>
