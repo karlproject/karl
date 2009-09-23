@@ -23,19 +23,6 @@ class IContentSource(Interface):
     Instances of IContentSource expose a datasource from which content can be
     pulled into Karl.
     """
-    id = Attribute("id",
-        """
-        A globally unique identifier which identifies the data source.
-        """
-        )
-
-    modified = Attribute("modified",
-        """
-        An instance of datetime.datetime which the last time any content in
-        this source was modified. If the most recent sync is more recent than
-        this timestamp, no syncronization will be performed."
-        """
-        )
 
     content = Attribute("content",
         """

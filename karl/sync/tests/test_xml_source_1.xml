@@ -9,8 +9,6 @@ by Paul's XML editor.
 <source xmlns="http://namespaces.karlproject.org/xml-sync"
         location="http://foo.com/bar"
         incremental="True">
-    <id>abcdef</id>
-    <modified>2009-09-10T18:28:03-05:00</modified>
     <deleted-content>64071160-f25e-4221-a2d7-cd85b76395fb</deleted-content>
     <deleted-content>a66af600-718c-4f60-ad78-63dc7018de78</deleted-content>
     <content>

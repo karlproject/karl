@@ -178,11 +178,6 @@ class XMLContentSource(object):
 
     @property
     @memoize
-    def id(self):
-        return _element_value(self.root, 'id')
-
-    @property
-    @memoize
     def location(self):
         return self.root.get('location')
 
@@ -190,11 +185,6 @@ class XMLContentSource(object):
     @memoize
     def incremental(self):
         return _boolean(self.root.get('incremental'))
-
-    @property
-    @memoize
-    def modified(self):
-        return _parse_date(_element_value(self.root, 'modified'))
 
     @property
     def content(self):
@@ -221,7 +211,6 @@ class XMLContentItem(object):
     @memoize
     def id(self):
         return _element_value(self.element, 'id')
-
 
     @property
     @memoize
