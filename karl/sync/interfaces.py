@@ -37,7 +37,7 @@ class IContentSource(Interface):
         """
         )
 
-    items = Attribute("items",
+    content = Attribute("content",
         """
         An iterable object which iterates over individual IcontentItem instances
         in the content source.
@@ -54,7 +54,7 @@ class IContentSource(Interface):
         """
         )
 
-    deleted_items = Attribute("deleted_items",
+    deleted_content = Attribute("deleted_content",
         """
         This is an iterable containing ids of recently deleted items.  These
         items will also be deleted in Karl.  This is primarily useful in the

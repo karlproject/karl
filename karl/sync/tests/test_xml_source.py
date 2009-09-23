@@ -45,13 +45,13 @@ class XMLContentSourceTests(unittest.TestCase):
         )
         self.assertEqual(o.modified, expected)
 
-    def test_items(self):
+    def test_content(self):
         o = self._make_one()
-        self.assertEqual(2, len(list(o.items)))
+        self.assertEqual(2, len(list(o.content)))
 
-    def test_deleted_items(self):
+    def test_deleted_content(self):
         o = self._make_one()
-        self.assertEqual(o.deleted_items,
+        self.assertEqual(o.deleted_content,
                          ['64071160-f25e-4221-a2d7-cd85b76395fb',
                           'a66af600-718c-4f60-ad78-63dc7018de78'])
 
@@ -76,7 +76,7 @@ class XMLContentItemTests(unittest.TestCase):
         assert stream is not None
 
         from karl.sync.xml_source import XMLContentSource
-        return XMLContentSource(stream).items
+        return XMLContentSource(stream).content
 
 
     def test_class_conforms_to_interface(self):

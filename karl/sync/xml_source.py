@@ -197,15 +197,15 @@ class XMLContentSource(object):
         return _parse_date(_element_value(self.root, 'modified'))
 
     @property
-    def items(self):
-        for element in self.root.iterchildren('{%s}item' % NAMESPACE):
+    def content(self):
+        for element in self.root.iterchildren('{%s}content' % NAMESPACE):
             yield XMLContentItem(element)
 
     @property
     @memoize
-    def deleted_items(self):
+    def deleted_content(self):
         return [element.text for element in
-             self.root.iterchildren('{%s}deleted-item' % NAMESPACE)]
+             self.root.iterchildren('{%s}deleted-content' % NAMESPACE)]
 
 
 class XMLContentItem(object):
@@ -279,11 +279,11 @@ class XMLContentItem(object):
 
     @property
     def children(self):
-        for element in self.element.xpath('k:item', namespaces=NAMESPACES):
+        for element in self.element.xpath('k:content', namespaces=NAMESPACES):
             yield XMLContentItem(element)
 
     @property
     @memoize
     def deleted_children(self):
         return [element.text for element in
-             self.element.iterchildren('{%s}deleted-item' % NAMESPACE)]
+             self.element.iterchildren('{%s}deleted-content' % NAMESPACE)]
