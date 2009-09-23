@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #434879 Add support for pasting into livesearch
+
 - The RSS icon on the new calendar views is now placed on the lower
   right for consistency with the other pages.
 

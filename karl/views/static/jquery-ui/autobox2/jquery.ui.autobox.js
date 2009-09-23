@@ -167,6 +167,9 @@ $.widget('ui.autobox3', {
                 startTypingTimeout(e, this, opt.timeout);
               }
             })
+            .bind("paste", function(e) {
+              startTypingTimeout(e, this, 0);
+            })
             .bind("autobox", function(){
               var self=$(this);
               self.one("updateList", function(e, list){//clear/update/redraw list
