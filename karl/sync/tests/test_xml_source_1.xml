@@ -23,17 +23,17 @@ by Paul's XML editor.
         <modified-by>crossi</modified-by>
         <modified>2009-09-09T18:28:03-05:00</modified>
         <attributes>
-            <simple name="title" type="text">Why Radio is Awesome</simple>
+            <simple name="title">Why Radio is Awesome</simple>
             <simple name="text" type="text">La radio è straordinaria perché ...</simple>
             <simple name="description" type="text" none="True"/>
             <list name="colors">
-                <item type="text">Red</item>
-                <item type="text">Green</item>
+                <item>Red</item>
+                <item>Green</item>
                 <item type="text">Blue</item>
             </list>
             <dict name="animals">
-                <item name="Clio" type="text">cat</item>
-                <item name="Ginger" type="text">cat</item>
+                <item name="Clio">cat</item>
+                <item name="Ginger">cat</item>
                 <item name="Elsa" type="text">dog</item>
             </dict>
         </attributes>
@@ -48,9 +48,9 @@ by Paul's XML editor.
         <modified-by>crossi</modified-by>
         <modified>2009-09-09T18:28:03-05:00</modified>
         <attributes>
-            <simple name="title" type="text"> Why Radio is Awesome </simple>
-            <simple name="text" type="text"> Radio is awesome because ... </simple>
-            <simple name="description" type="text" none="True"/>
+            <simple name="title"> Why Radio is Awesome </simple>
+            <simple name="text" > Radio is awesome because ... </simple>
+            <simple name="description" none="True"/>
         </attributes>
         <item>
             <id>234jjlkj3423</id>
@@ -62,9 +62,9 @@ by Paul's XML editor.
             <modified-by>crossi</modified-by>
             <modified>2009-09-09T18:28:03-05:00</modified>
             <attributes>
-                <simple name="title" type="text"> Why Radio is Awesome </simple>
-                <simple name="text" type="text"> Radio is awesome because ... </simple>
-                <simple name="description" type="text" none="True"/>
+                <simple name="title"> Why Radio is Awesome </simple>
+                <simple name="text"> Radio is awesome because ... </simple>
+                <simple name="description" none="True"/>
             </attributes>
         </item>
         <deleted-item>abc123</deleted-item>

@@ -149,6 +149,8 @@ _attr_converters = {
 
 def _simple_attr_value(element):
     type = element.get('type')
+    if type is None:
+        type = 'text'
     converter = _attr_converters[type]
     return converter(element.text)
 
