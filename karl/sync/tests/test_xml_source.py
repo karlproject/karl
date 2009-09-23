@@ -114,6 +114,13 @@ class XMLContentItemTests(unittest.TestCase):
                                      tzinfo=pytz.FixedOffset(-300))
         self.assertEqual(o.created, expected)
 
+    def test_created_not_specified(self):
+        import datetime
+        now = datetime.datetime.now()
+        window = datetime.timedelta(seconds=2)
+        o = list(self._make_some())[1]
+        self.failUnless(o.created - now < window)
+
     def test_created_by(self):
         o = self._make_some().next()
         self.assertEqual(o.created_by, 'crossi')
@@ -125,6 +132,13 @@ class XMLContentItemTests(unittest.TestCase):
         expected = datetime.datetime(2009, 9, 9, 18, 28, 3,
                                      tzinfo=pytz.FixedOffset(-300))
         self.assertEqual(o.modified, expected)
+
+    def test_modified_not_specified(self):
+        import datetime
+        now = datetime.datetime.now()
+        window = datetime.timedelta(seconds=2)
+        o = list(self._make_some())[1]
+        self.failUnless(o.modified - now < window)
 
     def test_modified_by(self):
         o = self._make_some().next()

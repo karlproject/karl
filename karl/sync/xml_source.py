@@ -45,8 +45,17 @@ def memoize(f):
         return value
     return wrapper
 
-def _element_value(node, name):
-    return node.xpath('k:' + name, namespaces=NAMESPACES)[0].text
+def _element_value(node, name, default=_marker):
+    nodes = node.xpath('k:' + name, namespaces=NAMESPACES)
+    if not nodes:
+        if default is not _marker:
+            return default
+        raise LookupError('No such element: %s' % name)
+
+    if len(nodes) > 1:
+        raise LookupError('Too many elements: %s' % name)
+
+    return nodes[0].text
 
 def _module(name):
     module = sys.modules.get(name, None)
@@ -230,7 +239,10 @@ class XMLContentItem(object):
     @property
     @memoize
     def created(self):
-        return _parse_date(_element_value(self.element, 'created'))
+        timestamp = _element_value(self.element, 'created', None)
+        if timestamp is not None:
+            return _parse_date(timestamp)
+        return datetime.datetime.now()
 
     @property
     @memoize
@@ -240,7 +252,10 @@ class XMLContentItem(object):
     @property
     @memoize
     def modified(self):
-        return _parse_date(_element_value(self.element, 'modified'))
+        timestamp = _element_value(self.element, 'modified', None)
+        if timestamp is not None:
+            return _parse_date(timestamp)
+        return datetime.datetime.now()
 
     @property
     @memoize

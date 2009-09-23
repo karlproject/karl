@@ -41,10 +41,8 @@ by Paul's XML editor.
         <name>some-folder</name>
         <type>IFolder</type>
         <workflow-state>inherit</workflow-state>
-        <created>2009-09-09T18:28:03-05:00</created>
         <created-by>crossi</created-by>
         <modified-by>crossi</modified-by>
-        <modified>2009-09-09T18:28:03-05:00</modified>
         <attributes>
             <simple name="title"> Why Radio is Awesome </simple>
             <simple name="text" > Radio is awesome because ... </simple>
