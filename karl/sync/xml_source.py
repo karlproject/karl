@@ -15,17 +15,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import base64
-import codecs
 import lxml.etree
 import datetime
-import pytz
 import sys
-import time
 import types
-import urllib2
 
 from zope.interface import implements
+from karl.sync.conversion import convert
 from karl.sync.interfaces import IContentItem
 from karl.sync.interfaces import IContentNode
 from karl.sync.interfaces import IContentSource
@@ -89,80 +85,11 @@ def _resolve_type(name):
 
     return cur
 
-def _parse_date(s):
-    # Whoever decided to make strptime not be able to parse simple numeric
-    # timezone offsets should be punched in the face.
-    s, tzinfo = s[:-6], s[-6:]
-    t = time.strptime(s, '%Y-%m-%dT%H:%M:%S')
-    tzh, tzm = [int(x) for x in tzinfo.split(':')]
-    tz = pytz.FixedOffset(tzh * 60 + tzm)
-    tzinfo = dict(tzinfo=tz)
-    return datetime.datetime(*t[:6], **tzinfo)
-
-def _boolean(value):
-    if value is None:
-        return False
-
-    value = value.lower()
-    if value in ('t', 'true', 'y', 'yes'):
-        return True
-    if value in ('f', 'false', 'n', 'no'):
-        return False
-    try:
-        return not not int(value)
-    except ValueError:
-        raise ValueError("Can't convert to boolean: %s" % value)
-
-class _Blob(object):
-    def __init__(self, url):
-        self.url = url
-
-    def open(self):
-        return urllib2.urlopen(self.url)
-
-class _Clob(object):
-    def __init__(self, url):
-        self.url = url
-
-    def open(self, encoding='utf-8'):
-        # Supposedly codecs.EncodedFile is supposed to be able to wrap a stream
-        # and read unicode, but I couldn't get it to work--always returns raw
-        # string.
-        # This monkey patch is being peformed to replace just the read method
-        # with a version that decodes the stream and returns unicode, still
-        # allowing access to url.info, in case calling code wants to see http
-        # headers or status code.
-        def decode_read(read_raw):
-            def read(size=-1):
-                data = read_raw(size)
-                if data:
-                    data = unicode(data, encoding)
-                return data
-            return read
-
-        url = urllib2.urlopen(self.url)
-        url.read = decode_read(url.read)
-        return url
-
-# XXX Might need to make these pluggable at some point.
-#     Can make these adapters and register with ZCA if need be.
-_attr_converters = {
-    'int': int,
-    'float': float,
-    'bool': _boolean,
-    'bytes': base64.b64decode,
-    'text': unicode,
-    'timestamp': _parse_date,
-    'blob': _Blob,
-    'clob': _Clob,
-    }
-
 def _simple_attr_value(element):
     type = element.get('type')
     if type is None:
         type = 'text'
-    converter = _attr_converters[type]
-    return converter(element.text.strip())
+    return convert(element.text.strip(), type)
 
 def _list_attr_value(element):
     return [_simple_attr_value(item) for item in
@@ -194,7 +121,7 @@ class XMLContentSource(object):
     @property
     @memoize
     def incremental(self):
-        return _boolean(self.root.get('incremental'))
+        return convert(self.root.get('incremental'), 'bool')
 
     @property
     def content(self):
@@ -247,7 +174,7 @@ class XMLContentItem(object):
     def created(self):
         timestamp = _element_value(self.element, 'created', None)
         if timestamp is not None:
-            return _parse_date(timestamp)
+            return convert(timestamp, 'timestamp')
         return datetime.datetime.now()
 
     @property
@@ -260,7 +187,7 @@ class XMLContentItem(object):
     def modified(self):
         timestamp = _element_value(self.element, 'modified', None)
         if timestamp is not None:
-            return _parse_date(timestamp)
+            return convert(timestamp, 'timestamp')
         return datetime.datetime.now()
 
     @property
@@ -275,7 +202,7 @@ class XMLContentItem(object):
         for element in self.element.xpath('k:attributes/k:*',
                                           namespaces=NAMESPACES):
             name = element.get('name')
-            if _boolean(element.get('none')):
+            if convert(element.get('none'), 'bool'):
                 attrs[name] = None
             else:
                 if element.tag == '{%s}simple' % NAMESPACE:

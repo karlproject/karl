@@ -176,6 +176,19 @@ class IContentNode(Interface):
         """
         )
 
+class IDataConverter(Interface):
+    """
+    Implementors of this interface provide a means of converting a textual
+    representation of some data that is an attribute value into a python
+    data type.  Adapters can be registered to provide custom data conversion
+    beyond the built in converters already provided, like int, text, bool,
+    etc...
+    """
+    def __call__():
+        """
+        Get converted python value.
+        """
+
 class IGenericContentFactory(Interface):
     """
     Normally, with repoze.lemonade you register content type factories as
