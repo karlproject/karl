@@ -24,6 +24,13 @@ class IContentSource(Interface):
     pulled into Karl.
     """
 
+    nodes = Attribute("nodes",
+        """
+        Iterable of IContentNode instances, used to traverse to particular
+        containers inside Karl.
+        """
+        )
+
     content = Attribute("content",
         """
         An iterable object which iterates over individual IcontentItem instances
@@ -130,6 +137,40 @@ class IContentItem(Interface):
     deleted_children = Attribute("deleted_children",
         """
         List of ids of children recently deleted from this item.  This is only
+        necessary if doing an incremental update.  Otherwise, deleted children
+        can be communicated implicitly via omission from ``children``.
+        """
+        )
+
+class IContentNode(Interface):
+    """
+    A node is like an item excpet it is merely traversed.  No update or create
+    is performed.  It must correspond to an actually existing container object
+    in Karl and is used to indicate that any children of this node should be
+    imported into that container object.
+    """
+
+    name = Attribute("name",
+        """
+        The object.__name__ of the node to be traversed.
+        """
+        )
+
+    nodes = Attribute("nodes",
+        """
+        Any child nodes of this node.
+        """
+        )
+
+    content = Attribute("content",
+        """
+        Instances of IContentItem contained by this node.
+        """
+        )
+
+    deleted_content = Attribute("deleted_content",
+        """
+        List of ids of children recently deleted from this node.  This is only
         necessary if doing an incremental update.  Otherwise, deleted children
         can be communicated implicitly via omission from ``children``.
         """

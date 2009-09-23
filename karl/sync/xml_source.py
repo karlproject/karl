@@ -27,6 +27,7 @@ import urllib2
 
 from zope.interface import implements
 from karl.sync.interfaces import IContentItem
+from karl.sync.interfaces import IContentNode
 from karl.sync.interfaces import IContentSource
 
 _marker = object()
@@ -55,7 +56,7 @@ def _element_value(node, name, default=_marker):
     if len(nodes) > 1:
         raise LookupError('Too many elements: %s' % name)
 
-    return nodes[0].text
+    return nodes[0].text.strip()
 
 def _module(name):
     module = sys.modules.get(name, None)
@@ -161,7 +162,7 @@ def _simple_attr_value(element):
     if type is None:
         type = 'text'
     converter = _attr_converters[type]
-    return converter(element.text)
+    return converter(element.text.strip())
 
 def _list_attr_value(element):
     return [_simple_attr_value(item) for item in
@@ -201,9 +202,14 @@ class XMLContentSource(object):
             yield XMLContentItem(element)
 
     @property
+    def nodes(self):
+        for element in self.root.iterchildren('{%s}node' % NAMESPACE):
+            yield XMLContentNode(element)
+
+    @property
     @memoize
     def deleted_content(self):
-        return [element.text for element in
+        return [element.text.strip() for element in
              self.root.iterchildren('{%s}deleted-content' % NAMESPACE)]
 
 
@@ -289,5 +295,35 @@ class XMLContentItem(object):
     @property
     @memoize
     def deleted_children(self):
-        return [element.text for element in
+        return [element.text.strip() for element in
+             self.element.iterchildren('{%s}deleted-content' % NAMESPACE)]
+
+class XMLContentNode(object):
+    """
+    XXX
+    """
+    implements(IContentNode)
+
+    def __init__(self, element):
+        self.element = element
+
+    @property
+    @memoize
+    def name(self):
+        return self.element.get('name')
+
+    @property
+    def nodes(self):
+        for element in self.element.iterchildren('{%s}node' % NAMESPACE):
+            yield XMLContentNode(element)
+
+    @property
+    def content(self):
+        for element in self.element.xpath('k:content', namespaces=NAMESPACES):
+            yield XMLContentItem(element)
+
+    @property
+    @memoize
+    def deleted_content(self):
+        return [element.text.strip() for element in
              self.element.iterchildren('{%s}deleted-content' % NAMESPACE)]

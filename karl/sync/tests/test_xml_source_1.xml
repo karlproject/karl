@@ -21,8 +21,8 @@ by Paul's XML editor.
         <modified-by>crossi</modified-by>
         <modified>2009-09-09T18:28:03-05:00</modified>
         <attributes>
-            <simple name="title">Why Radio is Awesome</simple>
-            <simple name="text" type="text">La radio è straordinaria perché ...</simple>
+            <simple name="title"> Why Radio is Awesome </simple>
+            <simple name="text" type="text"> La radio è straordinaria perché ... </simple>
             <simple name="description" type="text" none="True"/>
             <list name="colors">
                 <item>Red</item>
@@ -65,4 +65,38 @@ by Paul's XML editor.
         </content>
         <deleted-content>abc123</deleted-content>
     </content>
+    <node name="foo">
+        <content>
+            <id>39393</id>
+            <name>some-folder</name>
+            <type>IFolder</type>
+            <workflow-state>inherit</workflow-state>
+            <created-by>crossi</created-by>
+            <modified-by>crossi</modified-by>
+            <attributes>
+                <simple name="title"> Why Radio is Awesome </simple>
+                <simple name="text" > Radio is awesome because ... </simple>
+                <simple name="description" none="True"/>
+            </attributes>
+        </content>
+        <node name="bar">
+            <content>
+                <id>234jjlkj3423</id>
+                <name>some-doc-in-folder</name>
+                <type>IFile</type>
+                <workflow-state>inherit</workflow-state>
+                <created>2009-09-09T18:28:03-05:00</created>
+                <created-by>crossi</created-by>
+                <modified-by>crossi</modified-by>
+                <modified>2009-09-09T18:28:03-05:00</modified>
+                <attributes>
+                    <simple name="title"> Why Radio is Awesome </simple>
+                    <simple name="text"> Radio is awesome because ... </simple>
+                    <simple name="description" none="True"/>
+                </attributes>
+            </content>
+        </node>
+        <deleted-content>abc123</deleted-content>
+    </node>
+
 </source>

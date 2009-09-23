@@ -56,6 +56,10 @@ class XMLContentSourceTests(unittest.TestCase):
 
         self.failUnless(schema.validate(doc))
 
+    def test_nodes(self):
+        o = self._make_one()
+        self.assertEqual(1, len(list(o.nodes)))
+
 class XMLContentItemTests(unittest.TestCase):
     def _make_some(self, test_file='test_xml_source_1.xml'):
         import pkg_resources
@@ -271,6 +275,45 @@ class AttributeConversionTests(unittest.TestCase):
         self.failUnless(isinstance(blob.open().read(), unicode))
         self.assertRaises(ValueError, converter('no where in particular').open )
 
+class XMLContentNodeTests(unittest.TestCase):
+    def setUp(self):
+        import pkg_resources
+        from karl.sync.xml_source import XMLContentSource
+        test_file = 'test_xml_source_1.xml'
+        stream = pkg_resources.resource_stream(__name__, test_file)
+        self.source =  XMLContentSource(stream)
+
+    def test_class_conforms_to_interface(self):
+        from zope.interface.verify import verifyClass
+        from karl.sync.interfaces import IContentNode
+        from karl.sync.xml_source import XMLContentNode
+        verifyClass(IContentNode, XMLContentNode)
+
+    def test_instance_conforms_to_interface(self):
+        from zope.interface.verify import verifyObject
+        from karl.sync.interfaces import IContentNode
+        verifyObject(IContentNode, list(self.source.nodes)[0])
+
+    def test_name(self):
+        node = list(self.source.nodes)[0]
+        self.assertEqual(node.name, 'foo')
+
+    def test_nodes(self):
+        node = list(self.source.nodes)[0]
+        nodes = list(node.nodes)
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].name, 'bar')
+
+    def test_content(self):
+        node = list(self.source.nodes)[0]
+        content = list(node.content)
+        self.assertEqual(len(content), 1)
+        self.assertEqual(content[0].name, 'some-folder')
+
+    def test_deleted_content(self):
+        node = list(self.source.nodes)[0]
+        self.assertEqual(node.deleted_content, ['abc123'])
+
 class MemoizeTests(unittest.TestCase):
     def test_it(self):
         from karl.sync.xml_source import memoize
@@ -285,7 +328,5 @@ class MemoizeTests(unittest.TestCase):
                 return self.count
 
         foo = Foo()
-        self.failIf(hasattr(foo, '_memoize_f'))
         self.assertEqual(foo.f, 1)
         self.assertEqual(foo.f, 1) # doesn't increment
-        self.assertEqual(foo._memoize_f, 1)
