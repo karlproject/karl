@@ -50,6 +50,8 @@
       <div class="cal_time" style="display: none">&nbsp;</div>
     </div>
 
+    <div metal:use-macro="calendar.navigation.macros['footer']"/>
+
   </div>
 
 </div>

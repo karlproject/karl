@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- The RSS icon on the new calendar views is now placed on the lower
+  right for consistency with the other pages.
+
 - Removed the "View Earlier Events" and "View Later Events" from
   the list view on the new calendar.  These duplicate the functions
   of the forward/backward buttons and are not necessary.  

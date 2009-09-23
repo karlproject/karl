@@ -1780,7 +1780,14 @@ div.moderator {
   border-top: 1px solid #dddfe0;
   border-bottom: 1px solid #dddfe0;
   font-size: 85%;
+}       
+.cal_footer {
+  margin-top: 15px;    
 }
+.cal_footer a img {
+  border: 0;
+  float: right;
+}          
 .cal_calendars {
   background-color: #edf1f3;
   border-bottom: 1px solid #dddfe0;

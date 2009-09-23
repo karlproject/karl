@@ -65,6 +65,8 @@
       </tr>
     </table>
 
+    <div metal:use-macro="calendar.navigation.macros['footer']"/>
+
   </div>
 
 </div>
