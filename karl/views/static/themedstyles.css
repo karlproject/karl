@@ -2495,20 +2495,10 @@ body .cal_hour_event .cal_event_block .time {
 .cal_agenda_block .cal_event_time a:visited {
   float: left;
   text-decoration: none;
-  padding: 1px 12px 1px 4px;
+  padding: 1px 5px 1px 5px;
   font-size: 90%;
-  background-image: url("images/cal_expand.png");
-  background-repeat: no-repeat;
-  background-position: right center;
 }
 
-.cal_agenda_body {
-  width: 420px;
-  float: left;
-  margin: 4px 0 6px 128px;
-  border-left: 2px solid #cedfef;
-  padding-left: 5px;
-}
 .cal_agenda_title {
   width: 390px;
   float: left;

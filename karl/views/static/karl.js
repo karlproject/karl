@@ -1770,21 +1770,6 @@ function scrollToTime() {
   $(".cal_hours_scroll").scrollTo(scrollPos, { duration: 1000 });
 }
 
-/** =CALENDAR AGENDA TOGGLING
------------------------------------------------ */
-function expandAgendaEvents(evt) {
-  evt.preventDefault();
-  $('.cal_agenda_body').show();
-}
-function collapseAgendaEvents(evt) {
-  evt.preventDefault();
-  $('.cal_agenda_body').hide();
-}
-function toggleAgendaEvent(evt) {
-  evt.preventDefault();
-  $(this).siblings('.cal_agenda_body').toggle();
-}
-
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
@@ -1807,11 +1792,6 @@ function initCalendar() {
   DD_roundies.addRule('.cal_hour_event .cal_event_block', '7px');
 
   scrollToTime();
-
-  // AGENDA VIEW
-  $('#cal_expand_all').click(expandAgendaEvents);
-  $('#cal_collapse_all').click(collapseAgendaEvents);
-  $('.cal_event_time').click(toggleAgendaEvent);
 }
 
 // Initialize jquery
