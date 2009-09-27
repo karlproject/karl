@@ -25,12 +25,6 @@
           <div class="cal_new_event">
             <a href="${calendar.add_event_url}"><img src="${api.static_url}/images/cal_buttons_event.png" /></a>    
           </div>
-       
-          <!-- actions 
-          <div class="cal_actions">
-             <a class="cal_download" href="#">Download</a>
-          </div>
-          -->
         </div>
 
         <!-- buttons -->
@@ -47,9 +41,11 @@
       </div>
 
       <div class="cal_footer clearafter" metal:define-macro="footer">
-        <a href="${calendar.feed_href}">
-          <img src="${api.static_url}/images/feed-icon-16x16.png" alt="Subscribe" />
-        </a>      
+        <!-- actions -->
+        <div class="cal_actions">
+           <!-- <a class="cal_download" href="#">Download</a> -->
+           <a class="cal_subscribe" href="${calendar.feed_href}">Subscribe</a>
+        </div>
       </div>
 
 </div>
