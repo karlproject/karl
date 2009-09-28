@@ -21,12 +21,14 @@ from zope.component import queryUtility
 from ZODB.POSException import POSKeyError
 
 from repoze.bfg.traversal import model_path
+from repoze.bfg.traversal import find_interface
 
 from karl.models.interfaces import ITextIndexData
+from karl.content.interfaces import ICalendar
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.converters.entities import convert_entities
 from karl.utilities.converters.stripogram import html2text
-from karl.utils import find_community
+
 
 import logging
 log = logging.getLogger(__name__)
@@ -121,8 +123,8 @@ class CalendarEventVirtualData(object):
         self.context = context
 
     def __call__(self):
-        community = find_community(self.context)
-        path = model_path(community)
+        calendar = find_interface(self.context, ICalendar)
+        calendar_path = model_path(calendar)
         virtual_calendar = getattr(self.context, 'virtual_calendar', None)
-        return (path, virtual_calendar)
+        return (calendar_path, virtual_calendar)
     

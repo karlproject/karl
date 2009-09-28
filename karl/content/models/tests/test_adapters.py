@@ -267,9 +267,9 @@ class TestCalendarEventVirtualData(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
+        from karl.content.interfaces import ICalendar
         community = testing.DummyModel()
-        directlyProvides(community, ICommunity)
+        directlyProvides(community, ICalendar)
         context = testing.DummyModel()
         context.virtual_calendar = 'virt'
         community['context'] = context

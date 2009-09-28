@@ -8,10 +8,11 @@ Unreleased
   use for this index is to be able to query for catalog events
   globally for the purposes of creating a "dynamic" calendar: the
   ``virtual`` index, for catalog events, will be populated with a
-  tuple: ``(community_path, virtual_catalog_name)``.  This tuple can
+  tuple: ``(calendar_path, virtual_calendar_name)``.  This tuple can
   be used in queries by the dynamic catalog machinery (which will need
-  to spell out a set of tuples naming these "real" catalogs, and query
-  them as "virtual").
+  to spell out a set of tuples naming these calendars, and query the
+  "virtual" catalog field index using the tuples in an OR clause along
+  with, e.g. ``interfaces=(ICatalogEvent,)``.
 
 - If a user doesn't have an associated profile, don't fail hard
   when trying to reindex the peopledir catalog.
