@@ -207,13 +207,14 @@ def reindex_profile_after_group_change(event):
     """ Subscriber for group change events to reindex the profile
     in peopledir catalog """
     profiles = find_profiles(event.site)
-    profile = profiles[event.id]
-    catalog = find_peopledirectory_catalog(profile)
-    if catalog is not None:
-        path = model_path(profile)
-        docid = catalog.document_map.docid_for_address(path)
-        catalog.unindex_doc(docid)
-        catalog.index_doc(docid, profile)
+    profile = profiles.get(event.id)
+    if profile is not None:
+        catalog = find_peopledirectory_catalog(profile)
+        if catalog is not None:
+            path = model_path(profile)
+            docid = catalog.document_map.docid_for_address(path)
+            catalog.unindex_doc(docid)
+            catalog.index_doc(docid, profile)
 
 
 class QueryLogger(object):

@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- If a user doesn't have an associated profile, don't fail hard
+  when trying to reindex the peopledir catalog.
+
 - LP #434879 Add support for pasting into livesearch
 
 - The RSS icon on the new calendar views is now placed on the lower
