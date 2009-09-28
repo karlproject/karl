@@ -396,6 +396,28 @@ class TestGetAllowedToView(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(result, ['system.Everyone'])
 
+class TestGetVirtual(unittest.TestCase):
+    def _callFUT(self, object, default):
+        from karl.models.site import get_virtual
+        return get_virtual(object, default)
+
+    def test_no_adapter(self):
+        context = testing.DummyModel()
+        data = self._callFUT(context, None)
+        self.assertEqual(data, None)
+    
+    def test_with_adapter(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import IVirtualData
+        class DummyAdapter:
+            def __init__(self, context):
+                self.context = context
+            def __call__(self):
+                return 'stuff'
+        testing.registerAdapter(DummyAdapter, (None,), IVirtualData)
+        data = self._callFUT(context, None)
+        self.assertEqual(data, 'stuff')
+
 class DummyCache(dict):
     generation = None
     

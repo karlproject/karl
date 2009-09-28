@@ -20,10 +20,13 @@ from zope.component import queryUtility
 
 from ZODB.POSException import POSKeyError
 
+from repoze.bfg.traversal import model_path
+
 from karl.models.interfaces import ITextIndexData
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.converters.entities import convert_entities
 from karl.utilities.converters.stripogram import html2text
+from karl.utils import find_community
 
 import logging
 log = logging.getLogger(__name__)
@@ -112,3 +115,14 @@ FileTextIndexData = makeFlexibleTextIndexData(
                                 [('title', 10, None),
                                  (_extract_file_data, 1, None),
                                 ])
+
+class CalendarEventVirtualData(object):
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self):
+        community = find_community(self.context)
+        path = model_path(community)
+        virtual_calendar = getattr(self.context, 'virtual_calendar', None)
+        return (path, virtual_calendar)
+    

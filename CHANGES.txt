@@ -4,6 +4,15 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add a new field index named "virtual" to the catalog.  The initial
+  use for this index is to be able to query for catalog events
+  globally for the purposes of creating a "dynamic" calendar: the
+  ``virtual`` index, for catalog events, will be populated with a
+  tuple: ``(community_path, virtual_catalog_name)``.  This tuple can
+  be used in queries by the dynamic catalog machinery (which will need
+  to spell out a set of tuples naming these "real" catalogs, and query
+  them as "virtual").
+
 - If a user doesn't have an associated profile, don't fail hard
   when trying to reindex the peopledir catalog.
 

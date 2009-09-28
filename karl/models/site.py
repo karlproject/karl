@@ -45,6 +45,7 @@ from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
+from karl.models.interfaces import IVirtualData
 from karl.models.interfaces import IUserAdded
 from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemoved
@@ -213,6 +214,12 @@ def get_member_name(object, default):
         return default
     return ('%s %s' % (object.firstname, object.lastname)).lower()
 
+def get_virtual(object, default):
+    adapter = queryAdapter(object, IVirtualData)
+    if adapter is not None:
+        return adapter()
+    return default
+
 class Site(Folder):
     implements(ISite, ILocation)
     __name__ = None
@@ -256,6 +263,7 @@ class Site(Folder):
             'tags': TagIndex(self),
             'lastfirst': CatalogFieldIndex(get_lastfirst),
             'member_name': CatalogTextIndex(get_member_name),
+            'virtual':CatalogFieldIndex(get_virtual),
             }
 
         catalog = self.catalog

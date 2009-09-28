@@ -244,6 +244,16 @@ class ITextIndexData(Interface):
     def __call__():
         """ Return text data """
 
+class IVirtualData(Interface):
+    """ An adapter which returns a hashable object representing
+    'virtual' data for an object.  It's initial use is for the virtual
+    calendar name/path associated with an ICalendarEvent, but content
+    type adapters for cataloging should feel free to use it any time
+    they need some adhoc identifying data about a piece of content as
+    an extra filter argument."""
+    def __call__():
+        """ Return hashable data """
+
 # XXX Arguably, this is display logic and belongs in views.
 class IGridEntryInfo(Interface):
     """Adapt resources for display in a grid listing"""

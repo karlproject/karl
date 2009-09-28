@@ -125,6 +125,12 @@
      />
 
   <adapter
+      for="karl.content.interfaces.ICalendarEvent"
+      provides="karl.models.interfaces.IVirtualData"
+      factory=".adapters.CalendarEventVirtualData"
+     />
+
+  <adapter
       for="karl.content.interfaces.IReferenceManual"
       provides="karl.models.interfaces.ITextIndexData"
       factory=".adapters.TitleAndDescriptionIndexData"

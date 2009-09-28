@@ -251,6 +251,33 @@ class TestFileTextIndexData(unittest.TestCase):
         adapter = self._makeOne(context)
         self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
 
+class TestCalendarEventVirtualData(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.content.models.adapters import CalendarEventVirtualData
+        return CalendarEventVirtualData
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_it(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        community = testing.DummyModel()
+        directlyProvides(community, ICommunity)
+        context = testing.DummyModel()
+        context.virtual_calendar = 'virt'
+        community['context'] = context
+        adapter = self._makeOne(context)
+        result = adapter()
+        self.assertEqual(result, ('/', 'virt'))
+    
+
 class DummyConverter:
     def __init__(self, data):
         self.data = data
