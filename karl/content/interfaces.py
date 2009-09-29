@@ -52,7 +52,9 @@ class ICalendar(IFolder):
     taggedValue('name', 'Calendar')
 
     title = Attribute(u'Title needed for backlinks')
-    virtual_calendars = Attribute('Tuple of virtual calendar names')
+    virtual_calendar_data = Attribute('Dictionary which maps a virtual '
+                                      'calendar name to a mapping of data '
+                                      'about a virtual calendar')
 
 class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""

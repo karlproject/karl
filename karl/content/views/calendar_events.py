@@ -206,13 +206,10 @@ def _next_month(year, month):
 def get_calendar_actions(context, request):
     """Return the actions to display when looking at the calendar"""
     actions = []     
-    #
-    # XXX "Settings" temporarily hidden at request of OSI
-    #
-    # if has_permission('moderate', context, request):
-    #     actions.append(
-    #         ('Settings', 'settings.html'),
-    #         )
+    if has_permission('moderate', context, request):
+        actions.append(
+            ('Settings', 'settings.html'),
+            )
     if has_permission('create', context, request):
         actions.append(
             ('Add Event', 'add_calendarevent.html'),
@@ -411,8 +408,9 @@ def add_calendarevent_view(context, request):
     layout = layout_provider('community')
 
     calendar = find_interface(context, ICalendar)
-    if calendar is not None:
-        virtual_calendars = calendar.virtual_calendars
+    if calendar:
+        virtual_calendars = calendar.virtual_calendar_data.keys()
+        virtual_calendars.sort()
     else:
         virtual_calendars = []
 
@@ -626,7 +624,8 @@ def edit_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar is not None:
-        virtual_calendars = calendar.virtual_calendars
+        virtual_calendars = calendar.virtual_calendar_data.keys()
+        virtual_calendars.sort()
     else:
         virtual_calendars = []
 
@@ -675,7 +674,10 @@ class EditCalendarEventForm(FormSchema):
     contact_email = validators.Email(not_empty=False, strip=True)
 
 class CalendarSettingsForm(FormSchema):
-    virtual_calendars = baseforms.TextAreaToList(strip=True)
+    virtual_calendar_name = validators.UnicodeString(strip=True,
+                                                     not_empty=True)
+    virtual_calendar_color = validators.UnicodeString(strip=True,
+                                                      not_empty=True)
 
 def calendar_settings_view(context, request):
     form = CalendarSettingsForm()
@@ -683,14 +685,29 @@ def calendar_settings_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
+    if 'form.delete' in request.GET:
+        todelete = request.GET['form.delete']
+        if todelete in context.virtual_calendar_data:
+            del context.virtual_calendar_data[todelete]
+            context._p_changed = True
+        location = model_url(
+            context, request,
+            'settings.html',
+            query={'status_message':'%s virtual calendar removed' % todelete})
+        return HTTPFound(location=location)
+
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            context.virtual_calendars = tuple(
-                converted['virtual_calendars'])
-            location = model_url(context, request)
-            msg = "?status_message=Calendar%20settings%20changed"
-            return HTTPFound(location=location+msg)
+            name = converted['virtual_calendar_name']
+            color = converted['virtual_calendar_color']
+            context.virtual_calendar_data['name'] = {'color':color}
+            context._p_changed = True
+            location = model_url(
+                context, request,
+                'settings.html',
+                query={'status_message':'Calendar settings changed'})
+            return HTTPFound(location=location)
 
         except Invalid, e:
             fielderrors = e.error_dict
@@ -698,19 +715,25 @@ def calendar_settings_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            virtual_calendars=context.virtual_calendars,
+            virtual_calendar_name='',
+            virtual_calendar_color='red'
             )
 
     # Render the form and shove some default values in
     page_title = 'Calendar Settings'
     api = TemplateAPI(context, request, page_title)
+    virtual_calendars = context.virtual_calendar_data.items()
+    virtual_calendars.sort()
 
     return render_form_to_response(
         'templates/calendar_settings.pt',
         form,
         fill_values,
-        post_url=request.url,
+        post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,
+        virtual_calendars = virtual_calendars,
+        colors = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
+                  "orange", "silver", "olive"),
         api=api,
         )

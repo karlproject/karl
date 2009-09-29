@@ -816,30 +816,34 @@ class CalendarSettingsViewTests(unittest.TestCase):
             'templates/calendar_settings.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['virtual_calendars'], ())
+        self.assertEqual(renderer.fieldvalues['virtual_calendar_name'], '')
+        self.assertEqual(renderer.fieldvalues['virtual_calendar_color'], 'red')
 
     def test_submitted_valid(self):
         context = DummyCalendar()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_settings.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'virtual_calendars': 'Announcements\nMeetings\n\n',
+            'virtual_calendar_name': 'Announcements',
+            'virtual_calendar_color': 'red',
             })
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-            'http://example.com/?status_message=Calendar%20settings%20changed')
-        self.assertEqual(context.virtual_calendars,
-            ('Announcements', 'Meetings'))
+            'http://example.com/settings.html?status_message=Calendar+settings+changed')
+        self.assertEqual(context.virtual_calendar_data,
+                         {'Announcements':{'color':'red'}})
+                            
 
-    def test_submitted_empty(self):
+    def test_submitted_invalid(self):
         context = DummyCalendar()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_settings.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'virtual_calendars': '\n',
             })
         response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/?status_message=Calendar%20settings%20changed')
-        self.assertEqual(context.virtual_calendars, ())
+        self.failUnless(renderer.fielderrors)
 
 
 ICS_TEMPLATE = """
@@ -905,4 +909,6 @@ from karl.content.interfaces import ICalendar
 
 class DummyCalendar(testing.DummyModel):
     implements(ICalendar)
-    virtual_calendars = ()
+    def __init__(self, **kw):
+        testing.DummyModel.__init__(self, **kw)
+        self.virtual_calendar_data = {}

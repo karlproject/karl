@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- "Settings" action on calendar tool now allows the choice of a color
+  along with a virtual calendar name.
+
+- Reenable "Settings" action on calendar tool.
+
 - Add a new field index named "virtual" to the catalog.  The initial
   use for this index is to be able to query for catalog events
   globally for the purposes of creating a "dynamic" calendar: the

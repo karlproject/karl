@@ -132,4 +132,16 @@ class TestGetSession(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, foo)
 
+class TestPersistentBBB(unittest.TestCase):
+    def _makeOne(self, *arg):
+        from karl.utils import PersistentBBB
+        return PersistentBBB(*arg)
 
+    def test_it(self):
+        from persistent import Persistent
+        class Dummy(Persistent):
+            attr = self._makeOne('attr', [])
+        d = Dummy()
+        self.assertEqual(d.__dict__, {})
+        self.assertEqual(d.attr, [])
+        self.assertEqual(d.__dict__, {'attr':[]})

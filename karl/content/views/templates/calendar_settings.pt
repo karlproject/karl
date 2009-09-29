@@ -14,15 +14,51 @@
 
     <div metal:use-macro="formfields.macros['formerror']"/>
 
-    <fieldset tal:define="error fielderrors['virtual_calendars']|None"
+    <table id="calendars" border="0">
+      <tr tal:condition="virtual_calendars">
+        <th>Color</th>
+        <th>Name</th>
+        <th>Delete</th>
+      </tr>
+      <tr tal:repeat="(calendar_name, calendar) virtual_calendars">
+         <td style="background-color: ${calendar.color}">&nbsp;</td>
+         <td>${calendar_name}</td>
+         <td><a href="${post_url}?form.delete=${calendar_name}"
+                >${calendar_name}</a></td>
+       </tr>
+     </table>
+
+    <fieldset tal:define="error fielderrors['virtual_calendar_name']|None"
               class="${error and 'fieldError' or ''}"
               id="virtual-calendars-field">
-      <label>Calendar Names</label>
-      <div class="fieldHelp">
-      One per line.
-      </div>
-      <div tal:condition="error" class="errorMessage">${error}</div>
-      <textarea name="virtual_calendars" rows="10" cols="20"></textarea>
+
+      <h2>Add Calendar</h2>
+
+      <div tal:condition="error" class="errorMessage">${error}</div> 
+
+      <label for="virtual_calendar_name" class="required">
+        Name the calendar
+      </label>
+      <input name="virtual_calendar_name" type="text"/>
+
+      <br/>
+
+      <label for="virtual_calendar_color" class="required">
+        Choose color
+      </label>
+
+      <table border="0">
+
+        <tr>
+          <td tal:repeat="color colors">
+            <input name="virtual_calendar_color"
+                   type="radio" value="${color}" alt="${color}"/>
+            <br/>
+            <div style="background-color: ${color}">&nbsp;</div>
+          </td>
+        </tr>
+      </table>
+
     </fieldset>
 
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>

@@ -28,11 +28,16 @@ from karl.content.models.attachments import AttachmentsFolder
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
+from karl.utils import PersistentBBB
+
 class Calendar(Folder):
     implements(ICalendar)
     title = u'Calendar'
-    virtual_calendars = ()  # List of names
+    virtual_calendar_data = PersistentBBB('virtual_calendar_data', {})
 
+    def __init__(self, *arg, **kw):
+        Folder.__init__(self, *arg, **kw)
+        self.virtual_calendar_data = {}
 
 class CalendarEvent(Folder):
     implements(ICalendarEvent)

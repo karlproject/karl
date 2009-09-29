@@ -125,3 +125,17 @@ def support_attachments(context):
     else:
         # support attachments by default
         return True
+
+class PersistentBBB(object):
+    """ A descriptor which fixes up old persistent instances with a
+    default value as a 'write on read' operation.  This is usually not
+    useful if the default value isn't mutable, and arguably 'write on
+    read' behavior is evil.  Note that this descriptor returns the
+    value after *replacing itself* on the instance with the value."""
+    def __init__(self, name, val):
+        self.name = name
+        self.val = val
+
+    def __get__(self, inst, cls):
+        setattr(inst, self.name, self.val)
+        return getattr(inst, self.name)
