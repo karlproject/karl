@@ -205,11 +205,13 @@ def _next_month(year, month):
 
 def get_calendar_actions(context, request):
     """Return the actions to display when looking at the calendar"""
-    actions = []     
-    if has_permission('moderate', context, request):
-        actions.append(
-            ('Settings', 'settings.html'),
-            )
+    actions = []
+    # temporarily disable settings action until virtual calendaring is
+    # solid
+##     if has_permission('moderate', context, request):
+##         actions.append(
+##             ('Settings', 'settings.html'),
+##             )
     if has_permission('create', context, request):
         actions.append(
             ('Add Event', 'add_calendarevent.html'),
@@ -701,7 +703,7 @@ def calendar_settings_view(context, request):
             converted = form.validate(request.POST)
             name = converted['virtual_calendar_name']
             color = converted['virtual_calendar_color']
-            context.virtual_calendar_data['name'] = {'color':color}
+            context.virtual_calendar_data[name] = {'color':color}
             context._p_changed = True
             location = model_url(
                 context, request,
