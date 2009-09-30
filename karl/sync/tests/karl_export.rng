@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="http://namespaces.karlproject.org/xml-sync" xmlns="http://relaxng.org/ns/structure/1.0"
+<grammar xmlns:p="http://xml.soros.org/karl/profile"
+  xmlns:c="http://xml.soros.org/karl/people-category" xmlns="http://relaxng.org/ns/structure/1.0"
   xmlns:a="http://www.example.com/annotation"
   datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
@@ -7,112 +8,166 @@
     <ref name="sourceElement"/>
   </start>
   <define name="sourceElement">
-    <!-- This is the definition of <source>.  It requires a 'location'
-    attribute that must be a URL. We then have one or more <container>
-    elements. -->
-    <element name="source">
-      <attribute name="location">
-        <data type="anyURI"/>
-      </attribute>
-      <optional>
-        <attribute name="incremental">
-          <choice>
-            <value>True</value>
-            <value>False</value>
-          </choice>
-        </attribute>
-      </optional>
+    <a:div>The top-level node can be any element name.</a:div>
+    <element>
+      <anyName/>
+      <zeroOrMore>
+        <ref name="profileElement"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="categoryElement"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="profileElement">
+    <element name="p:profile">
       <interleave>
-        <ref name="idElement"/>
-        <ref name="modifiedElement"/>
-        <zeroOrMore>
-          <element name="deleted-item">
+        <element name="p:username">
+          <text/>
+        </element>
+        <element name="p:sha_password">
+          <text/>
+        </element>
+        <optional>
+          <element name="p:firstname">
             <text/>
           </element>
-        </zeroOrMore>
+        </optional>
+        <optional>
+          <element name="p:lastname">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:email">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:phone">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:extension">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:department">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:position">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:organization">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:location">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:country">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:website">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:languages">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:office">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:room_no">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:biography">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:home_path">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:entities">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:offices">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:groups">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:departments">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
       </interleave>
-      <oneOrMore>
-        <ref name="itemElement"/>
-      </oneOrMore>
-    </element>
-  </define>
-  <define name="idElement">
-    <element name="id">
-      <text/>
-    </element>
-  </define>
-  <define name="pathElement">
-    <element name="path">
-      <text/>
-    </element>
-  </define>
-  <define name="modifiedElement">
-    <element name="modified">
-      <data type="dateTime"/>
     </element>
   </define>
   <define name="itemElement">
-    <element name="item">
-      <interleave>
-        <ref name="idElement"/>
-        <element name="name">
-          <data type="NCName"/>
-        </element>
-        <element name="type">
-          <data type="NCName"/>
-        </element>
-        <optional>
-          <element name="workflow-state">
-            <data type="NCName"/>
-          </element>
-        </optional>
-        <element name="created">
-          <data type="dateTime"/>
-        </element>
-        <element name="created-by">
-          <data type="NCName"/>
-        </element>
-        <ref name="modifiedElement"/>
-        <element name="modified-by">
-          <data type="NCName"/>
-        </element>
-        <zeroOrMore>
-          <ref name="itemElement"/>
-        </zeroOrMore>
-        <zeroOrMore>
-          <element name="deleted-item">
-            <text/>
-          </element>
-        </zeroOrMore>
-        <ref name="attributesElement"/>
-      </interleave>
-    </element>
-  </define>
-  <define name="typeElement">
-    <element name="type">
+    <element name="p:item">
       <text/>
     </element>
   </define>
-  <define name="attributesElement">
-    <element name="attributes">
-      <oneOrMore>
-        <ref name="attributeElement"/>
-      </oneOrMore>
-    </element>
-  </define>
-  <define name="attributeElement">
-    <element name="simple">
-      <attribute name="name"/>
-      <attribute name="type"/>
-      <optional>
-        <attribute name="none">
-          <choice>
-            <value>True</value>
-            <value>False</value>
-          </choice>
-        </attribute>
-      </optional>
-      <text/>
-    </element>
+  <define name="categoryElement">
+    <element name="c:category">
+      <attribute name="id"/>
+    <interleave>
+      <element name="c:category-group">
+        <attribute name="id"/><text/>
+      </element>
+      <element name="c:title"><text/></element>
+      <optional><element name="c:fn"><text/></element></optional>
+      <optional><element name="c:org"><text/></element></optional>
+      <optional><element name="c:url"><text/></element></optional>
+      <optional><element name="c:note"><text/></element></optional>
+      <optional><element name="c:adrs"><oneOrMore><element name="c:adr"><text/></element></oneOrMore></element></optional>
+    </interleave></element>
+    <!-- 
+      <c:adrs>
+      <c:adr type="Main">
+      <c:street-address>143 Avenue Christophe, Port-au-Prince</c:street-address>
+      <c:extended-address></c:extended-address>
+      <c:locality>Port-au-Prince</c:locality>
+      <c:region></c:region>
+      <c:postal-code></c:postal-code>
+      <c:country-name>HT</c:country-name>
+      </c:adr>
+      </c:adrs>    -->
   </define>
 </grammar>
