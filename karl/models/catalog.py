@@ -137,7 +137,7 @@ class CatalogQueryEvent(object):
         self.result = result
 
 def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
-                    output=None, transaction=transaction):
+                    output=None, transaction=transaction, indexes=None):
 
     def commit_or_abort():
         if dry_run:
@@ -154,6 +154,9 @@ def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
     site.update_indexes()
     commit_or_abort()
 
+    if indexes is not None:
+        output and output('reindexing only indexes %s' % str(indexes))
+
     i = 1
     for path, docid in catalog.document_map.address_to_docid.items():
         if path_re is not None and path_re.match(path) is None:
@@ -164,7 +167,12 @@ def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
         except KeyError:
             output and output('error: %s not found' % path)
             continue
-        catalog.reindex_doc(docid, model)
+
+        if indexes is None:
+            catalog.reindex_doc(docid, model)
+        else:
+            for index in indexes:
+                catalog[index].reindex_doc(docid, model)
         if i % commit_interval == 0:
             commit_or_abort()
         i+=1

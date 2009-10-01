@@ -279,6 +279,32 @@ class TestReindexCatalog(unittest.TestCase):
         self.assertEqual(transaction.aborted, 2)
         self.assertEqual(transaction.committed, 0)
 
+    def test_it_with_indexes(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        a = testing.DummyModel()
+        testing.registerModels({'a':a})
+        L = []
+        output = L.append
+        site = testing.DummyModel()
+        site.update_indexes = lambda *arg: L.append('updated')
+        catalog = DummyCatalog({'a':1})
+        catalog.index = DummyIndex()
+        directlyProvides(site, ISite)
+        site.catalog = catalog
+        transaction = DummyTransaction()
+        self._callFUT(site, output=output, transaction=transaction,
+                      indexes=('index',))
+        self.assertEqual(L,
+                         ['updating indexes',
+                          'updated',
+                          '*** committing ***',
+                          "reindexing only indexes ('index',)",
+                          'reindexing a',
+                          '*** committing ***'])
+        self.assertEqual(transaction.committed, 2)
+        self.assertEqual(catalog.index.indexed, {1:a})
+
 from repoze.catalog.interfaces import ICatalogIndex
 from zope.interface import implements
 
@@ -287,6 +313,9 @@ class DummyCatalog(object):
         self.document_map = testing.DummyModel()
         self.document_map.address_to_docid = address_to_docid
         self.reindexed = []
+
+    def __getitem__(self, k):
+        return getattr(self, k)
 
     def reindex_doc(self, docid, model):
         self.reindexed.append(docid)
@@ -310,6 +339,8 @@ class DummyIndex:
 
     def index_doc(self, docid, val):
         self.indexed[docid] = val
+
+    reindex_doc = index_doc
 
     def apply(self, *arg, **kw):
         return [1,2,3]
