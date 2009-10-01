@@ -147,27 +147,96 @@
   <define name="categoryElement">
     <element name="c:category">
       <attribute name="id"/>
-    <interleave>
-      <element name="c:category-group">
-        <attribute name="id"/><text/>
-      </element>
-      <element name="c:title"><text/></element>
-      <optional><element name="c:fn"><text/></element></optional>
-      <optional><element name="c:org"><text/></element></optional>
-      <optional><element name="c:url"><text/></element></optional>
-      <optional><element name="c:note"><text/></element></optional>
-      <optional><element name="c:adrs"><oneOrMore><element name="c:adr"><text/></element></oneOrMore></element></optional>
-    </interleave></element>
-    <!-- 
-      <c:adrs>
-      <c:adr type="Main">
-      <c:street-address>143 Avenue Christophe, Port-au-Prince</c:street-address>
-      <c:extended-address></c:extended-address>
-      <c:locality>Port-au-Prince</c:locality>
-      <c:region></c:region>
-      <c:postal-code></c:postal-code>
-      <c:country-name>HT</c:country-name>
-      </c:adr>
-      </c:adrs>    -->
+      <interleave>
+        <element name="c:category-group">
+          <attribute name="id"/>
+          <text/>
+        </element>
+        <element name="c:title">
+          <text/>
+        </element>
+        <optional>
+          <element name="c:fn">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:org">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:url">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:note">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:adrs">
+            <oneOrMore>
+              <element name="c:adr">
+                <attribute name="type"/>
+                <interleave>
+                  <optional>
+                    <element name="c:street-address">
+                      <text/>
+                    </element>
+                  </optional>
+                  <optional>
+                    <element name="c:extended-address">
+                      <text/>
+                    </element>
+                  </optional>
+                  <optional>
+                    <element name="c:locality">
+                      <text/>
+                    </element>
+                  </optional>
+                  <optional>
+                    <element name="c:region">
+                      <text/>
+                    </element>
+                  </optional>
+                  <optional>
+                    <element name="c:postal-code">
+                      <text/>
+                    </element>
+                  </optional>
+                  <optional>
+                    <element name="c:country-name">
+                      <text/>
+                    </element>
+                  </optional>
+                </interleave>
+              </element>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:tels">
+            <oneOrMore>
+              <element name="c:tel">
+                <attribute name="type"/>
+                <text/>
+              </element>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="c:emails">
+            <oneOrMore>
+              <element name="c:email">
+                <attribute name="type"/>
+                <text/>
+              </element>
+            </oneOrMore>
+          </element>
+        </optional>
+      </interleave>
+    </element>
   </define>
 </grammar>
