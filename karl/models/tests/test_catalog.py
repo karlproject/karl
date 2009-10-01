@@ -198,8 +198,110 @@ class TestCachingCatalog(unittest.TestCase):
         self.assertEqual(result, (3, [1,2,3]))
         self.assertEqual(len(cache), 0)
 
+class TestReindexCatalog(unittest.TestCase):
+    def _callFUT(self, context, **kw):
+        from karl.models.catalog import reindex_catalog
+        return reindex_catalog(context, **kw)
+
+    def test_it(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        a = testing.DummyModel()
+        testing.registerModels({'a':a})
+        L = []
+        output = L.append
+        site = testing.DummyModel()
+        site.update_indexes = lambda *arg: L.append('updated')
+        catalog = DummyCatalog({'a':1})
+        directlyProvides(site, ISite)
+        site.catalog = catalog
+        transaction = DummyTransaction()
+        self._callFUT(site, output=output, transaction=transaction)
+        self.assertEqual(catalog.reindexed, [1])
+        self.assertEqual(L,
+                         ['updating indexes',
+                          'updated',
+                          '*** committing ***',
+                          'reindexing a',
+                          '*** committing ***'])
+        self.assertEqual(transaction.committed, 2)
+
+    def test_it_pathre(self):
+        import re
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        a = testing.DummyModel()
+        b = testing.DummyModel()
+        testing.registerModels({'a':a, 'b':b})
+        L = []
+        output = L.append
+        site = testing.DummyModel()
+        site.update_indexes = lambda *arg: L.append('updated')
+        catalog = DummyCatalog({'a':1, 'b':2})
+        directlyProvides(site, ISite)
+        site.catalog = catalog
+        transaction = DummyTransaction()
+        self._callFUT(site, output=output, transaction=transaction,
+                      path_re=re.compile('a'))
+        self.assertEqual(catalog.reindexed, [1])
+        self.assertEqual(L,
+                         ['updating indexes',
+                          'updated',
+                          '*** committing ***',
+                          'reindexing a',
+                          '*** committing ***'])
+        self.assertEqual(transaction.committed, 2)
+
+    def test_it_dryrun(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        a = testing.DummyModel()
+        b = testing.DummyModel()
+        testing.registerModels({'a':a, 'b':b})
+        L = []
+        output = L.append
+        site = testing.DummyModel()
+        site.update_indexes = lambda *arg: L.append('updated')
+        catalog = DummyCatalog({'a':1, 'b':2})
+        directlyProvides(site, ISite)
+        site.catalog = catalog
+        transaction = DummyTransaction()
+        self._callFUT(site, output=output, transaction=transaction,
+                      dry_run=True)
+        self.assertEqual(catalog.reindexed, [1, 2])
+        self.assertEqual(L,
+                         ['updating indexes',
+                          'updated',
+                          '*** aborting ***',
+                          'reindexing a',
+                          'reindexing b',
+                          '*** aborting ***'])
+        self.assertEqual(transaction.aborted, 2)
+        self.assertEqual(transaction.committed, 0)
+
 from repoze.catalog.interfaces import ICatalogIndex
 from zope.interface import implements
+
+class DummyCatalog(object):
+    def __init__(self, address_to_docid):
+        self.document_map = testing.DummyModel()
+        self.document_map.address_to_docid = address_to_docid
+        self.reindexed = []
+
+    def reindex_doc(self, docid, model):
+        self.reindexed.append(docid)
+
+class DummyTransaction(object):
+    def __init__(self):
+        self.committed = 0
+        self.aborted = 0
+        
+    def commit(self):
+        self.committed += 1
+
+    def abort(self):
+        self.aborted += 1
+        
 
 class DummyIndex:
     implements(ICatalogIndex)
@@ -214,4 +316,3 @@ class DummyIndex:
 
 class DummyCache(dict):
     generation = 0
-

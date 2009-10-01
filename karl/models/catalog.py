@@ -3,16 +3,20 @@ import sys
 import time
 import cPickle
 
+import transaction
+
 from zope.event import notify
 from zope.interface import implements
 from zope.component import queryUtility
 
+from repoze.bfg.traversal import find_model
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.interfaces import ICatalog
 
 from karl.models.interfaces import ICatalogSearchCache
 from karl.models.interfaces import ICatalogQueryEvent
 from karl.utilities.lru import LRUCache
+from karl.utils import find_site
 
 from BTrees.Length import Length
 
@@ -131,3 +135,37 @@ class CatalogQueryEvent(object):
         self.query = query
         self.duration = duration
         self.result = result
+
+def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
+                    output=None, transaction=transaction):
+
+    def commit_or_abort():
+        if dry_run:
+            output and output('*** aborting ***')
+            transaction.abort()
+        else:
+            output and output('*** committing ***')
+            transaction.commit()
+
+    site = find_site(context)
+    catalog = site.catalog
+
+    output and output('updating indexes')
+    site.update_indexes()
+    commit_or_abort()
+
+    i = 1
+    for path, docid in catalog.document_map.address_to_docid.items():
+        if path_re is not None and path_re.match(path) is None:
+            continue
+        output and output('reindexing %s' % path)
+        try:
+            model = find_model(context, path)
+        except KeyError:
+            output and output('error: %s not found' % path)
+            continue
+        catalog.reindex_doc(docid, model)
+        if i % commit_interval == 0:
+            commit_or_abort()
+        i+=1
+    commit_or_abort()
