@@ -71,8 +71,6 @@ from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import store_attachments
 
-from karl.content.views.utils import add_security_state_field
-
 _NOW = None
 
 def _now():
