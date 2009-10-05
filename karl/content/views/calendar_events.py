@@ -24,6 +24,7 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
+from zope.component import queryAdapter
 
 from webob.exc import HTTPFound
 from formencode import Invalid
@@ -33,6 +34,8 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
+from repoze.bfg.traversal import find_model
+
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
 
@@ -50,6 +53,7 @@ from karl.utilities.interfaces import IKarlDates
 
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
+from karl.utils import find_community
 
 from karl.security.workflow import get_security_states
 
@@ -64,6 +68,7 @@ from karl.views.baseforms import security_state as security_state_field
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
+from karl.content.interfaces import IVirtualCalendar
 from karl.content.views.utils import extract_description
 from karl.views.interfaces import ILayoutProvider
 from karl.content.views.interfaces import IShowSendalert
@@ -303,6 +308,8 @@ def listing_calendar_view(context, request):
         )
 
 
+def _get_virtual_calendars(calendar):
+    return [ x for x in calendar.values() if IVirtualCalendar.providedBy(x) ]
 
 def add_calendarevent_view(context, request):
 
@@ -409,7 +416,7 @@ def add_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar:
-        virtual_calendars = calendar.virtual_calendar_data.keys()
+        virtual_calendars =[x.title for x in _get_virtual_calendars(calendar)]
         virtual_calendars.sort()
     else:
         virtual_calendars = []
@@ -624,7 +631,7 @@ def edit_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar is not None:
-        virtual_calendars = calendar.virtual_calendar_data.keys()
+        virtual_calendars=[x.title for x in _get_virtual_calendars(calendar)]
         virtual_calendars.sort()
     else:
         virtual_calendars = []
@@ -674,35 +681,67 @@ class EditCalendarEventForm(FormSchema):
     contact_email = validators.Email(not_empty=False, strip=True)
 
 class CalendarSettingsForm(FormSchema):
-    virtual_calendar_name = validators.UnicodeString(strip=True,
-                                                     not_empty=True)
-    virtual_calendar_color = validators.UnicodeString(strip=True,
-                                                      not_empty=True)
+    calendar_path = validators.UnicodeString(strip=True, not_empty=False)
+    calendar_name = validators.UnicodeString(strip=True, not_empty=True)
+    calendar_color = validators.UnicodeString(strip=True, not_empty=True)
+
+def _virtual_calendar_title(ob):
+    community = find_community(ob)
+    title = community and community.title or ''
+    if ICalendar.providedBy(ob):
+        title = title + ' (default)'
+    else:
+        title = title + ' (%s)' % ob.title
+    return title
 
 def calendar_settings_view(context, request):
     form = CalendarSettingsForm()
+    here_path = model_path(context)
+    calendar_names = [ x['name'] for x in context.manifest ]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
     if 'form.delete' in request.GET:
-        todelete = request.GET['form.delete']
-        if todelete in context.virtual_calendar_data:
-            del context.virtual_calendar_data[todelete]
+        calendar_name = request.GET['form.delete']
+        if calendar_name in calendar_names:
+            idx = calendar_names.index(calendar_name)
+            del context.manifest[idx]
+            ob = context.get(calendar_name)
+            if IVirtualCalendar.providedBy(ob):
+                del context[calendar_name]
             context._p_changed = True
         location = model_url(
             context, request,
             'settings.html',
-            query={'status_message':'%s virtual calendar removed' % todelete})
+            query={'status_message':'%s calendar removed' % calendar_name})
         return HTTPFound(location=location)
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            name = converted['virtual_calendar_name']
-            color = converted['virtual_calendar_color']
-            context.virtual_calendar_data[name] = {'color':color}
+            calendar_path = converted['calendar_path']
+            calendar_name = converted['calendar_name']
+            calendar_color = converted['calendar_color']
+
+            if calendar_name in calendar_names:
+                idx = calendar_names.index(calendar_name)
+                context.manifest[idx]['color'] = calendar_color
+                category = context.get(calendar_name)
+                if IVirtualCalendar.providedBy(category):
+                    category.title = calendar_name
+
+            else:
+                if not calendar_path:
+                    category = create_content(IVirtualCalendar, calendar_name)
+                    context[calendar_name] = category
+                    calendar_path = model_path(category)
+                context.manifest.append({'path':calendar_path,
+                                         'color':calendar_color,
+                                         'name':calendar_name})
+                
             context._p_changed = True
+
             location = model_url(
                 context, request,
                 'settings.html',
@@ -715,15 +754,55 @@ def calendar_settings_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            virtual_calendar_name='',
-            virtual_calendar_color='red'
+            calendar_path='',
+            calendar_name='',
+            calendar_color='red'
             )
 
     # Render the form and shove some default values in
     page_title = 'Calendar Settings'
     api = TemplateAPI(context, request, page_title)
-    virtual_calendars = context.virtual_calendar_data.items()
-    virtual_calendars.sort()
+
+    manifest = []
+    used_remote = {}
+
+    for item in context.manifest:
+        path = item['path']
+        local = path.startswith(here_path)
+        d = {}
+        if local:
+            d['title'] = '*Local*'
+        else:
+            used_remote[path] = True
+            try:
+                remote = find_model(context, item['path'])
+                d['title'] = _virtual_calendar_title(remote)
+            except KeyError:
+                continue
+        d.update(item)
+        manifest.append(d)
+
+    remote_calendars = []
+
+    searcher =  queryAdapter(context, ICatalogSearch)
+
+    if searcher is not None:
+        total, docids, resolver = searcher(
+            allowed={'query': effective_principals(request), 'operator': 'or'},
+            interfaces={'query':[ICalendar, IVirtualCalendar],'operator':'or'},
+            reverse=False,
+            )
+
+        for docid in docids:
+            ob = resolver(docid)
+            calendar_path = model_path(ob)
+            if not calendar_path.startswith(here_path):
+                if not calendar_path in used_remote:
+                    title = _virtual_calendar_title(ob)
+                    remote_calendars.append({'title':title,
+                                             'path':calendar_path})
+
+    remote_calendars.sort(key=lambda x: x['path'])
 
     return render_form_to_response(
         'templates/calendar_settings.pt',
@@ -732,7 +811,8 @@ def calendar_settings_view(context, request):
         post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,
-        virtual_calendars = virtual_calendars,
+        manifest = manifest,
+        remote_calendars = remote_calendars,
         colors = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
                   "orange", "silver", "olive"),
         api=api,

@@ -15,14 +15,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from persistent.mapping import PersistentMapping
+from persistent import Persistent
 from repoze.lemonade.content import create_content
 
 from repoze.folder import Folder
 from zope.interface import implements
 
-from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import ICalendar
+from karl.content.interfaces import IVirtualCalendar
+from karl.content.interfaces import ICalendarEvent
+
 from karl.content.models.attachments import AttachmentsFolder
 
 from karl.models.tool import ToolFactory
@@ -33,11 +35,17 @@ from karl.utils import PersistentBBB
 class Calendar(Folder):
     implements(ICalendar)
     title = u'Calendar'
-    virtual_calendar_data = PersistentBBB('virtual_calendar_data', {})
+    manifest = PersistentBBB('manifest', [])
 
     def __init__(self, *arg, **kw):
         Folder.__init__(self, *arg, **kw)
-        self.virtual_calendar_data = {}
+        self.manifest = []
+
+class VirtualCalendar(Persistent):
+    implements(IVirtualCalendar)
+
+    def __init__(self, title):
+        self.title = title
 
 class CalendarEvent(Folder):
     implements(ICalendarEvent)

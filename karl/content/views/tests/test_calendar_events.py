@@ -816,23 +816,56 @@ class CalendarSettingsViewTests(unittest.TestCase):
             'templates/calendar_settings.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['virtual_calendar_name'], '')
-        self.assertEqual(renderer.fieldvalues['virtual_calendar_color'], 'red')
+        self.assertEqual(renderer.fieldvalues['calendar_name'], '')
+        self.assertEqual(renderer.fieldvalues['calendar_path'], '')
+        self.assertEqual(renderer.fieldvalues['calendar_color'], 'red')
 
-    def test_submitted_valid(self):
+    def test_submitted_valid_local(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.content.interfaces import IVirtualCalendar
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_settings.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'virtual_calendar_name': 'Announcements',
-            'virtual_calendar_color': 'red',
+            'calendar_name': 'Announcements',
+            'calendar_color': 'red',
+            'calendar_path': '',
             })
+        class factory:
+            def __init__(self, title):
+                self.title = title
+        registerContentFactory(factory, IVirtualCalendar)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
             'http://example.com/settings.html?status_message=Calendar+settings+changed')
-        self.assertEqual(context.virtual_calendar_data,
-                         {'Announcements':{'color':'red'}})
+        self.assertEqual(context['Announcements'].title, 'Announcements')
+        self.assertEqual(context.manifest,
+                         [{'color': u'red', 'path': '/Announcements',
+                           'name': u'Announcements'}])
+
+    def test_submitted_valid_remote(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.content.interfaces import IVirtualCalendar
+        context = DummyCalendar()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_settings.pt')
+        request = testing.DummyRequest({
+            'form.submitted': 1,
+            'calendar_name': 'Announcements',
+            'calendar_color': 'red',
+            'calendar_path': '/foo',
+            })
+        class factory:
+            def __init__(self, title):
+                self.title = title
+        registerContentFactory(factory, IVirtualCalendar)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+            'http://example.com/settings.html?status_message=Calendar+settings+changed')
+        self.assertEqual(context.manifest,
+                         [{'color': u'red', 'path': u'/foo',
+                           'name': u'Announcements'}] )
                             
 
     def test_submitted_invalid(self):
@@ -911,4 +944,5 @@ class DummyCalendar(testing.DummyModel):
     implements(ICalendar)
     def __init__(self, **kw):
         testing.DummyModel.__init__(self, **kw)
-        self.virtual_calendar_data = {}
+        self.manifest = []
+        

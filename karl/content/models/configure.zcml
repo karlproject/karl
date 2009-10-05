@@ -80,7 +80,12 @@
       factory=".calendar.CalendarEvent"
       type="karl.content.interfaces.ICalendarEvent"
       />
-    
+
+  <lemonade:content
+      factory=".calendar.VirtualCalendar"
+      type="karl.content.interfaces.IVirtualCalendar"
+      />
+
   <lemonade:content
       factory=".files.CommunityRootFolder"
       type="karl.content.interfaces.ICommunityRootFolder"

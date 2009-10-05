@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
@@ -15,20 +16,23 @@
     <div metal:use-macro="formfields.macros['formerror']"/>
 
     <table id="calendars" border="0">
-      <tr tal:condition="virtual_calendars">
+      <tr tal:condition="manifest">
         <th>Color</th>
         <th>Name</th>
+        <th>Location</th>
         <th>Delete</th>
       </tr>
-      <tr tal:repeat="(calendar_name, calendar) virtual_calendars">
+      <tr tal:repeat="calendar manifest">
          <td style="background-color: ${calendar.color}">&nbsp;</td>
-         <td>${calendar_name}</td>
-         <td><a href="${post_url}?form.delete=${calendar_name}"
-                >${calendar_name}</a></td>
+         <td>${calendar.name}</td>
+         <td tal:condition="calendar.local">${calendar.title}</td>
+         <td tal:condition="not calendar.local">${calendar.title}</td>
+         <td><a href="${post_url}?form.delete=${calendar.name}"
+                >${calendar.name}</a></td>
        </tr>
      </table>
 
-    <fieldset tal:define="error fielderrors['virtual_calendar_name']|None"
+    <fieldset tal:define="error fielderrors['calendar_name']|None"
               class="${error and 'fieldError' or ''}"
               id="virtual-calendars-field">
 
@@ -36,14 +40,24 @@
 
       <div tal:condition="error" class="errorMessage">${error}</div> 
 
-      <label for="virtual_calendar_name" class="required">
+      <label for="calendar_path" class="required">
+        Calendar Location
+      </label>
+      <select name="calendar_path">
+        <option value="">Local</option>
+        <option tal:repeat="calendar remote_calendars"
+                value="${calendar['path']}">${calendar['title']}</option>
+      </select>
+      <br/>
+
+      <label for="calendar_name" class="required">
         Name the calendar
       </label>
-      <input name="virtual_calendar_name" type="text"/>
+      <input name="calendar_name" type="text"/>
 
       <br/>
 
-      <label for="virtual_calendar_color" class="required">
+      <label for="calendar_color" class="required">
         Choose color
       </label>
 
@@ -51,7 +65,7 @@
 
         <tr>
           <td tal:repeat="color colors">
-            <input name="virtual_calendar_color"
+            <input name="calendar_color"
                    type="radio" value="${color}" alt="${color}"/>
             <br/>
             <div style="background-color: ${color}">&nbsp;</div>

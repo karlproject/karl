@@ -52,9 +52,8 @@ class ICalendar(IFolder):
     taggedValue('name', 'Calendar')
 
     title = Attribute(u'Title needed for backlinks')
-    virtual_calendar_data = Attribute('Dictionary which maps a virtual '
-                                      'calendar name to a mapping of data '
-                                      'about a virtual calendar')
+    mainfest = Attribute('Sequence of dictionaries.  Each dictionary contains '
+                         'a description of a local or remote virtual calendar')
 
 class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""
@@ -71,6 +70,9 @@ class ICalendarEvent(ICommunityContent, IOthers):
     contact_email = Attribute(u'Email of person to contact about this event.')
     creator = Attribute(u'User id of user that created this event.')
     virtual_calendar = Attribute("Name of the associated virtual calendar")
+
+class IVirtualCalendar(Interface):
+    title = Attribute(u'Calendar title')
 
 class INewsItem(ICommunityContent, IFolder):
     """ A news item.
