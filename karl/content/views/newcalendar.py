@@ -19,54 +19,15 @@ import calendar
 calendar.setfirstweekday(calendar.SUNDAY)
 import datetime
 
-from zope.component.event import objectEventNotify
-from zope.component import getMultiAdapter
-from zope.component import queryMultiAdapter
-from zope.component import getUtility
-from zope.component import queryUtility
-
-from webob.exc import HTTPFound
-from formencode import Invalid
-
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
-from repoze.enformed import FormSchema
-from repoze.lemonade.content import create_content
-
-from karl.events import ObjectModifiedEvent
-from karl.events import ObjectWillBeModifiedEvent
-
 from karl.models.interfaces import ICatalogSearch
-
-from karl.utilities.alerts import Alerts
-from karl.utilities.interfaces import IAlerts
-from karl.utilities.interfaces import IKarlDates
-
 from karl.utils import coarse_datetime_repr
 
-from karl.views import baseforms
 from karl.views.api import TemplateAPI
-from karl.views.form import render_form_to_response
-from karl.views.tags import set_tags
-from karl.views.tags import get_tags_client_data
-from karl.views.utils import convert_to_script
-from karl.views.utils import make_unique_name
-
 from karl.content.interfaces import ICalendarEvent
-from karl.content.views.utils import extract_description
-from karl.views.interfaces import ILayoutProvider
-from karl.content.views.interfaces import IShowSendalert
-
-from karl.content.views.utils import fetch_attachments
-from karl.content.views.utils import store_attachments
-
-from karl.content.views.utils import get_show_is_private
-from karl.security.interfaces import ISecurityWorkflow
-
 from karl.content.newcalendar.presenters.day import DayViewPresenter
 from karl.content.newcalendar.presenters.week import WeekViewPresenter
 from karl.content.newcalendar.presenters.month import MonthViewPresenter
