@@ -43,7 +43,7 @@ class UserProfileImporterTests(unittest.TestCase):
         import sys
         import lxml.etree
         here = os.path.dirname(sys.modules[__name__].__file__)
-        with open(os.path.join(here, fname)) as stream:
+        with open(os.path.join(here, 'xml', fname)) as stream:
             doc = lxml.etree.parse(stream)
         return self._target_class()(doc.getroot())
 
@@ -184,7 +184,7 @@ class PeopleCategoryImporterTests(unittest.TestCase):
         import sys
         import lxml.etree
         here = os.path.dirname(sys.modules[__name__].__file__)
-        with open(os.path.join(here, fname)) as stream:
+        with open(os.path.join(here, 'xml', fname)) as stream:
             doc = lxml.etree.parse(stream)
         return self._target_class()(doc.getroot())
 
