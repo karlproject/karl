@@ -589,6 +589,36 @@ class GetGridDataTests(unittest.TestCase):
         self.assertEqual(grid_data['totalRecords'], 0)
 
 
+class GetReportDescriptionsTests(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, report):
+        from karl.views.peopledirectory import get_report_descriptions
+        return get_report_descriptions(report)
+
+    def test_one_description(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        report = testing.DummyModel(
+            filters={'office': ['nyc']},
+            )
+        pd = testing.DummyModel()
+        directlyProvides(pd, IPeopleDirectory)
+        pd['r1'] = report
+        catitem = testing.DummyModel(
+            title='New York',
+            description='I<b>heart</b>NY',
+            )
+        pd.categories = {'office': catitem}
+        res = self._callFUT(report)
+        self.assertEqual(res, [])
+
+
 class TextDumpTests(unittest.TestCase):
 
     def setUp(self):
@@ -845,6 +875,7 @@ class DummyReport(testing.DummyModel):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         directlyProvides(pd, IPeopleDirectory)
+        pd.categories = {}
 
         section = testing.DummyModel(
             columns=[], tab_title='A', title='Section A')

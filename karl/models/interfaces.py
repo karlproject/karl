@@ -412,6 +412,28 @@ class IPeopleDirectory(IFolder):
     catalog = Attribute("Catalog of profiles")
     order = Attribute("Sequence of section IDs to display as tabs")
 
+class IPeopleCategory(Interface):
+    """A vocabulary for profile category values.
+
+    This object is a mapping. It maps an identifier for the category
+    value (for example, 'payroll-department') to an object that
+    implements IPeopleCategoryValue.
+    """
+    title = Attribute("The name of the category.  Example: 'Departments'")
+
+    def __getitem__(value_id):
+        """Return the specified IPeopleCategoryValue, or raise KeyError"""
+
+    def get(value_id, default=None):
+        """Return the specified IPeopleCategoryValue, or None"""
+
+class IPeopleCategoryItem(Interface):
+    """Metadata about a person category value."""
+    title = Attribute(
+        "Descriptive name.  Example: 'Human Resources'")
+    description = Attribute(
+        "An XHTML block that describes the category value")
+
 class IPeopleSection(IFolder):
     """Section of the people directory.
 
@@ -437,8 +459,9 @@ class IPeopleReport(Interface):
     title = Attribute("Report title")
     link_title = Attribute("Title to use for the link to the report")
     css_class = Attribute("CSS class of the link to the report")
-    filters = Attribute("Reduces the content of the report.  "
-        "Maps category ID to a list of values.")
+    filters = Attribute(
+        "Limit the report to the specified category values. "
+        "Maps category ID to a list of category value IDs.")
     columns = Attribute("IDs of columns to display in the report.")
 
     def set_filter(catid, values):

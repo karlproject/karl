@@ -442,7 +442,9 @@ class PeopleConfTests(unittest.TestCase):
         <peopledirectory>
             <categories>
                 <category id="offices" title="Offices">
-                    <value id="nyc" title="NYC"/>
+                    <value id="nyc" title="NYC">
+                        <description>I<b>heart</b>NY</description>
+                    </value>
                 </category>
             </categories>
             <sections>
@@ -471,6 +473,12 @@ class PeopleConfTests(unittest.TestCase):
         self.assertEqual(peopledir['everyone'].__acl__,
             [('Allow', 'bob', 'view')])
         self.assertEqual(list(peopledir['everyone'].keys()), ['ny'])
+
+        self.assertEqual(list(peopledir.categories.keys()), ['offices'])
+        self.assertEqual(peopledir.categories['offices'].title, 'Offices')
+        self.assertEqual(list(peopledir.categories['offices'].keys()), ['nyc'])
+        self.assertEqual(peopledir.categories['offices']['nyc'].description,
+            'I<b>heart</b>NY')
 
     def test_force_reindex(self):
         from karl.testing import DummyCatalog

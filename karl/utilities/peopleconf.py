@@ -21,6 +21,7 @@ Reindex if necessary.
 
 from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import PeopleCategory
+from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
@@ -31,6 +32,7 @@ from karl.views.peopledirectory import COLUMNS
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Deny
 from repoze.bfg.traversal import model_path
+from lxml import etree
 
 class ParseError(Exception):
     def __init__(self, msg, elem):
@@ -172,7 +174,18 @@ def peopleconf(peopledir, tree, force_reindex=False):
         peopledir.categories[catid] = pc
         for value_elem in cat_elem.findall('value'):
             valueid, title = id_and_title(value_elem)
-            pc[valueid] = title
+            desc_elem = value_elem.find('description')
+            if desc_elem is not None:
+                # get the content of the description as XML
+                # Note that lxml.etree.Element.text is documented as the
+                # "text before the first subelement".
+                text = desc_elem.text or ''
+                description = text + u''.join(
+                    etree.tostring(e, encoding=unicode) for e in desc_elem)
+            else:
+                description = u''
+            item = PeopleCategoryItem(title, description)
+            pc[valueid] = item
 
     for secid in list(peopledir.keys()):
         del peopledir[secid]

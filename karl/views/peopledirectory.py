@@ -135,6 +135,7 @@ def report_view(context, request):
     letter_info = mgr.get_info(request)
     kw, qualifiers = get_search_qualifiers(request)
 
+    descriptions = get_report_descriptions(context)
     print_url = model_url(context, request, 'print.html', **kw)
     csv_url = model_url(context, request, 'csv', **kw)
     pictures_url = model_url(context, request, 'picture_view.html', **kw)
@@ -145,6 +146,7 @@ def report_view(context, request):
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs,
         head_data=convert_to_script(client_json_data),
+        descriptions=descriptions,
         letters=letter_info,
         print_url=print_url,
         csv_url=csv_url,
@@ -222,6 +224,7 @@ def picture_view(context, request):
     letter_info = mgr.get_info(request)
     kw, qualifiers = get_search_qualifiers(request)
 
+    descriptions = get_report_descriptions(context)
     print_url = model_url(context, request, 'print.html', **kw)
     csv_url = model_url(context, request, 'csv', **kw)
     tabular_url = model_url(context, request, **kw)
@@ -232,6 +235,7 @@ def picture_view(context, request):
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs,
         letters=letter_info,
+        descriptions=descriptions,
         print_url=print_url,
         csv_url=csv_url,
         tabular_url=tabular_url,
@@ -325,6 +329,19 @@ def get_grid_data(context, request, start=0, limit=12,
         sortDirection=(reverse and 'desc' or 'asc'),
         )
     return payload
+
+def get_report_descriptions(report):
+    descriptions = []  # [(value title, description)]
+    categories = find_peopledirectory(report).categories
+    for catid, values in report.filters.items():
+        cat = categories.get(catid)
+        if cat:
+            for value in values:
+                catitem = cat.get(value)
+                if catitem:
+                    descriptions.append((catitem.title, catitem.description))
+    descriptions.sort()
+    return [d for (t, d) in descriptions]
 
 def text_dump(report, request):
     """Generates a table of text for a report.

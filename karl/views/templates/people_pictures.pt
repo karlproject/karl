@@ -16,7 +16,10 @@
 
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
 
-      <!--div metal:use-macro="peopledir_api.snippets.macros['peopledirhcards']" /-->
+      <div class="peopledir-report-description"
+        tal:repeat="description descriptions"
+        tal:content="structure description"></div>
+
       <div>
         <a class="rightFloatLink" title="Show table"
             href="${tabular_url}">Tabular View</a>

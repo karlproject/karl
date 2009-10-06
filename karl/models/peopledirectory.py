@@ -16,6 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from karl.models.catalog import CachingCatalog
+from karl.models.interfaces import IPeopleCategory
+from karl.models.interfaces import IPeopleCategoryItem
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
@@ -187,17 +189,18 @@ class PeopleDirectory(Folder):
 
 
 class PeopleCategory(PersistentMapping):
+    implements(IPeopleCategory)
 
     def __init__(self, title):
         super(PeopleCategory, self).__init__()
         self.title = title
 
-
 class PeopleCategoryItem(Persistent):
+    implements(IPeopleCategoryItem)
 
-    def __init__(self, title, description=''):
+    def __init__(self, title, description=u''):
         self.title = title
-        self.description = description
+        self.description = description  # HTML blob
 
 class PeopleSection(Folder):
     implements(IPeopleSection)
