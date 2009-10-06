@@ -75,6 +75,16 @@ class TestMakeName(unittest.TestCase):
         self.assertEqual(make_name(context, u"\u0081\u0082"), "-81-82-")
         self.assertEqual(make_name(context, u'foo\u008ab\u00c3ll'), "foosball")
 
+
+class TestBasenameOfFilepath(unittest.TestCase):
+    def test_it(self):
+        from karl.views.utils import basename_of_filepath
+        self.assertEqual(basename_of_filepath('c:\\dos\\autorun.bat'),
+            'autorun.bat')
+        self.assertEqual(basename_of_filepath('/home/user/myimage.jpg'),
+            'myimage.jpg')
+
+
 class TestGetUserHome(unittest.TestCase):
     def setUp(self):
         cleanUp()

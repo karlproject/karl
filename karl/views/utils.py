@@ -161,7 +161,8 @@ def basename_of_filepath(title):
 
        /communities/test1/files/c:\Documents and Settings\admin\Desktop\somefile.doc
 
-    We need to just get the last part.
+    We need to just get the last part after all back slashes and
+    forward slashes.
 
     usage::
 
@@ -169,7 +170,7 @@ def basename_of_filepath(title):
         make_unique_name(context, basename_of_filepath(title))
 
     """
-    return title.rsplit("\\", 1)[-1]
+    return title.rsplit("\\", 1)[-1].rsplit('/', 1)[-1]
 
 
 def convert_to_script(data):

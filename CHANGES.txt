@@ -54,6 +54,10 @@ Unreleased
 - LP #426385 Added a few extra parameters to template call for
   admin_edit_profile view.  Extra paramaters used by OSI custom template.
 
+- The ID of an uploaded should not include directory names provided
+  by the browser, if any.  This was solved previously for Windows but not
+  for POSIX (forward slash) path names.
+
 3.14 (2009-09-08)
 -----------------
 
