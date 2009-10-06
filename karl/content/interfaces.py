@@ -52,7 +52,7 @@ class ICalendar(IFolder):
     taggedValue('name', 'Calendar')
 
     title = Attribute(u'Title needed for backlinks')
-    mainfest = Attribute('Sequence of dictionaries.  Each dictionary contains '
+    manifest = Attribute('Sequence of dictionaries.  Each dictionary contains '
                          'a description of a local or remote virtual calendar')
 
 class ICalendarEvent(ICommunityContent, IOthers):
