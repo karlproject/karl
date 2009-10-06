@@ -192,6 +192,13 @@ class PeopleCategory(PersistentMapping):
         super(PeopleCategory, self).__init__()
         self.title = title
 
+
+class PeopleCategoryItem(Persistent):
+
+    def __init__(self, title, description=''):
+        self.title = title
+        self.description = description
+
 class PeopleSection(Folder):
     implements(IPeopleSection)
 

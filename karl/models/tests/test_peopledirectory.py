@@ -219,12 +219,29 @@ class TestPeopleDirectory(unittest.TestCase):
         self.assertEqual(pd.update_indexes(), False)
         self.assertFalse('category_office' in pd.catalog)
 
+
 class TestPeopleCategory(unittest.TestCase):
 
     def test_it(self):
         from karl.models.peopledirectory import PeopleCategory
         pc = PeopleCategory('Offices')
         self.assertEqual(pc.title, 'Offices')
+
+
+class TestPeopleCategoryItem(unittest.TestCase):
+
+    def test_with_description(self):
+        from karl.models.peopledirectory import PeopleCategoryItem
+        pci = PeopleCategoryItem('Title', 'Description')
+        self.assertEqual(pci.title, 'Title')
+        self.assertEqual(pci.description, 'Description')
+
+    def test_without_description(self):
+        from karl.models.peopledirectory import PeopleCategoryItem
+        pci = PeopleCategoryItem('Title')
+        self.assertEqual(pci.title, 'Title')
+        self.assertEqual(pci.description, '')
+
 
 class TestPeopleSection(unittest.TestCase):
 
