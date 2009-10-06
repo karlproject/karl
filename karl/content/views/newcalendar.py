@@ -48,10 +48,10 @@ def _date_requested(request):
     day   = int(request.GET.get('day', now.day)) 
     return (year, month, day)
 
-def _get_catalog_events(context, request, first_moment, last_moment):
-    searcher =  ICatalogSearch(context)
-    total, docids, resolver = searcher(
-        path={'query': model_path(context)},
+def _get_catalog_events(calendar, request, first_moment, last_moment):
+    searcher =  ICatalogSearch(calendar)
+
+    shared_params = dict(
         allowed={'query': effective_principals(request), 'operator': 'or'},
         start_date=(None, coarse_datetime_repr(last_moment)),
         end_date=(coarse_datetime_repr(first_moment),None),
@@ -60,10 +60,24 @@ def _get_catalog_events(context, request, first_moment, last_moment):
         reverse=False,
         )
 
-    events = []       
-    for docid in docids:
-        events.append(resolver(docid))
-        
+    events = []
+
+    def _resolve(docids, resolver):
+        return [ resolver(docid) for docid in docids ]
+
+    calendar_path = model_path(calendar)
+
+    # events that were not assigned to a virtual calendar
+    total, docids, resolver = searcher(virtual=calendar_path,
+                                       **shared_params)
+    events.append(_resolve(docids, resolver))
+
+    # events that were assigned to a virtual calendar
+    for virtual in calendar.manifest:
+        total, docids, resolver = searcher(virtual=virtual['path'],
+                                           **shared_params)
+        events.append(_resolve(docids, resolver))
+
     return events
 
 def _show_calendar_view(context, request, make_presenter):
@@ -83,7 +97,8 @@ def _show_calendar_view(context, request, make_presenter):
     # find events and paint them on the calendar 
     events = _get_catalog_events(context, request,
                                  calendar.first_moment,
-                                 calendar.last_moment)                                                       
+                                 calendar.last_moment)
+    events = events[0] # XXX each sequence in 'events' is an event stream
     calendar.paint_events(events)
 
     # render

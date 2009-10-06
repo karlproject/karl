@@ -275,7 +275,7 @@ class TestCalendarEventVirtualData(unittest.TestCase):
         community['context'] = context
         adapter = self._makeOne(context)
         result = adapter()
-        self.assertEqual(result, ('/', 'virt'))
+        self.assertEqual(result, 'virt')
     
 
 class DummyConverter:

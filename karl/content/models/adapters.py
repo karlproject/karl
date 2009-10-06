@@ -123,8 +123,12 @@ class CalendarEventVirtualData(object):
         self.context = context
 
     def __call__(self):
-        calendar = find_interface(self.context, ICalendar)
-        calendar_path = model_path(calendar)
-        virtual_calendar = getattr(self.context, 'virtual_calendar', None)
-        return (calendar_path, virtual_calendar)
+        virtual = getattr(self.context, 'virtual_calendar', None)
+        if not virtual:
+            calendar = find_interface(self.context, ICalendar)
+            virtual = model_path(calendar)
+        return virtual
+
+        
+                
     

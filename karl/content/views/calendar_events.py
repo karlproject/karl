@@ -307,7 +307,6 @@ def listing_calendar_view(context, request):
         feed_url=feed_url,
         )
 
-
 def _get_virtual_calendars(calendar):
     return [ x for x in calendar.values() if IVirtualCalendar.providedBy(x) ]
 
@@ -416,8 +415,9 @@ def add_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar:
-        virtual_calendars =[x.title for x in _get_virtual_calendars(calendar)]
-        virtual_calendars.sort()
+        virtual_calendars = [ {'title':x.title, 'path':model_path(x)} for x in
+                              _get_virtual_calendars(calendar) ]
+        virtual_calendars.sort(key=lambda x: x['title'])
     else:
         virtual_calendars = []
 
@@ -631,8 +631,9 @@ def edit_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar is not None:
-        virtual_calendars=[x.title for x in _get_virtual_calendars(calendar)]
-        virtual_calendars.sort()
+        virtual_calendars = [ {'title':x.title, 'path':model_path(x)} for x in
+                              _get_virtual_calendars(calendar) ]
+        virtual_calendars.sort(key=lambda x: x['title'])
     else:
         virtual_calendars = []
 

@@ -16,20 +16,22 @@
     <div metal:use-macro="formfields.macros['formerror']"/>
 
     <table id="calendars" border="0">
+
       <tr tal:condition="manifest">
         <th>Color</th>
         <th>Name</th>
         <th>Location</th>
         <th>Delete</th>
       </tr>
+
       <tr tal:repeat="calendar manifest">
-         <td style="background-color: ${calendar.color}">&nbsp;</td>
-         <td>${calendar.name}</td>
-         <td tal:condition="calendar.local">${calendar.title}</td>
-         <td tal:condition="not calendar.local">${calendar.title}</td>
-         <td><a href="${post_url}?form.delete=${calendar.name}"
-                >${calendar.name}</a></td>
+         <td style="background-color: ${calendar['color']}">&nbsp;</td>
+         <td>${calendar['name']}</td>
+         <td>${calendar['title']}</td>
+         <td><a href="${post_url}?form.delete=${calendar['name']}"
+                >${calendar['name']}</a></td>
        </tr>
+
      </table>
 
     <fieldset tal:define="error fielderrors['calendar_name']|None"
