@@ -199,26 +199,25 @@ class PeopleCategoryImporterTests(unittest.TestCase):
         self.failUnless(verifyObject(IContentIn, self._make_one()))
 
     def test_update(self):
-        from karl.peopledir.models.category import PeopleCategoryItem
-        item = PeopleCategoryItem('Temporary Title', sync_id='1062')
+        from karl.models.peopledirectory import PeopleCategoryItem
+        item = PeopleCategoryItem('Temporary Title')
         self._make_one().update(item)
 
         self.assertEqual(item.title, 'Fondation Connaissance et Liberte')
         self.assertEqual(item.description,
                          '113 Huse St, Beverly Hills, CA 90210')
-        self.assertEqual(item.sync_id, '1062')
 
     def test_create(self):
         context = {}
-        self._make_one().create(context)
+        self._make_one('test_category2.xml').create(context)
 
         self.failUnless('offices' in context)
         offices = context['offices']
-        self.failUnless('fondation-connaissance-et-liberte' in offices)
-        item = offices['fondation-connaissance-et-liberte']
-        self.assertEqual(item.title, 'Fondation Connaissance et Liberte')
-        self.assertEqual(item.description,
-                         '113 Huse St, Beverly Hills, CA 90210')
+        self.failUnless('category-2' in offices)
+        item = offices['category-2']
+        self.assertEqual(item.title, 'Category 2')
+        self.failUnless('<h:div>Port-au-Prince, HT 90210</h:div>' in
+                        item.description)
         self.assertEqual(item.sync_id, '1062')
 
     def test_empty_category(self):

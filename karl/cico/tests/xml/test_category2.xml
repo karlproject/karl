@@ -5,15 +5,13 @@
   <category id="offices">Offices</category>
   <title>Category 2</title>
   <description>
-    <!-- Example: this can contain arbitrary blobs of html to be displayed
-         in search for this category. -->
-    <h:div>
-      <h:div>143 Avenue Christophe, Port-au-Prince, Apt B</h:div>
-      <h:div>Port-au-Prince, HT 90210</h:div>
-      <h:div></h:div>
-      <h:div><h:b>Tel:</h:b> 212-555-2323, 212-555-2121</h:div>
-      <h:div><h:b>Fax:</h:b> 212-555-1313</h:div>
-      <h:div><h:b>Url:</h:b> http://www.fokal.org</h:div>
-    </h:div>
+    &lt;h:div>
+      &lt;h:div>143 Avenue Christophe, Port-au-Prince, Apt B&lt;/h:div>
+      &lt;h:div>Port-au-Prince, HT 90210&lt;/h:div>
+      &lt;h:div>&lt;/h:div>
+      &lt;h:div>&lt;h:b>Tel:&lt;/h:b> 212-555-2323, 212-555-2121&lt;/h:div>
+      &lt;h:div>&lt;h:b>Fax:&lt;/h:b> 212-555-1313&lt;/h:div>
+      &lt;h:div>&lt;h:b>Url:&lt;/h:b> http://www.fokal.org&lt;/h:div>
+    &lt;/h:div>
   </description>
 </category-item>
