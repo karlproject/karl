@@ -7,12 +7,15 @@
             <label for="">
               Calendar: 
             </label>
-            <select onchange="javascript:document.location='${api.request.path_url}?filter=' + escape(this.options[this.selectedIndex].value)">
-              <option class="group" value="">All calendars</option>
+            <select id="cal_picker">
+              <option 
+                      tal:attributes="value api.request.path_url + '?filter=';
+                                      class 'group'" 
+                      >All calendars</option>
               <option 
                       tal:define="selected_cal selected_cal"
                       tal:repeat="data api.context.manifest"
-                      tal:attributes="value data['path']; 
+                      tal:attributes="value api.request.path_url + '?filter=' + data['path']; 
                                       class 'color cal_' +data['color'];
                                       selected data['path'] == selected_cal"
                       >${data['name']}</option>

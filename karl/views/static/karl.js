@@ -1773,6 +1773,12 @@ function scrollToTime() {
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
+  // ALL VIEWS - virtual calendar switcher
+  $("#cal_picker").change(function() {
+    var values = this.options[this.selectedIndex].value.split("?filter=");
+    javascript:document.location = values[0] + "?filter=" + escape(values[1]);
+  })
+
   // MONTH VIEW - hover to show (+) icon to add events
   $("table.cal_month td").hover(mouseOverHour, mouseOutHour);
 
