@@ -16,7 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import calendar 
-import datetime
+import datetime  
+import time
 from karl.content.newcalendar.presenters.base import BasePresenter
 from karl.content.newcalendar.presenters.base import BaseEvent
 from karl.content.newcalendar.navigation import Navigation
@@ -115,6 +116,7 @@ class DayViewPresenter(BasePresenter):
 
     def _init_time_slots(self):
         self.half_hour_slots = []
+
         for i in range(0, 48):
            if (i < 16) or (i > 35):
                is_shaded = True
@@ -125,13 +127,58 @@ class DayViewPresenter(BasePresenter):
                is_half_hour = True
            else:
                is_half_hour = False
+                                           
+           start_datetime = add_minutes(self.first_moment, (i * 30))
            
            slot = TimeSlot(shaded_row=is_shaded, 
-                           is_half_hour=is_half_hour)
+                           is_half_hour=is_half_hour,
+                           start_datetime=start_datetime)
            self.half_hour_slots.append(slot)
 
     def paint_events(self, events):
-        return
+        mapping = self._map_catalog_events_to_slot_indices(events)
+        
+        for slot_index, catalog_events in enumerate(mapping):
+            pass
+
+
+    def _map_catalog_events_to_slot_indices(self, events):
+        mapping = [ [] for slot in self.half_hour_slots ]
+
+        num_slots = len(self.half_hour_slots)
+
+        for event in events:
+            index = self._find_first_slot_index_for_event(event)
+            if index is None:
+                continue
+            
+            for i in range(index, num_slots):
+                mapping[i].append(event)
+
+                if (i != num_slots-1):
+                    next_slot = self.half_hour_slots[i+1]                                           
+                    if event.endDate <= next_slot.start_datetime:
+                        break
+
+        return mapping
+
+    def _find_first_slot_index_for_event(self, catalog_event):
+        if catalog_event.endDate > self.last_moment:
+            return None
+
+        event_start_datetime = catalog_event.startDate
+        if event_start_datetime < self.first_moment:
+            event_start_datetime = self.first_moment
+        
+        slot_index = None
+        
+        for i, slot in enumerate(self.half_hour_slots):
+            if slot.start_datetime > event_start_datetime:
+                break
+            slot_index = i
+        
+        return slot_index
+        
 
     @property
     def first_moment(self):
@@ -153,9 +200,13 @@ class DayViewPresenter(BasePresenter):
 
 
 class TimeSlot(object):
-    def __init__(self, shaded_row=False, is_half_hour=False):
-        self.shaded_row   = shaded_row
-        self.is_half_hour = is_half_hour
+    def __init__(self, shaded_row=False, is_half_hour=False,
+                       start_datetime=0):
+        self.shaded_row     = shaded_row
+        self.is_half_hour   = is_half_hour
+        self.start_datetime = start_datetime
+
+        self.bubbles        = []
     
     @property
     def shade_class(self):
@@ -170,3 +221,15 @@ class TimeSlot(object):
             return 'cal_half_hour'
         else:
             return 'cal_hour'    
+
+    def __repr__(self):
+        fmt  = "<Half Hour at %s>"
+        time = self.start_datetime.strftime('%Y-%m-%d %r')
+        return fmt % time 
+
+
+
+def add_minutes(dtime, num_minutes):
+    unixtime = time.mktime(dtime.timetuple()) # ignores microseconds
+    unixtime += (num_minutes * 60)
+    return datetime.datetime.fromtimestamp(unixtime)
