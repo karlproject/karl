@@ -7,7 +7,7 @@
             <label for="">
               Calendar: 
             </label>
-            <select onchange="javascript:document.location='${api.request.path_url}?filter=' + this.options[this.selectedIndex].value">
+            <select onchange="javascript:document.location='${api.request.path_url}?filter=' + escape(this.options[this.selectedIndex].value)">
               <option class="group" value="">All calendars</option>
               <option 
                       tal:define="selected_cal selected_cal"
