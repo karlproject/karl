@@ -141,11 +141,10 @@ def _show_calendar_view(context, request, make_presenter):
     now_datetime   = _now()
     session = get_session(context, request)
 
-    filt = request.params.get('filter')
-    if not filt:
+    filt = request.params.get('filter', None)
+    if filt is None:
         filt = session.get('calendar_filter', None)
-    if filt:
-        session['calendar_filter'] = filt
+    session['calendar_filter'] = filt
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
