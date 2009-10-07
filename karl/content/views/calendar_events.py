@@ -145,15 +145,23 @@ def _show_calendar_view(context, request, make_presenter):
     events = _get_catalog_events(context, request,
                                  calendar.first_moment,
                                  calendar.last_moment)
+
+    from pprint import pprint as pp
+    import sys
+    pp(events, sys.stderr)
+
     events = events[0] # XXX each sequence in 'events' is an event stream
     calendar.paint_events(events)
+
+    settings_url = model_url(context, request, 'settings.html')
 
     # render
     api = TemplateAPI(context, request, calendar.title)    
     return render_template_to_response(
         calendar.template_filename,
         api=api,          
-        feed_url=calendar.feed_href,
+        feed_url=calendar.feed_href,                         
+        settings_url=settings_url,
         calendar=calendar        
     )    
 

@@ -3,23 +3,21 @@
 
       <div class="cal_header" metal:define-macro="header">
         <div class="cal_calendars clearafter" >
-          <!-- choose (Not Implemented)
           <div class="cal_choose">
             <label for="">
               Calendar: 
             </label>
             <select>
               <option class="group">All calendars</option>
-              <option class="group">Default Community</option>
+              <option class="group">Local Community</option>
               <option class="color cal_green">Personal</option>
               <option class="color cal_blue">Vacation</option>
               <option class="color cal_red">Meetings</option>
-              <option class="group">NYC Community</option>
+              <option class="group">Remote Calendars</option>
               <option class="color cal_orange">Travel</option>
             </select>
-            (<a href="#">Setup</a>)
+            (<a href="${settings_url}">Setup</a>)
           </div>
-          -->
 
           <!-- new event -->
           <div class="cal_new_event">
