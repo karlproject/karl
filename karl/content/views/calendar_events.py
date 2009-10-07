@@ -112,26 +112,31 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
     def _resolve(docids, resolver):
         return [ resolver(docid) for docid in docids ]
 
+    def _color(obs, color):
+        for ob in obs:
+            ob._v_color = color
+        return obs
+
     events = []
 
     if calendar_path:
         total, docids, resolver = searcher(virtual=calendar_path,
                                            **shared_params)
-        events.append(_resolve(docids, resolver))
+        events.append(_color(_resolve(docids, resolver), 'blue'))
 
     else:
         calendar_path = model_path(calendar)
-
         # events that were not assigned to a virtual calendar
         total, docids, resolver = searcher(virtual=calendar_path,
                                            **shared_params)
-        events.append(_resolve(docids, resolver))
+        events.append(_color(_resolve(docids, resolver), 'blue'))
 
         # events that were assigned to a virtual calendar
         for virtual in calendar.manifest:
+            color = virtual['color']
             total, docids, resolver = searcher(virtual=virtual['path'],
                                                **shared_params)
-            events.append(_resolve(docids, resolver))
+            events.append(_color(_resolve(docids, resolver), color))
 
     return events
 
