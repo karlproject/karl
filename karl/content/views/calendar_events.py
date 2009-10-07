@@ -54,6 +54,7 @@ from karl.utilities.interfaces import IKarlDates
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
 from karl.utils import find_community
+from karl.utils import get_session
 
 from karl.security.workflow import get_security_states
 
@@ -95,7 +96,8 @@ def _date_requested(request):
     day   = int(request.GET.get('day', now.day)) 
     return (year, month, day)
 
-def _get_catalog_events(calendar, request, first_moment, last_moment):
+def _get_catalog_events(calendar, request, first_moment, last_moment,
+                        calendar_path=None):
     searcher =  ICatalogSearch(calendar)
 
     shared_params = dict(
@@ -107,23 +109,29 @@ def _get_catalog_events(calendar, request, first_moment, last_moment):
         reverse=False,
         )
 
-    events = []
-
     def _resolve(docids, resolver):
         return [ resolver(docid) for docid in docids ]
 
-    calendar_path = model_path(calendar)
+    events = []
 
-    # events that were not assigned to a virtual calendar
-    total, docids, resolver = searcher(virtual=calendar_path,
-                                       **shared_params)
-    events.append(_resolve(docids, resolver))
-
-    # events that were assigned to a virtual calendar
-    for virtual in calendar.manifest:
-        total, docids, resolver = searcher(virtual=virtual['path'],
+    if calendar_path:
+        total, docids, resolver = searcher(virtual=calendar_path,
                                            **shared_params)
         events.append(_resolve(docids, resolver))
+
+    else:
+        calendar_path = model_path(calendar)
+
+        # events that were not assigned to a virtual calendar
+        total, docids, resolver = searcher(virtual=calendar_path,
+                                           **shared_params)
+        events.append(_resolve(docids, resolver))
+
+        # events that were assigned to a virtual calendar
+        for virtual in calendar.manifest:
+            total, docids, resolver = searcher(virtual=virtual['path'],
+                                               **shared_params)
+            events.append(_resolve(docids, resolver))
 
     return events
 
@@ -131,6 +139,9 @@ def _show_calendar_view(context, request, make_presenter):
     year, month, day = _date_requested(request)
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
+    session = get_session(context, request)
+
+    filt = request.params.get('filter', session.get('calendar_filter'))
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
@@ -144,7 +155,8 @@ def _show_calendar_view(context, request, make_presenter):
     # find events and paint them on the calendar 
     events = _get_catalog_events(context, request,
                                  calendar.first_moment,
-                                 calendar.last_moment)
+                                 calendar.last_moment,
+                                 filt)
 
     from pprint import pprint as pp
     import sys
@@ -162,7 +174,8 @@ def _show_calendar_view(context, request, make_presenter):
         api=api,          
         feed_url=calendar.feed_href,                         
         settings_url=settings_url,
-        calendar=calendar        
+        calendar=calendar,
+        selected_cal = filt,
     )    
 
 def show_list_view(context, request):
