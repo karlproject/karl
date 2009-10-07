@@ -101,6 +101,8 @@ class BaseEvent(object):
         self._day = day # DayOnListView                               
         self._catalog_event = catalog_event # ICalendarEvent                               
 
+        self.color = catalog_event._v_color 
+
         self.show_url = show_url
         self.edit_url = edit_url
         self.delete_url = delete_url

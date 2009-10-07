@@ -382,6 +382,6 @@ class EventOnMonthView(BaseEvent):
     @property 
     def caption_class(self):
         if self.bubbled:
-            return 'cal_blue_all'
+            return 'cal_%s_all' % self.color
         else:
-            return 'cal_blue'
+            return 'cal_%s' % self.color

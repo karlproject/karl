@@ -22,11 +22,11 @@
         <td>
           <div tal:repeat="event day.events" class="cal_agenda_block clearafter">
             <div class="cal_event_time cal_event_pos_full">
-              <a href="${event.show_url}" class="cal_blue">${event.time_in_words}</a>
+              <a href="${event.show_url}" class="cal_${event.color}">${event.time_in_words}</a>
             </div>
 
             <div class="cal_agenda_title">
-              <a href="${event.show_url}" class="cal_blue">${event.title}</a>
+              <a href="${event.show_url}" class="cal_${event.color}">${event.title}</a>
 
 	            <tal:block condition="event.location">
               - ${event.location}

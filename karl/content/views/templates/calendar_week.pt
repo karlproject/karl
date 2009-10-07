@@ -71,7 +71,7 @@
                </div>
 
                <tal:block condition="slot.bubble">
-               <div class="cal_blue cal_event_block" style="height: ${slot.bubble.length_px}px">
+               <div class="cal_${slot.bubble.catalog_event._v_color} cal_event_block" style="height: ${slot.bubble.length_px}px">
                  <a href="#">
                    <span class="time">${slot.bubble.catalog_event.startDate.strftime('%l:%M %p')}</span><br />
                    ${slot.bubble.catalog_event.title}
