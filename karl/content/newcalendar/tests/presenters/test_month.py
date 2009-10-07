@@ -121,7 +121,7 @@ class MonthViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.today_href.endswith(
-            'newmonth.html?year=2009&month=8&day=26'
+            'month.html?year=2009&month=8&day=26'
         ))
 
     def test_sets_navigation_prev_href(self):
@@ -131,7 +131,7 @@ class MonthViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.prev_href.endswith(
-            'newmonth.html?year=2009&month=7&day=1'
+            'month.html?year=2009&month=7&day=1'
         ))
 
     def test_sets_navigation_next_href(self):
@@ -141,7 +141,7 @@ class MonthViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.next_href.endswith(
-            'newmonth.html?year=2009&month=9&day=1'
+            'month.html?year=2009&month=9&day=1'
         ))
 
     # canvas
@@ -198,7 +198,7 @@ class MonthViewPresenterTests(unittest.TestCase):
         for week in presenter.weeks:
             for day in week:
                 format = '%s?year=%d&month=%d&day=%d'
-                url = format % (presenter.url_for('newday.html'),
+                url = format % (presenter.url_for('day.html'),
                                 day.year, day.month, day.day)   
                 self.assertEqual(day.show_day_url, url)
 

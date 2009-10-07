@@ -69,7 +69,7 @@ class MonthViewPresenter(BasePresenter):
 
                 # url to view this day
                 format = '%s?year=%d&month=%d&day=%d'
-                show_url = format % (self.url_for('newday.html'),
+                show_url = format % (self.url_for('day.html'),
                                      dt.year, dt.month, dt.day)  
                 
                 day = DayOnMonthView(dt.year, dt.month, dt.day,
@@ -122,7 +122,7 @@ class MonthViewPresenter(BasePresenter):
 
         # left side
         format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('newmonth.html')
+        url = self.url_for('month.html')
 
         nav.prev_href = format % (url, self.prior_month.year, 
                                        self.prior_month.month,

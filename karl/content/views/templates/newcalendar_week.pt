@@ -32,6 +32,8 @@
           <div class="create">
             <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
           </div>
+          
+
         </div>
         </td>
         <td class="last">&nbsp;</td>   

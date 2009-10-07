@@ -52,48 +52,34 @@
     view=".blog.edit_blogentry_view"
     permission="edit"
   />
-  
+
   <view
     for="karl.content.interfaces.ICalendar"
-    view=".calendar_events.monthly_calendar_view"
+    view=".calendar_events.show_month_view"
     permission="view"
   />
 
   <view
     for="karl.content.interfaces.ICalendar"
-    view=".newcalendar.show_day_view"
+    view=".calendar_events.show_week_view"
     permission="view"
-    name="newday.html"
+    name="week.html"
   />
 
   <view
     for="karl.content.interfaces.ICalendar"
-    view=".newcalendar.show_week_view"
+    view=".calendar_events.show_day_view"
     permission="view"
-    name="newweek.html"
+    name="day.html"
   />
 
   <view
     for="karl.content.interfaces.ICalendar"
-    view=".newcalendar.show_month_view"
+    view=".calendar_events.show_list_view"
     permission="view"
-    name="newmonth.html"
-  />
-
-  <view
-    for="karl.content.interfaces.ICalendar"
-    view=".newcalendar.show_list_view"
-    permission="view"
-    name="newlist.html"
+    name="list.html"
   />
   
-  <view
-    for="karl.content.interfaces.ICalendar"
-    view=".calendar_events.listing_calendar_view"
-    permission="view"
-    name="listing.html"
-  />
-
   <view
     for="karl.content.interfaces.ICalendar"
     name="settings.html"

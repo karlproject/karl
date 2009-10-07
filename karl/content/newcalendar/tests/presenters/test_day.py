@@ -109,7 +109,7 @@ class DayViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.today_href.endswith(
-            'newday.html?year=2009&month=8&day=26'
+            'day.html?year=2009&month=8&day=26'
         ))
 
     def test_sets_navigation_prev_href(self):
@@ -119,7 +119,7 @@ class DayViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.prev_href.endswith(
-            'newday.html?year=2009&month=7&day=31'
+            'day.html?year=2009&month=7&day=31'
         ))
 
     def test_sets_navigation_next_href(self):
@@ -129,7 +129,7 @@ class DayViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.next_href.endswith(
-            'newday.html?year=2009&month=8&day=2'
+            'day.html?year=2009&month=8&day=2'
         ))
 
     # time slots

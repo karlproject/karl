@@ -96,7 +96,7 @@ class WeekViewPresenter(BasePresenter):
 
         # left side
         format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('newweek.html')
+        url = self.url_for('week.html')
 
         nav.prev_href = format % (url, self.prior_week.year, 
                                        self.prior_week.month,

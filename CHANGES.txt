@@ -58,6 +58,8 @@ Unreleased
   by the browser, if any.  This was solved previously for Windows but not
   for POSIX (forward slash) path names.
 
+- The new calendar pages have now replaced the original calendar.
+
 3.14 (2009-09-08)
 -----------------
 

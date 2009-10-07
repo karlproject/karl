@@ -113,7 +113,7 @@ class ListViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.today_href.endswith(
-            'newlist.html?year=2009&month=8&day=26'
+            'list.html?year=2009&month=8&day=26'
         ))
 
     def test_sets_navigation_prev_href(self):
@@ -123,7 +123,7 @@ class ListViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.prev_href.endswith(
-            'newlist.html?year=2009&month=7&day=1'
+            'list.html?year=2009&month=7&day=1'
         ))
 
     def test_sets_navigation_next_href(self):
@@ -133,7 +133,7 @@ class ListViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertTrue(presenter.navigation.next_href.endswith(
-            'newlist.html?year=2009&month=9&day=1'
+            'list.html?year=2009&month=9&day=1'
         ))
 
     # paint_events 

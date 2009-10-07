@@ -76,6 +76,11 @@ from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import store_attachments
 
+from karl.content.newcalendar.presenters.day import DayViewPresenter
+from karl.content.newcalendar.presenters.week import WeekViewPresenter
+from karl.content.newcalendar.presenters.month import MonthViewPresenter
+from karl.content.newcalendar.presenters.list import ListViewPresenter
+
 _NOW = None
 
 def _now():
@@ -83,18 +88,17 @@ def _now():
         return _NOW
     return datetime.datetime.now()
 
-def get_catalog_events(context, request, year, month):
-    """ Return a mapping, day_number -> [event_info], for the given month.
-    """
-    year = int(year)
-    month = int(month)
-    last_day = calendar.monthrange(year, month)[1]
-    first_moment = datetime.datetime(year, month, 1)
-    last_moment = datetime.datetime(year, month, last_day, 23, 59, 59)
+def _date_requested(request):
+    now = _now()
+    year  = int(request.GET.get('year', now.year))
+    month = int(request.GET.get('month', now.month))
+    day   = int(request.GET.get('day', now.day)) 
+    return (year, month, day)
 
-    searcher =  ICatalogSearch(context)
-    total, docids, resolver = searcher(
-        path={'query': model_path(context)},
+def _get_catalog_events(calendar, request, first_moment, last_moment):
+    searcher =  ICatalogSearch(calendar)
+
+    shared_params = dict(
         allowed={'query': effective_principals(request), 'operator': 'or'},
         start_date=(None, coarse_datetime_repr(last_moment)),
         end_date=(coarse_datetime_repr(first_moment),None),
@@ -103,108 +107,68 @@ def get_catalog_events(context, request, year, month):
         reverse=False,
         )
 
-    # compile a list of the days that have events
-    event_days = {}
+    events = []
 
-    now = _now()
-    if first_moment <= now <= last_moment:
-        today_day = now.day
-    else:
-        today_day = None
+    def _resolve(docids, resolver):
+        return [ resolver(docid) for docid in docids ]
 
-    # link to month on listing view; used to build day_href
-    mu = model_url(context, request, 'listing.html',
-                   query={'year':year, 'month':month})
+    calendar_path = model_path(calendar)
 
-    for day in range(1, last_day+1):
-        info = event_days[day] = {'day': day, 'events': []}
-        if day == today_day:
-            info['day_class'] = 'today'
-        else:
-            info['day_class'] = 'this-month'
+    # events that were not assigned to a virtual calendar
+    total, docids, resolver = searcher(virtual=calendar_path,
+                                       **shared_params)
+    events.append(_resolve(docids, resolver))
 
-        info['day_href'] = "%s#day-%d" % (mu, day)
+    # events that were assigned to a virtual calendar
+    for virtual in calendar.manifest:
+        total, docids, resolver = searcher(virtual=virtual['path'],
+                                           **shared_params)
+        events.append(_resolve(docids, resolver))
 
-    for event in [resolver(docid) for docid in docids]:
+    return events
 
-        # we need to deal with events that end next month
-        if event.startDate < first_moment:
-            event_first = 1
-        else:
-            event_first = event.startDate.day
+def _show_calendar_view(context, request, make_presenter):
+    year, month, day = _date_requested(request)
+    focus_datetime = datetime.datetime(year, month, day)
+    now_datetime   = _now()
 
-        if event.endDate > last_moment:
-            event_last = last_day
-        else:
-            event_last = event.endDate.day
+    def url_for(*args, **kargs):
+        ctx = kargs.pop('context', context)
+        return model_url(ctx, request, *args, **kargs)          
 
-        for day in range(event_first, event_last + 1):
-            events = event_days[day]['events']
-            events.append({'title': event.title,
-                           'href': model_url(event, request),
-                          })
+    # make the calendar presenter for this view
+    calendar = make_presenter(focus_datetime, 
+                              now_datetime, 
+                              url_for)
 
-    return event_days
+    # find events and paint them on the calendar 
+    events = _get_catalog_events(context, request,
+                                 calendar.first_moment,
+                                 calendar.last_moment)
+    events = events[0] # XXX each sequence in 'events' is an event stream
+    calendar.paint_events(events)
 
-def get_calendar_skeleton(context, request, year, month):
-    """ Return a sequence of sequence of mappings representing the given month.
+    # render
+    api = TemplateAPI(context, request, calendar.title)    
+    return render_template_to_response(
+        calendar.template_filename,
+        api=api,          
+        feed_url=calendar.feed_href,
+        calendar=calendar        
+    )    
 
-    o The outermost sequeces are weeks in the month.
+def show_list_view(context, request):
+    return _show_calendar_view(context, request, ListViewPresenter)
 
-    o The innermost sequences are days in each week.
+def show_month_view(context, request):
+    return _show_calendar_view(context, request, MonthViewPresenter)
 
-    o The mappings have the following keys:
+def show_week_view(context, request):
+    return _show_calendar_view(context, request, WeekViewPresenter)
+    
+def show_day_view(context, request):
+    return _show_calendar_view(context, request, DayViewPresenter)
 
-      'day'
-        the day number
-
-      'day_class'
-        CSS class, one of 'other-month' (padding days), 'this-month', 'today'
-
-      'day_href'
-        Hyperlink to the day on listing_calendar_view
-
-      'events'
-        a sequence if mappings describing events on the day.  Keys are
-        'title' and 'href'.
-    """
-    year = int(year)
-    month = int(month)
-    # days_by_week is a list of days inside a list of weeks, like so:
-    # [[0, 1, 2, 3, 4, 5, 6],
-    #  [7, 8, 9, 10, 11, 12, 13],
-    #  [14, 15, 16, 17, 18, 19, 20],
-    #  [21, 22, 23, 24, 25, 26, 27],
-    #  [28, 29, 30, 31, 0, 0, 0]]
-    days_by_week = calendar.monthcalendar(year, month)
-    weeks = []
-
-    events = get_catalog_events(context, request, year, month)
-
-    for week in days_by_week:
-        days = []
-        for day in week:
-            if events.has_key(day):
-                days.append(events[day])
-            else:
-                days.append({'day': day,
-                             'day_class': 'other-month',
-                             'events':[],
-                            })
-
-        weeks.append(days)
-
-    return weeks
-
-def _prior_month(year, month):
-    if month == 1:
-        return (year - 1, 12)
-    return (year, month - 1)
-
-def _next_month(year, month):
-    if month == 12:
-        return (year + 1, 1)
-    return (year, month + 1)
 
 def get_calendar_actions(context, request):
     """Return the actions to display when looking at the calendar"""
@@ -221,91 +185,6 @@ def get_calendar_actions(context, request):
             )
     return actions
 
-def monthly_calendar_view(context, request):
-
-    now = _now()
-    year = int(request.GET.get('year', now.year))
-    month = int(request.GET.get('month', now.month))
-
-    p_year, p_month = _prior_month(year, month)
-    n_year, n_month = _next_month(year, month)
-
-    weeks_days = get_calendar_skeleton(context, request, year, month)
-
-    page_title = '%s %d' % (calendar.month_name[month], year)
-    api = TemplateAPI(context, request, page_title)
-
-    actions = get_calendar_actions(context, request)
-
-    url = model_url(context, request)
-
-    previous = {
-        'title': '%s %d' % (calendar.month_name[p_month], p_year),
-        'href': '%s?year=%d&month=%d' % (url, p_year, p_month),
-        }
-    next = {
-        'title': '%s %d' % (calendar.month_name[n_month], n_year),
-        'href': '%s?year=%d&month=%d' % (url, n_year, n_month),
-        }
-
-    mu = model_url(context, request, 'listing.html',
-                   query={'year':year, 'month':month})
-
-    submenu = [
-        {'label': 'Monthly View', 'href': mu, 'make_link': False},
-        {'label': 'Listing View', 'href': mu, 'make_link': True},
-        ]
-
-    feed_url = model_url(context, request, "atom.xml")
-    return render_template_to_response(
-        'templates/monthly_calendar.pt',
-        api=api,
-        actions=actions,
-        weeks_days=weeks_days,
-        previous_month=previous,
-        next_month=next,
-        submenu=submenu,
-        feed_url=feed_url,
-        )
-
-
-def listing_calendar_view(context, request):
-
-    now = _now()
-    year = int(request.GET.get('year', now.year))
-    month = int(request.GET.get('month', now.month))
-
-    catalog_events = get_catalog_events(context, request, year, month)
-
-    days_with_events = []
-    for day in catalog_events.values():
-        if day['events'] != []:
-            date = datetime.date(year, month, day['day'])
-            day['dow'] = date.strftime('%A')
-            days_with_events.append(day)
-
-    page_title = '%s %d' % (calendar.month_name[month], year)
-    api = TemplateAPI(context, request, page_title)
-
-    actions = get_calendar_actions(context, request)
-
-    mu = model_url(context, request,
-                   query={'year':year, 'month':month})
-
-    submenu = [
-        {'label': 'Monthly View', 'href': mu, 'make_link': True},
-        {'label': 'Listing View', 'href': mu, 'make_link': False},
-        ]
-
-    feed_url = model_url(context, request, "atom.xml")
-    return render_template_to_response(
-        'templates/listing_calendar.pt',
-        api=api,
-        actions=actions,
-        days_with_events=days_with_events,
-        submenu=submenu,
-        feed_url=feed_url,
-        )
 
 def _get_virtual_calendars(calendar):
     return [ x for x in calendar.values() if IVirtualCalendar.providedBy(x) ]

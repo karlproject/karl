@@ -87,7 +87,7 @@ class DayViewPresenter(BasePresenter):
 
         # left side
         format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('newday.html')
+        url = self.url_for('day.html')
 
         nav.prev_href = format % (url, self.prior_day.year, 
                                        self.prior_day.month,
