@@ -19,6 +19,7 @@ import calendar
 import datetime
 from karl.content.newcalendar.presenters.base import BasePresenter
 from karl.content.newcalendar.presenters.base import BaseEvent           
+from karl.content.newcalendar.presenters.day import DayViewPresenter
 from karl.content.newcalendar.navigation import Navigation 
 from karl.content.newcalendar.utils import MonthSkeleton
 from karl.content.newcalendar.utils import next_month
@@ -123,7 +124,37 @@ class WeekViewPresenter(BasePresenter):
             self.hour_labels.append(label)
 
     def paint_events(self, events):
-        return
+        for day in self.week:
+          presenter = DayViewPresenter(focus_datetime= day.start_datetime,
+                                       now_datetime  = self.now_datetime,
+                                       url_for       = self.url_for)
+
+          presenter.paint_events(
+              self._filter_events_for_day(events, day)
+          )  
+
+          day.all_day_events  = presenter.all_day_events
+          day.half_hour_slots = presenter.half_hour_slots
+
+          from pprint import pprint as pp
+          import sys
+          pp(presenter.half_hour_slots, sys.stderr)
+
+    def _filter_events_for_day(self, events, day):
+        filtered = []
+        for event in events: 
+            dt = event.startDate
+            while dt < event.endDate:
+              same_year  = (dt.year  == day.year)
+              same_month = (dt.month == day.month)
+              same_day   = (dt.day   == day.day)
+
+              if (same_year and same_month and same_day):
+                filtered.append(event)
+
+              dt = add_days(dt, 1) 
+        
+        return filtered  
 
     @property
     def today_class(self):
@@ -163,6 +194,9 @@ class DayOnWeekView(object):
         self.end_datetime   = datetime.datetime(year, month, day, 23, 59, 59)
 
         self._init_heading_and_css_day_abbr()
+
+        self.all_day_events  = []
+        self.half_hour_slots = []
     
     def _init_heading_and_css_day_abbr(self):
         day_idx = calendar.weekday(self.start_datetime.year,
