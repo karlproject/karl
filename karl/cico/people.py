@@ -133,7 +133,7 @@ class UserProfileImporter(object):
         categories = [item.text.strip() for item in
                       element.iterchildren(self.NS_PREFIX + 'item')]
         root = find_site(profile)
-        category_group = root['people']['categories'][section]
+        category_group = root['people'].categories[section]
         category_names = dict([(c.sync_id, c.__name__) for c in
                                category_group.values()])
         profile.categories[section] = [category_names[id] for id in categories]
@@ -160,7 +160,11 @@ class PeopleCategoryImporter(object):
         schema_doc = lxml.etree.parse(pkg_resources.resource_stream(
             __name__, 'schemas/%s' % self.SCHEMA))
         schema = lxml.etree.RelaxNG(schema_doc)
-        schema.assertValid(element)
+        try:
+            schema.assertValid(element)
+        except:
+            print lxml.etree.tostring(element)
+            raise
 
         self.element = element
 

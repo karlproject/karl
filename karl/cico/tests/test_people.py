@@ -14,7 +14,7 @@ class UserProfileImporterTests(unittest.TestCase):
         self.profiles = profiles = testing.DummyModel()
         root['profiles'] = profiles
         root['people'] = testing.DummyModel()
-        root['people']['categories'] = categories = testing.DummyModel()
+        root['people'].categories = categories = testing.DummyModel()
         categories['entities'] = entities = testing.DummyModel()
         entities['open-society-institute'] = testing.DummyModel(sync_id='123')
         entities['hardees'] = testing.DummyModel(sync_id='456')
