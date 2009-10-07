@@ -135,6 +135,7 @@ class PeopleDirectory(Folder):
     def __init__(self):
         super(PeopleDirectory, self).__init__()
         self.categories = PersistentMapping()  # {id: PeopleCategory}
+        self.categories.__parent__ = self
         self.catalog = CachingCatalog()
         self.catalog.document_map = DocumentMap()
         self.update_indexes()
@@ -191,7 +192,7 @@ class PeopleDirectory(Folder):
         return need_reindex
 
 
-class PeopleCategory(PersistentMapping):
+class PeopleCategory(Folder):
     implements(IPeopleCategory)
 
     def __init__(self, title):
