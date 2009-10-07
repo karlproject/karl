@@ -12,7 +12,7 @@
               <option 
                       tal:repeat="data api.context.manifest"
                       tal:attributes="value data['path']; 
-                                      class 'color ' +data['color']"
+                                      class 'color cal_' +data['color']"
                       >${data['name']}</option>
             </select>
             (<a href="${settings_url}">Setup</a>)
