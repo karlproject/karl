@@ -2523,12 +2523,14 @@ body .cal_hour_event .cal_event_block .time {
   display: none; 
   background: url("images/cal_tooltip_white.png") no-repeat; 
   font-size: 110%; 
-  height: 61px; 
-  width: 140px; 
+  height: 71px; 
+  width: 150px; 
   padding: 5px; 
   color: #333; 
   z-index: 100;
   line-height: 1.2em;
+}
+.tooltip {
 }
 .tooltip a {
   line-height: 1.2em;
