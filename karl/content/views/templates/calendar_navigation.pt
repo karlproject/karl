@@ -7,7 +7,7 @@
             <label for="">
               Calendar: 
             </label>
-            <select>
+            <select onchange="javascript:document.location='${api.request.url}?filter=' + this.options[this.selectedIndex].value">
               <option class="group" value="">All calendars</option>
               <option 
                       tal:repeat="data api.context.manifest"
