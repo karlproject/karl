@@ -8,13 +8,12 @@
               Calendar: 
             </label>
             <select>
-              <option class="group">All calendars</option>
-              <option class="group">Local Community</option>
-              <option class="color cal_green">Personal</option>
-              <option class="color cal_blue">Vacation</option>
-              <option class="color cal_red">Meetings</option>
-              <option class="group">Remote Calendars</option>
-              <option class="color cal_orange">Travel</option>
+              <option class="group" value="">All calendars</option>
+              <option 
+                      tal:repeat="data api.context.manifest"
+                      tal:attributes="value data['path']; 
+                                      class 'color ' +data['color']"
+                      >${data['name']}</option>
             </select>
             (<a href="${settings_url}">Setup</a>)
           </div>
