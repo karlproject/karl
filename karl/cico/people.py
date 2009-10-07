@@ -16,6 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import datetime
+import lxml.etree
+import pkg_resources
 
 from zope.event import notify
 from zope.component.event import objectEventNotify
@@ -40,6 +42,7 @@ class UserProfileImporter(object):
 
     NAMESPACE = 'http://xml.karlproject.org/people/userprofile'
     NS_PREFIX = '{%s}' % NAMESPACE
+    SCHEMA = 'userprofile.rng'
 
     _simple_attributes = [
         "firstname",
@@ -61,6 +64,13 @@ class UserProfileImporter(object):
         ]
 
     def __init__(self, element):
+        # Validate xml against RNG Schema
+        # XXX Memoize schema?
+        schema_doc = lxml.etree.parse(pkg_resources.resource_stream(
+            __name__, 'schemas/%s' % self.SCHEMA))
+        schema = lxml.etree.RelaxNG(schema_doc)
+        schema.assertValid(element)
+
         self.element = element
 
     def create(self, profiles):
@@ -96,10 +106,6 @@ class UserProfileImporter(object):
         objectEventNotify(ObjectModifiedEvent(profile))
 
     def _populate(self, profile):
-        # Root element must be in correct namespace
-        if not self.element.tag.startswith(self.NS_PREFIX):
-            raise ValueError("Wrong namespace, expecting: %s" % self.NAMESPACE)
-
         # Iterate over each child node in root element, calling appropriate
         # handlers.
         for element in self.element.iterchildren():
@@ -131,11 +137,6 @@ class UserProfileImporter(object):
         category_names = dict([(c.sync_id, c.__name__) for c in
                                category_group.values()])
         profile.categories[section] = [category_names[id] for id in categories]
-
-
-    def _element_value(self, root, name):
-        element = root.find(self.NS_PREFIX + name)
-        return element.text.strip()
 
 
     def _groups(self, root):

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:p="http://xml.karlproject.org/people/userprofile"
+         xmlns:a="http://www.example.com/annotation"
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <ref name="profileElement"/>
+  </start>
+  <define name="profileElement">
+    <element>
+      <anyName/>
+      <interleave>
+        <element name="p:username">
+          <text/>
+        </element>
+        <element name="p:sha_password">
+          <text/>
+        </element>
+        <optional>
+          <element name="p:firstname">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:lastname">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:email">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:phone">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:extension">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:department">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:position">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:organization">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:location">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:country">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:website">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:languages">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:office">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:room_no">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:biography">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:home_path">
+            <text/>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:entities">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:offices">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:groups">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+        <optional>
+          <element name="p:departments">
+            <oneOrMore>
+              <ref name="itemElement"/>
+            </oneOrMore>
+          </element>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+  <define name="itemElement">
+    <element name="p:item">
+      <text/>
+    </element>
+  </define>
+</grammar>
