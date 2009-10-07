@@ -18,13 +18,13 @@
 import calendar
 import datetime
 import time
-from karl.content.newcalendar.presenters.base import BasePresenter
-from karl.content.newcalendar.presenters.base import BaseEvent
-from karl.content.newcalendar.navigation import Navigation
-from karl.content.newcalendar.utils import MonthSkeleton
-from karl.content.newcalendar.utils import next_month
-from karl.content.newcalendar.utils import prior_month                   
-from karl.content.newcalendar.utils import add_days                   
+from karl.content.calendar.presenters.base import BasePresenter
+from karl.content.calendar.presenters.base import BaseEvent
+from karl.content.calendar.navigation import Navigation
+from karl.content.calendar.utils import MonthSkeleton
+from karl.content.calendar.utils import next_month
+from karl.content.calendar.utils import prior_month                   
+from karl.content.calendar.utils import add_days                   
 
 
 class MonthViewPresenter(BasePresenter):
@@ -310,7 +310,7 @@ class MonthViewPresenter(BasePresenter):
 
     @property
     def template_filename(self):
-        return 'templates/newcalendar_month.pt'
+        return 'templates/calendar_month.pt'
 
 
 class DayOnMonthView(object):   

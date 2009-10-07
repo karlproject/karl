@@ -76,10 +76,10 @@ from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import store_attachments
 
-from karl.content.newcalendar.presenters.day import DayViewPresenter
-from karl.content.newcalendar.presenters.week import WeekViewPresenter
-from karl.content.newcalendar.presenters.month import MonthViewPresenter
-from karl.content.newcalendar.presenters.list import ListViewPresenter
+from karl.content.calendar.presenters.day import DayViewPresenter
+from karl.content.calendar.presenters.week import WeekViewPresenter
+from karl.content.calendar.presenters.month import MonthViewPresenter
+from karl.content.calendar.presenters.list import ListViewPresenter
 
 _NOW = None
 

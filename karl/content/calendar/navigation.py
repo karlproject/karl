@@ -69,7 +69,7 @@ class Navigation(object):
         return (within_start and within_end)
 
     def _init_template(self):
-        path = '../views/templates/newcalendar_navigation.pt'
+        path = '../views/templates/calendar_navigation.pt'
         self._template = get_template(path)
 
     @property

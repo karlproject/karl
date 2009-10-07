@@ -20,8 +20,8 @@ import sys
 import datetime
 import time
 import calendar
-from karl.content.newcalendar.tests.presenters.test_base import dummy_url_for
-from karl.content.newcalendar.tests.presenters.test_base import DummyCatalogEvent
+from karl.content.calendar.tests.presenters.test_base import dummy_url_for
+from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 
 
 class ListViewPresenterTests(unittest.TestCase):
@@ -343,7 +343,7 @@ class ListViewPresenterTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.list import ListViewPresenter
+        from karl.content.calendar.presenters.list import ListViewPresenter
         return ListViewPresenter(*args, **kargs)
 
 
@@ -419,5 +419,5 @@ class DayOnListViewTests(unittest.TestCase):
     # helpers
     
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.list import DayOnListView
+        from karl.content.calendar.presenters.list import DayOnListView
         return DayOnListView(*args, **kargs)

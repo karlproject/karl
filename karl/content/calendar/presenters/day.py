@@ -18,11 +18,11 @@
 import calendar 
 import datetime  
 import time
-from karl.content.newcalendar.presenters.base import BasePresenter
-from karl.content.newcalendar.presenters.base import BaseEvent
-from karl.content.newcalendar.navigation import Navigation
-from karl.content.newcalendar.utils import next_month
-from karl.content.newcalendar.utils import prior_month
+from karl.content.calendar.presenters.base import BasePresenter
+from karl.content.calendar.presenters.base import BaseEvent
+from karl.content.calendar.navigation import Navigation
+from karl.content.calendar.utils import next_month
+from karl.content.calendar.utils import prior_month
 
 
 class DayViewPresenter(BasePresenter):
@@ -226,7 +226,7 @@ class DayViewPresenter(BasePresenter):
 
     @property
     def template_filename(self):
-        return 'templates/newcalendar_day.pt'
+        return 'templates/calendar_day.pt'
 
 
 class TimeSlot(object):

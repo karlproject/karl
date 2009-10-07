@@ -71,7 +71,7 @@ class BasePresenterTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.base import BasePresenter
+        from karl.content.calendar.presenters.base import BasePresenter
         return BasePresenter(*args, **kargs)
 
 
@@ -207,11 +207,11 @@ class BaseEventTests(unittest.TestCase):
     # helpers
     
     def _makeEvent(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.base import BaseEvent
+        from karl.content.calendar.presenters.base import BaseEvent
         return BaseEvent(*args, **kargs)
 
     def _makeDay(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.list import DayOnListView
+        from karl.content.calendar.presenters.list import DayOnListView
         return DayOnListView(*args, **kargs)
 
 

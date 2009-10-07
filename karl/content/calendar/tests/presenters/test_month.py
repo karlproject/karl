@@ -20,9 +20,9 @@ import sys
 import datetime
 import time
 import calendar
-from karl.content.newcalendar.tests.presenters.test_base import dummy_url_for
-from karl.content.newcalendar.tests.presenters.test_base import DummyCatalogEvent
-from karl.content.newcalendar.tests.presenters.test_base import DummyDayWithEvents
+from karl.content.calendar.tests.presenters.test_base import dummy_url_for
+from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
+from karl.content.calendar.tests.presenters.test_base import DummyDayWithEvents
 
 
 class MonthViewPresenterTests(unittest.TestCase):
@@ -275,7 +275,7 @@ class MonthViewPresenterTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.month import MonthViewPresenter
+        from karl.content.calendar.presenters.month import MonthViewPresenter
         return MonthViewPresenter(*args, **kargs)
 
 
@@ -378,5 +378,5 @@ class DayOnMonthViewTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.month import DayOnMonthView
+        from karl.content.calendar.presenters.month import DayOnMonthView
         return DayOnMonthView(*args, **kargs)

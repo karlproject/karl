@@ -20,7 +20,7 @@ import sys
 import datetime
 import time
 import calendar
-from karl.content.newcalendar.tests.presenters.test_base import dummy_url_for
+from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 
  
 class WeekViewPresenterTests(unittest.TestCase):
@@ -110,7 +110,7 @@ class WeekViewPresenterTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.week import WeekViewPresenter
+        from karl.content.calendar.presenters.week import WeekViewPresenter
         return WeekViewPresenter(*args, **kargs)
 
 
@@ -149,5 +149,5 @@ class DayOnWeekViewTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.week import DayOnWeekView
+        from karl.content.calendar.presenters.week import DayOnWeekView
         return DayOnWeekView(*args, **kargs)

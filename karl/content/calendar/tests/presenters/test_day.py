@@ -20,8 +20,8 @@ import sys
 import datetime
 import time
 import calendar
-from karl.content.newcalendar.tests.presenters.test_base import DummyCatalogEvent
-from karl.content.newcalendar.tests.presenters.test_base import dummy_url_for
+from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
+from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 
 
 class DayViewPresenterTests(unittest.TestCase):
@@ -301,5 +301,5 @@ class DayViewPresenterTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.day import DayViewPresenter
+        from karl.content.calendar.presenters.day import DayViewPresenter
         return DayViewPresenter(*args, **kargs)

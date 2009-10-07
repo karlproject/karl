@@ -22,7 +22,7 @@ import time
 import calendar
 from repoze.bfg import testing
 from zope.testing.cleanup import cleanUp
-from karl.content.newcalendar.tests.presenters.test_base import dummy_url_for
+from karl.content.calendar.tests.presenters.test_base import dummy_url_for
  
 
 class CalendarNavigationTests(unittest.TestCase):
@@ -54,11 +54,11 @@ class CalendarNavigationTests(unittest.TestCase):
     # helpers
 
     def _makePresenter(self, *args, **kargs):
-        from karl.content.newcalendar.presenters.month import MonthViewPresenter
+        from karl.content.calendar.presenters.month import MonthViewPresenter
         return MonthViewPresenter(*args, **kargs)
 
     def _makeNavigation(self, *args, **kargs):
-        from karl.content.newcalendar.navigation import Navigation
+        from karl.content.calendar.navigation import Navigation
         return Navigation(*args, **kargs)
 
 

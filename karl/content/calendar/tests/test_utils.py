@@ -86,5 +86,5 @@ class MonthSkeletonTests(unittest.TestCase):
     # helpers
 
     def _makeOne(self, *args, **kargs):
-        from karl.content.newcalendar.utils import MonthSkeleton
+        from karl.content.calendar.utils import MonthSkeleton
         return MonthSkeleton(*args, **kargs)
