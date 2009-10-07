@@ -55,6 +55,18 @@ class TestUtilFunctions(unittest.TestCase):
         cf = context['communities'] = testing.DummyModel()
         self.failUnless(find_communities(context) is cf)
 
+    def test_find_peopledirectory(self):
+        from karl.utils import find_peopledirectory
+        pd = testing.DummyModel()
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        directlyProvides(pd, IPeopleDirectory)
+        site = testing.DummyModel()
+        site['people'] = pd
+        context = testing.DummyModel()
+        pd['obj'] = context
+        self.assertEqual(find_peopledirectory(context), pd)
+
     def test_find_peopledirectory_catalog(self):
         from karl.utils import find_peopledirectory_catalog
         context = testing.DummyModel()

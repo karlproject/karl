@@ -20,6 +20,7 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
+from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
@@ -29,7 +30,6 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import Unauthorized
-from repoze.bfg.traversal import lineage
 from repoze.bfg.url import model_url
 from simplejson import JSONEncoder
 from webob import Response
@@ -49,12 +49,6 @@ def peopledirectory_view(context, request):
         if has_permission('view', section, request):
             return section_view(section, request)
     raise Unauthorized("No accessible sections")
-
-def find_peopledirectory(context):
-    for obj in lineage(context):
-        if IPeopleDirectory.providedBy(obj):
-            return obj
-    raise AssertionError("No IPeopleDirectory found")
 
 def get_tabs(peopledir, request, current_sectionid):
     """Return a list of dictionaries containing tabs to display in the UI"""

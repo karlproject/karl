@@ -23,6 +23,7 @@ from zope.component import queryUtility
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.traversal import find_root
 from repoze.bfg.traversal import find_interface
+from repoze.bfg.traversal import lineage
 from repoze.lemonade.content import get_content_type
 
 from karl.models.interfaces import ICatalogSearch
@@ -31,6 +32,7 @@ from karl.models.interfaces import ISite
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IAttachmentPolicy
+from karl.models.interfaces import IPeopleDirectory
 
 def find_site(context):
     site = find_interface(context, ISite)
@@ -69,6 +71,14 @@ def find_intranets(context):
             return v
 
     return []
+
+def find_peopledirectory(context):
+    site = find_site(context)
+    people = site.get('people', None)
+    if people is not None and not IPeopleDirectory.providedBy(people):
+        # wrong kind of people directory
+        return None
+    return people
 
 def find_peopledirectory_catalog(context):
     site = find_site(context)

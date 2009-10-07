@@ -60,22 +60,6 @@ class PeopleDirectoryViewTests(unittest.TestCase):
         self.assertEqual(renderer.api.context, section)
 
 
-class FindPeopleDirectoryTests(unittest.TestCase):
-
-    def _callFUT(self, context):
-        from karl.views.peopledirectory import find_peopledirectory
-        return find_peopledirectory(context)
-
-    def test_it(self):
-        pd = testing.DummyModel()
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleDirectory
-        directlyProvides(pd, IPeopleDirectory)
-        context = testing.DummyModel()
-        pd['obj'] = context
-        self.assertEqual(self._callFUT(context), pd)
-
-
 class GetTabsTests(unittest.TestCase):
 
     def _callFUT(self, peopledir, request, current_sectionid):
@@ -176,7 +160,7 @@ class SectionViewTests(unittest.TestCase):
 
         self.assertEqual(renderer.peopledir, pd)
         self.assertEqual(renderer.peopledir_tabs, [{
-            'href': 'http://example.com/s1/',
+            'href': 'http://example.com/people/s1/',
             'selected': True,
             'title': 'A',
             }])
@@ -236,11 +220,11 @@ class ReportViewTests(unittest.TestCase):
         self.assertEqual(renderer.api.context, report)
         self.assert_('grid_data' in renderer.head_data)
         self.assertEqual(renderer.print_url,
-            'http://example.com/s1/r1/print.html')
+            'http://example.com/people/s1/r1/print.html')
         self.assertEqual(renderer.csv_url,
-            'http://example.com/s1/r1/csv')
+            'http://example.com/people/s1/r1/csv')
         self.assertEqual(renderer.pictures_url,
-            'http://example.com/s1/r1/picture_view.html')
+            'http://example.com/people/s1/r1/picture_view.html')
         self.assertEqual(renderer.qualifiers, [])
 
     def test_qualified_report(self):
@@ -259,11 +243,11 @@ class ReportViewTests(unittest.TestCase):
         self.assertEqual(renderer.api.context, report)
         self.assert_('grid_data' in renderer.head_data)
         self.assertEqual(renderer.print_url,
-            'http://example.com/s1/r1/print.html?body=spock')
+            'http://example.com/people/s1/r1/print.html?body=spock')
         self.assertEqual(renderer.csv_url,
-            'http://example.com/s1/r1/csv?body=spock')
+            'http://example.com/people/s1/r1/csv?body=spock')
         self.assertEqual(renderer.pictures_url,
-            'http://example.com/s1/r1/picture_view.html?body=spock')
+            'http://example.com/people/s1/r1/picture_view.html?body=spock')
         self.assertEqual(renderer.qualifiers, ['Search for "spock"'])
 
 
@@ -402,11 +386,11 @@ class PictureViewTests(unittest.TestCase):
         self.assertEqual(renderer.api.context, report)
         self.assertEqual(len(list(renderer.rows)), 0)
         self.assertEqual(renderer.print_url,
-            'http://example.com/s1/r1/print.html')
+            'http://example.com/people/s1/r1/print.html')
         self.assertEqual(renderer.csv_url,
-            'http://example.com/s1/r1/csv')
+            'http://example.com/people/s1/r1/csv')
         self.assertEqual(renderer.tabular_url,
-            'http://example.com/s1/r1/')
+            'http://example.com/people/s1/r1/')
         self.assertEqual(renderer.qualifiers, [])
 
     def test_qualified_report(self):
@@ -420,11 +404,11 @@ class PictureViewTests(unittest.TestCase):
 
         self.assertEqual(len(list(renderer.rows)), 0)
         self.assertEqual(renderer.print_url,
-            'http://example.com/s1/r1/print.html?body=spock%27s+brain')
+            'http://example.com/people/s1/r1/print.html?body=spock%27s+brain')
         self.assertEqual(renderer.csv_url,
-            'http://example.com/s1/r1/csv?body=spock%27s+brain')
+            'http://example.com/people/s1/r1/csv?body=spock%27s+brain')
         self.assertEqual(renderer.tabular_url,
-            'http://example.com/s1/r1/?body=spock%27s+brain')
+            'http://example.com/people/s1/r1/?body=spock%27s+brain')
         self.assertEqual(renderer.qualifiers, ['Search for "spock\'s brain"'])
 
     def test_bad_search_text(self):
@@ -518,7 +502,7 @@ class GetGridDataTests(unittest.TestCase):
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
         self.assertEqual(grid_data, {
-            'fetch_url': 'http://example.com/s1/r1/jquery_grid',
+            'fetch_url': 'http://example.com/people/s1/r1/jquery_grid',
             'sortColumn': 'name',
             'records': [],
             'sortDirection': 'asc',
@@ -567,7 +551,7 @@ class GetGridDataTests(unittest.TestCase):
             })
         grid_data = self._callFUT(report, request, start=21, limit=10)
         self.assertEqual(grid_data['fetch_url'],
-            'http://example.com/s1/r1/jquery_grid?'
+            'http://example.com/people/s1/r1/jquery_grid?'
             'body=stuff&lastnamestartswith=A')
 
     def test_bad_text_search(self):
@@ -607,9 +591,10 @@ class GetReportDescriptionsTests(unittest.TestCase):
         report = testing.DummyModel(
             filters={'office': ['nyc']},
             )
-        pd = testing.DummyModel()
+        site = testing.DummyModel()
+        site['people'] = pd = testing.DummyModel()
         directlyProvides(pd, IPeopleDirectory)
-        pd['r1'] = report
+        site['r1'] = report
         catitem = testing.DummyModel(
             title='New York',
             description='I<b>heart</b>NY',
@@ -876,6 +861,8 @@ class DummyReport(testing.DummyModel):
         from karl.models.interfaces import IPeopleDirectory
         directlyProvides(pd, IPeopleDirectory)
         pd.categories = {}
+        site = testing.DummyModel()
+        site['people'] = pd
 
         section = testing.DummyModel(
             columns=[], tab_title='A', title='Section A')

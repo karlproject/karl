@@ -17,6 +17,7 @@
 
 import datetime
 
+from zope.event import notify
 from zope.component.event import objectEventNotify
 from zope.interface import implements
 from repoze.lemonade.content import create_content
@@ -27,7 +28,9 @@ from karl.events import ObjectModifiedEvent
 from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
+from karl.models.peopledirectory import PeopleDirectorySchemaChanged
 from karl.views.utils import make_name
+from karl.utils import find_peopledirectory
 from karl.utils import find_site
 from karl.utils import find_users
 
@@ -167,6 +170,8 @@ class PeopleCategoryImporter(object):
         if category is None:
             category = PeopleCategory(category_element.text.strip())
             container[category_id] = category
+            peopledir = find_peopledirectory(container)
+            notify(PeopleDirectorySchemaChanged(peopledir))
 
         category_item = PeopleCategoryItem(title, description)
         if sync_id is not None:

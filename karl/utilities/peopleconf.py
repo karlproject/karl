@@ -26,6 +26,7 @@ from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
+from karl.models.peopledirectory import reindex_peopledirectory
 from karl.security.policy import NO_INHERIT
 from karl.utils import find_profiles
 from karl.views.peopledirectory import COLUMNS
@@ -208,19 +209,4 @@ def peopleconf(peopledir, tree, force_reindex=False):
 
     need_reindex = peopledir.update_indexes()
     if need_reindex or force_reindex:
-        reindex(peopledir)
-
-def reindex(peopledir):
-    catalog = peopledir.catalog
-    document_map = catalog.document_map
-    profiles = find_profiles(peopledir)
-    for obj in profiles.values():
-        if IProfile.providedBy(obj):
-            path = model_path(obj)
-            docid = document_map.docid_for_address(path)
-            if not docid:
-                docid = document_map.add(path)
-                catalog.index_doc(docid, obj)
-            else:
-                catalog.reindex_doc(docid, obj)
-
+        reindex_peopledirectory(peopledir)

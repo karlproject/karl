@@ -19,6 +19,7 @@ from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import IPeopleCategory
 from karl.models.interfaces import IPeopleCategoryItem
 from karl.models.interfaces import IPeopleDirectory
+from karl.models.interfaces import IPeopleDirectorySchemaChanged
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleSection
@@ -28,9 +29,11 @@ from karl.models.site import get_allowed_to_view
 from karl.models.site import get_lastfirst
 from karl.models.site import get_path
 from karl.models.site import get_textrepr
+from karl.utils import find_profiles
 from karl.utils import find_users
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
+from repoze.bfg.traversal import model_path
 from repoze.catalog.document import DocumentMap
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
@@ -254,3 +257,25 @@ class PeopleReport(Persistent):
 
     def set_columns(self, columns):
         self.columns = tuple(columns)
+
+class PeopleDirectorySchemaChanged(object):
+    implements(IPeopleDirectorySchemaChanged)
+
+    def __init__(self, peopledir):
+        self.peopledir = peopledir
+
+
+def reindex_peopledirectory(peopledir):
+    catalog = peopledir.catalog
+    document_map = catalog.document_map
+    profiles = find_profiles(peopledir)
+    for obj in profiles.values():
+        if IProfile.providedBy(obj):
+            path = model_path(obj)
+            docid = document_map.docid_for_address(path)
+            if not docid:
+                docid = document_map.add(path)
+                catalog.index_doc(docid, obj)
+            else:
+                catalog.reindex_doc(docid, obj)
+

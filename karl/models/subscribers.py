@@ -31,7 +31,9 @@ from repoze.lemonade.content import is_content
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
+from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
+from karl.utils import find_peopledirectory
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
 from karl.utils import find_tags
@@ -215,6 +217,15 @@ def reindex_profile_after_group_change(event):
             docid = catalog.document_map.docid_for_address(path)
             catalog.unindex_doc(docid)
             catalog.index_doc(docid, profile)
+
+def update_peopledirectory_indexes(event):
+    """Updates the peopledir catalog schema.
+
+    This is an IPeopleDirectorySchemaChanged subscriber.
+    """
+    peopledir = event.peopledir
+    if peopledir.update_indexes():
+        reindex_peopledirectory(peopledir)
 
 
 class QueryLogger(object):

@@ -350,6 +350,63 @@ class TestPeopleReport(unittest.TestCase):
         obj.set_columns(['name', 'email'])
         self.assertEqual(obj.columns, ('name', 'email'))
 
+
+class ReindexPeopleDirectoryTests(unittest.TestCase):
+
+    def _callFUT(self, peopledir):
+        from karl.models.peopledirectory import reindex_peopledirectory
+        reindex_peopledirectory(peopledir)
+
+    def test_no_profiles(self):
+        from karl.testing import DummyCatalog
+        site = testing.DummyModel()
+        peopledir = testing.DummyModel()
+        peopledir.catalog = DummyCatalog()
+        site['people'] = peopledir
+        profiles = testing.DummyModel()
+        site['profiles'] = profiles
+        self._callFUT(peopledir)
+
+    def test_with_new_profile(self):
+        from karl.testing import DummyCatalog
+        site = testing.DummyModel()
+        peopledir = testing.DummyModel()
+        peopledir.catalog = DummyCatalog()
+        site['people'] = peopledir
+        profiles = testing.DummyModel()
+        site['profiles'] = profiles
+
+        p1 = testing.DummyModel()
+        from karl.models.interfaces import IProfile
+        from zope.interface import directlyProvides
+        directlyProvides(p1, IProfile)
+        profiles['p1'] = p1
+
+        self._callFUT(peopledir)
+        self.assertEquals(peopledir.catalog.document_map.added,
+            [(None, '/profiles/p1')])
+
+    def test_with_existing_profile(self):
+        from karl.testing import DummyCatalog
+        site = testing.DummyModel()
+        peopledir = testing.DummyModel()
+        peopledir.catalog = DummyCatalog()
+        site['people'] = peopledir
+        profiles = testing.DummyModel()
+        site['profiles'] = profiles
+
+        p1 = testing.DummyModel()
+        from karl.models.interfaces import IProfile
+        from zope.interface import directlyProvides
+        directlyProvides(p1, IProfile)
+        profiles['p1'] = p1
+
+        peopledir.catalog.document_map.add('/profiles/p1', 10)
+        self._callFUT(peopledir)
+        self.assertEquals(peopledir.catalog.document_map.added,
+            [(10, '/profiles/p1')])
+
+
 from zope.interface import implements
 from karl.models.interfaces import IProfile
 

@@ -208,7 +208,7 @@ class PeopleCategoryImporterTests(unittest.TestCase):
                          '113 Huse St, Beverly Hills, CA 90210')
 
     def test_create(self):
-        context = {}
+        context = testing.DummyModel()
         self._make_one('test_category2.xml').create(context)
 
         self.failUnless('offices' in context)
@@ -221,7 +221,7 @@ class PeopleCategoryImporterTests(unittest.TestCase):
         self.assertEqual(item.sync_id, '1062')
 
     def test_empty_category(self):
-        context = {}
+        context = testing.DummyModel()
         self._make_one('test_category3.xml').create(context)
         office = context['offices']['category-3']
         self.assertEqual(office.sync_id, '1062')

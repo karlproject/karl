@@ -102,6 +102,10 @@
       handler=".subscribers.reindex_profile_after_group_change"/>
 
   <subscriber
+      for="karl.models.interfaces.IPeopleDirectorySchemaChanged"
+      handler=".subscribers.update_peopledirectory_indexes"/>
+
+  <subscriber
       for=".interfaces.ICatalogQueryEvent"
       handler=".subscribers.log_query"/>
 

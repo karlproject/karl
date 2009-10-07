@@ -469,3 +469,7 @@ class IPeopleReport(Interface):
 
     def set_columns(columns):
         """Set the IDs of columns to display"""
+
+class IPeopleDirectorySchemaChanged(Interface):
+    """Notification that the schema of the people directory has changed"""
+    peopledir = Attribute('The IPeopleDirectory object')
