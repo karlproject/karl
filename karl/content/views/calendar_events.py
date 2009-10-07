@@ -166,8 +166,11 @@ def _show_calendar_view(context, request, make_presenter):
                                  calendar.last_moment,
                                  filt)
 
-    events = events[0] # XXX each sequence in 'events' is an event stream
-    calendar.paint_events(events)
+    flattened_events = []
+    for event_stream in events: # XXX each sequence in 'events' is an event stream
+        flattened_events.extend(event_stream)
+
+    calendar.paint_events(flattened_events)
 
     settings_url = model_url(context, request, 'settings.html')
 
