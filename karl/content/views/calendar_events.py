@@ -89,12 +89,20 @@ def _now():
         return _NOW
     return datetime.datetime.now()
 
-def _date_requested(request):
+def _date_requested(context, request):
     now = _now()
-    year  = int(request.GET.get('year', now.year))
-    month = int(request.GET.get('month', now.month))
-    day   = int(request.GET.get('day', now.day)) 
-    return (year, month, day)
+    session = get_session(context, request)
+    if 'year' in request.GET:
+        year  = int(request.GET.get('year', now.year))
+        month = int(request.GET.get('month', now.month))
+        day   = int(request.GET.get('day', now.day))
+        value = (year, month, day)
+        session['calendar_date_requested'] = value
+    elif 'calendar_date_requested' in session:
+        value = session['calendar_date_requested']
+    else:
+        value = (now.year, now.month, now.day)
+    return value
 
 def _get_catalog_events(calendar, request, first_moment, last_moment,
                         calendar_path=None):
@@ -140,16 +148,22 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
 
     return events
 
-def _show_calendar_view(context, request, make_presenter):
-    year, month, day = _date_requested(request)
-    focus_datetime = datetime.datetime(year, month, day)
-    now_datetime   = _now()
+def _calendar_filter(context, request):
     session = get_session(context, request)
 
     filt = request.params.get('filter', None)
     if filt is None:
         filt = session.get('calendar_filter', None)
     session['calendar_filter'] = filt
+    return filt
+
+def _show_calendar_view(context, request, make_presenter):
+    year, month, day = _date_requested(context, request)
+    focus_datetime = datetime.datetime(year, month, day)
+    now_datetime   = _now()
+
+    filt = _calendar_filter(context, request)
+    
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
