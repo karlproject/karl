@@ -69,6 +69,15 @@
                      <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
                    </div>
 
+                   <tal:block condition="slot.bubble">
+                   <div class="cal_blue cal_event_block" style="height: ${slot.bubble.length_px}px">
+                     <a href="#">
+                       <span class="time">${slot.bubble.catalog_event.startDate.strftime('%l:%M %p')}</span><br />
+                       ${slot.bubble.catalog_event.title}
+                     </a>
+                   </div>
+                   </tal:block>
+
                  </div>
               </div>
             </td>        

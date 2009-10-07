@@ -36,7 +36,7 @@ class WeekViewPresenter(BasePresenter):
         self._init_week_around_focus_datetime()
         self._init_first_and_last_moment()
         self._init_next_and_prior_week()
-
+        self._init_hour_labels()
         self._init_navigation()
         
     def _init_title(self):
@@ -108,6 +108,19 @@ class WeekViewPresenter(BasePresenter):
                                         self.now_datetime.month,
                                         self.now_datetime.day)
         self.navigation = nav
+
+    def _init_hour_labels(self):
+        self.hour_labels = []
+        for hour in range(0, 24):
+            if hour == 0:
+                label = '12 AM'
+            elif hour == 12:
+                label = '12 PM'
+            elif hour < 12:
+                label = '%d AM' % hour
+            else:
+                label = '%d PM' % (hour - 12)
+            self.hour_labels.append(label)
 
     def paint_events(self, events):
         return

@@ -136,11 +136,26 @@ class DayViewPresenter(BasePresenter):
            self.half_hour_slots.append(slot)
 
     def paint_events(self, events):
+        # [ [event], [event,event], ... ]
         mapping = self._map_catalog_events_to_slot_indices(events)
-        
-        for slot_index, catalog_events in enumerate(mapping):
-            pass
 
+        for slot_index, catalog_events in enumerate(mapping):
+            if not catalog_events:
+                continue
+
+            for event in catalog_events:                         
+                bubble = Bubble()
+                bubble.catalog_event = event
+                
+                for i in range(slot_index, len(mapping)):
+                    next_in_map = mapping[i]
+                    if event in next_in_map:
+                         next_in_map.remove(event)
+                         bubble.length += 1
+                    else:
+                        break
+
+                self.half_hour_slots[slot_index].bubbles.append(bubble)        
 
     def _map_catalog_events_to_slot_indices(self, events):
         mapping = [ [] for slot in self.half_hour_slots ]
@@ -209,6 +224,12 @@ class TimeSlot(object):
         self.bubbles        = []
     
     @property
+    def bubble(self):
+        if self.bubbles:
+            return self.bubbles[0]
+        return None
+    
+    @property
     def shade_class(self):
         if self.shaded_row:
             return 'shade'
@@ -227,6 +248,15 @@ class TimeSlot(object):
         time = self.start_datetime.strftime('%Y-%m-%d %r')
         return fmt % time 
 
+
+class Bubble(object):
+    def __init__(self, catalog_event=None):    
+        self.catalog_event = catalog_event
+        self.length = 0 # half hour slots
+    
+    @property
+    def length_px(self):
+        return self.length * 25 + (self.length - 1 - 2) # 25 + (borders - padding)
 
 
 def add_minutes(dtime, num_minutes):

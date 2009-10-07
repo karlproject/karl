@@ -48,6 +48,24 @@
 
       <!-- current time bar -->
       <div class="cal_time" style="display: none">&nbsp;</div>
+      <table class="cal cal_scroll cal_week cal_today_wed" cellspacing="0">
+        <tr>
+          <!-- time labels -->
+          <th>
+            <div class="cal_stack">
+              <div tal:repeat="hour_ampm calendar.hour_labels" class="cal_time_label">${hour_ampm}</div>
+            </div>
+          </th>
+
+         <!-- each day this week -->                        
+         <td tal:repeat="day calendar.week" class="cal_${day.css_day_abbr}">
+           <div class="cal_stack">     
+           </div>
+         </td>
+           
+        </tr>
+      </table>
+                        
     </div>
 
     <div metal:use-macro="calendar.navigation.macros['footer']"/>
