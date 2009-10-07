@@ -47,7 +47,7 @@ class Navigation(object):
         format = '%s?year=%d&month=%d&day=%d' 
 
         for view_name in ('day', 'week', 'month', 'list'):
-            url = self._presenter.url_for('new%s.html' % view_name)
+            url = self._presenter.url_for('%s.html' % view_name)
             sub = (url, self._presenter.focus_datetime.year, 
                         self._presenter.focus_datetime.month, 
                         self._presenter.focus_datetime.day)

@@ -61,6 +61,13 @@
 
   <view
     for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_month_view"
+    permission="view"
+    name="month.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
     view=".calendar_events.show_week_view"
     permission="view"
     name="week.html"
