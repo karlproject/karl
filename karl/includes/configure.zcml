@@ -7,4 +7,5 @@
   <include package="karl.security"/>
   <include package="karl.tagging"/>
   <include package="karl.adapters"/>
+  <include package="karl.cico"/>
 </configure>
