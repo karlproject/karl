@@ -36,7 +36,7 @@
               </tal:block>
 
               <tal:block condition="event">
-                <div class="cal_event cal_event_pos_${event.rounding_class} ${event.type_class}">
+                <div class="cal_event with_tooltip cal_event_pos_${event.rounding_class} ${event.type_class}">
                   <a href="${event.show_url}" class="${event.caption_class}">
                     <tal:block condition="event.bubbled">
                       ${event.bubble_title}

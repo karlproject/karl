@@ -1780,7 +1780,7 @@ function initCalendar() {
   DD_roundies.addRule('.cal_event_pos_left a', '5px 0 0 5px');
   DD_roundies.addRule('.cal_event_pos_right a', '0 5px 5px 0');
   
-  $(".cal_event").tooltip({ tip: '.tooltip', offset: [9, 0], predelay: 250});
+  $(".with_tooltip").tooltip({ tip: '.tooltip', offset: [9, 0], predelay: 250});
 
   // WEEK/DAY VIEW - 
   $("table.cal_week li.cal_hour_event").hover(mouseOverHour, mouseOutHour);
