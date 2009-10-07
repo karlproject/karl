@@ -2123,7 +2123,7 @@ table.cal_scroll {
   position: absolute;
   top: 20px;
   left: 40px;
-  background: url("/images/cal_time.png") 0 0 no-repeat;
+  background: url("../images/cal_time.png") 0 0 no-repeat;
   font-size: 1%;
   line-height: 1em;
   z-index: 3;
