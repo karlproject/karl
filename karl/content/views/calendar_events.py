@@ -130,7 +130,7 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
     if calendar_path:
         total, docids, resolver = searcher(virtual=calendar_path,
                                            **shared_params)
-        events.append(_color(_resolve(docids, resolver), 'blue'))
+        events.append(_color(_resolve(docids, resolver), 'purple'))
 
     else:
         calendar_path = model_path(calendar)
