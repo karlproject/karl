@@ -134,8 +134,8 @@ class UserProfileImporter(object):
                       element.iterchildren(self.NS_PREFIX + 'item')]
         root = find_site(profile)
         category_group = root['people'].categories[section]
-        category_names = dict([(c.sync_id, c.__name__) for c in
-                               category_group.values()])
+        category_names = dict([(v.sync_id, k) for k,v in
+                               category_group.items()])
         profile.categories[section] = [category_names[id] for id in categories]
 
 

@@ -192,7 +192,7 @@ class PeopleDirectory(Folder):
         return need_reindex
 
 
-class PeopleCategory(Folder):
+class PeopleCategory(PersistentMapping):
     implements(IPeopleCategory)
 
     def __init__(self, title):
