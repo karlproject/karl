@@ -31,8 +31,8 @@
               <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
             </div>
 
-            <div class="cal_event cal_event_pos_full">
-              <a href="#" class="cal_blue">Dummy Event</a>
+            <div tal:repeat="event calendar.all_day_events" class="cal_event cal_event_pos_full">
+              <a href="#" class="cal_blue">${event.title}</a>
             </div>
           </div>
 

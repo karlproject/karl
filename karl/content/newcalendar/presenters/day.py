@@ -136,6 +136,8 @@ class DayViewPresenter(BasePresenter):
            self.half_hour_slots.append(slot)
 
     def paint_events(self, events):
+        self.all_day_events, events = self._separate_all_day_events(events)
+
         # [ [event], [event,event], ... ]
         mapping = self._map_catalog_events_to_slot_indices(events)
 
@@ -156,6 +158,20 @@ class DayViewPresenter(BasePresenter):
                         break
 
                 self.half_hour_slots[slot_index].bubbles.append(bubble)        
+
+    def _separate_all_day_events(self, events):
+        all_day_events, other_events = [], []
+        
+        for event in events:
+            lbound = (event.startDate <= self.first_moment)
+            ubound = (event.endDate   >= self.last_moment)
+            
+            if lbound and ubound:
+                all_day_events.append(event)
+            else:
+                other_events.append(event) 
+        
+        return (all_day_events, other_events)
 
     def _map_catalog_events_to_slot_indices(self, events):
         mapping = [ [] for slot in self.half_hour_slots ]
@@ -193,7 +209,6 @@ class DayViewPresenter(BasePresenter):
             slot_index = i
         
         return slot_index
-        
 
     @property
     def first_moment(self):
