@@ -152,8 +152,16 @@ class PeopleCategoryImporter(object):
 
     NAMESPACE = 'http://xml.karlproject.org/people/category'
     NS_PREFIX = '{%s}' % NAMESPACE
+    SCHEMA = 'peoplecategory.rng'
 
     def __init__(self, element):
+        # Validate xml against RNG Schema
+        # XXX Memoize schema?
+        schema_doc = lxml.etree.parse(pkg_resources.resource_stream(
+            __name__, 'schemas/%s' % self.SCHEMA))
+        schema = lxml.etree.RelaxNG(schema_doc)
+        schema.assertValid(element)
+
         self.element = element
 
     def create(self, container):
