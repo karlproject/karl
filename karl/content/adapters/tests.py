@@ -185,6 +185,47 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         self.assertEqual(len(self.alerts.emissions), 1)
         self.failUnless(workflow.initialized)
 
+    def test_handle_w_attachments_name_collision(self):
+        from karl.models.interfaces import IComment
+        from karl.content.interfaces import ICommunityFile
+        self._registerFactory(IComment, DummyModel)
+        self._registerFactory(ICommunityFile)
+        workflow = self._registerSecurityWorkflow()
+        context = DummyBlogEntry('foo', 'foo', 'foo', 'foo')
+        comments = context['comments'] = DummyModel()
+        comments.next_id = '1'
+        adapter = self._makeOne(context)
+        message = object() # ignored
+        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        attachments = [('file1.png', 'image/png', 'IMAGE1'),
+                       ('file1.png', 'image/png', 'IMAGE2'),
+                      ]
+
+        adapter.handle(message, info, 'TEXT', attachments)
+
+        self.assertEqual(len(comments), 1)
+        comment_id, comment = comments.items()[0]
+        self.assertEqual(comment_id, '1')
+        self.assertEqual(comment.title, 'SUBJECT')
+        self.assertEqual(comment.creator, 'phreddy')
+        self.assertEqual(comment.text, 'TEXT')
+
+        attachments = comment
+        self.assertEqual(len(attachments), 2)
+        file1 = attachments['file1.png']
+        self.assertEqual(file1.title, 'file1.png')
+        self.assertEqual(file1.filename, 'file1.png')
+        self.assertEqual(file1.mimetype, 'image/png')
+        self.assertEqual(file1.stream.read(), 'IMAGE1')
+        file2 = attachments['file1-1.png']
+        self.assertEqual(file2.title, 'file1.png')
+        self.assertEqual(file2.filename, 'file1.png')
+        self.assertEqual(file2.mimetype, 'image/png')
+        self.assertEqual(file2.stream.read(), 'IMAGE2')
+
+        self.assertEqual(len(self.alerts.emissions), 1)
+        self.failUnless(workflow.initialized)
+
     def test_handle_w_alert(self):
         from karl.models.interfaces import IComment
         self._registerFactory(IComment, DummyModel)

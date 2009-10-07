@@ -145,9 +145,16 @@ def make_unique_name(context, title):
     """
     postfix = ''
     counter = 1
+    if '.' in title:
+        base, ext = title.rsplit('.', 1)
+        ext = '.' + ext
+    else:
+        base = title
+        ext = ''
+
     while True:
         try:
-            return make_name(context, title + postfix)
+            return make_name(context, base + postfix + ext)
         except ValueError:
             postfix = '-%i' % (counter, )
             counter += 1

@@ -39,6 +39,7 @@ offline_request = OfflineRequest()
 def _addAttachments(att_folder, info, attachments):
     for filename, mimetype, data in attachments:
         stream = StringIO(data)
+        name = make_unique_name(att_folder, filename)
         attachment = create_content(ICommunityFile,
                                     title = filename,
                                     stream = stream,
@@ -46,7 +47,7 @@ def _addAttachments(att_folder, info, attachments):
                                     filename = filename,
                                     creator = info['author'],
                                     )
-        att_folder[filename] = attachment
+        att_folder[name] = attachment
 
 class BlogEntryMailinHandler(object):
     implements(IMailinHandler)
