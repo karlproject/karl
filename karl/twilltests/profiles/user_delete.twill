@@ -1,0 +1,17 @@
+# Logging in as admin to "delete users"
+login "${cur_admin}"
+
+
+# Delete user
+go /profiles/tempuser
+find "Test User"
+go /profiles/tempuser/delete.html
+find "Do you really want to delete <strong> Test User"
+find "ok"
+follow "ok"
+go /profiles/tempuser
+code 404
+
+
+# logging back in as current user
+login "${cur_user}"

@@ -1,0 +1,3 @@
+#login "${cur_admin}"
+make_community "$community_name"
+#login "${cur_user}"

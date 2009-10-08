@@ -1,0 +1,11 @@
+# Test calendar
+
+go /communities/${community_name}/calendar/add_calendarevent.html
+fv save title "Community Created"
+fv save text "This community was created on this day. Added by Twill test (community.calendar_initialize.twill)."
+fv save location "Online"
+fv save attendees "Staff One, Staff Two, Affili Atay"
+fv save contact_name "Staff One"
+fv save contact_email "karltest@mailinator.com"
+submit
+title "Community Created"

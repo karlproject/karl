@@ -1,0 +1,8 @@
+# View forum
+go /offices/forums
+
+go /offices/forums/all_forums.html
+find "OSI"
+find "${forum_name}"
+follow "${forum_name}"
+find "Back to Forums"

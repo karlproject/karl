@@ -1,0 +1,38 @@
+login.login
+
+
+#
+# Twill scripts that create the hierarchy of /offices, /offices/nyc
+# and related content for OSI evaluation..
+#
+offices.add-forum
+offices.edit-forum
+offices.show-forum
+offices.office_security
+
+offices.bulk_add_news(arg1="Grotty", arg2="03/02/2009 19:30", arg3="04/02/2009 20:30")
+offices.bulk_add_news(arg1="Alpha", arg2="05/02/2009 19:30", arg3="05/02/2009 20:30")
+offices.bulk_add_news(arg1="Beta", arg2="04/02/2009 19:30", arg3="04/04/2009 20:30")
+offices.bulk_add_news(arg1="Gamma", arg2="09/02/2007 19:30", arg3="09/02/2007 20:30")
+offices.bulk_add_news(arg1="Grok", arg2="04/02/2009 19:30", arg3="04/02/2009 20:30")
+offices.bulk_add_news(arg1="Zoolander", arg2="02/02/2007 19:30", arg3="04/02/2007 20:30")
+offices.bulk_add_news(arg1="Gulag", arg2="04/02/2009 19:30", arg3="04/02/2009 20:30")
+offices.bulk_add_news(arg1="Deed", arg2="04/22/2007 19:30", arg3="04/23/2007 20:30")
+offices.bulk_add_news(arg1="Echo", arg2="04/21/2008 19:30", arg3="04/22/2008 20:30")
+offices.bulk_add_news(arg1="Foxtrot", arg2="04/02/2009 19:30", arg3="04/02/2009 20:30")
+offices.bulk_add_news(arg1="Golf", arg2="04/12/2008 19:30", arg3="04/12/2008 20:30")
+offices.bulk_add_news(arg1="Hotel", arg2="04/05/2009 19:30", arg3="04/05/2009 20:30")
+offices.bulk_add_news(arg1="India", arg2="11/02/2009 19:30", arg3="11/03/2009 20:30")
+offices.bulk_add_news(arg1="Joker", arg2="04/06/2009 09:30", arg3="04/07/2009 20:30")
+offices.bulk_add_news(arg1="Kroker", arg2="12/03/2009 19:30", arg3="12/04/2009 20:30")
+offices.bulk_add_news(arg1="Lima", arg2="04/06/2009 19:30", arg3="04/07/2009 20:30")
+offices.bulk_add_news(arg1="Minimo", arg2="09/05/2009 19:30", arg3="09/06/2009 20:30")
+offices.bulk_add_news(arg1="Nimbus 2000", arg2="08/24/2009 19:30", arg3="08/24/2009 20:30")
+offices.bulk_add_news(arg1="Orange", arg2="07/16/2009 19:30", arg3="07/16/2009 20:30")
+offices.bulk_add_news(arg1="Paltry Pudding", arg2="07/17/2009 19:30", arg3="07/18/2009 20:30")
+offices.bulk_add_news(arg1="Question", arg2="07/18/2009 19:30", arg3="07/19/2009 20:30")
+offices.bulk_add_news(arg1="Republic", arg2="01/21/2009 19:30", arg3="01/22/2009 20:30")
+offices.bulk_add_news(arg1="Standing Room", arg2="10/19/2009 19:30", arg3="10/20/2009 20:30")
+offices.bulk_add_news(arg1="Tango", arg2="05/20/2009 19:30", arg3="05/22/2009 20:30")
+
+

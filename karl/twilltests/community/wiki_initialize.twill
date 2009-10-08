@@ -1,0 +1,5 @@
+# Create the first wikipage for the community
+go /communities/${community_name}/wiki
+follow "Edit"
+fv save text "Welcome to the  ${community_name} Wiki. <br/><br/> This community has been auto-generated from the Twill tests (community.wiki_initialize.twill) to verify Karl is working correctly."
+submit

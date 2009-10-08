@@ -1,0 +1,5 @@
+# These tests login with multiple logins to test various functionality
+
+# Run profile test suite
+profiles.profiles-tests
+

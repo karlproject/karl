@@ -1,0 +1,37 @@
+
+# Add/view/edit/delete for blogentry.  Presumes that
+# make_community.twill has run.
+
+# Make a random word to insert in the blog title
+set_random_word resourcetitle
+
+# Create a blog entry and ensure the random word appears
+go /communities/${community_name}/blog/add_blogentry.html
+notfind "Delete"
+fv save title ${resourcetitle}
+fv save text "Test Blog Entry"
+submit
+
+# Confirm
+find ${resourcetitle}
+find "Test Blog Entry"
+find "Edit"
+find "Delete"
+
+# Edit
+set_random_word titlechange
+follow "Edit"
+notfind "Delete"
+fv save title "Changed to ${titlechange}"
+submit
+find ${titlechange}
+
+catalog_find ${titlechange} ${community_name}
+
+# Now delete
+follow "Delete"
+follow "ok"
+go /communities/${community_name}/blog/${resourcetitle}
+code 404
+
+#catalog_notfind ${titlechange} ${community_name}

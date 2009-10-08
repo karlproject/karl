@@ -1,0 +1,12 @@
+# Profile tests
+
+# Test to see what profiles we can see
+user_view
+
+# Login as admin before add/edit/delete user
+login_admin
+
+# Add, edit, and delete user account
+user_add
+#user_edit
+user_delete

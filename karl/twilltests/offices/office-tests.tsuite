@@ -1,0 +1,52 @@
+# Add forum as admin and then re-login as user
+login_admin
+forum_add
+login_user
+
+# View forum
+forum_view
+
+# Edit forum as admin and then re-login as user
+login_admin
+forum_edit 
+login_user
+
+# Add forum topic
+forumtopic_add
+
+# View forum topic
+forumtopic_view
+
+# Edit forum topic
+forumtopic_edit
+
+# Delete forum topic
+forumtopic_delete
+
+# Delete forum as admin and then re-login as user
+login_admin
+forum_delete
+login_user
+
+# View Network Events
+networkevents_view
+
+# Add Network Event as admin and then re-login as user
+login_admin
+networkevents_add(arg1="twill-office-test")
+login_user
+
+# Edit Network Event as admin and then re-login as user
+login_admin
+networkevents_edit(arg1="twill-office-test")
+login_user
+
+# Delete Network Event as admin and then re-login as user
+login_admin
+networkevents_delete(arg1="twill-office-test")
+login_user
+
+# Add Network News as admin and then re-login as user
+login_admin
+networknews_add(arg1="twill-office-test")
+login_user

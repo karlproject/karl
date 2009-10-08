@@ -1,0 +1,35 @@
+# Testing calendar's add event
+set_random_word titleword
+go /communities
+go /communities/${community_name}/calendar/add_calendarevent.html
+fv save title "${titleword}"
+fv save startDate "04/20/2009 12:30"
+fv save endDate "04/21/2009 12:30"
+fv save location "our house with two cats in the yard"
+fv save attendees "Staff One, Staff Two, Affili Atay"
+fv save contact_name "Staff One"
+fv save contact_email "karltest@mailinator.com"
+submit
+title ${titleword}
+find "Staff One"
+find "karltest@mailinator.com"
+
+# Testing calendar's Edit
+go /communities/${community_name}/calendar/?year=2009&month=4
+find "${titleword}"
+follow "Listing View"
+find "${titleword}"
+follow ${titleword}
+follow "Edit"
+notfind "Delete"
+set_random_word titlechange
+fv save title "${titlechange}"
+submit
+find "${titlechange}"
+
+# Testing calendar's Delete
+catalog_find ${titlechange} ${community_name}
+follow "Delete"
+follow "ok"
+go /communities/${community_name}/calendar/${titleword}
+code 404

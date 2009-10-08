@@ -1,0 +1,8 @@
+# have to login first
+login.login
+
+# make the community
+community.make_community
+
+# run the blog test suite
+blog.blog-tests

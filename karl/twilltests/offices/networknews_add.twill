@@ -1,0 +1,10 @@
+# Add a network news
+
+
+# Create a folder and ensure the random word appears
+go /offices/files/network-news/add_calendarevent.html
+fv save title "Twill Test of ${arg1}"
+fv save text "This network news was made by a Twill test (offices.networkevents_add)"
+submit
+find twill-test-of-${arg1}
+find "Back to Network News"

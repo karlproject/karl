@@ -1,0 +1,26 @@
+# Edit user
+go /profiles/tempuser
+find "Test User"
+follow "Edit"
+url /profiles/tempuser/admin_edit_profile.html
+fv save firstname "Test Edited"
+fv save country "US"
+fv save email "tempuser2@example.com"
+fv save biography "User account (Test User) added by Twill test (profiles.user_add.twill)<br/>Edited by Twill test (user_edit.twill)"
+fv save phone "800-555-5555"
+fv save extension "555"
+fv save department "Dept 1"
+fv save position "Tester"
+fv save organization "Web Services"
+fv save location "New York"
+fv save website "http://localhost:6543/"
+fv save biography "Test User was created by Twill tests in order to verify that Karl is working correctly."
+submit
+
+# Verify user edited
+go /profiles/tempuser
+find United States
+find "800-555-5555"
+find tempuser2@example.com
+notfind tempuser@example.com
+find "user_edit.twill"

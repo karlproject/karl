@@ -1,0 +1,2 @@
+go /communities/${community_name}/calendar
+find "Add Event"

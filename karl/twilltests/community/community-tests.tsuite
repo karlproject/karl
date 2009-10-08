@@ -1,0 +1,9 @@
+
+
+# Make community
+make_community
+
+#optional:
+blog_initialize
+calendar_initialize
+wiki_initialize

@@ -1,0 +1,17 @@
+# Bulk adding of folders to test batching, pagination, sorting, and
+# the grid.  Expects the main karl3.tsuite to call this passing in an
+# arg1 argument, per the Flunc documentation.
+
+
+# Make a random word to insert in the folder title
+set_random_word resourcetitle
+
+# Create a folder and ensure the random word appears
+login admin
+go /offices/files/network-events/add_calendarevent.html
+fv save title "${arg1} ${resourcetitle}"
+fv save startDate ${arg2}
+fv save endDate ${arg3}
+submit
+find ${resourcetitle}
+find "Back to Network Events"

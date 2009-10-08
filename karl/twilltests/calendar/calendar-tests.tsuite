@@ -1,0 +1,5 @@
+# run calendar tests
+calendar.calendar-view
+calendar.create-event
+calendar.calendar-aved
+calendar.calendar-index

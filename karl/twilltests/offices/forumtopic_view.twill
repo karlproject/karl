@@ -1,0 +1,7 @@
+# View forum topic
+go /offices/forums/${forum_name}
+go /offices/forums/${forum_name}/${forum_topic}/
+url /offices/forums/${forum_name}/${forum_topic}/
+title "${forum_topic}"
+find "Edit"
+find "Delete"

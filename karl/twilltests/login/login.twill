@@ -1,0 +1,3 @@
+#  change user & admin accounts under karl3.conf
+
+login ${cur_user}

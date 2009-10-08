@@ -1,0 +1,5 @@
+go /communities/${community_name}/blog
+follow "Add Blog Entry"
+fv save title "Introduction to ${community_name} blog"
+fv save text "Welcome to the ${community_name} Community Blog. <br/><br/> This community has been auto-generated from the Twill tests (community.blog_initialize.twill) to verify Karl is working correctly."
+submit

@@ -1,0 +1,8 @@
+# have to login first
+login.login
+
+# make the community
+community.make_community
+
+# run calendar test suite
+calendar.calendar-tests
