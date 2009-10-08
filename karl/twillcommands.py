@@ -145,7 +145,6 @@ def make_community(community_name=test_name, title=None):
     """Make a community, deleting first if the community exists"""
 
     global_dict, local_dict = namespaces.get_twill_glocals()
-
     # Append "-testcase" to the community name, so we can spot later
     # which were created by Twill
     if community_name == test_name:
@@ -172,7 +171,6 @@ def make_community(community_name=test_name, title=None):
         dump("Deleted old version of Community: %s " % (community_name))
         url = "/communities/%s/delete.html?confirm=1" % community_name
         commands.go(url)
-        commands.title("Communities")
     else:
         dump("Didn't delete old version of Community: %s " % (community_name))
     # Now, make the community and make sure it exists
