@@ -26,6 +26,8 @@ __all__ = ['login',
            'make_intranets',
            'make_community',
            'remove_community',
+           'make_forum',
+           'remove_forum',
            'timeit',
            'catalog_find',
            'catalog_notfind',
@@ -67,8 +69,8 @@ def login(username):
 
     # Set a globabl Twill variable to let Twill scripts now the name
     # of the test, e.g. the directory, as well as community name.
-    global_dict['test_name'] = test_name
-    global_dict['community_name'] = test_name + "-testcase"
+    #global_dict['test_name'] = test_name
+    #global_dict['community_name'] = test_name + "-testcase"
     global_dict['cwd'] = os.getcwd()
 
     hn = global_dict['localhost_url']
@@ -147,7 +149,14 @@ def make_community(community_name=test_name, title=None):
     # Append "-testcase" to the community name, so we can spot later
     # which were created by Twill
     if community_name == test_name:
-        community_name = global_dict['community_name']
+        try:
+            community_name = global_dict['community_name']
+        except:
+            global_dict['test_name'] = test_name
+            global_dict['community_name'] = test_name + "-testcase"
+            community_name = global_dict['community_name']
+    # Echo to screen
+    dump("Community is %s" % (community_name))
 
     if title is None:
         title = community_name
@@ -160,10 +169,13 @@ def make_community(community_name=test_name, title=None):
         # The community shouldn't exist, and so we should get 404
         # looking for it.  If no 404, then it exists and we should
         # delete it.
+        # Echo to screen
+        dump("Deleted old version of Community: %s " % (community_name))
         url = "/communities/%s/delete.html?confirm=1" % community_name
         commands.go(url)
         commands.title("Communities")
-
+    else:
+        dump("Didn't delete old version of Community: %s " % (community_name))
     # Now, make the community and make sure it exists
     commands.go("/communities/add_community.html")
     commands.fv("save", "title", title)
@@ -193,6 +205,69 @@ def remove_community(community_name):
         commands.go(url)
         commands.title("Communities")
 
+def make_forum(forum_name=test_name, title=None):
+    """Make a forum, deleting first if the forum exists"""
+
+    global_dict, local_dict = namespaces.get_twill_glocals()
+
+    # Append "-testcase" to the community name, so we can spot later
+    # which were created by Twill
+    if forum_name == test_name:
+        try:
+            forum_name = global_dict['forum_name']
+        except:
+            global_dict['test_name'] = test_name
+            global_dict['forum_name'] = test_name + "-testcase"
+            forum_name = global_dict['forum_name']
+    # Echo to screen
+    dump("Forum is %s" % forum_name)
+
+    if title is None:
+        title = forum_name
+
+    # Check to see if we have that community, if so, delete it.
+    commands.go("/offices/forums/%s" % (forum_name))
+    br = get_browser()
+    status = br.get_code()
+    if status != 404:
+        # The community shouldn't exist, and so we should get 404
+        # looking for it.  If no 404, then it exists and we should
+        # delete it.
+        # Echo to screen
+        dump("Deleted old version of Forum: %s " % (forum_name))
+        url = "/offices/forums/%s/delete.html?confirm=1" % forum_name
+        commands.go(url)
+        commands.title("Forums")
+    else:
+        dump("Didn't delete old version of Forum: %s " % (forum_name))
+    # Now, make the community and make sure it exists
+    commands.go("/offices/forums/add_forum.html")
+    commands.fv("save", "title", title)
+    desc = "Test forum created for Twill test case named '%s'"
+    commands.fv("save", "description", desc % forum_name)
+    commands.submit()
+    commands.find("Add Forum Topic")
+
+def remove_forum(forum_name):
+    """Remove a community and make sure it is gone"""
+
+    # Normally we don't need to do this, as make_community internally
+    # does a delete before adding.
+
+    global_dict, local_dict = namespaces.get_twill_glocals()
+
+    # Go to the forum, see if it exists.  If not, log a message.
+    # If so, delete it.
+    commands.go("/offices/forums/" + forum_name)
+    br = get_browser()
+    status = br.get_code()
+    if status != 200:
+        msg = "Community %s not returning 200, must exist"
+        dump(msg % forum_name)
+    else:
+        url = "/offices/forums/%s/delete.html?confirm=1" % forum_name
+        commands.go(url)
+        commands.title("Forums")
 
 def timeit(msg):
     """Keep partial and total elapsed times and print to console"""
