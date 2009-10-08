@@ -1,0 +1,38 @@
+# Add/view/edit/delete for files.  
+
+# Make a random word to insert in the blog title
+set_random_word test_file
+
+# Add a file and ensure the random word appears
+go /communities/${community_name}/files/add_file.html
+notfind "Delete"
+fv save title ${test_file}
+formfile save file "${test_path}/files/profile.jpg" image/jpeg
+submit
+
+
+# Confirm
+find ${test_file}
+#find "Test Blog Entry"
+find "Edit"
+find "Delete"
+
+# Edit
+set_random_word titlechange
+follow "Edit"
+notfind "Delete"
+fv save title "Changed to ${titlechange}"
+submit
+find ${titlechange}
+
+catalog_find ${titlechange} ${community_name}
+
+# Now delete
+# tip: if you don't delete file, you might get error on re-running test
+# each location needs unique filenames of files uploaded
+follow "Delete"
+follow "ok"
+go /communities/${community_name}/files/${test_file}
+code 404
+
+catalog_notfind ${titlechange} ${community_name}

@@ -1,0 +1,4 @@
+# Verify files page exist
+go /communities/${community_name}/files
+find "Add Folder"
+find "Add File"

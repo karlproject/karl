@@ -6,4 +6,5 @@ make_community
 #optional:
 blog_initialize
 calendar_initialize
+files_initialize
 wiki_initialize

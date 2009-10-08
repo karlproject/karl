@@ -1,0 +1,12 @@
+# Make a random word to insert in the blog title
+set_random_word test_fileindex
+
+# Add a file and ensure the random word appears
+go /communities/${community_name}/files/add_file.html
+notfind "Delete"
+fv save title ${test_fileindex}
+formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
+submit
+
+catalog_find ${test_fileindex} ${community_name}/files
+
