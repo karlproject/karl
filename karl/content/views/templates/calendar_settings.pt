@@ -28,8 +28,8 @@
          <td style="background-color: ${calendar['color']}">&nbsp;</td>
          <td>${calendar['name']}</td>
          <td>${calendar['title']}</td>
-         <td><a href="${post_url}?form.delete=${calendar['name']}"
-                >${calendar['name']}</a></td>
+         <td><a href="${post_url}?form.delete=${calendar['escaped_name']}"
+                >delete</a></td>
        </tr>
 
      </table>

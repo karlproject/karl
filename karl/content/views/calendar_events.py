@@ -19,6 +19,8 @@ import calendar
 calendar.setfirstweekday(6) # Fscking Europeans!
 import datetime
 
+from urllib import quote
+
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
@@ -697,6 +699,7 @@ def calendar_settings_view(context, request):
         path = item['path']
         local = path.startswith(here_path)
         d = {}
+        d['escaped_name'] = quote(item['name'])
         if local:
             d['title'] = '*Local*'
         else:
