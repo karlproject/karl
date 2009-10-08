@@ -1,6 +1,4 @@
-
-# Add/view/edit/delete for blogentry.  Presumes that
-# make_community.twill has run.
+# Add/view/edit/delete for blogentry.  
 
 # Make a random word to insert in the blog title
 set_random_word resourcetitle

@@ -1,8 +1,8 @@
 go /communities/${community_name}/blog
 follow "Add Blog Entry"
-set_random_word petri
-fv save title ${petri}
-fv save text "${petri} <br /><br />  This is a sample blog entry entered by a Twill test (blog_index.twill) to verify blog indexing."
+set_random_word blogtest
+fv save title ${blogtest}
+fv save text "${blogtest} <br /><br />  This is a sample blog entry entered by a Twill test (blog_index.twill) to verify blog indexing."
 submit
-catalog_find ${petri} ${community_name}/blog
+catalog_find ${blogtest} ${community_name}/blog
 

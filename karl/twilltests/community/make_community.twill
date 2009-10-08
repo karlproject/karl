@@ -1,3 +1,2 @@
-#login "${cur_admin}"
+# Makes a community using function in twillcommands
 make_community "$community_name"
-#login "${cur_user}"
