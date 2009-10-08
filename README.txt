@@ -179,10 +179,6 @@ To run the "front-end" (the main application), do::
 
   bin/paster serve etc/karl.ini
 
-Or::
-
-  bin/karlctl
-
 To run the "back end" (the ZEO server), do::
 
   bin/runzeo -C etc/zeo.conf
