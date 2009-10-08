@@ -1,5 +1,1 @@
-# Login as Admin
-login "${cur_admin}"
-
-# Destroy current community
-remove_community "$community_name"
+cleanup.cleanup-tests

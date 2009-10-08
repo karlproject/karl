@@ -1,0 +1,11 @@
+# Login as Admin
+login ${cur_admin}
+
+# Destroy current community
+remove_community "${community_name}"
+
+# Destroy default test communities for various tests
+remove_community "blog-test"
+remove_community "calendar-test"
+remove_community "community-test"
+remove_community "twill-all"
