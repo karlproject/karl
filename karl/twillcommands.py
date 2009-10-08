@@ -153,6 +153,7 @@ def make_community(community_name=test_name, title=None):
                                          test_name + '-testcase')
         global_dict['test_name'] = test_name
         global_dict['community_name'] = community_name
+    community_name = global_dict['community_name']
     # Echo to screen
     dump("Community is %s" % (community_name))
 
@@ -209,14 +210,14 @@ def make_forum(forum_name=test_name, title=None):
     global_dict, local_dict = namespaces.get_twill_glocals()
 
     # Append "-testcase" to the community name, so we can spot later
-    # which were created by Twill
+    # which were created by Twillif community_name == test_name:
     if forum_name == test_name:
-        try:
-            forum_name = global_dict['forum_name']
-        except:
-            global_dict['test_name'] = test_name
-            global_dict['forum_name'] = test_name + "-testcase"
-            forum_name = global_dict['forum_name']
+        forum_name = global_dict.get('forum_name', 
+                                         test_name + '-forum-testcase')
+        global_dict['test_name'] = test_name
+        global_dict['forum_name'] = forum_name
+    forum_name = global_dict['forum_name']
+
     # Echo to screen
     dump("Forum is %s" % forum_name)
 
