@@ -209,25 +209,6 @@ out all existing data (while the ZEO server is running)::
 
  bin/start_over --yes
 
-Writable checkouts with ``switch``
------------------------------------
-
-Because we provide anonymous checkouts by default with the buildout,
-your ``src`` directory doesn't use a writable svn+ssh by default.
-Thus, each time you run buildout, you will need to reset the svn URL
-on each directory in ``src``.
-
-A small script is provided at the root of the checkout to make this
-easier::
-
-  $ cd src/karl
-  $ ../../switch
-  $ cd ../karl.content
-  $ ../../switch
-
-Do this for any ``src`` directories that you need to make
-writeable. Later, when we have released packages that evaluators can
-use anonymously, we will get rid of this extra step.
 
 Known Issues
 ------------
