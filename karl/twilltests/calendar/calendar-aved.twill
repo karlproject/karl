@@ -14,10 +14,13 @@ title ${titleword}
 find "Staff One"
 find "karltest@mailinator.com"
 
+# Verify
+catalog_find ${titleword} ${community_name}
+
 # Testing calendar's Edit
 go /communities/${community_name}/calendar/?year=2009&month=4
 find "${titleword}"
-follow "Listing View"
+follow "list.html"
 find "${titleword}"
 follow ${titleword}
 follow "Edit"
@@ -27,9 +30,14 @@ fv save title "${titlechange}"
 submit
 find "${titlechange}"
 
+# Verify
+catalog_find ${titlechange} ${community_name}
+catalog_notfind ${titleword} ${community_name}
+
 # Testing calendar's Delete
 catalog_find ${titlechange} ${community_name}
 follow "Delete"
 follow "ok"
 go /communities/${community_name}/calendar/${titleword}
 code 404
+catalog_notfind ${titleword} ${community_name}

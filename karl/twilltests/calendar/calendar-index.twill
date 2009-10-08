@@ -1,6 +1,6 @@
 # Test index for calendar
 go /communities/${community_name}/calendar
-follow "Add Event"
+go /communities/${community_name}/calendar/add_calendarevent.html
 set_random_word monitor
 fv save title ${monitor}
 fv save text "Added by Twill test (calendar.calendar-index)"
@@ -10,3 +10,4 @@ follow "Delete"
 follow "ok"
 go /communities/${community_name}/calendar/${monitor}
 code 404
+catalog_notfind ${monitor} ${community_name}/calendar

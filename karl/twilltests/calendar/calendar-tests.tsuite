@@ -1,5 +1,5 @@
 # run calendar tests
-calendar.calendar-view
-calendar.create-event
-calendar.calendar-aved
-calendar.calendar-index
+calendar-view
+create-event
+calendar-aved
+calendar-index

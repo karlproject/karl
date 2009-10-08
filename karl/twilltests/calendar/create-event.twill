@@ -2,8 +2,6 @@ set_random_word titleword
 go /communities
 go /communities/${community_name}/calendar/add_calendarevent.html
 fv save title "${titleword}"
-#fv save startDate "04/20/2009 12:30"
-#fv save endDate "04/21/2009 12:30"
 fv save text "Added by Twill test (calendar.create-event)."
 fv save location "our house with two cats in the yard"
 fv save attendees "Staff One, Staff Two, Affili Atay"
@@ -11,13 +9,14 @@ fv save contact_name "Staff One"
 fv save contact_email "karltest@mailinator.com"
 submit
 title ${titleword}
+catalog_find ${titleword} ${community_name}/calendar
 
 # same test, but includes testing "startDate" and "endDate"
 go /communities
 go /communities/${community_name}/calendar/add_calendarevent.html
 fv save title "Karl's New Years bash"
-fv save startDate "01/01/2010 12:30"
-fv save endDate "01/02/2010 12:30"
+fv save startDate "01/01/2010 13:00"
+fv save endDate "01/01/2010 23:00"
 fv save text "This is a test from Twill (calendar.create-event). It tests using startDate and endDate. <br/><br/> Hope everyone is celebrating the new year."
 fv save location "our house with two cats in the yard"
 fv save attendees "Staff One, Staff Two, Affili Atay"
