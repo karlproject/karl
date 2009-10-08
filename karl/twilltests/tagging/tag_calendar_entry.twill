@@ -1,0 +1,7 @@
+# Add Tag for a community
+go /communities/${community_name}
+add_tag tag85
+
+# Verify show tag
+go /showtag/tag85
+find "Tagged by"

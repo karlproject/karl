@@ -1,0 +1,8 @@
+# First login
+login.login
+
+# Make community
+community.community-tests
+
+# run tagging tests
+tagging.tagging-tests

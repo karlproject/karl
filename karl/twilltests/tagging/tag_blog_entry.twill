@@ -1,0 +1,13 @@
+# Add Tag for a blog
+go /communities/${community_name}/blog
+follow "Add Blog Entry"
+url /communities/${community_name}/blog/add_blogentry.html
+fv save title "Testing of Tagging on ${community_name} blog"
+fv save text "This is a test to verify that we can tag a blog entry in the ${community_name} Community Blog. <br/><br/> This community has been auto-generated from the Twill tests (tagging.tag_blog_entry.twill) to verify Karl is working correctly."
+submit
+add_tag twill
+add_tag blog-tag-test
+
+# Verify show tag
+go /showtag/blog-tag-test
+find "Tagged by"

@@ -1,0 +1,17 @@
+# Add Tag for file
+
+go /communities/${community_name}
+# Creates the first file in the community
+go /communities/${community_name}/files/add_file.html
+notfind "Delete"
+fv save title "tag_file-twill"
+formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
+submit
+
+go /communities/${community_name}/files/sample_photo.jpg
+add_tag twill
+add_tag file-tag-test
+
+# Verify show tag
+go /showtag/file-tag-test
+find "Tagged by"

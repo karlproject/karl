@@ -1,0 +1,8 @@
+# Add Tag for a user
+go /profiles/${cur_user}
+add_tag "tag-user-test"
+add_tag "twill"
+
+# Verify show tag
+go /showtag/tag-user-test
+find "Tagged by"

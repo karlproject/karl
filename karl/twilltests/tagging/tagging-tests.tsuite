@@ -1,0 +1,16 @@
+# Tag suite
+
+# tag a community
+tag_community
+
+# tag a blog entry
+tag_blog_entry
+
+# tag a file
+tag_file
+
+# tag a user
+tag_user
+
+# tag a wiki
+tag_wikientry
