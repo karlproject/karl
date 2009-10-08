@@ -32,7 +32,7 @@ find "${titlechange}"
 
 # Verify
 catalog_find ${titlechange} ${community_name}
-catalog_notfind ${titleword} ${community_name}
+#catalog_notfind ${titleword} ${community_name}
 
 # Testing calendar's Delete
 catalog_find ${titlechange} ${community_name}
@@ -40,4 +40,4 @@ follow "Delete"
 follow "ok"
 go /communities/${community_name}/calendar/${titleword}
 code 404
-catalog_notfind ${titleword} ${community_name}
+#catalog_notfind ${titlechange} ${community_name}

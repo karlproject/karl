@@ -1,0 +1,12 @@
+go /communities/${community_name}/wiki/front_page
+follow "Edit"
+set_random_word wikitest
+#fv save title ${wikitest}
+fv save text "This is a sample wiki entry Edited by a ((Twill)) test (wiki_index.twill) to verify wiki indexing."
+submit
+follow "\+"
+#fv save title ${wikitest}
+fv save text "${wikitest} This is a wiki entry entered by a Twill test (wiki_index.twill) to verify wiki indexing."
+submit
+catalog_find ${wikitest} ${community_name}/wiki
+

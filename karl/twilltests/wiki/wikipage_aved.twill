@@ -1,0 +1,34 @@
+# Add/view/edit/delete for wikipages. 
+
+# Make a random word to insert in the wiki title
+set_random_word wikititle
+
+# Create a wikipage and ensure the random word appears
+go /communities/${community_name}/wiki
+follow "Edit"
+fv save text "Make a gnarly new ((${wikititle})) page."
+submit
+find "Make a gnarly new"
+
+# Make sure catalog is happy
+catalog_find ${wikititle} ${community_name}
+
+# Follow the "+" symbol
+follow "\+"
+fv save title ${wikititle}
+fv save text "Get rid of the fake wiki title."
+submit
+url /communities/${community_name}/wiki/${wikititle}
+find "fake"
+notfind "gnarly"
+
+# Check that the body content was indexed.
+catalog_find "fake" ${community_name}/wiki/${wikititle}
+catalog_notfind "gnarly" ${community_name}/wiki/${wikititle}
+
+# Now delete the page.
+go /communities/${community_name}/wiki/${wikititle}
+follow "Delete"
+follow "ok"
+go /communities/${community_name}/wiki/${wikititle}
+code 404
