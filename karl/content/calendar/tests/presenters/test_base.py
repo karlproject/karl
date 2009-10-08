@@ -242,4 +242,6 @@ class DummyCatalogEvent(object):
         if endDate is None:       
             endDate = datetime.datetime.now()
         self.endDate = endDate
+        
+        self._v_color = 'blue'
             
