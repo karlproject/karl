@@ -149,12 +149,10 @@ def make_community(community_name=test_name, title=None):
     # Append "-testcase" to the community name, so we can spot later
     # which were created by Twill
     if community_name == test_name:
-        try:
-            community_name = global_dict['community_name']
-        except:
-            global_dict['test_name'] = test_name
-            global_dict['community_name'] = test_name + "-testcase"
-            community_name = global_dict['community_name']
+        community_name = global_dict.get('community_name', 
+                                         test_name + '-testcase')
+        global_dict['test_name'] = test_name
+        global_dict['community_name'] = community_name
     # Echo to screen
     dump("Community is %s" % (community_name))
 
