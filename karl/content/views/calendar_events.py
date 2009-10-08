@@ -193,7 +193,10 @@ def _show_calendar_view(context, request, make_presenter):
 
     calendar.paint_events(flattened_events)
 
-    settings_url = model_url(context, request, 'settings.html')
+    if has_permission('moderate', context, request):
+        settings_url = model_url(context, request, 'settings.html')
+    else:
+        settings_url = None
 
     # render
     api = TemplateAPI(context, request, calendar.title)    
@@ -222,12 +225,10 @@ def show_day_view(context, request):
 def get_calendar_actions(context, request):
     """Return the actions to display when looking at the calendar"""
     actions = []
-    # temporarily disable settings action until virtual calendaring is
-    # solid
-##     if has_permission('moderate', context, request):
-##         actions.append(
-##             ('Settings', 'settings.html'),
-##             )
+    if has_permission('moderate', context, request):
+        actions.append(
+            ('Settings', 'settings.html'),
+            )
     if has_permission('create', context, request):
         actions.append(
             ('Add Event', 'add_calendarevent.html'),

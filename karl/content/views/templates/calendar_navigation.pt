@@ -19,8 +19,11 @@
                                       class 'color cal_' +data['color'];
                                       selected data['path'] == selected_cal"
                       >${data['name']}</option>
-            </select>
+            </select>                       
+            
+            <tal:block condition="settings_url"> 
             (<a href="${settings_url}">Setup</a>)
+            </tal:block>
           </div>
 
           <!-- new event -->
