@@ -13,8 +13,8 @@ blog.blog-tests
 # run calendar tests
 calendar.calendar-tests
 
-# run offices tests
-offices.office-tests
+# run files tests
+files.files-tests
 
 # run profile tests, then re-login as user vs. admin
 profiles.user_initialize
