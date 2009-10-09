@@ -1,9 +1,11 @@
 # Add Tag for a community
 go /communities/${community_name}
-add_tag tag85
 add_tag twill
 add_tag community-tag-test
 
 # Verify show tag
-go /showtag/tag85
+go /showtag/community-tag-test
 find "Tagged by"
+
+# Remove tag
+remove_tag twill

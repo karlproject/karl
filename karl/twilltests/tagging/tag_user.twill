@@ -6,3 +6,8 @@ add_tag "twill"
 # Verify show tag
 go /showtag/tag-user-test
 find "Tagged by"
+
+# Remove tags
+go /profiles/${cur_user}
+remove_tag "twill"
+remove_tag "tag-user-test"

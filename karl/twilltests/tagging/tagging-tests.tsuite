@@ -6,6 +6,9 @@ tag_community
 # tag a blog entry
 tag_blog_entry
 
+# tag a calendar entry
+tag_calendar_entry
+
 # tag a file
 tag_file
 

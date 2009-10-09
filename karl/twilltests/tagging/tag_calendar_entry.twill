@@ -1,7 +1,29 @@
-# Add Tag for a community
-go /communities/${community_name}
-add_tag tag85
+# Add Tag for a calendar entry
+
+# create calendar entry
+go /communities/${community_name}/calendar/add_calendarevent.html
+fv save title "calendar-tag-event"
+fv save text "This calendar entry was created to test tagging. Added by Twill test (tagging.tag_calendar_entry.twill)."
+fv save location "Online"
+fv save attendees "Staff One, Staff Two, Affili Atay"
+fv save contact_name "Staff One"
+fv save contact_email "karltest@mailinator.com"
+submit
+title "calendar-tag-event"
+
+# add tags
+add_tag calendar-tag-test
+add_tag twill
 
 # Verify show tag
-go /showtag/tag85
+go /showtag/calendar-tag-test
 find "Tagged by"
+
+# Remove tag
+go /communities/${community_name}/calendar/calendar-tag-event
+remove_tag calendar-tag-test
+
+# Remove event
+go /communities/${community_name}/calendar/calendar-tag-event/delete.html?confirm=1
+go /communities/${community_name}/calendar/calendar-tag-event
+code 404

@@ -1,5 +1,6 @@
 # Add Tag for file
 
+# Add file for test
 go /communities/${community_name}
 # Creates the first file in the community
 go /communities/${community_name}/files/add_file.html
@@ -8,6 +9,7 @@ fv save title "tag_file-twill"
 formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
 submit
 
+# Add tags
 go /communities/${community_name}/files/sample_photo.jpg
 add_tag twill
 add_tag file-tag-test
@@ -15,3 +17,12 @@ add_tag file-tag-test
 # Verify show tag
 go /showtag/file-tag-test
 find "Tagged by"
+
+# Remove tag
+go /communities/${community_name}/files/sample_photo.jpg
+remove_tag file-tag-test
+
+# Remove file
+go /communities/${community_name}/files/sample_photo.jpg/delete.html?confirm=1
+go /communities/${community_name}/files/sample_photo.jpg
+code 404

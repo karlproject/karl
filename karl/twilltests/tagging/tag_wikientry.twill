@@ -6,3 +6,7 @@ add_tag twill
 # Verify show tag
 go /showtag/wiki-tag-test
 find "Tagged by"
+
+# Remove tag
+go /communities/${community_name}/wiki/front_page
+remove_tag "wiki-tag-test"
