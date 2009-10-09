@@ -1,0 +1,32 @@
+# Search for a calendar entry
+
+# create calendar entry
+go /communities/${community_name}/calendar/add_calendarevent.html
+fv save title "calendar-search-event"
+fv save text "This calendar entry was created to test searching. Added by Twill test (search.search_calendar_entry.twill)."
+fv save location "Online"
+fv save attendees "Staff One, Staff Two, Affili Atay"
+fv save contact_name "Staff One"
+fv save contact_email "karltest@mailinator.com"
+submit
+title "calendar-search-event"
+
+# Verify show tag
+go /communities/${community_name}/calendar/calendar-search-event
+find search_calendar_entry.twill
+
+# Search for calendar entry
+catalog_find "search_calendar_entry" ${community_name}
+
+
+# Remove tag
+go /communities/${community_name}/calendar/calendar-search-event
+remove_tag calendar-tag-test
+
+# Remove event
+go /communities/${community_name}/calendar/calendar-search-event/delete.html?confirm=1
+go /communities/${community_name}/calendar/calendar-search-event
+code 404
+
+# Verify search doesn't find it now that it's been deleted
+catalog_notfind "search_calendar_entry" ${community_name}

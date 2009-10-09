@@ -1,0 +1,24 @@
+# Search for a blog entry
+
+# Add blog entry
+go /communities/${community_name}/blog
+follow "Add Blog Entry"
+url /communities/${community_name}/blog/add_blogentry.html
+fv save title "blog-testsearch-${community_name}"
+fv save text "This is a test to verify that we can search for a blog entry in the ${community_name} Community Blog. <br/><br/> This community has been auto-generated from the Twill tests (search.search_blog_entry.twill) to verify Karl is working correctly."
+submit
+
+# Verify blog entry
+go /communities/${community_name}/blog/blog-testsearch-${community_name}
+find "search.search_blog_entry.twill"
+
+# Search for blog entry
+catalog_find "search_blog_entry" ${community_name}
+
+# Delete blog entry
+go /communities/${community_name}/blog/blog-testsearch-${community_name}/delete.html?confirm=1
+go /communities/${community_name}/blog/blog-testsearch-${community_name}
+code 404
+
+# Verify search doesn't find it now that it's been deleted
+catalog_notfind "search_blog_entry" ${community_name}

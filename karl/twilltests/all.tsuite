@@ -20,6 +20,12 @@ offices.office-tests
 profiles.user_initialize
 profiles.profiles-tests
 
+# run search tests
+search.search-tests
+
+# run tagging tests
+tagging.tagging-tests
+
 # run wiki tests
 wiki.wiki-tests
 

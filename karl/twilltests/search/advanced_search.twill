@@ -1,0 +1,12 @@
+# Test to verify advanced search exist
+
+# Make sure the page is there and has the correct structure
+go /advancedsearch.html
+find "Advanced Search"
+find "Keyword"
+find "Author"
+find "Type"
+find "Tag"
+find "Year"
+
+

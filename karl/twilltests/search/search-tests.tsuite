@@ -1,0 +1,11 @@
+# Search tests
+
+# Test searching for a blog entry
+search_blog_entry
+
+# Test searching for a calendar entry
+search_calendar_entry
+
+# Check the advanced search page
+advanced_search
+

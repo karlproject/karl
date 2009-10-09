@@ -1,0 +1,12 @@
+# have to login first
+login.login
+
+# make the community
+community.make_community
+
+# run the blog test suite
+search.search-tests
+
+# Done testing, let's remove the test community we used
+# Remove community
+#community.remove_community
