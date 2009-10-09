@@ -9,5 +9,5 @@ follow "\+"
 
 fv save text "${wikitest} This is a wiki entry entered by a Twill test (wiki_index.twill) to verify wiki indexing."
 submit
-catalog_find ${wikitest} ${community_name}/wiki/${wikitest}
+catalog_find ${wikitest} ${community_name}/wiki/twill
 
