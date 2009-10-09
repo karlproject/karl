@@ -94,6 +94,7 @@ setup(name='karl',
       addlicense = karl.scripts.addlicense:main
       jsconcat = karl.scripts.jsconcat:main
       cssconcat = karl.scripts.cssconcat:main
+      samplegen = karl.scripts.samplegen:main
       [paste.paster_create_template]
       karl_project=karl.paster:KARLProjectTemplate
       """
