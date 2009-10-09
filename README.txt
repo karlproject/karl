@@ -212,10 +212,10 @@ out all existing data (while the ZEO server is running)::
 Generating Sample Content
 -------------------------
 
-For testing purposes, KARL has a utility named ``samplegen`` for adding
+For testing purposes, KARL has a utility named ``samplegen`` that adds
 randomized sample content to the database. The utility generates
-communities, then adds blog entries, wiki pages, calendar events, and
-files to each of the generated communities.
+communities, each containing blog entries, wiki pages, calendar events,
+and files.
 
 To use the ``samplegen`` utility, type::
 
