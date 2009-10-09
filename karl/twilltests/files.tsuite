@@ -4,8 +4,8 @@ login.login
 # make the community
 community.make_community
 
-# run the blog test suite
-blog.blog-tests
+# Run the files tests suite
+files.files-tests
 
 # Done testing, let's remove the test community we used
 # Remove community

@@ -4,7 +4,7 @@ forum_add
 login_user
 
 # View forum
-forum_view
+#forum_view
 
 # Edit forum as admin and then re-login as user
 login_admin
@@ -29,7 +29,7 @@ forum_delete
 login_user
 
 # View Network Events
-networkevents_view
+#networkevents_view
 
 # Add Network Event as admin and then re-login as user
 login_admin

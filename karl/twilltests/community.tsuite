@@ -4,3 +4,6 @@ login.login
 # Make community
 community.community-tests
 
+# Done testing, let's remove the test community we used
+# Remove community
+community.remove_community

@@ -6,3 +6,6 @@ community.community-tests
 
 # run tagging tests
 tagging.tagging-tests
+
+# Remove community
+community.remove_community

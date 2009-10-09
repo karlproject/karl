@@ -5,7 +5,7 @@ login.login
 community.make_community
 
 # run the blog test suite
-blog.blog-tests
+wiki.wiki-tests
 
 # Done testing, let's remove the test community we used
 # Remove community

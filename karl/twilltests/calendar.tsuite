@@ -6,3 +6,7 @@ community.make_community
 
 # run calendar test suite
 calendar.calendar-tests
+
+# Done testing, let's remove the test community we used
+# Remove community
+community.remove_community
