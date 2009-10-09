@@ -1,0 +1,9 @@
+# Search for a user
+
+# Verify current user exist
+go ${localhost_url}/profiles/${cur_user}
+find ${cur_user}
+
+# Search for current user
+catalog_find ${cur_user} /profiles/${cur_user}
+

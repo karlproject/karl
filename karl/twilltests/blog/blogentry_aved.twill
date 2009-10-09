@@ -32,4 +32,4 @@ follow "ok"
 go /communities/${community_name}/blog/${resourcetitle}
 code 404
 
-#catalog_notfind ${titlechange} ${community_name}
+catalog_notfind ${titlechange} "/${community_name}/blog/${titlechange}"

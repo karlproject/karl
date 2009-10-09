@@ -11,7 +11,7 @@ submit
 find "Make a gnarly new"
 
 # Make sure catalog is happy
-catalog_find ${wikititle} ${community_name}
+catalog_find ${wikititle} /communities/${community_name}/wiki/${wikititle}
 
 # Follow the "+" symbol
 follow "\+"

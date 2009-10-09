@@ -1,0 +1,26 @@
+# Search for a wiki entry
+
+# Make a random word to insert in the wiki title
+set_random_word search_we
+
+# Add wiki entry
+go /communities/${community_name}/wiki/front_page
+follow "Edit"
+
+fv save text "This is a sample wiki entry Edited by a Twill test ((search_wiki_entry.twill)) to verify wiki searching."
+submit
+follow "\+"
+
+fv save text "${search_we} This is a wiki entry entered by a Twill test (search_wiki_entry.twill) to verify wiki searching."
+submit
+
+# Search for wiki entry
+catalog_find ${search_we} ${community_name}/wiki/search_wiki_entry
+
+# Delete wiki entry
+go /communities/${community_name}/wiki/search_wiki_entry.twill/delete.html?confirm=1
+go /communities/${community_name}/wiki/search_wiki_entry.twill
+code 404
+
+# Verify search doesn't find it now that it's been deleted
+catalog_notfind ${search_we} "/communities/${community_name}/wiki/search_wiki_entry"

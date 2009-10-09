@@ -1,32 +1,30 @@
 # Search for a calendar entry
 
+# Make a random word to insert in the calendar title
+set_random_word scalentry
+
 # create calendar entry
 go /communities/${community_name}/calendar/add_calendarevent.html
-fv save title "calendar-search-event"
-fv save text "This calendar entry was created to test searching. Added by Twill test (search.search_calendar_entry.twill)."
+fv save title ${scalentry}
+fv save text "${scalentry}<br/>This calendar entry was created to test searching. Added by Twill test (search.search_calendar_entry.twill)."
 fv save location "Online"
 fv save attendees "Staff One, Staff Two, Affili Atay"
 fv save contact_name "Staff One"
 fv save contact_email "karltest@mailinator.com"
 submit
-title "calendar-search-event"
+title ${scalentry}
 
-# Verify show tag
-go /communities/${community_name}/calendar/calendar-search-event
-find search_calendar_entry.twill
+# Verify calendar entry
+go /communities/${community_name}/calendar/${scalentry}
+find ${scalentry}
 
 # Search for calendar entry
-catalog_find "search_calendar_entry" ${community_name}
-
-
-# Remove tag
-go /communities/${community_name}/calendar/calendar-search-event
-remove_tag calendar-tag-test
+catalog_find ${scalentry} ${community_name}
 
 # Remove event
-go /communities/${community_name}/calendar/calendar-search-event/delete.html?confirm=1
-go /communities/${community_name}/calendar/calendar-search-event
+go /communities/${community_name}/calendar/${scalentry}/delete.html?confirm=1
+go /communities/${community_name}/calendar/${scalentry}
 code 404
 
 # Verify search doesn't find it now that it's been deleted
-catalog_notfind "search_calendar_entry" ${community_name}
+catalog_notfind ${scalentry} "/communities/${community_name}/calendar/${scalentry}"

@@ -9,7 +9,7 @@ notfind "Delete"
 fv save title ${test_file}
 formfile save file "${test_path}/files/profile.jpg" image/jpeg
 submit
-
+url "/communities/${community_name}/files/profile.jpg"
 
 # Confirm
 find ${test_file}

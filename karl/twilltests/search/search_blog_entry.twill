@@ -1,24 +1,27 @@
 # Search for a blog entry
 
+# Make a random word to insert in the blog title
+set_random_word search_blogentry
+
 # Add blog entry
 go /communities/${community_name}/blog
 follow "Add Blog Entry"
 url /communities/${community_name}/blog/add_blogentry.html
-fv save title "blog-testsearch-${community_name}"
-fv save text "This is a test to verify that we can search for a blog entry in the ${community_name} Community Blog. <br/><br/> This community has been auto-generated from the Twill tests (search.search_blog_entry.twill) to verify Karl is working correctly."
+fv save title ${search_blogentry}
+fv save text "${search_blogentry}<br/><br/>This is a test to verify that we can search for a blog entry in the ${community_name} Community Blog. <br/><br/> This community has been auto-generated from the Twill tests (search.search_blog_entry.twill) to verify Karl is working correctly."
 submit
 
 # Verify blog entry
-go /communities/${community_name}/blog/blog-testsearch-${community_name}
-find "search.search_blog_entry.twill"
+go /communities/${community_name}/blog/${search_blogentry}
+find ${search_blogentry}
 
 # Search for blog entry
-catalog_find "search_blog_entry" ${community_name}
+catalog_find ${search_blogentry} /communities/${community_name}/blog/${search_blogentry}
 
 # Delete blog entry
-go /communities/${community_name}/blog/blog-testsearch-${community_name}/delete.html?confirm=1
-go /communities/${community_name}/blog/blog-testsearch-${community_name}
+go /communities/${community_name}/blog/${search_blogentry}/delete.html?confirm=1
+go /communities/${community_name}/blog/${search_blogentry}
 code 404
 
 # Verify search doesn't find it now that it's been deleted
-catalog_notfind "search_blog_entry" ${community_name}
+catalog_notfind ${search_blogentry} "/communities/${community_name}/blog/{$search_blogentry}"

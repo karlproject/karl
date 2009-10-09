@@ -6,6 +6,18 @@ search_blog_entry
 # Test searching for a calendar entry
 search_calendar_entry
 
+# Test searching for a community 
+search_community 
+
+# Test searching for a file
+search_file
+
+# Test searching for a user
+search_user 
+
+# Test searching for wiki 
+search_wiki_entry
+
 # Check the advanced search page
 advanced_search
 

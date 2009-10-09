@@ -1,0 +1,29 @@
+# Search for a file
+
+# Make a random word to insert in the blog title
+set_random_word search_file
+
+# Add file for test
+go /communities/${community_name}
+# Creates the first file in the community
+go /communities/${community_name}/files/add_file.html
+notfind "Delete"
+fv save title "${search_file}"
+formfile save file "${test_path}/files/sample_photo2.jpg" image/jpeg
+submit
+url "/communities/${community_name}/files/sample_photo2.jpg"
+
+# Verify file exist
+go /communities/${community_name}/files/sample_photo2.jpg
+find "${search_file}"
+
+# Search for file
+catalog_find ${search_file} ${community_name}
+
+# Delete file
+go /communities/${community_name}/files/sample-photo2.jpg/delete.html?confirm=1
+go /communities/${community_name}/files/sample-photo2.jpg
+code 404
+
+# Verify search doesn't find it now that it's been deleted
+catalog_notfind ${search_file} "/communities/${community_name}/files/sample-photo2.jpg"

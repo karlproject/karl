@@ -7,6 +7,7 @@ notfind "Delete"
 fv save title ${test_fileindex}
 formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
 submit
+url "/communities/${community_name}/files/sample_photo.jpg"
 
 catalog_find ${test_fileindex} ${community_name}/files
 
