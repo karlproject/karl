@@ -7,6 +7,8 @@ Unreleased
 - Speed up rendering of any page shown inside the community layout by
   roughly 2X.
 
+- LP #444502: Added a sample content generation script.
+
 - "Settings" action on calendar tool now allows the choice of a color
   along with a virtual calendar name.
 

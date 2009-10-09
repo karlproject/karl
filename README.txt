@@ -209,6 +209,20 @@ out all existing data (while the ZEO server is running)::
 
  bin/start_over --yes
 
+Generating Sample Content
+-------------------------
+
+For testing purposes, KARL has a utility named ``samplegen`` for adding
+randomized sample content to the database. The utility generates
+communities, then adds blog entries, wiki pages, calendar events, and
+files to each of the generated communities.
+
+To use the ``samplegen`` utility, type::
+
+ bin/samplegen
+
+Use the "-c" option to control the number of communities generated.
+Type ``bin/samplegen --help`` for more option documentation.
 
 Known Issues
 ------------
