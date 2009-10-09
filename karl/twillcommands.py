@@ -35,6 +35,7 @@ __all__ = ['login',
            'livesearch_find',
            'livesearch_notfind',
            'add_tag',
+           'remove_tag',
            'xpath'
            ]
 
@@ -152,7 +153,6 @@ def make_community(community_name=test_name, title=None):
                                          test_name + '-testcase')
         global_dict['test_name'] = test_name
         global_dict['community_name'] = community_name
-    community_name = global_dict['community_name']
     # Echo to screen
     dump("Community is %s" % (community_name))
 
@@ -200,7 +200,7 @@ def remove_community(community_name):
     else:
         url = "/communities/%s/delete.html?confirm=1" % community_name
         commands.go(url)
-        commands.title("Communities")
+        #commands.title("Communities")
 
 def make_forum(forum_name=test_name, title=None):
     """Make a forum, deleting first if the forum exists"""
@@ -214,7 +214,6 @@ def make_forum(forum_name=test_name, title=None):
                                          test_name + '-forum-testcase')
         global_dict['test_name'] = test_name
         global_dict['forum_name'] = forum_name
-    forum_name = global_dict['forum_name']
 
     # Echo to screen
     dump("Forum is %s" % forum_name)
@@ -438,6 +437,32 @@ def add_tag(tagname):
     # Go to the tag url, then go back where you were
     commands.go(tag_url)
     commands.go(start_url)
+
+def remove_tag(tagname):
+    """ Add a tag to a piece of content.
+
+    o This is an emuatilon of what the AJAX stuff does:  a better test
+      would actually use the AJAX somehow (e.g., via Selenium).
+    """
+
+
+    br = get_browser()
+    start_url = br.get_url()
+
+    # Make the URL used (inapproriately) for the GET
+    current_url = br.get_url().split('?')[0]
+    if current_url.endswith('.html'):
+        current_url = current_url.rsplit('/', 1)[0]
+    if current_url[-1] != '/':
+        # Wish urljoin didn't remove the last hop
+        current_url += '/'
+    tag_url = urljoin(current_url, 'jquery_tag_del?val=%s' % tagname)
+
+    # Go to the tag url, then go back where you were
+    commands.go(tag_url)
+    commands.go(start_url)
+
+
 
 
 def xpath(expr, result):
