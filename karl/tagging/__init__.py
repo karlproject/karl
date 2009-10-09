@@ -22,7 +22,6 @@ from BTrees import OOBTree
 from persistent import Persistent
 from zope.component import queryAdapter
 from zope.interface import implements
-from zope.schema.fieldproperty import FieldProperty
 from repoze.bfg.traversal import find_model
 
 from karl.utils import find_catalog
@@ -37,11 +36,6 @@ class Tag(Persistent):
     """ Simple implementation of a tag.
     """
     implements(ITag)
-
-    item = FieldProperty(ITag['item'])
-    user = FieldProperty(ITag['user'])
-    name = FieldProperty(ITag['name'])
-    community = FieldProperty(ITag['community'])
 
     def __init__(self, item, user, name, community=None):
         self.item = item
