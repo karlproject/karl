@@ -1,0 +1,12 @@
+# have to login first
+login.login
+
+# make the community
+community.make_community
+
+# run the forums test suite
+forums.forums-tests
+
+# Done testing, let's remove the test community we used
+# Remove community
+#community.remove_community
