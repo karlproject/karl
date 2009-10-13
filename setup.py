@@ -60,6 +60,7 @@ requires = [
     'zope.testing', # fwd compat when not directly relied on by BFG
     'PILwoTk',
     'icalendar',
+    'markdown2',
     ]
 
 setup(name='karl',
