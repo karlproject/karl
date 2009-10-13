@@ -1,7 +1,7 @@
 # Profile tests
 
 # Test to see what profiles we can see
-user_view
+#user_view
 
 # Login as admin before add/edit/delete user
 login_admin

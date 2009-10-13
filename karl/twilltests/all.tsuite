@@ -1,3 +1,10 @@
+# This suite is to test major functionality for this installation of karl.
+# Set variables inside of all.conf
+# run from this directory, by running
+# flunc all
+# see more options in the README
+
+
 # check for login accounts
 profiles.user_karl3
 

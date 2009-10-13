@@ -1,3 +1,4 @@
+# Initial test of blog functionality for a new community
 go /communities/${community_name}/blog
 follow "Add Blog Entry"
 fv save title "Introduction to ${community_name} blog"

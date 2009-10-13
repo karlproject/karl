@@ -19,7 +19,7 @@ submit
 
 # Verify user edited
 go /profiles/tempuser
-find United States
+find "United States"
 find "800-555-5555"
 find tempuser2@example.com
 notfind tempuser@example.com

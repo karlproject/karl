@@ -1,6 +1,3 @@
-# Logging in as admin to "add users"
-login "${cur_admin}"
-
 # Add a new user
 go /profiles/add.html
 fv save login "tempuser"
@@ -19,6 +16,3 @@ submit
 go /profiles/tempuser
 find Afghanistan
 find tempuser@example.com
-
-# logging back in as current user
-login "${cur_user}"

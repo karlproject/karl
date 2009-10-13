@@ -1,9 +1,12 @@
+# This suite is to functionality for community for this installation of karl.
+# Set variables inside of community.conf
+# run from this directory, by running
+# flunc community
+# see more options in the README
+
+
 # First login
 login.login
 
 # Make community
 community.community-tests
-
-# Done testing, let's remove the test community we used
-# Remove community
-community.remove_community

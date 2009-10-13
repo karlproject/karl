@@ -1,0 +1,11 @@
+# This is the cleanup routines for the "forums" suite
+# To run just the cleanup suite, use the -C flag
+# flunc -C forums
+#
+# or to run the "forums" suite without running cleanup 
+# use the -X flag
+# flunc -X forums
+# See README.txt for more
+
+# Cleanup tests
+community.delete_testing_community

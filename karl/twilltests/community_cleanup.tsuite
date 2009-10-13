@@ -1,0 +1,11 @@
+# This is the cleanup routines for the "community" suite
+# To run just the cleanup suite, use the -C flag
+# flunc -C community
+#
+# or to run the "community" suite without running cleanup 
+# use the -X flag
+# flunc -X community
+# See README.txt for more
+
+# Cleanup tests
+community.delete_testing_community

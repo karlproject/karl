@@ -25,14 +25,14 @@ fv save title "Changed to ${titlechange}"
 submit
 find ${titlechange}
 
-catalog_find ${titlechange} ${community_name}
+catalog_find ${titlechange} /communities/${community_name}/files/
 
 # Now delete
 # tip: if you don't delete file, you might get error on re-running test
 # each location needs unique filenames of files uploaded
 follow "Delete"
 follow "ok"
-go /communities/${community_name}/files/${test_file}
+go /communities/${community_name}/files/profile.jpg
 code 404
 
-catalog_notfind ${titlechange} ${community_name}
+catalog_notfind ${titlechange} /communities/${community_name}/files/

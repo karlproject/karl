@@ -1,16 +1,4 @@
+# Delete the current community 
+# used after testing during cleanup phase
 login "${cur_admin}"
 remove_community "$community_name"
-remove_community "blog-testing"
-remove_community "blog-test"
-remove_community "calendar-test"
-remove_community "offices-test"
-remove_community "community-test"
-remove_community "twill-all"
-remove_community "publicsecurityandactions"
-remove_community "lp344434"
-remove_community "lp4036566"
-remove_community "m3t2-test-2"
-remove_community "m3t2-test-4"
-remove_community "m3t4-test-4"
-remove_community "m3t5"
-remove_community "m3t6-test-6"

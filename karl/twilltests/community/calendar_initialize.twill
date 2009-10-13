@@ -1,5 +1,4 @@
-# Test calendar
-
+# Initial test of calendar for a new community
 go /communities/${community_name}/calendar/add_calendarevent.html
 fv save title "Community Created"
 fv save text "This community was created on this day. Added by Twill test (community.calendar_initialize.twill)."

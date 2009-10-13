@@ -1,0 +1,11 @@
+# This is the cleanup routines for the "calendar" suite
+# To run just the cleanup suite, use the -C flag
+# flunc -C calendar
+#
+# or to run the "calendar" suite without running cleanup 
+# use the -X flag
+# flunc -X calendar
+# See README.txt for more
+
+# Cleanup tests
+community.delete_testing_community

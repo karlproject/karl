@@ -1,3 +1,9 @@
+# This suite is to functionality for wiki for this installation of karl.
+# Set variables inside of wiki.conf
+# run from this directory, by running
+# flunc wiki
+# see more options in the README
+
 # have to login first
 login.login
 
@@ -6,7 +12,3 @@ community.make_community
 
 # run the blog test suite
 wiki.wiki-tests
-
-# Done testing, let's remove the test community we used
-# Remove community
-community.remove_community
