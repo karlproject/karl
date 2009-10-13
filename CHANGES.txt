@@ -67,6 +67,9 @@ Unreleased
 
 - LP #449690 Moved text scrubber utility for mailin to core.
 
+- Removed out of date paster template.  This has been superceded by KarlSample
+  project.
+
 3.14 (2009-09-08)
 -----------------
 
