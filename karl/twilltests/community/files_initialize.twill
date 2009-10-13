@@ -2,5 +2,5 @@
 go /communities/${community_name}/files/add_file.html
 notfind "Delete"
 fv save title "community-files_initialize-twill"
-formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
+formfile save file "${test_path}/community/sample_file.txt" text/plain
 submit
