@@ -29,6 +29,12 @@
     provides=".interfaces.IRandomId"
   />
 
+  <utility
+      provides="karl.utilities.interfaces.IMailinTextScrubber"
+      component=".mailin.text_scrubber"
+      name="karl.utilities.mailin.text_scrubber"
+      />
+
   <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
