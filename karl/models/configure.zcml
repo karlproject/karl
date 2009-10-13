@@ -7,12 +7,12 @@
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectWillBeRemovedEvent"
       handler=".subscribers.handle_content_removed"/>
-    
+
   <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectAddedEvent"
       handler=".subscribers.index_content"/>
-  
+
   <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectWillBeAddedEvent"
@@ -161,7 +161,7 @@
       />
 
   <adapter
-    for=".interfaces.ICommunity 
+    for=".interfaces.ICommunity
           repoze.bfg.interfaces.IRequest"
     provides=".interfaces.ICommunityInfo"
     factory=".adapters.CommunityInfo"
@@ -209,7 +209,7 @@
     provides=".interfaces.ITagQuery"
     factory=".adapters.TagQuery"
   />
-  
+
   <adapter
     for="repoze.lemonade.interfaces.IContent
           repoze.bfg.interfaces.IRequest"
@@ -261,5 +261,11 @@
       factory=".feedstorage.Feed"
       type=".interfaces.IFeed"
       />
+
+  <route
+    factory=".mailin_monitor.KarlMailInMonitor"
+    path="/mailin/*traverse"
+    name="mailin_monitor"
+    />
 
 </configure>

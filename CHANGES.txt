@@ -65,7 +65,8 @@ Unreleased
 
 - The new calendar pages have now replaced the original calendar.
 
-- LP #449690 Moved text scrubber utility for mailin to core.
+- LP #449690 Moved text scrubber utility for mailin to core.  Moved mailin
+  monitor sub-application to core.
 
 - Removed out of date paster template.  This has been superceded by KarlSample
   project.

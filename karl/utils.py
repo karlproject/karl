@@ -147,5 +147,5 @@ class PersistentBBB(object):
         self.val = val
 
     def __get__(self, inst, cls):
-        setattr(inst, self.name, copy.deepycopy(self.val))
+        setattr(inst, self.name, copy.deepcopy(self.val))
         return getattr(inst, self.name)
