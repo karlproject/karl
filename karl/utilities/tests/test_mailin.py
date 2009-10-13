@@ -302,18 +302,18 @@ KARL wrote:
 
 class TestMailinTextScrubber(unittest.TestCase):
     def test_bad_mimetype(self):
-        from karlsample.utilities.mailin import text_scrubber
+        from karl.utilities.mailin import text_scrubber
         self.assertRaises(Exception, text_scrubber, "TEXT", "text/html")
 
     def test_no_mimetype(self, text=test_message):
-        from karlsample.utilities.mailin import text_scrubber
-        from karlsample.utilities.mailin import REPLY_SEPARATOR
+        from karl.utilities.mailin import text_scrubber
+        from karl.utilities.mailin import REPLY_SEPARATOR
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
         self.assertEqual(expected, text_scrubber(text))
 
     def test_good_mimetype(self):
-        from karlsample.utilities.mailin import text_scrubber
-        from karlsample.utilities.mailin import REPLY_SEPARATOR
+        from karl.utilities.mailin import text_scrubber
+        from karl.utilities.mailin import REPLY_SEPARATOR
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
         self.assertEqual(expected, text_scrubber(test_message,
                                                  mimetype="text/plain"))
