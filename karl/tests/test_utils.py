@@ -157,3 +157,14 @@ class TestPersistentBBB(unittest.TestCase):
         self.assertEqual(d.__dict__, {})
         self.assertEqual(d.attr, [])
         self.assertEqual(d.__dict__, {'attr':[]})
+
+    def test_default_copied(self):
+        from persistent import Persistent
+        L = []
+        class Dummy(Persistent):
+            attr = self._makeOne('attr', L)
+        d = Dummy()
+        self.assertEqual(d.__dict__, {})
+        L2 = d.attr
+        self.failIf(L is L2)
+        

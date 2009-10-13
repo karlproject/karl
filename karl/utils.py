@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import calendar
+import copy
 
 from zope.component import queryAdapter
 from zope.component import queryUtility
@@ -23,7 +24,6 @@ from zope.component import queryUtility
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.traversal import find_root
 from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import lineage
 from repoze.lemonade.content import get_content_type
 
 from karl.models.interfaces import ICatalogSearch
@@ -147,5 +147,5 @@ class PersistentBBB(object):
         self.val = val
 
     def __get__(self, inst, cls):
-        setattr(inst, self.name, self.val)
+        setattr(inst, self.name, copy.deepycopy(self.val))
         return getattr(inst, self.name)
