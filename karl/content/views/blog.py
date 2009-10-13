@@ -127,7 +127,10 @@ def show_blog_view(context, request):
     system_email_domain = get_setting(context, "system_email_domain")
     feed_url = "%satom.xml" % model_url(context, request)
     workflow = get_workflow(IBlogEntry, 'security', context)
-    security_states = get_security_states(workflow, None, request)
+    if workflow is None:
+        security_states = []
+    else:
+        security_states = get_security_states(workflow, None, request)
 
     return render_template_to_response(
         'templates/show_blog.pt',
