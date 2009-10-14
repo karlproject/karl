@@ -113,9 +113,9 @@
         </optional>
         <optional>
           <element name="p:groups">
-            <oneOrMore>
+            <zeroOrMore>
               <ref name="itemElement"/>
-            </oneOrMore>
+            </zeroOrMore>
           </element>
         </optional>
         <optional>
