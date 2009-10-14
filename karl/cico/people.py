@@ -18,6 +18,7 @@
 import datetime
 import lxml.etree
 import pkg_resources
+import sys
 
 from zope.event import notify
 from zope.component.event import objectEventNotify
@@ -66,10 +67,14 @@ class UserProfileImporter(object):
     def __init__(self, element):
         # Validate xml against RNG Schema
         # XXX Memoize schema?
-        schema_doc = lxml.etree.parse(pkg_resources.resource_stream(
-            __name__, 'schemas/%s' % self.SCHEMA))
-        schema = lxml.etree.RelaxNG(schema_doc)
-        schema.assertValid(element)
+        try:
+            schema_doc = lxml.etree.parse(pkg_resources.resource_stream(
+                __name__, 'schemas/%s' % self.SCHEMA))
+            schema = lxml.etree.RelaxNG(schema_doc)
+            schema.assertValid(element)
+        except lxml.etree.DocumentInvalid:
+            print lxml.etree.tostring(element, pretty_print=True)
+            raise
 
         self.element = element
 
@@ -163,7 +168,7 @@ class PeopleCategoryImporter(object):
         try:
             schema.assertValid(element)
         except:
-            print lxml.etree.tostring(element)
+            print sys.stderr, lxml.etree.tostring(element)
             raise
 
         self.element = element
