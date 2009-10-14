@@ -257,6 +257,12 @@ class DummyUsers:
             return self._by_login[login]
         return None
 
+    def get(self, userid=None, login=None):
+        if userid is not None:
+            return self.get_by_id(userid)
+        else:
+            return self.get_by_login(login)
+
     def change_password(self, userid, password):
         from repoze.who.plugins.zodb.users import get_sha_password
         self._by_id[userid]["password"] = get_sha_password(password)

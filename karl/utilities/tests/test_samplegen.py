@@ -133,6 +133,20 @@ class SampleGenTests(unittest.TestCase):
         obj = add_sample_file(community, 1)
         self.assert_('SampleF' in obj.title)
 
+    def test_add_users(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.models.interfaces import IProfile
+        registerContentFactory(testing.DummyModel, IProfile)
+
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
+        site.users = karl.testing.DummyUsers()
+
+        from karl.utilities.samplegen import add_sample_users
+        add_sample_users(site)
+        self.assert_('staff1' in site.users._by_id)
+        self.assert_('staff1' in site['profiles'])
+
 
 class DummyAdapter:
     def __init__(self, context, request):

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-"""Add random sample content.
+"""Add sample users and random sample content.
 
 This is called by a script named "samplegen".
 """
@@ -24,9 +24,12 @@ from karl.content.views.blog import add_blogentry_view
 from karl.content.views.files import add_file_view
 from karl.content.views.calendar_events import add_calendarevent_view
 from karl.content.views.wiki import add_wikipage_view
+from karl.models.interfaces import IProfile
 from karl.views.communities import add_community_view
 from repoze.bfg import testing
 from repoze.bfg.url import model_url
+from repoze.lemonade.content import create_content
+from repoze.workflow import get_workflow
 import datetime
 import logging
 import lxml.html
@@ -308,3 +311,59 @@ def add_sample_file(community, i):
     stream.close()
 
     return file
+
+
+def add_sample_users(site):
+    profiles = site['profiles']
+    users = site.users
+
+    for login, firstname, lastname, email, groups in [
+        ('staff1','Staff','One','staff1@example.com',
+         ('group.KarlStaff',)),
+        ('staff2','Staff','Two','staff2@example.com',
+         ('group.KarlStaff',)),
+        ('staff3','Staff','Three','staff3@example.com',
+         ('group.KarlStaff',)),
+        ('staff4','Staff','Four','staff4@example.com',
+         ('group.KarlStaff',)),
+        ('staff5','Staff','Five','staff5@example.com',
+         ('group.KarlStaff',)),
+        ('staff6','Staff','Six','staff6@example.com',
+         ('group.KarlStaff',)),
+        ('staff7','Staff','Seven','staff7@example.com',
+         ('group.KarlStaff',)),
+        ('staff8','Staff','Eight','staff8@example.com',
+         ('group.KarlStaff',)),
+        ('staff9','Staff','Nine','staff9@example.com',
+         ('group.KarlStaff',)),
+        ('affiliate1','Affiliate','One','affiliate1@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate2','Affiliate','Two','affiliate2@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate3','Affiliate','Three','affiliate3@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate4','Affiliate','Four','affiliate4@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate5','Affiliate','Five','affiliate5@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate6','Affiliate','Six','affiliate6@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate7','Affiliate','Seven','affiliate7@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate8','Affiliate','Eight','affiliate8@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate9','Affiliate','Nine','affiliate9@example.com',
+         ('groups.KarlAffiliate',)),
+        ]:
+        if users.get(login=login) is None:
+            users.add(login, login, login, groups)
+        if not login in profiles:
+            profile = profiles[login] = create_content(
+                IProfile,
+                firstname=firstname,
+                lastname=lastname,
+                email=email,
+                )
+            workflow = get_workflow(IProfile, 'security', profiles)
+            if workflow is not None:
+                workflow.initialize(profile)

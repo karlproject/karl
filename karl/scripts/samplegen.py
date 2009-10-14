@@ -20,6 +20,7 @@ from ConfigParser import ConfigParser
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 from karl.utilities.samplegen import add_sample_community
+from karl.utilities.samplegen import add_sample_users
 import logging
 import optparse
 import os
@@ -50,6 +51,7 @@ def main(argv=sys.argv):
     root, closer = open_root(config)
 
     try:
+        add_sample_users(root)
         for i in range(int(options.communities)):
             add_sample_community(root)
     except:
