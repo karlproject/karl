@@ -178,6 +178,16 @@ def get_catalog_batch_grid(context, request, **kw):
         next = pagemaker(current + 1)
     else:
         next = empty(None)
+
+    # make a paging status, identical to how js does it
+    if batch['batch_end'] == batch['batch_start'] + 1:
+        # single item only. start from 1
+        fromto = "%i" % (batch['batch_start'] + 1, )
+    else:
+        # start from 1, finish at last item
+        fromto = "%i-%i" % (batch['batch_start'] + 1, batch['batch_end'])
+    batch['status'] = "Result %s of %i" % (fromto, batch['total'])
+
     #
     # Construct html
     # We do it this way and not with a template, because the current

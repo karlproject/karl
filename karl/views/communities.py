@@ -148,7 +148,7 @@ def add_community_view(context, request):
 
     if security_states:
         form.add_field('security_state', security_state_field)
-    
+
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))

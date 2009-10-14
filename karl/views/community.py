@@ -274,15 +274,6 @@ def show_community_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    # make a paging status, identical to how js does it
-    if recent_items_batch['batch_end'] == recent_items_batch['batch_start'] + 1:
-        # single item only. start from 1
-        fromto = "%i" % (recent_items_batch['batch_start'] + 1, )
-    else:
-        # start from 1, finish at last item
-        fromto = "%i-%i" % (recent_items_batch['batch_start'] + 1, recent_items_batch['batch_end'])
-    pager_status_text = "Result %s of %i" % (fromto, recent_items_batch['total'])
-
     feed_url = model_url(context, request, "atom.xml")
     return render_template_to_response(
         'templates/community.pt',
@@ -291,7 +282,6 @@ def show_community_view(context, request):
         recent_items=recent_items,
         batch_info=recent_items_batch,
         head_data=convert_to_script(client_json_data),
-        pager_status_text=pager_status_text,
         feed_url=feed_url,
     )
 

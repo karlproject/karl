@@ -357,8 +357,9 @@
 
     <metal:gridstyle_batching metal:define-macro="gridstyle_batching">
       <span class="ui-grid-footer-text ui-grid-limits"
-            tal:content="pager_status_text|None" />
-      <span class="ui-grid-pagination clearafter" tal:content="structure batch_info.gridbatch_snippet"></span>
+            tal:content="batch_info['status']|None" />
+      <span class="ui-grid-pagination clearafter"
+            tal:content="structure batch_info.gridbatch_snippet"></span>
     </metal:gridstyle_batching>
 
     <div metal:define-macro="show_attachments" class="blogAttachments"
