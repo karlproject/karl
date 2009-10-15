@@ -28,7 +28,9 @@
 
           <!-- new event -->
           <div class="cal_new_event">
-            <a href="${calendar.add_event_url}"><img src="${api.static_url}/images/cal_buttons_event.png" /></a>    
+            <a href="${calendar.add_event_url}" class="button primary_button">
+              <span>Add Event</span>
+            </a>    
           </div>
         </div>
 

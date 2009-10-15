@@ -3,6 +3,8 @@ karl package Changelog
 
 Unreleased
 ----------
+- Change calendar "Add Event" button to not be an image so that it is easier
+  to test and change the label if needed
 
 - Speed up rendering of any page shown inside the community layout by
   roughly 2X.

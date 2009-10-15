@@ -1848,7 +1848,7 @@ div.moderator {
 .cal_new_event {
   float: right;
   display: inline;
-  margin: 2px 0 0 7px;
+  margin: 0 0 0 7px;
 }
 
 .cal_buttons {
@@ -2576,14 +2576,47 @@ button::-moz-focus-inner {
   border: none;
   padding: 0;
 }
-button.icon_button span {
-  padding-left: 8px !important;
+
+a.button:link, 
+a.button:visited {
+  color: #333;
+}
+a.button:link span, 
+a.button:visited span {
+  float: left;
+  display: inline;
+}
+
+/* primary */
+button.primary, 
+a:link.primary, 
+a:visited.primary {
+  font-weight: bold;
+  color: #000;
+}
+
+/* disabled */
+button.disabled, 
+a:link.disabled, 
+a:visited.disabled {
+  color: #aaa;
+  cursor: default;
+}
+button.disabled img, 
+a.disabled img {
+  filter:alpha(opacity=50);
+  -moz-opacity:0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
 }
 
 /* primary button */
-button.primary_button {
+button.primary_button, 
+a.primary_button:link,
+a.primary_button:visited {
   font-weight: bold;
   color: #fff;
+  text-decoration: none;
 }
 .primary_button,
 .disabled.primary_button:hover { 
