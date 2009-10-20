@@ -21,12 +21,14 @@
 
 __all__ = ['login',
            'logout',
+           'set_random_word',
            'make_community',
            'remove_community'
            ]
 
 DEBUG=True
 import unittest
+import random
 from funkload.FunkLoadTestCase import FunkLoadTestCase
 from webunit.utility import Upload
 from funkload.utils import Data
@@ -54,6 +56,11 @@ def logout(self):
    self.get('%s/logout' % self.server_url,
             description="logout %s" % self._karl_login)
 
+def set_random_word(varname):
+    """Create a random word based by adding an int to varname """
+
+    randint = str(random.randint(100000, 999999))
+    return (varname + randint)
 
 def make_community(self, community):
     # return the doc_url
