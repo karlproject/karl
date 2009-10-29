@@ -118,6 +118,10 @@ def docid_to_hex(docid):
 def hex_to_docid(hex):
     return int('%s' % hex, 16) - _MAX_32BIT_INT
 
+def asbool(s):
+    s = str(s).strip()
+    return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
+
 def coarse_datetime_repr(date):
     """Convert a datetime to an integer with 100 second granularity.
 
