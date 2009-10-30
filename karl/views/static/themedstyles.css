@@ -2268,7 +2268,10 @@ body .cal_hour_event .cal_event_block .time {
 }
 .cal_month .label .num {
   float: right;
-  padding: 2px 2px 2px 10px;
+  padding: 3px 3px 3px 10px;
+}
+.cal_month .hov .label .num:hover {
+    color: #333;
 }
 .cal_month .label .add {
   float: left;
@@ -2277,11 +2280,14 @@ body .cal_hour_event .cal_event_block .time {
 .cal_month .label a, 
 .cal_month .label a:visited {
   text-decoration: none;
-  color: #333;
+  color: #3A74A9;
 }
 .cal_month .faded a, 
 .cal_month .faded a:visited {
   color: #bbb;
+}
+.cal_month .label a:hover {
+  text-decoration: underline;
 }
 .cal_month .today {
   background-color: #fdffd2;
