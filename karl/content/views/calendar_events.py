@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import calendar
-calendar.setfirstweekday(6) # Fscking Europeans!
+calendar.setfirstweekday(calendar.SUNDAY)
 import datetime
 
 from urllib import quote
