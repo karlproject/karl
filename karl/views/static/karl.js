@@ -1694,10 +1694,12 @@ function initButtons() {
   var active  = new Image(), hover  = new Image(),
       pActive = new Image(), pHover = new Image();
 
-  active.src  = '/static/images/button_active.png';
-  hover.src   = '/static/images/button_hover.png';
-  pActive.src = '/static/images/button_primary_active.png';
-  pHover.src  = '/static/images/button_primary_hover.png';
+  // find static link
+  var url = $('link[rel="icon"]').attr("href").replace("favicon.ico", "");
+  active.src  = url + '/button_active.png';
+  hover.src   = url + '/button_hover.png';
+  pActive.src = url + '/button_primary_active.png';
+  pHover.src  = url + '/button_primary_hover.png';
 }
 
 /* auto create anon ids (used by calendar) */

@@ -2520,6 +2520,26 @@ body .cal_hour_event .cal_event_block .time {
   margin: 0 2px;
   color: #999;
 }
+.cal_new_event a, 
+.cal_new_event a:visited {
+  float: left;
+  width: 79px;
+  height: 20px;
+  line-height: 20px;
+  background: url("images/cal_buttons_new_event.png") 0 0 no-repeat; 
+  font-weight: bold;
+  font-family: Arial, Verdana, sans-serif;
+  font-size: 11px;
+  text-decoration: none;
+  text-align: center;
+  color: #fff;
+}
+.cal_new_event a:hover {
+  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat; 
+}
+.cal_new_event a:active {
+  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat; 
+}
 
 
 /** =CALENDAR TOOLTIP
