@@ -2535,7 +2535,8 @@ body .cal_hour_event .cal_event_block .time {
   color: #fff;
 }
 .cal_new_event a:hover {
-  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat; 
+  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat;
+  text-decoration: none; 
 }
 .cal_new_event a:active {
   background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat; 
