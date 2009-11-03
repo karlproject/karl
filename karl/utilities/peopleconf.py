@@ -19,8 +19,6 @@
 Reindex if necessary.
 """
 
-import sys
-
 from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
@@ -107,7 +105,7 @@ def parse_report(people, elem):
             raise ParseError("No category values given", e)
         for v in values:
             if v not in pc:
-                print >>sys.stderr, "WARN: No such category value %s" % v
+                raise ParseError("No such category value: %s" % v, e)
         obj.set_filter(catid, values)
 
     columns = None
@@ -170,7 +168,7 @@ def parse_section(people, section_elem):
 
 def peopleconf(peopledir, tree, force_reindex=False):
     # tree is an lxml.etree element.
-    if tree.find('categories'):
+    if tree.find('categories') is not None:
         peopledir.categories.clear()
         for cat_elem in tree.findall('categories/category'):
             catid, title = id_and_title(cat_elem)
