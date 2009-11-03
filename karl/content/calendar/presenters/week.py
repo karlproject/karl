@@ -165,6 +165,18 @@ class WeekViewPresenter(BasePresenter):
                 break
         return today_class
 
+    @property 
+    def auto_scroll_class(self):
+        at_or_after_first_moment = (self.now_datetime >= self.first_moment)
+        at_or_before_last_moment = (self.now_datetime <= self.last_moment)
+        
+        if at_or_after_first_moment and at_or_before_last_moment:
+            css_class = 'today'
+        else:
+            css_class = ''
+
+        return css_class
+
     @property
     def first_moment(self):
         return self._first_moment

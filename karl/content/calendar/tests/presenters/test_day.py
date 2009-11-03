@@ -58,6 +58,24 @@ class DayViewPresenterTests(unittest.TestCase):
         expected = datetime.datetime(2009, 8, 26, 23, 59, 59)
         self.assertEqual(presenter.last_moment, expected)
 
+    # css auto_scroll_class used to trigger javascript scroll effect
+    
+    def test_auto_scroll_class_is_today_when_now_is_in_focus(self):
+        focus_at = datetime.datetime(2009, 11, 2, 0, 0, 0)
+        now_at   = datetime.datetime(2009, 11, 2, 1, 2, 3)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assertEqual(presenter.auto_scroll_class, 'today')
+        
+    def test_auto_scroll_class_is_empty_when_now_is_not_in_focus(self):
+        focus_at = datetime.datetime(2009, 11, 2)
+        now_at   = datetime.datetime(2009, 11, 3)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assertEqual(presenter.auto_scroll_class, '')
+
     # prior_day & next_day
     
     def test_computes_next_day_within_the_same_month(self):

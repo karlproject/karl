@@ -48,7 +48,7 @@
 
     <div class="cal_hours_scroll">
       <!-- current time bar -->
-      <div class="cal_time" style="display: none">&nbsp;</div>
+      <div class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
 
         <table class="cal cal_scroll cal_day" cellspacing="0">
           <tr>

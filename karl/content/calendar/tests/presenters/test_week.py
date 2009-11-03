@@ -106,6 +106,24 @@ class WeekViewPresenterTests(unittest.TestCase):
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         self.assertEqual(presenter.today_class, '')
+
+    # css auto_scroll_class used to trigger javascript scroll effect
+
+    def test_auto_scroll_class_is_today_when_now_is_in_focus(self):
+        focus_at = datetime.datetime(2009, 11, 2)
+        now_at   = datetime.datetime(2009, 11, 5)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assertEqual(presenter.auto_scroll_class, 'today')
+        
+    def test_auto_scroll_class_is_empty_when_now_is_not_in_focus(self):
+        focus_at = datetime.datetime(2009, 11, 2)
+        now_at   = datetime.datetime(2009, 10, 31)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assertEqual(presenter.auto_scroll_class, '')
  
     # helpers
 

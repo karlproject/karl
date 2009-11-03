@@ -225,6 +225,19 @@ class DayViewPresenter(BasePresenter):
                                  23, 59, 59)
 
     @property
+    def auto_scroll_class(self):
+        same_year  = (self.now_datetime.year  == self.focus_datetime.year)
+        same_month = (self.now_datetime.month == self.focus_datetime.month)
+        same_day   = (self.now_datetime.day   == self.focus_datetime.day)
+
+        if same_year and same_month and same_day:
+            css_class = 'today'
+        else:
+            css_class = ''
+
+        return css_class
+
+    @property
     def template_filename(self):
         return 'templates/calendar_day.pt'
 
