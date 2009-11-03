@@ -1876,6 +1876,11 @@ body .cal_red a,
 body .cal_red a:visited {
   color: #cc3333;
 }
+body .cal_red_all {
+  color: #fff;
+  background-color: #cc3333;
+}
+
 body .cal_pink {
   color: #dd4477;
   background-color: #fcecf1;
@@ -1885,6 +1890,11 @@ body .cal_pink a,
 body .cal_pink a:visited {
   color: #dd4477;
 }
+body .cal_pink_all {
+  color: #fff;
+  background-color: #dd4477;
+}
+
 body .cal_purple {
   color: #994499;
   background-color: #f5ecf5;
@@ -1894,6 +1904,11 @@ body .cal_purple a,
 body .cal_purple a:visited {
   color: #994499;
 }
+body .cal_purple_all {
+  color: #fff;
+  background-color: #994499;
+}
+
 body .cal_blue {
   color: #3366cc;
   background-color: #eaeffa;
@@ -1903,6 +1918,11 @@ body .cal_blue a,
 body .cal_blue a:visited {
   color: #3366cc;
 }
+body .cal_blue_all {
+  color: #fff;
+  background-color: #3366cc;
+}
+
 body .cal_aqua {
   color: #22aa99;
   background-color: #e8f6f5;
@@ -1912,6 +1932,11 @@ body .cal_aqua a,
 body .cal_aqua a:visited {
   color: #22aa99;
 }
+body .cal_aqua_all {
+  color: #fff;
+  background-color: #22aa99;
+}
+
 body .cal_green {
   color: #109618; 
   background-color: #e7f4e7;
@@ -1921,6 +1946,11 @@ body .cal_green a,
 body .cal_green a:visited {
   color: #109618; 
 }
+body .cal_green_all {
+  color: #fff; 
+  background-color: #109618;
+}
+
 body .cal_mustard {
   color: #d6ae00;
   background-color: #fbf7e5;
@@ -1930,6 +1960,11 @@ body .cal_mustard a,
 body .cal_mustard a:visited {
   color: #d6ae00;
 }
+body .cal_mustard_all {
+  color: #fff;
+  background-color: #d6ae00;
+}
+
 body .cal_orange {
   color: #dd5511;
   background-color: #fceee7;
@@ -1939,6 +1974,11 @@ body .cal_orange a,
 body .cal_orange a:visited {
   color: #dd5511;
 }
+body .cal_orange_all {
+  color: #fff;
+  background-color: #dd5511;
+}
+
 body .cal_silver {
   color: #627487;
   background-color: #eff1f3;
@@ -1948,56 +1988,23 @@ body .cal_silver a,
 body .cal_silver a:visited {
   color: #627487;
 }
-body .cal_olive {
-  color: #d6ae00;
-  background-color: #f1f4f2;
-  border: 1px solid #d6ae00;
-}
-body .cal_olive a, 
-body .cal_olive a:visited {
-  color: #d6ae00;
-}
-
-/* inverse - white on dark */
-body .cal_red_all {
-  color: #fff;
-  background-color: #cc3333;
-}
-body .cal_pink_all {
-  color: #fff;
-  background-color: #dd4477;
-}
-body .cal_purple_all {
-  color: #fff;
-  background-color: #994499;
-}
-body .cal_blue_all {
-  color: #fff;
-  background-color: #3366cc;
-}
-body .cal_aqua_all {
-  color: #fff;
-  background-color: #22aa99;
-}
-body .cal_green_all {
-  color: #fff; 
-  background-color: #109618;
-}
-body .cal_mustard_all {
-  color: #fff;
-  background-color: #d6ae00;
-}
-body .cal_orange_all {
-  color: #fff;
-  background-color: #dd5511;
-}
 body .cal_silver_all {
   color: #fff;
   background-color: #627487;
 }
+
+body .cal_olive {
+  color: #6b8a73;
+  background-color: #f1f4f2;
+  border: 1px solid #6b8a73;
+}
+body .cal_olive a, 
+body .cal_olive a:visited {
+  color: #6b8a73;
+}
 body .cal_olive_all {
   color: #fff;
-  background-color: #d6ae00;
+  background-color: #6b8a73;
 }
 
 
@@ -2542,6 +2549,70 @@ body .cal_hour_event .cal_event_block .time {
   background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat; 
 }
 
+
+/** =CALENDAR SETUP
+----------------------------------------------- */
+table.cal_all {
+  margin-bottom: 30px;
+}
+table.cal_all td {
+  background-color: #f1f4f6;
+  border-bottom: 1px solid #e4e6e9;
+  border-top: 1px solid #fff;
+  padding: 4px 5px;  
+}
+table.cal_all th {
+  border-bottom: 1px solid #e4e6e9;
+  padding: 2px 5px;
+  font-weight: normal;
+  text-align: left;
+}
+table.cal_all .actions {
+  padding-right: 8px;
+}
+table.cal_all a, 
+table.cal_all a:visited {
+  color: #797979;
+}
+table.cal_all .color {
+  width: 20px;
+}
+table.cal_all .name {
+  width: 150px;
+}
+table.cal_all .location {
+  width: 90px;
+}
+#calendar_path {
+  width: 150px;
+}
+#calendar_name {
+  width: 330px;
+}
+.cal_add input, 
+.cal_add select {
+  margin-top: 2px;
+}
+.cal_choose_color {
+  float: left;
+  margin: 6px 0 10px 0;
+  padding: 0;
+  list-style: none;
+}
+.cal_choose_color li {
+  float: left;
+  margin: 0 5px 0 0;
+  text-align: center;
+}
+.cal_choose_color li div {
+  padding: 0 8px;
+}
+.cal_choose_color li input {
+  margin: 0 0 3px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
 
 /** =CALENDAR TOOLTIP
 ----------------------------------------------- */

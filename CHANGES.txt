@@ -3,6 +3,8 @@ karl package Changelog
 
 Unreleased
 ----------
+- Update styles for Calendar Setup page
+
 - Preload button images better so that they don't flickr on hover/click
 
 - Change calendar "Add Event" button to not be an image so that it is easier
