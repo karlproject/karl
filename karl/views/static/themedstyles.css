@@ -2233,16 +2233,16 @@ body .cal_hour_event .cal_event_block .time {
 .cal_hour_event .create img {
   border: 0;
 }
-.cal li.hov {
+.cal div.hov {
   background-color: #ecf2ff !important;
 }
-.cal li.hov_below {
+.cal div.hov_below {
   background-color: #ecf2ff !important;
 }
-.cal li .add {
+.cal div .add {
   visibility: hidden;
 }
-.cal li.hov .add {
+.cal div.hov .add {
   visibility: visible;
   position: relative;
 }
@@ -2618,7 +2618,6 @@ table.cal_all .location {
 ----------------------------------------------- */
 .tooltip { 
   display: none; 
-  background: url("images/cal_tooltip_white.png") no-repeat; 
   font-size: 110%; 
   height: 71px; 
   width: 150px; 
@@ -2627,8 +2626,19 @@ table.cal_all .location {
   z-index: 100;
   line-height: 1.2em;
 }
-.tooltip {
+.cal_month .tooltip {
+  background: url("images/cal_tooltip_right.png") no-repeat; 
 }
+.cal_week .cal_hour_event .tooltip {
+  background: url("images/cal_tooltip_white.png") no-repeat; 
+}
+.cal_week .tooltip {
+  background: url("images/cal_tooltip_left.png") no-repeat; 
+}
+.cal_week .cal_hour_event .tooltip {
+  font-size: 95%;
+}
+
 .tooltip a {
   line-height: 1.2em;
 }

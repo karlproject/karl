@@ -1799,13 +1799,15 @@ function initCalendar() {
   DD_roundies.addRule('.cal_event_pos_left a', '5px 0 0 5px');
   DD_roundies.addRule('.cal_event_pos_right a', '0 5px 5px 0');
   
-  $(".cal_event").tooltip({ tip: '.tooltip', offset: [8, 44], predelay: 250});
+  $(".cal_month .cal_event").tooltip({ tip: '.tooltip', offset: [8, 44], predelay: 250});
+  $(".cal_week .cal_event").tooltip({ tip: '.tooltip', offset: [8, -48], predelay: 250});
+  $(".cal_week .cal_event_block").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
 
   // WEEK/DAY VIEW - 
-  $("table.cal_week li.cal_hour_event").hover(mouseOverHour, mouseOutHour);
+  $("table.cal_week div.cal_hour_event").hover(mouseOverHour, mouseOutHour);
   $("table.cal_week .all_day td").hover(mouseOverHour, mouseOutHour);
 
-  $("table.cal_day li.cal_hour_event").hover(mouseOverHour, mouseOutHour);  
+  $("table.cal_day div.cal_hour_event").hover(mouseOverHour, mouseOutHour);  
   $("table.cal_day .all_day td").hover(mouseOverHour, mouseOutHour);
 
   DD_roundies.addRule('.cal_hour_event .cal_event_block', '7px');
