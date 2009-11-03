@@ -75,6 +75,14 @@ Unreleased
 - Removed out of date paster template.  This has been superceded by KarlSample
   project.
 
+- Made setting of categories via peopleconf util optional.  OSI will set
+  categories via gsa_sync, so peopleconf needs to be able to handle the
+  categories and reports separately.  Also removed the requirement in the
+  peopleconf utility that categories used by reports must exist, as this is
+  a very likely vector for breakage when they are handled separately.  If a
+  category isn't found when adding a report, a warning is printed to standard
+  error, but the peopleconf configuration is now allowed to continue.
+
 3.14 (2009-09-08)
 -----------------
 

@@ -208,19 +208,6 @@ class ParseReportTests(unittest.TestCase):
         from karl.utilities.peopleconf import ParseError
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
-    def test_invalid_category_value(self):
-        xml = """
-        <report id="r1">
-            <filter category="office" values="la"/>
-            <columns ids="name"/>
-        </report>
-        """
-        elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
-        peopledir.categories['office'] = {'nyc': 'NYC'}
-        from karl.utilities.peopleconf import ParseError
-        self.assertRaises(ParseError, self._callFUT, peopledir, elem)
-
     def test_no_columns(self):
         xml = """
         <report id="r1">

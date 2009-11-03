@@ -107,7 +107,6 @@ def parse_report(people, elem):
             raise ParseError("No category values given", e)
         for v in values:
             if v not in pc:
-                #raise ParseError("No such category value: %s" % v, e)
                 print >>sys.stderr, "WARN: No such category value %s" % v
         obj.set_filter(catid, values)
 
