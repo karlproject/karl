@@ -77,7 +77,7 @@ class IContentOut(Interface):
     In order to create parallellism with IContentIn, instances of IContentOut
     may be registered by name, using the namespace as the name.  This makes it
     possible maintain different complementary pairs of adapters for the same
-    content type.  Because adaptation is performed on the conte type, though,
+    content type.  Because adaptation is performed on the content type, though,
     use of named adapters is optional.
     """
     def __call__():
