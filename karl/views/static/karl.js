@@ -1751,13 +1751,24 @@ function mouseOutHour(evt) {
 /** =CALENDAR TIME SCROLLING
 ----------------------------------------------- */
 function scrollToTime() {
-  if (!$('.cal_time')) { return; }
+  if ($('.cal_time').length == 0) { return; }
 
-  // find current time - determine % of day passed
-  var time = new Date();
+  // Scroll to current time for today
+  if ($('.cal_time.today').length > 0) {
+    // find current time - determine % of day passed
+    var time = new Date();
 
-  // total minutes passed today & total mins in a day
-  var mins = time.getHours() * 60 + time.getMinutes();
+    // total minutes passed today & total mins in a day
+    var mins = time.getHours() * 60 + time.getMinutes();
+    var scrollDuration = 1000;
+
+  // go to ~ 8:00am
+  } else {
+    var mins = 740;
+    var scrollDuration = 0;
+    $('.cal_time').css("visibility", "hidden");
+  }
+
   var day  = 1440;
   var perc = parseInt(mins / day * 100);
 
@@ -1769,7 +1780,7 @@ function scrollToTime() {
   // scroll to make time centered if possible
   var scrollPos = top - 250 > 0 ? top - 250 : 0;
 
-  $(".cal_hours_scroll").scrollTo(scrollPos, { duration: 1000 });
+  $(".cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
 }
 
 /** =CALENDAR INIT JAVASCRIPT
