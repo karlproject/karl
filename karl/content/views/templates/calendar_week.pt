@@ -19,7 +19,7 @@
       <tr class="cal_dates">
         <th>2009</th>
         <th class="cal_${day.heading}" tal:repeat="day calendar.week">
-          <a href="#">${day.heading}</a>
+          <a href="${day.show_url}">${day.heading}</a>
         </th>
         <th class="last">&nbsp;</th>
       </tr>

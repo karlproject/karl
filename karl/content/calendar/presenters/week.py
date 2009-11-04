@@ -71,8 +71,12 @@ class WeekViewPresenter(BasePresenter):
         # save week in focus on the instance
         self.week = []
         for dt in week_of_datetimes:
+            format = '%s?year=%d&month=%d&day=%d'
+            show_url = format % (self.url_for('day.html'),
+                                 dt.year, dt.month, dt.day)
+            
             self.week.append(
-                DayOnWeekView(dt.year, dt.month, dt.day)
+                DayOnWeekView(dt.year, dt.month, dt.day, show_url)
             )
     
     def _init_first_and_last_moment(self):
@@ -193,10 +197,11 @@ class WeekViewPresenter(BasePresenter):
 class DayOnWeekView(object):
     _css_day_abbr = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
     
-    def __init__(self, year, month, day):
-        self.year  = year
-        self.month = month
-        self.day   = day
+    def __init__(self, year, month, day, show_url=None):
+        self.year     = year
+        self.month    = month
+        self.day      = day
+        self.show_url = show_url
 
         self.start_datetime = datetime.datetime(year, month, day, 0,   0,  0)
         self.end_datetime   = datetime.datetime(year, month, day, 23, 59, 59)

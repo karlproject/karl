@@ -124,6 +124,22 @@ class WeekViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertEqual(presenter.auto_scroll_class, '')
+
+    # days in week
+    
+    def test_each_day_is_assigned_a_show_url(self):
+        focus_at = datetime.datetime(2009, 11, 3)
+        now_at   = datetime.datetime(2009, 11, 3)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+                                       
+        sunday = presenter.week[0]
+        self.assert_('day.html' in sunday.show_url)
+        self.assert_('year=2009&month=11&day=1' in sunday.show_url)
+
+        saturday = presenter.week[6]
+        self.assert_('day.html' in saturday.show_url)
+        self.assert_('year=2009&month=11&day=7' in saturday.show_url)
  
     # helpers
 
@@ -151,6 +167,10 @@ class DayOnWeekViewTests(unittest.TestCase):
         self.assertEqual(day.year,  2009)
         self.assertEqual(day.month, 9)
         self.assertEqual(day.day,   4)
+
+    def test_has_a_show_url_used_to_link_to_the_day_view(self):
+        day = self._makeOne(2009, 9, 4, 'http://the-day')
+        self.assertEqual(day.show_url, 'http://the-day')
 
     # start_datetime & end_datetime
     
