@@ -51,7 +51,7 @@
       <!-- current time bar -->
       <div class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
 
-      <table class="cal cal_scroll cal_week cal_today_wed" cellspacing="0">
+      <table class="cal cal_scroll cal_week ${calendar.today_class}" cellspacing="0">
         <tr>
           <!-- time labels -->
           <th>
