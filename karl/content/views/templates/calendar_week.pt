@@ -71,19 +71,19 @@
                </div>
 
                <tal:block condition="slot.bubble">
-               <div class="cal_${slot.bubble.catalog_event._v_color} cal_event_block" style="height: ${slot.bubble.length_px}px">
-                 <a href="#">
-                   <span class="time">${slot.bubble.catalog_event.startDate.strftime('%l:%M %p')}</span><br />
-                   ${slot.bubble.catalog_event.title}
+               <div class="cal_${slot.bubble.event._catalog_event._v_color} cal_event_block" style="height: ${slot.bubble.length_px}px">
+                 <a href="${slot.bubble.event.show_url}">
+                   <span class="time">${slot.bubble.event.time_of_first_moment}</span><br />
+                   ${slot.bubble.event.title}
                  </a>
                </div>
 
                <div class="tooltip">
-                 <div class="cal_tool_time">${slot.bubble.catalog_event.startDate.strftime('%l:%M %p')}</div>
+                 <div class="cal_tool_time">${slot.bubble.event.time_of_first_moment}</div>
                  <div class="cal_tool_title">
-                   <a href="/event.php">${slot.bubble.catalog_event.title}</a>
-                   <span tal:condition="slot.bubble.catalog_event.location" class="cal_tool_loc"> 
-                     <strong>-</strong> ${slot.bubble.catalog_event.location}
+                   <a href="${slot.bubble.event.show_url}">${slot.bubble.event.title}</a>
+                   <span tal:condition="slot.bubble.event.location" class="cal_tool_loc"> 
+                     <strong>-</strong> ${slot.bubble.event.location}
                    </span>
                  </div>
                </div>

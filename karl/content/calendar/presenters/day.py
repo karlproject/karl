@@ -145,14 +145,16 @@ class DayViewPresenter(BasePresenter):
             if not catalog_events:
                 continue
 
-            for event in catalog_events:                         
+            for catalog_event in catalog_events:                         
                 bubble = Bubble()
-                bubble.catalog_event = event
+                
+                bubble.event = EventOnDayView(self, catalog_event,
+                    show_url=self.url_for(context=catalog_event))
                 
                 for i in range(slot_index, len(mapping)):
                     next_in_map = mapping[i]
-                    if event in next_in_map:
-                         next_in_map.remove(event)
+                    if catalog_event in next_in_map:
+                         next_in_map.remove(catalog_event)
                          bubble.length += 1
                     else:
                         break
@@ -278,14 +280,30 @@ class TimeSlot(object):
 
 
 class Bubble(object):
-    def __init__(self, catalog_event=None):    
-        self.catalog_event = catalog_event
+    def __init__(self, event=None):    
+        self.event  = event
         self.length = 0 # half hour slots
     
     @property
     def length_px(self):
         return self.length * 25 + (self.length - 1 - 2) # 25 + (borders - padding)
 
+
+class EventOnDayView(BaseEvent):
+    def __init__(self, day, catalog_event, 
+                 show_url='#', edit_url='#', delete_url='#'): 
+
+        BaseEvent.__init__(self, day, catalog_event, 
+                       show_url, edit_url, delete_url)         
+
+    @property        
+    def time_of_first_moment(self):
+        return self.first_moment.strftime('%l:%M %p')
+
+    @property
+    def color_class(self):
+        return 'cal_%s' % self._catalog_event._v_color
+        
 
 def add_minutes(dtime, num_minutes):
     unixtime = time.mktime(dtime.timetuple()) # ignores microseconds
