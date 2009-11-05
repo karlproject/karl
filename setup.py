@@ -96,6 +96,7 @@ setup(name='karl',
       jsconcat = karl.scripts.jsconcat:main
       cssconcat = karl.scripts.cssconcat:main
       samplegen = karl.scripts.samplegen:main
+      mvcontent = karl.scripts.mvcontent:main
       """
       )
 
