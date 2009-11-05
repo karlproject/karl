@@ -92,8 +92,16 @@ def main(argv=sys.argv):
     root, closer = open_root(config)
 
     try:
-        context = find_model(root, args[0])
-        dest = find_model(root, args[1])
+        try:
+            context = find_model(root, args[0])
+        except KeyError:
+            parser.error("Source content not found: %s" % args[0])
+
+        try:
+            dest = find_model(root, args[1])
+        except KeyError:
+            parser.error("Destination folder not found: %s" % args[1])
+
         src_community = find_community(context)
 
         catalog = find_catalog(root)
