@@ -63,6 +63,68 @@ def postorder(startnode):
             node._p_deactivate()
     return visit(startnode)
 
+def move_content(root, src, dst, wf_state):
+    try:
+        context = find_model(root, src)
+    except KeyError:
+        print >>sys.stderr, "Source content not found: %s" % args[0]
+        sys.exit(-1)
+
+    try:
+        dest_folder = find_model(root, dst)
+    except KeyError:
+        print >>sys.stderr, "Destination folder not found: %s" % args[1]
+        sys.exit(-1)
+
+    src_community = find_community(context)
+
+    catalog = find_catalog(root)
+    assert catalog is not None
+    users = find_users(root)
+    assert users is not None
+
+    if src_community is not None:
+        move_header = ('<p><em>This was originally authored '
+                       'in the "%s" community.</em></p>' %
+                       src_community.title)
+    else:
+        move_header = ''
+
+    src_folder = context.__parent__
+    name = context.__name__
+
+    log.info("Moving %s", model_path(context))
+    for obj in postorder(context):
+        if hasattr(obj, 'docid'):
+            docid = obj.docid
+            catalog.document_map.remove_docid(docid)
+            catalog.unindex_doc(docid)
+    del src_folder[name]
+
+    if (context.creator != 'admin'
+            and users.get_by_id(context.creator) is None):
+        # give the entry to the system admin
+        log.warning(
+            "User %s not found; reassigning to admin", context.creator)
+        context.creator = 'admin'
+
+    if name in dest_folder:
+        name = make_unique_name(dest_folder, context.title)
+
+    dest_folder[name] = context
+    for obj in postorder(context):
+        if hasattr(obj, 'docid'):
+            docid = obj.docid
+            catalog.document_map.add(model_path(obj), docid)
+            catalog.index_doc(docid, obj)
+
+    if wf_state is not None:
+        wf = ISecurityWorkflow(context)
+        if getattr(context, 'security_state', None) != wf_state:
+            wf.execute(None, wf_state)
+
+    if hasattr(context, 'text'):
+        context.text = "%s\n%s" % (move_header, context.text)
 
 def main(argv=sys.argv):
     logging.basicConfig()
@@ -92,66 +154,7 @@ def main(argv=sys.argv):
     root, closer = open_root(config)
 
     try:
-        try:
-            context = find_model(root, args[0])
-        except KeyError:
-            parser.error("Source content not found: %s" % args[0])
-
-        try:
-            dest = find_model(root, args[1])
-        except KeyError:
-            parser.error("Destination folder not found: %s" % args[1])
-
-        src_community = find_community(context)
-
-        catalog = find_catalog(root)
-        assert catalog is not None
-        users = find_users(root)
-        assert users is not None
-
-        if src_community is not None:
-            move_header = ('<p><em>This was originally authored '
-                           'in the "%s" community.</em></p>' %
-                           src_community.title)
-        else:
-            move_header = ''
-
-        src_folder = context.__parent__
-        name = context.__name__
-
-        log.info("Moving %s", model_path(context))
-        for obj in postorder(context):
-            if hasattr(obj, 'docid'):
-                docid = obj.docid
-                catalog.document_map.remove_docid(docid)
-                catalog.unindex_doc(docid)
-        del src_folder[name]
-
-        if (context.creator != 'admin'
-                and users.get_by_id(context.creator) is None):
-            # give the entry to the system admin
-            log.warning(
-                "User %s not found; reassigning to admin", context.creator)
-            context.creator = 'admin'
-
-        if name in dest:
-            name = make_unique_name(dest, dest.title)
-
-        dest[name] = context
-        for obj in postorder(context):
-            if hasattr(obj, 'docid'):
-                docid = obj.docid
-                catalog.document_map.add(model_path(obj), docid)
-                catalog.index_doc(docid, obj)
-
-        if options.security_state is not None:
-            wf = ISecurityWorkflow(context)
-            if getattr(context, 'security_state',
-                       None) != options.security_state:
-                wf.execute(None, options.security_state)
-
-        if hasattr(context, 'text'):
-            context.text = "%s\n%s" % (move_header, context.text)
+        move_content(root, args[0], args[1], options.security_state)
 
     except:
         transaction.abort()
