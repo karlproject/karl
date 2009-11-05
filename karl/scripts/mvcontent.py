@@ -67,13 +67,13 @@ def move_content(root, src, dst, wf_state):
     try:
         context = find_model(root, src)
     except KeyError:
-        print >>sys.stderr, "Source content not found: %s" % args[0]
+        print >>sys.stderr, "Source content not found: %s" % src
         sys.exit(-1)
 
     try:
         dest_folder = find_model(root, dst)
     except KeyError:
-        print >>sys.stderr, "Destination folder not found: %s" % args[1]
+        print >>sys.stderr, "Destination folder not found: %s" % dst
         sys.exit(-1)
 
     src_community = find_community(context)
