@@ -15,16 +15,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
-sys.path[0:0] = ['',
-'/Users/jbglenn/tutorial/oct_2009/wsgi_twill/lib/python2.5/site-packages/WSGIProxy-0.2-py2.5.egg', 
-'/Users/jbglenn/tutorial/oct_2009/wsgi_twill/lib/python2.5/site-packages/twill-0.9-py2.5.egg']
 
-from webob import Request
-from wsgiproxy.exactproxy import proxy_exact_request
 import twill
 import karl.twillcommands
 from cStringIO import StringIO
+from repoze.bfg.paster import get_app 
 
 
 class TestKarlTwill:
@@ -37,9 +32,15 @@ class TestKarlTwill:
     or you can run a twill file which is mostly what has been done in this class by
     twill.execute_string("runfile '${test_path}/path/to/twill_file.twill")'''
     
+    wsgi_app = get_app('../../../../etc/karl.ini','main')
+
+
     def setUp(self):
-        req = Request.blank('http://localhost:6543/')
-        resp = req.get_response(proxy_exact_request)
+        '''Create the app'''
+        def build_app():
+            return self.wsgi_app
+            
+        twill.add_wsgi_intercept('localhost', 6543, build_app)
         twill.execute_string("extend_with karl.twillcommands")
         # mostly the same as karl3.conf without extending with flunc
         # and few other adjustments.
@@ -232,8 +233,8 @@ class TestKarlTwill:
         # This suite is to test major functionality for this installation of karl.
         # 
         # see more options in the README
-
-
+        print twill.execute_string("go http://localhost:6543")
+        twill.execute_string("login 'admin'")
         # check for login accounts
         twill.execute_string("runfile '${test_path}/profiles/user_karl3.twill'")
 

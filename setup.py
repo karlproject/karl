@@ -61,6 +61,7 @@ requires = [
     'PILwoTk',
     'icalendar',
     'markdown2',
+    'twill', # for testing
     ]
 
 setup(name='karl',
