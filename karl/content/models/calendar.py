@@ -22,6 +22,7 @@ from repoze.folder import Folder
 from zope.interface import implements
 
 from karl.content.interfaces import ICalendar
+from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import IVirtualCalendar
 from karl.content.interfaces import ICalendarEvent
 
@@ -30,22 +31,23 @@ from karl.content.models.attachments import AttachmentsFolder
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
-from karl.utils import PersistentBBB
-
 class Calendar(Folder):
     implements(ICalendar)
     title = u'Calendar'
-    manifest = PersistentBBB('manifest', [])
-
-    def __init__(self, *arg, **kw):
-        Folder.__init__(self, *arg, **kw)
-        self.manifest = []
 
 class VirtualCalendar(Persistent):
     implements(IVirtualCalendar)
 
     def __init__(self, title):
         self.title = title
+
+class CalendarLayer(Persistent):
+    implements(ICalendarLayer)
+
+    def __init__(self, title, color, paths):
+        self.title = title
+        self.color = color
+        self.paths = paths
 
 class CalendarEvent(Folder):
     implements(ICalendarEvent)

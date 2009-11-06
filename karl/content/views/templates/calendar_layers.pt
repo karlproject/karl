@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <metal:resources fill-slot="extra-headers">
+
+      <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('.remove').live('click', function(event) {
+                $(this).parents('tr').remove();
+                return false;
+            });
+        });
+
+      </script>
+
+    </metal:resources>
+
+    <div class="chparent_wrapper">
+      <a id="backto" class="chparent" href="#">
+        <img width="15" height="15" alt="Up to" src="http://localhost:6543/static/r1257261457/images/arrow_up.jpg"/>
+        Back to Calendar
+      </a>
+    </div>
+
+    <h1 class="kscreentitle" tal:condition="layers">${api.page_title}</h1>
+
+  <form method="post" action="${post_url}" class="cal_add k3_genericForm"
+        xml:id="contentform" enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <table id="calendars" class="cal_all" cellspacing="0" tal:condition="layers">
+      <tr tal:repeat="layer layers">
+        <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
+        <td class="name"><a href="#">${layer['name']}</a></td>
+        <td class="location">${layer['title']}</td>
+        <td class="names"><span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/></td>
+        <td class="actions"><a href="${post_url}?form.delete=${layer['escaped_name']}">delete</a></td>
+      </tr>
+    </table>
+
+
+    <h1>Add Layer</h1>
+      
+    <fieldset tal:define="error fielderrors['calendar_path']|None"
+              class="${error and 'fieldError' or ''}"
+              id="virtual-calendars-field">
+      <label for="calendar_path" class="required">Virtual Calendars</label><br />
+      <table border="0" id="layers">
+        <tr>
+          <td>
+            <select name="virtual_paths" id="virtual_paths">
+              <option tal:repeat="virt virtual_calendars"
+                      value="${virt['path']}">${virt['title']}</option>
+            </select>
+          </td>
+          <td><a class="remove" href="#">Remove</a></td>
+        </tr>
+      </table>
+      <a href="#" onclick="$('#layers tr:last').clone().appendTo('#layers'); return false;" alt="Add Calendar">Add another calendar to this layer</a>
+
+    </fieldset>
+
+    <fieldset tal:define="error fielderrors['layer_name']|None"
+              class="${error and 'fieldError' or ''}"
+              id="virtual-calendars-field">
+      <label for="layer_name" class="required">Name the layer</label><br />
+      <div tal:condition="error" class="errorMessage">${error}</div> 
+      <input name="layer_name" id="layer_name" type="text"/>
+    </fieldset>
+
+    <fieldset tal:define="error fielderrors['layer_color']|None"
+              class="${error and 'fieldError' or ''}"
+              id="virtual-calendars-field">
+      <label for="layer_color" class="required">Choose color</label><br />
+      <div tal:condition="error" class="errorMessage">${error}</div> 
+
+      <ul class="cal_choose_color">
+        <li tal:repeat="color colors">
+            <input name="layer_color"
+                   type="radio" value="${color}" alt="${color}"/>
+            <br/>
+            <div class="cal_${color}_all">&nbsp;</div>
+        </li>
+      </ul>
+
+    </fieldset>
+
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+  </div>
+</html>

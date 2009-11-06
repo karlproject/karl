@@ -5,24 +5,28 @@
         <div class="cal_calendars clearafter" >
           <div class="cal_choose">
             <label for="">
-              Calendar: 
+              Layer: 
             </label>
             <select id="cal_picker">
               <option 
                       tal:attributes="value api.request.path_url + '?filter=';
                                       class 'group'" 
-                      >All calendars</option>
+                      >All layers</option>
               <option 
-                      tal:define="selected_cal selected_cal"
-                      tal:repeat="data api.context.manifest"
-                      tal:attributes="value api.request.path_url + '?filter=' + data['path']; 
-                                      class 'color cal_' +data['color'];
-                                      selected data['path'] == selected_cal"
-                      >${data['name']}</option>
+                      tal:attributes="value api.request.path_url + '?filter=*default*';
+                                      class 'group';
+                                      selected selected_layer == '*default*'"
+                      >Default layer</option>
+              <option 
+                      tal:repeat="layer layers"
+                      tal:attributes="value api.request.path_url + '?filter=' + layer.title; 
+                                      class 'color cal_' +layer.color;
+                                      selected layer.title == selected_layer"
+                      >${layer.title}</option>
             </select>                       
             
-            <tal:block condition="settings_url"> 
-            (<a href="${settings_url}">Setup</a>)
+            <tal:block condition="virtualcal_url"> 
+            (<a href="${virtualcal_url}">Virtual Calendars</a> | <a href="${layers_url}">Layers</a>)
             </tal:block>
           </div>
 

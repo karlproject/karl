@@ -2,11 +2,12 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal" 
       metal:define-macro="master">
+
   <head>
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
     <metal:resources use-macro="api.snippets.macros['css_resources']"/>
     <metal:resources use-macro="api.snippets.macros['js_resources']"/>
-    <span metal:define-slot="extra-headers" tal:omit-tag=""/>
+    <metal:resources define-slot="extra-headers"/>
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
 

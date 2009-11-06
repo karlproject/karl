@@ -30,6 +30,7 @@ from zope.component import queryAdapter
 
 from webob.exc import HTTPFound
 from formencode import Invalid
+from formencode import validators
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
@@ -71,6 +72,7 @@ from karl.views.baseforms import security_state as security_state_field
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
+from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import IVirtualCalendar
 from karl.content.views.utils import extract_description
 from karl.views.interfaces import ILayoutProvider
@@ -107,7 +109,7 @@ def _date_requested(context, request):
     return value
 
 def _get_catalog_events(calendar, request, first_moment, last_moment,
-                        calendar_path=None):
+                        layer_name=None):
     searcher =  ICatalogSearch(calendar)
 
     shared_params = dict(
@@ -128,30 +130,30 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
         return obs
 
     events = []
+    seen = set()
 
-    if calendar_path:
-        color = 'blue'
-        for item in calendar.manifest:
-            if calendar_path == item['path']:
-                color = item['color']
+    def _f(docids, seen):
+        for docid in docids:
+            if not (docid in seen):
+                seen.add(docid)
+                yield docid
 
-        total, docids, resolver = searcher(virtual=calendar_path,
-                                           **shared_params)
-        events.append(_color(_resolve(docids, resolver), color))
+    
+    default_layer = create_content(ICalendarLayer, '*default*', 'blue',
+                                   [model_path(calendar)])
 
-    else:
-        calendar_path = model_path(calendar)
-        # events that were not assigned to a virtual calendar
-        total, docids, resolver = searcher(virtual=calendar_path,
-                                           **shared_params)
-        events.append(_color(_resolve(docids, resolver), 'blue'))
+    layers = [default_layer]
 
-        # events that were assigned to a virtual calendar
-        for virtual in calendar.manifest:
-            color = virtual['color']
-            total, docids, resolver = searcher(virtual=virtual['path'],
-                                               **shared_params)
-            events.append(_color(_resolve(docids, resolver), color))
+    layers.extend(_get_layers(calendar))
+
+    for layer in layers:
+        if layer_name and layer.title != layer_name:
+            continue
+        for path in layer.paths:
+            total, docids, resolver = searcher(virtual=path, **shared_params)
+            path_events = _color(_resolve(_f(docids, seen), resolver),
+                                 layer.color)
+            events.append(path_events)
 
     return events
 
@@ -170,7 +172,6 @@ def _show_calendar_view(context, request, make_presenter):
     now_datetime   = _now()
 
     filt = _calendar_filter(context, request)
-    
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
@@ -188,15 +189,19 @@ def _show_calendar_view(context, request, make_presenter):
                                  filt)
 
     flattened_events = []
-    for event_stream in events: # XXX each sequence in 'events' is an event stream
+    for event_stream in events:
         flattened_events.extend(event_stream)
 
     calendar.paint_events(flattened_events)
 
     if has_permission('moderate', context, request):
-        settings_url = model_url(context, request, 'settings.html')
+        virtualcal_url = model_url(context, request, 'virtual.html')
+        layers_url = model_url(context, request, 'layers.html')
     else:
-        settings_url = None
+        virtualcal_url = None
+        layers_url = None
+
+    layers = _get_layers(context)
 
     # render
     api = TemplateAPI(context, request, calendar.title)    
@@ -204,9 +209,12 @@ def _show_calendar_view(context, request, make_presenter):
         calendar.template_filename,
         api=api,          
         feed_url=calendar.feed_href,                         
-        settings_url=settings_url,
+        virtualcal_url=virtualcal_url,
+        layers_url = layers_url,
         calendar=calendar,
-        selected_cal = filt,
+        selected_layer = filt,
+        layers = layers,
+        quote = quote,
     )    
 
 def show_list_view(context, request):
@@ -227,7 +235,10 @@ def get_calendar_actions(context, request):
     actions = []
     if has_permission('moderate', context, request):
         actions.append(
-            ('Settings', 'settings.html'),
+            ('Virtual Calendars', 'virtual.html'),
+            )
+        actions.append(
+            ('Layers', 'layers.html'),
             )
     if has_permission('create', context, request):
         actions.append(
@@ -580,7 +591,6 @@ def edit_calendarevent_view(context, request):
         security_states=security_states,
         )
 
-from formencode import validators
 class AddCalendarEventForm(FormSchema):
     chained_validators = baseforms.start_end_constraints
     #
@@ -610,10 +620,9 @@ class EditCalendarEventForm(FormSchema):
     contact_name = validators.UnicodeString(strip=True)
     contact_email = validators.Email(not_empty=False, strip=True)
 
-class CalendarSettingsForm(FormSchema):
-    calendar_path = validators.UnicodeString(strip=True, not_empty=False)
-    calendar_name = validators.UnicodeString(strip=True, not_empty=True)
-    calendar_color = validators.UnicodeString(strip=True, not_empty=True)
+class CalendarVirtualsForm(FormSchema):
+    virtual_name = validators.UnicodeString(strip=True, not_empty=True)
+    layer_color = validators.UnicodeString(strip=True, not_empty=True)
 
 def _virtual_calendar_title(ob):
     community = find_community(ob)
@@ -624,58 +633,47 @@ def _virtual_calendar_title(ob):
         title = title + ' (%s)' % ob.title
     return title
 
-def calendar_settings_view(context, request):
-    form = CalendarSettingsForm()
+_COLORS = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
+           "orange", "silver", "olive")
+
+def calendar_virtuals_view(context, request):
+    form = CalendarVirtualsForm()
     here_path = model_path(context)
-    calendar_names = [ x['name'] for x in context.manifest ]
+    virtuals = _get_virtual_calendars(context)
+    virtual_names = [ x.title for x in virtuals ]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
     if 'form.delete' in request.GET:
-        calendar_name = request.GET['form.delete']
-        if calendar_name in calendar_names:
-            idx = calendar_names.index(calendar_name)
-            del context.manifest[idx]
-            ob = context.get(calendar_name)
-            if IVirtualCalendar.providedBy(ob):
-                del context[calendar_name]
-            context._p_changed = True
-        location = model_url(
-            context, request,
-            'settings.html',
-            query={'status_message':'%s calendar removed' % calendar_name})
+        virtual_name = request.GET['form.delete']
+        if virtual_name and virtual_name in virtual_names:
+            del context[virtual_name]
+        location = model_url(context, request, 'virtual.html',
+            query={'status_message':'%s calendar removed' % virtual_name})
         return HTTPFound(location=location)
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            calendar_path = converted['calendar_path']
-            calendar_name = converted['calendar_name']
-            calendar_color = converted['calendar_color']
+            name = converted['virtual_name']
+            if name in context:
+                location = model_url(
+                    context, request, 'virtual.html',
+                    query={'status_message':'Name already used'})
+                return HTTPFound(location=location)
 
-            if calendar_name in calendar_names:
-                idx = calendar_names.index(calendar_name)
-                context.manifest[idx]['color'] = calendar_color
-                category = context.get(calendar_name)
-                if IVirtualCalendar.providedBy(category):
-                    category.title = calendar_name
-
-            else:
-                if not calendar_path:
-                    category = create_content(IVirtualCalendar, calendar_name)
-                    context[calendar_name] = category
-                    calendar_path = model_path(category)
-                context.manifest.append({'path':calendar_path,
-                                         'color':calendar_color,
-                                         'name':calendar_name})
-                
-            context._p_changed = True
-
+            virtual = create_content(IVirtualCalendar, name)
+            context[name] = virtual
             location = model_url(
                 context, request,
-                'settings.html',
-                query={'status_message':'Calendar settings changed'})
+                'virtual.html',
+                query={'status_message':'Virtual calendar added'})
+            color = converted['layer_color']
+            layer_name = '%s layer' % name
+            paths = [model_path(context[name])]
+            layer = create_content(ICalendarLayer, layer_name, color, paths)
+            context[layer_name] = layer
             return HTTPFound(location=location)
 
         except Invalid, e:
@@ -684,36 +682,124 @@ def calendar_settings_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            calendar_path='',
-            calendar_name='',
-            calendar_color='red'
+            virtual_name='',
+            layer_color='red',
             )
 
     # Render the form and shove some default values in
-    page_title = 'Calendar Settings'
+    page_title = 'Virtual Calendars'
     api = TemplateAPI(context, request, page_title)
 
-    manifest = []
+    virtuals = []
     used_remote = {}
 
-    for item in context.manifest:
-        path = item['path']
-        local = path.startswith(here_path)
+    for item in _get_virtual_calendars(context):
         d = {}
-        d['escaped_name'] = quote(item['name'])
-        if local:
-            d['title'] = '*Local*'
-        else:
-            used_remote[path] = True
+        d['escaped_name'] = quote(item.title)
+        d['name'] = item.title
+        virtuals.append(d)
+
+    return render_form_to_response(
+        'templates/calendar_virtuals.pt',
+        form,
+        fill_values,
+        post_url=request.path_url,
+        formfields=api.formfields,
+        fielderrors=fielderrors,
+        api=api,
+        virtuals = virtuals,
+        colors = _COLORS,
+        )
+
+class CalendarLayersForm(FormSchema):
+##     virtual_paths = foreach.ForEach(
+##         validators.UnicodeString(strip=True, not_empty=False))
+    layer_name = validators.UnicodeString(strip=True, not_empty=True)
+    layer_color = validators.UnicodeString(strip=True, not_empty=True)
+
+def _get_layers(context):
+    for ob in context.values():
+        if ICalendarLayer.providedBy(ob):
+            yield ob
+
+def calendar_layers_view(context, request):
+    form = CalendarLayersForm()
+    here_path = model_path(context)
+    layers = list(_get_layers(context))
+    layer_names = [ x.title for x in layers]
+
+    if 'form.cancel' in request.POST:
+        return HTTPFound(location=model_url(context, request))
+
+    if 'form.delete' in request.GET:
+        layer_name = request.GET['form.delete']
+        if layer_name in layer_names:
+            del context[layer_name]
+        location = model_url(context, request, 'layers.html',
+            query={'status_message':'%s layer removed' % layer_name})
+        return HTTPFound(location=location)
+
+    if 'form.submitted' in request.POST:
+        try:
+            converted = form.validate(request.POST)
+            virtual_paths = list(set(request.POST.getall('virtual_paths')))
+            layer_name = converted['layer_name']
+            layer_color = converted['layer_color']
+
+            if layer_name in layer_names:
+                layer = context[layer_name]
+                layer.color = layer_color
+                layer.title = layer_name
+                layer.paths = virtual_paths
+            else:
+                layer = create_content(ICalendarLayer,
+                                       layer_name, layer_color, virtual_paths)
+                context[layer_name] = layer
+
+            location = model_url(
+                context, request,
+                'layers.html',
+                query={'status_message':'Layers changed'})
+            return HTTPFound(location=location)
+
+        except Invalid, e:
+            fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
+    else:
+        fielderrors = {}
+        fill_values = dict(
+            virtual_paths=[],
+            layer_name='',
+            layer_color='red'
+            )
+
+    # Render the form and shove some default values in
+    page_title = 'Calendar Layers'
+    api = TemplateAPI(context, request, page_title)
+
+    layers = []
+
+    for item in _get_layers(context):
+        paths = item.paths
+        d = {}
+        d['title'] = item.title
+        d['name'] = item.title
+        d['escaped_name'] = quote(item.title)
+        d['color'] = item.color
+        d['paths'] = []
+        for path in paths:
+            v = {}
             try:
-                remote = find_model(context, item['path'])
-                d['title'] = _virtual_calendar_title(remote)
+                calendar = find_model(context, path)
+                title = _virtual_calendar_title(calendar)
+                v['title'] = title
+                v['escaped_name'] = quote(title)
+                d['paths'].append(v)
             except KeyError:
                 continue
-        d.update(item)
-        manifest.append(d)
+        layers.append(d)
 
-    remote_calendars = []
+    virtual_calendars = []
 
     searcher =  queryAdapter(context, ICatalogSearch)
 
@@ -726,25 +812,22 @@ def calendar_settings_view(context, request):
 
         for docid in docids:
             ob = resolver(docid)
-            calendar_path = model_path(ob)
-            if not calendar_path.startswith(here_path):
-                if not calendar_path in used_remote:
-                    title = _virtual_calendar_title(ob)
-                    remote_calendars.append({'title':title,
-                                             'path':calendar_path})
+            path = model_path(ob)
+            title = _virtual_calendar_title(ob)
+            virtual_calendars.append({'title':title,
+                                      'path':path})
 
-    remote_calendars.sort(key=lambda x: x['path'])
+    virtual_calendars.sort(key=lambda x: x['path'])
 
     return render_form_to_response(
-        'templates/calendar_settings.pt',
+        'templates/calendar_layers.pt',
         form,
         fill_values,
         post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,
-        manifest = manifest,
-        remote_calendars = remote_calendars,
-        colors = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
-                  "orange", "silver", "olive"),
+        layers = layers,
+        virtual_calendars = virtual_calendars,
+        colors = _COLORS,
         api=api,
         )

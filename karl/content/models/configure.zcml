@@ -87,6 +87,11 @@
       />
 
   <lemonade:content
+      factory=".calendar.CalendarLayer"
+      type="karl.content.interfaces.ICalendarLayer"
+      />
+
+  <lemonade:content
       factory=".files.CommunityRootFolder"
       type="karl.content.interfaces.ICommunityRootFolder"
       />

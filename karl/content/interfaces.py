@@ -52,8 +52,6 @@ class ICalendar(IFolder):
     taggedValue('name', 'Calendar')
 
     title = Attribute(u'Title needed for backlinks')
-    manifest = Attribute('Sequence of dictionaries.  Each dictionary contains '
-                         'a description of a local or remote virtual calendar')
 
 class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""
@@ -70,6 +68,11 @@ class ICalendarEvent(ICommunityContent, IOthers):
     contact_email = Attribute(u'Email of person to contact about this event.')
     creator = Attribute(u'User id of user that created this event.')
     virtual_calendar = Attribute("Name of the associated virtual calendar")
+
+class ICalendarLayer(Interface):
+    title = Attribute(u'Layer title')
+    color = Attribute(u'Layer color')
+    paths = Attribute(u'Layer paths')
 
 class IVirtualCalendar(Interface):
     title = Attribute(u'Calendar title')

@@ -341,7 +341,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(evt['dtend'].dt, end)
 
 
-class CalendarSettingsViewTests(unittest.TestCase):
+class CalendarVirtualsViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -349,72 +349,47 @@ class CalendarSettingsViewTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import calendar_settings_view
-        return calendar_settings_view(context, request)
+        from karl.content.views.calendar_events import calendar_virtuals_view
+        return calendar_virtuals_view(context, request)
 
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_settings.pt')
+            'templates/calendar_virtuals.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['calendar_name'], '')
-        self.assertEqual(renderer.fieldvalues['calendar_path'], '')
-        self.assertEqual(renderer.fieldvalues['calendar_color'], 'red')
+        self.assertEqual(renderer.fieldvalues['virtual_name'], '')
+        self.assertEqual(renderer.fieldvalues['layer_color'], 'red')
 
     def test_submitted_valid_local(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import IVirtualCalendar
+        from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_settings.pt')
+            'templates/calendar_virtuals.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'calendar_name': 'Announcements',
-            'calendar_color': 'red',
-            'calendar_path': '',
+            'virtual_name': 'Announcements',
+            'layer_color': 'red',
             })
         class factory:
-            def __init__(self, title):
-                self.title = title
+            def __init__(self, *arg):
+                self.arg = arg
         registerContentFactory(factory, IVirtualCalendar)
+        registerContentFactory(factory, ICalendarLayer)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-            'http://example.com/settings.html?status_message=Calendar+settings+changed')
-        self.assertEqual(context['Announcements'].title, 'Announcements')
-        self.assertEqual(context.manifest,
-                         [{'color': u'red', 'path': '/Announcements',
-                           'name': u'Announcements'}])
-
-    def test_submitted_valid_remote(self):
-        from repoze.lemonade.testing import registerContentFactory
-        from karl.content.interfaces import IVirtualCalendar
-        context = DummyCalendar()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_settings.pt')
-        request = testing.DummyRequest({
-            'form.submitted': 1,
-            'calendar_name': 'Announcements',
-            'calendar_color': 'red',
-            'calendar_path': '/foo',
-            })
-        class factory:
-            def __init__(self, title):
-                self.title = title
-        registerContentFactory(factory, IVirtualCalendar)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/settings.html?status_message=Calendar+settings+changed')
-        self.assertEqual(context.manifest,
-                         [{'color': u'red', 'path': u'/foo',
-                           'name': u'Announcements'}] )
-                            
+            'http://example.com/virtual.html?status_message=Virtual+calendar+added')
+        self.assertEqual(context['Announcements'].arg, ('Announcements',))
+        self.assertEqual(context['Announcements layer'].arg,
+                         (u'Announcements layer', u'red', ['/Announcements']))
 
     def test_submitted_invalid(self):
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_settings.pt')
+            'templates/calendar_virtuals.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
             })
