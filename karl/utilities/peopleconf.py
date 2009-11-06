@@ -124,6 +124,9 @@ def parse_report(people, elem):
 def parse_reports(people, parent_elem, reportmap):
     contents = []
     for e in parent_elem:
+        if isinstance(e, etree._Comment):
+            continue
+
         if e.tag == 'report-group':
             obj = PeopleReportGroup(e.get('title'))
             obj.set_reports(parse_reports(people, e, reportmap))
