@@ -29,7 +29,6 @@ from repoze.workflow import get_workflow
 from karl.security.policy import NO_INHERIT
 from karl.security.workflow import get_security_states
 from karl.security.workflow import postorder
-from karl.security.interfaces import ISecurityWorkflow
 
 from karl.utils import find_catalog
 
