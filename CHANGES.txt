@@ -81,6 +81,9 @@ Unreleased
   categories via gsa_sync, so peopleconf needs to be able to handle the
   categories and reports separately.
 
+- Removed all references to ISecurityWorkflow, in favor of newer worfklow
+  system.
+
 3.14 (2009-09-08)
 -----------------
 

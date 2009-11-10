@@ -144,7 +144,6 @@ class TestAddWikipageView(unittest.TestCase):
         from karl.content.interfaces import IWikiPage
         registerContentFactory(DummyWikiPage, IWikiPage)
         testing.registerDummySecurityPolicy('userid')
-        from karl.security.interfaces import ISecurityWorkflow
         self._registerSecurityWorkflow()
         response = self._callFUT(context, request)
         wikipage = context['wikipage']
