@@ -1,0 +1,232 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+  <include package="repoze.workflow" file="meta.zcml"/>
+
+  <workflow type="security"
+            name="community"
+            description="WF for communities added outside the intranet"
+            elector="karl.workflow.not_intranets_containment"
+            content_types="karl.models.interfaces.ICommunity"
+            initial_state="public"
+            state_attr="security_state"
+            permission_checker="repoze.bfg.security.has_permission"
+            >
+
+      <state name="public" title="Public"
+             callback="karl.workflow.community_to_public">
+          <alias name="initial"/> <!-- b/c -->
+      </state>
+
+      <state name="private" title="Private"
+             callback="karl.workflow.community_to_private"/>
+
+      <transition name="public"
+                  to_state="public"
+                  from_state="private"
+                  permission="administer"/>
+      <transition name="private"
+                  to_state="private"
+                  from_state="public"/>
+
+  </workflow>
+
+  <workflow type="security"
+            name="intranet-community"
+            description="WF for communities added within an intranet"
+            content_types="karl.models.interfaces.ICommunity"
+            elector="karl.workflow.intranets_containment"
+            initial_state="intranet"
+            state_attr="security_state"
+            >
+
+      <state name="intranet" title="Default"
+             callback="karl.workflow.community_to_intranet">
+          <alias name="private"/>  <!-- b/c -->
+          <alias name="inherits"/>  <!-- b/c -->
+      </state>
+
+
+  </workflow>
+
+  <workflow type="security"
+            name="private-community-blogentry"
+            description="Workflow for blog entries in private communities"
+            content_types="karl.content.interfaces.IBlogEntry"
+            elector="karl.workflow.private_community_containment"
+            initial_state="inherits"
+            state_attr="security_state"
+            >
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.blogentry_to_inherits">
+          <alias name="public"/> <!-- b/c -->
+          <alias name="private"/> <!-- b/c -->
+      </state>
+
+  </workflow>
+
+  <workflow type="security"
+            name="public-community-blogentry"
+            description="Workflow for blog entries in public communities"
+            content_types="karl.content.interfaces.IBlogEntry"
+            elector="karl.workflow.public_community_containment"
+            initial_state="inherits"
+            state_attr="security_state"
+            >
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.blogentry_to_inherits">
+           <alias name="public"/> <!-- b/c -->
+      </state>
+      <state name="private" title="Private"
+             callback="karl.workflow.blogentry_to_private"/>
+
+      <transition name="inherits_to_private"
+                  to_state="private"
+                  from_state="inherits"/>
+      <transition name="private_to_inherits"
+                  to_state="inherits"
+                  from_state="private"/>
+
+  </workflow>
+
+  <workflow type="security"
+            name="comment"
+            description="Workflow for comments"
+            content_types="karl.models.interfaces.IComment"
+            initial_state="inherits"
+            state_attr="security_state"
+            >
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.comment_to_inherits">
+          <alias name="public"/> <!-- b/c -->
+          <alias name="private"/> <!-- b/c -->
+      </state>
+
+  <workflow type="security"
+            name="forum"
+            description="Workflow for forums"
+            content_types="karl.content.interfaces.IForum"
+            initial_state="inherits"
+            state_attr="security_state">
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.forum_to_inherits"/>
+
+  </workflow>
+
+  <workflow type="security"
+            name="forum-topic"
+            description="Workflow for forum topics"
+            content_types="karl.content.interfaces.IForumTopic"
+            initial_state="inherits"
+            state_attr="security_state">
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.forum_topic_to_inherits"/>
+
+  </workflow>
+
+  </workflow>
+
+  <workflow type="security"
+            name="profile"
+            description="Workflow for profiles"
+            content_types="karl.models.interfaces.IProfile"
+            initial_state="profile"
+            state_attr="security_state"
+            >
+
+      <state name="profile" title="Profile"
+             callback="karl.workflow.to_profile">
+          <alias name="inherits"/> <!-- b/c -->
+      </state>
+
+  </workflow>
+
+  <!--
+
+    "public-community-content" and "private-community-content" are two
+    separate workflows.  However, content contained within a single
+    community will transition from one workflow
+    (e.g. "public-community-content") to another
+    (e.g. "private-community-content") when it the *community it is
+    contained in* is transitioned from "public" to "private", by
+    virtue of the "karl.workflow.private_community_containment" elector.
+
+    When a community is transitioned from private to public or vice
+    versa, the community's ACL is changed and all of its content is
+    reindexed.  The two content workflows share a common "inherits"
+    state which shares the same callback.  The callback erases any ACL
+    and reindexes the object.
+
+    The effect is that the "inherits" state in the
+    private-community-content workflow effectively means "private",
+    and the "inherits" state in a public-community-content workflow
+    effectively means "public".
+
+   -->
+
+  <workflow type="security"
+            name="private-community-content"
+            description="Workflow for content added within a private community"
+            content_types="karl.models.interfaces.ICommunityContent"
+            elector="karl.workflow.private_community_containment"
+            initial_state="inherits"
+            state_attr="security_state"
+            >
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.content_to_inherits">
+         <alias name="private"/>
+         <!-- public content in a private community shouldnt be possible,
+              but it is out there in the wild; we alias it to inherits
+              for purposes of migration -->
+         <alias name="public"/>
+      </state>
+
+  </workflow>
+
+  <workflow type="security"
+            name="public-community-content"
+            description="Workflow for content added within a public community"
+            content_types="karl.models.interfaces.ICommunityContent"
+            elector="karl.workflow.public_community_containment"
+            initial_state="inherits"
+            state_attr="security_state">
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.content_to_inherits">
+           <alias name="public"/> <!-- b/c -->
+           <alias name="initial"/> <!-- b/c -->
+      </state>
+
+      <state name="private" title="Private"
+             callback="karl.workflow.content_to_private"/>
+
+      <transition name="inherits_to_private"
+                  to_state="private"
+                  from_state="inherits"/>
+      <transition name="private_to_inherits"
+                  to_state="inherits"
+                  from_state="private"/>
+
+  </workflow>
+
+  <workflow type="security"
+            name="intranet-content"
+            description="Workflow for content added within an intranet"
+            content_types="karl.models.interfaces.ICommunityContent"
+            elector="karl.workflow.intranets_containment"
+            initial_state="inherits"
+            state_attr="security_state"
+            >
+
+      <state name="inherits" title="Default"
+             callback="karl.workflow.intranet_content_to_inherits">
+          <alias name="private"/>
+      </state>
+
+  </workflow>
+
+</configure>
