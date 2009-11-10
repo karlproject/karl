@@ -111,7 +111,7 @@ class IProfiles(IFolder):
         o Return None if no match is found.
         """
 
-class IProfile(IFolder, IPeople, IContent):
+class IProfile(IFolder, IPeople):
     """ User profile """
     taggedValue('name', 'Profile')
 

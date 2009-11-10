@@ -498,6 +498,7 @@ class Test_reset_profile(unittest.TestCase):
         reset_profile(event)
 
     def _makeSite(self):
+        from repoze.lemonade.interfaces import IContent
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IProfile
         from zope.interface import directlyProvides
@@ -508,7 +509,7 @@ class Test_reset_profile(unittest.TestCase):
             userid={'groups': ['group.community:foo:members',
                                'group.another']})
         profile = site['profiles']['userid'] = testing.DummyModel()
-        directlyProvides(profile, IProfile)
+        directlyProvides(profile, IProfile, IContent)
         profile.__acl__ = ['1']
         profile.creator = 'userid'
         profile.docid = 1234
