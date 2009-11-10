@@ -31,7 +31,6 @@ Move a piece of content to another folder.  Constraints:
 of the body text.
 """
 
-from karl.security.interfaces import ISecurityWorkflow
 from karl.utils import find_catalog
 from karl.utils import find_community
 from karl.utils import find_users
@@ -42,6 +41,8 @@ from osi.scripting import open_root
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_model
 from repoze.folder.interfaces import IFolder
+from repoze.lemonade.content import get_content_type
+from repoze.workflow import get_workflow
 
 import logging
 import sys
@@ -119,9 +120,8 @@ def move_content(root, src, dst, wf_state):
             catalog.index_doc(docid, obj)
 
     if wf_state is not None:
-        wf = ISecurityWorkflow(context)
-        if getattr(context, 'security_state', None) != wf_state:
-            wf.execute(None, wf_state)
+        wf = get_workflow(get_content_type(context), 'security', context)
+        wf.transition_to_state(context, None, wf_state)
 
     if hasattr(context, 'text'):
         context.text = "%s\n%s" % (move_header, context.text)
