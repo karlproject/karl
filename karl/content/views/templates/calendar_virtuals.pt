@@ -8,8 +8,8 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
     <div class="chparent_wrapper">
-      <a id="backto" class="chparent" href="#">
-        <img width="15" height="15" alt="Up to" src="http://localhost:6543/static/r1257261457/images/arrow_up.jpg"/>
+      <a id="backto" class="chparent" href="${back_to_calendar_url}">
+        <img width="15" height="15" alt="Up to" src="${api.static_url}/images/arrow_up.jpg"/>
         Back to Calendar
       </a>
     </div>

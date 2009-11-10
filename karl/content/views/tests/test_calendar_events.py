@@ -396,6 +396,15 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.failUnless(renderer.fielderrors)
 
+    def test_sets_back_to_calendar_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_virtuals.pt')
+        response = self._callFUT(context, request)
+        self.assertTrue(renderer.back_to_calendar_url.startswith('http'))
+
+
 
 ICS_TEMPLATE = """
 BEGIN:VCALENDAR
@@ -418,6 +427,26 @@ CLASS:PUBLIC
 END:VEVENT
 END:VCALENDAR
 """
+
+
+class CalendarLayersViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.calendar_events import calendar_layers_view
+        return calendar_layers_view(context, request)
+
+    def test_sets_back_to_calendar_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_layers.pt')
+        response = self._callFUT(context, request)
+        self.assertTrue(renderer.back_to_calendar_url.startswith('http'))
 
 
 class DummyCalendarEvent(testing.DummyModel):
