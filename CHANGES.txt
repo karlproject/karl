@@ -89,6 +89,11 @@ Unreleased
   the core.  Since the workflows are hooked up via ZCML these "default"
   workflows can always be overridden in a customization package.
 
+- LP #449676 Moved most console scripts into core to avoid duplication across
+  all of the customization packages.  Entry points are still declared in
+  customization packages to allow partners to opt out of or replace particular
+  console scripts.
+
 3.14 (2009-09-08)
 -----------------
 
