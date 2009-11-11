@@ -2248,6 +2248,11 @@ body .cal_hour_event .cal_event_block .time {
 #startdate-field .all_day label {
   vertical-align: middle;
 }
+#startdate-field .all_day input {
+  background: none;
+  border: none;
+}
+
 
 /** =CALENDAR MONTH VIEW
 ----------------------------------------------- */
