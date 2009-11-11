@@ -2245,6 +2245,9 @@ body .cal_hour_event .cal_event_block .time {
   visibility: visible;
   position: relative;
 }
+#startdate-field .all_day label {
+  vertical-align: middle;
+}
 
 /** =CALENDAR MONTH VIEW
 ----------------------------------------------- */

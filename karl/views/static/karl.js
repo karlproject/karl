@@ -1696,10 +1696,10 @@ function initButtons() {
 
   // find static link
   var url = $('link[rel="icon"]').attr("href").replace("favicon.ico", "");
-  active.src  = url + '/button_active.png';
-  hover.src   = url + '/button_hover.png';
-  pActive.src = url + '/button_primary_active.png';
-  pHover.src  = url + '/button_primary_hover.png';
+  active.src  = url + 'button_active.png';
+  hover.src   = url + 'button_hover.png';
+  pActive.src = url + 'button_primary_active.png';
+  pHover.src  = url + 'button_primary_hover.png';
 }
 
 /* auto create anon ids (used by calendar) */
@@ -1815,6 +1815,34 @@ function initCalendar() {
   scrollToTime();
 }
 
+function initNewEvent() {
+  if ($("#startdate-field").length == 0 || $("#enddate-field").length == 0) { return; }
+  
+  // add the "all-day" checkbox
+  var checkbox = '<span class="all_day">' +
+                  '<input type="checkbox" id="cal_all_day" name="allDay" value="1" />' + 
+                  '<label for="cal_all_day">All-day</label>' + 
+                 '</span>';
+  $("#startdate-field").append(checkbox);
+
+  $("#cal_all_day").click(function() {
+    // check - hide time input
+    if (this.checked) {      
+      $('#startdate-field select').hide();
+      $('#startdate-field .ui-karldatetimepicker-colon').hide();
+      $('#enddate-field select').hide();
+      $('#enddate-field .ui-karldatetimepicker-colon').hide();
+      
+    // uncheck - show time inputs
+    } else {
+      $('#startdate-field select').show();
+      $('#startdate-field .ui-karldatetimepicker-colon').show();
+      $('#enddate-field select').show();
+      $('#enddate-field .ui-karldatetimepicker-colon').show();
+    }
+  });
+}
+
 // Initialize jquery
 $(document).ready(function() {
     
@@ -1876,14 +1904,20 @@ $(document).ready(function() {
     enableOldStyleDropdowns();
     
     // initialize button images
-    if ($('.button')) { initButtons(); }
+    if ($('.button').length > 0) { initButtons(); }
 
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');
 
     /** =CALENDAR ATTACH EVENTS
     ----------------------------------------------- */
-    if ($('table.cal')) { initCalendar(); }
+    if ($('table.cal').length > 0) { 
+      initCalendar(); 
+    }
+
+    if ($("fieldset#virtual-calendar-field").length > 0) { 
+      initNewEvent(); 
+    }
 
 }); // END document ready handler
 
