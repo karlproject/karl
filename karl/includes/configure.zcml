@@ -8,5 +8,4 @@
   <include package="karl.tagging"/>
   <include package="karl.adapters"/>
   <include package="karl.cico"/>
-  <include file="workflow.zcml"/>
 </configure>
