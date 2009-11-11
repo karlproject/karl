@@ -229,4 +229,12 @@
 
   </workflow>
 
+  <subscriber
+      for="karl.models.interfaces.IUserAddedGroup"
+      handler="karl.workflow.reset_profile"/>
+
+  <subscriber
+      for="karl.models.interfaces.IUserRemovedGroup"
+      handler="karl.workflow.reset_profile"/>
+
 </configure>
