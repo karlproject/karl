@@ -242,6 +242,11 @@ class TestGetUserHome(unittest.TestCase):
         self.assertEqual(extra_path, [])
 
 class TestHandlePhotoUpload(unittest.TestCase):
+    def tearDown(self):
+        # call to transaction.get().doom() might leave transaction manager
+        # in doomed state for next test if we don't abort.
+        import transaction
+        transaction.abort()
 
     def _callFUT(self, context, form, thumbnail=False):
         from karl.views.utils import handle_photo_upload

@@ -234,10 +234,12 @@ class TestAddFileView(unittest.TestCase):
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
-        
 
-    def _callFUT(self, context, request):
+
+    def _callFUT(self, context, request, check_upload_size=None):
         from karl.content.views.files import add_file_view
+        if check_upload_size is not None:
+            return add_file_view(context, request, check_upload_size)
         return add_file_view(context, request)
 
     def _registerLayoutProvider(self):
@@ -422,10 +424,13 @@ class TestAddFileView(unittest.TestCase):
         self._register()
         self._registerLayoutProvider()
 
-        from karl.testing import DummySettings
-        from repoze.bfg.interfaces import ISettings
-        settings = DummySettings(upload_limit = '2')
-        testing.registerUtility(settings, ISettings)
+        from formencode import Invalid
+        class CustomInvalid(Invalid):
+            def __init__(self, error_dict):
+                self.error_dict = error_dict
+
+        def check_upload_size(*args):
+            raise CustomInvalid({'file': 'TEST VALIDATION ERROR'})
 
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
@@ -445,9 +450,9 @@ class TestAddFileView(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request)
+        response = self._callFUT(context, request, check_upload_size)
         self.assertEqual(renderer.fielderrors, {
-            'file': 'File size exceeds upload limit of 2.'})
+            'file': 'TEST VALIDATION ERROR'})
 
 class TestShowFileView(unittest.TestCase):
     def setUp(self):
@@ -1098,7 +1103,7 @@ class DummyWorkflow:
 
     def initialize(self, content):
         self.initialized = True
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,

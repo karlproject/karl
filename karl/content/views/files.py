@@ -289,7 +289,7 @@ def advanced_folder_view(context, request):
         selected=selected,
         )
 
-def add_file_view(context, request):
+def add_file_view(context, request, check_upload_size=check_upload_size):
 
     tags_list=request.POST.getall('tags')
     form = AddFileForm(tags_list=tags_list)
