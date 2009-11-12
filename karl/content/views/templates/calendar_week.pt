@@ -71,7 +71,7 @@
                </div>
 
                <tal:block condition="slot.bubble">
-               <div class="cal_${slot.bubble.event._catalog_event._v_color} cal_event_block" style="height: ${slot.bubble.length_px}px">
+               <div class="cal_${slot.bubble.event._catalog_event._v_color} with_tooltip cal_event_block" style="height: ${slot.bubble.length_px}px">
                  <a href="${slot.bubble.event.show_url}">
                    <span class="time">${slot.bubble.event.time_of_first_moment}</span><br />
                    ${slot.bubble.event.title}
