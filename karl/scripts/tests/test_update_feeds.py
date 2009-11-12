@@ -19,13 +19,6 @@ import unittest
 from zope.testing.cleanup import cleanUp
 
 class UpdateFeedsScriptTests(unittest.TestCase):
-    def setUp(self):
-        import transaction
-        transaction.abort()
-
-    def tearDown(self):
-        import transaction
-        transaction.abort()
 
     def _callFUT(self, args=[]):
         from karl.scripts.update_feeds import main
