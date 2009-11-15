@@ -7,21 +7,6 @@
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <metal:resources fill-slot="extra-headers">
-
-      <script type="text/javascript">
-
-        $(document).ready(function(){
-            $('.remove').live('click', function(event) {
-                $(this).parents('tr').remove();
-                return false;
-            });
-        });
-
-      </script>
-
-    </metal:resources>
-
     <div class="chparent_wrapper">
       <a id="backto" class="chparent" href="${back_to_calendar_url}">
         <img width="15" height="15" alt="Up to" src="${api.static_url}/images/arrow_up.jpg"/>
@@ -61,10 +46,10 @@
                       value="${virt['path']}">${virt['title']}</option>
             </select>
           </td>
-          <td><a class="remove" href="#">Remove</a></td>
+          <td><a class="remove" href="#" style="display: none;">Remove</a></td>
         </tr>
       </table>
-      <a href="#" onclick="$('#layers tr:last').clone().appendTo('#layers'); return false;" alt="Add Calendar">Add another calendar to this layer</a>
+      <a href="#" class="add" alt="Add Calendar">Add another calendar to this layer</a>
 
     </fieldset>
 

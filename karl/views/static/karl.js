@@ -1815,6 +1815,7 @@ function initCalendar() {
   scrollToTime();
 }
 
+// Add Event view only
 function initNewEvent() {
   if ($("#startdate-field").length == 0 || $("#enddate-field").length == 0) { return; }
   
@@ -1841,6 +1842,31 @@ function initNewEvent() {
       $('#enddate-field .ui-karldatetimepicker-colon').show();
     }
   });
+}
+     
+// Calendar Layers view only
+function initCalendarLayersEdit() {
+    if ($("select#virtual_paths").length == 0) { return; }
+
+    // remove a virtual calendar from the layer
+    $('a.remove').live('click', function(event) { 
+      $(this).parents('tr').remove();
+      _updateRemoveLinks();
+      return false;
+    });   
+
+    // add a virtual calendar to the layer
+    $('#virtual-calendars-field > a.add').bind('click', function(e) {
+      $('#layers tr:last').clone().appendTo('#layers'); 
+      _updateRemoveLinks(); 
+      return false;      
+    })
+
+    // only show "Remove" if more than one virtual calendar is present
+    function _updateRemoveLinks() {
+      var els = $('table#layers td > a.remove');
+      els.css('display', els.length > 1 ? "inline" : "none");
+    }
 }
 
 // Initialize jquery
@@ -1917,6 +1943,10 @@ $(document).ready(function() {
 
     if ($("fieldset#virtual-calendar-field").length > 0) { 
       initNewEvent(); 
+    }
+
+    if ($("fieldset#virtual-calendars-field").length > 0) {
+      initCalendarLayersEdit();        
     }
 
 }); // END document ready handler
