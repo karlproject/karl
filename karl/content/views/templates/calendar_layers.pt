@@ -25,7 +25,6 @@
       <tr tal:repeat="layer layers">
         <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
         <td class="name">${layer['name']}</td>
-        <td class="location">${layer['title']}</td>
         <td class="names"><span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/></td>
         <td class="actions"><a href="${post_url}?form.delete=${layer['escaped_name']}">delete</a></td>
       </tr>

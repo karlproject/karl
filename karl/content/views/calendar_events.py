@@ -783,7 +783,6 @@ def calendar_layers_view(context, request):
     for item in _get_layers(context):
         paths = item.paths
         d = {}
-        d['title'] = item.title
         d['name'] = item.title
         d['escaped_name'] = quote(item.title)
         d['color'] = item.color
