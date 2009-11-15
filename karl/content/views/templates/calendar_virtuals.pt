@@ -23,7 +23,7 @@
 
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="virtuals">
       <tr tal:repeat="virt virtuals">
-        <td class="name"><a href="#">${virt['name']}</a></td>
+        <td class="name">${virt['name']}</td>
         <td class="actions"><a href="${post_url}?form.delete=${virt['escaped_name']}">delete</a></td>
       </tr>
     </table>
