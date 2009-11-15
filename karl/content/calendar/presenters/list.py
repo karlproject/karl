@@ -89,9 +89,16 @@ class ListViewPresenter(BasePresenter):
 
         self.days = []     
         for day_num in sorted(days_events.keys()):
+            # url to view this day
+            format = '%s?year=%d&month=%d&day=%d'
+            url = format % (self.url_for('day.html'),
+                            self.focus_datetime.year, 
+                            self.focus_datetime.month, day_num)  
+
             day = DayOnListView(self.focus_datetime.year,
                                 self.focus_datetime.month,
-                                day_num)
+                                day_num,
+                                show_day_url=url)
             self.days.append(day)
 
             for start_unixtime in sorted(days_events[day_num].keys()):
@@ -169,18 +176,13 @@ class ListViewPresenter(BasePresenter):
 
 
 class DayOnListView(object):
-    def __init__(self, year, month, day, shaded_row=False, events=None):
+    def __init__(self, year, month, day, shaded_row=False, show_day_url='#'):
         self.year = year
         self.month = month
         self.day = day
-
+        self.events = []
         self.shaded_row = shaded_row
-
-        if events is None:
-            events = []
-        self.events = events    
-            
-        self.show_day_url = '#'
+        self.show_day_url = show_day_url
 
     @property
     def first_moment(self):

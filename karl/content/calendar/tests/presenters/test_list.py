@@ -171,6 +171,7 @@ class ListViewPresenterTests(unittest.TestCase):
         
         friday = presenter.days[0]
         self.assertEqual(friday.day_in_words, 'Fri, Aug  7')
+        self.assertTrue(friday.show_day_url.startswith('http://'))
 
         self.assertEqual(friday.events[0].time_in_words, 'all-day')
         self.assertEqual(friday.events[0].title, 'Summer vacation')
@@ -401,7 +402,7 @@ class DayOnListViewTests(unittest.TestCase):
         expected = "%s, %s  %d" % (weekday, month, 7)
 
         self.assertEqual(day.day_in_words, expected)
- 
+
     # shade_class
     
     def test_shaded_class_is_shade_when_shaded_row_is_true(self):
@@ -415,6 +416,16 @@ class DayOnListViewTests(unittest.TestCase):
         day.shaded_row = False
         
         self.assertEqual(day.shade_class, '')
+
+    # show_day_url
+
+    def test_show_day_url_defaults_to_pound(self):
+        day = self._makeOne(2009, 9, 7)
+        self.assertEqual(day.show_day_url, '#')
+    
+    def test_show_day_url_can_be_set_in_ctor(self):
+        day = self._makeOne(2009, 9, 7, show_day_url='http://foo')
+        self.assertEqual(day.show_day_url, 'http://foo')
     
     # helpers
     
