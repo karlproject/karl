@@ -41,7 +41,7 @@
     <fieldset tal:define="error fielderrors['layer_color']|None"
               class="${error and 'fieldError' or ''}"
               id="virtual-calendars-field">
-      <label for="layer_color" class="required">Layer color</label><br />
+      <label for="layer_color" class="required">Choose color</label><br />
       <div tal:condition="error" class="errorMessage">${error}</div> 
 
       <ul class="cal_choose_color">
