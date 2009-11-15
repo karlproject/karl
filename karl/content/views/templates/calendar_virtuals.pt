@@ -30,7 +30,7 @@
 
     <h1>Add Virtual Calendar</h1>
       
-    <fieldset tal:define="error fielderrors['calendar_name']|None"
+    <fieldset tal:define="error fielderrors['virtual_name']|None"
               class="${error and 'fieldError' or ''}"
               id="virtual-calendars-field">
       <label for="virtual_name" class="required">Name the virtual calendar</label><br />
