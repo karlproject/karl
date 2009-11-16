@@ -2559,6 +2559,16 @@ body .cal_hour_event .cal_event_block .time {
 
 /** =CALENDAR SETUP
 ----------------------------------------------- */
+#calendar_setup dt { 
+    font-size: 110%; 
+    margin-top: 25px; 
+}
+#calendar_setup dd { 
+    margin-top: 10px; 
+    margin-left: 25px; 
+    width: 425px; 
+}
+
 table.cal_all {
   margin-bottom: 30px;
 }
@@ -2783,4 +2793,5 @@ a.primary_button:visited {
 }
 .normal_button:active span {
   background: url("images/button_active.png") left no-repeat; 
-}
+}     
+

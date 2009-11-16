@@ -195,11 +195,9 @@ def _show_calendar_view(context, request, make_presenter):
     calendar.paint_events(flattened_events)
 
     if has_permission('moderate', context, request):
-        virtualcal_url = model_url(context, request, 'virtual.html')
-        layers_url = model_url(context, request, 'layers.html')
+        setup_url = model_url(context, request, 'setup.html')
     else:
-        virtualcal_url = None
-        layers_url = None
+        setup_url = None
 
     layers = _get_layers(context)
 
@@ -208,9 +206,7 @@ def _show_calendar_view(context, request, make_presenter):
     return render_template_to_response(
         calendar.template_filename,
         api=api,          
-        feed_url=calendar.feed_href,                         
-        virtualcal_url=virtualcal_url,
-        layers_url = layers_url,
+        setup_url=setup_url,
         calendar=calendar,
         selected_layer = filt,
         layers = layers,
@@ -636,6 +632,18 @@ def _virtual_calendar_title(ob):
 _COLORS = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
            "orange", "silver", "olive")
 
+def calendar_setup_view(context, request):
+    page_title = 'Calendar Setup'
+    api = TemplateAPI(context, request, page_title)
+    
+    return render_template_to_response(
+        'templates/calendar_setup.pt',
+        back_to_calendar_url=model_url(context, request, 'month.html'),
+        virtuals_url=model_url(context, request, 'virtual.html'),
+        layers_url=model_url(context, request, 'layers.html'),
+        api=api,
+        )
+
 def calendar_virtuals_view(context, request):
     form = CalendarVirtualsForm()
     here_path = model_path(context)
@@ -643,7 +651,7 @@ def calendar_virtuals_view(context, request):
     virtual_names = [ x.title for x in virtuals ]
 
     if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.GET:
         virtual_name = request.GET['form.delete']
@@ -703,7 +711,7 @@ def calendar_virtuals_view(context, request):
         'templates/calendar_virtuals.pt',
         form,
         fill_values,
-        back_to_calendar_url=model_url(context, request, 'month.html'),
+        back_to_setup_url=model_url(context, request, 'setup.html'),
         post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,
@@ -730,7 +738,7 @@ def calendar_layers_view(context, request):
     layer_names = [ x.title for x in layers]
 
     if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.GET:
         layer_name = request.GET['form.delete']
@@ -823,7 +831,7 @@ def calendar_layers_view(context, request):
         'templates/calendar_layers.pt',
         form,
         fill_values,
-        back_to_calendar_url=model_url(context, request, 'month.html'),
+        back_to_setup_url=model_url(context, request, 'setup.html'),
         post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,

@@ -86,6 +86,13 @@
     permission="view"
     name="list.html"
   />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="setup.html"
+    view=".calendar_events.calendar_setup_view"
+    permission="moderate"
+  />
   
   <view
     for="karl.content.interfaces.ICalendar"

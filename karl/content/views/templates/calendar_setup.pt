@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div class="chparent_wrapper">
+      <a id="backto" class="chparent" href="${back_to_calendar_url}">
+        <img width="15" height="15" alt="Up to" src="${api.static_url}/images/arrow_up.jpg"/>
+        Back to Calendar
+      </a>
+    </div>
+
+    <h1>Calendar Setup</h1>
+
+    <dl id="calendar_setup">
+      <dt><a href="${virtuals_url}">Virtual Calendars</a></dt>
+      <dd>
+        Virtual Calendars help to organize the calendar events within
+        a community.  It may help to think of a virtual calendar as a
+        category.  
+      </dd>
+               
+      <dt><a href="${layers_url}">Layers</a></dt>
+      <dd>
+        Layers are groupings of virtual calendars. Virtual Calendars are not
+        shown on the calendar directly. Instead, they are grouped into layers
+        and the layers are shown on the calendar.
+      </dd>
+    </dl>  
+
+  </div>
+</html>

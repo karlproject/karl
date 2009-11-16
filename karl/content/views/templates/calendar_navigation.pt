@@ -25,8 +25,8 @@
                       >${layer.title}</option>
             </select>                       
             
-            <tal:block condition="virtualcal_url"> 
-            (<a href="${virtualcal_url}">Virtual Calendars</a> | <a href="${layers_url}">Layers</a>)
+            <tal:block condition="setup_url"> 
+              (<a href="${setup_url}">Setup</a>)
             </tal:block>
           </div>
 

@@ -396,14 +396,16 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.failUnless(renderer.fielderrors)
 
-    def test_sets_back_to_calendar_url(self):
+    def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_virtuals.pt')
         response = self._callFUT(context, request)
-        self.assertTrue(renderer.back_to_calendar_url.startswith('http'))
 
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'setup.html'),
+                         renderer.back_to_setup_url)
 
 
 ICS_TEMPLATE = """
@@ -440,13 +442,61 @@ class CalendarLayersViewTests(unittest.TestCase):
         from karl.content.views.calendar_events import calendar_layers_view
         return calendar_layers_view(context, request)
 
-    def test_sets_back_to_calendar_url(self):
+    def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_layers.pt')
         response = self._callFUT(context, request)
-        self.assertTrue(renderer.back_to_calendar_url.startswith('http'))
+
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'setup.html'),
+                         renderer.back_to_setup_url)
+
+
+class CalendarSetupViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.calendar_events import calendar_setup_view
+        return calendar_setup_view(context, request)
+
+    def test_sets_back_to_calendar_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup.pt')
+        response = self._callFUT(context, request)
+        
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'month.html'), 
+                         renderer.back_to_calendar_url)
+
+    def test_sets_virtuals_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup.pt')
+        response = self._callFUT(context, request)
+        
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'virtual.html'), 
+                         renderer.virtuals_url)
+
+    def test_sets_layers_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup.pt')
+        response = self._callFUT(context, request)
+        
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'layers.html'), 
+                         renderer.layers_url)
 
 
 class DummyCalendarEvent(testing.DummyModel):
