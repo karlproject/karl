@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal" metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">Statistics for Administrator</h1>
+
+  <form method="post" action="" class="k3_genericForm"
+	xml:id="contentform" enctype="multipart/form-data" name="save"
+        autocomplete="off">
+
+
+    <div>
+
+        <div metal:define-macro="communitycountportlet"
+               id="comstatsportlet" class="left-portlet">
+             <h2>Community Counts</h2> 
+                 <div tal:repeat="item comms">
+                     <h3>${item[0]} - ${item[1]}</h3>
+                </div>
+           </div>
+
+    </div>
+
+  </form>
+
+  </div>
+</html>
