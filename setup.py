@@ -96,6 +96,7 @@ setup(name='karl',
       addlicense = karl.scripts.addlicense:main
       jsconcat = karl.scripts.jsconcat:main
       cssconcat = karl.scripts.cssconcat:main
+      generate_stats = karl.scripts.generate_stats:main
       samplegen = karl.scripts.samplegen:main
       mvcontent = karl.scripts.mvcontent:main
       """
