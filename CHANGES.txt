@@ -94,6 +94,10 @@ Unreleased
   customization packages to allow partners to opt out of or replace particular
   console scripts.
 
+- LP #449683 Moved initial data for bootstrapping Karl in the core and made
+  overridable via utility registrations on the interfaces in
+  karl.bootstrapping.interfaces.
+
 3.14 (2009-09-08)
 -----------------
 
