@@ -1,8 +1,6 @@
 from zope.component import queryUtility
 from zope.interface import implements
 
-import pkg_resources
-
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
 
@@ -12,7 +10,6 @@ from karl.bootstrap.interfaces import IInitialOfficeData
 from karl.security.policy import ADMINISTRATOR_PERMS
 from karl.security.policy import GUEST_PERMS
 from karl.security.policy import MODERATOR_PERMS
-from karl.security.policy import NO_INHERIT
 
 _marker = object()
 
