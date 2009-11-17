@@ -98,6 +98,10 @@ Unreleased
   overridable via utility registrations on the interfaces in
   karl.bootstrapping.interfaces.
 
+- LP #449683 Moved Paste Deploy application factory (aka run.py) into core (as
+  application.py).
+
+
 3.14 (2009-09-08)
 -----------------
 

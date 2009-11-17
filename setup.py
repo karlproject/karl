@@ -89,6 +89,8 @@ setup(name='karl',
       tests_require = requires,
       test_suite="karl",
       entry_points = """\
+      [paste.app_factory]
+      make_app = karl.application:make_app
       [paste.filter_app_factory]
       timeit = karl.timeit:main
       karlerrorpage = karl.errorpage:ErrorPageFilter
