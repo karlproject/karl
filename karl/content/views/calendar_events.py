@@ -644,7 +644,7 @@ def calendar_setup_view(context, request):
         api=api,
         )
 
-def calendar_virtuals_view(context, request):
+def calendar_setup_virtuals_view(context, request):
     form = CalendarVirtualsForm()
     here_path = model_path(context)
     virtuals = _get_virtual_calendars(context)
@@ -708,7 +708,7 @@ def calendar_virtuals_view(context, request):
         virtuals.append(d)
 
     return render_form_to_response(
-        'templates/calendar_virtuals.pt',
+        'templates/calendar_setup_virtuals.pt',
         form,
         fill_values,
         back_to_setup_url=model_url(context, request, 'setup.html'),
@@ -731,7 +731,7 @@ def _get_layers(context):
         if ICalendarLayer.providedBy(ob):
             yield ob
 
-def calendar_layers_view(context, request):
+def calendar_setup_layers_view(context, request):
     form = CalendarLayersForm()
     here_path = model_path(context)
     layers = list(_get_layers(context))
@@ -828,7 +828,7 @@ def calendar_layers_view(context, request):
     virtual_calendars.sort(key=lambda x: x['path'])
 
     return render_form_to_response(
-        'templates/calendar_layers.pt',
+        'templates/calendar_setup_layers.pt',
         form,
         fill_values,
         back_to_setup_url=model_url(context, request, 'setup.html'),

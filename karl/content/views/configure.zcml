@@ -97,14 +97,14 @@
   <view
     for="karl.content.interfaces.ICalendar"
     name="virtual.html"
-    view=".calendar_events.calendar_virtuals_view"
+    view=".calendar_events.calendar_setup_virtuals_view"
     permission="moderate"
   />
 
   <view
     for="karl.content.interfaces.ICalendar"
     name="layers.html"
-    view=".calendar_events.calendar_layers_view"
+    view=".calendar_events.calendar_setup_layers_view"
     permission="moderate"
   />
 

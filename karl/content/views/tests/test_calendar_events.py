@@ -349,14 +349,14 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import calendar_virtuals_view
-        return calendar_virtuals_view(context, request)
+        from karl.content.views.calendar_events import calendar_setup_virtuals_view
+        return calendar_setup_virtuals_view(context, request)
 
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_virtuals.pt')
+            'templates/calendar_setup_virtuals.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fieldvalues['virtual_name'], '')
@@ -368,7 +368,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_virtuals.pt')
+            'templates/calendar_setup_virtuals.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
             'virtual_name': 'Announcements',
@@ -389,7 +389,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
     def test_submitted_invalid(self):
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_virtuals.pt')
+            'templates/calendar_setup_virtuals.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
             })
@@ -400,7 +400,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_virtuals.pt')
+            'templates/calendar_setup_virtuals.pt')
         response = self._callFUT(context, request)
 
         from repoze.bfg.url import model_url 
@@ -439,14 +439,14 @@ class CalendarLayersViewTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import calendar_layers_view
-        return calendar_layers_view(context, request)
+        from karl.content.views.calendar_events import calendar_setup_layers_view
+        return calendar_setup_layers_view(context, request)
 
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_layers.pt')
+            'templates/calendar_setup_layers.pt')
         response = self._callFUT(context, request)
 
         from repoze.bfg.url import model_url 
