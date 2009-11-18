@@ -36,8 +36,8 @@ from karl.utils import find_community
 from karl.utils import find_users
 from karl.views.utils import make_unique_name
 from optparse import OptionParser
-from osi.scripting import get_default_config
-from osi.scripting import open_root
+from karl.scripting import get_default_config
+from karl.scripting import open_root
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_model
 from repoze.folder.interfaces import IFolder

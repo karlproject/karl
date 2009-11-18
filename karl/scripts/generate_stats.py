@@ -10,18 +10,18 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-""" GenerateStats 
+""" GenerateStats
 
 
 """
 
-from osi.scripting import get_default_config
-from osi.scripting import open_root
+from karl.scripting import get_default_config
+from karl.scripting import open_root
 from optparse import OptionParser
 import os
 import sys
@@ -35,8 +35,8 @@ import time
 def getCommCount(root):
     communitycoun = find_communities(root)
     communitycount = len(communitycoun)
-    return communitycoun 
-    
+    return communitycoun
+
 def main():
     parser = OptionParser(description=__doc__,
                           usage='usage: %prog [options] username password')
@@ -44,7 +44,7 @@ def main():
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
 
     options, args = parser.parse_args()
-   
+
     config = options.config
     if config is None:
         config = get_default_config()
@@ -61,6 +61,6 @@ def main():
     f = open(outfile_path, 'a')
     f.write(oline)
     f.close()
-    
+
 if __name__ == '__main__':
     main()
