@@ -82,6 +82,8 @@ def populate(root, do_transaction_begin=True):
             'repoze.who.userid': data.admin_user,
             'groups': data.admin_groups,
            }
+
+    # Create a Default community
     request.POST = FauxPost(request.POST)
     request.POST['title'] = 'default'
     request.POST['description'] = 'Created by startup script'
@@ -95,6 +97,7 @@ def populate(root, do_transaction_begin=True):
     add_community_view(communities, request)
     communities['default'].title = 'Default Community'
 
+    # Import office data, if there is any
     office_data = data.office_data
     if office_data is not None:
         INTRANET_INCLUDED_TOOLS = data.intranet_tools
