@@ -174,6 +174,17 @@ class DayViewPresenterTests(unittest.TestCase):
         self.assertEqual(half_hour_slots[-1].start_datetime,
                          datetime.datetime(2009, 8, 1, 23, 30, 0)) # 11:30pm
 
+    def test_assigns_add_event_url_to_each_half_hour_slot(self):
+        focus_at = datetime.datetime(2009, 11, 17) 
+        now_at   = datetime.datetime(2009, 11, 17)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        
+        half_hour_slots = presenter.half_hour_slots
+
+        self.assertEqual(half_hour_slots[0].add_event_url, 
+                         presenter.url_for('add_calendarevent.html'))
+
     # _find_starting_slot_for_event
     
     def test_find_starting_slot_index_finds_first_slot(self):
@@ -321,3 +332,49 @@ class DayViewPresenterTests(unittest.TestCase):
     def _makeOne(self, *args, **kargs):
         from karl.content.calendar.presenters.day import DayViewPresenter
         return DayViewPresenter(*args, **kargs)
+
+
+class TimeSlotTests(unittest.TestCase):
+    # add_event_url
+    
+    def test_add_event_url_defaults_to_pound(self):
+        time_slot = self._makeOne()
+        self.assertEqual(time_slot.add_event_url, '#')
+    
+    def test_add_event_url_can_be_set(self):
+        time_slot = self._makeOne(add_event_url='http://foo')
+        self.assertEqual(time_slot.add_event_url, 'http://foo')
+
+    # is_half_hour
+    
+    def test_hour_class_defaults_to_hour(self):
+        time_slot = self._makeOne()
+        self.assertEqual(time_slot.hour_class, 'cal_hour')
+
+    def test_hour_class_returns_hour_when_not_is_half_hour(self):
+        time_slot = self._makeOne(is_half_hour=False)
+        self.assertEqual(time_slot.hour_class, 'cal_hour')
+    
+    def test_hour_class_returns_half_hour_when_is_half_hour(self):
+        time_slot = self._makeOne(is_half_hour=True)
+        self.assertEqual(time_slot.hour_class, 'cal_half_hour')
+ 
+    # shade_class
+
+    def test_shade_class_defaults_to_empty_string_for_no_shading(self):
+        time_slot = self._makeOne()
+        self.assertEqual(time_slot.shade_class, '')
+
+    def test_shade_class_returns_css_class_when_not_shaded_row(self):
+        time_slot = self._makeOne(shaded_row=False)
+        self.assertEqual(time_slot.shade_class, '')
+    
+    def test_shade_class_returns_empty_string_when_shaded_row(self):
+        time_slot = self._makeOne(shaded_row=True)
+        self.assertEqual(time_slot.shade_class, 'shade')
+
+    # helpers
+
+    def _makeOne(self, *args, **kargs):
+        from karl.content.calendar.presenters.day import TimeSlot
+        return TimeSlot(*args, **kargs)

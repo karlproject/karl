@@ -66,7 +66,7 @@
                       class="cal_hour_event ${slot.shade_class} ${slot.hour_class}">
 
                    <div class="create">
-                     <a class="add" href="#"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+                     <a class="add" href="${slot.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
                    </div>
 
                    <tal:block condition="slot.bubble">

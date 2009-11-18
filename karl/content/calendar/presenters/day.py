@@ -118,21 +118,18 @@ class DayViewPresenter(BasePresenter):
         self.half_hour_slots = []
 
         for i in range(0, 48):
-           if (i < 16) or (i > 35):
-               is_shaded = True
-           else:
-               is_shaded = False
-
-           if i % 2:
-               is_half_hour = True
-           else:
-               is_half_hour = False
-                                           
+           is_shaded    = (i < 16) or (i > 35)
+           is_half_hour = (i % 2) != 0
            start_datetime = add_minutes(self.first_moment, (i * 30))
+
+           # url to add an event to this time slot           
+           # TODO: auto-fill time slot on add event form
+           add_event_url = self.url_for('add_calendarevent.html')
            
            slot = TimeSlot(shaded_row=is_shaded, 
                            is_half_hour=is_half_hour,
-                           start_datetime=start_datetime)
+                           start_datetime=start_datetime,
+                           add_event_url=add_event_url)
            self.half_hour_slots.append(slot)
 
     def paint_events(self, events):
@@ -246,10 +243,11 @@ class DayViewPresenter(BasePresenter):
 
 class TimeSlot(object):
     def __init__(self, shaded_row=False, is_half_hour=False,
-                       start_datetime=0):
+                       start_datetime=0, add_event_url='#'):
         self.shaded_row     = shaded_row
         self.is_half_hour   = is_half_hour
-        self.start_datetime = start_datetime
+        self.start_datetime = start_datetime             
+        self.add_event_url  = add_event_url
 
         self.bubbles        = []
     
