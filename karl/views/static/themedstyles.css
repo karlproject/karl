@@ -2439,30 +2439,6 @@ body .cal_hour_event .cal_event_block .time {
 }
 
 
-/** =CALENDAR LIST VIEW
------------------------------------------------ */
-.cal_list dl {
-  margin: 0 0 15px 0;
-}
-.cal_list dt {
-  margin-bottom: 3px;
-  font-weight: bold;
-}
-.cal_list dd {
-  margin: 1px 0;
-  padding: 5px 7px;
-  background-color: #EFF7FF;
-}
-.cal_list dd .title {
-  float: left;
-}
-.cal_list dd .time {
-  float: right;
-  color: #555;
-  font-size: 90%;
-}
-
-
 /** =CALENDAR AGENDA VIEW
 ----------------------------------------------- */
 .cal_agenda .cal_expand th {
