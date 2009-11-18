@@ -26,7 +26,9 @@
         <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
         <td class="name">${layer['name']}</td>
         <td class="names"><span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/></td>
-        <td class="actions"><a href="${post_url}?form.delete=${layer['escaped_name']}">delete</a></td>
+        <td class="actions">
+          <a class="delete_action" id="delete_${layer['name']}" href="#">delete</a>
+        </td>
       </tr>
     </table>
 
@@ -78,6 +80,10 @@
     </fieldset>
 
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+  <form method="post" action="${post_url}" id="cal_delete_form">
+    <input type="hidden" name="form.delete" value="#" />
   </form>
 
   </div>

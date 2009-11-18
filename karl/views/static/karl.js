@@ -1860,7 +1860,7 @@ function initCalendarLayersEdit() {
       $('#layers tr:last').clone().appendTo('#layers'); 
       _updateRemoveLinks(); 
       return false;      
-    })
+    });
 
     // only show "Remove" if more than one virtual calendar is present
     function _updateRemoveLinks() {
@@ -1868,6 +1868,19 @@ function initCalendarLayersEdit() {
       els.css('display', els.length > 1 ? "inline" : "none");
     }
 }
+
+// Calendar Layers or Virtual calendars views only
+function initCalendarLayersOrVirtualsDelete() {  
+    $('a.delete_action').bind('click', function(e) {
+      if (confirm("Are you sure?")) {
+        var cal = this.id.substring(7); // delete_*
+        $('#cal_delete_form > input[name=form.delete]').val(cal);
+        $('#cal_delete_form').submit();
+      }
+      return false;
+    });
+}
+
 
 // Initialize jquery
 $(document).ready(function() {
@@ -1947,6 +1960,10 @@ $(document).ready(function() {
 
     if ($("fieldset#virtual-calendars-field").length > 0) {
       initCalendarLayersEdit();        
+    }
+
+    if ($("#cal_delete_form").length > 0) {
+      initCalendarLayersOrVirtualsDelete();
     }
 
 }); // END document ready handler

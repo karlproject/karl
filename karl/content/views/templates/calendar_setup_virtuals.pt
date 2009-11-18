@@ -24,7 +24,9 @@
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="virtuals">
       <tr tal:repeat="virt virtuals">
         <td class="name">${virt['name']}</td>
-        <td class="actions"><a href="${post_url}?form.delete=${virt['escaped_name']}">delete</a></td>
+        <td class="actions">
+          <a class="delete_action" id="delete_${virt['name']}" href="#">delete</a>
+        </td>
       </tr>
     </table>
 
@@ -56,6 +58,10 @@
     </fieldset>
 
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+  <form method="post" action="${post_url}" id="cal_delete_form">
+    <input type="hidden" name="form.delete" value="#" />
   </form>
 
   </div>

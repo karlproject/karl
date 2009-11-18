@@ -653,8 +653,8 @@ def calendar_setup_virtuals_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
 
-    if 'form.delete' in request.GET:
-        virtual_name = request.GET['form.delete']
+    if 'form.delete' in request.POST:
+        virtual_name = request.POST['form.delete']
         if virtual_name and virtual_name in virtual_names:
             del context[virtual_name]
         location = model_url(context, request, 'virtual.html',
@@ -703,7 +703,6 @@ def calendar_setup_virtuals_view(context, request):
 
     for item in _get_virtual_calendars(context):
         d = {}
-        d['escaped_name'] = quote(item.title)
         d['name'] = item.title
         virtuals.append(d)
 
@@ -740,8 +739,8 @@ def calendar_setup_layers_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
 
-    if 'form.delete' in request.GET:
-        layer_name = request.GET['form.delete']
+    if 'form.delete' in request.POST:
+        layer_name = request.POST['form.delete']
         if layer_name in layer_names:
             del context[layer_name]
         location = model_url(context, request, 'layers.html',
@@ -792,7 +791,6 @@ def calendar_setup_layers_view(context, request):
         paths = item.paths
         d = {}
         d['name'] = item.title
-        d['escaped_name'] = quote(item.title)
         d['color'] = item.color
         d['paths'] = []
         for path in paths:
@@ -801,7 +799,6 @@ def calendar_setup_layers_view(context, request):
                 calendar = find_model(context, path)
                 title = _virtual_calendar_title(calendar)
                 v['title'] = title
-                v['escaped_name'] = quote(title)
                 d['paths'].append(v)
             except KeyError:
                 continue
