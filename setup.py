@@ -101,6 +101,7 @@ setup(name='karl',
       generate_stats = karl.scripts.generate_stats:main
       samplegen = karl.scripts.samplegen:main
       mvcontent = karl.scripts.mvcontent:main
+      karl = karl.scripts.karl:main
       """
       )
 
