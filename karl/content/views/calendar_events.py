@@ -232,7 +232,7 @@ def get_calendar_actions(context, request):
     actions = []
     if has_permission('moderate', context, request):
         actions.append(
-            ('Virtual Calendars', 'virtual.html'),
+            ('Categories', 'categories.html'),
             )
         actions.append(
             ('Layers', 'layers.html'),
@@ -617,8 +617,8 @@ class EditCalendarEventForm(FormSchema):
     contact_name = validators.UnicodeString(strip=True)
     contact_email = validators.Email(not_empty=False, strip=True)
 
-class CalendarVirtualsForm(FormSchema):
-    virtual_name = validators.UnicodeString(strip=True, not_empty=True)
+class CalendarCategoriesForm(FormSchema):
+    category_name = validators.UnicodeString(strip=True, not_empty=True)
     layer_color = validators.UnicodeString(strip=True, not_empty=True)
 
 def _calendar_category_title(ob):
@@ -640,44 +640,44 @@ def calendar_setup_view(context, request):
     return render_template_to_response(
         'templates/calendar_setup.pt',
         back_to_calendar_url=model_url(context, request, 'month.html'),
-        virtuals_url=model_url(context, request, 'virtual.html'),
+        categories_url=model_url(context, request, 'categories.html'),
         layers_url=model_url(context, request, 'layers.html'),
         api=api,
         )
 
-def calendar_setup_virtuals_view(context, request):
-    form = CalendarVirtualsForm()
+def calendar_setup_categories_view(context, request):
+    form = CalendarCategoriesForm()
     here_path = model_path(context)
-    virtuals = _get_calendar_categories(context)
-    virtual_names = [ x.title for x in virtuals ]
+    categories = _get_calendar_categories(context)
+    category_names = [ x.title for x in categories ]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.POST:
-        virtual_name = request.POST['form.delete']
-        if virtual_name and virtual_name in virtual_names:
-            del context[virtual_name]
-        location = model_url(context, request, 'virtual.html',
-            query={'status_message':'%s calendar removed' % virtual_name})
+        category_name = request.POST['form.delete']
+        if category_name and category_name in category_names:
+            del context[category_name]
+        location = model_url(context, request, 'categories.html',
+            query={'status_message':'%s calendar removed' % category_name})
         return HTTPFound(location=location)
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            name = converted['virtual_name']
+            name = converted['category_name']
             if name in context:
                 location = model_url(
-                    context, request, 'virtual.html',
+                    context, request, 'categories.html',
                     query={'status_message':'Name already used'})
                 return HTTPFound(location=location)
 
-            virtual = create_content(ICalendarCategory, name)
-            context[name] = virtual
+            category = create_content(ICalendarCategory, name)
+            context[name] = category
             location = model_url(
                 context, request,
-                'virtual.html',
-                query={'status_message':'Virtual calendar added'})
+                'categories.html',
+                query={'status_message':'Calendar category added'})
             color = converted['layer_color']
             layer_name = '%s layer' % name
             paths = [model_path(context[name])]
@@ -691,24 +691,24 @@ def calendar_setup_virtuals_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            virtual_name='',
+            category_name='',
             layer_color='red',
             )
 
     # Render the form and shove some default values in
-    page_title = 'Virtual Calendars'
+    page_title = 'Calendar Categories'
     api = TemplateAPI(context, request, page_title)
 
-    virtuals = []
+    categories = []
     used_remote = {}
 
     for item in _get_calendar_categories(context):
         d = {}
         d['name'] = item.title
-        virtuals.append(d)
+        categories.append(d)
 
     return render_form_to_response(
-        'templates/calendar_setup_virtuals.pt',
+        'templates/calendar_setup_categories.pt',
         form,
         fill_values,
         back_to_setup_url=model_url(context, request, 'setup.html'),
@@ -716,7 +716,7 @@ def calendar_setup_virtuals_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
-        virtuals = virtuals,
+        categories = categories,
         colors = _COLORS,
         )
 
@@ -751,7 +751,7 @@ def calendar_setup_layers_view(context, request):
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            virtual_paths = list(set(request.POST.getall('virtual_paths')))
+            category_paths = list(set(request.POST.getall('category_paths')))
             layer_name = converted['layer_name']
             layer_color = converted['layer_color']
 
@@ -759,10 +759,10 @@ def calendar_setup_layers_view(context, request):
                 layer = context[layer_name]
                 layer.color = layer_color
                 layer.title = layer_name
-                layer.paths = virtual_paths
+                layer.paths = category_paths
             else:
                 layer = create_content(ICalendarLayer,
-                                       layer_name, layer_color, virtual_paths)
+                                       layer_name, layer_color, category_paths)
                 context[layer_name] = layer
 
             location = model_url(
@@ -777,7 +777,7 @@ def calendar_setup_layers_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            virtual_paths=[],
+            category_paths=[],
             layer_name='',
             layer_color='red'
             )

@@ -1786,7 +1786,7 @@ function scrollToTime() {
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
-  // ALL VIEWS - virtual calendar switcher
+  // ALL VIEWS - calendar layer switcher
   $("#cal_picker").change(function() {
     var values = this.options[this.selectedIndex].value.split("?filter=");
     javascript:document.location = values[0] + "?filter=" + escape(values[1]);
@@ -1846,31 +1846,31 @@ function initNewEvent() {
      
 // Calendar Layers view only
 function initCalendarLayersEdit() {
-    if ($("select#virtual_paths").length == 0) { return; }
+    if ($("select#category_paths").length == 0) { return; }
 
-    // remove a virtual calendar from the layer
+    // remove a category from the layer
     $('a.remove').live('click', function(event) { 
       $(this).parents('tr').remove();
       _updateRemoveLinks();
       return false;
     });   
 
-    // add a virtual calendar to the layer
+    // add a category to the layer
     $('#calendar-categories-field > a.add').bind('click', function(e) {
       $('#layers tr:last').clone().appendTo('#layers'); 
       _updateRemoveLinks(); 
       return false;      
     });
 
-    // only show "Remove" if more than one virtual calendar is present
+    // only show "Remove" if more than one category is present
     function _updateRemoveLinks() {
       var els = $('table#layers td > a.remove');
       els.css('display', els.length > 1 ? "inline" : "none");
     }
 }
 
-// Calendar Layers or Virtual calendars views only
-function initCalendarLayersOrVirtualsDelete() {  
+// Calendar Layers or category views only
+function initCalendarLayersOrCategoriesDelete() {  
     $('a.delete_action').bind('click', function(e) {
       if (confirm("Are you sure?")) {
         var cal = this.id.substring(7); // delete_*
@@ -1963,7 +1963,7 @@ $(document).ready(function() {
     }
 
     if ($("#cal_delete_form").length > 0) {
-      initCalendarLayersOrVirtualsDelete();
+      initCalendarLayersOrCategoriesDelete();
     }
 
 }); // END document ready handler

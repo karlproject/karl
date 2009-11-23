@@ -38,7 +38,7 @@
             </div>
             
             <tal:block condition="event.layer">
-              <div class="cal_event_pos_full cal_event_virtual">
+              <div class="cal_event_pos_full cal_event_category">
                 <a href="${event.show_url}" class="cal_${event.color}">${event.layer}</a>
               </div>                             
             </tal:block>

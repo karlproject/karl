@@ -341,7 +341,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(evt['dtend'].dt, end)
 
 
-class CalendarVirtualsViewTests(unittest.TestCase):
+class CalendarCategoriesViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -349,17 +349,17 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import calendar_setup_virtuals_view
-        return calendar_setup_virtuals_view(context, request)
+        from karl.content.views.calendar_events import calendar_setup_categories_view
+        return calendar_setup_categories_view(context, request)
 
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_virtuals.pt')
+            'templates/calendar_setup_categories.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['virtual_name'], '')
+        self.assertEqual(renderer.fieldvalues['category_name'], '')
         self.assertEqual(renderer.fieldvalues['layer_color'], 'red')
 
     def test_submitted_valid_local(self):
@@ -368,10 +368,10 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_virtuals.pt')
+            'templates/calendar_setup_categories.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'virtual_name': 'Announcements',
+            'category_name': 'Announcements',
             'layer_color': 'red',
             })
         class factory:
@@ -381,7 +381,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         registerContentFactory(factory, ICalendarLayer)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
-            'http://example.com/virtual.html?status_message=Virtual+calendar+added')
+            'http://example.com/categories.html?status_message=Calendar+category+added')
         self.assertEqual(context['Announcements'].arg, ('Announcements',))
         self.assertEqual(context['Announcements layer'].arg,
                          (u'Announcements layer', u'red', ['/Announcements']))
@@ -389,7 +389,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
     def test_submitted_invalid(self):
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_virtuals.pt')
+            'templates/calendar_setup_categories.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
             })
@@ -400,7 +400,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_virtuals.pt')
+            'templates/calendar_setup_categories.pt')
         response = self._callFUT(context, request)
 
         from repoze.bfg.url import model_url 
@@ -476,7 +476,7 @@ class CalendarSetupViewTests(unittest.TestCase):
         self.assertEqual(model_url(context, request, 'month.html'), 
                          renderer.back_to_calendar_url)
 
-    def test_sets_virtuals_url(self):
+    def test_sets_categories_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
@@ -484,8 +484,8 @@ class CalendarSetupViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         
         from repoze.bfg.url import model_url 
-        self.assertEqual(model_url(context, request, 'virtual.html'), 
-                         renderer.virtuals_url)
+        self.assertEqual(model_url(context, request, 'categories.html'), 
+                         renderer.categories_url)
 
     def test_sets_layers_url(self):
         context = DummyCalendar()

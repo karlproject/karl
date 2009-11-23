@@ -2505,11 +2505,11 @@ body .cal_hour_event .cal_event_block .time {
   border: 0;
   text-decoration: none;
 }
-.cal_event_virtual {
+.cal_event_category {
   height: 16px;
 }
-.cal_event_virtual a, 
-.cal_event_virtual a:visited {
+.cal_event_category a, 
+.cal_event_category a:visited {
   float: left;
   text-decoration: none;
   padding: 1px 5px 1px 5px;

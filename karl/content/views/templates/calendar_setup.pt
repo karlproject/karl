@@ -15,16 +15,15 @@
     <h1>Calendar Setup</h1>
 
     <dl id="calendar_setup">
-      <dt><a href="${virtuals_url}">Virtual Calendars</a></dt>
+      <dt><a href="${categories_url}">Calendar Categories</a></dt>
       <dd>
-        Virtual Calendars help to organize the calendar events within
-        a community.  It may help to think of a virtual calendar as a
-        category.  
+        Categories help to organize the calendar events within
+        a community.    
       </dd>
                
       <dt><a href="${layers_url}">Calendar Layers</a></dt>
       <dd>
-        Layers are groupings of virtual calendars. Virtual Calendars are not
+        Layers are groupings of categories. Categories are not
         shown on the calendar directly. Instead, they are grouped into layers
         and the layers are shown on the calendar.
       </dd>

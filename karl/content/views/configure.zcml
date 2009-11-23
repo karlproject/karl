@@ -96,8 +96,8 @@
   
   <view
     for="karl.content.interfaces.ICalendar"
-    name="virtual.html"
-    view=".calendar_events.calendar_setup_virtuals_view"
+    name="categories.html"
+    view=".calendar_events.calendar_setup_categories_view"
     permission="moderate"
   />
 

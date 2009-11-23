@@ -82,7 +82,7 @@
       />
 
   <lemonade:content
-      factory=".calendar.VirtualCalendar"
+      factory=".calendar.CalendarCategory"
       type="karl.content.interfaces.ICalendarCategory"
       />
 
@@ -137,7 +137,7 @@
   <adapter
       for="karl.content.interfaces.ICalendarEvent"
       provides="karl.models.interfaces.IVirtualData"
-      factory=".adapters.CalendarEventVirtualData"
+      factory=".adapters.CalendarEventCategoryData"
      />
 
   <adapter

@@ -35,7 +35,7 @@ class Calendar(Folder):
     implements(ICalendar)
     title = u'Calendar'
 
-class VirtualCalendar(Persistent):
+class CalendarCategory(Persistent):
     implements(ICalendarCategory)
 
     def __init__(self, title):

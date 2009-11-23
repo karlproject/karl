@@ -118,16 +118,16 @@ FileTextIndexData = makeFlexibleTextIndexData(
                                  (_extract_file_data, 1, None),
                                 ])
 
-class CalendarEventVirtualData(object):
+class CalendarEventCategoryData(object):
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
-        virtual = getattr(self.context, 'calendar_category', None)
-        if not virtual:
+        category = getattr(self.context, 'calendar_category', None)
+        if not category:
             calendar = find_interface(self.context, ICalendar)
-            virtual = model_path(calendar)
-        return virtual
+            category = model_path(calendar)
+        return category
 
         
                 

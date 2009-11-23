@@ -46,11 +46,11 @@
     <fieldset tal:define="error fielderrors['calendar_path']|None"
               class="${error and 'fieldError' or ''}"
               id="calendar-categories-field">
-      <label for="calendar_path" class="required">Virtual Calendars</label><br />
+      <label for="calendar_path" class="required">Calendars Categories</label><br />
       <table border="0" id="layers">
         <tr>
           <td>
-            <select name="virtual_paths" id="virtual_paths">
+            <select name="category_paths" id="category_paths">
               <option tal:repeat="virt calendar_categories"
                       value="${virt['path']}">${virt['title']}</option>
             </select>

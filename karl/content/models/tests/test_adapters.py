@@ -251,7 +251,7 @@ class TestFileTextIndexData(unittest.TestCase):
         adapter = self._makeOne(context)
         self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
 
-class TestCalendarEventVirtualData(unittest.TestCase):
+class TestCalendarEventCategoryData(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -259,8 +259,8 @@ class TestCalendarEventVirtualData(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from karl.content.models.adapters import CalendarEventVirtualData
-        return CalendarEventVirtualData
+        from karl.content.models.adapters import CalendarEventCategoryData
+        return CalendarEventCategoryData
 
     def _makeOne(self, context):
         return self._getTargetClass()(context)

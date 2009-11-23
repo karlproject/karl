@@ -67,7 +67,7 @@ class ICalendarEvent(ICommunityContent, IOthers):
     contact_name = Attribute(u'Name of person to contact about this event.')
     contact_email = Attribute(u'Email of person to contact about this event.')
     creator = Attribute(u'User id of user that created this event.')
-    calendar_category = Attribute("Name of the associated virtual calendar")
+    calendar_category = Attribute("Name of the associated calendar category")
 
 class ICalendarLayer(Interface):
     title = Attribute(u'Layer title')
