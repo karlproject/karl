@@ -74,7 +74,7 @@ class ICalendarLayer(Interface):
     color = Attribute(u'Layer color')
     paths = Attribute(u'Layer paths')
 
-class IVirtualCalendar(Interface):
+class ICalendarCategory(Interface):
     title = Attribute(u'Calendar title')
 
 class INewsItem(ICommunityContent, IFolder):

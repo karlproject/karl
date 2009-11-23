@@ -23,7 +23,7 @@ from zope.interface import implements
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarLayer
-from karl.content.interfaces import IVirtualCalendar
+from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarEvent
 
 from karl.content.models.attachments import AttachmentsFolder
@@ -36,7 +36,7 @@ class Calendar(Folder):
     title = u'Calendar'
 
 class VirtualCalendar(Persistent):
-    implements(IVirtualCalendar)
+    implements(ICalendarCategory)
 
     def __init__(self, title):
         self.title = title

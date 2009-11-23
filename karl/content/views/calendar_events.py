@@ -73,7 +73,7 @@ from karl.views.baseforms import security_state as security_state_field
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import ICalendarLayer
-from karl.content.interfaces import IVirtualCalendar
+from karl.content.interfaces import ICalendarCategory
 from karl.content.views.utils import extract_description
 from karl.views.interfaces import ILayoutProvider
 from karl.content.views.interfaces import IShowSendalert
@@ -245,7 +245,7 @@ def get_calendar_actions(context, request):
 
 
 def _get_virtual_calendars(calendar):
-    return [ x for x in calendar.values() if IVirtualCalendar.providedBy(x) ]
+    return [ x for x in calendar.values() if ICalendarCategory.providedBy(x) ]
 
 def add_calendarevent_view(context, request):
 
@@ -672,7 +672,7 @@ def calendar_setup_virtuals_view(context, request):
                     query={'status_message':'Name already used'})
                 return HTTPFound(location=location)
 
-            virtual = create_content(IVirtualCalendar, name)
+            virtual = create_content(ICalendarCategory, name)
             context[name] = virtual
             location = model_url(
                 context, request,
@@ -812,7 +812,7 @@ def calendar_setup_layers_view(context, request):
     if searcher is not None:
         total, docids, resolver = searcher(
             allowed={'query': effective_principals(request), 'operator': 'or'},
-            interfaces={'query':[ICalendar, IVirtualCalendar],'operator':'or'},
+            interfaces={'query':[ICalendar, ICalendarCategory],'operator':'or'},
             reverse=False,
             )
 

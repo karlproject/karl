@@ -83,7 +83,7 @@
 
   <lemonade:content
       factory=".calendar.VirtualCalendar"
-      type="karl.content.interfaces.IVirtualCalendar"
+      type="karl.content.interfaces.ICalendarCategory"
       />
 
   <lemonade:content

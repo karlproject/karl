@@ -364,7 +364,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
 
     def test_submitted_valid_local(self):
         from repoze.lemonade.testing import registerContentFactory
-        from karl.content.interfaces import IVirtualCalendar
+        from karl.content.interfaces import ICalendarCategory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
@@ -377,7 +377,7 @@ class CalendarVirtualsViewTests(unittest.TestCase):
         class factory:
             def __init__(self, *arg):
                 self.arg = arg
-        registerContentFactory(factory, IVirtualCalendar)
+        registerContentFactory(factory, ICalendarCategory)
         registerContentFactory(factory, ICalendarLayer)
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
