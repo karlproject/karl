@@ -263,7 +263,7 @@ def add_sample_calendar_event(community):
     request.environ.update(DEFAULT_ENV)
     request.POST = FauxPost(request.POST)
     request.POST['title'] = title
-    request.POST['virtual_calendar'] = ''
+    request.POST['calendar_category'] = ''
     request.POST['startDate'] = start_str
     request.POST['endDate'] = end_str
     request.POST['location'] = 'Sample Location'

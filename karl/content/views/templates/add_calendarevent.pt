@@ -16,7 +16,7 @@
 
     <fieldset metal:use-macro="formfields.macros['title-field']"/>
     <fieldset metal:use-macro="formfields.macros['tags-field']"/>
-    <fieldset metal:use-macro="formfields.macros['virtual-calendar-field']"/>
+    <fieldset metal:use-macro="formfields.macros['calendar-category-field']"/>
     <fieldset metal:use-macro="formfields.macros['start_date-field']"/>
     <fieldset metal:use-macro="formfields.macros['end_date-field']"/>
     <fieldset metal:use-macro="formfields.macros['location-field']"/>

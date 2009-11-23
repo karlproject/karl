@@ -271,7 +271,7 @@ class TestCalendarEventVirtualData(unittest.TestCase):
         community = testing.DummyModel()
         directlyProvides(community, ICalendar)
         context = testing.DummyModel()
-        context.virtual_calendar = 'virt'
+        context.calendar_category = 'virt'
         community['context'] = context
         adapter = self._makeOne(context)
         result = adapter()

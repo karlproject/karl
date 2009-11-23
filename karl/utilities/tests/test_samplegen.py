@@ -192,7 +192,7 @@ class DummyCalendarEvent(testing.DummyModel):
 
     def __init__(self, title='', startDate=None, endDate=None, creator=0,
                  text='', location='', attendees=[], contact_name='',
-                 contact_email='', virtual_calendar=''):
+                 contact_email='', calendar_category=''):
         testing.DummyModel.__init__(self)
         self.title = title
         self.startDate = startDate
@@ -203,7 +203,7 @@ class DummyCalendarEvent(testing.DummyModel):
         self.attendees = attendees
         self.contact_name = contact_name
         self.contact_email = contact_email
-        self.virtual_calendar = virtual_calendar
+        self.calendar_category = calendar_category
         self.__parent__ = testing.DummyModel()
         self.__name__ = 'calendarevent'
         self['attachments'] = testing.DummyModel()

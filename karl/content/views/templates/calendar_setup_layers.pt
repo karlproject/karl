@@ -37,7 +37,7 @@
 
     <fieldset tal:define="error fielderrors['layer_name']|None"
               class="${error and 'fieldError' or ''}"
-              id="virtual-calendars-field">
+              id="calendar-categories-field">
       <label for="layer_name" class="required">Name the layer</label><br />
       <div tal:condition="error" class="errorMessage">${error}</div> 
       <input name="layer_name" id="layer_name" type="text"/>
@@ -45,13 +45,13 @@
       
     <fieldset tal:define="error fielderrors['calendar_path']|None"
               class="${error and 'fieldError' or ''}"
-              id="virtual-calendars-field">
+              id="calendar-categories-field">
       <label for="calendar_path" class="required">Virtual Calendars</label><br />
       <table border="0" id="layers">
         <tr>
           <td>
             <select name="virtual_paths" id="virtual_paths">
-              <option tal:repeat="virt virtual_calendars"
+              <option tal:repeat="virt calendar_categories"
                       value="${virt['path']}">${virt['title']}</option>
             </select>
           </td>
@@ -64,7 +64,7 @@
 
     <fieldset tal:define="error fielderrors['layer_color']|None"
               class="${error and 'fieldError' or ''}"
-              id="virtual-calendars-field">
+              id="calendar-categories-field">
       <label for="layer_color" class="required">Choose color</label><br />
       <div tal:condition="error" class="errorMessage">${error}</div> 
 

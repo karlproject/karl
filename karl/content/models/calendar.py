@@ -52,12 +52,12 @@ class CalendarLayer(Persistent):
 class CalendarEvent(Folder):
     implements(ICalendarEvent)
     modified_by = None
-    virtual_calendar = u''
+    calendar_category = u''
 
     def __init__(self, title, startDate, endDate, creator,
                  text=u'', location=u'', attendees=[],
                  contact_name = u'', contact_email = u'',
-                 virtual_calendar=u''):
+                 calendar_category=u''):
         Folder.__init__(self)
         self.title = unicode(title)
         self.startDate = startDate
@@ -72,7 +72,7 @@ class CalendarEvent(Folder):
             self.text = u''
         else:
             self.text = unicode(text)
-        self.virtual_calendar = virtual_calendar
+        self.calendar_category = calendar_category
         self['attachments'] = AttachmentsFolder()
 
 

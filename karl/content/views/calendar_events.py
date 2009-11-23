@@ -244,7 +244,7 @@ def get_calendar_actions(context, request):
     return actions
 
 
-def _get_virtual_calendars(calendar):
+def _get_calendar_categories(calendar):
     return [ x for x in calendar.values() if ICalendarCategory.providedBy(x) ]
 
 def add_calendarevent_view(context, request):
@@ -285,8 +285,8 @@ def add_calendarevent_view(context, request):
                                            converted['attendees'],
                                            converted['contact_name'],
                                            converted['contact_email'],
-                                           virtual_calendar=
-                                            converted['virtual_calendar'],
+                                           calendar_category=
+                                            converted['calendar_category'],
                                            )
             calendarevent.description = extract_description(converted['text'])
             calname = make_unique_name(context, calendarevent.title)
@@ -352,11 +352,11 @@ def add_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar:
-        virtual_calendars = [ {'title':x.title, 'path':model_path(x)} for x in
-                              _get_virtual_calendars(calendar) ]
-        virtual_calendars.sort(key=lambda x: x['title'])
+        calendar_categories = [ {'title':x.title, 'path':model_path(x)} for x in
+                              _get_calendar_categories(calendar) ]
+        calendar_categories.sort(key=lambda x: x['title'])
     else:
-        virtual_calendars = []
+        calendar_categories = []
 
     return render_form_to_response(
         'templates/add_calendarevent.pt',
@@ -369,7 +369,7 @@ def add_calendarevent_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
-        virtual_calendars=virtual_calendars,
+        calendar_categories=calendar_categories,
         show_sendalert_field=show_sendalert_field,
         layout=layout,
         security_states = security_states,
@@ -512,7 +512,7 @@ def edit_calendarevent_view(context, request):
             context.attendees = converted['attendees']
             context.contact_name = converted['contact_name']
             context.contact_email = converted['contact_email']
-            context.virtual_calendar = converted['virtual_calendar']
+            context.calendar_category = converted['calendar_category']
             context.description = extract_description(converted['text'])
 
             # Save the tags on it
@@ -548,7 +548,7 @@ def edit_calendarevent_view(context, request):
             attendees=context.attendees,
             contact_name=context.contact_name,
             contact_email=context.contact_email,
-            virtual_calendar=context.virtual_calendar,
+            calendar_category=context.calendar_category,
             security_state = security_state,
             )
         if fill_values['contact_email'] is None:
@@ -568,11 +568,11 @@ def edit_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar is not None:
-        virtual_calendars = [ {'title':x.title, 'path':model_path(x)} for x in
-                              _get_virtual_calendars(calendar) ]
-        virtual_calendars.sort(key=lambda x: x['title'])
+        calendar_categories = [ {'title':x.title, 'path':model_path(x)} for x in
+                              _get_calendar_categories(calendar) ]
+        calendar_categories.sort(key=lambda x: x['title'])
     else:
-        virtual_calendars = []
+        calendar_categories = []
 
     return render_form_to_response(
         'templates/edit_calendarevent.pt',
@@ -582,7 +582,7 @@ def edit_calendarevent_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         api=api,
-        virtual_calendars=virtual_calendars,
+        calendar_categories=calendar_categories,
         head_data=client_json_data,
         layout=layout,
         security_states=security_states,
@@ -593,7 +593,7 @@ class AddCalendarEventForm(FormSchema):
     #
     title = baseforms.title
     tags = baseforms.tags
-    virtual_calendar = validators.UnicodeString(strip=True)
+    calendar_category = validators.UnicodeString(strip=True)
     startDate = baseforms.start_date
     endDate = baseforms.end_date
     location = validators.UnicodeString(strip=True)
@@ -608,7 +608,7 @@ class EditCalendarEventForm(FormSchema):
     #
     title = baseforms.title
     tags = baseforms.tags
-    virtual_calendar = validators.UnicodeString(strip=True)
+    calendar_category = validators.UnicodeString(strip=True)
     startDate = baseforms.start_date
     endDate = baseforms.end_date
     location = validators.UnicodeString(strip=True)
@@ -621,7 +621,7 @@ class CalendarVirtualsForm(FormSchema):
     virtual_name = validators.UnicodeString(strip=True, not_empty=True)
     layer_color = validators.UnicodeString(strip=True, not_empty=True)
 
-def _virtual_calendar_title(ob):
+def _calendar_category_title(ob):
     community = find_community(ob)
     title = community and community.title or ''
     if ICalendar.providedBy(ob):
@@ -648,7 +648,7 @@ def calendar_setup_view(context, request):
 def calendar_setup_virtuals_view(context, request):
     form = CalendarVirtualsForm()
     here_path = model_path(context)
-    virtuals = _get_virtual_calendars(context)
+    virtuals = _get_calendar_categories(context)
     virtual_names = [ x.title for x in virtuals ]
 
     if 'form.cancel' in request.POST:
@@ -702,7 +702,7 @@ def calendar_setup_virtuals_view(context, request):
     virtuals = []
     used_remote = {}
 
-    for item in _get_virtual_calendars(context):
+    for item in _get_calendar_categories(context):
         d = {}
         d['name'] = item.title
         virtuals.append(d)
@@ -798,14 +798,14 @@ def calendar_setup_layers_view(context, request):
             v = {}
             try:
                 calendar = find_model(context, path)
-                title = _virtual_calendar_title(calendar)
+                title = _calendar_category_title(calendar)
                 v['title'] = title
                 d['paths'].append(v)
             except KeyError:
                 continue
         layers.append(d)
 
-    virtual_calendars = []
+    calendar_categories = []
 
     searcher =  queryAdapter(context, ICatalogSearch)
 
@@ -819,11 +819,11 @@ def calendar_setup_layers_view(context, request):
         for docid in docids:
             ob = resolver(docid)
             path = model_path(ob)
-            title = _virtual_calendar_title(ob)
-            virtual_calendars.append({'title':title,
+            title = _calendar_category_title(ob)
+            calendar_categories.append({'title':title,
                                       'path':path})
 
-    virtual_calendars.sort(key=lambda x: x['path'])
+    calendar_categories.sort(key=lambda x: x['path'])
 
     return render_form_to_response(
         'templates/calendar_setup_layers.pt',
@@ -834,7 +834,7 @@ def calendar_setup_layers_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         layers = layers,
-        virtual_calendars = virtual_calendars,
+        calendar_categories = calendar_categories,
         colors = _COLORS,
         api=api,
         )

@@ -97,7 +97,7 @@ class karltest(FunkLoadTestCase):
 
        self.post(server_url + "/communities/" + new_word + "/calendar/add_calendarevent.html", params=[
            ['title', 'test event 1'],
-           ['virtual_calendar', ''],
+           ['calendar_category', ''],
            ['startDate', '10/19/2009 16:00'],
            ['endDate', '10/19/2009 17:00'],
            ['location', ''],

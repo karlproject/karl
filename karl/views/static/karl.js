@@ -1856,7 +1856,7 @@ function initCalendarLayersEdit() {
     });   
 
     // add a virtual calendar to the layer
-    $('#virtual-calendars-field > a.add').bind('click', function(e) {
+    $('#calendar-categories-field > a.add').bind('click', function(e) {
       $('#layers tr:last').clone().appendTo('#layers'); 
       _updateRemoveLinks(); 
       return false;      
@@ -1954,11 +1954,11 @@ $(document).ready(function() {
       initCalendar(); 
     }
 
-    if ($("fieldset#virtual-calendar-field").length > 0) { 
+    if ($("fieldset#calendar-category-field").length > 0) { 
       initNewEvent(); 
     }
 
-    if ($("fieldset#virtual-calendars-field").length > 0) {
+    if ($("fieldset#calendar-categories-field").length > 0) {
       initCalendarLayersEdit();        
     }
 

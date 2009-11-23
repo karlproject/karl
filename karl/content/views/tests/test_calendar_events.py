@@ -116,7 +116,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
                 'attendees': '',
                 'security_state': 'public',
                 'tags': 'thetesttag',
-                'virtual_calendar': '',
+                'calendar_category': '',
                 })
             )
         self._register()
@@ -148,7 +148,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
                 'attendees': '',
                 'sendalert': 'true',
                 'security_state': 'public',
-                'virtual_calendar': '',
+                'calendar_category': '',
                 })
             )
         self._register()
@@ -262,7 +262,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
                 'sendalert': 'true',
                 'security_state': 'public',
                 'tags': 'thetesttag',
-                'virtual_calendar': 'cal1',
+                'calendar_category': 'cal1',
                 }))
         from karl.content.interfaces import ICalendarEvent
         from repoze.lemonade.testing import registerContentFactory
@@ -278,7 +278,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         self.assertEqual(context.title, 'My Event')
         self.assertEqual(context.text, 'Come to a party!')
         self.assertEqual(context.modified_by, 'testeditor')
-        self.assertEqual(context.virtual_calendar, 'cal1')
+        self.assertEqual(context.calendar_category, 'cal1')
 
 
 class Test_show_calendarevent_ics_view(unittest.TestCase):
@@ -503,7 +503,7 @@ class DummyCalendarEvent(testing.DummyModel):
 
     def __init__(self, title='', startDate=None, endDate=None, creator=0,
                  text='', location='', attendees=[], contact_name='',
-                 contact_email='', virtual_calendar=''):
+                 contact_email='', calendar_category=''):
         testing.DummyModel.__init__(self)
         self.title = title
         self.startDate = startDate
@@ -514,7 +514,7 @@ class DummyCalendarEvent(testing.DummyModel):
         self.attendees = attendees
         self.contact_name = contact_name
         self.contact_email = contact_email
-        self.virtual_calendar = virtual_calendar
+        self.calendar_category = calendar_category
         self.__parent__ = testing.DummyModel()
         self.__name__ = 'calendarevent'
         self['attachments'] = testing.DummyModel()
