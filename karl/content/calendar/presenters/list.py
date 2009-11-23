@@ -34,7 +34,7 @@ class ListViewPresenter(BasePresenter):
         self.title = "%s %d" % (monthname, self.focus_datetime.year)
         self.feed_href = self.url_for('atom.xml')  
 
-        self.days = []
+        self.events = []
 
         self._init_prior_month()
         self._init_next_month()
@@ -85,74 +85,14 @@ class ListViewPresenter(BasePresenter):
         self.navigation = nav
 
     def paint_events(self, events):
-        days_events = self._make_days_events_dict(events)
-
-        self.days = []     
-        for day_num in sorted(days_events.keys()):
-            # url to view this day
-            format = '%s?year=%d&month=%d&day=%d'
-            url = format % (self.url_for('day.html'),
-                            self.focus_datetime.year, 
-                            self.focus_datetime.month, day_num)  
-
-            day = DayOnListView(self.focus_datetime.year,
-                                self.focus_datetime.month,
-                                day_num,
-                                show_day_url=url)
-            self.days.append(day)
-
-            for start_unixtime in sorted(days_events[day_num].keys()):
-                for event in days_events[day_num][start_unixtime]:
-                    listed_event = Event(
-                                        day=day, catalog_event=event,
-                                        show_url=self.url_for(context=event)
-                                   )
-                    day.events.append(listed_event)
-
-        shaded = True
-        for day in self.days:
-            day.shaded_row = shaded
-            shaded = not(shaded)        
-        
-    def _make_days_events_dict(self, events):
-        ''' 
-        days_events = {day_num: {start_unixtime: [event, event], 
-                                 start_unixtime: [event, event]}, 
-                       day_num: ...}
-        '''
-        days_events = {}
+        shaded_row = True
         for event in events:
-            for day_num in self._day_range_of_event(event):
-                if not days_events.has_key(day_num):
-                    days_events[day_num] = {}
-
-                if event.startDate < self.first_moment:
-                    starts_at = self.first_moment
-                else:
-                    starts_at = event.startDate
-                unixtime = time.mktime(starts_at.timetuple())
-                
-                if not days_events[day_num].has_key(unixtime):
-                    days_events[day_num][unixtime] = []
-                
-                days_events[day_num][unixtime].append(event)                    
-        return days_events        
-
-    def _day_range_of_event(self, event):
-        ''' Given a catalog event, return a range of days in this
-        month that the event falls on. '''
-
-        if event.startDate < self.first_moment:
-            first_day_of_event = 1
-        else:
-            first_day_of_event = event.startDate.day
-
-        if event.endDate > self.last_moment:
-            last_day_of_event = self.last_moment.day
-        else:
-            last_day_of_event = event.endDate.day
-        
-        return range(first_day_of_event, last_day_of_event + 1)        
+            listed_event = Event(catalog_event=event,
+                                shaded_row=shaded_row,
+                                show_url=self.url_for(context=event)
+                           )
+            self.events.append(listed_event)          
+            shaded_row = not(shaded_row)
 
     @property
     def first_moment(self):
@@ -175,35 +115,79 @@ class ListViewPresenter(BasePresenter):
         return 'templates/calendar_list.pt'
 
 
-class DayOnListView(object):
-    def __init__(self, year, month, day, shaded_row=False, show_day_url='#'):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.events = []
+class Event(object):
+    DEFAULT_LAYER = '*default*'
+    LAYER_SUFFIX  = ' layer'
+
+    def __init__(self, catalog_event, shaded_row=True,
+                 show_url='#', edit_url='#', delete_url='#'):
+
+        self._catalog_event = catalog_event # ICalendarEvent                               
+
         self.shaded_row = shaded_row
-        self.show_day_url = show_day_url
+        self.show_url = show_url
+        self.edit_url = edit_url
+        self.delete_url = delete_url
 
-    @property
-    def first_moment(self):
-        return datetime.datetime(self.year, self.month, self.day, 0, 0, 0)
-        
-    @property
-    def last_moment(self):
-        return datetime.datetime(self.year, self.month, self.day, 23, 59, 59)
+        self._init_properties()
+        self._init_layer_properties()
+        self._init_date_and_time_properties()
+ 
+    def _init_properties(self):
+        self.title       = self._catalog_event.title
+        self.location    = self._catalog_event.location
+        self.description = self._catalog_event.description
 
-    @property 
-    def day_in_words(self):
-        return self.first_moment.strftime("%a, %b %e")
+    def _init_layer_properties(self):
+        self.color = self._catalog_event._v_layer_color 
+
+        if self._catalog_event._v_layer_title == self.DEFAULT_LAYER:
+            self.layer = None
+        else: 
+            title = self._catalog_event._v_layer_title
+            self.layer = title.rstrip(self.LAYER_SUFFIX)
         
     @property
     def shade_class(self):
-        css_class = ''
         if self.shaded_row:
-            css_class = 'shade'
-        return css_class
+            return 'shade'
+        else:
+            return ''
 
+    # date & time info: first line
+    
+    def _init_date_and_time_properties(self):    
+        start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
+        start_time = self._format_time_of_day(self._catalog_event.startDate)
 
-class Event(BaseEvent):
-    pass
+        end_day  = self._catalog_event.endDate.strftime("%a, %b %e")
+        end_time = self._format_time_of_day(self._catalog_event.endDate)
 
+        if start_day == end_day:
+            self.first_line_day   = start_day
+            self.first_line_time  = '%s - %s' % (start_time, end_time)
+            self.second_line_time = ''
+            self.second_line_day  = ''
+
+        else:
+            self.first_line_day   = start_day
+            self.first_line_time  = '%s - ' % start_time
+            self.second_line_day  = end_day
+            self.second_line_time = end_time
+
+    def _format_time_of_day(self, dt):
+        ''' Format a time like "2pm" or "3:15pm". '''
+        fmt = dt.strftime('%l:%M%p').lstrip(' ')
+        time, ampm = fmt[:-2], fmt[-2:].lower()
+        if time.endswith(':00'):
+            time = time[:-3]
+        return time + ampm
+
+    
+    @property
+    def first_line_day_show_url(self):
+        return '#'
+
+    @property
+    def second_line_day_show_url(self):
+        return ''

@@ -16,28 +16,42 @@
     <h3 class="cal_title">${calendar.title}</h3>        
 
     <table class="cal cal_agenda">
-      <tr tal:repeat="day calendar.days" class="cal_agenda_day ${day.shade_class}">
-        <th><a href="${day.show_day_url}">${day.day_in_words}</a></th>
-
-        <td>
-          <div tal:repeat="event day.events" class="cal_agenda_block clearafter">
-            <div class="cal_event_time cal_event_pos_full">
-              <a href="${event.show_url}" class="cal_${event.color}">${event.time_in_words}</a>
-            </div>
-
+      <tr tal:repeat="event calendar.events" class="cal_agenda_day ${event.shade_class}">
+        <th>
+          <a href="${event.first_line_day_show_url}">${event.first_line_day}</a>
+          <br/> 
+          <tal:block condition="event.second_line_day">
+            <a href="${event.second_line_day_show_url}">${event.second_line_day}</a>
+          </tal:block>
+        </th>
+        
+        <td class="cal_agenda_time">
+          ${event.first_line_time}
+          <br/>
+          ${event.second_line_time}
+        </td>
+             
+        <td class="cal_agenda_block">
+          <div class="clearafter">
             <div class="cal_agenda_title">
               <a href="${event.show_url}" class="cal_${event.color}">${event.title}</a>
-
-	            <tal:block condition="event.location">
-              - ${event.location}
-              </tal:block>
             </div>
+            
+            <tal:block condition="event.layer">
+              <div class="cal_event_pos_full cal_event_virtual">
+                <a href="${event.show_url}" class="cal_${event.color}">${event.layer}</a>
+              </div>                             
+            </tal:block>
+
+            <tal:block condition="event.location">
+              <div class="cal_agenda_loc"> ${event.location} </div>
+            </tal:block>              
           </div>
         </td>
       </tr>
 
       <tr class="cal_agenda_range">
-        <td colspan="2"><a href="${calendar.navigation.next_href}">View more events</a></td>
+        <td colspan="3"><a href="${calendar.navigation.next_href}">View more events</a></td>
       </tr>      
     </table>
 

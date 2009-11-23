@@ -124,9 +124,10 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
     def _resolve(docids, resolver):
         return [ resolver(docid) for docid in docids ]
 
-    def _color(obs, color):
+    def _volatiles(obs, layer):
         for ob in obs:
-            ob._v_color = color
+            ob._v_layer_color = layer.color
+            ob._v_layer_title = layer.title
         return obs
 
     events = []
@@ -151,8 +152,8 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
             continue
         for path in layer.paths:
             total, docids, resolver = searcher(virtual=path, **shared_params)
-            path_events = _color(_resolve(_f(docids, seen), resolver),
-                                 layer.color)
+            path_events = _volatiles(_resolve(_f(docids, seen), resolver),
+                                     layer)
             events.append(path_events)
 
     return events

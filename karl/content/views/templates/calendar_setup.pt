@@ -22,7 +22,7 @@
         category.  
       </dd>
                
-      <dt><a href="${layers_url}">Layers</a></dt>
+      <dt><a href="${layers_url}">Calendar Layers</a></dt>
       <dd>
         Layers are groupings of virtual calendars. Virtual Calendars are not
         shown on the calendar directly. Instead, they are grouped into layers

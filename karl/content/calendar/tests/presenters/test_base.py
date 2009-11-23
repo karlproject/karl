@@ -211,8 +211,8 @@ class BaseEventTests(unittest.TestCase):
         return BaseEvent(*args, **kargs)
 
     def _makeDay(self, *args, **kargs):
-        from karl.content.calendar.presenters.list import DayOnListView
-        return DayOnListView(*args, **kargs)
+        from karl.content.calendar.presenters.month import DayOnMonthView
+        return DayOnMonthView(*args, **kargs)
 
 
 def dummy_url_for(*args, **kargs):
@@ -243,5 +243,6 @@ class DummyCatalogEvent(object):
             endDate = datetime.datetime.now()
         self.endDate = endDate
         
-        self._v_color = 'blue'
+        self._v_layer_color = 'blue'
+        self._v_layer_title = 'Vacation'
             

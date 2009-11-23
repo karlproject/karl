@@ -2462,7 +2462,7 @@ body .cal_hour_event .cal_event_block .time {
 .cal_agenda th, 
 .cal_agenda td {
   font-size: 90%;
-  padding: 7px 8px 3px 8px;
+  padding: 9px 8px 7px 8px;
   border-bottom: 1px solid #eff3f5;
 }
 .cal_agenda tr.shade th,
@@ -2471,32 +2471,31 @@ body .cal_hour_event .cal_event_block .time {
 }
 .cal_agenda .cal_agenda_day th {
   width: 80px;
-  text-align: left;
+  text-align: right;
+  padding-right: 0px;
+  line-height: 1.4em;
+}
+.cal_agenda_time {
+  width: 115px;
   border-right: 1px solid #eff3f5;
+  color: #666;
+  text-align: right;
+}
+.cal_agenda_day a, 
+.cal_agenda_time {
+  line-height: 1.4em;
 }
 .cal_agenda th a {
   text-decoration: none;
 }
-
 .cal_agenda_block {
   margin-bottom: 5px;
 }
-.cal_agenda_block .cal_event_time {
-  float: left;
-  width: 126px;
-  height: 16px;
-}
-.cal_agenda_block .cal_event_time a, 
-.cal_agenda_block .cal_event_time a:visited {
-  float: left;
-  text-decoration: none;
-  padding: 1px 5px 1px 5px;
-  font-size: 90%;
-}
+
 
 .cal_agenda_title {
-  width: 390px;
   float: left;
+  margin-right: 10px;
   line-height: 16px;
 }
 .cal_agenda_title a {
@@ -2506,6 +2505,22 @@ body .cal_hour_event .cal_event_block .time {
   border: 0;
   text-decoration: none;
 }
+.cal_event_virtual {
+  height: 16px;
+}
+.cal_event_virtual a, 
+.cal_event_virtual a:visited {
+  float: left;
+  text-decoration: none;
+  padding: 1px 5px 1px 5px;
+  font-size: 90%;
+}
+.cal_agenda_loc {
+  margin: 3px 0 0 0;
+  color: #666;
+  font-size: 95%;
+}
+
 .cal_agenda .pipe {
   margin: 0 2px;
   color: #999;
