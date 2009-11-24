@@ -1,3 +1,4 @@
+import sys
 import transaction
 from zope.component import queryUtility
 from zope.interface import alsoProvides
@@ -174,6 +175,7 @@ def populate(root, do_transaction_begin=True):
             add_page_view(offices['files'], request)
             offices['files'][page[0]].title = page[1]
 
+
     # Set up default feeds from snapshots.
     #import os
     #import feedparser
@@ -192,3 +194,15 @@ def populate(root, do_transaction_begin=True):
         #feed.update(parser)
         #feeds_container[feed_name] = feed
 
+    bootstrap_evolution(root)
+
+def bootstrap_evolution(root):
+    from zope.component import getUtilitiesFor
+    from repoze.evolution import IEvolutionManager
+    for pkg_name, factory in getUtilitiesFor(IEvolutionManager):
+        __import__(pkg_name)
+        package = sys.modules[pkg_name]
+        manager = factory(root, pkg_name, package.VERSION)
+        # when we do start_over, we unconditionally set the database's
+        # version number to the current code number
+        manager._set_db_version(package.VERSION)

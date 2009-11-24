@@ -103,6 +103,7 @@ setup(name='karl',
       karl = karl.scripts.karlctl:main
       mvcontent = karl.scripts.mvcontent:main
       samplegen = karl.scripts.samplegen:main
+      startover = karl.scripts.startover:main
       """
       )
 

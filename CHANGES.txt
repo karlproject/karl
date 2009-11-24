@@ -101,11 +101,15 @@ Unreleased
 - LP #449683 Moved Paste Deploy application factory (aka run.py) into core (as
   application.py).
 
-- LP 449691 Moved evolve script to core and updated it to use utility
+- LP #449691 Moved evolve script to core and updated it to use utility
   registrations in ZCA to find packages to evolve.  This allows us to maintain
   a set of evolution steps inside the core that would be common to all
   instances of Karl while still allowing for customer specific evolutions in
   the customization packages.
+
+- LP #449683 Evolution DB versions are now set at bootstrap time, whether
+  called from application.py or the startover script.  The startover script
+  has been moved to core.
 
 3.14 (2009-09-08)
 -----------------
