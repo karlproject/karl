@@ -96,12 +96,13 @@ setup(name='karl',
       karlerrorpage = karl.errorpage:ErrorPageFilter
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
-      jsconcat = karl.scripts.jsconcat:main
       cssconcat = karl.scripts.cssconcat:main
+      evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
-      samplegen = karl.scripts.samplegen:main
+      jsconcat = karl.scripts.jsconcat:main
+      karl = karl.scripts.karlctl:main
       mvcontent = karl.scripts.mvcontent:main
-      karl = karl.scripts.karl:main
+      samplegen = karl.scripts.samplegen:main
       """
       )
 

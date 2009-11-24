@@ -1,0 +1,9 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <utility
+      provides="repoze.evolution.IEvolutionManager"
+      component="repoze.evolution.ZODBEvolutionManager"
+      name="karl.evolve.zodb"
+      />
+
+</configure>
