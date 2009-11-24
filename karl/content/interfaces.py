@@ -70,11 +70,13 @@ class ICalendarEvent(ICommunityContent, IOthers):
     calendar_category = Attribute("Name of the associated calendar category")
 
 class ICalendarLayer(Interface):
+    taggedValue('default_name', '_default_layer_')
     title = Attribute(u'Layer title')
     color = Attribute(u'Layer color')
     paths = Attribute(u'Layer paths')
 
 class ICalendarCategory(Interface):
+    taggedValue('default_name', '_default_category_')
     title = Attribute(u'Calendar title')
 
 class INewsItem(ICommunityContent, IFolder):

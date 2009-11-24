@@ -176,16 +176,14 @@ def add_community_view(context, request):
                                        userid,
                                        )
 
-            # required to use moderators_group_name and
-            # members_group_name
-            community.__name__ = name
+            # By default the "default tool" is None (indicating 'overview')
+            community.default_tool = None
+
+            context[name] = community
 
             for toolinfo in available_tools:
                 if toolinfo['name'] in request.POST.keys():
                     toolinfo['component'].add(community, request)
-
-            # By default the "default tool" is None (indicating 'overview')
-            community.default_tool = None
 
             users = find_users(context)
             moderators_group_name = community.moderators_group_name
@@ -194,7 +192,6 @@ def add_community_view(context, request):
             for group_name in moderators_group_name, members_group_name:
                 users.add_group(userid, group_name)
 
-            context[name] = community
             if workflow is not None:
                 if 'security_state' in converted:
                     workflow.transition_to_state(community, request,

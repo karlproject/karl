@@ -732,7 +732,6 @@
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <select name="calendar_category" size="1">
-        <option value="" selected="selected">Select...</option>
         <option value="${calendar['path']}"
                 tal:repeat="calendar calendar_categories">${calendar['title']}</option>
       </select>

@@ -100,11 +100,13 @@ class TestCalendarToolFactory(unittest.TestCase):
         return calendar_tool_factory
 
     def test_factory(self):
-        from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        from zope.interface import Interface
+        from repoze.lemonade.testing import registerContentFactory
+        def factory(*arg, **kw):
+            return testing.DummyModel(**kw)
+        registerContentFactory(factory, Interface)
         context = testing.DummyModel()
-        request = testing.DummyRequest
+        request = testing.DummyRequest()
         factory = self._makeOne()
         factory.add(context, request)
         self.failUnless(context['calendar'])

@@ -13,15 +13,10 @@
                                       class 'group'" 
                       >All layers</option>
               <option 
-                      tal:attributes="value api.request.path_url + '?filter=*default*';
-                                      class 'group';
-                                      selected selected_layer == '*default*'"
-                      >Default layer</option>
-              <option 
                       tal:repeat="layer layers"
-                      tal:attributes="value api.request.path_url + '?filter=' + layer.title; 
+                      tal:attributes="value api.request.path_url + '?filter=' + layer.__name__; 
                                       class 'color cal_' +layer.color;
-                                      selected layer.title == selected_layer"
+                                      selected layer.__name__ == selected_layer"
                       >${layer.title}</option>
             </select>                       
             

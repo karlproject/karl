@@ -24,7 +24,7 @@
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="layers">
       <tr tal:repeat="layer layers">
         <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
-        <td class="name">${layer['name']}</td>
+        <td class="name">${layer['title']}</td>
         <td class="names"><span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/></td>
         <td class="actions">
           <a class="delete_action" id="delete_${layer['name']}" href="#">delete</a>

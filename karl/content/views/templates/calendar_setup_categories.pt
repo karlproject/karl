@@ -22,10 +22,10 @@
     <div metal:use-macro="formfields.macros['formerror']"/>
 
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="categories">
-      <tr tal:repeat="virt categories">
-        <td class="name">${virt['name']}</td>
+      <tr tal:repeat="category categories">
+        <td class="name">${category.title}</td>
         <td class="actions">
-          <a class="delete_action" id="delete_${virt['name']}" href="#">delete</a>
+          <a class="delete_action" id="delete_${category.__name__}" href="#">delete</a>
         </td>
       </tr>
     </table>

@@ -139,16 +139,10 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
                 seen.add(docid)
                 yield docid
 
-    
-    default_layer = create_content(ICalendarLayer, '*default*', 'blue',
-                                   [model_path(calendar)])
-
-    layers = [default_layer]
-
-    layers.extend(_get_layers(calendar))
+    layers = _get_layers(calendar)
 
     for layer in layers:
-        if layer_name and layer.title != layer_name:
+        if layer_name and layer.__name__ != layer_name:
             continue
         for path in layer.paths:
             total, docids, resolver = searcher(virtual=path, **shared_params)
@@ -172,7 +166,7 @@ def _show_calendar_view(context, request, make_presenter):
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
-    filt = _calendar_filter(context, request)
+    selected_layer = _calendar_filter(context, request)
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
@@ -187,7 +181,7 @@ def _show_calendar_view(context, request, make_presenter):
     events = _get_catalog_events(context, request,
                                  calendar.first_moment,
                                  calendar.last_moment,
-                                 filt)
+                                 selected_layer)
 
     flattened_events = []
     for event_stream in events:
@@ -209,7 +203,7 @@ def _show_calendar_view(context, request, make_presenter):
         api=api,          
         setup_url=setup_url,
         calendar=calendar,
-        selected_layer = filt,
+        selected_layer = selected_layer,
         layers = layers,
         quote = quote,
     )    
@@ -624,10 +618,7 @@ class CalendarCategoriesForm(FormSchema):
 def _calendar_category_title(ob):
     community = find_community(ob)
     title = community and community.title or ''
-    if ICalendar.providedBy(ob):
-        title = title + ' (default)'
-    else:
-        title = title + ' (%s)' % ob.title
+    title = title + ' (%s)' % ob.title
     return title
 
 _COLORS = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
@@ -649,17 +640,23 @@ def calendar_setup_categories_view(context, request):
     form = CalendarCategoriesForm()
     here_path = model_path(context)
     categories = _get_calendar_categories(context)
-    category_names = [ x.title for x in categories ]
+    category_names = [ x.__name__ for x in categories ]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.POST:
         category_name = request.POST['form.delete']
+        if category_name == ICalendarCategory.getTaggedValue('default_name'):
+            location = model_url(
+                context,
+                request, 'categories.html',
+                query={'status_message':'Cannot delete default category'})
+            return HTTPFound(location=location)
         if category_name and category_name in category_names:
             del context[category_name]
         location = model_url(context, request, 'categories.html',
-            query={'status_message':'%s calendar removed' % category_name})
+            query={'status_message':'%s category removed' % category_name})
         return HTTPFound(location=location)
 
     if 'form.submitted' in request.POST:
@@ -702,10 +699,7 @@ def calendar_setup_categories_view(context, request):
     categories = []
     used_remote = {}
 
-    for item in _get_calendar_categories(context):
-        d = {}
-        d['name'] = item.title
-        categories.append(d)
+    categories = _get_calendar_categories(context)
 
     return render_form_to_response(
         'templates/calendar_setup_categories.pt',
@@ -735,13 +729,19 @@ def calendar_setup_layers_view(context, request):
     form = CalendarLayersForm()
     here_path = model_path(context)
     layers = list(_get_layers(context))
-    layer_names = [ x.title for x in layers]
+    layer_names = [ x.__name__ for x in layers]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
+        if layer_name == ICalendarLayer.getTaggedValue('default_name'):
+            location = model_url(
+                context,
+                request, 'layers.html',
+                query={'status_message':'Cannot delete default layer'})
+            return HTTPFound(location=location)
         if layer_name in layer_names:
             del context[layer_name]
         location = model_url(context, request, 'layers.html',
@@ -788,11 +788,12 @@ def calendar_setup_layers_view(context, request):
 
     layers = []
 
-    for item in _get_layers(context):
-        paths = item.paths
+    for layer in _get_layers(context):
+        paths = layer.paths
         d = {}
-        d['name'] = item.title
-        d['color'] = item.color
+        d['name'] = layer.__name__
+        d['title'] = layer.title
+        d['color'] = layer.color
         d['paths'] = []
         for path in paths:
             v = {}
@@ -812,7 +813,7 @@ def calendar_setup_layers_view(context, request):
     if searcher is not None:
         total, docids, resolver = searcher(
             allowed={'query': effective_principals(request), 'operator': 'or'},
-            interfaces={'query':[ICalendar, ICalendarCategory],'operator':'or'},
+            interfaces={'query':[ICalendarCategory],'operator':'or'},
             reverse=False,
             )
 

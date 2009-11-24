@@ -19,6 +19,8 @@ from persistent import Persistent
 from repoze.lemonade.content import create_content
 
 from repoze.folder import Folder
+from repoze.bfg.traversal import model_path
+
 from zope.interface import implements
 
 from karl.content.interfaces import ICalendar
@@ -44,7 +46,7 @@ class CalendarCategory(Persistent):
 class CalendarLayer(Persistent):
     implements(ICalendarLayer)
 
-    def __init__(self, title, color, paths):
+    def __init__(self, title, color, paths=()):
         self.title = title
         self.color = color
         self.paths = paths
@@ -81,8 +83,18 @@ class CalendarToolFactory(ToolFactory):
     name = 'calendar'
     interfaces = (ICalendar, ICalendarEvent)
     def add(self, context, request):
+        default_category_name = ICalendarCategory.getTaggedValue('default_name')
+        default_layer_name = ICalendarLayer.getTaggedValue('default_name')
+
         calendar = create_content(ICalendar)
         context['calendar'] = calendar
+        calendar = context['calendar']
+        default_category = create_content(ICalendarCategory, 'Default')
+        calendar[default_category_name] = default_category
+        local_layer = create_content(ICalendarLayer,
+                                     "This Calendar's Events Only",' blue',
+                                     [model_path(default_category)])
+        calendar[default_layer_name] = local_layer
 
     def remove(self, context, request):
         del context['calendar']
