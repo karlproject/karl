@@ -36,14 +36,13 @@ class TestPopulate(unittest.TestCase):
         testing.registerAdapter(DummyToolAddables, (Interface, Interface),
                                 IToolAddables)
 
-
     def _callFUT(self, root, do_transaction_begin=True):
         from karl.bootstrap.bootstrap import populate
         populate(root, do_transaction_begin=do_transaction_begin)
 
     def test_it(self):
         self._registerComponents()
-        root = testing.DummyModel()
+        root = DummyDummy()
         connections = {}
         connections['main'] = DummyConnection(root, connections)
         root._p_jar = connections['main']
@@ -66,7 +65,7 @@ class TestPopulate(unittest.TestCase):
 
     def test_external_catalog(self):
         self._registerComponents()
-        root = testing.DummyModel()
+        root = DummyDummy()
         connections = {}
         connections['main'] = DummyConnection(root, connections)
         connections['catalog'] = DummyConnection(
@@ -94,12 +93,6 @@ class DummySecurityWorkflow:
     def setInitialState(self):
         self.initial_state_set = True
 
-class DummyContent(testing.DummyModel):
-    def __init__(self, *arg, **kw):
-        self.arg = arg
-        self.kw = kw
-        testing.DummyModel.__init__(self)
-
 class DummyConnection:
     def __init__(self, root, connections):
         self._root = root
@@ -111,6 +104,9 @@ class DummyConnection:
         return self._root
     def add(self, obj):
         self.added.append(obj)
+
+class DummyDummy(dict):
+    pass
 
 EXCLUDE_TOOLS = ['intranets',]
 
@@ -126,3 +122,4 @@ class DummyToolAddables(object):
         """
         tools = get_listitems(IToolFactory)
         return [tool for tool in tools if tool['name'] not in EXCLUDE_TOOLS]
+
