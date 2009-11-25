@@ -19,6 +19,7 @@
 Generate some statistics about usage.
 """
 
+import datetime
 from optparse import OptionParser
 
 from csv import DictWriter
@@ -29,6 +30,7 @@ import transaction
 from repoze.folder.interfaces import IFolder
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IComment
+from karl.models.interfaces import IProfile
 from karl.content.interfaces import IWikiPage
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
@@ -38,21 +40,14 @@ from karl.scripting import get_default_config
 from karl.scripting import open_root
 
 from karl.utils import find_tags
+from karl.utils import find_users
 
 log = logging.getLogger(__name__)
-
-count = 0
 
 def walk(startnode, visit, leave):
     """Visit shallow nodes earlier."""
     def traverse(node):
-        global count
-        if count >= 1000:
-            return
-
-        sys.stdout.write('.')
-        sys.stdout.flush()
-        count += 1
+        sys.stdout.write('.'); sys.stdout.flush()
         visit(node)
         if IFolder.providedBy(node):
             for child in node.values():
@@ -151,9 +146,87 @@ class CommunitiesReport(object):
             self.rows.append(self.row)
             self.row = self.community = None
 
+class PeopleReport(object):
+    filename = 'people.csv'
+    columns = [
+        'first_last',
+        'profile_id',
+        'create_date',
+        'is_staff',
+        'membership',
+        'communities_moderator',
+        'location',
+        'department',
+        'content_created',
+        'tags',
+        'created_this_month',
+    ]
+
+    def __init__(self):
+        self.people = {}
+        self.one_month_ago = (datetime.datetime.now() -
+                              datetime.timedelta(days=30))
+
+    @property
+    def rows(self):
+        r = list(self.people.values())
+        r.sort(key=lambda x: x['profile_id'])
+        return r
+
+    def _get_person(self, id):
+        if id not in self.people:
+            self.people[id] = {
+                'first_last': None,
+                'profile_id': id,
+                'create_date': None,
+                'is_staff': None,
+                'membership': 0,
+                'communities_moderator': 0,
+                'location': None,
+                'department': None,
+                'content_created': 0,
+                'tags': None,
+                'created_this_month': 0,
+                }
+
+        return self.people[id]
+
+    def visit(self, context):
+        if IProfile.providedBy(context):
+            users = find_users(context)
+            person = self._get_person(context.__name__)
+            person['first_last'] = ' '.join(
+                (context.firstname, context.lastname))
+            person['create_date'] = context.created
+            person['is_staff'] = users.member_of_group(
+                context.__name__, 'group.KarlStaff')
+            person['location'] = context.location
+            person['department'] = context.department
+
+            tags = find_tags(context)
+            person['tags'] = len(tags.getTags(users=[context.__name__]))
+
+        elif ICommunity.providedBy(context):
+            for id in context.member_names:
+                self._get_person(id)['membership'] += 1
+            for id in context.moderator_names:
+                self._get_person(id)['communities_moderator'] += 1
+
+        else:
+            creator = getattr(context, 'creator', None)
+            if creator is not None:
+                person = self._get_person(creator)
+                person['content_created'] += 1
+                if context.created > self.one_month_ago:
+                    person['created_this_month'] += 1
+
+    def leave(self, context):
+        pass
+
 def gen_stats(root):
     reports = [
         CommunitiesReport(),
+        PeopleReport(),
         ]
     def visit(context):
         for report in reports:
@@ -173,8 +246,17 @@ def write_report(report):
     f = open(report.filename, 'wb')
     print >>f, ','.join(report.columns)
     writer = DictWriter(f, report.columns)
-    writer.writerows(report.rows)
+    for row in report.rows:
+        writer.writerow(_encode_row(row))
     f.close()
+
+def _encode_row(row):
+    new_row = {}
+    for k,v in row.items():
+        if isinstance(v, unicode):
+            v = v.encode('utf-8')
+        new_row[k] = v
+    return new_row
 
 def main(argv=sys.argv):
     logging.basicConfig()
