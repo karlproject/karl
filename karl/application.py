@@ -1,3 +1,4 @@
+import sys
 import transaction
 
 from zope.component import queryUtility
@@ -19,7 +20,8 @@ def appmaker(root):
 
 def make_app(global_config, **kw):
     pkg_name = global_config.get('package', 'karl.includes')
-    package = __import__(pkg_name)
+    __import__(pkg_name)
+    package = sys.modules[pkg_name]
 
     # paster app config callback
     zodb_uri = global_config.get('zodb_uri')

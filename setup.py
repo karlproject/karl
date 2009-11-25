@@ -37,6 +37,8 @@ requires = [
     'repoze.bfg',
     'repoze.retry',
     'repoze.tm2',
+    'repoze.mailin',
+    'repoze.mailin.monitor',
     'repoze.monty',
     'ZODB3',
     'repoze.catalog',
