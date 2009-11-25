@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-
+import os
 import twill
 import karl.twillcommands
 from cStringIO import StringIO
@@ -31,8 +31,11 @@ class TestKarlTwill:
     twill.execute_string("valid twill statement")
     or you can run a twill file which is mostly what has been done in this class by
     twill.execute_string("runfile '${test_path}/path/to/twill_file.twill")'''
+    test_path =  os.path.abspath(os.path.dirname(__file__))
+    testpath_command = "setglobal test_path " + test_path
+    twill.execute_string(testpath_command)
     
-    wsgi_app = get_app('../../../../etc/karl.ini','main')
+    wsgi_app = get_app(test_path + '/../../../../etc/karl.ini','main')
 
 
     def setUp(self):
@@ -44,7 +47,7 @@ class TestKarlTwill:
         twill.execute_string("extend_with karl.twillcommands")
         # mostly the same as karl3.conf without extending with flunc
         # and few other adjustments.
-        twill.execute_string("runfile 'test_twill_wsgi_karl3.conf'")
+        twill.execute_string("runfile '" + os.path.abspath(os.path.dirname(__file__)) + "/test_twill_wsgi_karl3.conf'")
 
         # while we're at it, stop twill from running off at the mouth...
         outp = StringIO()
