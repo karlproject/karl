@@ -47,10 +47,11 @@ from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import handle_photo_upload
 
-from karl.views.interfaces import ILayoutProvider
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import store_attachments
 from karl.content.views.utils import fetch_attachments
+
+from karl.utils import get_layout_provider
 
 import datetime
 
@@ -121,7 +122,7 @@ def add_newsitem_view(context, request):
     }
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
     return render_form_to_response(
@@ -173,7 +174,7 @@ def show_newsitem_view(context, request):
         }
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
     return render_template_to_response(
@@ -258,7 +259,7 @@ def edit_newsitem_view(context, request):
         display_photo["may_delete"] = False
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
     return render_form_to_response(

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -23,7 +23,7 @@ from webob.exc import HTTPFound
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import model_url
 
-from karl.views.interfaces import ILayoutProvider
+from karl.utils import get_layout_provider
 
 from karl.views.api import TemplateAPI
 from repoze.folder.interfaces import IFolder
@@ -43,7 +43,7 @@ def delete_resource_view(context, request):
         return HTTPFound(location=location)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     # LP #399337, Add warning on delete of Folder with content inside

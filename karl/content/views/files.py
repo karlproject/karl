@@ -65,7 +65,6 @@ from karl.content.interfaces import IIntranetRootFolder
 from karl.content.views.interfaces import IFileInfo
 from karl.views.interfaces import IFolderAddables
 from karl.content.views.interfaces import IFolderCustomizer
-from karl.views.interfaces import ILayoutProvider
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 from karl.content.views.interfaces import IShowSendalert
@@ -75,6 +74,8 @@ from karl.content.interfaces import IReferencesFolder
 from karl.content.views.utils import get_previous_next
 
 from karl.security.workflow import get_security_states
+
+from karl.utils import get_layout_provider
 
 from karl.views import baseforms
 from karl.views.tags import set_tags
@@ -136,7 +137,7 @@ def show_folder_view(context, request):
         )
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_template_to_response(
@@ -215,7 +216,7 @@ def add_folder_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = queryMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     if layout_provider is None:
         layout = api.community_layout
     else:
@@ -266,7 +267,7 @@ def advanced_folder_view(context, request):
             return HTTPFound(location=location)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     if IReferencesFolder.providedBy(context):
@@ -385,7 +386,7 @@ def add_file_view(context, request, check_upload_size=check_upload_size):
         show_sendalert_field = True
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_form_to_response(
@@ -441,7 +442,7 @@ def show_file_view(context, request):
     previous, next = get_previous_next(context, request)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_template_to_response(
@@ -531,7 +532,7 @@ def edit_folder_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_form_to_response(
@@ -617,7 +618,7 @@ def edit_file_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_form_to_response(

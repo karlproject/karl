@@ -20,8 +20,8 @@ import email.message
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+from zope.component import queryMultiAdapter
 from zope.interface import implements
-
 from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import get_template
@@ -49,12 +49,13 @@ from karl.models.interfaces import ITagQuery
 
 from repoze.workflow import get_workflow
 
+from karl.utils import get_layout_provider
 from karl.utils import find_profiles
 from karl.utils import get_setting
 
+from karl.views.adapters import DefaultToolAddables
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import ISidebar
-from karl.views.interfaces import ILayoutProvider
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import convert_to_script
 from karl.views.batch import get_catalog_batch_grid
@@ -76,7 +77,9 @@ def edit_community_view(context, request):
 
     system_name = get_setting(context, 'system_name', 'KARL')
     workflow = get_workflow(ICommunity, 'security', context)
-    available_tools = getMultiAdapter((context, request), IToolAddables)()
+    available_tools = queryMultiAdapter(
+        (context, request), IToolAddables,
+        default=DefaultToolAddables(context, request))()
 
     tags_list = request.POST.getall('tags')
     form = EditCommunityForm(tags_list=tags_list)
@@ -362,7 +365,7 @@ def delete_community_view(context, request):
         return HTTPFound(location=location)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_template_to_response(

@@ -23,6 +23,7 @@ from formencode import Invalid
 
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
+from zope.component import queryMultiAdapter
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -36,6 +37,7 @@ from repoze.lemonade.content import create_content
 from repoze.bfg.url import model_url
 from repoze.enformed import FormSchema
 
+from karl.views.adapters import DefaultToolAddables
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import make_name
@@ -153,7 +155,9 @@ def add_community_view(context, request):
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request))
 
-    available_tools = getMultiAdapter((context, request), IToolAddables)()
+    available_tools = queryMultiAdapter(
+        (context, request), IToolAddables,
+        default=DefaultToolAddables(context,request))()
 
     if 'form.submitted' in request.POST:
         try:

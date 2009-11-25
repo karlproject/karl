@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -40,7 +40,6 @@ from karl.views import baseforms
 from karl.views.api import TemplateAPI
 from karl.views.form import render_form_to_response
 from karl.views.interfaces import IFolderAddables
-from karl.views.interfaces import ILayoutProvider
 from karl.views.tags import set_tags
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
@@ -52,6 +51,8 @@ from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.utils import get_previous_next
+
+from karl.utils import get_layout_provider
 
 def add_referencemanual_view(context, request):
     tags_list=request.POST.getall('tags')
@@ -95,7 +96,7 @@ def add_referencemanual_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     return render_form_to_response(
@@ -142,7 +143,7 @@ def _get_toc(context, here_url):
         for subitem_name in section.ordering.items():
             subitem = section.get(subitem_name)
             item['items'].append({
-                'name': subitem_name, 
+                'name': subitem_name,
                 'title': subitem.title,
                  'href': here_url + section_name + '/' + subitem_name,
                  'moveUp': item_up % (section_name, subitem_name),
@@ -192,7 +193,7 @@ def _get_viewall(context, request, api):
             else:
                 html = '<p>Unknown type</p>'
             item['items'].append({
-                'name': subitem_name, 
+                'name': subitem_name,
                 'title': subitem.title,
                 'html': html,
                  })
@@ -252,7 +253,7 @@ def show_referencemanual_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     # provide client data for rendering current tags in the tagbox
@@ -262,7 +263,7 @@ def show_referencemanual_view(context, request):
 
     api.status_message = status_message
     return render_template_to_response(
-        'templates/show_referencemanual.pt', 
+        'templates/show_referencemanual.pt',
         api=api,
         actions=actions,
         head_data=convert_to_script(client_json_data),
@@ -283,7 +284,7 @@ def viewall_referencemanual_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     # provide client data for rendering current tags in the tagbox
@@ -292,7 +293,7 @@ def viewall_referencemanual_view(context, request):
         )
 
     return render_template_to_response(
-        'templates/viewall_referencemanual.pt', 
+        'templates/viewall_referencemanual.pt',
         api=api,
         actions=[],
         head_data=convert_to_script(client_json_data),
@@ -350,7 +351,7 @@ def edit_referencemanual_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     return render_form_to_response(
@@ -418,7 +419,7 @@ def add_referencesection_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     return render_form_to_response(
@@ -471,7 +472,7 @@ def show_referencesection_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     previous, next = get_previous_next(context, request)
@@ -482,7 +483,7 @@ def show_referencesection_view(context, request):
         )
 
     return render_template_to_response(
-        'templates/show_referencesection.pt', 
+        'templates/show_referencesection.pt',
         api=api,
         actions=actions,
         entries=_get_ordered_listing(context, request),
@@ -541,7 +542,7 @@ def edit_referencesection_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('intranet')
 
     return render_form_to_response(

@@ -27,6 +27,7 @@ from karl.security.workflow import get_security_states
 from karl.utils import find_community
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.views.adapters import DefaultToolAddables
 from karl.views.api import TemplateAPI
 from karl.views.form import render_form_to_response
 from karl.views.interfaces import IToolAddables
@@ -44,6 +45,7 @@ from urllib import quote
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.interface import alsoProvides
 
 def show_intranets_view(context, request):
@@ -246,7 +248,9 @@ def edit_intranet_root_view(context, request):
     tags_list = request.POST.getall('tags')
     form = EditIntranetRootForm(tags_list=tags_list)
     workflow = get_workflow(ICommunity, 'security', context)
-    available_tools = getMultiAdapter((context, request), IToolAddables)()
+    available_tools = queryMultiAdapter(
+        (context, request), IToolAddables,
+        default=DefaultToolAddables(context, request))()
 
     if workflow is None:
         security_states = []

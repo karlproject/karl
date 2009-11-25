@@ -40,7 +40,6 @@ from repoze.lemonade.content import create_content
 
 from karl.content.interfaces import IForum
 from karl.content.interfaces import IForumTopic
-from karl.views.interfaces import ILayoutProvider
 
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
@@ -50,6 +49,7 @@ from karl.models.interfaces import ICatalogSearch
 
 from karl.security.workflow import get_security_states
 
+from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import support_attachments
@@ -176,7 +176,7 @@ def show_forum_view(context, request):
         }
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_template_to_response(
@@ -238,7 +238,7 @@ def add_forum_view(context, request):
         else:
             security_state = workflow.initial_state
         fill_values = dict(security_state = security_state)
-            
+
 
     # Render the form and shove some default values in
     page_title = 'Add Forum'
@@ -395,7 +395,7 @@ def add_forum_topic_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_form_to_response(
@@ -479,7 +479,7 @@ def show_forum_topic_view(context, request):
         )
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     if support_attachments(context):
@@ -526,7 +526,7 @@ def edit_forum_topic_view(context, request):
                 if 'security_state' in converted:
                     workflow.transition_to_state(context, request,
                                                  converted['security_state'])
-                                             
+
             context.title = converted['title']
             context.text = converted['text']
             context.description = extract_description(converted['text'])
@@ -573,7 +573,7 @@ def edit_forum_topic_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_form_to_response(

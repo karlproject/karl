@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -49,11 +49,11 @@ from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 
 from karl.content.views.utils import extract_description
-from karl.views.interfaces import ILayoutProvider
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import store_attachments
 from karl.content.views.utils import fetch_attachments
 
+from karl.utils import get_layout_provider
 
 def add_page_view(context, request):
     tags_list=request.POST.getall('tags')
@@ -83,7 +83,7 @@ def add_page_view(context, request):
             # Update ordering if in ordered container
             if hasattr(context, 'ordering'):
                 context.ordering.add(name)
-                
+
             location = model_url(page, request)
             return HTTPFound(location=location)
 
@@ -105,12 +105,12 @@ def add_page_view(context, request):
 
     # Get a layout
     community = find_community(context)
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     if community is not None:
         layout = layout_provider('community')
     else:
         layout = layout_provider('generic')
-        
+
     return render_form_to_response(
         'templates/addedit_page.pt',
         form,
@@ -155,14 +155,14 @@ def show_page_view(context, request):
 
     # Get a layout
     community = find_community(context)
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     if community is not None:
         layout = layout_provider('community')
     else:
         layout = layout_provider('generic')
 
     return render_template_to_response(
-        'templates/show_page.pt', 
+        'templates/show_page.pt',
         api=api,
         actions=actions,
         attachments=fetch_attachments(context['attachments'], request),
@@ -229,7 +229,7 @@ def edit_page_view(context, request):
 
     # Get a layout
     community = find_community(context)
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     if community is not None:
         layout = layout_provider('community')
     else:

@@ -75,7 +75,7 @@ from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import ICalendarCategory
 from karl.content.views.utils import extract_description
-from karl.views.interfaces import ILayoutProvider
+from karl.utils import get_layout_provider
 from karl.content.views.interfaces import IShowSendalert
 
 from karl.content.views.utils import fetch_attachments
@@ -170,14 +170,14 @@ def _show_calendar_view(context, request, make_presenter):
 
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
-        return model_url(ctx, request, *args, **kargs)          
+        return model_url(ctx, request, *args, **kargs)
 
     # make the calendar presenter for this view
-    calendar = make_presenter(focus_datetime, 
-                              now_datetime, 
+    calendar = make_presenter(focus_datetime,
+                              now_datetime,
                               url_for)
 
-    # find events and paint them on the calendar 
+    # find events and paint them on the calendar
     events = _get_catalog_events(context, request,
                                  calendar.first_moment,
                                  calendar.last_moment,
@@ -197,16 +197,16 @@ def _show_calendar_view(context, request, make_presenter):
     layers = _get_layers(context)
 
     # render
-    api = TemplateAPI(context, request, calendar.title)    
+    api = TemplateAPI(context, request, calendar.title)
     return render_template_to_response(
         calendar.template_filename,
-        api=api,          
+        api=api,
         setup_url=setup_url,
         calendar=calendar,
         selected_layer = selected_layer,
         layers = layers,
         quote = quote,
-    )    
+    )
 
 def show_list_view(context, request):
     return _show_calendar_view(context, request, ListViewPresenter)
@@ -216,7 +216,7 @@ def show_month_view(context, request):
 
 def show_week_view(context, request):
     return _show_calendar_view(context, request, WeekViewPresenter)
-    
+
 def show_day_view(context, request):
     return _show_calendar_view(context, request, DayViewPresenter)
 
@@ -341,7 +341,7 @@ def add_calendarevent_view(context, request):
         show_sendalert_field = True
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     calendar = find_interface(context, ICalendar)
@@ -402,7 +402,7 @@ def show_calendarevent_view(context, request):
     contact_email = context.contact_email
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     return render_template_to_response(
@@ -557,7 +557,7 @@ def edit_calendarevent_view(context, request):
         ))
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     calendar = find_interface(context, ICalendar)
@@ -627,7 +627,7 @@ _COLORS = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
 def calendar_setup_view(context, request):
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
-    
+
     return render_template_to_response(
         'templates/calendar_setup.pt',
         back_to_calendar_url=model_url(context, request, 'month.html'),

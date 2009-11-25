@@ -36,6 +36,7 @@ from karl.views.api import TemplateAPI
 from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
 
+from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import support_attachments
 
@@ -45,7 +46,6 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForumTopic
 from karl.content.views.utils import extract_description
 from karl.content.views.interfaces import IBylineInfo
-from karl.views.interfaces import ILayoutProvider
 from karl.views.form import render_form_to_response
 from karl.views.baseforms import security_state as security_state_field
 from karl.content.views.utils import fetch_attachments
@@ -96,7 +96,7 @@ def show_comment_view(context, request):
         }
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     if support_attachments(context):
@@ -238,7 +238,7 @@ def edit_comment_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
-    layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+    layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
     if support_attachments(context):

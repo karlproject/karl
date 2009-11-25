@@ -19,6 +19,7 @@ import calendar
 import copy
 
 from zope.component import queryAdapter
+from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
 from repoze.bfg.interfaces import ISettings
@@ -33,6 +34,7 @@ from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IAttachmentPolicy
 from karl.models.interfaces import IPeopleDirectory
+from karl.views.interfaces import ILayoutProvider
 
 def find_site(context):
     site = find_interface(context, ISite)
@@ -153,3 +155,8 @@ class PersistentBBB(object):
     def __get__(self, inst, cls):
         setattr(inst, self.name, copy.deepcopy(self.val))
         return getattr(inst, self.name)
+
+def get_layout_provider(context, request):
+    from karl.views.adapters import DefaultLayoutProvider
+    return queryMultiAdapter((context, request), ILayoutProvider,
+                             default=DefaultLayoutProvider(context,request))
