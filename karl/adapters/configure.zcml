@@ -1,5 +1,5 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
-  
+
   <adapter
     for="zope.interface.Interface
          karl.adapters.url.OfflineRequest"
@@ -7,5 +7,20 @@
     factory="karl.adapters.url.OfflineContextURL"
     />
 
+  <adapter for="karl.models.interfaces.ISite"
+       provides="karl.adapters.interfaces.IMailinDispatcher"
+       factory="karl.adapters.mailin.MailinDispatcher"
+       />
+
+  <adapter for="karl.content.interfaces.IBlog"
+           provides="karl.adapters.interfaces.IMailinHandler"
+           factory="karl.content.adapters.mailin.BlogMailinHandler"
+           />
+
+  <adapter for="karl.content.interfaces.IBlogEntry"
+           provides="karl.adapters.interfaces.IMailinHandler"
+           factory="karl.content.adapters.mailin.BlogEntryMailinHandler"
+           />
+
 </configure>
-  
+

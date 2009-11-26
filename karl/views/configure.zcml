@@ -42,14 +42,14 @@
     view=".site.versioning_static_view"
     factory=".site.StaticRootFactory"
   />
-  
+
   <!-- Redirect requests to site root, to correct URL -->
   <view
     for="karl.models.interfaces.ISite"
     view=".site.site_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.ISite"
     view=".search.advancedsearch_view"
@@ -94,59 +94,59 @@
     for="karl.models.interfaces.ISite"
     view=".tags.tag_cloud_view"
     permission="view"
-    name="tagcloud.html" 
+    name="tagcloud.html"
   />
 
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_cloud_view"
     permission="view"
-    name="tagcloud.html" 
+    name="tagcloud.html"
   />
 
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_listing_view"
     permission="view"
-    name="taglisting.html" 
+    name="taglisting.html"
   />
 
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_listing_view"
     permission="view"
-    name="taglisting.html" 
+    name="taglisting.html"
   />
 
   <view
     for="karl.models.interfaces.IProfile"
     view=".tags.profile_tag_listing_view"
     permission="view"
-    name="taglisting.html" 
+    name="taglisting.html"
   />
 
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_users_view"
     permission="view"
-    name="tagusers.html" 
+    name="tagusers.html"
   />
 
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_users_view"
     permission="view"
-    name="tagusers.html" 
+    name="tagusers.html"
   />
 
   <view
     for="karl.models.interfaces.IProfile"
     view=".tags.manage_tags_view"
     permission="edit"
-    name="manage_tags.html" 
+    name="manage_tags.html"
   />
 
-  
+
 
   <!-- /stop global tagging related views -->
 
@@ -156,14 +156,14 @@
     view=".communities.show_communities_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.ICommunities"
     name="add_community.html"
     view=".communities.add_community_view"
     permission="create"
   />
-  
+
   <!-- We need to be able to add the intranets hierarchy at root -->
   <view
     for="karl.models.interfaces.ISite"
@@ -171,40 +171,40 @@
     view=".communities.add_community_view"
     permission="create"
   />
-  
+
   <view
     for="karl.models.interfaces.ICommunity"
     view=".community.redirect_community_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.ICommunity"
     view=".community.show_community_view"
     name="view.html"
     permission="view"
-  /> 
-  
+  />
+
   <view
     for="karl.models.interfaces.ICommunity"
     view=".atom.community_atom_view"
     name="atom.xml"
     permission="view"
-  /> 
-  
+  />
+
   <view
     for="karl.models.interfaces.ICommunity"
     name="edit.html"
     view=".community.edit_community_view"
     permission="moderate"
   />
-  
+
   <view
     for="karl.models.interfaces.ICommunity"
     name="delete.html"
     view=".community.delete_community_view"
     permission="moderate"
-  />  
+  />
 
   <view
     for="karl.models.interfaces.ICommunity"
@@ -219,7 +219,7 @@
     view=".community.join_community_view"
     permission="view"
     />
-    
+
   <adapter
     for="karl.models.interfaces.ICommunity
          repoze.bfg.interfaces.IRequest"
@@ -232,7 +232,7 @@
     name="login.html"
     view=".login.login_view"
   />
-  
+
   <view
     for="karl.models.interfaces.ISite"
     name="logout.html"
@@ -298,26 +298,26 @@
     name="manage_communities.html"
     permission="edit"
     />
-    
+
   <view
     for="karl.models.interfaces.IProfile"
     view=".people.show_profile_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.IProfile"
     name="delete.html"
     view=".people.delete_profile_view"
     permission="delete"
-  />  
-  
+  />
+
   <view
     for="karl.models.interfaces.ICommunityContent"
     name="delete.html"
     view=".resource.delete_resource_view"
     permission="delete"
-  />  
+  />
 
   <view
     for="karl.models.interfaces.IProfiles"
@@ -406,7 +406,7 @@
     view=".file.serve_file_view"
     permission="view"
     />
-  
+
   <view
     for="karl.models.interfaces.IAttachmentsFolder"
     view=".redirect_up.redirect_up_view"
@@ -481,6 +481,11 @@
   <forbidden
     view=".forbidden.forbidden"
     />
+
+  <subscriber
+      for="repoze.bfg.interfaces.INewResponse"
+      handler="karl.handlers.add_no_cache_headers"
+      />
 
 </configure>
 
