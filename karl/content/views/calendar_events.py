@@ -630,7 +630,7 @@ def calendar_setup_view(context, request):
 
     return render_template_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=model_url(context, request, 'month.html'),
+        back_to_calendar_url=model_url(context, request),
         categories_url=model_url(context, request, 'categories.html'),
         layers_url=model_url(context, request, 'layers.html'),
         api=api,

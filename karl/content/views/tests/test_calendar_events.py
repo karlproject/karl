@@ -473,7 +473,7 @@ class CalendarSetupViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         
         from repoze.bfg.url import model_url 
-        self.assertEqual(model_url(context, request, 'month.html'), 
+        self.assertEqual(model_url(context, request), 
                          renderer.back_to_calendar_url)
 
     def test_sets_categories_url(self):
