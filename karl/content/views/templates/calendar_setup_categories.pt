@@ -22,6 +22,10 @@
     <div metal:use-macro="formfields.macros['formerror']"/>
 
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="categories">
+      <tr>
+        <th>Name</th>
+        <th>&nbsp;</th>
+      </tr>
       <tr tal:repeat="category categories">
         <td class="name">${category.title}</td>
         <td class="actions">
@@ -30,7 +34,7 @@
       </tr>
     </table>
 
-    <h1>Add Calendar Category</h1>
+    <h1>Add Category</h1>
       
     <fieldset tal:define="error fielderrors['category_name']|None"
               class="${error and 'fieldError' or ''}"

@@ -22,6 +22,12 @@
     <div metal:use-macro="formfields.macros['formerror']"/>
 
     <table id="calendars" class="cal_all" cellspacing="0" tal:condition="layers">
+      <tr>
+        <th>&nbsp;</th>
+        <th>Layer</th>
+        <th>Categories</th>
+        <th>&nbsp;</th>
+      </tr>
       <tr tal:repeat="layer layers">
         <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
         <td class="name">${layer['title']}</td>
@@ -46,7 +52,7 @@
     <fieldset tal:define="error fielderrors['calendar_path']|None"
               class="${error and 'fieldError' or ''}"
               id="calendar-categories-field">
-      <label for="calendar_path" class="required">Calendars Categories</label><br />
+      <label for="calendar_path" class="required">Categories</label><br />
       <table border="0" id="layers">
         <tr>
           <td>
@@ -58,7 +64,7 @@
           <td><a class="remove" href="#" style="display: none;">Remove</a></td>
         </tr>
       </table>
-      <a href="#" class="add" alt="Add Calendar">Add another calendar to this layer</a>
+      <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
 
     </fieldset>
 

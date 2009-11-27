@@ -2562,6 +2562,7 @@ body .cal_hour_event .cal_event_block .time {
 
 table.cal_all {
   margin-bottom: 30px;
+  font-size: 0.9em;
 }
 table.cal_all td {
   background-color: #f1f4f6;
@@ -2570,13 +2571,15 @@ table.cal_all td {
   padding: 4px 5px;  
 }
 table.cal_all th {
+  background-color: #e4e6e9;
   border-bottom: 1px solid #e4e6e9;
-  padding: 2px 5px;
-  font-weight: normal;
+  padding: 3px 5px;
   text-align: left;
 }
 table.cal_all .actions {
+  width: 100px;
   padding-right: 8px;
+  text-align: right;
 }
 table.cal_all a, 
 table.cal_all a:visited {
@@ -2597,8 +2600,8 @@ table.cal_all .location {
 #calendar_name, #layer_name {
   width: 330px;
 }
-.cal_add input, 
-.cal_add select {
+.cal_add input,  .cal_add select, 
+.cal_edit input, .cal_edit select {
   margin-top: 2px;
 }
 .cal_choose_color {
@@ -2620,6 +2623,14 @@ table.cal_all .location {
   padding: 0;
   border: 0;
   background: none;
+}
+#setup_add_cal a {
+  background-color: #639332;
+  padding: 1px 11px;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 /** =CALENDAR TOOLTIP
