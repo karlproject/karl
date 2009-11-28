@@ -721,8 +721,12 @@ def _get_layers(context):
 def calendar_setup_layers_view(context, request):
     form = CalendarLayersForm()
     here_path = model_path(context)
+
     layers = list(_get_layers(context))
     layer_names = [ x.__name__ for x in layers]
+
+    categories = _get_calendar_categories(context)
+    category_names = [ x.__name__ for x in categories ]
 
     if 'form.cancel' in request.POST:
         return HTTPFound(location=model_url(context, request, 'setup.html'))
@@ -747,6 +751,12 @@ def calendar_setup_layers_view(context, request):
             category_paths = list(set(request.POST.getall('category_paths')))
             layer_name = converted['layer_name']
             layer_color = converted['layer_color']
+
+            if layer_name in category_names:
+                location = model_url(
+                    context, request, 'layers.html',
+                    query={'status_message':'Name already used by a category'})
+                return HTTPFound(location=location)    
 
             if layer_name in layer_names:
                 layer = context[layer_name]
