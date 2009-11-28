@@ -360,7 +360,6 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fieldvalues['category_name'], '')
-        self.assertEqual(renderer.fieldvalues['layer_color'], 'red')
 
     def test_submitted_valid_local(self):
         from repoze.lemonade.testing import registerContentFactory
@@ -383,8 +382,6 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/categories.html?status_message=Calendar+category+added')
         self.assertEqual(context['Announcements'].arg, ('Announcements',))
-        self.assertEqual(context['Announcements layer'].arg,
-                         (u'Announcements layer', u'red', ['/Announcements']))
 
     def test_submitted_invalid(self):
         context = DummyCalendar()

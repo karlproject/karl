@@ -613,7 +613,6 @@ class EditCalendarEventForm(FormSchema):
 
 class CalendarCategoriesForm(FormSchema):
     category_name = validators.UnicodeString(strip=True, not_empty=True)
-    layer_color = validators.UnicodeString(strip=True, not_empty=True)
 
 def _calendar_category_title(ob):
     community = find_community(ob)
@@ -675,11 +674,6 @@ def calendar_setup_categories_view(context, request):
                 context, request,
                 'categories.html',
                 query={'status_message':'Calendar category added'})
-            color = converted['layer_color']
-            layer_name = '%s layer' % name
-            paths = [model_path(context[name])]
-            layer = create_content(ICalendarLayer, layer_name, color, paths)
-            context[layer_name] = layer
             return HTTPFound(location=location)
 
         except Invalid, e:
@@ -689,7 +683,6 @@ def calendar_setup_categories_view(context, request):
         fielderrors = {}
         fill_values = dict(
             category_name='',
-            layer_color='red',
             )
 
     # Render the form and shove some default values in

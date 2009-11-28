@@ -48,22 +48,6 @@
       <input name="category_name" id="calendar_name" type="text"/>
     </fieldset>
 
-    <fieldset tal:define="error fielderrors['layer_color']|None"
-              class="calendar-categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_color" class="required">Choose color</label><br />
-      <div tal:condition="error" class="errorMessage">${error}</div> 
-
-      <ul class="cal_choose_color">
-        <li tal:repeat="color colors">
-            <input name="layer_color"
-                   type="radio" value="${color}" alt="${color}"/>
-            <br/>
-            <div class="cal_${color}_all">&nbsp;</div>
-        </li>
-      </ul>
-
-    </fieldset>
-
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>
   </form>
 
