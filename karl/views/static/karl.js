@@ -1844,32 +1844,94 @@ function initNewEvent() {
   });
 }
      
-// Calendar Layers view only
-function initCalendarLayersEdit() {
-    if ($("select#category_paths").length == 0) { return; }
+/** =CALENDAR SETUP
+----------------------------------------------- */
+function initCalendarSetup() {
+  // toggle add layer/virtual calendar form
+  $("#setup_add_cal").click(function(eventObject) {
+    eventObject.preventDefault();
+    $("#setup_add_cal").hide("fast");
+    $("#setup_add_cal_form").show("slow");
+  });
+  $(".cal_add button[name=form.cancel]").click(function(eventObject) {
+    eventObject.preventDefault();
+    var validationErrors = $("div.portalMessage");
+    if (validationErrors) { validationErrors.remove(); }
+    $("#setup_add_cal").show("fast");
+    $("#setup_add_cal_form").hide("slow");
+    $(this).parents("form")[0].reset();
+  });
 
-    // remove a category from the layer
-    $('a.remove').live('click', function(event) { 
-      $(this).parents('tr').remove();
-      _updateRemoveLinks();
-      return false;
-    });   
+  // automatically show form if submission failed with validation errors
+  if ($("div.portalMessage").length > 0) {
+    $("#setup_add_cal").hide();
+    $("#setup_add_cal_form").show();
+  }
 
-    // add a category to the layer
-    $('#calendar-categories-field > a.add').bind('click', function(e) {
-      $('#layers tr:last').clone().appendTo('#layers'); 
-      _updateRemoveLinks(); 
-      return false;      
-    });
+  // toggle edit layer/virtual calendar form
+  $("#calendars .edit_action").click(function(eventObject) {
+    eventObject.preventDefault();
+    $("form").hide("fast");
+    $("#setup_add_cal").hide("fast");
+    var formId = "#" + $(this).identify() + "_form";
+    $(formId).show("slow");
+  });
+  $(".cal_edit button[name=form.cancel]").click(function(eventObject) {
+    eventObject.preventDefault();
+    var validationErrors = $("div.portalMessage");
+    if (validationErrors) { validationErrors.remove(); }
+    $("#setup_add_cal").show("fast");
+    $("form").hide("slow");
+    $(this).parents("form")[0].reset();
+  });
 
-    // only show "Remove" if more than one category is present
-    function _updateRemoveLinks() {
-      var els = $('table#layers td > a.remove');
-      els.css('display', els.length > 1 ? "inline" : "none");
-    }
+  // edit categories for a layer
+  if ($("fieldset.categories-field").length > 0) {
+    initCalendarLayersEdit();        
+  }
+  // delete layer / virtual calendar
+  if ($("#cal_delete_form").length > 0) {
+    initCalendarLayersOrCategoriesDelete();
+  }
 }
 
-// Calendar Layers or category views only
+// Calendar Layers view 
+function initCalendarLayersEdit() {
+    if ($("select.category_paths").length == 0) { return; }
+
+    // add category to a layer
+    $('.categories-field a.add').click(function(eventObject) {
+      eventObject.preventDefault();
+
+      var layers = $(this).parents("fieldset").find(".layers");
+      var row = layers.find("tr:last");
+      row.clone().appendTo(layers).find("option").removeAttr("selected");
+
+      _updateRemoveLinks();
+    });
+
+    // remove virtual calendar from a layer
+    $('a.remove').live('click', function(eventObject) { 
+      eventObject.preventDefault();
+
+      $(this).parents('tr').remove();
+
+      _updateRemoveLinks();
+    });   
+
+    // only show "Remove" if more than one virtual calendar is present
+    function _updateRemoveLinks() {
+      $(".layers").each(function() {
+        var elts = $(this).find('td a.remove');
+        elts.css('display', elts.length > 1 ? "inline" : "none");
+      })
+    }
+    
+    // update remove links on page load
+    _updateRemoveLinks();
+}
+
+// Calendar Layers or Virtual calendars 
 function initCalendarLayersOrCategoriesDelete() {  
     $('a.delete_action').bind('click', function(e) {
       if (confirm("Are you sure?")) {
@@ -1962,8 +2024,9 @@ $(document).ready(function() {
       initCalendarLayersEdit();        
     }
 
-    if ($("#cal_delete_form").length > 0) {
-      initCalendarLayersOrCategoriesDelete();
+    // calendar setup pages
+    if ($('#setup_add_cal').length > 0) {
+      initCalendarSetup();
     }
 
 }); // END document ready handler
