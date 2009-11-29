@@ -665,7 +665,7 @@ def calendar_setup_categories_view(context, request):
             location = model_url(
                 context,
                 request, 'categories.html',
-                query={'status_message':'Cannot delete default category'})
+                query={'status_message':'Cannot edit default category'})
             return HTTPFound(location=location)
 
         if not category_name or not category_name in category_names:
@@ -751,7 +751,6 @@ def calendar_setup_categories_view(context, request):
         fielderrors=fielderrors,
         api=api,
         categories = categories,
-        colors = _COLORS,
         )
 
 class CalendarLayersForm(FormSchema):
