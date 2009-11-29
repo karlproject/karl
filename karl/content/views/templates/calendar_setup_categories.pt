@@ -45,7 +45,7 @@
               class="calendar-categories-field ${error and 'fieldError' or ''}">
       <label for="category_name" class="required">Name the category</label><br />
       <div tal:condition="error" class="errorMessage">${error}</div> 
-      <input name="category_name" id="calendar_name" type="text"/>
+      <input name="category_name" class="category_name" type="text"/>
     </fieldset>
 
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>
