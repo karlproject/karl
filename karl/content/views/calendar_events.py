@@ -682,7 +682,7 @@ def calendar_setup_categories_view(context, request):
             title = converted['category_title']
 
             if title in [ x.title for x in categories]:
-                msg = "Name is already used."
+                msg = "Name is already used"
                 raise Invalid(value=title, state=None, 
                           msg=msg, error_list=None,
                           error_dict={'category_title': msg})
@@ -710,7 +710,7 @@ def calendar_setup_categories_view(context, request):
             title = converted['category_title']
 
             if title in [ x.title for x in categories]:
-                msg = "Name is already used."
+                msg = "Name is already used"
                 raise Invalid(value=title, state=None, 
                           msg=msg, error_list=None,
                           error_dict={'category_title': msg})
