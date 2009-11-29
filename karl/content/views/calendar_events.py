@@ -659,6 +659,7 @@ def calendar_setup_categories_view(context, request):
         return HTTPFound(location=location)
 
     fielderrors = {}
+    fielderrors_category_name = None
     fill_values = {'category_title': ''}
     
     if 'form.edit' in request.POST:
@@ -683,7 +684,7 @@ def calendar_setup_categories_view(context, request):
         try:
             converted = form.validate(request.POST)
             title = converted['category_title']
-
+            
             if title in [ x.title for x in categories]:
                 msg = "Name is already used"
                 raise Invalid(value=title, state=None, 
@@ -699,6 +700,7 @@ def calendar_setup_categories_view(context, request):
                 return HTTPFound(location=location)
 
         except Invalid, e:
+            fielderrors_category_name = category_name
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
 
@@ -722,6 +724,7 @@ def calendar_setup_categories_view(context, request):
             return HTTPFound(location=location)
 
         except Invalid, e:
+            fielderrors_category_name = '__add__'
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
 
@@ -742,8 +745,9 @@ def calendar_setup_categories_view(context, request):
         post_url=request.path_url,
         formfields=api.formfields,
         fielderrors=fielderrors,
+        fielderrors_category_name = fielderrors_category_name,
         api=api,
-        categories = categories,
+        categories = categories
         )
 
 class CalendarLayersForm(FormSchema):

@@ -1863,9 +1863,15 @@ function initCalendarSetup() {
   });
 
   // automatically show form if submission failed with validation errors
-  if ($("div.portalMessage").length > 0) {
+  var fielderrors_category_name = $('#fielderrors_category_name').val();
+  if (fielderrors_category_name.length > 0) {
+    if (fielderrors_category_name == "__add__") {
+        var formSelector = "#setup_add_cal_form";
+    } else {
+        var formSelector = "#edit_" + fielderrors_category_name + "_form";
+    }
     $("#setup_add_cal").hide();
-    $("#setup_add_cal_form").show();
+    $(formSelector).show();
   }
 
   // toggle edit layer/virtual calendar form
