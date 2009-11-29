@@ -2582,7 +2582,8 @@ table.cal_all .actions {
   text-align: right;
 }
 table.cal_all a, 
-table.cal_all a:visited {
+table.cal_all a:visited,
+table.cal_all .separator {
   color: #797979;
 }
 table.cal_all .color {
