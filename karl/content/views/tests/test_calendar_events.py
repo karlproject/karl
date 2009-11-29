@@ -352,6 +352,73 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         from karl.content.views.calendar_events import calendar_setup_categories_view
         return calendar_setup_categories_view(context, request)
 
+    # cancel
+
+    def test_cancel_redirects_to_setup_page(self):
+        from repoze.bfg.url import model_url
+        
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.cancel': 1})
+        response = self._callFUT(context, request)
+        
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, 
+                         model_url(context, request, 'setup.html'))
+
+    # delete
+    
+    def test_delete_does_not_allow_deletion_of_default_category(self):
+        from repoze.bfg.url import model_url
+        from karl.content.models.calendar import ICalendarCategory
+
+        default_name = ICalendarCategory.getTaggedValue('default_name')
+        
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': default_name})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Cannot delete default category'})
+        self.assertEqual(response.location, expected)
+
+    def test_delete_reports_invalid_when_category_name_is_empty(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': ''})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Category is invalid'})
+        self.assertEqual(response.location, expected)
+        
+    def test_delete_reports_invalid_when_category_name_is_invalid(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': 'invalid'})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Category is invalid'})
+        self.assertEqual(response.location, expected)
+
+    def test_delete_will_delete_a_valid_category_name(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarCategory('foo')
+        
+        request = testing.DummyRequest(post={'form.delete': 'foo'})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(context.get('foo', None), None)
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'foo category removed'})
+        self.assertEqual(response.location, expected)
+    
+
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
@@ -533,10 +600,17 @@ class DummyTags:
 
 from zope.interface import implements
 from karl.content.interfaces import ICalendar
+from karl.content.interfaces import ICalendarCategory
 
 class DummyCalendar(testing.DummyModel):
     implements(ICalendar)
     def __init__(self, **kw):
         testing.DummyModel.__init__(self, **kw)
         self.manifest = []
+
+class DummyCalendarCategory(testing.DummyModel):
+    implements(ICalendarCategory)
+    def __init__(self, title, **kw):
+        testing.DummyModel.__init__(self, **kw)
+        self.title = title
         

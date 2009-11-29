@@ -647,15 +647,15 @@ def calendar_setup_categories_view(context, request):
     if 'form.delete' in request.POST:
         category_name = request.POST['form.delete']
         if category_name == ICalendarCategory.getTaggedValue('default_name'):
-            location = model_url(
-                context,
-                request, 'categories.html',
-                query={'status_message':'Cannot delete default category'})
-            return HTTPFound(location=location)
-        if category_name and category_name in category_names:
+            message = 'Cannot delete default category'
+        elif category_name and category_name in category_names:
             del context[category_name]
-        location = model_url(context, request, 'categories.html',
-            query={'status_message':'%s category removed' % category_name})
+            message = '%s category removed' % category_name
+        else:
+            message = 'Category is invalid'
+        
+        location = model_url(context, request, 'categories.html', 
+                             query={'status_message': message})
         return HTTPFound(location=location)
     
     if 'form.edit' in request.POST:
