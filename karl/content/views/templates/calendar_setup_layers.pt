@@ -45,11 +45,11 @@
 
     <h1>Add Layer</h1>
 
-    <fieldset tal:define="error fielderrors['layer_name']|None"
+    <fieldset tal:define="error fielderrors['layer_title']|None"
               class="categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_name" class="required">Name the layer</label><br />
+      <label for="layer_title" class="required">Name the layer</label><br />
       <div tal:condition="error" class="errorMessage">${error}</div> 
-      <input name="layer_name" class="layer_name" type="text"/>
+      <input name="layer_title" class="layer_title" type="text"/>
     </fieldset>
       
     <fieldset tal:define="error fielderrors['calendar_path']|None"

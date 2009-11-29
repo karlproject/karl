@@ -2597,7 +2597,7 @@ table.cal_all .location {
 #calendar_path {
   width: 150px;
 }
-input.category_name, input.layer_name {
+input.category_title, input.layer_title {
   width: 330px;
 }
 .cal_add input,  .cal_add select, 

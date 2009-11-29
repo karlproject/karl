@@ -612,7 +612,7 @@ class EditCalendarEventForm(FormSchema):
     contact_email = validators.Email(not_empty=False, strip=True)
 
 class CalendarCategoriesForm(FormSchema):
-    category_name = validators.UnicodeString(strip=True, not_empty=True)
+    category_title = validators.UnicodeString(strip=True, not_empty=True)
 
 def _calendar_category_title(ob):
     community = find_community(ob)
@@ -679,7 +679,7 @@ def calendar_setup_categories_view(context, request):
 
         try:
             converted = form.validate(request.POST)
-            title = converted['category_name']
+            title = converted['category_title']
 
             if title in [ x.title for x in categories]:
                 location = model_url(
@@ -701,13 +701,13 @@ def calendar_setup_categories_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            category_name='',
+            category_title='',
             )
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            name = converted['category_name']
+            name = converted['category_title']
             if name in context:
                 location = model_url(
                     context, request, 'categories.html',
@@ -728,7 +728,7 @@ def calendar_setup_categories_view(context, request):
     else:
         fielderrors = {}
         fill_values = dict(
-            category_name='',
+            category_title='',
             )
 
     # Render the form and shove some default values in
@@ -754,9 +754,7 @@ def calendar_setup_categories_view(context, request):
         )
 
 class CalendarLayersForm(FormSchema):
-##     virtual_paths = foreach.ForEach(
-##         validators.UnicodeString(strip=True, not_empty=False))
-    layer_name = validators.UnicodeString(strip=True, not_empty=True)
+    layer_title = validators.UnicodeString(strip=True, not_empty=True)
     layer_color = validators.UnicodeString(strip=True, not_empty=True)
 
 def _get_layers(context):
@@ -795,24 +793,24 @@ def calendar_setup_layers_view(context, request):
         try:
             converted = form.validate(request.POST)
             category_paths = list(set(request.POST.getall('category_paths')))
-            layer_name = converted['layer_name']
+            layer_title = converted['layer_title']
             layer_color = converted['layer_color']
 
-            if layer_name in category_names:
+            if layer_title in category_names:
                 location = model_url(
                     context, request, 'layers.html',
                     query={'status_message':'Name already used by a category'})
                 return HTTPFound(location=location)    
 
-            if layer_name in layer_names:
-                layer = context[layer_name]
+            if layer_title in layer_names:
+                layer = context[layer_title]
                 layer.color = layer_color
-                layer.title = layer_name
+                layer.title = layer_title
                 layer.paths = category_paths
             else:
                 layer = create_content(ICalendarLayer,
-                                       layer_name, layer_color, category_paths)
-                context[layer_name] = layer
+                                       layer_title, layer_color, category_paths)
+                context[layer_title] = layer
 
             location = model_url(
                 context, request,
@@ -827,7 +825,7 @@ def calendar_setup_layers_view(context, request):
         fielderrors = {}
         fill_values = dict(
             category_paths=[],
-            layer_name='',
+            layer_title='',
             layer_color='red'
             )
 
