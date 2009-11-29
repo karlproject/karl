@@ -776,15 +776,16 @@ def calendar_setup_layers_view(context, request):
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
         if layer_name == ICalendarLayer.getTaggedValue('default_name'):
-            location = model_url(
-                context,
-                request, 'layers.html',
-                query={'status_message':'Cannot delete default layer'})
-            return HTTPFound(location=location)
-        if layer_name in layer_names:
+            message = 'Cannot delete default layer'
+        elif layer_name and layer_name in layer_names:
+            title = context[layer_name].title
             del context[layer_name]
-        location = model_url(context, request, 'layers.html',
-            query={'status_message':'%s layer removed' % layer_name})
+            message = '%s layer removed' % title
+        else:
+            message = 'Layer is invalid'
+        
+        location = model_url(context, request, 'layers.html', 
+                             query={'status_message': message})
         return HTTPFound(location=location)
 
     if 'form.submitted' in request.POST:

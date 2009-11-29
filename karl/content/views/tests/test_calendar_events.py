@@ -623,6 +623,18 @@ class CalendarLayersViewTests(unittest.TestCase):
         from karl.content.views.calendar_events import calendar_setup_layers_view
         return calendar_setup_layers_view(context, request)
 
+    # show
+
+    def test_notsubmitted(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fielderrors_target_name, None)
+        self.assertEqual(renderer.fieldvalues['layer_title'], '')
+
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
@@ -633,6 +645,72 @@ class CalendarLayersViewTests(unittest.TestCase):
         from repoze.bfg.url import model_url 
         self.assertEqual(model_url(context, request, 'setup.html'),
                          renderer.back_to_setup_url)
+
+    # cancel
+
+    def test_cancel_redirects_to_setup_page(self):
+        from repoze.bfg.url import model_url
+        
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.cancel': 1})
+        response = self._callFUT(context, request)
+        
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, 
+                         model_url(context, request, 'setup.html'))
+
+    # delete
+    
+    def test_delete_does_not_allow_deletion_of_default_layer(self):
+        from repoze.bfg.url import model_url
+        from karl.content.models.calendar import ICalendarLayer
+
+        default_name = ICalendarLayer.getTaggedValue('default_name')
+        
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': default_name})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Cannot delete default layer'})
+        self.assertEqual(response.location, expected)
+
+    def test_delete_reports_invalid_when_layer_name_is_empty(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': ''})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Layer is invalid'})
+        self.assertEqual(response.location, expected)
+
+    def test_delete_reports_invalid_when_layer_name_is_invalid(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={'form.delete': 'invalid'})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Layer is invalid'})
+        self.assertEqual(response.location, expected)
+
+    def test_delete_will_delete_a_valid_layer_name(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo-title')
+        
+        request = testing.DummyRequest(post={'form.delete': 'foo'})
+        response = self._callFUT(context, request)
+
+        self.assertEqual(context.get('foo'), None)
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'foo-title layer removed'})
+        self.assertEqual(response.location, expected)
 
 
 class CalendarSetupViewTests(unittest.TestCase):
@@ -718,6 +796,7 @@ class DummyTags:
 from zope.interface import implements
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarCategory
+from karl.content.interfaces import ICalendarLayer
 
 class DummyCalendar(testing.DummyModel):
     implements(ICalendar)
@@ -730,4 +809,10 @@ class DummyCalendarCategory(testing.DummyModel):
     def __init__(self, title, **kw):
         testing.DummyModel.__init__(self, **kw)
         self.title = title
-        
+
+class DummyCalendarLayer(testing.DummyModel):
+    implements(ICalendarLayer)
+    def __init__(self, title, **kw):
+        testing.DummyModel.__init__(self, **kw)
+        self.title = title
+
