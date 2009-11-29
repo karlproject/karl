@@ -657,6 +657,52 @@ def calendar_setup_categories_view(context, request):
         location = model_url(context, request, 'categories.html',
             query={'status_message':'%s category removed' % category_name})
         return HTTPFound(location=location)
+    
+    if 'form.edit' in request.POST:
+        category_name = request.POST['category__name__']
+
+        if category_name == ICalendarCategory.getTaggedValue('default_name'):
+            location = model_url(
+                context,
+                request, 'categories.html',
+                query={'status_message':'Cannot delete default category'})
+            return HTTPFound(location=location)
+
+        if not category_name or not category_name in category_names:
+            location = model_url(
+                context,
+                request, 'categories.html',
+                query={'status_message':'Could not find category to edit'})
+            return HTTPFound(location=location)
+
+        category = context[category_name]
+
+        try:
+            converted = form.validate(request.POST)
+            title = converted['category_name']
+
+            if title in [ x.title for x in categories]:
+                location = model_url(
+                    context,
+                    request, 'categories.html',
+                    query={'status_message':'Name is already used'})
+                return HTTPFound(location=location)
+
+            category.title = title
+            location = model_url(
+                context, request,
+                'categories.html',
+                query={'status_message':'Calendar category updated'})
+            return HTTPFound(location=location)
+
+        except Invalid, e:
+            fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
+    else:
+        fielderrors = {}
+        fill_values = dict(
+            category_name='',
+            )
 
     if 'form.submitted' in request.POST:
         try:

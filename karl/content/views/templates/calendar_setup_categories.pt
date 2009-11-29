@@ -26,6 +26,7 @@
     <tr tal:repeat="category categories">
       <td class="name">${category.title}</td>
       <td class="actions">
+        <a class="edit_action" id="edit_${category.__name__}" href="#">edit</a> | 
         <a class="delete_action" id="delete_${category.__name__}" href="#">delete</a>
       </td>
     </tr>
@@ -53,6 +54,28 @@
 
   <form method="post" action="${post_url}" id="cal_delete_form">
     <input type="hidden" name="form.delete" value="#" />
+  </form>
+
+  <form tal:repeat="category categories"
+    id="edit_${category.__name__}_form" style="display: none" method="post" 
+    action="${post_url}" class="cal_edit k3_genericForm" 
+    xml:id="contentform" enctype="multipart/form-data" name="save"> 
+
+    <h1>Edit Category</h1>   
+
+    <fieldset class="categories-field">
+      <input name="category__name__" type="hidden" value="${category.__name__}" />
+
+      <label for="category_name" class="required">Name the category</label><br/>
+      <input name="category_name" type="text" value="${category.title}" />
+    </fieldset>
+
+    <fieldset class="submitcancel-field">
+      <div class="buttons clearafter"> 
+        <button name="form.edit" type="submit" class="button primary_button"><span>submit</span></button> 
+        <button name="form.cancel" type="submit" class="button normal_button"><span>cancel</span></button> 
+      </div> 
+    </fieldset>
   </form>
 
   </div>
