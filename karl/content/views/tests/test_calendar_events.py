@@ -480,7 +480,6 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         from repoze.bfg.url import model_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarCategory
-        from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup_categories.pt')
@@ -488,11 +487,10 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'form.submitted': 1,
             'category_title': 'Announcements',
             })
-        class factory:
+        class category_factory:
             def __init__(self, *arg):
                 self.arg = arg
-        registerContentFactory(factory, ICalendarCategory)
-        registerContentFactory(factory, ICalendarLayer)
+        registerContentFactory(category_factory, ICalendarCategory)
         response = self._callFUT(context, request) 
         
         self.assertEqual(context['Announcements'].arg, ('Announcements',))
@@ -712,6 +710,112 @@ class CalendarLayersViewTests(unittest.TestCase):
                    query={'status_message':'foo-title layer removed'})
         self.assertEqual(response.location, expected)
 
+    # add new category    
+
+    def test_submit_fails_if_title_is_already_taken_by_a_layer(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo')
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.submitted': 1,
+            'layer_color': 'red',
+            'layer_title': 'foo'
+            }))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        
+        self.assertEqual(str(renderer.fielderrors['layer_title']), 
+                         'Name is already used')
+        
+    def test_submit_fails_if_title_is_already_taken_by_a_category(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarCategory('foo')
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.submitted': 1,
+            'layer_color': 'red',
+            'layer_title': 'foo'
+            }))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        
+        self.assertEqual(str(renderer.fielderrors['layer_title']), 
+                         'Name is already used by a category')
+
+    def test_submit_fails_if_title_is_missing(self):
+        context = DummyCalendar()
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.submitted': 1,
+            'layer_color': 'red',
+            'layer_title': ''}))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(str(renderer.fielderrors['layer_title']),
+                         'Please enter a value')
+
+    def test_submit_fails_if_color_is_missing(self):
+        context = DummyCalendar()
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.submitted': 1,
+            'layer_color': '',
+            'layer_title': 'foo'}))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(str(renderer.fielderrors['layer_color']),
+                         'Please enter a value')
+
+    def test_submit_adds_a_new_layer(self):
+        from repoze.bfg.url import model_url
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.content.interfaces import ICalendarLayer
+        context = DummyCalendar()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.submitted': 1,
+            'layer_title': 'Announcements',
+            'layer_color': 'blue',
+            'category_paths': '/path',
+            }))
+        class layer_factory:
+            def __init__(self, *arg):
+                self.arg = arg
+        registerContentFactory(layer_factory, ICalendarLayer)
+        response = self._callFUT(context, request) 
+        
+        self.assertEqual(context['Announcements'].arg, ('Announcements', 'blue', ['/path']))
+        
+        expected = model_url(context, request, 'layers.html',
+                             query={'status_message':'Calendar layer added'})
+        self.assertEqual(response.location, expected)
+
 
 class CalendarSetupViewTests(unittest.TestCase):
     def setUp(self):
@@ -815,4 +919,5 @@ class DummyCalendarLayer(testing.DummyModel):
     def __init__(self, title, **kw):
         testing.DummyModel.__init__(self, **kw)
         self.title = title
-
+        self.color = 'red'
+        self.paths = []
