@@ -359,7 +359,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup_categories.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['category_name'], '')
+        self.assertEqual(renderer.fieldvalues['category_title'], '')
 
     def test_submitted_valid_local(self):
         from repoze.lemonade.testing import registerContentFactory
@@ -370,7 +370,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup_categories.pt')
         request = testing.DummyRequest({
             'form.submitted': 1,
-            'category_name': 'Announcements',
+            'category_title': 'Announcements',
             'layer_color': 'red',
             })
         class factory:
