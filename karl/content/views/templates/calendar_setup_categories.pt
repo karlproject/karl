@@ -26,16 +26,19 @@
     <tr tal:repeat="category categories">
       <td class="name">${category.title}</td>
       <td class="actions">
-        <a class="edit_action" id="edit_${category.__name__}" href="#">edit</a> | 
+        <a class="edit_action" id="edit_${category.__name__}" href="#">edit</a> 
+        <span class="separator">|</span> 
         <a class="delete_action" id="delete_${category.__name__}" href="#">delete</a>
       </td>
     </tr>
   </table>
 
+  <!-- Add a new category button -->
   <div id="setup_add_cal">
     <a href="#">Add Category</a>
   </div>
 
+  <!-- Add a new category form -->
   <form id="setup_add_cal_form" style="display: none" method="post" 
         action="${post_url}" class="cal_add k3_genericForm"
         xml:id="contentform" enctype="multipart/form-data" name="save" >
@@ -52,10 +55,7 @@
     <fieldset metal:use-macro="formfields.macros['form-submit']"/>
   </form>
 
-  <form method="post" action="${post_url}" id="cal_delete_form">
-    <input type="hidden" name="form.delete" value="#" />
-  </form>
-
+  <!-- Edit each category forms -->
   <form tal:repeat="category categories"
     id="edit_${category.__name__}_form" style="display: none" method="post" 
     action="${post_url}" class="cal_edit k3_genericForm" 
@@ -80,6 +80,12 @@
     </fieldset>
   </form>
 
+  <!-- Delete any category -->
+  <form method="post" action="${post_url}" id="cal_delete_form">
+    <input type="hidden" name="form.delete" value="#" />
+  </form>
+
+  <!-- Signal JavaScript with name of category with errors -->
   <form style="display: none">
     <input type="hidden" id="fielderrors_target_name" 
            name="fielderrors_target_name" value="${fielderrors_target_name}" />

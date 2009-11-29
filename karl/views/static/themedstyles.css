@@ -2580,6 +2580,7 @@ table.cal_all .actions {
   width: 100px;
   padding-right: 8px;
   text-align: right;
+  vertical-align: top;
 }
 table.cal_all a, 
 table.cal_all a:visited,
@@ -2588,9 +2589,11 @@ table.cal_all .separator {
 }
 table.cal_all .color {
   width: 20px;
+  vertical-align: top;
 }
 table.cal_all .name {
   width: 150px;
+  vertical-align: top;
 }
 table.cal_all .location {
   width: 90px;

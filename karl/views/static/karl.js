@@ -1877,7 +1877,7 @@ function initCalendarSetup() {
   // toggle edit layer/virtual calendar form
   $("#calendars .edit_action").click(function(eventObject) {
     eventObject.preventDefault();
-    $("form").hide("fast");
+    $("form.cal_edit").hide("fast");
     $("#setup_add_cal").hide("fast");
     var formId = "#" + $(this).identify() + "_form";
     $(formId).show("slow");
@@ -1887,7 +1887,7 @@ function initCalendarSetup() {
     var validationErrors = $("div.portalMessage");
     if (validationErrors) { validationErrors.remove(); }
     $("#setup_add_cal").show("fast");
-    $("form").hide("slow");
+    $("form.cal_edit").hide("slow");
     $(this).parents("form")[0].reset();
   });
 
