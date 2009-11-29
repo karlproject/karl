@@ -657,6 +657,9 @@ def calendar_setup_categories_view(context, request):
         location = model_url(context, request, 'categories.html', 
                              query={'status_message': message})
         return HTTPFound(location=location)
+
+    fielderrors = {}
+    fill_values = {'category_title': ''}
     
     if 'form.edit' in request.POST:
         category_name = request.POST['category__name__']
@@ -698,18 +701,13 @@ def calendar_setup_categories_view(context, request):
         except Invalid, e:
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = dict(
-            category_title='',
-            )
 
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
             title = converted['category_title']
 
-            if title in [ x.title for x in categories]:
+            if title in [ x.title for x in categories ]:
                 msg = "Name is already used"
                 raise Invalid(value=title, state=None, 
                           msg=msg, error_list=None,
@@ -726,11 +724,6 @@ def calendar_setup_categories_view(context, request):
         except Invalid, e:
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = dict(
-            category_title='',
-            )
 
     # Render the form and shove some default values in
     page_title = 'Calendar Categories'

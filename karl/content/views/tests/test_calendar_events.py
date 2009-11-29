@@ -352,6 +352,28 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         from karl.content.views.calendar_events import calendar_setup_categories_view
         return calendar_setup_categories_view(context, request)
 
+    # show
+    
+    def test_notsubmitted(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fieldvalues['category_title'], '')
+
+    def test_sets_back_to_setup_url(self):
+        context = DummyCalendar()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        response = self._callFUT(context, request)
+
+        from repoze.bfg.url import model_url 
+        self.assertEqual(model_url(context, request, 'setup.html'),
+                         renderer.back_to_setup_url)
+
     # cancel
 
     def test_cancel_redirects_to_setup_page(self):
@@ -412,64 +434,154 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         request = testing.DummyRequest(post={'form.delete': 'foo'})
         response = self._callFUT(context, request)
 
-        self.assertEqual(context.get('foo', None), None)
+        self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
         expected = model_url(context, request, 'categories.html',
                    query={'status_message':'foo category removed'})
         self.assertEqual(response.location, expected)
-    
 
-    def test_notsubmitted(self):
+    # add new category    
+
+    def test_submit_fails_if_title_is_already_taken(self):
         context = DummyCalendar()
-        request = testing.DummyRequest()
+        context['foo'] = DummyCalendarCategory('foo')
+
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup_categories.pt')
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['category_title'], '')
+        request = testing.DummyRequest(post={
+            'form.submitted': 1,
+            'category_title': 'foo'})
 
-    def test_submitted_valid_local(self):
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(str(renderer.fielderrors['category_title']), 
+                         'Name is already used')
+        
+    def test_submit_fails_if_title_is_missing(self):
+        context = DummyCalendar()
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        request = testing.DummyRequest(post={
+            'form.submitted': 1,
+            'category_title': ''})
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(str(renderer.fielderrors['category_title']),
+                         'Please enter a value')
+
+    def test_submit_adds_a_new_category(self):
+        from repoze.bfg.url import model_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarCategory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup_categories.pt')
-        request = testing.DummyRequest({
+        request = testing.DummyRequest(post={
             'form.submitted': 1,
             'category_title': 'Announcements',
-            'layer_color': 'red',
             })
         class factory:
             def __init__(self, *arg):
                 self.arg = arg
         registerContentFactory(factory, ICalendarCategory)
         registerContentFactory(factory, ICalendarLayer)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/categories.html?status_message=Calendar+category+added')
+        response = self._callFUT(context, request) 
+        
         self.assertEqual(context['Announcements'].arg, ('Announcements',))
+        
+        expected = model_url(context, request, 'categories.html',
+                             query={'status_message':'Calendar category added'})
+        self.assertEqual(response.location, expected)
 
-    def test_submitted_invalid(self):
+    # edit an existing category
+    
+    def test_edit_does_not_allow_editing_the_default_category(self):
+        from repoze.bfg.url import model_url
+        from karl.content.models.calendar import ICalendarCategory
+
+        default_name = ICalendarCategory.getTaggedValue('default_name')
+        
         context = DummyCalendar()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
-        request = testing.DummyRequest({
-            'form.submitted': 1,
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'category__name__': default_name
             })
         response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
 
-    def test_sets_back_to_setup_url(self):
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Cannot edit default category'})
+        self.assertEqual(response.location, expected)
+
+    def test_edit_reports_not_found_when_category_name_is_empty(self):
+        from repoze.bfg.url import model_url
         context = DummyCalendar()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'category__name__': ''
+            })
         response = self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url 
-        self.assertEqual(model_url(context, request, 'setup.html'),
-                         renderer.back_to_setup_url)
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Could not find category to edit'})
+        self.assertEqual(response.location, expected)
+    
+    def test_edit_reports_not_found_when_category_name_is_invalid(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'category__name__': 'invalid'
+            })
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'categories.html',
+                   query={'status_message':'Could not find category to edit'})
+        self.assertEqual(response.location, expected)
+    
+    def test_edit_fails_if_title_is_missing(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarCategory('foo')
+    
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'category__name__': 'foo',
+            'category_title': ''
+            })
+    
+        response = self._callFUT(context, request)
+    
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(str(renderer.fielderrors['category_title']),
+                         'Please enter a value')
+
+    def test_edit_fails_if_title_is_already_taken(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarCategory('foo')
+        context['bar'] = DummyCalendarCategory('bar')
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'category__name__': 'foo',
+            'category_title': 'bar'
+            })   
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(str(renderer.fielderrors['category_title']), 
+                         'Name is already used')
+        
 
 
 ICS_TEMPLATE = """
