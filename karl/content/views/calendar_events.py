@@ -649,8 +649,9 @@ def calendar_setup_categories_view(context, request):
         if category_name == ICalendarCategory.getTaggedValue('default_name'):
             message = 'Cannot delete default category'
         elif category_name and category_name in category_names:
+            title = context[category_name].title
             del context[category_name]
-            message = '%s category removed' % category_name
+            message = '%s category removed' % title
         else:
             message = 'Category is invalid'
         

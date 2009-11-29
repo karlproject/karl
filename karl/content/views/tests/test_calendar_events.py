@@ -430,7 +430,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     def test_delete_will_delete_a_valid_category_name(self):
         from repoze.bfg.url import model_url
         context = DummyCalendar()
-        context['foo'] = DummyCalendarCategory('foo')
+        context['foo'] = DummyCalendarCategory('foo-title')
         
         request = testing.DummyRequest(post={'form.delete': 'foo'})
         response = self._callFUT(context, request)
@@ -438,7 +438,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
         expected = model_url(context, request, 'categories.html',
-                   query={'status_message':'foo category removed'})
+                   query={'status_message':'foo-title category removed'})
         self.assertEqual(response.location, expected)
 
     # add new category    
