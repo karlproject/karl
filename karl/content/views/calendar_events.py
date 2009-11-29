@@ -682,18 +682,18 @@ def calendar_setup_categories_view(context, request):
             title = converted['category_title']
 
             if title in [ x.title for x in categories]:
-                location = model_url(
-                    context,
-                    request, 'categories.html',
-                    query={'status_message':'Name is already used'})
-                return HTTPFound(location=location)
+                msg = "Name is already used."
+                raise Invalid(value=title, state=None, 
+                          msg=msg, error_list=None,
+                          error_dict={'category_title': msg})
 
-            category.title = title
-            location = model_url(
-                context, request,
-                'categories.html',
-                query={'status_message':'Calendar category updated'})
-            return HTTPFound(location=location)
+            else:
+                category.title = title
+                location = model_url(
+                    context, request,
+                    'categories.html',
+                    query={'status_message':'Calendar category updated'})
+                return HTTPFound(location=location)
 
         except Invalid, e:
             fielderrors = e.error_dict
@@ -707,15 +707,16 @@ def calendar_setup_categories_view(context, request):
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-            name = converted['category_title']
-            if name in context:
-                location = model_url(
-                    context, request, 'categories.html',
-                    query={'status_message':'Name already used'})
-                return HTTPFound(location=location)
+            title = converted['category_title']
 
-            category = create_content(ICalendarCategory, name)
-            context[name] = category
+            if title in [ x.title for x in categories]:
+                msg = "Name is already used."
+                raise Invalid(value=title, state=None, 
+                          msg=msg, error_list=None,
+                          error_dict={'category_title': msg})
+
+            category = create_content(ICalendarCategory, title)
+            context[title] = category
             location = model_url(
                 context, request,
                 'categories.html',
@@ -797,10 +798,10 @@ def calendar_setup_layers_view(context, request):
             layer_color = converted['layer_color']
 
             if layer_title in category_names:
-                location = model_url(
-                    context, request, 'layers.html',
-                    query={'status_message':'Name already used by a category'})
-                return HTTPFound(location=location)    
+                msg = "Name is already used by a category."
+                raise Invalid(value=title, state=None, 
+                          msg=msg, error_list=None,
+                          error_dict={'layer_title': msg})
 
             if layer_title in layer_names:
                 layer = context[layer_title]
