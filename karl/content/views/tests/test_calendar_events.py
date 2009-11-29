@@ -361,7 +361,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup_categories.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fielderrors_category_name, None)
+        self.assertEqual(renderer.fielderrors_target_name, None)
         self.assertEqual(renderer.fieldvalues['category_title'], '')
 
     def test_sets_back_to_setup_url(self):
@@ -456,7 +456,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_category_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
         self.assertEqual(str(renderer.fielderrors['category_title']), 
                          'Name is already used')
         
@@ -472,7 +472,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_category_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add__')
         self.assertEqual(str(renderer.fielderrors['category_title']),
                          'Please enter a value')
 
@@ -564,7 +564,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
     
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_category_name, 'foo')
+        self.assertEqual(renderer.fielderrors_target_name, 'foo')
         self.assertEqual(str(renderer.fielderrors['category_title']),
                          'Please enter a value')
 
@@ -583,7 +583,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_category_name, 'foo')
+        self.assertEqual(renderer.fielderrors_target_name, 'foo')
         self.assertEqual(str(renderer.fielderrors['category_title']), 
                          'Name is already used')
         

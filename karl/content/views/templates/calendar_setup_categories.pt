@@ -43,14 +43,14 @@
     <h1>Add Category</h1>
 
     <!-- Add New Category (no errors) -->
-    <fieldset tal:condition="(fielderrors_category_name != '__add__')"
+    <fieldset tal:condition="(fielderrors_target_name != '__add__')"
               class="calendar-categories-field">
       <label for="category_title" class="required">Name the category</label><br />
       <input name="category_title" class="category_title" type="text"/>
     </fieldset>
 
     <!-- Add New Category (with errors) -->
-    <fieldset tal:condition="(fielderrors_category_name == '__add__')"
+    <fieldset tal:condition="(fielderrors_target_name == '__add__')"
               tal:define="error fielderrors['category_title']|None"
               class="calendar-categories-field ${error and 'fieldError' or ''}">
       <label for="category_title" class="required">Name the category</label><br />
@@ -75,14 +75,14 @@
     <input name="category__name__" type="hidden" value="${category.__name__}" />
 
     <!-- Edit Existing Category (no errors) -->
-    <fieldset tal:condition="(fielderrors_category_name != category.__name__)"
+    <fieldset tal:condition="(fielderrors_target_name != category.__name__)"
               class="calendar-categories-field">
       <label for="category_title" class="required">Name the category</label><br />
       <input name="category_title" class="category_title" type="text" value="${category.title}" />
     </fieldset>
 
     <!-- Edit Existing Category (with errors) -->
-    <fieldset tal:condition="(fielderrors_category_name == category.__name__)"
+    <fieldset tal:condition="(fielderrors_target_name == category.__name__)"
               tal:define="error fielderrors['category_title']|None"
               class="calendar-categories-field ${error and 'fieldError' or ''}">
       <label for="category_title" class="required">Name the category</label><br />
@@ -99,8 +99,8 @@
   </form>
 
   <form style="display: none">
-    <input type="hidden" id="fielderrors_category_name" 
-           name="fielderrors_category_name" value="${fielderrors_category_name}" />
+    <input type="hidden" id="fielderrors_target_name" 
+           name="fielderrors_target_name" value="${fielderrors_target_name}" />
   </form>
 
   </div>

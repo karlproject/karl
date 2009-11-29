@@ -28,7 +28,9 @@
       <tr tal:repeat="layer layers">
         <td class="color"><div class="cal_${layer['color']}_all">&nbsp;</div></td>
         <td class="name">${layer['title']}</td>
-        <td class="names"><span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/></td>
+        <td class="names">
+          <span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer['paths']])"/>&nbsp;
+        </td>
         <td class="actions">
           <a class="delete_action" id="delete_${layer['name']}" href="#">delete</a>
         </td>
@@ -91,6 +93,11 @@
 
   <form method="post" action="${post_url}" id="cal_delete_form">
     <input type="hidden" name="form.delete" value="#" />
+  </form>
+
+  <form style="display: none">
+    <input type="hidden" id="fielderrors_target_name" 
+           name="fielderrors_target_name" value="${fielderrors_target_name}" />
   </form>
 
   </div>

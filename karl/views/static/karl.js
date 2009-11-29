@@ -1863,12 +1863,12 @@ function initCalendarSetup() {
   });
 
   // automatically show form if submission failed with validation errors
-  var fielderrors_category_name = $('#fielderrors_category_name').val();
-  if (fielderrors_category_name.length > 0) {
-    if (fielderrors_category_name == "__add__") {
+  var fielderrors_target_name = $('#fielderrors_target_name').val();
+  if (fielderrors_target_name.length > 0) {
+    if (fielderrors_target_name == "__add__") {
         var formSelector = "#setup_add_cal_form";
     } else {
-        var formSelector = "#edit_" + fielderrors_category_name + "_form";
+        var formSelector = "#edit_" + fielderrors_target_name + "_form";
     }
     $("#setup_add_cal").hide();
     $(formSelector).show();
@@ -1906,7 +1906,7 @@ function initCalendarLayersEdit() {
     if ($("select.category_paths").length == 0) { return; }
 
     // add category to a layer
-    $('.categories-field a.add').click(function(eventObject) {
+    $('a.add').click(function(eventObject) {
       eventObject.preventDefault();
 
       var layers = $(this).parents("fieldset").find(".layers");
