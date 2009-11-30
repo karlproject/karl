@@ -19,12 +19,12 @@ import os
 import twill
 import karl.twillcommands
 from cStringIO import StringIO
-from repoze.bfg.paster import get_app 
+from repoze.bfg.paster import get_app
 
 
 class TestKarlTwill:
     '''Uses wsgiproxy to proxy requests to let twill run tests\
-    
+
     Runs with "nosetests"
     You can use Twill commands including commands written for karl that are in
     karl.twillcommands by:
@@ -34,15 +34,14 @@ class TestKarlTwill:
     test_path =  os.path.abspath(os.path.dirname(__file__))
     testpath_command = "setglobal test_path " + test_path
     twill.execute_string(testpath_command)
-    
-    wsgi_app = get_app(test_path + '/../../../../etc/karl.ini','main')
 
+    wsgi_app = get_app(os.path.join(test_path, 'fixtures', 'karl.ini'), 'main')
 
     def setUp(self):
         '''Create the app'''
         def build_app():
             return self.wsgi_app
-            
+
         twill.add_wsgi_intercept('localhost', 6543, build_app)
         twill.execute_string("extend_with karl.twillcommands")
         # mostly the same as karl3.conf without extending with flunc
@@ -50,13 +49,13 @@ class TestKarlTwill:
         twill.execute_string("runfile '" + os.path.abspath(os.path.dirname(__file__)) + "/test_twill_wsgi_karl3.conf'")
 
         # while we're at it, stop twill from running off at the mouth...
-        outp = StringIO()
-        twill.set_output(outp)
-        
+        #outp = StringIO()
+        #twill.set_output(outp)
+
     def tearDown(self):
         # remove intercept
         twill.remove_wsgi_intercept('localhost', 6543)
-        
+
     def blog_tes(self):
         ''' Blog tests:'''
 
@@ -91,11 +90,11 @@ class TestKarlTwill:
 
     def community_tes(self):
         ''' Community tests:'''
-        
+
         # copied from twilltests/community/community-tests.tsuite
         mytwilltests = [
                       "login 'admin'",
-                      
+
                       # Make community
                       "runfile '${test_path}/community/make_community.twill'",
 
@@ -108,7 +107,7 @@ class TestKarlTwill:
                       ]
         for comm in mytwilltests:
             twill.execute_string(comm)
-            
+
     def files_tes(self):
         ''' Files tests:'''
 
@@ -163,16 +162,16 @@ class TestKarlTwill:
                       # Test searching for a calendar entry
                       "runfile '${test_path}/search/search_calendar_entry.twill'",
 
-                      # Test searching for a community 
+                      # Test searching for a community
                       "runfile '${test_path}/search/search_community.twill'",
 
                       # Test searching for a file
                       "runfile '${test_path}/search/search_file.twill'",
 
                       # Test searching for a user
-                      "runfile '${test_path}/search/search_user.twill'", 
+                      "runfile '${test_path}/search/search_user.twill'",
 
-                      # Test searching for wiki 
+                      # Test searching for wiki
                       "runfile '${test_path}/search/search_wiki_entry.twill'",
 
                       # Check the advanced search page
@@ -234,7 +233,7 @@ class TestKarlTwill:
 
 
         # This suite is to test major functionality for this installation of karl.
-        # 
+        #
         # see more options in the README
         print twill.execute_string("go http://localhost:6543")
         twill.execute_string("login 'admin'")
@@ -244,7 +243,7 @@ class TestKarlTwill:
         # first login
         # changed to admin for this script (different from copy & paste)
         twill.execute_string("login 'admin'")
-        
+
         # make community to test with
         self.community_tes()
 
@@ -275,7 +274,7 @@ class TestKarlTwill:
         # To run just the cleanup suite, use the -C flag
         # flunc -C all
         #
-        # or to run the "all" suite without running cleanup 
+        # or to run the "all" suite without running cleanup
         # use the -X flag
         # flunc -X all
         # See README.txt for more
@@ -284,5 +283,64 @@ class TestKarlTwill:
         twill.execute_string("runfile '${test_path}/community/delete_testing_community.twill'")
 
         twill.execute_string("logout")
-                    
 
+
+from karl.bootstrap.data import DefaultInitialData
+
+class TestData(DefaultInitialData):
+    users_and_groups = [
+        ('admin', 'Ad','Min','admin@example.com',
+         ('group.KarlAdmin', 'group.KarlUserAdmin', 'group.KarlStaff')),
+        ('nyc', 'En', 'Wycee', 'nyc@example.com',
+         ('group.KarlStaff',)),
+        ('affiliate', 'Aff', 'Illiate', 'affiliate@example.com',
+         ('group.KarlAffiliate',)),
+        ('staff1','Staff','One','staff1@example.com',
+         ('group.KarlStaff',)),
+        ('staff2','Staff','Two','staff2@example.com',
+         ('group.KarlStaff',)),
+        ('staff3','Staff','Three','staff3@example.com',
+         ('group.KarlStaff',)),
+        ('staff4','Staff','Four','staff4@example.com',
+         ('group.KarlStaff',)),
+        ('staff5','Staff','Five','staff5@example.com',
+         ('group.KarlStaff',)),
+        ('staff6','Staff','Six','staff6@example.com',
+         ('group.KarlStaff',)),
+        ('staff7','Staff','Seven','staff7@example.com',
+         ('group.KarlStaff',)),
+        ('staff8','Staff','Eight','staff8@example.com',
+         ('group.KarlStaff',)),
+        ('staff9','Staff','Nine','staff9@example.com',
+         ('group.KarlStaff',)),
+        ('staff10','Staff','Ten','staff10@example.com',
+         ('group.KarlStaff',)),
+        ('staff11','Staff','Eleven','staff11@example.com',
+         ('group.KarlStaff',)),
+        ('staff12','Staff','Twelve','staff12@example.com',
+         ('group.KarlStaff',)),
+        ('affiliate1','Affiliate','One','affiliate1@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate2','Affiliate','Two','affiliate2@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate3','Affiliate','Three','affiliate3@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate4','Affiliate','Four','affiliate4@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate5','Affiliate','Five','affiliate5@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate6','Affiliate','Six','affiliate6@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate7','Affiliate','Seven','affiliate7@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate8','Affiliate','Eight','affiliate8@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate9','Affiliate','Nine','affiliate9@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate10','Affiliate','Ten','affiliate10@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate11','Affiliate','Eleven','affiliate11@example.com',
+         ('groups.KarlAffiliate',)),
+        ('affiliate12','Affiliate','Twelve','affiliate12@example.com',
+         ('groups.KarlAffiliate',)),
+    ]

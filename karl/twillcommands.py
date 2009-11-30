@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -22,7 +22,7 @@
 
 __all__ = ['login',
            'logout',
-           'set_random_word', 
+           'set_random_word',
            'make_intranets',
            'make_community',
            'remove_community',
@@ -51,9 +51,9 @@ from lxml.html import document_fromstring
 from simplejson import loads
 from urlparse import urljoin
 
-# Globally set the a variable that gives us the name of 
-# the test.  Use the current working directory to provide 
-# the name.  We use this primarily to make a community for 
+# Globally set the a variable that gives us the name of
+# the test.  Use the current working directory to provide
+# the name.  We use this primarily to make a community for
 # the purpose of an individual test.
 test_name = os.path.basename(os.getcwd())
 
@@ -84,7 +84,7 @@ def login(username):
 
     # Echo to screen
     dump("Logging into %s as %s" % (hn, au))
-    
+
     # Continue
     ap = global_dict['%s_password' % username]
     commands.go(hn + '/login.html')
@@ -93,6 +93,7 @@ def login(username):
     commands.submit()
 
     # Make sure the login succeeded
+    commands.show()
     commands.find("My Profile")
 
 def logout():
@@ -140,7 +141,7 @@ def make_intranets(intranets_name):
     commands.fv("save", "description", desc % test_name)
     commands.submit()
     commands.find("Add Existing")
-    
+
 
 def make_community(community_name=test_name, title=None):
     """Make a community, deleting first if the community exists"""
@@ -149,7 +150,7 @@ def make_community(community_name=test_name, title=None):
     # Append "-testcase" to the community name, so we can spot later
     # which were created by Twill
     if community_name == test_name:
-        community_name = global_dict.get('community_name', 
+        community_name = global_dict.get('community_name',
                                          test_name + '-testcase')
         global_dict['test_name'] = test_name
         global_dict['community_name'] = community_name
@@ -210,7 +211,7 @@ def make_forum(forum_name=test_name, title=None):
     # Append "-testcase" to the community name, so we can spot later
     # which were created by Twillif community_name == test_name:
     if forum_name == test_name:
-        forum_name = global_dict.get('forum_name', 
+        forum_name = global_dict.get('forum_name',
                                          test_name + '-forum-testcase')
         global_dict['test_name'] = test_name
         global_dict['forum_name'] = forum_name
@@ -272,13 +273,13 @@ def timeit(msg):
     # functional testing, we'd like to have some easy and convenient
     # ways to watch elapsed time.  This command can be sprinkled
     # throughout a test run to show 2 kinds of time:
-    #     - Elapsed time since the start of the first "timeit" 
-    #     - Elapsed time since the previous "timeit" 
+    #     - Elapsed time since the start of the first "timeit"
+    #     - Elapsed time since the previous "timeit"
     # Putting a line such as this in your .twill script:
-    #     timeit "Some Stinking Message" 
-    # ...causes a line like this to be printed to the console: 
+    #     timeit "Some Stinking Message"
+    # ...causes a line like this to be printed to the console:
     #     Timeit: 0.02323,14.938,Some Stinking Message
-    # You could thus run a test, ignoring the functional testing 
+    # You could thus run a test, ignoring the functional testing
     # output, and showing just the timing:
     #     ../runtest.sh | grep Timeit
 
@@ -339,7 +340,7 @@ def livesearch_find(group, term, titleword, notfind=False):
     hasterm = len(groups[group])
 
     if notfind:
-        # Let the _notfind version decide what to do with 
+        # Let the _notfind version decide what to do with
         # the error
         return hasterm
 
@@ -412,7 +413,7 @@ def add_members(community_name, user1, user2=None):
         commands.go(add_member_url)
         commands.find('Add Existing')
         commands.fv('save', 'users', user2)
-        commands.submit()        
+        commands.submit()
 
 def add_tag(tagname):
     """ Add a tag to a piece of content.
