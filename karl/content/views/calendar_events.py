@@ -831,34 +831,79 @@ def calendar_setup_layers_view(context, request):
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
 
+    if 'form.edit' in request.POST:
+        layer_name = request.POST['layer__name__']
+
+        if layer_name == ICalendarLayer.getTaggedValue('default_name'):
+            location = model_url(
+                context,
+                request, 'layers.html',
+                query={'status_message':'Cannot edit default layer'})
+            return HTTPFound(location=location)
+
+        if not layer_name or not layer_name in layer_names:
+            location = model_url(
+                context,
+                request, 'layers.html',
+                query={'status_message':'Could not find layer to edit'})
+            return HTTPFound(location=location)
+
+        layer = context[layer_name]
+
+        try:
+            converted = form.validate(request.POST)
+            layer_title = converted['layer_title']
+            category_paths = list(set(request.POST.getall('category_paths')))
+            layer_color = converted['layer_color']
+                                    
+            if layer_title in category_names:
+                msg = "Name is already used by a category"
+                raise Invalid(value=layer_title, state=None, 
+                          msg=msg, error_list=None,
+                          error_dict={'layer_title': msg})
+
+            if (layer_title != layer.title) and (layer_title in layer_names):
+                msg = "Name is already used"
+                raise Invalid(value=layer_title, state=None, 
+                          msg=msg, error_list=None,
+                          error_dict={'layer_title': msg})
+
+            else:
+                layer.title = layer_title
+                layer.paths = list(set(request.POST.getall('category_paths')))
+                layer.color = layer_color
+            
+                location = model_url(
+                    context, request,
+                    'layers.html',
+                    query={'status_message':'Calendar layer updated'})
+                return HTTPFound(location=location)
+
+        except Invalid, e:
+            fielderrors_target_name = layer_name
+            fielderrors = e.error_dict
+            fill_values = form.convert(request.POST)
+
     # Render the form and shove some default values in
     page_title = 'Calendar Layers'
     api = TemplateAPI(context, request, page_title)
 
-    layers = []
-
-    for layer in _get_layers(context):
-        paths = layer.paths
-        d = {}
-        d['name'] = layer.__name__
-        d['title'] = layer.title
-        d['color'] = layer.color
-        d['paths'] = []
-        for path in paths:
-            v = {}
+    layers = list(_get_layers(context))
+    for layer in layers:
+        layer._v_categories = []
+        for path in layer.paths:
+            category = {}
             try:
                 calendar = find_model(context, path)
                 title = _calendar_category_title(calendar)
-                v['title'] = title
-                d['paths'].append(v)
+                category['title'] = title
+                layer._v_categories.append(category)
             except KeyError:
                 continue
-        layers.append(d)
 
     calendar_categories = []
 
-    searcher =  queryAdapter(context, ICatalogSearch)
-
+    searcher = queryAdapter(context, ICatalogSearch)
     if searcher is not None:
         total, docids, resolver = searcher(
             allowed={'query': effective_principals(request), 'operator': 'or'},

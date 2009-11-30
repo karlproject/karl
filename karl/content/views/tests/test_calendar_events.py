@@ -816,6 +816,120 @@ class CalendarLayersViewTests(unittest.TestCase):
                              query={'status_message':'Calendar layer added'})
         self.assertEqual(response.location, expected)
 
+    # edit an existing layer
+    
+    def test_edit_does_not_allow_editing_the_default_layer(self):
+        from repoze.bfg.url import model_url
+        from karl.content.models.calendar import ICalendarCategory
+
+        default_name = ICalendarLayer.getTaggedValue('default_name')
+        
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'layer__name__': default_name
+            })
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Cannot edit default layer'})
+        self.assertEqual(response.location, expected)
+
+    def test_edit_reports_not_found_when_layer_name_is_empty(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'layer__name__': ''
+            })
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Could not find layer to edit'})
+        self.assertEqual(response.location, expected)
+
+    def test_edit_reports_not_found_when_layer_name_is_invalid(self):
+        from repoze.bfg.url import model_url
+        context = DummyCalendar()
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'layer__name__': 'invalid'
+            })
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        expected = model_url(context, request, 'layers.html',
+                   query={'status_message':'Could not find layer to edit'})
+        self.assertEqual(response.location, expected)
+
+    def test_edit_fails_if_title_is_missing(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo')
+    
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        request = testing.DummyRequest(post={
+            'form.edit': 1,
+            'layer__name__': 'foo',
+            'layer_title': ''
+            })
+    
+        response = self._callFUT(context, request)
+    
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, 'foo')
+        self.assertEqual(str(renderer.fielderrors['layer_title']),
+                         'Please enter a value')
+
+    def test_submit_fails_if_title_is_already_taken_by_a_layer(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo')
+        context['bar'] = DummyCalendarLayer('bar')
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.edit': 1,
+            'layer__name__': 'foo', 
+            'layer_color': 'red',
+            'layer_title': 'bar'
+            }))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, 'foo')
+        
+        self.assertEqual(str(renderer.fielderrors['layer_title']), 
+                         'Name is already used')
+
+    def test_submit_fails_if_title_is_already_taken_by_a_category(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo')
+        context['bar'] = DummyCalendarCategory('bar')
+
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        from webob import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
+            'form.edit': 1,
+            'layer__name__': 'foo', 
+            'layer_color': 'red',
+            'layer_title': 'bar'
+            }))
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(renderer.fielderrors_target_name, 'foo')
+        
+        self.assertEqual(str(renderer.fielderrors['layer_title']), 
+                         'Name is already used by a category')
+        
+
 
 class CalendarSetupViewTests(unittest.TestCase):
     def setUp(self):
