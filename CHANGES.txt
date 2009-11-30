@@ -111,6 +111,9 @@ Unreleased
   called from application.py or the startover script.  The startover script
   has been moved to core.
 
+- LP #449689 Add standalone.zcml for running Karl without a customization
+  package.
+
 3.14 (2009-09-08)
 -----------------
 
