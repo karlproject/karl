@@ -19,9 +19,15 @@ def appmaker(root):
     return root['site']
 
 def make_app(global_config, **kw):
-    pkg_name = global_config.get('package', 'karl.includes')
-    __import__(pkg_name)
-    package = sys.modules[pkg_name]
+    package = None
+    filename = None
+
+    pkg_name = global_config.get('package', None)
+    if pkg_name is not None:
+        __import__(pkg_name)
+        package = sys.modules[pkg_name]
+    else:
+        filename = 'karl.includes:standalone.zcml'
 
     # paster app config callback
     zodb_uri = global_config.get('zodb_uri')
@@ -33,7 +39,7 @@ def make_app(global_config, **kw):
     jquery_dev_mode = kw.get('jquery_dev_mode', False)
     kw['jquery_dev_mode'] = asbool(jquery_dev_mode)
 
-    app = bfg_make_app(get_root, package, options=kw)
+    app = bfg_make_app(get_root, package, filename, options=kw)
     return app
 
 def find_users(root):
