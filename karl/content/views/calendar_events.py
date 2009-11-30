@@ -639,7 +639,9 @@ def calendar_setup_categories_view(context, request):
     form = CalendarCategoriesForm()
     here_path = model_path(context)
 
-    categories = _get_calendar_categories(context)
+    default_category_name = ICalendarCategory.getTaggedValue('default_name')
+    categories = filter(lambda x: x.__name__ != default_category_name, 
+                        _get_calendar_categories(context))
     category_names = [ x.__name__ for x in categories ]
 
     if 'form.cancel' in request.POST:
@@ -647,7 +649,7 @@ def calendar_setup_categories_view(context, request):
 
     if 'form.delete' in request.POST:
         category_name = request.POST['form.delete']
-        if category_name == ICalendarCategory.getTaggedValue('default_name'):
+        if category_name == default_category_name:
             message = 'Cannot delete default category'
         elif category_name and category_name in category_names:
             title = context[category_name].title
@@ -734,11 +736,6 @@ def calendar_setup_categories_view(context, request):
     page_title = 'Calendar Categories'
     api = TemplateAPI(context, request, page_title)
 
-    categories = []
-    used_remote = {}
-
-    categories = _get_calendar_categories(context)
-
     return render_form_to_response(
         'templates/calendar_setup_categories.pt',
         form,
@@ -765,7 +762,9 @@ def calendar_setup_layers_view(context, request):
     form = CalendarLayersForm()
     here_path = model_path(context)
 
-    layers = list(_get_layers(context))
+    default_layer_name = ICalendarLayer.getTaggedValue('default_name')
+    layers = filter(lambda x: x.__name__ != default_layer_name, 
+                    _get_layers(context))
     layer_names = [ x.__name__ for x in layers]
 
     categories = _get_calendar_categories(context)
@@ -776,7 +775,7 @@ def calendar_setup_layers_view(context, request):
 
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
-        if layer_name == ICalendarLayer.getTaggedValue('default_name'):
+        if layer_name == default_layer_name:
             message = 'Cannot delete default layer'
         elif layer_name and layer_name in layer_names:
             title = context[layer_name].title
@@ -834,7 +833,7 @@ def calendar_setup_layers_view(context, request):
     if 'form.edit' in request.POST:
         layer_name = request.POST['layer__name__']
 
-        if layer_name == ICalendarLayer.getTaggedValue('default_name'):
+        if layer_name == default_layer_name:
             location = model_url(
                 context,
                 request, 'layers.html',
@@ -888,7 +887,6 @@ def calendar_setup_layers_view(context, request):
     page_title = 'Calendar Layers'
     api = TemplateAPI(context, request, page_title)
 
-    layers = list(_get_layers(context))
     for layer in layers:
         layer._v_categories = []
         for path in layer.paths:

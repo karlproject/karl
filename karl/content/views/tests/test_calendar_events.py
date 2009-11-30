@@ -364,6 +364,24 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(renderer.fielderrors_target_name, None)
         self.assertEqual(renderer.fieldvalues['category_title'], '')
 
+    def test_builds_a_category_list_without_the_default_category(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarCategory('foo')
+        context['bar'] = DummyCalendarCategory('bar')
+        
+        from karl.content.interfaces import ICalendarCategory
+        default_name = ICalendarCategory.getTaggedValue('default_name')
+        context[default_name] = DummyCalendarCategory(default_name)
+
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_categories.pt')
+        response = self._callFUT(context, request)
+        
+        self.assert_(len(renderer.categories), 2) 
+        self.assert_(
+            default_name not in [x.__name__ for x in renderer.categories])
+
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
@@ -632,6 +650,24 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target_name, None)
         self.assertEqual(renderer.fieldvalues['layer_title'], '')
+
+    def test_builds_a_layers_list_without_the_default_layer(self):
+        context = DummyCalendar()
+        context['foo'] = DummyCalendarLayer('foo')
+        context['bar'] = DummyCalendarLayer('bar')
+        
+        from karl.content.interfaces import ICalendarLayer
+        default_name = ICalendarLayer.getTaggedValue('default_name')
+        context[default_name] = DummyCalendarLayer(default_name)
+
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_setup_layers.pt')
+        response = self._callFUT(context, request)
+        
+        self.assert_(len(renderer.layers), 2) 
+        self.assert_(
+            default_name not in [x.__name__ for x in renderer.layers])
 
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
