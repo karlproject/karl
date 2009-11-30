@@ -1,4 +1,4 @@
-""" Run evolution steps for the OSI site  """
+""" Run database evolution steps  """
 
 import getopt
 import sys
