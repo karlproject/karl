@@ -21,7 +21,7 @@ def evolve(context):
         if not default_category_name in calendar:
             calendar[default_category_name] = default_category
             local_layer = create_content(ICalendarLayer,
-                                         "This Calendar's Events Only",' blue',
+                                         "This Calendar's Events Only", 'blue',
                                          [model_path(default_category)])
             if not default_layer_name in calendar:
                 calendar[default_layer_name] = local_layer
