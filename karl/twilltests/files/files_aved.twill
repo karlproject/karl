@@ -1,4 +1,4 @@
-# Add/view/edit/delete for files.  
+# Add/view/edit/delete for files.
 
 # Make a random word to insert in the blog title
 set_random_word test_file
@@ -9,6 +9,7 @@ notfind "Delete"
 fv save title ${test_file}
 formfile save file "${test_path}/files/profile.jpg" image/jpeg
 submit
+show
 url "/communities/${community_name}/files/profile.jpg"
 
 # Confirm

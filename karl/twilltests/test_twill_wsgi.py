@@ -16,47 +16,72 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import os
+import shutil
 import twill
 import karl.twillcommands
 from cStringIO import StringIO
-from repoze.bfg.paster import get_app 
+from repoze.bfg.paster import get_app
 
+def _rm(path):
+    """ grrr. """
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    else:
+        os.remove(path)
 
 class TestKarlTwill:
     '''Uses wsgiproxy to proxy requests to let twill run tests\
-    
+
     Runs with "nosetests"
     You can use Twill commands including commands written for karl that are in
     karl.twillcommands by:
     twill.execute_string("valid twill statement")
     or you can run a twill file which is mostly what has been done in this class by
     twill.execute_string("runfile '${test_path}/path/to/twill_file.twill")'''
-    test_path =  os.path.abspath(os.path.dirname(__file__))
-    testpath_command = "setglobal test_path " + test_path
-    twill.execute_string(testpath_command)
-    
-    wsgi_app = get_app(test_path + '/../../../../etc/karl.ini','main')
-
 
     def setUp(self):
         '''Create the app'''
+        test_path =  os.path.abspath(os.path.dirname(__file__))
+        testpath_command = "setglobal test_path " + test_path
+        twill.execute_string(testpath_command)
+
+        fixtures = os.path.join(test_path, 'fixtures')
+        for to_delete in [fname for fname in os.listdir(fixtures)
+                          if fname.startswith('Data.fs') or fname in ['blobs']]:
+            _rm(os.path.join(fixtures, to_delete))
+        os.mkdir(os.path.join(fixtures, 'blobs'))
+        wsgi_app = get_app(os.path.join(test_path, 'fixtures', 'karl.ini'), 'main')
+
         def build_app():
-            return self.wsgi_app
-            
+            return wsgi_app
+
         twill.add_wsgi_intercept('localhost', 6543, build_app)
         twill.execute_string("extend_with karl.twillcommands")
+
         # mostly the same as karl3.conf without extending with flunc
         # and few other adjustments.
-        twill.execute_string("runfile '" + os.path.abspath(os.path.dirname(__file__)) + "/test_twill_wsgi_karl3.conf'")
+
+        twill.execute_string("runfile '" +
+                             os.path.abspath(os.path.dirname(__file__)) +
+                             "/test_twill_wsgi_karl3.conf'")
 
         # while we're at it, stop twill from running off at the mouth...
+        # Comment out for debugging.
+        # XXX How do we suppress the annoying "AT LINE: " output?
         outp = StringIO()
         twill.set_output(outp)
-        
+
     def tearDown(self):
         # remove intercept
         twill.remove_wsgi_intercept('localhost', 6543)
-        
+
+        test_path =  os.path.abspath(os.path.dirname(__file__))
+        fixtures = os.path.join(test_path, 'fixtures')
+        for to_delete in [fname for fname in os.listdir(fixtures)
+                          if fname.startswith('Data.fs') or fname in
+                          ['blobs', 'mail_queue']]:
+            _rm(os.path.join(fixtures, to_delete))
+
     def blog_tes(self):
         ''' Blog tests:'''
 
@@ -91,11 +116,11 @@ class TestKarlTwill:
 
     def community_tes(self):
         ''' Community tests:'''
-        
+
         # copied from twilltests/community/community-tests.tsuite
         mytwilltests = [
                       "login 'admin'",
-                      
+
                       # Make community
                       "runfile '${test_path}/community/make_community.twill'",
 
@@ -108,7 +133,7 @@ class TestKarlTwill:
                       ]
         for comm in mytwilltests:
             twill.execute_string(comm)
-            
+
     def files_tes(self):
         ''' Files tests:'''
 
@@ -163,16 +188,16 @@ class TestKarlTwill:
                       # Test searching for a calendar entry
                       "runfile '${test_path}/search/search_calendar_entry.twill'",
 
-                      # Test searching for a community 
+                      # Test searching for a community
                       "runfile '${test_path}/search/search_community.twill'",
 
                       # Test searching for a file
                       "runfile '${test_path}/search/search_file.twill'",
 
                       # Test searching for a user
-                      "runfile '${test_path}/search/search_user.twill'", 
+                      "runfile '${test_path}/search/search_user.twill'",
 
-                      # Test searching for wiki 
+                      # Test searching for wiki
                       "runfile '${test_path}/search/search_wiki_entry.twill'",
 
                       # Check the advanced search page
@@ -234,7 +259,7 @@ class TestKarlTwill:
 
 
         # This suite is to test major functionality for this installation of karl.
-        # 
+        #
         # see more options in the README
         print twill.execute_string("go http://localhost:6543")
         twill.execute_string("login 'admin'")
@@ -244,7 +269,7 @@ class TestKarlTwill:
         # first login
         # changed to admin for this script (different from copy & paste)
         twill.execute_string("login 'admin'")
-        
+
         # make community to test with
         self.community_tes()
 
@@ -275,7 +300,7 @@ class TestKarlTwill:
         # To run just the cleanup suite, use the -C flag
         # flunc -C all
         #
-        # or to run the "all" suite without running cleanup 
+        # or to run the "all" suite without running cleanup
         # use the -X flag
         # flunc -X all
         # See README.txt for more
@@ -284,5 +309,3 @@ class TestKarlTwill:
         twill.execute_string("runfile '${test_path}/community/delete_testing_community.twill'")
 
         twill.execute_string("logout")
-                    
-
