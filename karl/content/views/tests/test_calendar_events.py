@@ -362,7 +362,6 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target_name, None)
-        self.assertEqual(renderer.fieldvalues['category_title'], '')
 
     def test_builds_a_category_list_without_the_default_category(self):
         context = DummyCalendar()
@@ -636,7 +635,6 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target_name, None)
-        self.assertEqual(renderer.fieldvalues['layer_title'], '')
 
     def test_builds_a_layers_list_without_the_default_layer(self):
         context = DummyCalendar()

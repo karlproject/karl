@@ -727,16 +727,13 @@ def calendar_setup_categories_view(context, request):
         except Invalid, e:
             fielderrors_target_name = '__add__'
             fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
 
     # Render the form and shove some default values in
     page_title = 'Calendar Categories'
     api = TemplateAPI(context, request, page_title)
 
-    return render_form_to_response(
+    return render_template_to_response(
         'templates/calendar_setup_categories.pt',
-        form,
-        fill_values,
         back_to_setup_url=model_url(context, request, 'setup.html'),
         post_url=request.path_url,
         formfields=api.formfields,
@@ -912,10 +909,8 @@ def calendar_setup_layers_view(context, request):
 
     calendar_categories.sort(key=lambda x: x['path'])
 
-    return render_form_to_response(
+    return render_template_to_response(
         'templates/calendar_setup_layers.pt',
-        form,
-        fill_values,
         back_to_setup_url=model_url(context, request, 'setup.html'),
         post_url=request.path_url,
         formfields=api.formfields,
