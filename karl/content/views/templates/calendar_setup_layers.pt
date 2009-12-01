@@ -46,7 +46,7 @@
 
     <!-- Add a new layer form -->  
     <form id="setup_add_cal_form" style="display: none" method="post"
-          action="${post_url}" class="cal_add k3_genericForm" 
+          action="${layers_url}" class="cal_add k3_genericForm" 
           xml:id="contentform" enctype="multipart/form-data" name="save">
 
     <h1>Add Layer</h1>
@@ -96,7 +96,7 @@
   <!-- Edit each layer forms -->  
   <form tal:repeat="layer layers" style="display: none" method="post"
         id="edit_${layer.__name__}_form" 
-        action="${post_url}" class="cal_edit k3_genericForm" 
+        action="${layers_url}" class="cal_edit k3_genericForm" 
         xml:id="contentform" enctype="multipart/form-data" name="save">
 
     <h1>Edit Layer</h1>
@@ -164,7 +164,7 @@
   </form>
 
   <!-- Delete any layer -->
-  <form method="post" action="${post_url}" id="cal_delete_form">
+  <form method="post" action="${layers_url}" id="cal_delete_form">
     <input type="hidden" name="form.delete" value="#" />
   </form>
 

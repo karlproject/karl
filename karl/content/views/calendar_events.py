@@ -735,7 +735,7 @@ def calendar_setup_categories_view(context, request):
     return render_template_to_response(
         'templates/calendar_setup_categories.pt',
         back_to_setup_url=model_url(context, request, 'setup.html'),
-        post_url=request.path_url,
+        categories_url=model_url(context, request, 'categories.html'),
         formfields=api.formfields,
         fielderrors=fielderrors,
         fielderrors_target_name = fielderrors_target_name,
@@ -912,7 +912,7 @@ def calendar_setup_layers_view(context, request):
     return render_template_to_response(
         'templates/calendar_setup_layers.pt',
         back_to_setup_url=model_url(context, request, 'setup.html'),
-        post_url=request.path_url,
+        layers_url=model_url(context, request, 'layers.html'),
         formfields=api.formfields,
         fielderrors=fielderrors,
         fielderrors_target_name=fielderrors_target_name,
