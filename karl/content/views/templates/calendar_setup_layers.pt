@@ -15,164 +15,164 @@
     </div>
 
     <h1 class="kscreentitle">${api.page_title}</h1>
+    <div class="setup_group">
+      <div metal:use-macro="formfields.macros['formerror']"/>
 
-    <div metal:use-macro="formfields.macros['formerror']"/>
-
-    <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_layers">
-      <tr>
-        <th>&nbsp;</th>
-        <th>Layer</th>
-        <th>Categories</th>
-        <th>&nbsp;</th>
-      </tr>
-      <tr tal:repeat="layer editable_layers">
-        <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
-        <td class="name">${layer.title}</td>
-        <td class="names">
-          <span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer._v_categories])"/>&nbsp;
-        </td>
-        <td class="actions">
-          <a class="edit_action" id="edit_${layer.__name__}" href="#">edit</a>
-          <span class="separator">|</span> 
-          <a class="delete_action" id="delete_${layer.__name__}" href="#">delete</a>
-        </td>
-      </tr>
-    </table>
-
-    <!-- Add a new layer button -->  
-    <div id="setup_add_cal">
-      <a href="#">Add Layer</a>
-    </div>
-
-    <!-- Add a new layer form -->  
-    <form id="setup_add_cal_form" style="display: none" method="post"
-          action="${layers_url}" class="cal_add k3_genericForm" 
-          xml:id="contentform" enctype="multipart/form-data" name="save">
-
-    <h1>Add Layer</h1>
-
-    <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['layer_title'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_title" class="required">Name the layer</label><br />
-      <div tal:condition="error" class="errorMessage">${error}</div> 
-      <input name="layer_title" class="layer_title" type="text"/>
-    </fieldset>
-      
-    <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['calendar_path'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="calendar_path" class="required">Categories</label><br />
-      <table border="0" class="layers">
+      <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_layers">
         <tr>
-          <td>
-            <select name="category_paths" class="category_paths">
-              <option tal:repeat="category all_categories"
-                      value="${category['path']}">${category['title']}</option>
-            </select>
+          <th>&nbsp;</th>
+          <th>Layer</th>
+          <th>Categories</th>
+          <th>&nbsp;</th>
+        </tr>
+        <tr tal:repeat="layer editable_layers">
+          <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
+          <td class="name">${layer.title}</td>
+          <td class="names">
+            <span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer._v_categories])"/>&nbsp;
           </td>
-          <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+          <td class="actions">
+            <a class="edit_action" id="edit_${layer.__name__}" href="#">edit</a>
+            <span class="separator">|</span> 
+            <a class="delete_action" id="delete_${layer.__name__}" href="#">delete</a>
+          </td>
         </tr>
       </table>
-      <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
-    </fieldset>
 
-    <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['layer_color'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_color" class="required">Choose color</label><br />
-      <div tal:condition="error" class="errorMessage">${error}</div> 
+      <!-- Add a new layer button -->  
+      <div class="add_button" id="setup_add_cal">
+        <a href="#">Add Layer</a>
+      </div>
 
-      <ul class="cal_choose_color">
-        <li tal:repeat="color colors">
-            <input name="layer_color"
-                   type="radio" value="${color}" alt="${color}"/>
-            <br/>
-            <div class="cal_${color}_all">&nbsp;</div>
-        </li>
-      </ul>
-    </fieldset>
+      <!-- Add a new layer form -->  
+      <form id="setup_add_cal_form" style="display: none" method="post"
+            action="${layers_url}" class="cal_add k3_genericForm" 
+            xml:id="contentform" enctype="multipart/form-data" name="save">
 
-    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
-  </form>
+        <h1>Add Layer</h1>
 
-  <!-- Edit each layer forms -->  
-  <form tal:repeat="layer editable_layers" style="display: none" method="post"
-        id="edit_${layer.__name__}_form" 
-        action="${layers_url}" class="cal_edit k3_genericForm" 
-        xml:id="contentform" enctype="multipart/form-data" name="save">
-
-    <h1>Edit Layer</h1>
-
-    <input name="layer__name__" type="hidden" value="${layer.__name__}" />
-
-    <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_title'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_title" class="required">Name the layer</label><br />
-      <div tal:condition="error" class="errorMessage">${error}</div> 
-      <input name="layer_title" class="layer_title" type="text" value="${layer.title}" />
-    </fieldset>
+        <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['layer_title'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="layer_title" class="required">Name the layer</label><br />
+          <div tal:condition="error" class="errorMessage">${error}</div> 
+          <input name="layer_title" class="layer_title" type="text"/>
+        </fieldset>
       
-    <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['calendar_path'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="calendar_path" class="required">Categories</label><br />
-      <table border="0" class="layers">
-        <tr tal:repeat="selected_category layer._v_categories">
-          <td>
-            <select name="category_paths" class="category_paths">
-              <option tal:repeat="category all_categories"
-                      value="${category['path']}"
-                      selected="${selected_category['title'] == category['title']}">${category['title']}</option>
-            </select>
-          </td>
-          <td><a class="remove" href="#" style="display: none;">Remove</a></td>
-        </tr>
+        <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['calendar_path'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="calendar_path" class="required">Categories</label><br />
+          <table border="0" class="layers">
+            <tr>
+              <td>
+                <select name="category_paths" class="category_paths">
+                  <option tal:repeat="category all_categories"
+                          value="${category['path']}">${category['title']}</option>
+                </select>
+              </td>
+              <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+            </tr>
+          </table>
+          <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
+        </fieldset>
 
-        <tr tal:condition="not(layer._v_categories)">
-          <td>
-            <select name="category_paths" class="category_paths">
-              <option tal:repeat="category all_categories"
-                      value="${category['path']}">${category['title']}</option>
-            </select>
-          </td>
-          <td><a class="remove" href="#" style="display: none;">Remove</a></td>
-        </tr>
-      </table>
-      <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
-    </fieldset>
+        <fieldset tal:define="error (fielderrors_target_name == '__add__' and fielderrors['layer_color'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="layer_color" class="required">Choose color</label><br />
+          <div tal:condition="error" class="errorMessage">${error}</div> 
 
-    <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_color'])|None"
-              class="categories-field ${error and 'fieldError' or ''}">
-      <label for="layer_color" class="required">Choose color</label><br />
-      <div tal:condition="error" class="errorMessage">${error}</div> 
+          <ul class="cal_choose_color">
+            <li tal:repeat="color colors">
+                <input name="layer_color"
+                       type="radio" value="${color}" alt="${color}"/>
+                <br/>
+                <div class="cal_${color}_all">&nbsp;</div>
+            </li>
+          </ul>
+        </fieldset>
 
-      <ul class="cal_choose_color">
-        <li tal:repeat="color colors">
-            <input name="layer_color"
-                   type="radio" value="${color}" alt="${color}"
-                   group="colors_${layer.__name__}" 
-                   checked="${layer.color == color}"/>
-            <br/>
-            <div class="cal_${color}_all">&nbsp;</div>
-        </li>
-      </ul>
-    </fieldset>
+        <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+      </form>
 
-    <fieldset class="submitcancel-field">
-      <div class="buttons clearafter"> 
-        <button name="form.edit" type="submit" class="button primary_button"><span>submit</span></button> 
-        <button name="form.cancel" type="submit" class="button normal_button"><span>cancel</span></button> 
-      </div> 
-    </fieldset>  
-  </form>
+      <!-- Edit each layer forms -->  
+      <form tal:repeat="layer editable_layers" style="display: none" method="post"
+            id="edit_${layer.__name__}_form" 
+            action="${layers_url}" class="cal_edit k3_genericForm" 
+            xml:id="contentform" enctype="multipart/form-data" name="save">
 
-  <!-- Delete any layer -->
-  <form method="post" action="${layers_url}" id="cal_delete_form">
-    <input type="hidden" name="form.delete" value="#" />
-  </form>
+        <h1>Edit Layer</h1>
 
-  <!-- Signal JavaScript with name of layer with errors -->
-  <form style="display: none">
-    <input type="hidden" id="fielderrors_target_name" 
-           name="fielderrors_target_name" value="${fielderrors_target_name}" />
-  </form>
+        <input name="layer__name__" type="hidden" value="${layer.__name__}" />
 
+        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_title'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="layer_title" class="required">Name the layer</label><br />
+          <div tal:condition="error" class="errorMessage">${error}</div> 
+          <input name="layer_title" class="layer_title" type="text" value="${layer.title}" />
+        </fieldset>
+      
+        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['calendar_path'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="calendar_path" class="required">Categories</label><br />
+          <table border="0" class="layers">
+            <tr tal:repeat="selected_category layer._v_categories">
+              <td>
+                <select name="category_paths" class="category_paths">
+                  <option tal:repeat="category all_categories"
+                          value="${category['path']}"
+                          selected="${selected_category['title'] == category['title']}">${category['title']}</option>
+                </select>
+              </td>
+              <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+            </tr>
+
+            <tr tal:condition="not(layer._v_categories)">
+              <td>
+                <select name="category_paths" class="category_paths">
+                  <option tal:repeat="category all_categories"
+                          value="${category['path']}">${category['title']}</option>
+                </select>
+              </td>
+              <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+            </tr>
+          </table>
+          <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
+        </fieldset>
+
+        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_color'])|None"
+                  class="categories-field ${error and 'fieldError' or ''}">
+          <label for="layer_color" class="required">Choose color</label><br />
+          <div tal:condition="error" class="errorMessage">${error}</div> 
+
+          <ul class="cal_choose_color">
+            <li tal:repeat="color colors">
+                <input name="layer_color"
+                       type="radio" value="${color}" alt="${color}"
+                       group="colors_${layer.__name__}" 
+                       checked="${layer.color == color}"/>
+                <br/>
+                <div class="cal_${color}_all">&nbsp;</div>
+            </li>
+          </ul>
+        </fieldset>
+
+        <fieldset class="submitcancel-field">
+          <div class="buttons clearafter"> 
+            <button name="form.edit" type="submit" class="button primary_button"><span>submit</span></button> 
+            <button name="form.cancel" type="submit" class="button normal_button"><span>cancel</span></button> 
+          </div> 
+        </fieldset>  
+      </form>
+
+      <!-- Delete any layer -->
+      <form method="post" action="${layers_url}" id="cal_delete_form">
+        <input type="hidden" name="form.delete" value="#" />
+      </form>
+
+      <!-- Signal JavaScript with name of layer with errors -->
+      <form style="display: none">
+        <input type="hidden" id="fielderrors_target_name" 
+               name="fielderrors_target_name" value="${fielderrors_target_name}" />
+      </form>
+    </div>
   </div>
 </html>

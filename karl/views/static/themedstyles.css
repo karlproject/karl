@@ -2561,7 +2561,7 @@ body .cal_hour_event .cal_event_block .time {
 }
 
 table.cal_all {
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   font-size: 0.9em;
 }
 table.cal_all td {
@@ -2628,6 +2628,13 @@ input.category_title, input.layer_title {
   border: 0;
   background: none;
 }
+.cal_add, .cal_edit,
+#setup_add_layer,
+#setup_add_cal {
+    margin-bottom: 35px;
+}
+
+#setup_add_layer a,
 #setup_add_cal a {
   background-color: #639332;
   padding: 1px 11px;

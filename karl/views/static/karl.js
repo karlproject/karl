@@ -1847,18 +1847,24 @@ function initNewEvent() {
 /** =CALENDAR SETUP
 ----------------------------------------------- */
 function initCalendarSetup() {
-  // toggle add layer/virtual calendar form
-  $("#setup_add_cal").click(function(eventObject) {
+    
+  // toggle add layers/categories calendar form
+  $(".add_button").click(function(eventObject) { 
     eventObject.preventDefault();
-    $("#setup_add_cal").hide("fast");
-    $("#setup_add_cal_form").show("slow");
+    var group = $(eventObject.target).parents(".setup_group");
+
+    group.find(".add_button").hide("fast");
+    group.find(".cal_add").show("slow");
   });
   $(".cal_add button[name=form.cancel]").click(function(eventObject) {
     eventObject.preventDefault();
     var validationErrors = $("div.portalMessage");
     if (validationErrors) { validationErrors.remove(); }
-    $("#setup_add_cal").show("fast");
-    $("#setup_add_cal_form").hide("slow");
+
+    var group = $(eventObject.target).parents(".setup_group");
+    group.find(".add_button").show("fast");
+    group.find(".cal_add").hide("slow");
+
     $(this).parents("form")[0].reset();
   });
 
@@ -1874,11 +1880,14 @@ function initCalendarSetup() {
     $(formSelector).show();
   }
 
-  // toggle edit layer/virtual calendar form
-  $("#calendars .edit_action").click(function(eventObject) {
+  // toggle edit layer/categories calendar form
+  $(".cal_all .edit_action").click(function(eventObject) {
     eventObject.preventDefault();
-    $("form.cal_edit").hide("fast");
-    $("#setup_add_cal").hide("fast");
+    var group = $(eventObject.target).parents(".setup_group");
+    
+    group.find("form").hide("slow");
+    group.find(".add_button").hide("fast");
+
     var formId = "#" + $(this).identify() + "_form";
     $(formId).show("slow");
   });
@@ -1886,25 +1895,25 @@ function initCalendarSetup() {
     eventObject.preventDefault();
     var validationErrors = $("div.portalMessage");
     if (validationErrors) { validationErrors.remove(); }
-    $("#setup_add_cal").show("fast");
-    $("form.cal_edit").hide("slow");
+
+    var group = $(eventObject.target).parents(".setup_group");
+    group.find(".add_button").show("fast");
+    group.find("form").hide("slow");
+
     $(this).parents("form")[0].reset();
   });
 
-  // edit categories for a layer
-  if ($("fieldset.categories-field").length > 0) {
-    initCalendarLayersEdit();        
-  }
-  // delete layer / virtual calendar
+  // delete layer / category
   if ($("#cal_delete_form").length > 0) {
     initCalendarLayersOrCategoriesDelete();
   }
+
+  if ($("select.category_paths").length > 0) { 
+    initCalendarLayersEdit();
+  }
 }
 
-// Calendar Layers view 
 function initCalendarLayersEdit() {
-    if ($("select.category_paths").length == 0) { return; }
-
     // add category to a layer
     $('a.add').click(function(eventObject) {
       eventObject.preventDefault();
@@ -1916,7 +1925,7 @@ function initCalendarLayersEdit() {
       _updateRemoveLinks();
     });
 
-    // remove virtual calendar from a layer
+    // remove category from a layer
     $('a.remove').live('click', function(eventObject) { 
       eventObject.preventDefault();
 
@@ -1925,7 +1934,7 @@ function initCalendarLayersEdit() {
       _updateRemoveLinks();
     });   
 
-    // only show "Remove" if more than one virtual calendar is present
+    // only show "Remove" if more than one category is present
     function _updateRemoveLinks() {
       $(".layers").each(function() {
         var elts = $(this).find('td a.remove');
@@ -1937,7 +1946,6 @@ function initCalendarLayersEdit() {
     _updateRemoveLinks();
 }
 
-// Calendar Layers or Virtual calendars 
 function initCalendarLayersOrCategoriesDelete() {  
     $('a.delete_action').bind('click', function(e) {
       if (confirm("Are you sure?")) {
@@ -2025,11 +2033,6 @@ $(document).ready(function() {
     if ($("fieldset#calendar-category-field").length > 0) { 
       initNewEvent(); 
     }
-
-    if ($("fieldset#calendar-categories-field").length > 0) {
-      initCalendarLayersEdit();        
-    }
-
     // calendar setup pages
     if ($('#setup_add_cal').length > 0) {
       initCalendarSetup();
