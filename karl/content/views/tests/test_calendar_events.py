@@ -393,19 +393,6 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(model_url(context, request, 'setup.html'),
                          renderer.back_to_setup_url)
 
-    # cancel
-
-    def test_cancel_redirects_to_setup_page(self):
-        from repoze.bfg.url import model_url
-        
-        context = DummyCalendar()
-        request = testing.DummyRequest(post={'form.cancel': 1})
-        response = self._callFUT(context, request)
-        
-        self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, 
-                         model_url(context, request, 'setup.html'))
-
     # delete
     
     def test_delete_does_not_allow_deletion_of_default_category(self):
@@ -679,19 +666,6 @@ class CalendarLayersViewTests(unittest.TestCase):
         from repoze.bfg.url import model_url 
         self.assertEqual(model_url(context, request, 'setup.html'),
                          renderer.back_to_setup_url)
-
-    # cancel
-
-    def test_cancel_redirects_to_setup_page(self):
-        from repoze.bfg.url import model_url
-        
-        context = DummyCalendar()
-        request = testing.DummyRequest(post={'form.cancel': 1})
-        response = self._callFUT(context, request)
-        
-        self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, 
-                         model_url(context, request, 'setup.html'))
 
     # delete
     

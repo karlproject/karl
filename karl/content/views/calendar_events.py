@@ -644,9 +644,6 @@ def calendar_setup_categories_view(context, request):
                         _get_calendar_categories(context))
     category_names = [ x.__name__ for x in categories ]
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request, 'setup.html'))
-
     if 'form.delete' in request.POST:
         category_name = request.POST['form.delete']
         if category_name == default_category_name:
@@ -769,9 +766,6 @@ def calendar_setup_layers_view(context, request):
 
     categories = _get_calendar_categories(context)
     category_names = [ x.__name__ for x in categories ]
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request, 'setup.html'))
 
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
