@@ -661,7 +661,6 @@ def calendar_setup_categories_view(context, request):
 
     fielderrors = {}
     fielderrors_target_name = None
-    fill_values = {'category_title': ''}
     
     if 'form.edit' in request.POST:
         category_name = request.POST['category__name__']
@@ -703,7 +702,6 @@ def calendar_setup_categories_view(context, request):
         except Invalid, e:
             fielderrors_target_name = category_name
             fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
 
     if 'form.submitted' in request.POST:
         try:
@@ -781,12 +779,7 @@ def calendar_setup_layers_view(context, request):
 
     fielderrors_target_name = None
     fielderrors = {}
-    fill_values = dict(
-        category_paths=[],
-        layer_title='',
-        layer_color='red'
-        ) 
-                    
+
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
@@ -819,7 +812,6 @@ def calendar_setup_layers_view(context, request):
         except Invalid, e:
             fielderrors_target_name = '__add__'
             fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
 
     if 'form.edit' in request.POST:
         layer_name = request.POST['layer__name__']
