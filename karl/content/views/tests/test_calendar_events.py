@@ -460,7 +460,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_category__')
         self.assertEqual(str(renderer.fielderrors['category_title']), 
                          'Name is already used')
         
@@ -476,7 +476,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_category__')
         self.assertEqual(str(renderer.fielderrors['category_title']),
                          'Please enter a value')
 
@@ -736,7 +736,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_layer__')
         
         self.assertEqual(str(renderer.fielderrors['layer_title']), 
                          'Name is already used')
@@ -757,7 +757,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_layer__')
         
         self.assertEqual(str(renderer.fielderrors['layer_title']), 
                          'Name is already used by a category')
@@ -776,7 +776,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_layer__')
         self.assertEqual(str(renderer.fielderrors['layer_title']),
                          'Please enter a value')
 
@@ -794,7 +794,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.fielderrors_target_name, '__add__')
+        self.assertEqual(renderer.fielderrors_target_name, '__add_layer__')
         self.assertEqual(str(renderer.fielderrors['layer_color']),
                          'Please enter a value')
 

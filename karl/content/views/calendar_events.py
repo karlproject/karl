@@ -727,7 +727,7 @@ def calendar_setup_categories_view(context, request):
             return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = '__add__'
+            fielderrors_target_name = '__add_category__'
             fielderrors = e.error_dict
 
     # Render the form and shove some default values in
@@ -814,7 +814,7 @@ def calendar_setup_layers_view(context, request):
             return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = '__add__'
+            fielderrors_target_name = '__add_layer__'
             fielderrors = e.error_dict
 
     if 'form.edit' in request.POST:

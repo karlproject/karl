@@ -1849,7 +1849,7 @@ function initNewEvent() {
 function initCalendarSetup() {
     
   // toggle add layers/categories calendar form
-  $(".add_button").click(function(eventObject) { 
+  $(".add_button").click(function(eventObject) {   
     eventObject.preventDefault();
     var group = $(eventObject.target).parents(".setup_group");
 
@@ -1871,12 +1871,13 @@ function initCalendarSetup() {
   // automatically show form if submission failed with validation errors
   var fielderrors_target_name = $('#fielderrors_target_name').val();
   if (fielderrors_target_name.length > 0) {
-    if (fielderrors_target_name == "__add__") {
-        var formSelector = "#setup_add_cal_form";
+    if (fielderrors_target_name == "__add_category__") {
+        var formSelector = "#setup_add_category_form";
+    } else if (fielderrors_target_name == "__add_layer__") {
+        var formSelector = "#setup_add_layer_form";
     } else {
         var formSelector = "#edit_" + fielderrors_target_name + "_form";
     }
-    $("#setup_add_cal").hide();
     $(formSelector).show();
   }
 
@@ -2035,6 +2036,9 @@ $(document).ready(function() {
     }
     // calendar setup pages
     if ($('#setup_add_cal').length > 0) {
+      initCalendarSetup();
+    }
+    if ($('#setup_add_layer').length > 0) {
       initCalendarSetup();
     }
 
