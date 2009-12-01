@@ -33,38 +33,43 @@ except IOError:
     CHANGES = ''
 
 requires = [
-    'setuptools',
+    'coverage',
+    'feedparser',
+    'FormEncode',
+    'icalendar',
+    'lxml',
+    'markdown2',
+    'PILwoTk',
+    'nose',
     'repoze.bfg',
-    'repoze.retry',
-    'repoze.tm2',
+    'repoze.browserid',
+    'repoze.catalog',
+    'repoze.enformed',
+    'repoze.evolution',
+    'repoze.folder',
+    'repoze.lemonade',
     'repoze.mailin',
     'repoze.mailin.monitor',
     'repoze.monty',
-    'ZODB3',
-    'repoze.catalog',
-    'repoze.folder',
-    'repoze.evolution',
-    'repoze.zodbconn',
-    'repoze.lemonade',
+    'repoze.retry',
+    'repoze.sendmail',
+    'repoze.session',
+    'repoze.tm2',
     'repoze.who',
     'repoze.whoplugins.zodb',
-    'repoze.session',
-    'repoze.browserid',
-    'repoze.enformed',
-    'repoze.sendmail',
     'repoze.workflow',
-    'lxml',
-    'nose',
-    'FormEncode',
+    'repoze.zodbconn',
+    'setuptools',
     'simplejson',
-    'coverage',
-    'feedparser',
-    'zope.testing', # fwd compat when not directly relied on by BFG
-    'PILwoTk',
-    'icalendar',
-    'markdown2',
     'twill', # for testing
-    ]
+    'ZODB3',
+    'zope.testing', # fwd compat when not directly relied on by BFG
+
+    # Not really a code depdencency, but used by most buildouts
+    # XXX Move to eggs in buildout?
+    'repoze.errorlog',
+    'supervisor',
+]
 
 setup(name='karl',
       version=__version__,
