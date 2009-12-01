@@ -742,7 +742,7 @@ def calendar_setup_categories_view(context, request):
         fielderrors=fielderrors,
         fielderrors_target_name = fielderrors_target_name,
         api=api,
-        categories = categories
+        editable_categories = categories
         )
 
 class CalendarLayersForm(FormSchema):
@@ -894,8 +894,8 @@ def calendar_setup_layers_view(context, request):
         formfields=api.formfields,
         fielderrors=fielderrors,
         fielderrors_target_name=fielderrors_target_name,
-        layers = layers,
-        calendar_categories = _get_all_calendar_categories(context, request),
+        editable_layers = layers,
+        all_categories = _get_all_calendar_categories(context, request),
         colors = _COLORS,
         api=api,
         )

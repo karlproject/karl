@@ -363,7 +363,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target_name, None)
 
-    def test_builds_a_category_list_without_the_default_category(self):
+    def test_builds_editable_categories_without_the_default_category(self):
         context = DummyCalendar()
         context['foo'] = DummyCalendarCategory('foo')
         context['bar'] = DummyCalendarCategory('bar')
@@ -377,9 +377,9 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup_categories.pt')
         response = self._callFUT(context, request)
         
-        self.assert_(len(renderer.categories), 2) 
-        self.assert_(
-            default_name not in [x.__name__ for x in renderer.categories])
+        self.assert_(len(renderer.editable_categories), 2)
+        names = [x.__name__ for x in renderer.editable_categories] 
+        self.assert_(default_name not in names)
 
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()
@@ -636,7 +636,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target_name, None)
 
-    def test_builds_a_layers_list_without_the_default_layer(self):
+    def test_builds_editable_layers_without_the_default_layer(self):
         context = DummyCalendar()
         context['foo'] = DummyCalendarLayer('foo')
         context['bar'] = DummyCalendarLayer('bar')
@@ -650,9 +650,9 @@ class CalendarLayersViewTests(unittest.TestCase):
             'templates/calendar_setup_layers.pt')
         response = self._callFUT(context, request)
         
-        self.assert_(len(renderer.layers), 2) 
-        self.assert_(
-            default_name not in [x.__name__ for x in renderer.layers])
+        self.assert_(len(renderer.editable_layers), 2) 
+        names = [x.__name__ for x in renderer.editable_layers]
+        self.assert_(default_name not in names)
 
     def test_sets_back_to_setup_url(self):
         context = DummyCalendar()

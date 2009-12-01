@@ -14,16 +14,16 @@
       </a>
     </div>
 
-  <h1 class="kscreentitle" tal:condition="categories">${api.page_title}</h1>
+  <h1 class="kscreentitle">${api.page_title}</h1>
 
   <div metal:use-macro="formfields.macros['formerror']"/>
 
-  <table id="calendars" class="cal_all" cellspacing="0" tal:condition="categories">
+  <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_categories">
     <tr>
       <th>Name</th>
       <th>&nbsp;</th>
     </tr>
-    <tr tal:repeat="category categories">
+    <tr tal:repeat="category editable_categories">
       <td class="name">${category.title}</td>
       <td class="actions">
         <a class="edit_action" id="edit_${category.__name__}" href="#">edit</a> 
@@ -56,7 +56,7 @@
   </form>
 
   <!-- Edit each category forms -->
-  <form tal:repeat="category categories"
+  <form tal:repeat="category editable_categories"
     id="edit_${category.__name__}_form" style="display: none" method="post" 
     action="${categories_url}" class="cal_edit k3_genericForm" 
     xml:id="contentform" enctype="multipart/form-data" name="save"> 

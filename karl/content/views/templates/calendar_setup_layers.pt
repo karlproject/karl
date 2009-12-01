@@ -14,18 +14,18 @@
       </a>  
     </div>
 
-    <h1 class="kscreentitle" tal:condition="layers">${api.page_title}</h1>
+    <h1 class="kscreentitle">${api.page_title}</h1>
 
     <div metal:use-macro="formfields.macros['formerror']"/>
 
-    <table id="calendars" class="cal_all" cellspacing="0" tal:condition="layers">
+    <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_layers">
       <tr>
         <th>&nbsp;</th>
         <th>Layer</th>
         <th>Categories</th>
         <th>&nbsp;</th>
       </tr>
-      <tr tal:repeat="layer layers">
+      <tr tal:repeat="layer editable_layers">
         <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
         <td class="name">${layer.title}</td>
         <td class="names">
@@ -65,8 +65,8 @@
         <tr>
           <td>
             <select name="category_paths" class="category_paths">
-              <option tal:repeat="cat calendar_categories"
-                      value="${cat['path']}">${cat['title']}</option>
+              <option tal:repeat="category all_categories"
+                      value="${category['path']}">${category['title']}</option>
             </select>
           </td>
           <td><a class="remove" href="#" style="display: none;">Remove</a></td>
@@ -94,7 +94,7 @@
   </form>
 
   <!-- Edit each layer forms -->  
-  <form tal:repeat="layer layers" style="display: none" method="post"
+  <form tal:repeat="layer editable_layers" style="display: none" method="post"
         id="edit_${layer.__name__}_form" 
         action="${layers_url}" class="cal_edit k3_genericForm" 
         xml:id="contentform" enctype="multipart/form-data" name="save">
@@ -117,7 +117,7 @@
         <tr tal:repeat="selected_category layer._v_categories">
           <td>
             <select name="category_paths" class="category_paths">
-              <option tal:repeat="category calendar_categories"
+              <option tal:repeat="category all_categories"
                       value="${category['path']}"
                       selected="${selected_category['title'] == category['title']}">${category['title']}</option>
             </select>
@@ -128,8 +128,8 @@
         <tr tal:condition="not(layer._v_categories)">
           <td>
             <select name="category_paths" class="category_paths">
-              <option tal:repeat="cat calendar_categories"
-                      value="${cat['path']}">${cat['title']}</option>
+              <option tal:repeat="category all_categories"
+                      value="${category['path']}">${category['title']}</option>
             </select>
           </td>
           <td><a class="remove" href="#" style="display: none;">Remove</a></td>
