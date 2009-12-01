@@ -221,8 +221,29 @@ def show_day_view(context, request):
     return _show_calendar_view(context, request, DayViewPresenter)
 
 
-def _get_calendar_categories(calendar):
-    return [ x for x in calendar.values() if ICalendarCategory.providedBy(x) ]
+def _get_calendar_categories(context):
+    return [ x for x in context.values() if ICalendarCategory.providedBy(x) ]
+
+def _get_all_calendar_categories(context, request):
+    calendar_categories = []
+
+    searcher = queryAdapter(context, ICatalogSearch)
+    if searcher is not None:
+        total, docids, resolver = searcher(
+            allowed={'query': effective_principals(request), 'operator': 'or'},
+            interfaces={'query':[ICalendarCategory],'operator':'or'},
+            reverse=False,
+            )
+
+        for docid in docids:
+            ob = resolver(docid)
+            path = model_path(ob)
+            title = _calendar_category_title(ob)
+            calendar_categories.append({'title':title, 'path':path})
+
+    calendar_categories.sort(key=lambda x: x['path'])
+    return calendar_categories
+
 
 def add_calendarevent_view(context, request):
 
@@ -865,24 +886,6 @@ def calendar_setup_layers_view(context, request):
             except KeyError:
                 continue
 
-    calendar_categories = []
-
-    searcher = queryAdapter(context, ICatalogSearch)
-    if searcher is not None:
-        total, docids, resolver = searcher(
-            allowed={'query': effective_principals(request), 'operator': 'or'},
-            interfaces={'query':[ICalendarCategory],'operator':'or'},
-            reverse=False,
-            )
-
-        for docid in docids:
-            ob = resolver(docid)
-            path = model_path(ob)
-            title = _calendar_category_title(ob)
-            calendar_categories.append({'title':title,
-                                      'path':path})
-
-    calendar_categories.sort(key=lambda x: x['path'])
 
     return render_template_to_response(
         'templates/calendar_setup_layers.pt',
@@ -892,7 +895,7 @@ def calendar_setup_layers_view(context, request):
         fielderrors=fielderrors,
         fielderrors_target_name=fielderrors_target_name,
         layers = layers,
-        calendar_categories = calendar_categories,
+        calendar_categories = _get_all_calendar_categories(context, request),
         colors = _COLORS,
         api=api,
         )
