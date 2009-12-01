@@ -1,2 +1,2 @@
-../../bin/nosetests $*
+../../bin/nosetests --exclude twill $*
 
