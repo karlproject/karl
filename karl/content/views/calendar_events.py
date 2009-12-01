@@ -221,23 +221,6 @@ def show_day_view(context, request):
     return _show_calendar_view(context, request, DayViewPresenter)
 
 
-def get_calendar_actions(context, request):
-    """Return the actions to display when looking at the calendar"""
-    actions = []
-    if has_permission('moderate', context, request):
-        actions.append(
-            ('Categories', 'categories.html'),
-            )
-        actions.append(
-            ('Layers', 'layers.html'),
-            )
-    if has_permission('create', context, request):
-        actions.append(
-            ('Add Event', 'add_calendarevent.html'),
-            )
-    return actions
-
-
 def _get_calendar_categories(calendar):
     return [ x for x in calendar.values() if ICalendarCategory.providedBy(x) ]
 
