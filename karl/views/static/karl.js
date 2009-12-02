@@ -1869,14 +1869,14 @@ function initCalendarSetup() {
   });
 
   // automatically show form if submission failed with validation errors
-  var fielderrors_target_name = $('#fielderrors_target_name').val();
-  if (fielderrors_target_name.length > 0) {
-    if (fielderrors_target_name == "__add_category__") {
+  var fielderrors_target = $('#fielderrors_target').val();
+  if (fielderrors_target.length > 0) {
+    if (fielderrors_target == "__add_category__") {
         var formSelector = "#setup_add_category_form";
-    } else if (fielderrors_target_name == "__add_layer__") {
+    } else if (fielderrors_target == "__add_layer__") {
         var formSelector = "#setup_add_layer_form";
     } else {
-        var formSelector = "#edit_" + fielderrors_target_name + "_form";
+        var formSelector = "#edit_" + fielderrors_target + "_form";
     }
     $(formSelector).show();
   }

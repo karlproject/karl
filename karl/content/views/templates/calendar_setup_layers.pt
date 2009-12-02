@@ -32,7 +32,7 @@
             <span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer._v_categories])"/>&nbsp;
           </td>
           <td class="actions">
-            <a class="edit_action" id="edit_${layer.__name__}" href="#">edit</a>
+            <a class="edit_action" id="edit_${layer.__name__}_layer" href="#">edit</a>
             <span class="separator">|</span> 
             <a class="delete_action" id="delete_${layer.__name__}" href="#">delete</a>
           </td>
@@ -95,7 +95,7 @@
 
       <!-- Edit each layer forms -->  
       <form tal:repeat="layer editable_layers" style="display: none" method="post"
-            id="edit_${layer.__name__}_form" 
+            id="edit_${layer.__name__}_layer_form" 
             action="${layers_url}" class="cal_edit k3_genericForm" 
             xml:id="contentform" enctype="multipart/form-data" name="save">
 
