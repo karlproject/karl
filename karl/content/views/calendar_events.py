@@ -664,7 +664,7 @@ def calendar_setup_categories_view(context, request):
         return HTTPFound(location=location)
 
     fielderrors = {}
-    fielderrors_target_name = None
+    fielderrors_target = None
     
     if 'form.edit' in request.POST:
         category_name = request.POST['category__name__']
@@ -704,7 +704,7 @@ def calendar_setup_categories_view(context, request):
                 return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = category_name
+            fielderrors_target = ("%s_category" % category_name)
             fielderrors = e.error_dict
 
     if 'form.submitted' in request.POST:
@@ -727,7 +727,7 @@ def calendar_setup_categories_view(context, request):
             return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = '__add_category__'
+            fielderrors_target = '__add_category__'
             fielderrors = e.error_dict
 
     # Render the form and shove some default values in
@@ -740,7 +740,7 @@ def calendar_setup_categories_view(context, request):
         categories_url=model_url(context, request, 'categories.html'),
         formfields=api.formfields,
         fielderrors=fielderrors,
-        fielderrors_target_name = fielderrors_target_name,
+        fielderrors_target = fielderrors_target,
         api=api,
         editable_categories = categories
         )
@@ -781,7 +781,7 @@ def calendar_setup_layers_view(context, request):
                              query={'status_message': message})
         return HTTPFound(location=location)
 
-    fielderrors_target_name = None
+    fielderrors_target = None
     fielderrors = {}
 
     if 'form.submitted' in request.POST:
@@ -814,7 +814,7 @@ def calendar_setup_layers_view(context, request):
             return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = '__add_layer__'
+            fielderrors_target = '__add_layer__'
             fielderrors = e.error_dict
 
     if 'form.edit' in request.POST:
@@ -866,7 +866,7 @@ def calendar_setup_layers_view(context, request):
                 return HTTPFound(location=location)
 
         except Invalid, e:
-            fielderrors_target_name = layer_name
+            fielderrors_target = ("%s_layer" % layer_name)
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
 
@@ -893,7 +893,7 @@ def calendar_setup_layers_view(context, request):
         layers_url=model_url(context, request, 'layers.html'),
         formfields=api.formfields,
         fielderrors=fielderrors,
-        fielderrors_target_name=fielderrors_target_name,
+        fielderrors_target=fielderrors_target,
         editable_layers = layers,
         all_categories = _get_all_calendar_categories(context, request),
         colors = _COLORS,

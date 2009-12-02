@@ -47,7 +47,7 @@
 
           <h1>Add Category</h1>
 
-          <fieldset tal:define="error (fielderrors_target_name == '__add_category__' and fielderrors['category_title'])|None"
+          <fieldset tal:define="error (fielderrors_target == '__add_category__' and fielderrors['category_title'])|None"
                     class="calendar-categories-field ${error and 'fieldError' or ''}">
             <label for="category_title" class="required">Name the category</label><br />
             <div tal:condition="error" class="errorMessage">${error}</div> 
@@ -67,7 +67,7 @@
 
           <input name="category__name__" type="hidden" value="${category.__name__}" />
 
-          <fieldset tal:define="error (fielderrors_target_name == category.__name__ and fielderrors['category_title'])|None"
+          <fieldset tal:define="error (fielderrors_target == ('%s_category' % category.__name__) and fielderrors['category_title'])|None"
                     class="calendar-categories-field ${error and 'fieldError' or ''}">
             <label for="category_title" class="required">Name the category</label><br />
             <div tal:condition="error" class="errorMessage">${error}</div> 
@@ -89,8 +89,8 @@
 
         <!-- Signal JavaScript with name of category with errors -->
         <form style="display: none">
-          <input type="hidden" id="fielderrors_target_name" 
-                 name="fielderrors_target_name" value="${fielderrors_target_name}" />
+          <input type="hidden" id="fielderrors_target" 
+                 name="fielderrors_target" value="${fielderrors_target}" />
         </form>
       </div>
     </div>

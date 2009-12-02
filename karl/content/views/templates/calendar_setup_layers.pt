@@ -51,14 +51,14 @@
 
         <h1>Add Layer</h1>
 
-        <fieldset tal:define="error (fielderrors_target_name == '__add_layer__' and fielderrors['layer_title'])|None"
+        <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['layer_title'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
           <div tal:condition="error" class="errorMessage">${error}</div> 
           <input name="layer_title" class="layer_title" type="text"/>
         </fieldset>
       
-        <fieldset tal:define="error (fielderrors_target_name == '__add_layer__' and fielderrors['calendar_path'])|None"
+        <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['calendar_path'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="calendar_path" class="required">Categories</label><br />
           <table border="0" class="layers">
@@ -75,7 +75,7 @@
           <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
         </fieldset>
 
-        <fieldset tal:define="error (fielderrors_target_name == '__add_layer__' and fielderrors['layer_color'])|None"
+        <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['layer_color'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="layer_color" class="required">Choose color</label><br />
           <div tal:condition="error" class="errorMessage">${error}</div> 
@@ -103,14 +103,14 @@
 
         <input name="layer__name__" type="hidden" value="${layer.__name__}" />
 
-        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_title'])|None"
+        <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['layer_title'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
           <div tal:condition="error" class="errorMessage">${error}</div> 
           <input name="layer_title" class="layer_title" type="text" value="${layer.title}" />
         </fieldset>
       
-        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['calendar_path'])|None"
+        <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['calendar_path'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="calendar_path" class="required">Categories</label><br />
           <table border="0" class="layers">
@@ -138,7 +138,7 @@
           <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
         </fieldset>
 
-        <fieldset tal:define="error (fielderrors_target_name == layer.__name__ and fielderrors['layer_color'])|None"
+        <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['layer_color'])|None"
                   class="categories-field ${error and 'fieldError' or ''}">
           <label for="layer_color" class="required">Choose color</label><br />
           <div tal:condition="error" class="errorMessage">${error}</div> 
@@ -170,8 +170,8 @@
 
       <!-- Signal JavaScript with name of layer with errors -->
       <form style="display: none">
-        <input type="hidden" id="fielderrors_target_name" 
-               name="fielderrors_target_name" value="${fielderrors_target_name}" />
+        <input type="hidden" id="fielderrors_target" 
+               name="fielderrors_target" value="${fielderrors_target}" />
       </form>
     </div>
   </div>
