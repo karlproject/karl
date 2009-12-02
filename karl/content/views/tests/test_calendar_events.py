@@ -358,7 +358,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target, None)
@@ -374,23 +374,23 @@ class CalendarCategoriesViewTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         
         self.assert_(len(renderer.editable_categories), 2)
         names = [x.__name__ for x in renderer.editable_categories] 
         self.assert_(default_name not in names)
 
-    def test_sets_back_to_setup_url(self):
+    def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
         from repoze.bfg.url import model_url 
-        self.assertEqual(model_url(context, request, 'setup.html'),
-                         renderer.back_to_setup_url)
+        self.assertEqual(model_url(context, request),
+                         renderer.back_to_calendar_url)
 
     # delete
     
@@ -452,7 +452,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarCategory('foo')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
             'category_title': 'foo'})
@@ -468,7 +468,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context = DummyCalendar()
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
             'category_title': ''})
@@ -486,7 +486,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarCategory
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
             'category_title': 'Announcements',
@@ -556,7 +556,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarCategory('foo')
     
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.edit': 1,
             'category__name__': 'foo',
@@ -576,7 +576,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context['bar'] = DummyCalendarCategory('bar')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_categories.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.edit': 1,
             'category__name__': 'foo',
@@ -631,7 +631,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target, None)
@@ -647,23 +647,23 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         
         self.assert_(len(renderer.editable_layers), 2) 
         names = [x.__name__ for x in renderer.editable_layers]
         self.assert_(default_name not in names)
 
-    def test_sets_back_to_setup_url(self):
+    def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
         from repoze.bfg.url import model_url 
-        self.assertEqual(model_url(context, request, 'setup.html'),
-                         renderer.back_to_setup_url)
+        self.assertEqual(model_url(context, request),
+                         renderer.back_to_calendar_url)
 
     # delete
     
@@ -725,7 +725,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarLayer('foo')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
@@ -746,7 +746,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarCategory('foo')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
@@ -766,7 +766,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context = DummyCalendar()
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
@@ -784,7 +784,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context = DummyCalendar()
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
@@ -804,7 +804,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
@@ -877,7 +877,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarLayer('foo')
     
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.edit': 1,
             'layer__name__': 'foo',
@@ -897,7 +897,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['bar'] = DummyCalendarLayer('bar')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.edit': 1,
@@ -920,7 +920,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['bar'] = DummyCalendarCategory('bar')
 
         renderer = testing.registerDummyRenderer(
-            'templates/calendar_setup_layers.pt')
+            'templates/calendar_setup.pt')
         from webob import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.edit': 1,

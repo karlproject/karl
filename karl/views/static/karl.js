@@ -1889,7 +1889,7 @@ function initCalendarSetup() {
     group.find("form").hide("slow");
     group.find(".add_button").hide("fast");
 
-    var formId = "#" + $(this).identify() + "_form";
+    var formId = "#" + $(this).identify() + "_form"; 
     $(formId).show("slow");
   });
   $(".cal_edit button[name=form.cancel]").click(function(eventObject) {
@@ -2043,9 +2043,6 @@ $(document).ready(function() {
     }
     // calendar setup pages
     if ($('#setup_add_cal').length > 0) {
-      initCalendarSetup();
-    }
-    if ($('#setup_add_layer').length > 0) {
       initCalendarSetup();
     }
 

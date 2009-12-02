@@ -2559,7 +2559,9 @@ body .cal_hour_event .cal_event_block .time {
     margin-left: 25px; 
     width: 425px; 
 }
-
+p.cal_hint {
+  width: 550px;
+} 
 table.cal_all {
   margin-bottom: 15px;
   font-size: 0.9em;

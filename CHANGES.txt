@@ -3,7 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
-- Update styles for Calendar Setup page
+- Calendar categories and layers are now managed on the same setup page.
 
 - Preload button images better so that they don't flickr on hover/click
 
