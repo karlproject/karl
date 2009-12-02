@@ -61,7 +61,8 @@ class UserProfileImporterTests(unittest.TestCase):
         profile = testing.DummyModel()
         self.profiles['crossi'] = profile
         self.root.users.add('crossi', 'crossi', 'crossi',
-                          set(['group.KarlStaff', 'group.KarlKitchenStaff']))
+                          set(['group.KarlStaff', 'group.KarlKitchenStaff',
+                               'group.community.FugaziFanClub']))
         adapter = self._make_one()
         adapter.update(profile)
 
@@ -100,7 +101,8 @@ class UserProfileImporterTests(unittest.TestCase):
             'id': 'crossi',
             'login': 'crossi',
             'password': 'password',
-            'groups': set(['group.KarlStaff', 'group.AnotherGroup']),
+            'groups': set(['group.KarlStaff', 'group.AnotherGroup',
+                           'group.community.FugaziFanClub']),
             })
 
     def test_create(self):

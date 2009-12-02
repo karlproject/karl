@@ -103,6 +103,13 @@ class UserProfileImporter(object):
         groups = self._groups(element)
 
         users = find_users(profile)
+
+        # Don't clobber user's community memberships
+        prev_groups = users.get_by_id(username)['groups']
+        community_groups = [g for g in prev_groups if
+                            g.startswith('group.community')]
+        groups = groups | set(community_groups)
+
         users.remove(username)
         users.add(username, username, password, groups, encrypted=True)
 
