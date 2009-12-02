@@ -30,7 +30,7 @@
             <td class="actions">
               <a class="edit_action" id="edit_${category.__name__}_category" href="#">edit</a> 
               <span class="separator">|</span> 
-              <a class="delete_action" id="delete_${category.__name__}" href="#">delete</a>
+              <a class="delete_category_action" id="delete_category_${category.__name__}" href="#">delete</a>
             </td>
           </tr>
         </table>
@@ -83,7 +83,7 @@
         </form>
 
         <!-- Delete any category -->
-        <form method="post" action="${categories_url}" id="cal_delete_form">
+        <form method="post" action="${categories_url}" id="cal_delete_category_form">
           <input type="hidden" name="form.delete" value="#" />
         </form>
 

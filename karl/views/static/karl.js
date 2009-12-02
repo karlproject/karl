@@ -1905,9 +1905,7 @@ function initCalendarSetup() {
   });
 
   // delete layer / category
-  if ($("#cal_delete_form").length > 0) {
-    initCalendarLayersOrCategoriesDelete();
-  }
+  initCalendarLayersOrCategoriesDelete();
 
   if ($("select.category_paths").length > 0) { 
     initCalendarLayersEdit();
@@ -1947,12 +1945,21 @@ function initCalendarLayersEdit() {
     _updateRemoveLinks();
 }
 
-function initCalendarLayersOrCategoriesDelete() {  
-    $('a.delete_action').bind('click', function(e) {
+function initCalendarLayersOrCategoriesDelete() {
+    $('a.delete_category_action').bind('click', function(e) {
       if (confirm("Are you sure?")) {
-        var cal = this.id.substring(7); // delete_*
-        $('#cal_delete_form > input[name=form.delete]').val(cal);
-        $('#cal_delete_form').submit();
+        var category = this.id.substring(16); // delete_category_*
+        $('#cal_delete_category_form > input[name=form.delete]').val(category);
+        $('#cal_delete_category_form').submit();
+      }
+      return false;
+    });
+
+    $('a.delete_layer_action').bind('click', function(e) {
+      if (confirm("Are you sure?")) {
+        var layer = this.id.substring(13); // delete_layer_*
+        $('#cal_delete_layer_form > input[name=form.delete]').val(layer);
+        $('#cal_delete_layer_form').submit();
       }
       return false;
     });

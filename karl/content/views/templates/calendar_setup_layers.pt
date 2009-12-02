@@ -34,7 +34,7 @@
           <td class="actions">
             <a class="edit_action" id="edit_${layer.__name__}_layer" href="#">edit</a>
             <span class="separator">|</span> 
-            <a class="delete_action" id="delete_${layer.__name__}" href="#">delete</a>
+            <a class="delete_layer_action" id="delete_layer_${layer.__name__}" href="#">delete</a>
           </td>
         </tr>
       </table>
@@ -164,7 +164,7 @@
       </form>
 
       <!-- Delete any layer -->
-      <form method="post" action="${layers_url}" id="cal_delete_form">
+      <form method="post" action="${layers_url}" id="cal_delete_layer_form">
         <input type="hidden" name="form.delete" value="#" />
       </form>
 
