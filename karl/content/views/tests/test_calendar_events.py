@@ -983,6 +983,38 @@ class CalendarSetupViewTests(unittest.TestCase):
         self.assertEqual(model_url(context, request, 'layers.html'), 
                          renderer.layers_url)
 
+class Test__get_catalog_events(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, calendar, request, first_moment, last_moment,
+                 layer_name=None):
+        from karl.content.views.calendar_events import _get_catalog_events
+        return _get_catalog_events(calendar, request, first_moment,
+                                   last_moment, layer_name)
+
+    def test_it(self):
+        import datetime
+        from zope.interface import Interface
+        calendar = DummyCalendar()
+        layer = DummyCalendarLayer('layer')
+        layer.paths = ['/foo/bar']
+        calendar['layer'] = layer
+        request = testing.DummyRequest()
+        now = datetime.datetime.now()
+        from karl.models.interfaces import ICatalogSearch
+        event = testing.DummyModel()
+        results = 1, [1], lambda *arg: event
+        search = DummySearchAdapter(results)
+        testing.registerAdapter(search, (Interface), ICatalogSearch)
+        event = DummyCalendarEvent('foo')
+        testing.registerModels({'/foo/bar':event})
+        result = self._callFUT(calendar, request, now, now)
+        self.assertEqual(result, [[event]])
 
 class DummyCalendarEvent(testing.DummyModel):
 
@@ -1043,3 +1075,17 @@ class DummyCalendarLayer(testing.DummyModel):
         self.title = title
         self.color = 'red'
         self.paths = []
+
+class DummySearchAdapter:
+    def __init__(self, result):
+        self.result = result
+    
+    def __call__(self, context):
+        def search(**kw):
+            self.kw = kw
+            return self.result
+            
+        return search
+
+class DummyCatalogEvent(testing.DummyModel):
+    pass

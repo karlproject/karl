@@ -22,7 +22,6 @@ import datetime
 from urllib import quote
 
 from zope.component.event import objectEventNotify
-from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -140,6 +139,15 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
                 yield docid
 
     layers = _get_calendar_layers(calendar)
+
+    for layer in layers:
+        if layer_name and layer.__name__ != layer_name:
+            continue
+        for path in layer.paths:
+            total, docids, resolver = searcher(virtual=path, **shared_params)
+            path_events = _volatiles(_resolve(_f(docids, seen), resolver),
+                                     layer)
+            events.append(path_events)
 
     return events
 
