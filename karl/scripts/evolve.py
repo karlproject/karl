@@ -69,7 +69,7 @@ def main(argv=sys.argv):
     root, closer = open_root(get_default_config())
 
     managers = list(getUtilitiesFor(IEvolutionManager))
-    
+
     if package and package not in [x[0] for x in managers]:
         usage('No such package "%s"' % package)
 
@@ -79,7 +79,7 @@ def main(argv=sys.argv):
             pkg = sys.modules[pkg_name]
             VERSION = pkg.VERSION
             print 'Package %s' % pkg_name
-            manager = factory(root, pkg_name, VERSION)
+            manager = factory(root, pkg_name, VERSION, 0)
             db_version = manager.get_db_version()
             print 'Code at software version %s' % VERSION
             print 'Database at version %s' % db_version
