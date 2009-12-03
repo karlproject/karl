@@ -2,7 +2,7 @@
  *	All the #333333 font colors shows as black on the web browser
  *	Change the color: on body and h3 css selectors to modify the main color
  *  NOTES:
- *  
+ *
  *  1) styles are written with assuming of IE6+ and FF on windows only usage
  */
 
@@ -10,28 +10,28 @@
 ----------------------------------------------- */
 body {
   margin: 0;
-  padding: 0;	
+  padding: 0;
   font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
   font-size: 72%;
   background-color: #fff;
   color: #333;
   text-align: center;
 }
-h1, h2, h3 { 
+h1, h2, h3 {
   margin: 0 0 0.5em 0;
-} 
-h1 { 
-  font-size: 1.8em; 
+}
+h1 {
+  font-size: 1.8em;
   font-weight: normal;
   font-family:Georgia,Palatino,Times New Roman;
 }
-h2 { 
-  font-size: 1.3em; 
+h2 {
+  font-size: 1.3em;
 }
-h3 { 
+h3 {
   font-size: 1.2em; letter-spacing: 0;
 }
-h3 div { 
+h3 div {
   color: #333333;
 }
 h4 {
@@ -83,7 +83,7 @@ input.inputField {
 textarea {
   background: #fff url('images/input_background.gif') 0% 0% repeat-x;
   color: black;
-  border: 1px solid #CECECE; 
+  border: 1px solid #CECECE;
 }
 label {
   font-weight: bold;
@@ -93,8 +93,8 @@ label {
   margin: 1em 1em 1.5em 0;
 }
 .k3_genericForm .required {
-  background-repeat: no-repeat; 
-  background-position: right center; 
+  background-repeat: no-repeat;
+  background-position: right center;
   padding-right: 0.8em;
 }
 .k3_genericForm .fieldHelp {
@@ -156,15 +156,15 @@ label {
   background: #639332;
   color: White !important;
   font-size: 1em;
-  padding: 0.2em 0.6em;       
+  padding: 0.2em 0.6em;
   border: 1px solid #CECECE;
 }
 .standalone {
   background: #F0F2F4;
   font-size: 1em;
   padding: 0.2em 0.6em;
-  color: #333 !important; 
-  border: 1px solid #CECECE;         
+  color: #333 !important;
+  border: 1px solid #CECECE;
 }
 a.context:hover,
 a.standalone:hover {
@@ -189,7 +189,7 @@ a.standalone:hover {
 /** =CLEAR HACKS
 ----------------------------------------------- */
 /* clearafter provides a way to clear after an element */
-.clearafter:after, 
+.clearafter:after,
 .kscreentitle:after {
   content: '.';
   height: 0;
@@ -219,16 +219,16 @@ a.standalone:hover {
   overflow: hidden;
 }
 .visualClear {
-  clear: both; 
+  clear: both;
   font-size: 1px;
 }
 
 /** =ERROR MESSAGES
 ----------------------------------------------- */
-.portalMessage, 
+.portalMessage,
 .portalErrorMessage,
-.portalWarningMessage, 
-.portalStopMessage, 
+.portalWarningMessage,
+.portalStopMessage,
 .statusbox-item {
   background: #fffad8 url('images/message_info_icon.gif') 7px 50% no-repeat;
   border: 1px solid #f1e186;
@@ -245,7 +245,7 @@ a.standalone:hover {
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;  
+  -webkit-border-bottom-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
 }
@@ -258,9 +258,9 @@ a.standalone:hover {
 #tag-inputbox .statusbox-item {
   padding: 3px 10px 4px 30px;
   width: auto;
-}  
+}
 #tag-inputbox .message-span {
-  margin-top: 4px; 
+  margin-top: 4px;
 }
 #tag-inputbox a.statusbox-closebutton {
   margin-top: 8px;
@@ -268,7 +268,7 @@ a.standalone:hover {
 }
 .bit-box {
   margin-top: 2px;
-} 
+}
 
 .discreet {
 	color: #999999;
@@ -327,12 +327,12 @@ ul.menubar {
   padding: 0;
   list-style: none;
   font-weight: bold;
-  text-align: right;    
+  text-align: right;
 }
 ul.menubar li {
   display: inline-block;
   float: left;
-  height: 18px; 
+  height: 18px;
   /* no min-width here, broken in ie6 */
   position: relative;
   padding: 0;
@@ -345,7 +345,7 @@ ul.menubar li {
 ul.menubar a,
 ul.menubar span {
   text-decoration: none;
-  line-height: 1.6em; 
+  line-height: 1.6em;
   margin: 0px;
   padding: 0 11px;
 }
@@ -424,7 +424,7 @@ a.chparent img {
   border: none;
 }
 a.chparent:hover {
-  text-decoration: none;    
+  text-decoration: none;
 }
 
 /** =LAYOUT STRUCTURE
@@ -436,7 +436,7 @@ a.chparent:hover {
 }
 #header {
   text-align: center;
-} 
+}
 #spo-header {
   width: 952px;
   position: relative;
@@ -465,7 +465,7 @@ a.chparent:hover {
   border:1px solid #CECECE;
   padding:10px;
   margin: 0 15px 15px;
-  position:relative;    
+  position:relative;
 }
 #right {
  	float: right;
@@ -505,7 +505,7 @@ ul.horListing li {
 }
 .horListing a,
 .horListing a:visited {
-	color: #639332;	
+	color: #639332;
 	text-decoration: none;
   padding: 0 0.5em;
 }
@@ -525,7 +525,7 @@ ul.horListing li {
 #logo a img {
   border: none;
   width: 129px;
-  height: 32px;    
+  height: 32px;
 }
 
 /** =HEADER MENU / ROUNDED TABS
@@ -549,7 +549,7 @@ ul#header-menu li {
   float: right;
   position: relative;
   top: -1px;
-  list-style: none;    
+  list-style: none;
 }
 ul#header-menu img {
   border: none;
@@ -598,7 +598,7 @@ input#livesearch-input {
   font-size: 0.8em;
 	color: #63707C;
   padding: 0;
-  margin: 0;           
+  margin: 0;
   text-decoration: none;
 }
 
@@ -652,8 +652,8 @@ input#livesearch-input {
   font-family: Georgia,Palatino,Times New Roman;
   text-transform: uppercase;
 }
-#left .menu ul li { 
-  margin: 0 !important; 
+#left .menu ul li {
+  margin: 0 !important;
   padding: 0;
 }
 #left a {
@@ -740,8 +740,8 @@ input#livesearch-input {
 	margin-left: 0px;
 }
 div.center_intranet {
-  margin: 0 0 15px !important; 
-  float: left; 
+  margin: 0 0 15px !important;
+  float: left;
   width: 399px;
 }
 
@@ -776,6 +776,10 @@ ul#peopledir-tabs li a:hover {
 ul#peopledir-tabs li.selected a {
   background: white;
   border-bottom: 1px solid white;
+}
+
+#peopledir-section ul {
+  padding: 0px;
 }
 
 #peopledir-content-wrapper {
@@ -835,7 +839,7 @@ ul#peopledir-tabs li.selected a {
   margin-bottom: 10px;
 }
 .deleteMessage {
-	text-align: center; 
+	text-align: center;
 	margin-top: 2em;
 	margin-bottom:2em;
 	font-size: 1.3em;
@@ -848,7 +852,7 @@ ul#peopledir-tabs li.selected a {
 /** =COMMUNITY HEADER (H1, SEARCH)
 ----------------------------------------------- */
 .community_view {
-  background-color: #CEDFEF !important;    
+  background-color: #CEDFEF !important;
 }
 .community_view .cheader {
 	clear: both;
@@ -867,7 +871,7 @@ ul#peopledir-tabs li.selected a {
 .community_view .cheader form input {
 	margin-right: 2px;
 	font-size: 11px;
-  display: inline;	
+  display: inline;
 }
 .community_view .cheader form .inp {
 	width: 15em;
@@ -896,7 +900,7 @@ ul#peopledir-tabs li.selected a {
   padding: 3px 0 3px 1em;
   margin: 0;
   border-bottom: 1px solid #CECECE;
-  list-style: none;    
+  list-style: none;
 }
 .community_view #cleftcol #cheader ul li {
   list-style: none;
@@ -909,7 +913,7 @@ ul#peopledir-tabs li.selected a {
   border: 1px solid #CECECE;
   border-bottom: none;
   background: #e6e6f2;
-  text-decoration: none;    
+  text-decoration: none;
   font-size: 0.9em;
 	text-transform: uppercase;
 }
@@ -983,7 +987,7 @@ ul.nav li {
   width: 200px;
 }
 ul.nav ul {
-  position: absolute; 
+  position: absolute;
   top: 0;
   left: 200px;
   z-index: 10;
@@ -1032,7 +1036,7 @@ ul.nav li.iehover ul a:hover {
 	padding-right: 10px;
 	text-align: right;
 }
-.portlet-table .name, 
+.portlet-table .name,
 .portlet-table .type{
 	padding-right: 2px;
 }
@@ -1080,11 +1084,11 @@ div#offices-wrapper p {
 .field {
   left: 0;
   top: 0;
-  margin: 1em 1em 1.5em 0;    
+  margin: 1em 1em 1.5em 0;
 }
-.field label.required { 
-  background-repeat: no-repeat; 
-  background-position: right center; 
+.field label.required {
+  background-repeat: no-repeat;
+  background-position: right center;
   padding-right: 8px;
 }
 input#title {
@@ -1224,7 +1228,7 @@ dl.eventsListing dd {
 }
 .batchNavigation a:hover {
   text-decoration: none;
-} 
+}
 table#calendar {
   border: 1px solid #D9D9D9;
   border-style: solid solid none none;
@@ -1244,15 +1248,15 @@ table#calendar span.middot {
   font-size: 160%;
   vertical-align: middle;
   font-family: "Trebuchet MS";
-  line-height: 0.6em;    
+  line-height: 0.6em;
 }
 .calendar_day_of_week_header {
   text-align:center;
   background-color:#e5e8ed;
 }
 .calendar_day_of_week_header td {
-  padding: 4px 0 4px 0;  
-  border: solid #D9D9D9; 
+  padding: 4px 0 4px 0;
+  border: solid #D9D9D9;
   border-width: 1px 0 1px 1px;
 }
 .calendar_day_header {
@@ -1266,7 +1270,7 @@ table#calendar span.middot {
   color: #D9D9D9;
 }
 .calendar_day_entry {
-  padding: 3px; 
+  padding: 3px;
   color: #999;
 }
 
@@ -1298,7 +1302,7 @@ div.search_utility_bar {
   clear: right;
   padding-top: 1em;
   margin: 0;
-  height: 1%; 
+  height: 1%;
 }
 .photoProfile {
   height: 127px;
@@ -1308,7 +1312,7 @@ div.search_utility_bar {
   margin: 0 0.5% 0.5% 0;
   font-size: 0.9em;
   float: left;
-  display: inline;          
+  display: inline;
   overflow: hidden;
 }
 .photoProfile img {
@@ -1319,17 +1323,17 @@ div.search_utility_bar {
   font-weight: normal;
   font-size: 1em;
 }
-.photoProfile p { 
+.photoProfile p {
   line-height: 1.5em;
   margin: 0.5em 10px 10px;
 }
 .photoProfile p span {
-  display: block; 
+  display: block;
 }
 .photoProfileImage {
   float: left;
   display: inline;
-  margin: 10px;     
+  margin: 10px;
 }
 .photoProfileImage img {
   border: none;
@@ -1338,7 +1342,7 @@ div.search_utility_bar {
   -ms-interpolation-mode: bicubic; /* ie 7 */
 }
 .profileInfoBox {
-  float: left; 
+  float: left;
   margin: 1em 0 0.2em;
   line-height: 1.5em;
   overflow: hidden;
@@ -1379,7 +1383,7 @@ img#login-gradient {
   width: 100%;
   left: 0px;
   position: absolute;
-  top: 0px; 
+  top: 0px;
   z-index: 0;
 }
 #outer {
@@ -1494,14 +1498,14 @@ ol#references-listing li a.topLevelItem {
   font-weight:bold;
   text-transform:uppercase;
 }
-ol#references-listing li ol { 
+ol#references-listing li ol {
   margin:0.3em 0 0;
   padding: 0 0 0 2em;
 }
 * html ol#references-listing li ol {
-  padding-left:1.5em; 
+  padding-left:1.5em;
 }
-ol#references-listing li ol li { 
+ol#references-listing li ol li {
   padding-bottom:0.3em;
   border-bottom:none;
   border-top:1px solid #CECECE;
@@ -1514,10 +1518,10 @@ span.sortingArrows {
   padding:0;
   float:right;
 }
-span.sortingArrows a { 
+span.sortingArrows a {
   text-decoration:none;
 }
-span.sortingArrows a img { 
+span.sortingArrows a img {
   border:none;
   margin:0;
 }
@@ -1542,7 +1546,7 @@ span.sortingArrows a img {
   font-size: 1em;
   background: #F0F2F4;
   padding: 0.2em 0.6em;
-  color: #333 !important; 
+  color: #333 !important;
   margin-right: 5px;
   position: relative;
   float: left;
@@ -1641,7 +1645,7 @@ ul.tagUsersList li {
 .profile_page_body div.wrapper {
 	margin-left: 93px;
 }
-.profile_page_body div p span { 
+.profile_page_body div p span {
 	display: inline;
 	margin-right: 5px;
 	margin-bottom: 2px;
@@ -1741,23 +1745,23 @@ table#staffprofile-content td a:hover {
 ----------------------------------------------- */
 
 /* Hide certain form fields when staff edits a profile */
-.k3_staff_role #firstname-field, .k3_staff_role #lastname-field, 
-.k3_staff_role #phone-field, 
-.k3_staff_role #extension-field, .k3_staff_role #department-field, 
-.k3_staff_role #organization-field, .k3_staff_role #position-field, 
-.k3_staff_role #location-field, .k3_staff_role #country-field { 
+.k3_staff_role #firstname-field, .k3_staff_role #lastname-field,
+.k3_staff_role #phone-field,
+.k3_staff_role #extension-field, .k3_staff_role #department-field,
+.k3_staff_role #organization-field, .k3_staff_role #position-field,
+.k3_staff_role #location-field, .k3_staff_role #country-field {
   /* Changed to display: block to facilitate testing, temporarily. */
   display: none;
 }
 
 /* XXX Temporarily allow editing by staff of email field to allow testing*/
-.k3_staff_role #email-field { 
+.k3_staff_role #email-field {
   display: block;
 }
 
 /** =ADDITIONS FOR KARL3
 ----------------------------------------------- */
-.k3_section_items:hover { 
+.k3_section_items:hover {
   background-color: #F0F2F4;
 }
 div.moderator {
@@ -1780,7 +1784,7 @@ div.moderator {
   border-top: 1px solid #dddfe0;
   border-bottom: 1px solid #dddfe0;
   font-size: 85%;
-}       
+}
 .cal_footer {
   background-color: #edf1f3;
   border-top: 1px solid #fff;
@@ -1872,7 +1876,7 @@ body .cal_red {
   background-color: #faeaea;
   border: 1px solid #cc3333;
 }
-body .cal_red a, 
+body .cal_red a,
 body .cal_red a:visited {
   color: #cc3333;
 }
@@ -1886,7 +1890,7 @@ body .cal_pink {
   background-color: #fcecf1;
   border: 1px solid #dd4477;
 }
-body .cal_pink a, 
+body .cal_pink a,
 body .cal_pink a:visited {
   color: #dd4477;
 }
@@ -1900,7 +1904,7 @@ body .cal_purple {
   background-color: #f5ecf5;
   border: 1px solid #994499;
 }
-body .cal_purple a, 
+body .cal_purple a,
 body .cal_purple a:visited {
   color: #994499;
 }
@@ -1914,7 +1918,7 @@ body .cal_blue {
   background-color: #eaeffa;
   border: 1px solid #3366cc;
 }
-body .cal_blue a, 
+body .cal_blue a,
 body .cal_blue a:visited {
   color: #3366cc;
 }
@@ -1928,7 +1932,7 @@ body .cal_aqua {
   background-color: #e8f6f5;
   border: 1px solid #22aa99;
 }
-body .cal_aqua a, 
+body .cal_aqua a,
 body .cal_aqua a:visited {
   color: #22aa99;
 }
@@ -1938,16 +1942,16 @@ body .cal_aqua_all {
 }
 
 body .cal_green {
-  color: #109618; 
+  color: #109618;
   background-color: #e7f4e7;
   border: 1px solid #109618;
 }
-body .cal_green a, 
+body .cal_green a,
 body .cal_green a:visited {
-  color: #109618; 
+  color: #109618;
 }
 body .cal_green_all {
-  color: #fff; 
+  color: #fff;
   background-color: #109618;
 }
 
@@ -1956,7 +1960,7 @@ body .cal_mustard {
   background-color: #fbf7e5;
   border: 1px solid #d6ae00;
 }
-body .cal_mustard a, 
+body .cal_mustard a,
 body .cal_mustard a:visited {
   color: #d6ae00;
 }
@@ -1970,7 +1974,7 @@ body .cal_orange {
   background-color: #fceee7;
   border: 1px solid #dd5511;
 }
-body .cal_orange a, 
+body .cal_orange a,
 body .cal_orange a:visited {
   color: #dd5511;
 }
@@ -1984,7 +1988,7 @@ body .cal_silver {
   background-color: #eff1f3;
   border: 1px solid #627487;
 }
-body .cal_silver a, 
+body .cal_silver a,
 body .cal_silver a:visited {
   color: #627487;
 }
@@ -1998,7 +2002,7 @@ body .cal_olive {
   background-color: #f1f4f2;
   border: 1px solid #6b8a73;
 }
-body .cal_olive a, 
+body .cal_olive a,
 body .cal_olive a:visited {
   color: #6b8a73;
 }
@@ -2021,7 +2025,7 @@ table.cal_scroll {
 .cal_scroll th {
   width: 43px;
 }
-.cal th, 
+.cal th,
 .cal td {
   padding: 0;
   vertical-align: top;
@@ -2049,7 +2053,7 @@ table.cal_scroll {
   color: #7a7a7a;
   vertical-align: middle;
 }
-.cal .all_day th, 
+.cal .all_day th,
 .cal .all_day td {
   border-right: 1px solid #cecece;
   border-bottom: 1px solid #ccc;
@@ -2081,7 +2085,7 @@ table.cal_scroll {
 }
 
 
-.cal .divider th, 
+.cal .divider th,
 .cal .divider td {
   height: 1px;
   font-size: 1px;
@@ -2094,21 +2098,21 @@ table.cal_scroll {
 }
 
 /* highlighting today */
-.cal_today_sun .cal_sun, 
-.cal_today_mon .cal_mon, 
-.cal_today_tue .cal_tue, 
-.cal_today_wed .cal_wed, 
-.cal_today_thu .cal_thu, 
-.cal_today_fri .cal_fri, 
+.cal_today_sun .cal_sun,
+.cal_today_mon .cal_mon,
+.cal_today_tue .cal_tue,
+.cal_today_wed .cal_wed,
+.cal_today_thu .cal_thu,
+.cal_today_fri .cal_fri,
 .cal_today_sat .cal_sat {
   background-color: #fdffd2;
 }
-.cal_today_sun .cal_sun .shade, 
-.cal_today_mon .cal_mon .shade, 
-.cal_today_tue .cal_tue .shade, 
-.cal_today_wed .cal_wed .shade, 
-.cal_today_thu .cal_thu .shade, 
-.cal_today_fri .cal_fri .shade, 
+.cal_today_sun .cal_sun .shade,
+.cal_today_mon .cal_mon .shade,
+.cal_today_tue .cal_tue .shade,
+.cal_today_wed .cal_wed .shade,
+.cal_today_thu .cal_thu .shade,
+.cal_today_fri .cal_fri .shade,
 .cal_today_sat .cal_sat .shade {
   background-color: #f5f9ce;
 }
@@ -2153,15 +2157,15 @@ table.cal_scroll {
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;  
+  -webkit-border-bottom-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;  
+  -webkit-border-bottom-right-radius: 5px;
 }
 .cal_event_pos_left a {
   -moz-border-radius-topleft: 5px;
   -moz-border-radius-bottomleft: 5px;
   -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;  
+  -webkit-border-bottom-left-radius: 5px;
 }
 .cal_event_pos_right a {
   width: 92px;
@@ -2174,7 +2178,7 @@ table.cal_scroll {
 /* hourly events */
 .cal_hour_event {
   height: 25px;
-  position: relative;  
+  position: relative;
   border-bottom: 1px solid #e6e6e6;
   line-height: 1.15em;
   font-size: 115%;
@@ -2207,7 +2211,7 @@ body .cal_hour_event .cal_event_block {
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;  
+  -webkit-border-bottom-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
   z-index: 1;
@@ -2291,12 +2295,12 @@ body .cal_hour_event .cal_event_block .time {
   float: left;
   padding: 3px 10px 4px 3px;
 }
-.cal_month .label a, 
+.cal_month .label a,
 .cal_month .label a:visited {
   text-decoration: none;
   color: #3A74A9;
 }
-.cal_month .faded a, 
+.cal_month .faded a,
 .cal_month .faded a:visited {
   color: #bbb;
 }
@@ -2362,7 +2366,7 @@ body .cal_hour_event .cal_event_block .time {
   width: 85px;
   border: 1px solid #ccc;
   border-top-color: #e6e6e6;
-  border-bottom-color: #e6e6e6;  
+  border-bottom-color: #e6e6e6;
 }
 .cal_week .last {
   width: auto;
@@ -2405,7 +2409,7 @@ body .cal_hour_event .cal_event_block .time {
 .cal_day td {
   border: 1px solid #ccc;
   border-top-color: #e6e6e6;
-  border-bottom-color: #e6e6e6;  
+  border-bottom-color: #e6e6e6;
 }
 .cal_day .last {
   width: 21px;
@@ -2443,7 +2447,7 @@ body .cal_hour_event .cal_event_block .time {
 ----------------------------------------------- */
 .cal_agenda .cal_expand th {
   padding: 0 8px 5px 8px;
-  text-align: left; 
+  text-align: left;
   font-weight: normal;
 }
 .cal_agenda .cal_expand th a {
@@ -2459,7 +2463,7 @@ body .cal_hour_event .cal_event_block .time {
 .cal_agenda .cal_agenda_range a {
   color: #666;
 }
-.cal_agenda th, 
+.cal_agenda th,
 .cal_agenda td {
   font-size: 90%;
   padding: 9px 8px 7px 8px;
@@ -2481,7 +2485,7 @@ body .cal_hour_event .cal_event_block .time {
   color: #666;
   text-align: right;
 }
-.cal_agenda_day a, 
+.cal_agenda_day a,
 .cal_agenda_time {
   line-height: 1.4em;
 }
@@ -2508,7 +2512,7 @@ body .cal_hour_event .cal_event_block .time {
 .cal_event_category {
   height: 16px;
 }
-.cal_event_category a, 
+.cal_event_category a,
 .cal_event_category a:visited {
   float: left;
   text-decoration: none;
@@ -2525,13 +2529,13 @@ body .cal_hour_event .cal_event_block .time {
   margin: 0 2px;
   color: #999;
 }
-.cal_new_event a, 
+.cal_new_event a,
 .cal_new_event a:visited {
   float: left;
   width: 79px;
   height: 20px;
   line-height: 20px;
-  background: url("images/cal_buttons_new_event.png") 0 0 no-repeat; 
+  background: url("images/cal_buttons_new_event.png") 0 0 no-repeat;
   font-weight: bold;
   font-family: Arial, Verdana, sans-serif;
   font-size: 11px;
@@ -2541,27 +2545,27 @@ body .cal_hour_event .cal_event_block .time {
 }
 .cal_new_event a:hover {
   background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat;
-  text-decoration: none; 
+  text-decoration: none;
 }
 .cal_new_event a:active {
-  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat; 
+  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat;
 }
 
 
 /** =CALENDAR SETUP
 ----------------------------------------------- */
-#calendar_setup dt { 
-    font-size: 110%; 
-    margin-top: 25px; 
+#calendar_setup dt {
+    font-size: 110%;
+    margin-top: 25px;
 }
-#calendar_setup dd { 
-    margin-top: 10px; 
-    margin-left: 25px; 
-    width: 425px; 
+#calendar_setup dd {
+    margin-top: 10px;
+    margin-left: 25px;
+    width: 425px;
 }
 p.cal_hint {
   width: 550px;
-} 
+}
 table.cal_all {
   margin-bottom: 15px;
   font-size: 0.9em;
@@ -2570,7 +2574,7 @@ table.cal_all td {
   background-color: #f1f4f6;
   border-bottom: 1px solid #e4e6e9;
   border-top: 1px solid #fff;
-  padding: 4px 5px;  
+  padding: 4px 5px;
 }
 table.cal_all th {
   background-color: #e4e6e9;
@@ -2584,7 +2588,7 @@ table.cal_all .actions {
   text-align: right;
   vertical-align: top;
 }
-table.cal_all a, 
+table.cal_all a,
 table.cal_all a:visited,
 table.cal_all .separator {
   color: #797979;
@@ -2606,7 +2610,7 @@ table.cal_all .location {
 input.category_title, input.layer_title {
   width: 330px;
 }
-.cal_add input,  .cal_add select, 
+.cal_add input,  .cal_add select,
 .cal_edit input, .cal_edit select {
   margin-top: 2px;
 }
@@ -2648,24 +2652,24 @@ input.category_title, input.layer_title {
 
 /** =CALENDAR TOOLTIP
 ----------------------------------------------- */
-.tooltip { 
-  display: none; 
-  font-size: 110%; 
-  height: 71px; 
-  width: 150px; 
-  padding: 5px; 
-  color: #333; 
+.tooltip {
+  display: none;
+  font-size: 110%;
+  height: 71px;
+  width: 150px;
+  padding: 5px;
+  color: #333;
   z-index: 100;
   line-height: 1.2em;
 }
 .cal_month .tooltip {
-  background: url("images/cal_tooltip_right.png") no-repeat; 
+  background: url("images/cal_tooltip_right.png") no-repeat;
 }
 .cal_week .cal_hour_event .tooltip {
-  background: url("images/cal_tooltip_white.png") no-repeat; 
+  background: url("images/cal_tooltip_white.png") no-repeat;
 }
 .cal_week .tooltip {
-  background: url("images/cal_tooltip_left.png") no-repeat; 
+  background: url("images/cal_tooltip_left.png") no-repeat;
 }
 .cal_week .cal_hour_event .tooltip {
   font-size: 95%;
@@ -2689,11 +2693,11 @@ input.category_title, input.layer_title {
 .buttons .button {
   margin-right: 7px;
 }
-.button { 
+.button {
   float: left;
   margin: 0;
-  border: 0; 
-  padding: 0 14px 0 0; 
+  border: 0;
+  padding: 0 14px 0 0;
   font-family: Arial, Verdana, sans-serif;
   font-size: 12px;
   color: #333;
@@ -2702,46 +2706,46 @@ input.category_title, input.layer_title {
   text-align: center;
   outline: none;
 }
-.button span { 
-  position: relative; 
-  display: block; 
-  white-space: nowrap; 
-  padding: 0 0 0 14px; 
+.button span {
+  position: relative;
+  display: block;
+  white-space: nowrap;
+  padding: 0 0 0 14px;
 }
-button:focus::-moz-focus-inner { 
-  border-color: transparent !important; 
-} 
-button::-moz-focus-inner { 
+button:focus::-moz-focus-inner {
+  border-color: transparent !important;
+}
+button::-moz-focus-inner {
   border: none;
   padding: 0;
 }
 
-a.button:link, 
+a.button:link,
 a.button:visited {
   color: #333;
 }
-a.button:link span, 
+a.button:link span,
 a.button:visited span {
   float: left;
   display: inline;
 }
 
 /* primary */
-button.primary, 
-a:link.primary, 
+button.primary,
+a:link.primary,
 a:visited.primary {
   font-weight: bold;
   color: #000;
 }
 
 /* disabled */
-button.disabled, 
-a:link.disabled, 
+button.disabled,
+a:link.disabled,
 a:visited.disabled {
   color: #aaa;
   cursor: default;
 }
-button.disabled img, 
+button.disabled img,
 a.disabled img {
   filter:alpha(opacity=50);
   -moz-opacity:0.5;
@@ -2750,7 +2754,7 @@ a.disabled img {
 }
 
 /* primary button */
-button.primary_button, 
+button.primary_button,
 a.primary_button:link,
 a.primary_button:visited {
   font-weight: bold;
@@ -2758,55 +2762,55 @@ a.primary_button:visited {
   text-decoration: none;
 }
 .primary_button,
-.disabled.primary_button:hover { 
-  background: url("images/button_primary_normal.png") right no-repeat; 
+.disabled.primary_button:hover {
+  background: url("images/button_primary_normal.png") right no-repeat;
 }
 .primary_button span,
-.disabled.primary_button:hover span { 
-  height: 15px; 
+.disabled.primary_button:hover span {
+  height: 15px;
   line-height: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
   background: url("images/button_primary_normal.png") left no-repeat;
 }
 .primary_button:hover {
-  background: url("images/button_primary_hover.png") right no-repeat; 
+  background: url("images/button_primary_hover.png") right no-repeat;
 }
 .primary_button:hover span {
-  background: url("images/button_primary_hover.png") left no-repeat; 
+  background: url("images/button_primary_hover.png") left no-repeat;
 }
 .primary_button:active {
-  background: url("images/button_primary_active.png") right no-repeat; 
-  -ms-background-position-y: 1px; /* ie8 hack */  
+  background: url("images/button_primary_active.png") right no-repeat;
+  -ms-background-position-y: 1px; /* ie8 hack */
 }
 .primary_button:active span {
-  background: url("images/button_primary_active.png") left no-repeat; 
+  background: url("images/button_primary_active.png") left no-repeat;
 }
 
 /* normal button */
 .normal_button,
-.disabled.normal_button:hover { 
-  background: url("images/button_normal.png") right no-repeat; 
+.disabled.normal_button:hover {
+  background: url("images/button_normal.png") right no-repeat;
 }
 .normal_button span,
-.disabled.normal_button:hover span { 
-  height: 15px; 
+.disabled.normal_button:hover span {
+  height: 15px;
   line-height: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
   background: url("images/button_normal.png") left no-repeat;
 }
 .normal_button:hover {
-  background: url("images/button_hover.png") right no-repeat; 
+  background: url("images/button_hover.png") right no-repeat;
 }
 .normal_button:hover span {
-  background: url("images/button_hover.png") left no-repeat; 
+  background: url("images/button_hover.png") left no-repeat;
 }
 .normal_button:active {
-  background: url("images/button_active.png") right no-repeat; 
-  -ms-background-position-y: 1px; /* ie8 hack */  
+  background: url("images/button_active.png") right no-repeat;
+  -ms-background-position-y: 1px; /* ie8 hack */
 }
 .normal_button:active span {
-  background: url("images/button_active.png") left no-repeat; 
-}     
+  background: url("images/button_active.png") left no-repeat;
+}
 

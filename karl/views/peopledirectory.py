@@ -82,7 +82,9 @@ def render_report_group(group, request, css_class=''):
                 escape(obj.link_title)))
         elif IPeopleReportGroup.providedBy(obj):
             html = render_report_group(obj, request)
+            res.append('<li>')
             res.append(html)
+            res.append('</li>')
     res.append('</ul>')
     return '\n'.join(res)
 
