@@ -2613,6 +2613,9 @@ table.cal_all .location {
 input.category_title, input.layer_title {
   width: 330px;
 }
+select.category_paths {
+  width: 500px;
+}
 .cal_add input,  .cal_add select,
 .cal_edit input, .cal_edit select {
   margin-top: 2px;

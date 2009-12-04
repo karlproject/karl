@@ -3,6 +3,8 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #491986: Constrain width of category selector on calendar setup page.
+
 - Increase performance of jQuery selectors in calendar daily/weekly view
 
 - Fix editing of calendar categories/layers when names have spaces
