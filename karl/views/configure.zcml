@@ -487,5 +487,11 @@
       handler="karl.handlers.add_no_cache_headers"
       />
 
+  <adapter
+      for="karl.models.interfaces.ISite
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IToolAddables"
+      factory=".adapters.SiteToolAddables"
+     />
 </configure>
 

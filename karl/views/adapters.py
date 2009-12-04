@@ -18,10 +18,10 @@ from repoze.bfg.traversal import find_interface
 from repoze.lemonade.listitem import get_listitems
 from zope.interface import implements
 
-EXCLUDE_TOOLS = ['intranets',]
-
 class DefaultToolAddables(object):
     implements(IToolAddables)
+
+    exclude_tools = ['intranets',]
 
     def __init__(self, context, request):
         self.context = context
@@ -31,7 +31,13 @@ class DefaultToolAddables(object):
         """ What tools can go in a community?
         """
         tools = get_listitems(IToolFactory)
-        return [tool for tool in tools if tool['name'] not in EXCLUDE_TOOLS]
+        return [tool for tool in tools if tool['name'] not in
+                self.exclude_tools]
+
+class SiteToolAddables(DefaultToolAddables):
+    """ For tools in community at site root.
+    """
+    exclude_tools = ['wiki', 'blog',]
 
 class DefaultFolderAddables(object):
     def __init__(self, context, request):
