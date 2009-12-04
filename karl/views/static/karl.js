@@ -1721,7 +1721,12 @@ jQuery.fn.identify = function() {
 var hov = {};
 
 function mouseOverHour(evt) {
-  var elt = $(this);
+  var elt = $(evt.target);
+  if (!elt.hasClass('cal_hour_event')) {
+    var elt = elt.parents(".cal_hour_event");
+  }
+  if (!elt) { return; }
+
   var id  = elt.identify("a");
   hov[id] = true;
   
@@ -1735,7 +1740,12 @@ function mouseOverHour(evt) {
 }
 
 function mouseOutHour(evt) {
-  var elt = $(this);
+  var elt = $(evt.target);
+  if (!elt.hasClass('cal_hour_event')) {
+    var elt = elt.parents(".cal_hour_event");
+  }
+  if (!elt) { return; }
+
   var id  = elt.identify("a");
   delete hov[id];
 
@@ -1748,13 +1758,37 @@ function mouseOutHour(evt) {
   }, 200);
 }
 
+
+function mouseOverDay(evt) {
+  var elt = $(this);
+  var id  = elt.identify("a");
+  hov[id] = true;
+  
+  // only display if still hovered after some time
+  setTimeout(function() {
+    if (hov[id]) { elt.addClass('hov'); }
+  }, 200);
+}
+
+function mouseOutDay(evt) {
+  var elt = $(this);
+  var id  = elt.identify("a");
+  delete hov[id];
+
+  // only hide if we've outed for number of time
+  setTimeout(function() {
+    if (!hov[id]) { elt.removeClass('hov');     }
+  }, 200);
+}
+
 /** =CALENDAR TIME SCROLLING
 ----------------------------------------------- */
 function scrollToTime() {
-  if ($('.cal_time').length == 0) { return; }
+  var time = $('#cal_time');
+  if (time.length == 0) { return; }
 
   // Scroll to current time for today
-  if ($('.cal_time.today').length > 0) {
+  if (time.hasClass('today')) {
     // find current time - determine % of day passed
     var time = new Date();
 
@@ -1766,26 +1800,41 @@ function scrollToTime() {
   } else {
     var mins = 740;
     var scrollDuration = 0;
-    $('.cal_time').css("visibility", "hidden");
+    time.css("visibility", "hidden");
   }
 
   var day  = 1440;
   var perc = parseInt(mins / day * 100);
 
   // get height of entire calendar and set position of time
-  var calHeight = $('.cal_scroll').height();  
+  var calHeight = $('#cal_scroll').height();
   var top       = parseInt(calHeight * perc / 100);
-  $('.cal_time').css('top', top + "px").show();
+  time.css('top', top + "px").show();
 
   // scroll to make time centered if possible
   var scrollPos = top - 250 > 0 ? top - 250 : 0;
 
-  $(".cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
+  $("#cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
 }
 
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
+  // rounded corners (monthly)
+  if ($("#cal_month").length > 0) {
+    DD_roundies.addRule('#cal_month .cal_event_pos_full a', '5px');
+    DD_roundies.addRule('#cal_month .cal_event_pos_left a', '5px 0 0 5px');
+    DD_roundies.addRule('#cal_month .cal_event_pos_right a', '0 5px 5px 0');
+  }
+
+  // rounded corners (daily/weekly)
+  if ($("#all_day").length > 0) {
+    DD_roundies.addRule('#all_day .cal_event_pos_full a', '5px');
+    DD_roundies.addRule('#all_day .cal_event_pos_left a', '5px 0 0 5px');
+    DD_roundies.addRule('#all_day .cal_event_pos_right a', '0 5px 5px 0');
+    DD_roundies.addRule('#cal_scroll .cal_hour_event .cal_event_block', '7px');
+  }
+
   // ALL VIEWS - calendar layer switcher
   $("#cal_picker").change(function() {
     var values = this.options[this.selectedIndex].value.split("?filter=");
@@ -1793,24 +1842,21 @@ function initCalendar() {
   })
 
   // MONTH VIEW - hover to show (+) icon to add events
-  $("table.cal_month td").hover(mouseOverHour, mouseOutHour);
-
-  DD_roundies.addRule('.cal_event_pos_full a', '5px');
-  DD_roundies.addRule('.cal_event_pos_left a', '5px 0 0 5px');
-  DD_roundies.addRule('.cal_event_pos_right a', '0 5px 5px 0');
-  
-  $(".cal_month .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
-  $(".cal_week .all_day .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, -48], predelay: 250});
-  $(".cal_week .cal_hour_event .with_tooltip").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
+  $("#cal_month td").hover(mouseOverDay, mouseOutDay);
+  $("#cal_month .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
 
   // WEEK/DAY VIEW - 
-  $("table.cal_week div.cal_hour_event").hover(mouseOverHour, mouseOutHour);
-  $("table.cal_week .all_day td").hover(mouseOverHour, mouseOutHour);
+  var scrollHours = $("#cal_hours_scroll");
+  scrollHours.mouseover(mouseOverHour);
+  scrollHours.mouseout(mouseOutHour);
+  $("#cal_scroll .all_day td").hover(mouseOverDay, mouseOutDay);
 
-  $("table.cal_day div.cal_hour_event").hover(mouseOverHour, mouseOutHour);  
-  $("table.cal_day .all_day td").hover(mouseOverHour, mouseOutHour);
-
-  DD_roundies.addRule('.cal_hour_event .cal_event_block', '7px');
+  // Week tooltips
+  var calScroll = $("#cal_scroll");
+  if (calScroll.hasClass('cal_week')) {
+    $("#all_day .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, -48], predelay: 250});
+    $("#cal_scroll .cal_hour_event .with_tooltip").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
+  }
 
   scrollToTime();
 }
@@ -1847,7 +1893,16 @@ function initNewEvent() {
 /** =CALENDAR SETUP
 ----------------------------------------------- */
 function initCalendarSetup() {
-    
+  // add unique ids to edit links/forms
+  $(".setup_group").each(function(i) {
+    $(this).find("a.edit_action").each(function(j) {
+      $(this).attr("id", "edit_" + i + "_" + j);
+    });
+    $(this).find("form.cal_edit").each(function(k) {
+      $(this).attr("id", ("edit_" + i + "_" + k + "_form"));
+    });
+  });
+
   // toggle add layers/categories calendar form
   $(".add_button").click(function(eventObject) {   
     eventObject.preventDefault();
@@ -2045,7 +2100,6 @@ $(document).ready(function() {
     if ($('#setup_add_cal').length > 0) {
       initCalendarSetup();
     }
-
 }); // END document ready handler
 
 // For debugging and development.

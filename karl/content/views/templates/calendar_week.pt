@@ -24,7 +24,7 @@
         <th class="last">&nbsp;</th>
       </tr>
 
-      <tr class="all_day">
+      <tr id="all_day" class="all_day">
         <th>all-day</th>
 
         <td class="cal_${day.heading}" tal:repeat="day calendar.week">
@@ -46,12 +46,12 @@
       </tr>
     </table>
 
-    <div class="cal_hours_scroll">
+    <div id="cal_hours_scroll" class="cal_hours_scroll">
 
       <!-- current time bar -->
-      <div class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
+      <div id="cal_time" class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
 
-      <table class="cal cal_scroll cal_week ${calendar.today_class}" cellspacing="0">
+      <table id="cal_scroll" class="cal cal_scroll cal_week ${calendar.today_class}" cellspacing="0">
         <tr>
           <!-- time labels -->
           <th>

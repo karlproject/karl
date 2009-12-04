@@ -2236,15 +2236,18 @@ body .cal_hour_event .cal_event_block .time {
 .cal_hour_event .create img {
   border: 0;
 }
+.cal td.hov,
 .cal div.hov {
   background-color: #ecf2ff !important;
 }
 .cal div.hov_below {
   background-color: #ecf2ff !important;
 }
+.cal td .add,
 .cal div .add {
   visibility: hidden;
 }
+.cal td.hov .add,
 .cal div.hov .add {
   visibility: visible;
   position: relative;
