@@ -3,6 +3,10 @@ karl package Changelog
 
 Unreleased
 ----------
+- Increase performance of jQuery selectors in calendar daily/weekly view
+
+- Fix editing of calendar categories/layers when names have spaces
+
 - Calendar categories and layers are now managed on the same setup page.
 
 - Preload button images better so that they don't flickr on hover/click
