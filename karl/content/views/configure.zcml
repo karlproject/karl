@@ -685,6 +685,13 @@
       factory=".adapters.NetworkNewsPortlet"
      />
 
+  <adapter
+      for="karl.models.interfaces.IFeed
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.FeedPortlet"
+    />
+
   <view
     for="karl.content.views.interfaces.INetworkNewsMarker"
     view=".custom_folderviews.network_news_view"

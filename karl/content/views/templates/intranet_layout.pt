@@ -1,6 +1,6 @@
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:define-macro="master">
   <head>
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>

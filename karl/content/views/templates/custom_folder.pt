@@ -1,0 +1,115 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <div metal:use-macro="api.snippets.macros['backto_link']"/>
+  
+    <!--
+      XXX This is a little bit of template pollution done here because
+          we're in a little bit of a hurry.  Really ought to be refactored
+	  into something more general.
+    -->
+    <a tal:condition="past_events_url|None"
+       href="${past_events_url}" title="Past Events" 
+       class="rightFloatLink">Show Past Events</a>
+    <a tal:condition="future_events_url|None"
+       href="${future_events_url}" title="Future Events" 
+       class="rightFloatLink">Show Upcoming Events</a>
+       
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+
+    <div class="peopleSearchWrapper" style="padding: 2em 0 1em; border: none; ">
+      <div class="search_utility_bar" style="border-top:1px solid #CECECE">
+        <form method="get" id="network-events-search">
+          <fieldset>
+
+            <div class="field">
+              <label for="keyword">Search</label>
+	      <tal:block condition="searchterm is None">
+		<input type="text" name="searchterm" value="" />
+	      </tal:block>
+	      <tal:block condition="searchterm is not None">
+		<input type="text" name="searchterm" value="${searchterm}" />
+	      </tal:block>
+              <label for="year">Year</label>
+              <select name="year">
+                <option value="all">All</option>
+		<tal:block repeat="year fb_years">
+		  <tal:block condition="year==selected_year">
+                    <option value="${year}" selected="selected">${year}</option>
+		  </tal:block>
+		  <tal:block condition="year!=selected_year">
+                    <option value="${year}">${year}</option>
+		  </tal:block>
+		</tal:block>
+              </select>
+              <label for="month">Month</label>
+              <select name="month" id="month">
+                <option value="all">All</option>
+		<tal:block repeat="month fb_months">
+		  <tal:block condition="month[0]==selected_month">
+                    <option value="${month[0]}" 
+			    selected="selected">${month[1]}</option>
+		  </tal:block>
+		  <tal:block condition="month[0]!=selected_month">
+                    <option value="${month[0]}">${month[1]}</option>
+		  </tal:block>
+		</tal:block>
+              </select>
+              <input type="submit" value="Go" />
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+
+    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']"/>
+
+    <table class="content-listing" tal:condition="entries">
+      <thead>
+        <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
+          <th colspan="2" class="ui-widget-header" style="padding: 0;">
+            <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+          </th>
+        </tr>
+        <tr>
+          <th class="cltitle">
+            <span class="cltitle">Title</span>
+          </th>
+          <th class="cldate">
+            <span class="cldate">Date</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr tal:repeat="entry entries">
+          <td class="cltitle">
+            <a href="${entry['url']}">${entry['title']}</a>
+          </td>
+          <td class="cldate">${entry['date']}</td>
+        </tr>
+      </tbody>
+      <tfoot tal:condition="batch_info.batching_required">
+        <tr class="ui-grid-footer">
+          <th colspan="2" class="ui-widget-header" style="padding: 0;">
+            <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <p tal:condition="not entries">
+      No items.    
+    </p>
+  </div>
+
+</html>
