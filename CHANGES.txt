@@ -120,6 +120,9 @@ Unreleased
 - LP #449689 Added standalone.zcml for running Karl without a customization
   package.
 
+- Moved OSI's notion of 'intranets' (aka offices) into core Karl for use by
+  other Karl instances.
+
 3.14 (2009-09-08)
 -----------------
 

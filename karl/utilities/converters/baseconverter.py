@@ -49,7 +49,15 @@ class BaseConverter:
         PO = Popen(com, shell=True, stdout=out, close_fds=True)
         timeout = _ProcTimeout(PO, timeout=self.timeout)
         timeout.start()
-        PO.communicate()
+        try:
+            PO.communicate()
+        except OSError, e:
+            if e.errno != 10: # No child process
+                raise
+            # else:
+            #    subprocess finished so quickly that os.wait() call failed
+            #    an ignorable error.
+
         timeout.stop()
         timeout.join()
         out.seek(0)

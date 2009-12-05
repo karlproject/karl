@@ -1,0 +1,18 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" class="clearafter">
+
+  <div id="left"><span tal:replace="structure current_intranet.navigation"/></div>
+  <div id="right">
+      <span tal:replace="structure right_portlet_html"/>
+  </div>
+
+  <div id="center" class="center_intranet">
+    <div id="screenid-office-view" class="ccontent">
+      <span tal:replace="structure feature"/>
+      <div class="visualClear"> </div>
+      <span tal:replace="structure middle_portlet_html"/>
+    </div>
+  </div>
+
+</div>

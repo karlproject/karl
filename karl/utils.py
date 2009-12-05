@@ -157,6 +157,6 @@ class PersistentBBB(object):
         return getattr(inst, self.name)
 
 def get_layout_provider(context, request):
-    from karl.views.adapters import DefaultLayoutProvider
+    from karl.content.views.adapters import DefaultLayoutProvider
     return queryMultiAdapter((context, request), ILayoutProvider,
                              default=DefaultLayoutProvider(context,request))

@@ -16,39 +16,67 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 from __future__ import with_statement
 
+from os.path import join
+import datetime
+import math
+
 from email import Encoders
 from email.message import Message
 from email.mime.multipart import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from lxml.html import fragment_fromstring
+from lxml.html import tostring
+from lxml.etree import SubElement
+
 from lxml import etree
 from lxml.html import document_fromstring
-import math
+
+from zope.component import getAdapter
 
 from zope.component import getUtility
 from zope.interface import implements
 
 from repoze.bfg.chameleon_zpt import get_template
+from repoze.bfg.chameleon_zpt import render_template
+from repoze.bfg.path import package_path
+from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
 
-from karl.utilities.interfaces import IAlert
-from karl.utilities.interfaces import IKarlDates
-from karl.utilities.interfaces import IMimeInfo
-from karl.models.interfaces import IComment
-from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import IBlogEntry
+from karl.content.interfaces import ICalendarEvent
+from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import IComment
+from karl.models.interfaces import IIntranet
+from karl.models.interfaces import IIntranets
+from karl.content.interfaces import IForum
+from karl.content.interfaces import IForumTopic
+from karl.content.interfaces import INewsItem
+from karl.content.interfaces import IReferencesFolder
+from karl.content.interfaces import IReferenceManual
+from karl.content.interfaces import IReferenceSection
 from karl.content.interfaces import IWikiPage
+from karl.content.views.interfaces import INetworkEventsMarker
+from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IBylineInfo
+from karl.utilities.interfaces import IAlert
+from karl.utilities.interfaces import IKarlDates
+from karl.utilities.interfaces import IMimeInfo
+from karl.views.interfaces import IIntranetPortlet
+from karl.views.interfaces import ILayoutProvider
 
+from karl.utils import coarse_datetime_repr
 from karl.utils import docid_to_hex
 from karl.utils import get_setting
 from karl.utils import find_community
 from karl.utils import find_profiles
-from karl.utilities.interfaces import IKarlDates
+
+# Imports used for the purpose of package_path
+from karl.views import site
 
 MAX_ATTACHMENT_SIZE = (1<<20) * 5  # 5 megabytes
 
@@ -503,3 +531,310 @@ class CalendarEventAlert(NonBlogAlert):
         if not model.attendees:
             return None
         return '; '.join(model.attendees)
+
+class DefaultFolderAddables(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        """ Based on markers, override what can be added to a folder """
+
+        # This is the default for all, meaning community, folders
+        _addlist = [
+            ('Add Folder', 'add_folder.html'),
+            ('Add File', 'add_file.html'),
+            ]
+
+        # Intranet folders by default get Add Page
+        intranets = find_interface(self.context, IIntranets)
+        if intranets:
+            _addlist.append(
+                ('Add Event', 'add_calendarevent.html'),
+                )
+            _addlist.append(
+                ('Add Page', 'add_page.html'),
+                )
+
+        # Override all addables in certain markers
+        if IReferencesFolder.providedBy(self.context):
+            _addlist = [('Add Reference Manual',
+                         'add_referencemanual.html')]
+        elif IReferenceManual.providedBy(self.context):
+            _addlist = [
+                ('Add Section', 'add_referencesection.html'),
+                ]
+        elif IReferenceSection.providedBy(self.context):
+            _addlist = [
+                ('Add File', 'add_file.html'),
+                ('Add Page', 'add_page.html'),
+                ]
+        elif INetworkEventsMarker.providedBy(self.context):
+            _addlist = [
+                ('Add Event', 'add_calendarevent.html'),
+                ]
+        elif INetworkNewsMarker.providedBy(self.context):
+            _addlist = [
+                ('Add News Item', 'add_newsitem.html'),
+                ]
+        return _addlist
+
+class AbstractPortlet(object):
+    """  """
+    implements(IIntranetPortlet)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @property
+    def title(self):
+        return self.context.title
+
+    @property
+    def href(self):
+        return model_url(self.context, self.request)
+
+    @property
+    def entries(self):
+        # Use cataloging to spelunk the forum
+
+        resolver, docids = self._query()
+        if docids:
+            # Flatten the results into dicts
+            entries = []
+            for docid in docids[0:5]:
+                doc = resolver(docid)
+                entries.append({
+                        'title': doc.title,
+                        'href': model_url(doc, self.request),
+                        })
+            return entries
+
+        else:
+            return None
+
+    @property
+    def asHTML(self):
+        """Use lxml to generate a customizable via adapter representation"""
+
+        portlet = fragment_fromstring('<div class="sections"/>')
+        heading = SubElement(portlet, 'h3')
+        heading.text = self.context.title
+
+        # Now the entries
+        entries = self.entries
+        if entries:
+            for entry in self.entries:
+                item = SubElement(portlet, 'p')
+                item_a = SubElement(item, 'a', href=entry['href'])
+                item_a.text = entry['title']
+        else:
+            msg = SubElement(portlet, 'p')
+            msg.text = "No entries found"
+
+        # Close out with the more link
+        more = SubElement(portlet, 'p')
+        more.set('class', 'more')
+        more_a = SubElement(more, 'a', href=self.href)
+        more_a.text = 'MORE ' + self.title
+
+        return tostring(portlet, pretty_print=True)
+
+class ForumPortlet(AbstractPortlet):
+    """Adapter for showing file entry data in views"""
+
+    def _query(self):
+        """The part implemented for each portlet, actually grab data"""
+
+        searcher = getAdapter(self.context, ICatalogSearch)
+        path = {
+            'query':model_path(self.context),
+            }
+        total, docids, resolver = searcher(
+            path=path,
+            sort_index='modified_date',
+            interfaces=[IForumTopic],
+            reverse=True)
+
+        return resolver, list(docids)
+
+class NetworkNewsPortlet(AbstractPortlet):
+    """Adapter for showing network news in views"""
+
+    def _query(self):
+        """The part implemented for each portlet, actually grab data"""
+
+        searcher = getAdapter(self.context, ICatalogSearch)
+        path = {
+            'query':model_path(self.context),
+            }
+        total, docids, resolver = searcher(
+            path=path,
+            sort_index='publication_date',
+            interfaces=[INewsItem],
+            reverse=True)
+
+        return resolver, list(docids)
+
+class NetworkEventsPortlet(AbstractPortlet):
+    """Adapter for showing network events in views"""
+
+    def _query(self):
+        """The part implemented for each portlet, actually grab data"""
+
+        searcher = getAdapter(self.context, ICatalogSearch)
+        path = {
+            'query':model_path(self.context),
+            }
+        # show only upcoming events, the soonest first.
+        now = coarse_datetime_repr(datetime.datetime.now())
+        total, docids, resolver = searcher(
+            path=path,
+            sort_index='start_date',
+            end_date=(now, None),
+            interfaces=[ICalendarEvent],
+            reverse=False,
+            use_cache=False
+            )
+
+        return resolver, list(docids)
+
+    @property
+    def entries(self):
+        # Use cataloging to spelunk the forum
+
+        resolver, docids = self._query()
+        if docids:
+            # Flatten the results into dicts
+            entries = []
+            for docid in docids[0:5]:
+                doc = resolver(docid)
+                entries.append({
+                        'title': doc.title,
+                        'href': model_url(doc, self.request),
+                        'startDate': doc.startDate,
+                        })
+            return entries
+
+        else:
+            return None
+
+    @property
+    def asHTML(self):
+        # The network events portlet is different.  Everything is different.
+        portlet = fragment_fromstring('<div class="sections"/>')
+        heading = SubElement(portlet, 'h3')
+        heading.text = self.context.title
+
+        # Now the entries
+        entries = self.entries
+        if entries:
+            ul = SubElement(portlet, 'ul', id='events_portlet')
+            event_style = 'text-decoration:none'
+            date_format = '%m/%d/%Y' #'%A, %B %d, %Y %I:%M %p'
+            for entry in self.entries:
+                li = SubElement(ul, 'li')
+
+                #tr = SubElement(table, 'tr')
+                #td = SubElement(tr, 'td')
+                #td.set('class', 'event_title')
+                span1 = SubElement(li, 'span')
+                span1.text = entry['startDate'].strftime(date_format)
+                span2 = SubElement(li, 'span')
+                span2.set('class', 'event_title')
+                a = SubElement(span2, 'a',
+                               href=entry['href'],
+                               style=event_style)
+                a.text = entry['title']
+                #td2 = SubElement(tr, 'td')
+        else:
+            msg = SubElement(portlet, 'p')
+            msg.text = "No entries found"
+
+        # Close out with the more link
+        more = SubElement(portlet, 'p')
+        more.set('class', 'more')
+        more_a = SubElement(more, 'a', href=self.href)
+        more_a.text = 'MORE ' + self.title
+
+        return tostring(portlet, pretty_print=True)
+
+
+class FeedPortlet(object):
+    implements(IIntranetPortlet)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @property
+    def asHTML(self):
+        return render_template(
+            'templates/feed.pt',
+            feed=self.context,
+            )
+
+class DefaultLayoutProvider(object):
+    """ Site policy on which o-wrap to choose from for a context"""
+    implements(ILayoutProvider)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @property
+    def community_layout(self):
+        package_dir = package_path(site)
+        template_fn = join(package_dir, 'templates', 'community_layout.pt')
+        return get_template(template_fn)
+
+    @property
+    def generic_layout(self):
+        package_dir = package_path(site)
+        template_fn = join(package_dir, 'templates', 'generic_layout.pt')
+        return get_template(template_fn)
+
+    @property
+    def intranet_layout(self):
+        layout = get_template('templates/intranet_layout.pt')
+        intranet = find_interface(self.context, IIntranet)
+        if intranet:
+            layout.navigation = intranet.navigation
+        return layout
+
+    def __call__(self, default=None):
+        # The layouts are by identifier, e.g. layout='community'
+
+        # A series of tests, in order of precedence.
+        layout = None
+        if default is not None:
+            layout = getattr(self, default+'_layout')
+        intranet = find_interface(self.context, IIntranet)
+
+        # Group a series of intranet-oriented decisions
+        if intranet:
+            # First, when under an intranet, OSI wants forums to get
+            # the generic layout.
+            if find_interface(self.context, IForum):
+                layout = getattr(self, 'generic_layout')
+
+            # Now for an intranet.  Everything gets the two-column
+            # view except the intranet home page, which gets the 3
+            # column treatment.
+            else:
+                layout = getattr(self, 'intranet_layout')
+
+        elif find_interface(self.context, IIntranets):
+            if find_interface(self.context, IForum):
+                layout = getattr(self, 'generic_layout')
+            elif ICalendarEvent.providedBy(self.context):
+                layout = getattr(self, 'generic_layout')
+            elif INetworkNewsMarker.providedBy(self.context):
+                layout = getattr(self, 'generic_layout')
+            elif find_interface(self.context, IReferencesFolder):
+                layout = getattr(self, 'generic_layout')
+            elif INetworkEventsMarker.providedBy(self.context):
+                layout = getattr(self, 'generic_layout')
+
+        return layout

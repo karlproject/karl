@@ -458,7 +458,7 @@ sample_feature = """\
 sample_navigation = """\
 <div>
 	<div class="menu">
-          <h3>About Our Organization</h3>
+          <h3>About Our Sample Organization</h3>
           <ul class="nav">
             <li><a href="#">About Our Network</a></li>
             <li><a href="#">About Us</a></li>
@@ -540,5 +540,5 @@ sample_navigation = """\
       </div>
 """
 
-sample_middle_portlets = ['network-news', 'network-events', 'soros-feed']
-sample_right_portlets = ['new-york-news', 'new-york-personals']
+sample_middle_portlets = ['network-news', 'network-events', 'intresting-feed']
+sample_right_portlets = ['my-site-news', 'my-site-personals']

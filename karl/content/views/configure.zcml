@@ -5,20 +5,20 @@
     view=".blog.show_blog_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.IBlog"
     name="add_blogentry.html"
     view=".blog.add_blogentry_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.IBlogEntry"
     view=".blog.show_blogentry_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.ICommentsFolder"
     view=".commenting.add_comment_view"
@@ -37,14 +37,14 @@
     view=".commenting.show_comment_view"
     permission="view"
   />
-  
+
   <view
     for="karl.models.interfaces.IComment"
     name="edit.html"
     view=".commenting.edit_comment_view"
     permission="edit"
   />
-  
+
 
   <view
     for="karl.content.interfaces.IBlogEntry"
@@ -94,7 +94,7 @@
     view=".calendar_events.calendar_setup_view"
     permission="moderate"
   />
-  
+
   <view
     for="karl.content.interfaces.ICalendar"
     name="categories.html"
@@ -115,41 +115,41 @@
     view=".calendar_events.add_calendarevent_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     name="add_calendarevent.html"
     view=".calendar_events.add_calendarevent_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="add_calendarevent.html"
     view=".calendar_events.add_calendarevent_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICalendarEvent"
     view=".calendar_events.show_calendarevent_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.ICalendarEvent"
     name="event.ics"
     view=".calendar_events.show_calendarevent_ics_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.ICalendarEvent"
     name="edit.html"
     view=".calendar_events.edit_calendarevent_view"
     permission="create"
   />
-  
+
   <adapter
     for="karl.content.interfaces.ICalendarEvent
          karl.models.interfaces.IProfile
@@ -170,21 +170,21 @@
     view=".files.add_folder_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     name="add_file.html"
     view=".files.add_file_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     name="add_page.html"
     view=".page.add_page_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view=".files.show_folder_view"
@@ -198,42 +198,42 @@
     permission="create"
   />
 
-    
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="add_folder.html"
     view=".files.add_folder_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="add_file.html"
     view=".files.add_file_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="add_page.html"
     view=".page.add_page_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.IReferenceSection"
     name="add_file.html"
     view=".files.add_file_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.IReferenceSection"
     name="add_page.html"
     view=".page.add_page_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="edit.html"
@@ -246,14 +246,14 @@
     view=".files.show_file_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFile"
     name="edit.html"
     view=".files.edit_file_view"
     permission="create"
-  />  
-  
+  />
+
   <view
     for="karl.content.interfaces.ICommunityFile"
     view=".files.download_file_view"
@@ -339,7 +339,7 @@
     name="delete.html"
     view="karl.views.resource.delete_resource_view"
     permission="delete"
-  />  
+  />
 
 
   <view
@@ -347,7 +347,7 @@
     name="delete.html"
     view="karl.views.resource.delete_resource_view"
     permission="delete"
-  />  
+  />
 
 
   <view
@@ -383,27 +383,27 @@
     view=".wiki.redirect_to_front_page"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.IWiki"
     name="index.html"
     view=".wiki.redirect_to_front_page"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.IWiki"
     name="add_wikipage.html"
     view=".wiki.add_wikipage_view"
     permission="create"
   />
-  
+
   <view
     for="karl.content.interfaces.IWikiPage"
     view=".wiki.show_wikipage_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.IWikiPage"
     name="edit.html"
@@ -416,7 +416,7 @@
     view=".page.show_page_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.IPage"
     name="edit.html"
@@ -429,7 +429,7 @@
     view=".newsitem.show_newsitem_view"
     permission="view"
   />
-  
+
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="add_newsitem.html"
@@ -451,35 +451,35 @@
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.WikiPageAlert"
       />
-      
+
   <view
     for="karl.content.interfaces.IBlog"
     name="atom.xml"
     view=".atom.blog_atom_view"
     permission="view"
     />
-    
+
   <view
     for="karl.content.interfaces.ICalendar"
     name="atom.xml"
     view=".atom.calendar_atom_view"
     permission="view"
     />
-    
+
   <view
     for="karl.content.interfaces.IWiki"
     name="atom.xml"
     view=".atom.wiki_atom_view"
     permission="view"
     />
-    
+
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     name="atom.xml"
     view=".atom.community_files_atom_view"
     permission="view"
     />
-    
+
   <adapter
     for="karl.content.interfaces.ICommunityContent
          repoze.bfg.interfaces.IRequest"
@@ -493,14 +493,14 @@
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
-    
+
   <adapter
     for="karl.content.interfaces.ICalendarEvent
          repoze.bfg.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.content.views.atom.CalendarEventAtomEntry"
     />
-    
+
   <adapter
     for="karl.content.interfaces.IReferenceManual
          repoze.bfg.interfaces.IRequest"
@@ -599,7 +599,7 @@
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.BlogEntryAlert"
       />
-      
+
   <adapter
       for="karl.models.interfaces.IComment
            karl.models.interfaces.IProfile
@@ -607,7 +607,7 @@
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.BlogCommentAlert"
       />
-      
+
   <adapter
       for="karl.content.interfaces.ICommunityFile
            karl.models.interfaces.IProfile
@@ -664,5 +664,38 @@
   />
 
 
+  <adapter
+      for="karl.content.interfaces.IForum
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.ForumPortlet"
+     />
+
+  <adapter
+      for="karl.content.views.interfaces.INetworkEventsMarker
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.NetworkEventsPortlet"
+     />
+
+  <adapter
+      for="karl.content.views.interfaces.INetworkNewsMarker
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.NetworkNewsPortlet"
+     />
+
+  <view
+    for="karl.content.views.interfaces.INetworkNewsMarker"
+    view=".custom_folderviews.network_news_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.views.interfaces.INetworkEventsMarker"
+    view=".custom_folderviews.network_events_view"
+    permission="view"
+  />
+
 </configure>
-  
+

@@ -493,5 +493,12 @@
       provides="karl.views.interfaces.IToolAddables"
       factory=".adapters.SiteToolAddables"
      />
+
+  <view
+    for="karl.models.interfaces.IIntranet"
+    view=".retail.retail_view"
+    permission="view"
+  />
+
 </configure>
 
