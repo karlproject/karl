@@ -744,6 +744,11 @@ div.center_intranet {
   float: left;
   width: 399px;
 }
+div.center_boards {
+  margin: 0 0 15px !important;
+  float: left;
+  width: 675px;
+}
 
 /** =PEOPLE DIRECTORY
 ----------------------------------------------- */
