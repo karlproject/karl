@@ -1790,10 +1790,10 @@ function scrollToTime() {
   // Scroll to current time for today
   if (time.hasClass('today')) {
     // find current time - determine % of day passed
-    var time = new Date();
+    var curTime = new Date();
 
     // total minutes passed today & total mins in a day
-    var mins = time.getHours() * 60 + time.getMinutes();
+    var mins = curTime.getHours() * 60 + curTime.getMinutes();
     var scrollDuration = 1000;
 
   // go to ~ 8:00am
