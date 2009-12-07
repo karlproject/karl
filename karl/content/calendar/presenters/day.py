@@ -300,7 +300,7 @@ class EventOnDayView(BaseEvent):
 
     @property
     def color_class(self):
-        return 'cal_%s' % self._catalog_event._v_color
+        return 'cal_%s' % self._catalog_event._v_layer_color
         
 
 def add_minutes(dtime, num_minutes):
