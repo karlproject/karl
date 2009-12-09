@@ -64,8 +64,9 @@ class MonthViewPresenter(BasePresenter):
                 is_today = (same_year and same_month and same_day)
 
                 # url to add an event to this day           
-                # TODO: auto-fill day on add event form
-                add_url = self.url_for('add_calendarevent.html')
+                starts = time.mktime(dt.timetuple())
+                add_event_url = self.url_for('add_calendarevent.html',
+                                 query={'starts':int(starts)}) 
 
                 # url to view this day
                 format = '%s?year=%d&month=%d&day=%d'
@@ -75,7 +76,7 @@ class MonthViewPresenter(BasePresenter):
                 day = DayOnMonthView(dt.year, dt.month, dt.day,
                                      current_month=is_focus_month,
                                      current_day=is_today,
-                                     add_event_url=add_url,
+                                     add_event_url=add_event_url,
                                      show_day_url=show_url)
 
                 week[d] = day

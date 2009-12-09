@@ -18,6 +18,7 @@
 import calendar
 calendar.setfirstweekday(calendar.SUNDAY)
 import datetime
+import time
 
 from urllib import quote
 
@@ -106,6 +107,18 @@ def _date_requested(context, request):
     else:
         value = (now.year, now.month, now.day)
     return value
+
+def _default_dates_requested(context, request):
+    try:
+        starts = request.GET.get('starts', time.mktime(_now().timetuple()))
+        ends   = request.GET.get('ends',   int(starts) + 3600)
+
+        startDate = datetime.datetime.fromtimestamp(int(starts))
+        endDate   = datetime.datetime.fromtimestamp(int(ends))
+    except ValueError:
+        startDate = _now()
+        endDate   = startDate + datetime.timedelta(hours=1)
+    return startDate, endDate            
 
 def _get_catalog_events(calendar, request, first_moment, last_moment,
                         layer_name=None):
@@ -338,9 +351,12 @@ def add_calendarevent_view(context, request):
             security_state = ''
         else:
             security_state = workflow.initial_state
+        
+        startDate, endDate = _default_dates_requested(context, request)
+            
         fill_values = dict(
-            startDate = now,
-            endDate = now + datetime.timedelta(hours=1),
+            startDate = startDate,
+            endDate = endDate,
             tags = u'',
             security_state = security_state,
             )

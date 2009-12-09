@@ -123,8 +123,9 @@ class DayViewPresenter(BasePresenter):
            start_datetime = add_minutes(self.first_moment, (i * 30))
 
            # url to add an event to this time slot           
-           # TODO: auto-fill time slot on add event form
-           add_event_url = self.url_for('add_calendarevent.html')
+           starts = time.mktime(start_datetime.timetuple())
+           add_event_url = self.url_for('add_calendarevent.html',
+                            query={'starts':int(starts)})
            
            slot = TimeSlot(shaded_row=is_shaded, 
                            is_half_hour=is_half_hour,
