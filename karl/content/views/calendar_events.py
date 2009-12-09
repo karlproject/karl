@@ -293,8 +293,6 @@ def add_calendarevent_view(context, request):
         try:
             converted = form.validate(request.POST)
 
-            name = make_unique_name(context, converted['title'])
-
             creator = authenticated_userid(request)
             if converted['contact_email'] is None:
                 # Couldn't convince the email validator to call
@@ -346,7 +344,6 @@ def add_calendarevent_view(context, request):
 
     else:
         fielderrors = {}
-        now = _now()
         if workflow is None:
             security_state = ''
         else:
@@ -703,25 +700,50 @@ def calendar_setup_categories_view(context, request):
     form = CalendarCategoriesForm()
 
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
-    categories = filter(lambda x: x.__name__ != default_category_name, 
-                        _get_calendar_categories(context))
+    default_category = context[default_category_name]
+    default_category_path = model_path(default_category)
+    categories = _get_calendar_categories(context)
+    editable_categories = filter(lambda x: x.__name__ != default_category_name, 
+                                 categories)
     category_names = [ x.__name__ for x in categories ]
 
     default_layer_name = ICalendarLayer.getTaggedValue('default_name')
-    layers = filter(lambda x: x.__name__ != default_layer_name, 
-                    _get_calendar_layers(context))
-    layer_names = [ x.__name__ for x in layers]
+    default_layer = context[default_layer_name]
+    layers = _get_calendar_layers(context)
+    editable_layers = filter(lambda x: x.__name__ != default_layer_name, 
+                             layers)
 
     if 'form.delete' in request.POST:
         category_name = request.POST['form.delete']
         if category_name == default_category_name:
             message = 'Cannot delete default category'
         elif category_name and category_name in category_names:
-            title = context[category_name].title
+            categ = context[category_name]
+            title = categ.title
+            categ_path = model_path(categ)
+            if categ_path in default_layer.paths:
+                default_layer.paths.remove(categ_path)
+                default_layer._p_changed = True
+
+            # uncategorize events that were previously in this
+            # category (put them in the default category)
+            query = dict(
+                interfaces=[ICalendarEvent],
+                virtual = categ_path,
+                )
+            searcher = ICatalogSearch(context)
+            total, docids, resolver = searcher(**query)
+            for event in [ resolver(x) for x in docids ]:
+                event.calendar_category = default_category_path
+                objectEventNotify(ObjectModifiedEvent(event))
+
             del context[category_name]
+
             message = '%s category removed' % title
         else:
             message = 'Category is invalid'
+
+        
         
         location = model_url(context, request, 'categories.html', 
                              query={'status_message': message})
@@ -733,7 +755,7 @@ def calendar_setup_categories_view(context, request):
     if 'form.edit' in request.POST:
         category_name = request.POST['category__name__']
 
-        if category_name == ICalendarCategory.getTaggedValue('default_name'):
+        if category_name == default_category_name:
             location = model_url(
                 context,
                 request, 'categories.html',
@@ -784,6 +806,9 @@ def calendar_setup_categories_view(context, request):
 
             category = create_content(ICalendarCategory, title)
             context[title] = category
+            default_layer.paths.append(model_path(category))
+            default_layer._p_changed = True
+            
             location = model_url(
                 context, request,
                 'categories.html',
@@ -807,8 +832,8 @@ def calendar_setup_categories_view(context, request):
         fielderrors=fielderrors,
         fielderrors_target = fielderrors_target,
         api=api,
-        editable_categories = categories,
-        editable_layers = layers,
+        editable_categories = editable_categories,
+        editable_layers = editable_layers,
         all_categories = _get_all_calendar_categories(context, request),
         colors = _COLORS,
         )
@@ -930,7 +955,6 @@ def calendar_setup_layers_view(context, request):
         except Invalid, e:
             fielderrors_target = ("%s_layer" % layer_name)
             fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
 
     # Render the form and shove some default values in
     page_title = 'Calendar Layers'

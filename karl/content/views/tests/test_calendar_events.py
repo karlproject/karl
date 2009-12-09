@@ -433,8 +433,18 @@ class CalendarCategoriesViewTests(unittest.TestCase):
 
     def test_delete_will_delete_a_valid_category_name(self):
         from repoze.bfg.url import model_url
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+
+        event = testing.DummyModel()
+        results = 1, [1], lambda *arg: event
+        search = DummySearchAdapter(results)
+        testing.registerAdapter(search, (Interface), ICatalogSearch)
+
         context = DummyCalendar()
+        context['_default_layer_'].paths = ['/foo']
         context['foo'] = DummyCalendarCategory('foo-title')
+        testing.registerModels({'/foo':context['foo']})
         
         request = testing.DummyRequest(post={'form.delete': 'foo'})
         response = self._callFUT(context, request)
@@ -444,6 +454,10 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         expected = model_url(context, request, 'categories.html',
                    query={'status_message':'foo-title category removed'})
         self.assertEqual(response.location, expected)
+        self.failIf('foo' in context)
+        self.assertEqual(context['_default_layer_'].paths, [])
+        self.assertEqual(context['_default_layer_']._p_changed, True)
+        self.assertEqual(event.calendar_category, '/_default_category_')
 
     # add new category    
 
@@ -502,6 +516,8 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         expected = model_url(context, request, 'categories.html',
                              query={'status_message':'Calendar category added'})
         self.assertEqual(response.location, expected)
+        self.assertEqual(context['_default_layer_'].paths, ['/Announcements'])
+        self.assertEqual(context['_default_layer_']._p_changed, True)
 
     # edit an existing category
     
@@ -722,6 +738,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
     def test_submit_fails_if_title_is_already_taken_by_a_layer(self):
         context = DummyCalendar()
+
         context['foo'] = DummyCalendarLayer('foo')
 
         renderer = testing.registerDummyRenderer(
@@ -1060,7 +1077,8 @@ class DummyCalendar(testing.DummyModel):
     implements(ICalendar)
     def __init__(self, **kw):
         testing.DummyModel.__init__(self, **kw)
-        self.manifest = []
+        self['_default_category_'] = DummyCalendarCategory('Default')
+        self['_default_layer_'] = DummyCalendarLayer('Default')
 
 class DummyCalendarCategory(testing.DummyModel):
     implements(ICalendarCategory)
