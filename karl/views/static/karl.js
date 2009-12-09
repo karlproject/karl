@@ -2071,7 +2071,6 @@ $(document).ready(function() {
         name: 'users'
     });
 
-
     // quotable comments
     
     $('.blogComment').karlquotablecomment({
@@ -2081,8 +2080,19 @@ $(document).ready(function() {
     // Enable old style dropdowns
     enableOldStyleDropdowns();
     
-    // initialize button images
-    if ($('.button').length > 0) { initButtons(); }
+    // initialize button
+    if ($('.button').length > 0) { 
+      initButtons(); 
+      $("#form-submit").click(function() { 
+        $("#form-cancel").attr("disabled", "disabled"); 
+      });
+      $("#form-cancel").click(function() { 
+        $("#form-submit").attr("disabled", "disabled"); 
+      });
+      $("form.k3_genericForm").keyup(function(eventObj) { 
+        if (eventObj.keyCode == 13) { $("#form-cancel").attr("disabled", "disabled"); }
+      });
+    }
 
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');
