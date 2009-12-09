@@ -422,6 +422,16 @@ def show_calendarevent_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
+    
+    # find this event's calendar category title
+    calendar = find_interface(context, ICalendar)
+    if calendar is not None:  
+        titles = {}
+        for cat in _get_calendar_categories(calendar):
+            titles[model_path(cat)] = cat.title
+        category_title = titles.get(context.calendar_category)
+    else: 
+        category_title = None
 
     return render_template_to_response(
         'templates/show_calendarevent.pt',
@@ -437,6 +447,7 @@ def show_calendarevent_view(context, request):
         location=location,
         contact_name=contact_name,
         contact_email=contact_email,
+        category_title=category_title,
         attachments=fetch_attachments(context['attachments'], request),
         backto=backto,
         layout=layout,

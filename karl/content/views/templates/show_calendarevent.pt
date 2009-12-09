@@ -23,6 +23,11 @@
       <div>${endDate}</div>
     </div>
 
+    <div tal:condition="category_title">
+      <h4>Category</h4>
+      <div>${category_title}</div>
+    </div>
+
     <div tal:condition="api.context.text != u''">
       <h4>Body</h4>
       <div class="kbody" >

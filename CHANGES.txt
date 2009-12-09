@@ -3,6 +3,9 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #491991: An event's calendar category is now displayed when
+  viewing the event.
+
 - LP #491986: Constrain width of category selector on calendar setup page.
 
 - Increase performance of jQuery selectors in calendar daily/weekly view
