@@ -3,6 +3,9 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #494701: Editing a calendar event now populates the form with
+  the correct times.
+
 - LP #492346: Clicking the (+) button to add a new event on the calendar
   views now populates a default date and time on the form based on the
   context of where (+) was clicked.

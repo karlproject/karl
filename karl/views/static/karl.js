@@ -1416,7 +1416,7 @@ $.widget('ui.karldatetimepicker', {
         var time_split_pos = timestr.search(':');
         this.composite_value = {
             datestr: value.substr(0, split_pos),
-            hourstr: value.substr(split_pos + 1, time_split_pos),
+            hourstr: value.substr(split_pos + 1, time_split_pos).replace(/^0/, ''),
             minutestr: value.substr(split_pos + time_split_pos + 2)
         };
         // Sets all input values we manage
