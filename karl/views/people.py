@@ -200,10 +200,18 @@ def get_group_fields(context):
             })
     return group_fields
 
-def admin_edit_profile_view(context, request):
+class AdminEditProfileForm(EditProfileForm):
+    login = baseforms.login
+    home_path = baseforms.HomePath(strip=True)
+    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
+    password = baseforms.PasswordChecker(strip=True)
+    password_confirm = validators.UnicodeString(strip=True)
+    chained_validators = baseforms.chained_validators
+
+def admin_edit_profile_view(context, request,
+                            form_factory=AdminEditProfileForm):
     min_pw_length = get_setting(context, 'min_pw_length')
-    form = AdminEditProfileForm(min_pw_length=min_pw_length,
-                                context=context)
+    form = form_factory(min_pw_length=min_pw_length, context=context)
     group_fields = get_group_fields(context)
     for field in group_fields:
         validator = validators.Bool(if_missing=False, default=False)
@@ -237,7 +245,7 @@ def admin_edit_profile_view(context, request):
                     if group in user_groups:
                         users.remove_user_from_group(userid, group)
 
-            if converted['password']:
+            if converted.get('password', None):
                 users.change_password(userid, converted['password'])
 
             # Handle simple fields
@@ -307,14 +315,6 @@ def admin_edit_profile_view(context, request):
         is_staff=is_staff,
         staff_change_password_url=staff_change_password_url,
         )
-
-class AdminEditProfileForm(EditProfileForm):
-    login = baseforms.login
-    home_path = baseforms.HomePath(strip=True)
-    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
-    password = baseforms.PasswordChecker(strip=True)
-    password_confirm = validators.UnicodeString(strip=True)
-    chained_validators = baseforms.chained_validators
 
 def get_profile_actions(profile, request):
     actions = []

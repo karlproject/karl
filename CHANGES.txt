@@ -133,6 +133,10 @@ Unreleased
 - LP #491984 Fixed bug where folder contents deletion warning was being used
   for any folderish object rather than just folders under the Files tab.
 
+- LP #492382 Added an argument for the form class to admin_edit_profile_view,
+  allowing third party customizations to still use the view logic and just
+  change the form validation.
+
 3.14 (2009-09-08)
 -----------------
 
