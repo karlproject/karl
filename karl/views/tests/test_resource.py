@@ -23,9 +23,9 @@ from repoze.bfg import testing
 
 class TestDeleteResourceView(unittest.TestCase):
 
-    def _callFUT(self, context, request):
+    def _callFUT(self, context, request, num_children=0):
         from karl.views.resource import delete_resource_view
-        return delete_resource_view(context, request)
+        return delete_resource_view(context, request, num_children)
 
     def test_noconfirm(self):
         from karl.testing import registerLayoutProvider
@@ -52,17 +52,14 @@ class TestDeleteResourceView(unittest.TestCase):
         self.failIf('child' in parent)
 
     def test_warn_for_folder_containing_children(self):
-        from repoze.folder.interfaces import IFolder
-        from zope.interface import alsoProvides
         parent = testing.DummyModel()
         parent.title = 'Parent'
-        alsoProvides(parent, IFolder)
         child = testing.DummyModel()
         child.title = 'Child'
         parent['child'] = child
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/delete_resource.pt')
-        response = self._callFUT(parent, request)
+        response = self._callFUT(parent, request, len(parent))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(renderer.num_children, 1)

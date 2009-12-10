@@ -345,7 +345,7 @@
   <view
     for="karl.content.interfaces.ICommunityFolder"
     name="delete.html"
-    view="karl.views.resource.delete_resource_view"
+    view="karl.content.views.files.delete_folder_view"
     permission="delete"
   />
 

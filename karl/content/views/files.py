@@ -53,6 +53,7 @@ from karl.views.tags import get_tags_client_data
 
 from karl.views.api import TemplateAPI
 from karl.views.baseforms import security_state as security_state_field
+from karl.views.resource import delete_resource_view
 
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
@@ -237,6 +238,11 @@ def add_folder_view(context, request):
         layout=layout,
         security_states = security_states,
         )
+
+def delete_folder_view(context, request,
+                       delete_resource_view=delete_resource_view):
+    # delete_resource_view is passed as hook for unit testing
+    return delete_resource_view(context, request, len(context))
 
 def advanced_folder_view(context, request):
 

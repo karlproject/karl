@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 - LP #492346: Clicking the (+) button to add a new event on the calendar
-  views now populates a default date and time on the form based on the 
+  views now populates a default date and time on the form based on the
   context of where (+) was clicked.
 
 - LP #491991: An event's calendar category is now displayed when
@@ -129,6 +129,9 @@ Unreleased
 
 - Moved OSI's notion of 'intranets' (aka offices) into core Karl for use by
   other Karl instances.
+
+- LP #491984 Fixed bug where folder contents deletion warning was being used
+  for any folderish object rather than just folders under the Files tab.
 
 3.14 (2009-09-08)
 -----------------

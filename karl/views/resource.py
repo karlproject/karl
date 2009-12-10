@@ -28,7 +28,7 @@ from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
 from repoze.folder.interfaces import IFolder
 
-def delete_resource_view(context, request):
+def delete_resource_view(context, request, num_children=0):
 
     page_title = 'Delete ' + context.title
     api = TemplateAPI(context, request, page_title)
@@ -45,11 +45,6 @@ def delete_resource_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
-
-    # LP #399337, Add warning on delete of Folder with content inside
-    num_children = 0
-    if IFolder.providedBy(context):
-        num_children = len(context)
 
     return render_template_to_response(
         'templates/delete_resource.pt',

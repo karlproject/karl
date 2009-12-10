@@ -97,7 +97,6 @@ class TestShowFolderView(unittest.TestCase):
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
-
 class TestAddFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -200,6 +199,30 @@ class TestAddFolderView(unittest.TestCase):
         self.assertEqual(context['a-title'].userid, 'userid')
         self.assertEqual(context.tags.updated,
             [(None, 'userid', ['thetesttag'])])
+
+class TestDeleteFolderView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request, delegate):
+        from karl.content.views.files import delete_folder_view
+        return delete_folder_view(context, request, delegate)
+
+    def test_it(self):
+        dummy_calls = []
+        def dummy_delete_resource_view(context, request, num_children):
+            dummy_calls.append((context, request, num_children))
+
+        context = testing.DummyModel()
+        context['foo'] = testing.DummyModel()
+        context['bar'] = testing.DummyModel()
+        request = 'Dummy'
+
+        self._callFUT(context, request, dummy_delete_resource_view)
+        self.assertEqual(dummy_calls, [(context, request, 2)])
 
 class TestAddFileView(unittest.TestCase):
     def setUp(self):
