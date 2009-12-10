@@ -186,8 +186,11 @@ class MonthViewPresenterTests(unittest.TestCase):
 
         for week in presenter.weeks:
             for day in week:
-                url = presenter.url_for('add_calendarevent.html')
-                self.assertEqual(day.add_event_url, url)
+                dt = datetime.datetime(day.year, day.month, day.day)
+                starts = time.mktime(dt.timetuple())
+                expected_url = presenter.url_for('add_calendarevent.html',
+                                                query={'starts':int(starts)})
+                self.assertEqual(day.add_event_url, expected_url)
 
     def test_each_day_of_week_is_given_a_show_day_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 

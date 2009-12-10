@@ -180,10 +180,13 @@ class DayViewPresenterTests(unittest.TestCase):
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         
-        half_hour_slots = presenter.half_hour_slots
+        half_hour_slot = presenter.half_hour_slots[0]
+        
+        starts = time.mktime(half_hour_slot.start_datetime.timetuple())
+        expected_url = presenter.url_for('add_calendarevent.html',
+                                            query={'starts':int(starts)})
 
-        self.assertEqual(half_hour_slots[0].add_event_url, 
-                         presenter.url_for('add_calendarevent.html'))
+        self.assertEqual(half_hour_slot.add_event_url, expected_url)
 
     # _find_starting_slot_for_event
     
