@@ -24,7 +24,6 @@ from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-from karl.content.calendar.utils import add_days                   
 
 
 class MonthViewPresenter(BasePresenter):
@@ -289,7 +288,7 @@ class MonthViewPresenter(BasePresenter):
             days.append(
                 self._idx_month_day[dt.month][dt.day]       
             )
-            dt = add_days(dt, 1) 
+            dt += datetime.timedelta(days=1) 
 
         return days
 

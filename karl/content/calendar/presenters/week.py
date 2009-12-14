@@ -24,7 +24,6 @@ from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-from karl.content.calendar.utils import add_days                   
 
 
 class WeekViewPresenter(BasePresenter):
@@ -91,9 +90,10 @@ class WeekViewPresenter(BasePresenter):
                                               last_day.day,
                                               23, 59, 59)
 
-    def _init_next_and_prior_week(self):
-        self.next_week  = add_days(self.focus_datetime,  7)
-        self.prior_week = add_days(self.focus_datetime, -7)
+    def _init_next_and_prior_week(self):                          
+        seven_days = datetime.timedelta(days=7)
+        self.next_week  = self.focus_datetime + seven_days
+        self.prior_week = self.focus_datetime - seven_days
 
     def _init_navigation(self):
         nav = Navigation(self)
@@ -142,6 +142,7 @@ class WeekViewPresenter(BasePresenter):
 
     def _filter_events_for_day(self, events, day):
         filtered = []
+        one_day = datetime.timedelta(days=1)
         for event in events: 
             dt = event.startDate
             while dt < event.endDate:
@@ -152,7 +153,7 @@ class WeekViewPresenter(BasePresenter):
               if (same_year and same_month and same_day):
                 filtered.append(event)
 
-              dt = add_days(dt, 1) 
+              dt += one_day
         
         return filtered  
 

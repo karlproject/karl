@@ -30,11 +30,6 @@ def next_month(year, month):
         return (year + 1, 1)
     return (year, month + 1)
 
-def add_days(dtime, num_days):
-    unixtime = time.mktime(dtime.timetuple()) # ignores microseconds
-    unixtime += (num_days * 86400)
-    return datetime.datetime.fromtimestamp(unixtime)
-
 
 class MonthSkeleton(object):
     '''
