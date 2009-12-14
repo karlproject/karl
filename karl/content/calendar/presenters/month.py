@@ -49,6 +49,7 @@ class MonthViewPresenter(BasePresenter):
         self.day_headings = skeleton.day_names
 
         weeks = skeleton.weeks
+        nine_hours = datetime.timedelta(hours=9)
         for week in weeks:
             for d, dt in enumerate(week):
                 # determine if this day is on the month in focus
@@ -63,7 +64,7 @@ class MonthViewPresenter(BasePresenter):
                 is_today = (same_year and same_month and same_day)
 
                 # url to add an event to this day
-                day_at_9am = dt + datetime.timedelta(hours=9)
+                day_at_9am = dt + nine_hours
                 starts = time.mktime(day_at_9am.timetuple())
                 add_event_url = self.url_for('add_calendarevent.html',
                                  query={'starts':int(starts)}) 
@@ -284,11 +285,12 @@ class MonthViewPresenter(BasePresenter):
             ends_at = event.endDate
 
         dt = starts_at
+        one_day = datetime.timedelta(days=1)
         while dt < ends_at:                             
             days.append(
                 self._idx_month_day[dt.month][dt.day]       
             )
-            dt += datetime.timedelta(days=1) 
+            dt += one_day
 
         return days
 
