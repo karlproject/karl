@@ -1,8 +1,9 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.15 (2009-12-14)
+-----------------
+
 - LP #496330: Clicking the (+) from the calendar month view now uses
   a default of 9:00am instead of 12:00am.
 
