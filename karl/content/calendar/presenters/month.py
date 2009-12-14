@@ -63,8 +63,9 @@ class MonthViewPresenter(BasePresenter):
                 same_day   = (self.now_datetime.day   == dt.day)
                 is_today = (same_year and same_month and same_day)
 
-                # url to add an event to this day           
-                starts = time.mktime(dt.timetuple())
+                # url to add an event to this day
+                day_at_9am = dt + datetime.timedelta(hours=9)
+                starts = time.mktime(day_at_9am.timetuple())
                 add_event_url = self.url_for('add_calendarevent.html',
                                  query={'starts':int(starts)}) 
 

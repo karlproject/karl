@@ -3,6 +3,9 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #496330: Clicking the (+) from the calendar month view now uses
+  a default of 9:00am instead of 12:00am.
+
 - LP #494701: Editing a calendar event now populates the form with
   the correct times.
 
