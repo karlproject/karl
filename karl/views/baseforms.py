@@ -176,10 +176,13 @@ class DateTime(validators.FancyValidator):
         return ts
 
     def _from_python(self, value, state):
-        # round the timestamp
-        ts = self._round_datetime(value)
-        # convert from timestamp to string
-        return ts.strftime(self.datetime_format)
+        try:
+            # round the timestamp
+            ts = self._round_datetime(value)
+            # convert from timestamp to string
+            return ts.strftime(self.datetime_format)
+        except (AttributeError, ValueError):
+            return None
 
     def _round_datetime(self, ts=None):
         """Round the datetime to quarters of hours"""
@@ -201,14 +204,19 @@ class StartEndFields(validators.FormValidator):
 
     messages = {
         'invalid': _("End date must follow start date."),
+        'invalid_duration': _("Event duration must be at least one minute"),
         }
 
     def validate_python(self, field_dict, state):
         start = field_dict[self.start_field]
         end = field_dict[self.end_field]
         errors = {}
+
         if end < start:
             errors[self.end_field] = self.message('invalid', state)
+        elif (end - start) < datetime.timedelta(minutes=1):
+            errors[self.end_field] = self.message('invalid_duration', state)
+            
         if errors:
             error_list = errors.items()
             error_list.sort()

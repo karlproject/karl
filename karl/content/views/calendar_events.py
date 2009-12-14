@@ -532,7 +532,7 @@ def edit_calendarevent_view(context, request):
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
-
+            
             # *will be* modified event
             objectEventNotify(ObjectWillBeModifiedEvent(context))
             if workflow is not None:
