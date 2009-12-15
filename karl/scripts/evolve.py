@@ -4,6 +4,8 @@ import getopt
 import sys
 
 from zope.component import getUtilitiesFor
+from zope.component import getSiteManager
+from repoze.bfg.threadlocal import get_current_registry
 
 from repoze.evolution import IEvolutionManager
 from repoze.evolution import evolve_to_latest
@@ -65,6 +67,9 @@ def main(argv=sys.argv):
     if set_version and not package:
         usage('Not setting db version to %s (specify --package to '
               'specify which package to set the db version for)' % set_version)
+
+    # hook gsm for good measure and max fwd compat
+    getSiteManager.sethook(get_current_registry)
 
     root, closer = open_root(get_default_config())
 
