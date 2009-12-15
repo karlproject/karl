@@ -298,10 +298,6 @@ class EventOnDayView(BaseEvent):
     @property        
     def time_of_first_moment(self):
         return self.first_moment.strftime('%l:%M %p')
-
-    @property
-    def color_class(self):
-        return 'cal_%s' % self._catalog_event._v_layer_color
         
 
 def add_minutes(dtime, num_minutes):

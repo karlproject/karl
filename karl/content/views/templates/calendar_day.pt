@@ -32,7 +32,7 @@
             </div>
 
             <div tal:repeat="event calendar.all_day_events" class="cal_event cal_event_pos_full">
-              <a href="#" class="cal_${event._v_layer_color}">${event.title}</a>
+              <a href="#" class="cal_${event.color}">${event.title}</a>
             </div>
           </div>
 
@@ -70,7 +70,7 @@
                    </div>
 
                    <tal:block condition="slot.bubble">
-                   <div class="${slot.bubble.event.color_class} cal_event_block" style="height: ${slot.bubble.length_px}px">
+                   <div class="cal_${slot.bubble.event.color} cal_event_block" style="height: ${slot.bubble.length_px}px">
                      <a href="${slot.bubble.event.show_url}">
                        <span class="time">${slot.bubble.event.time_of_first_moment}</span><br />
                        ${slot.bubble.event.title}
