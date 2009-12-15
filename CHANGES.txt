@@ -8,6 +8,8 @@ Unreleased
 
 - Added missing registration for IFileInfo adapter for ICommunityRootFolder.
 
+- Fixed bug in evolve2 step that updated 'Last Activity' for every community.
+
 3.15 (2009-12-14)
 -----------------
 
