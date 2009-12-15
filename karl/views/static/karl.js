@@ -1873,6 +1873,12 @@ function initNewEvent() {
   $("#startdate-field").append(checkbox);
 
   $("#cal_all_day").click(function() {
+    // remove any previous validation errors
+    $('#startdate-field').removeClass('fieldError');
+    $('#startdate-field > .errorMessage').remove();
+    $('#enddate-field').removeClass('fieldError');
+    $('#enddate-field > .errorMessage').remove();
+    
     // check - hide time input
     if (this.checked) {      
       $('#startdate-field select').hide();
