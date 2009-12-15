@@ -37,7 +37,7 @@ class TestKarlTwill:
     karl.twillcommands by:
     twill.execute_string("valid twill statement")
     or you can run a twill file which is mostly what has been done in this class by
-    twill.execute_string("runfile '${test_path}/path/to/twill_file.twill")'''
+    twill.execute_string("runfile '${test_path}/path/to/twill_file.twill')'''
 
     def setUp(self):
         '''Create the app'''
