@@ -6,6 +6,8 @@ Unreleased
 
 - LP #496381: Calendar event duration must be at least one minute.
 
+- Added missing registration for IFileInfo adapter for ICommunityRootFolder.
+
 3.15 (2009-12-14)
 -----------------
 
