@@ -17,6 +17,8 @@ Unreleased
 
 - Bug fix: Make sure acl's are properly set on profiles during import.
 
+- LP#494582 Added opensearch support to people directory.  (Ported from OSI.)
+
 3.15 (2009-12-14)
 -----------------
 

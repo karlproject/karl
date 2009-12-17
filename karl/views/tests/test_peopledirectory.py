@@ -724,9 +724,9 @@ class PrintViewTests(unittest.TestCase):
 
 class AddUserViewTests(unittest.TestCase):
 
-    def _callFUT(self, context, response):
+    def _callFUT(self, context, request):
         from karl.views.peopledirectory import add_user_view
-        return add_user_view(context, response)
+        return add_user_view(context, request)
 
     def test_it(self):
         context = testing.DummyModel()
@@ -736,6 +736,22 @@ class AddUserViewTests(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/profiles/add.html')
 
+class TestOpenSearchViews(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import opensearch_view
+        return opensearch_view(context, request)
+
+    def test_it(self):
+        context = testing.DummyModel()
+        context.title = 'Test Report'
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/opensearch.xml'
+        )
+        response = self._callFUT(context, request)
+        self.assertEqual(renderer.report, context)
+        self.assertEqual(renderer.url, 'http://example.com/')
 
 class ReportColumnTests(unittest.TestCase):
 

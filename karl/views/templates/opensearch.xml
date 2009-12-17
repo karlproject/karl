@@ -1,0 +1,12 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+    xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+    <ShortName>KARL People Search -- ${report.title}</ShortName>
+    <Description>Search KARL for People</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Url type="text/html" method="GET"
+        template="${url}?body={searchTerms}">
+    </Url>
+    <Image height="16" width="16" type="image/x-icon">${api.app_url}/favicon.ico</Image>
+
+    <moz:SearchForm>${url}</moz:SearchForm>
+</OpenSearchDescription>

@@ -54,6 +54,8 @@
         //]]>
       </script>
 
+      <div metal:use-macro="api.snippets.macros['opensearch']"></div>
+
     </div>
   </div>
 </html>

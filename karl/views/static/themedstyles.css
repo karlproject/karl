@@ -2825,3 +2825,8 @@ a.primary_button:visited {
   background: url("images/button_active.png") left no-repeat;
 }
 
+#peopledir-opensearch-add {
+    text-align: right;
+    padding-right: 10px;
+    margin-top: 10px;
+}

@@ -135,6 +135,7 @@ def report_view(context, request):
     print_url = model_url(context, request, 'print.html', **kw)
     csv_url = model_url(context, request, 'csv', **kw)
     pictures_url = model_url(context, request, 'picture_view.html', **kw)
+    opensearch_url = model_url(context, request, 'opensearch.xml')
 
     return render_template_to_response(
         'templates/people_report.pt',
@@ -148,6 +149,7 @@ def report_view(context, request):
         csv_url=csv_url,
         pictures_url=pictures_url,
         qualifiers=qualifiers,
+        opensearch_url=opensearch_url,
         actions=get_actions(context, request),
         )
 
@@ -391,6 +393,14 @@ def add_user_view(context, request):
     profiles = find_profiles(context)
     return HTTPFound(location=model_url(profiles, request, 'add.html'))
 
+def opensearch_view(context, request):
+    api = TemplateAPI(context, request, 'KARL People OpenSearch')
+    return render_template_to_response(
+        'templates/opensearch.xml',
+        api=api,
+        report=context,
+        url=model_url(context, request),
+    )
 
 class ReportColumn(object):
 

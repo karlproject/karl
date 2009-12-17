@@ -419,6 +419,13 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.opensearch_view"
+    permission="view"
+    name="opensearch.xml"
+  />
+
+  <view
     for="karl.models.interfaces.IPeopleSection"
     view=".peopledirectory.section_view"
     permission="view"

@@ -623,6 +623,17 @@
       </div>
     </div>
 
+    <div id="peopledir-opensearch-add" metal:define-macro="opensearch"
+         tal:condition="opensearch_url|None">
+      <div>
+        <a onclick="window.external.AddSearchProvider(
+                      '${opensearch_url}'); return false;"
+                      href="#">
+          <img border="0" src="${api.static_url}/opensearch.gif"
+               alt="Add KARL People Search to your browser toolbar" />
+        </a>
+      </div>
+    </div>
 
   </body>
 </html>
