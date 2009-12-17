@@ -24,6 +24,7 @@ from zope.event import notify
 from zope.component.event import objectEventNotify
 from zope.interface import implements
 from repoze.lemonade.content import create_content
+from repoze.workflow import get_workflow
 
 from karl.cico.interfaces import IContentIn
 from karl.events import ObjectWillBeModifiedEvent
@@ -32,6 +33,7 @@ from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleDirectorySchemaChanged
+from karl.security.workflow import reset_security_workflow
 from karl.views.utils import make_name
 from karl.utils import find_peopledirectory
 from karl.utils import find_site
@@ -91,6 +93,9 @@ class UserProfileImporter(object):
         profiles[username] = profile
         self._populate(profile)
 
+        workflow = get_workflow(IProfile, 'security', profile)
+        workflow.initialize(profile)
+
         profile.created_by = profile.modified_by = username
         profile.created = profile.modified = datetime.datetime.now()
 
@@ -114,6 +119,7 @@ class UserProfileImporter(object):
         users.add(username, username, password, groups, encrypted=True)
 
         self._populate(profile)
+        reset_security_workflow(profile)
 
         objectEventNotify(ObjectModifiedEvent(profile))
 
