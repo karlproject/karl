@@ -94,7 +94,8 @@ class UserProfileImporter(object):
         self._populate(profile)
 
         workflow = get_workflow(IProfile, 'security', profile)
-        workflow.initialize(profile)
+        if workflow is not None:
+            workflow.initialize(profile)
 
         profile.created_by = profile.modified_by = username
         profile.created = profile.modified = datetime.datetime.now()
