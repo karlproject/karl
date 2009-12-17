@@ -10,6 +10,8 @@ Unreleased
 
 - Fixed bug in evolve2 step that updated 'Last Activity' for every community.
 
+- Added missing view registrations for mailin monitor utility.
+
 3.15 (2009-12-14)
 -----------------
 
