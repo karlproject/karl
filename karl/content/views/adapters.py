@@ -282,7 +282,6 @@ class BlogAlert(Alert):
         attachment_links = []
         attachment_hrefs = {}
         for name,model in self._attachments.items():
-            assert name == model.title
             if profile.alert_attachments == 'link':
                 attachment_links.append(name)
                 attachment_hrefs[name] = model_url(model, request)

@@ -144,6 +144,9 @@ karl package Changelog
   allowing third party customizations to still use the view logic and just
   change the form validation.
 
+- Backport from trunk: Fix mailin failure on attachments due to bogus assert
+  that usually fails.
+
 3.14 (2009-09-08)
 -----------------
 
