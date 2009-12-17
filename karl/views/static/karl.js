@@ -586,8 +586,8 @@ var _snip_pre =     '<span>' +
                     '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
                     '<span class="count">&nbsp;(' +
                     '<a class="tagusers-link"  href="<%= tagusers_url %>"><%= count %></a>)</span>';
-var _snip_post =    '<input type="hidden" name="<%= _name %>" value="<%= tag %>" />' +
-                    '</span>' +
+var _snip_input =   '<input type="hidden" name="<%= _name %>" value="<%= tag %>" />';
+var _snip_post =    '</span>' +
                     '</li>';
 
 $.extend($.ui.karltagbox, {
@@ -621,6 +621,7 @@ $.extend($.ui.karltagbox, {
                 '<li id="<%= _wid %>" class="bit-box">' +
                 _snip_pre +
                 '<a href="#" class="closebutton"></a>' +
+                _snip_input +
                 _snip_post,
             nondeleteable: 
                 '<li id="<%= _wid %>" class="bit-box nondeleteable">' +
