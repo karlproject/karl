@@ -19,6 +19,9 @@ Unreleased
 
 - LP#494582 Added opensearch support to people directory.  (Ported from OSI.)
 
+- Bug fix: Make sure custom_folder_view uses get_layout_provider utility
+  method.
+
 3.15 (2009-12-14)
 -----------------
 

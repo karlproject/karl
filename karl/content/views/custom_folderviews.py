@@ -40,6 +40,7 @@ from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
 from karl.utils import coarse_datetime_repr
+from karl.utils import get_layout_provider
 
 def get_catalog_events(context, request,
                        searchterm=None, year=None, month=None,
@@ -251,7 +252,7 @@ class CustomFolderView(object):
             )
 
         # Get a layout
-        layout_provider = getMultiAdapter((context, request), ILayoutProvider)
+        layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
 
         return render_template_to_response(
