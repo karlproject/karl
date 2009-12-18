@@ -36,10 +36,10 @@ from karl.views.utils import get_user_home
 
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import INewsItem
-from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
 from karl.utils import coarse_datetime_repr
+from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
 def get_catalog_events(context, request,
@@ -233,7 +233,7 @@ class CustomFolderView(object):
         # Actions and backlink
         actions = []
         if has_permission('create', context, request):
-            addables = queryMultiAdapter((context, request), IFolderAddables)
+            addables = get_folder_addables(context, request)
             if addables is not None:
                 actions.extend(addables())
             actions.append(('Edit', 'edit.html'))

@@ -64,7 +64,6 @@ from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import IIntranetRootFolder
 
 from karl.content.views.interfaces import IFileInfo
-from karl.views.interfaces import IFolderAddables
 from karl.content.views.interfaces import IFolderCustomizer
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
@@ -76,6 +75,7 @@ from karl.content.views.utils import get_previous_next
 
 from karl.security.workflow import get_security_states
 
+from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
 from karl.views import baseforms
@@ -84,7 +84,6 @@ from karl.views.batch import get_container_batch
 
 from karl.views.utils import check_upload_size
 from karl.views.utils import CustomInvalid
-
 
 def show_folder_view(context, request):
 
@@ -99,7 +98,7 @@ def show_folder_view(context, request):
     actions = []
     if has_permission('create', context, request):
         # Allow "policy" to override list of addables in a particular context
-        addables = queryMultiAdapter((context, request), IFolderAddables)
+        addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
 

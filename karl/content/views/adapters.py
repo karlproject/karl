@@ -66,6 +66,7 @@ from karl.content.views.interfaces import IBylineInfo
 from karl.utilities.interfaces import IAlert
 from karl.utilities.interfaces import IKarlDates
 from karl.utilities.interfaces import IMimeInfo
+from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import IIntranetPortlet
 from karl.views.interfaces import ILayoutProvider
 
@@ -532,6 +533,8 @@ class CalendarEventAlert(NonBlogAlert):
         return '; '.join(model.attendees)
 
 class DefaultFolderAddables(object):
+    implements(IFolderAddables)
+
     def __init__(self, context, request):
         self.context = context
         self.request = request

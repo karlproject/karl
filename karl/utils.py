@@ -34,6 +34,7 @@ from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IAttachmentPolicy
 from karl.models.interfaces import IPeopleDirectory
+from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
 def find_site(context):
@@ -160,3 +161,9 @@ def get_layout_provider(context, request):
     from karl.content.views.adapters import DefaultLayoutProvider
     return queryMultiAdapter((context, request), ILayoutProvider,
                              default=DefaultLayoutProvider(context,request))
+
+def get_folder_addables(context, request):
+    from karl.content.views.adapters import DefaultFolderAddables
+    return queryMultiAdapter((context, request), IFolderAddables,
+                             default=DefaultFolderAddables(context,request))
+

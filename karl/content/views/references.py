@@ -39,7 +39,6 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.views import baseforms
 from karl.views.api import TemplateAPI
 from karl.views.form import render_form_to_response
-from karl.views.interfaces import IFolderAddables
 from karl.views.tags import set_tags
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
@@ -52,6 +51,7 @@ from karl.content.interfaces import IReferenceSection
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.utils import get_previous_next
 
+from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
 def add_referencemanual_view(context, request):
@@ -242,7 +242,7 @@ def show_referencemanual_view(context, request):
 
     actions = []
     if has_permission('create', context, request):
-        addables = queryMultiAdapter((context, request), IFolderAddables)
+        addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
         actions.append(('Edit', 'edit.html'))
@@ -461,7 +461,7 @@ def show_referencesection_view(context, request):
 
     actions = []
     if has_permission('create', context, request):
-        addables = queryMultiAdapter((context, request), IFolderAddables)
+        addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
         actions.append(('Edit', 'edit.html'))
