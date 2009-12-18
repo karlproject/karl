@@ -19,7 +19,7 @@ import unittest
 from webob import MultiDict
 
 from zope.interface import Interface
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 from repoze.bfg import testing
 
 from repoze.bfg.testing import DummyModel

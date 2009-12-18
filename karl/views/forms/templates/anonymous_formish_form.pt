@@ -1,0 +1,31 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <script type="text/javascript" 
+        src="${api.static_url}/jquery-ui/1.7/ui/ui.sortable.js">//</script>
+    <script type="text/javascript" 
+        src="${api.static_url}/formish.js">//</script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        formish();
+      });
+      //]]>
+    </script>
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">${page_title}</h1>
+
+      <span tal:content="structure request.form()" tal:omit-tag=""/>
+    
+  </div>
+  
+</div>
+

@@ -20,7 +20,7 @@ import unittest
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
 from repoze.bfg.testing import registerAdapter

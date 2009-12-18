@@ -285,6 +285,7 @@ class DummyUpload(object):
                        data="This is a test."):
         self.filename = filename
         self.type = mimetype
+        self.mimetype = mimetype
         self.data = data
         self.file = StringIO(data)
 
@@ -403,7 +404,7 @@ def registerSecurityWorkflow():
     from repoze.workflow.testing import registerDummyWorkflow
     return registerDummyWorkflow('security')
 
-def registerSettings():
+def registerSettings(**kw):
     from repoze.bfg.interfaces import ISettings
-    settings = DummySettings()
+    settings = DummySettings(**kw)
     registerUtility(settings, ISettings)

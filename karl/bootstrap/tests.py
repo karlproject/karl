@@ -3,6 +3,9 @@ from repoze.bfg import testing
 
 from zope.testing.cleanup import cleanUp
 
+from repoze.bfg.configuration import Configurator
+from repoze.bfg.threadlocal import get_current_registry
+
 from karl.views.interfaces import IToolAddables
 from karl.models.interfaces import IToolFactory
 from repoze.lemonade.listitem import get_listitems
@@ -21,17 +24,10 @@ class TestPopulate(unittest.TestCase):
     def _registerComponents(self):
         # Install a bit of configuration that make_app() usually
         # does for us.
-        from repoze.bfg.interfaces import IRoutesMapper
-        from repoze.bfg.urldispatch import RoutesRootFactory
-        from repoze.bfg.router import DefaultRootFactory
-        from zope.component import getSiteManager
-        mapper = RoutesRootFactory(DefaultRootFactory)
-        getSiteManager().registerUtility(mapper, IRoutesMapper)
-
-        from repoze.bfg.zcml import zcml_configure
-        import karl.includes
-        zcml_configure('configure.zcml', package=karl.includes)
-
+        reg = get_current_registry()
+        config = Configurator(reg)
+        config.setup_registry()
+        config.load_zcml('karl.includes:configure.zcml')
         from zope.interface import Interface
         testing.registerAdapter(DummyToolAddables, (Interface, Interface),
                                 IToolAddables)

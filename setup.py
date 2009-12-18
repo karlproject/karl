@@ -41,7 +41,7 @@ requires = [
     'markdown2',
     'PILwoTk',
     'nose',
-    'repoze.bfg',
+    'repoze.bfg >= 1.2a6',
     'repoze.browserid',
     'repoze.catalog',
     'repoze.enformed',
@@ -64,7 +64,11 @@ requires = [
     'twill', # for testing
     'ZODB3',
     'zope.testing', # fwd compat when not directly relied on by BFG
-
+    'PILwoTk',
+    'icalendar',
+    'markdown2',
+    'repoze.bfg.formish',
+    'twill', # for testing
     # Not really a code depdencency, but used by most buildouts
     # XXX Move to eggs in buildout?
     'repoze.errorlog',

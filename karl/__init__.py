@@ -16,3 +16,14 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 __import__('pkg_resources').declare_namespace(__name__)
+
+# shim to atone for usage of zope.testing.cleanUp in the test suite;
+# this doesn't belong here at all and must go away when the use of
+# zope.testing.cleanup.cleanUp is exorcised from the codebase
+
+try:
+    import zope.testing.cleanup
+    from repoze.bfg.testing import setUp
+    zope.testing.cleanup.addCleanUp(setUp)
+except ImportError:
+    pass

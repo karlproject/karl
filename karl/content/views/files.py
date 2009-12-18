@@ -18,6 +18,11 @@
 import mimetypes
 from simplejson import JSONEncoder
 
+import formish
+import schemaish
+from schemaish.type import File as SchemaFile
+from validatish import validator
+
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component.event import objectEventNotify
@@ -50,6 +55,7 @@ from karl.views.utils import make_unique_name
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
+from karl.views.forms import widgets as karlwidgets
 
 from karl.views.api import TemplateAPI
 from karl.views.baseforms import security_state as security_state_field
@@ -150,93 +156,102 @@ def show_folder_view(context, request):
         feed_url=feed_url,
         )
 
-def add_folder_view(context, request):
-    tags_list=request.POST.getall('tags')
-    form = AddFolderForm(tags_list=tags_list)
-    workflow = get_workflow(ICommunityFolder, 'security', context)
-
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
-
-    if security_states:
-        form.add_field('security_state', security_state_field)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-
-            name = make_unique_name(context, converted['title'])
-            creator = authenticated_userid(request)
-
-            folder = create_content(ICommunityFolder,
-                                    converted['title'],
-                                    authenticated_userid(request),
-                                    )
-            context[name] = folder
-            if workflow is not None:
-                workflow.initialize(folder)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(folder, request,
-                                                 converted['security_state'])
-
-            # Tags, attachments, alerts
-            set_tags(folder, request, converted['tags'])
-
-            # Make changes post-creation based on policy in src/osi
-            customizer = queryMultiAdapter((folder, request), IFolderCustomizer)
-            if customizer:
-                for interface in customizer.markers:
-                    alsoProvides(folder, interface)
-
-            location = model_url(folder, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.initial_state
-        fill_values = dict(security_state=security_state)
-        tags_field = dict(records=[])
-
-    # Render the form and shove some default values in
-    page_title = 'Add Folder'
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    if layout_provider is None:
-        layout = api.community_layout
-    else:
-        layout = layout_provider('community')
-
-
-    return render_form_to_response(
-        'templates/add_folder.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-                )),
-        layout=layout,
-        security_states = security_states,
+title_field = schemaish.String(
+    validator=validator.All(
+        validator.Length(max=100),
+        validator.Required(),
         )
+    )
+tags_field = schemaish.Sequence(schemaish.String())
+security_field = schemaish.String(
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
+
+class AddFolderFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunityFolder, 'security', context)
+
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
+
+    def form_defaults(self):
+        defaults = {
+            'title':'',
+            'tags':[],
+            }
+        
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
+
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
+
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsAddWidget(),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
+
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        layout_provider = get_layout_provider(self.context, self.request)
+        if layout_provider is None:
+            layout = api.community_layout
+        else:
+            layout = layout_provider('community')
+        return {'api':api, 'page_title':'Add Folder', 'actions':(),
+                'layout':layout}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        
+        name = make_unique_name(context, converted['title'])
+        creator = authenticated_userid(request)
+
+        folder = create_content(ICommunityFolder,
+                                converted['title'],
+                                creator,
+                                )
+        context[name] = folder
+        if workflow is not None:
+            workflow.initialize(folder)
+            if 'security_state' in converted:
+                workflow.transition_to_state(folder, request,
+                                             converted['security_state'])
+
+        # Tags, attachments, alerts
+        set_tags(folder, request, converted['tags'])
+
+        # Make changes post-creation based on policy in src/osi
+        customizer = queryMultiAdapter((folder, request), IFolderCustomizer)
+        if customizer:
+            for interface in customizer.markers:
+                alsoProvides(folder, interface)
+
+        location = model_url(folder, request)
+        return HTTPFound(location=location)
 
 def delete_folder_view(context, request,
                        delete_resource_view=delete_resource_view):
@@ -474,84 +489,86 @@ def download_file_view(context, request):
     response = Response(headerlist=headers, app_iter=f)
     return response
 
-def edit_folder_view(context, request):
-    tags_list = request.POST.getall('tags')
-    form = EditFolderForm(tags_list=tags_list)
-    workflow = get_workflow(ICommunityFolder, 'security', context)
+class EditFolderFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunityFolder, 'security', context)
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, self.context, self.request)
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_defaults(self):
+        defaults = {
+            'title':self.context.title,
+            'tags':[],
+            }
+        
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(self.context)
+        return defaults
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.title = converted['title']
-
-            # Tags, attachments, alerts
-            set_tags(context, request, converted['tags'])
-
-            # modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = '?status_message=Folder%20changed'
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        layout_provider = get_layout_provider(self.context, self.request)
+        if layout_provider is None:
+            layout = api.community_layout
         else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(title=context.title,
-                           security_state=security_state,
-                           )
+            layout = layout_provider('community')
+        return {'api':api, 'page_title':'Edit Folder %s' % self.context.title,
+                'actions':(), 'layout':layout}
 
-   # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-    )
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+        context.title = converted['title']
 
-    return render_form_to_response(
-        'templates/edit_folder.pt',
-        form,
-        fill_values,
-        head_data=convert_to_script(client_json_data),
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        layout=layout,
-        security_states = security_states,
-        )
+        # Tags, attachments, alerts
+        set_tags(context, request, converted['tags'])
+
+        # modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        location = model_url(context, request, query=
+                             {'status_message':'Folder changed'})
+        return HTTPFound(location=location)
 
 
 def edit_file_view(context, request):
@@ -646,14 +663,6 @@ class AddFileForm(FormSchema):
     sendalert = baseforms.sendalert
 
 class EditFileForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-
-class AddFolderForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-
-class EditFolderForm(FormSchema):
     title = baseforms.title
     tags = baseforms.tags
 

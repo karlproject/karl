@@ -46,9 +46,6 @@ class IShowSendalert(Interface):
 
     show_sendalert = Attribute('Boolean to determine visible')
 
-class IShowIsPrivate(Interface):
-    """ Policy for when to show-hide the is-private choice """
-
 class INetworkNewsMarker(Interface):
     """ TTW assignable marker to customize a network news folder """
 

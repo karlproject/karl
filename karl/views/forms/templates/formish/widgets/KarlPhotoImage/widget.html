@@ -1,0 +1,44 @@
+<span tal:omit-tag=""
+      tal:define="star ('*' in field.name);
+                  value_name (not star) and field.value['name'][0] or '';
+                  value_default (not star) and field.value['default'][0] or '';
+                  mimetype (not star) and field.value['mimetype'][0] or '';
+                  mimetype mimetype or '';"
+      >
+  
+  <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+  <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
+  <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
+  <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
+  <input id="${field.cssname}" type="file" name="${field.name}.file" />
+  
+  <div class="preview">
+
+    <div class="icon ${mimetype.replace('/','_')}">
+      
+      <span tal:condition="mimetype" tal:omit-tag="">
+        
+        <img height="100" width="75" 
+             style="width=75px; float: left;" align="right"
+             src="${field.widget.urlfactory(value_name)}"/>
+        
+        <div style="clear: both;"/>
+
+      </span>
+        
+      <span tal:condition="not mimetype" tal:omit-tag="">
+        
+        <img height="100" width="75" 
+             style="width=75px; float: left;" align="right"
+             src="${field.widget.image_thumbnail_default}"/>
+        
+        <div style="clear: both;"/>
+      
+      </span>
+
+    </div>
+      
+  </div>
+
+  
+</span>

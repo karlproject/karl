@@ -3,14 +3,14 @@ from __future__ import with_statement
 import os
 import unittest
 from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+
 
 class TestMailDeliveryFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, os=os):
         from karl.utilities.mailer import mail_delivery_factory
@@ -76,11 +76,11 @@ class TestWhiteListMailDelivery(unittest.TestCase):
                 print >>f, email
 
     def setUp(self):
-        cleanUp()
+        testing.setUp()
         self.white_list = None
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
         import os
         if os.path.exists(self.tmp_name):

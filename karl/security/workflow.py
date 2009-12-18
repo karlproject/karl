@@ -94,6 +94,8 @@ def has_custom_acl(ob):
     return False
 
 def get_security_states(workflow, context, request):
+    if workflow is None:
+        return []
     if has_custom_acl(context):
         return []
     states = workflow.state_info(context, request)

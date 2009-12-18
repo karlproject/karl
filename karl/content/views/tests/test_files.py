@@ -18,7 +18,7 @@
 import unittest
 
 from zope.interface import Interface
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
 from repoze.bfg.testing import registerAdapter
@@ -72,7 +72,7 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         directlyProvides(context, ICommunity)
         renderer  = testing.registerDummyRenderer('templates/show_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 5)
         self.assertEqual(actions[0][1], 'add_folder.html')
@@ -91,22 +91,18 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
         renderer  = testing.registerDummyRenderer('templates/show_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 2)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
-class TestAddFolderView(unittest.TestCase):
+class TestAddFolderFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.content.views.files import add_folder_view
-        return add_folder_view(context, request)
+        testing.tearDown()
 
     def _register(self):
         from repoze.bfg import testing
@@ -119,87 +115,89 @@ class TestAddFolderView(unittest.TestCase):
         testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
                                 IFolderCustomizer)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.files import AddFolderFormController
+        return AddFolderFormController(*arg, **kw)
 
-    def _registerSecurityWorkflow(self):
-        workflow = DummyWorkflow()
+    def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        return registerDummyWorkflow('security', workflow)
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def test_unsubmitted(self):
-
-        renderer  = testing.registerDummyRenderer('templates/add_folder.pt')
+    def test_form_defaults(self):
+        workflow = self._registerDummyWorkflow()
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-    def test_security_states_with_workflow(self):
-        renderer  = testing.registerDummyRenderer('templates/add_folder.pt')
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.security_states)
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('title' in dict(fields))
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_no_security_states_without_workflow(self):
-        renderer  = testing.registerDummyRenderer('templates/add_folder.pt')
+    def test_form_widgets(self):
+        self._registerDummyWorkflow()
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        response = self._callFUT(context, request)
-        self.failIf(renderer.security_states)
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('title' in widgets)
 
-    def test_submitted_invalid(self):
-
-        renderer  = testing.registerDummyRenderer('templates/add_folder.pt')
+    def test___call__(self):
         context = testing.DummyModel()
-        from webob import MultiDict
-        request = testing.DummyRequest(MultiDict({'form.submitted':1}))
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
 
-    def test_submitted_valid(self):
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
         self._register()
+        self._registerDummyWorkflow()
 
         testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         context.tags = DummyTagEngine()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':1,
-                    'title':'a title',
-                    'security_state': 'private',
-                    'tags': 'thetesttag',
-                    })
-            )
+        converted = {
+            'title':'a title',
+            'security_state': 'private',
+            'tags': ['thetesttag'],
+            }
         from karl.content.interfaces import ICommunityFolder
         from repoze.lemonade.interfaces import IContentFactory
         testing.registerAdapter(lambda *arg: DummyCommunityFolder,
                                 (ICommunityFolder,),
                                 IContentFactory)
-        self._registerSecurityWorkflow()
-
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/a-title/')
         self.assertEqual(context['a-title'].title, u'a title')
         self.assertEqual(context['a-title'].userid, 'userid')
         self.assertEqual(context.tags.updated,
             [(None, 'userid', ['thetesttag'])])
-
+    
 class TestDeleteFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -267,9 +265,9 @@ class TestAddFileView(unittest.TestCase):
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        registerAdapter(DummyLayoutProvider,
+                        (Interface, Interface),
+                        ILayoutProvider)
 
     def test_unsubmitted(self):
         self._registerLayoutProvider()
@@ -281,7 +279,7 @@ class TestAddFileView(unittest.TestCase):
         request = testing.DummyRequest()
         from webob import MultiDict
         request.POST = MultiDict()
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
 
     def test_submitted_invalid(self):
@@ -297,7 +295,7 @@ class TestAddFileView(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/add_file.pt')
         self._callFUT(context, request)
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.failUnless(renderer.fielderrors)
 
     def test_submitted_filename_with_only_symbols(self):
@@ -324,7 +322,7 @@ class TestAddFileView(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(
             renderer.fielderrors, {'file': 'The filename must not be empty'})
 
@@ -473,7 +471,7 @@ class TestAddFileView(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request, check_upload_size)
+        self._callFUT(context, request, check_upload_size)
         self.assertEqual(renderer.fielderrors, {
             'file': 'TEST VALIDATION ERROR'})
 
@@ -490,9 +488,9 @@ class TestShowFileView(unittest.TestCase):
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        registerAdapter(DummyLayoutProvider,
+                        (Interface, Interface),
+                        ILayoutProvider)
 
     def test_it(self):
         self._registerLayoutProvider()
@@ -510,7 +508,7 @@ class TestShowFileView(unittest.TestCase):
         testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                 IFileInfo)
 
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 2)
         self.assertEqual(actions[0][1], 'edit.html')
@@ -535,99 +533,110 @@ class TestDownloadFileView(unittest.TestCase):
         context.filename = 'thefilename'
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-#        self.assertEqual(response.headerlist[0],
-#               ('Content-Disposition', 'attachment; filename=thefilename'))
         self.assertEqual(response.headerlist[0],
                          ('Content-Type', 'x/foo'))
         self.assertEqual(response.app_iter, blobfile)
 
-class TestEditFolderView(unittest.TestCase):
+class TestEditFolderFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _register(self):
+        from repoze.bfg import testing
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+
+        # Register dummy IFolderCustomizer
+        from karl.content.views.interfaces import IFolderCustomizer
+        testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
+                                IFolderCustomizer)
+
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.files import EditFolderFormController
+        return EditFolderFormController(*arg, **kw)
+
+    def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
-
-    def _callFUT(self, context, request):
-        from karl.content.views.files import edit_folder_view
-        return edit_folder_view(context, request)
-
-    def test_unsubmitted(self):
-        self._register()
-        self._registerLayoutProvider()
-
-        renderer  = testing.registerDummyRenderer('templates/edit_folder.pt')
-        context = testing.DummyModel(title='thefile')
+    def test_form_defaults(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        context.title = 'title'
+        context.security_state = 'private'
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['security_state'], 'private')
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('title' in dict(fields))
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_invalid(self):
+    def test_form_widgets(self):
         self._register()
-        self._registerLayoutProvider()
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('title' in widgets)
 
-        renderer  = testing.registerDummyRenderer('templates/edit_folder.pt')
-        context = testing.DummyModel(title='thetitle')
-        from webob import MultiDict
-        request = testing.DummyRequest(MultiDict({'form.submitted':1}))
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def test___call__(self):
+        context = testing.DummyModel()
+        context.title = 'title'
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
 
-    def test_submitted_valid(self):
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
         self._register()
-
         from karl.models.interfaces import IObjectModifiedEvent
+        request = testing.DummyRequest()
         context = testing.DummyModel(title='oldtitle')
         context.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':1,
-                    'title':'new title',
-                    'security_state': 'private',
-                    'tags': 'thetesttag',
-                    })
-            )
+        request = testing.DummyRequest()
+        converted = {
+            'title':'new title',
+            'security_state': 'private',
+            'tags': ['thetesttag'],
+            }
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        msg = 'http://example.com/?status_message=Folder%20changed'
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
+        msg = 'http://example.com/?status_message=Folder+changed'
         self.assertEqual(response.location, msg)
         self.assertEqual(context.title, u'new title')
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.modified_by, 'testeditor')
-
-class DummySecurityWorkflow:
-    def __init__(self, context):
-        self.context = context
-
-    def setInitialState(self, request, **kw):
-        pass
-
-    def updateState(self, request, **kw):
-        if kw['sharing']:
-            self.context.transition_id = 'private'
-        else:
-            self.context.transition_id = 'public'
-
-    def getStateMap(self):
-        return {}
 
 class TestEditFileView(unittest.TestCase):
     def setUp(self):

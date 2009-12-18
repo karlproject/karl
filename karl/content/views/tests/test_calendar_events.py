@@ -17,7 +17,7 @@
 
 import unittest
 from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 
 class AddCalendarEventViewTests(unittest.TestCase):

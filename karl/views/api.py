@@ -23,6 +23,7 @@ from zope.component import queryUtility
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.url import model_url
 from repoze.bfg.security import effective_principals
+from repoze.bfg.traversal import quote_path_segment
 
 from repoze.bfg.location import lineage
 from repoze.bfg.traversal import model_path
@@ -227,20 +228,22 @@ class TemplateAPI(object):
         if self._intranets_info is None:
             intranets_info = []
             intranets = find_intranets(self.context)
-            if intranets == []:
+            if not intranets:
                 # Maybe there aren't any intranets defined yet
-                return intranets
-            for entry in intranets.values():
+                return []
+            request = self.request
+            intranets_url = model_url(intranets, request)
+            for name, entry in intranets.items():
                 try:
                     content_iface = get_content_type(entry)
                 except ValueError:
                     continue
+                href = '%s%s/' % (intranets_url, quote_path_segment(name))
                 if content_iface == ICommunity:
                     intranets_info.append({
                             'title': entry.title,
-                            'edit_href': model_url(entry, self.request,
-                                                   'edit_intranet.html'),
-                            'intranet_href': model_url(entry, self.request),
+                            'intranet_href': href,
+                            'edit_href': href + '/edit_intranet.html',
                             })
             # Sort the list
             def intranet_sort(x, y):

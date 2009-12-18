@@ -23,6 +23,8 @@ from zope.interface.declarations import Declaration
 from zope.component import queryAdapter
 from zope.event import notify
 
+from persistent.mapping import PersistentMapping
+
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
@@ -242,6 +244,7 @@ class Site(Folder):
         self.users = KARLUsers(self)
         self.tags = Tags(self)
         self.sessions = SessionDataManager(3600, 5)
+        self.filestore = PersistentMapping()
 
     def update_indexes(self):
         indexes = {

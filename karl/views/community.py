@@ -17,10 +17,16 @@
 
 import email.message
 
+import schemaish
+import formish
+from validatish import validator
+
+from repoze.lemonade.content import create_content
+
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
-from zope.component import getUtility
 from zope.component import queryMultiAdapter
+from zope.component import getUtility
 from zope.interface import implements
 from webob.exc import HTTPFound
 
@@ -32,12 +38,8 @@ from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
-from repoze.enformed import FormSchema
 
 from repoze.sendmail.interfaces import IMailDelivery
-
-from formencode import validators
-from formencode import Invalid
 
 from karl.events import ObjectWillBeModifiedEvent
 from karl.events import ObjectModifiedEvent
@@ -51,180 +53,278 @@ from repoze.workflow import get_workflow
 
 from karl.utils import get_layout_provider
 from karl.utils import find_profiles
-from karl.utils import get_setting
+from karl.utils import find_users
 
 from karl.views.adapters import DefaultToolAddables
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import ISidebar
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import convert_to_script
+from karl.views.utils import make_name
 from karl.views.batch import get_catalog_batch_grid
-from karl.views import baseforms
+from karl.views.tags import get_tags_client_data
 from karl.views.tags import set_tags
-from karl.views.form import render_form_to_response
+
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidators
+
 from karl.security.workflow import get_security_states
-from karl.views.baseforms import security_state as security_state_field
 
-class EditCommunityForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    description = baseforms.description
-    text = validators.UnicodeString(strip=True)
+security_field = schemaish.String(
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
 
-def edit_community_view(context, request):
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+tags_field = schemaish.Sequence(schemaish.String())
 
-    system_name = get_setting(context, 'system_name', 'KARL')
-    workflow = get_workflow(ICommunity, 'security', context)
+description_field = schemaish.String(
+    description=('This description will appear in search results and '
+                 'on the community listing page.  Please limit your '
+                 'description to 100 words or less'),
+    validator=validator.All(validator.Length(max=500),
+                                    validator.Required())
+    )
+
+text_field =  schemaish.String(
+    description=('This text will appear on the Overview page for this '
+                 'community.  You can use this to describe the '
+                 'community or to make a special announcement.'))
+
+tools_field = schemaish.Sequence(
+    attr=schemaish.String(),
+    description = 'Select which tools to enable on this community.')
+
+default_tool_field = schemaish.String(
+    description=(
+        'This is the first page people see when they view this '
+        'community.'))
+
+def shared_fields():
+    return [
+        ('tags', tags_field),
+        ('description', description_field),
+        ('text', text_field),
+        ('tools', tools_field)
+        ]
+
+def shared_widgets(context):
+    return {
+        'title':formish.Input(empty=''),
+        'description': formish.TextArea(cols=60, rows=10, empty=''),
+        'text':karlwidgets.RichTextWidget(empty=''),
+        'tools':formish.CheckboxMultiChoice(options=context.tools)
+        }
+
+def get_available_tools(context, request):
+    available_tools = []
     available_tools = queryMultiAdapter(
         (context, request), IToolAddables,
         default=DefaultToolAddables(context, request))()
+    return available_tools
 
-    tags_list = request.POST.getall('tags')
-    form = EditCommunityForm(tags_list=tags_list)
+class AddCommunityFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunity, 'security', context)
+        self.available_tools = get_available_tools(context, request)
+        self.tools = [ (x['name'], x['title']) for x in self.available_tools ]
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def form_defaults(self):
+        defaults = {
+        'title':'',
+        'tags': [], 
+        'description':'',
+        'text':'',
+        'tools':[ t[0] for t in self.tools ],
+        }
+        if self.workflow is not None:
+            defaults['security_state']  = self.workflow.initial_state
+        return defaults
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.title = converted['title']
-            context.description = converted['description']
-            context.text = converted['text']
-            context.default_tool = request.params['default_tool']
-
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
-
-            for info in available_tools:
-                component = info['component']
-                present = component.is_present(context, request)
-                if (not present) and info['name'] in request.params:
-                    component.add(context, request)
-                if present and (info['name'] not in request.params):
-                    component.remove(context, request)
-
-            # *modified* event
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            return HTTPFound(location=location)
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            # Get the default list of tools into sequence of dicts AND
-            # set checked state based on what the user typed in before
-            # invalidation.
-            tools = []
-            default_tools = [
-                {'title': 'Overview', 'name': '',
-                 'selected': (not context.default_tool)},
-                ]
-            for info in available_tools:
-                s = request.params.has_key(info['name'])
-                tools.append(
-                    {'name': info['name'], 'title': info['title'],
-                     'state': s}
-                    )
-                if info['component'].is_present(context, request):
-                    # Add this to the list of choices for
-                    # default_tool, but first find out if it should be
-                    # selected.
-                    selected = False
-                    if request.params['default_tool'] == info['name']:
-                        selected = True
-                    elif context.default_tool == info['name']:
-                        selected = True
-                    default_tools.append(
-                        {'name': info['name'], 'title': info['title'],
-                         'selected': selected}
-                        )
-
-            # provide client data for rendering current tags in the tagbox.
-            # We arrived here because the form is invalid.
-            tagbox_records = [dict(tag=tag) for tag in
-                              request.POST.getall('tags')]
-            # We still need the adapter for the docid
-            # (XXX or, could we get docid without the adapter?)
-            tagquery = getMultiAdapter((context, request), ITagQuery)
-            tagbox_docid = tagquery.docid
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(
-            title=context.title,
-            description=context.description,
-            text=context.text,
-            security_state = security_state,
+    def form_fields(self):
+        fields = shared_fields()
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context),
+                )
             )
+        fields.insert(0, ('title', title_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.insert(4, ('security_state', security_field))
+        return fields
+        
+    def form_widgets(self, fields):
+        widgets = shared_widgets(self)
+        widgets['tags'] = karlwidgets.TagsAddWidget()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-        # Get the default list of tools into a sequence of dicts
-        tools = []
-        default_tools = [
-            {'title': 'Overview', 'name': '',
-             'selected': (not context.default_tool)},
-            ]
-        for info in available_tools:
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Community'}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        name = make_name(context, converted['title'])
+        userid = authenticated_userid(request)
+        community = create_content(ICommunity,
+                                   converted['title'],
+                                   converted['description'],
+                                   converted['text'],
+                                   userid,
+                                   )
+        # required to use moderators_group_name and
+        # members_group_name
+        community.__name__ = name
+        for toolinfo in self.available_tools:
+            if toolinfo['name'] in converted.get('tools', []):
+                toolinfo['component'].add(community, request)
+
+        # By default the "default tool" is None (indicating 'overview')
+        community.default_tool = None
+
+        users = find_users(context)
+        moderators_group_name = community.moderators_group_name
+        members_group_name = community.members_group_name
+
+        for group_name in moderators_group_name, members_group_name:
+            users.add_group(userid, group_name)
+
+        context[name] = community
+
+        if self.workflow is not None:
+            if 'security_state' in converted:
+                self.workflow.transition_to_state(community, request,
+                                                  converted['security_state'])
+        # Save the tags on it.
+        set_tags(community, request, converted['tags'])
+        # Adding a community should take you to the Add Existing
+        # User screen, so the moderator can include some users.
+        location = model_url(community, request,
+                             'members', 'add_existing.html',
+                             query={'status_message':'Community added'})
+        return HTTPFound(location=location)
+
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
+
+def add_community(context, request): # b/c for start_over
+    form = AddCommunityFormController(context, request)
+    return form.handle_submit(request.POST)
+
+class EditCommunityFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunity, 'security', context)
+        self.available_tools = get_available_tools(context, request)
+        self.tools = [ (x['name'], x['title']) for x in self.available_tools ]
+        selected_tools = []
+        for info in self.available_tools:
             component = info['component']
             present = component.is_present(context, request)
-            tools.append(
-                {'name': info['name'], 'title': info['title'],
-                 'state': present}
-                )
             if present:
-                default_tools.append(
-                    {'name': info['name'], 'title': info['title'],
-                     'selected': (context.default_tool == info['name'])}
-                     )
+                selected_tools.append((info['name'], info['title']))
+        self.selected_tools = selected_tools
+        
+    def form_defaults(self):
+        context = self.context
+        defaults = {
+            'title':context.title,
+            'tags': [], # initial values are supplied by widget
+            'description':context.description,
+            'text':context.text,
+            'default_tool':getattr(context, 'default_tool', None),
+            'tools':[t[0] for t in self.selected_tools],
+            }
+        if self.workflow is not None:
+            defaults['security_state']  = self.workflow.state_of(context)
+        return defaults
 
-        # provide client data for rendering current tags in the tagbox.
-        tagquery = getMultiAdapter((context, request), ITagQuery)
-        tagbox_docid = tagquery.docid
-        tagbox_records = tagquery.tagswithcounts
+    def form_fields(self):
+        fields = shared_fields()
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required()))
+        fields.insert(0, ('title', title_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.insert(4, ('security_state', security_field))
+        fields.append(('default_tool', default_tool_field))
+        return fields
 
-    # prepare client data
-    client_json_data = dict(
-        tags_field = dict(
-            records = tagbox_records,
-            docid = tagbox_docid,
-            ),
-    )
+    def form_widgets(self, fields):
+        widgets = shared_widgets(self)
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets['tags'] = karlwidgets.TagsEditWidget(tagdata=tagdata)
+        widgets['default_tool'] = formish.SelectChoice(
+            options=self.selected_tools, none_option=('', 'Overview'))
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
+    
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Edit %s' % self.context.title}
 
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-    return render_form_to_response(
-        'templates/edit_community.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields = api.formfields,
-        fielderrors = fielderrors,
-        tools = tools,
-        default_tools = default_tools,
-        api = api,
-        system_name = system_name,
-        head_data = convert_to_script(client_json_data),
-        security_states = security_states,
-        )
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        workflow = self.workflow
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
+        context.title = converted['title']
+        context.description = converted['description']
+        context.text = converted['text']
+        # NB: this is an edit form, so tags are added immediately via
+        # AJAX; we needn't deal with setting them in the form post
+        tools_present = [None]
+        available_tools = self.available_tools
+        for info in available_tools:
+            component = info['component']
+            tool_name = info['name']
+            tools_present.append(tool_name)
+            present = component.is_present(context, request)
+            if (not present) and tool_name in converted['tools']:
+                component.add(context, request)
+            if present and (tool_name not in converted['tools']):
+                component.remove(context, request)
+                tools_present.remove(tool_name)
+        if converted['default_tool'] in tools_present:
+            context.default_tool = converted['default_tool']
+        elif not (context.default_tool in tools_present):
+            context.default_tool = None
+
+        # *modified* event
+        objectEventNotify(ObjectModifiedEvent(context))
+        location = model_url(context, request)
+        return HTTPFound(location=location)
+
+    def _get_security_states(self):
+        return get_security_states(self.workflow, self.context, self.request)
 
 def get_recent_items_batch(community, request, size=10):
     batch = get_catalog_batch_grid(

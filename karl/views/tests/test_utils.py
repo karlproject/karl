@@ -373,6 +373,28 @@ class TestHandlePhotoUpload(unittest.TestCase):
         self._callFUT(context, form)
         self.assertFalse('photo.jpg' in context)
 
+    def test_upload_has_mimetype_instead_of_type(self):
+        from cStringIO import StringIO
+        from karl.models.tests.test_image import one_pixel_jpeg
+        from karl.models.interfaces import IImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        def make_image(upload_file, upload_type):
+            res = testing.DummyModel()
+            res.extension = 'jpg'
+            res.size = 1
+            return res
+        registerContentFactory(make_image, IImageFile)
+
+        context = testing.DummyModel()
+        context.get_photo = lambda: None
+        upload = DummyUpload(StringIO(one_pixel_jpeg), None)
+        del upload.type
+        upload.mimetype = 'image/jpeg'
+        form = {'photo': upload}
+        self._callFUT(context, form, thumbnail=True)
+        self.assertTrue('photo.jpg' in context)
+        self.assertTrue('source_photo' in context)
+
 class TestMakeThumbnail(unittest.TestCase):
 
     def _callFUT(self, upload_file, upload_type):

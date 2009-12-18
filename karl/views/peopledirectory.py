@@ -17,7 +17,6 @@
 
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ILetterManager
-from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
 from karl.utils import find_peopledirectory
@@ -26,10 +25,10 @@ from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.utils import convert_to_script
+from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
-from repoze.bfg.security import Unauthorized
 from repoze.bfg.url import model_url
 from simplejson import JSONEncoder
 from webob import Response
@@ -48,7 +47,7 @@ def peopledirectory_view(context, request):
         section = context[section_id]
         if has_permission('view', section, request):
             return section_view(section, request)
-    raise Unauthorized("No accessible sections")
+    raise Forbidden("No accessible sections")
 
 def get_tabs(peopledir, request, current_sectionid):
     """Return a list of dictionaries containing tabs to display in the UI"""
@@ -102,7 +101,7 @@ def section_view(context, request):
             report = context.values()[0]
             if has_permission('view', report, request):
                 return report_view(report, request)
-            raise Unauthorized("Report is not accessible")
+            raise Forbidden("Report is not accessible")
 
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)

@@ -17,13 +17,16 @@
 
 import datetime
 
+import formish
+import schemaish
+from schemaish.type import File as SchemaFile
+from validatish import validator
+
 from webob.exc import HTTPFound
 
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.component.event import objectEventNotify
-
-from formencode import Invalid
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
@@ -33,8 +36,6 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.workflow import get_workflow
-
-from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
 
@@ -56,9 +57,9 @@ from karl.utils import support_attachments
 from karl.utilities.interfaces import IKarlDates
 
 from karl.views.api import TemplateAPI
-from karl.views import baseforms
 
-from karl.views.form import render_form_to_response
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms.filestore import get_filestore
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.views.tags import set_tags
@@ -67,9 +68,9 @@ from karl.views.tags import get_tags_client_data
 
 from karl.content.views.utils import extract_description
 from karl.content.views.interfaces import IBylineInfo
-from karl.content.views.utils import store_attachments
+from karl.content.views.utils import upload_attachments
 from karl.content.views.utils import fetch_attachments
-
+ 
 def titlesort(one, two):
     return cmp(one.title, two.title)
 
@@ -190,228 +191,168 @@ def show_forum_view(context, request):
         layout=layout,
         )
 
-
-def add_forum_view(context, request):
-
-    form = AddForumForm()
-    workflow = get_workflow(IForum, 'security', context)
-
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-
-            forum = create_content(IForum,
-                converted['title'],
-                converted['description'],
-                authenticated_userid(request),
-                )
-
-            name = make_unique_name(context, converted['title'])
-            context[name] = forum
-
-            # Set up workflow
-            if workflow is not None:
-                workflow.initialize(forum)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(forum, request,
-                                                 converted['security_state'])
-
-            location = model_url(forum, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.initial_state
-        fill_values = dict(security_state = security_state)
-
-
-    # Render the form and shove some default values in
-    page_title = 'Add Forum'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/add_forum.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        security_states = security_states,
+tags_field = schemaish.Sequence(schemaish.String())
+text_field = schemaish.String()
+security_field = schemaish.String(
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
+attachments_field = schemaish.Sequence(schemaish.File(),
+                                       title='Attachments')
+title_field = schemaish.String(
+    validator=validator.All(
+        validator.Length(max=100),
+        validator.Required(),
         )
+    )
+description_field = schemaish.String(
+    validator=validator.Length(max=500),
+    description=("This description will appear in search "
+                 "results and on the community listing page. Please "
+                 "limit your description to 100 words or less.")
+    )
 
+class AddForumFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IForum, 'security', self.context)
 
-def edit_forum_view(context, request):
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    form = EditForumForm()
-    workflow = get_workflow(IForum, 'security', context)
+    def form_defaults(self):
+        defaults = {
+            'title':'',
+            'description':''}
+        
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('description', description_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'description':formish.TextArea(cols=60, rows=10, empty=''),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Forum', 'actions':()}
 
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            context.title = converted['title']
-            context.description = converted['description']
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        workflow = self.workflow
 
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = "?status_message=Forum%20edited"
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(
-            title = context.title,
-            description = context.description,
-            security_state = security_state,
+        forum = create_content(IForum,
+            converted['title'],
+            converted['description'],
+            authenticated_userid(request),
             )
 
+        name = make_unique_name(context, converted['title'])
+        context[name] = forum
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+        # Set up workflow
+        if workflow is not None:
+            workflow.initialize(forum)
+            if 'security_state' in converted:
+                workflow.transition_to_state(forum, request,
+                                             converted['security_state'])
 
-    return render_form_to_response(
-        'templates/edit_forum.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        security_states = security_states,
-        )
+        location = model_url(forum, request)
+        return HTTPFound(location=location)
 
-def add_forum_topic_view(context, request):
+class EditForumFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IForum, 'security', context)
 
-    tags_list=request.POST.getall('tags')
-    form = AddForumTopicForm(tags_list=tags_list)
-    workflow = get_workflow(IForumTopic, 'security', context)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, self.context, self.request)
+        
+    def form_defaults(self):
+        defaults = {
+            'title':self.context.title,
+            'description':self.context.description}
+        
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(self.context)
+        return defaults
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('description', description_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'description':formish.TextArea(cols=60, rows=10, empty=''),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Edit Forum %s' % self.context.title,
+                'actions':()}
 
-            try:
-                name = make_unique_name(context, converted['title'])
-            except (ValueError, AttributeError), why:
-                url = model_url(context, request, request.view_name,
-                                query={'status_message':why[0]})
-                return HTTPFound(location=url)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            creator = authenticated_userid(request)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
 
-            topic = create_content(IForumTopic,
-                converted['title'],
-                converted['text'],
-                creator,
-                )
+        context.title = converted['title']
+        context.description = converted['description']
 
-            topic.description = extract_description(converted['text'])
-            context[name] = topic
+        # Modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
 
-            # Set up workflow
-            if workflow is not None:
-                workflow.initialize(topic)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(topic, request,
-                                                 converted['security_state'])
-
-            # Tags and attachments
-            set_tags(context, request, converted['tags'])
-            if support_attachments(topic):
-                store_attachments(topic['attachments'], request.params, creator)
-
-            location = model_url(topic, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.initial_state
-        fill_values = dict(security_state=security_state)
-        tags_field = dict(records=[])
-
-    # Render the form and shove some default values in
-    page_title = 'Add Forum Topic'
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
-
-    return render_form_to_response(
-        'templates/add_forumtopic.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-                )),
-        layout=layout,
-        security_states = security_states,
-        )
+        location = model_url(context, request,
+                             query={'status_message':'Forum Edited'})
+        return HTTPFound(location=location)
 
 def show_forum_topic_view(context, request):
     post_url = model_url(context, request, "comments", "add_comment.html")
@@ -502,92 +443,207 @@ def show_forum_topic_view(context, request):
         )
 
 
-def edit_forum_topic_view(context, request):
+class AddForumTopicFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IForum, 'security', context)
+        self.filestore = get_filestore(context, request, 'add-forumtopic')
 
-    tags_list = request.POST.getall('tags')
-    form = EditForumTopicForm(tags_list=tags_list)
-    workflow = get_workflow(IForumTopic, 'security', context)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def form_defaults(self):
+        defaults = {
+            'title':'',
+            'tags':[],
+            'text':'',
+            'attachments':[],
+            }
+            
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        fields.append(('attachments', attachments_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsAddWidget(),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
+    def __call__(self):
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('community')
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Forum Topic', 'actions':(),
+                'layout':layout}
 
-            context.title = converted['title']
-            context.text = converted['text']
-            context.description = extract_description(converted['text'])
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
 
-            # Save new attachments
-            creator = authenticated_userid(request)
-            if support_attachments(context):
-                store_attachments(
-                    context['attachments'], request.params, creator)
+        name = make_unique_name(context, converted['title'])
+        creator = authenticated_userid(request)
 
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
+        topic = create_content(IForumTopic,
+            converted['title'],
+            converted['text'],
+            creator,
+            )
 
-            location = model_url(context, request)
-            msg = "?status_message=Forum%20Topic%20edited"
-            return HTTPFound(location=location+msg)
+        topic.description = extract_description(converted['text'])
+        context[name] = topic
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = form.from_python(dict(
-                title = context.title,
-                text = context.text,
-                security_state = security_state,
-                ))
+        # Set up workflow
+        if workflow is not None:
+            workflow.initialize(topic)
+            if 'security_state' in converted:
+                workflow.transition_to_state(topic, request,
+                                             converted['security_state'])
 
-    # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-        )
+        # Tags and attachments
+        set_tags(context, request, converted['tags'])
+        if support_attachments(topic):
+            upload_attachments(converted['attachments'], topic['attachments'],
+                               creator, request)
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+        location = model_url(topic, request)
+        return HTTPFound(location=location)
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+class EditForumTopicFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IForum, 'security', context)
+        self.filestore = get_filestore(context, request, 'edit-forumtopic')
 
-    return render_form_to_response(
-        'templates/edit_forumtopic.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(client_json_data),
-        layout=layout,
-        security_states = security_states,
-        )
+    def _get_security_states(self):
+        return get_security_states(self.workflow, self.context, self.request)
+
+    def form_defaults(self):
+        attachments = [SchemaFile(None, x.__name__, x.mimetype)
+                       for x in self.context['attachments'].values()]
+        defaults = {
+            'title':self.context.title,
+            'tags':[], # initial values supplied by widget
+            'text':self.context.text,
+            'attachments':attachments,
+            }
+            
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(self.context)
+        return defaults
+
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        fields.append(('attachments', attachments_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
+
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
+
+    def __call__(self):
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('community')
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api,
+                'page_title':'Edit Forum Topic %s' % self.context.title,
+                'actions':(), 'layout':layout}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
+
+        context.title = converted['title']
+        context.text = converted['text']
+        context.description = extract_description(converted['text'])
+
+        # Save the tags on it
+        set_tags(context, request, converted['tags'])
+
+        # Save new attachments
+        creator = authenticated_userid(request)
+        if support_attachments(context):
+            upload_attachments(converted['attachments'], context['attachments'],
+                               creator, request)
+
+        # Modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        location = model_url(context, request,
+                             query={'status_message':'Forum Topic Edited'})
+        return HTTPFound(location=location)
 
 def number_of_topics(forum):
     return len(forum)
@@ -622,23 +678,4 @@ def get_topic_batch(forum, request):
         path={'query': model_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         )
-
-
-class AddForumForm(FormSchema):
-    title = baseforms.title
-    description = baseforms.description
-
-class EditForumForm(FormSchema):
-    title = baseforms.title
-    description = baseforms.description
-
-class AddForumTopicForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-
-class EditForumTopicForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
 

@@ -18,8 +18,12 @@
 import calendar
 import datetime
 
+import formish
+import schemaish
+from validatish import validator
+from schemaish.type import File as SchemaFile
+
 from webob.exc import HTTPFound
-from formencode import Invalid
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
@@ -28,20 +32,18 @@ from zope.interface import implements
 
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
-from repoze.enformed import FormSchema
 
 from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import extract_description
-from karl.content.views.utils import store_attachments
 from karl.content.views.utils import fetch_attachments
+from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.security.workflow import get_security_states
@@ -52,17 +54,18 @@ from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
 from karl.utils import coarse_datetime_repr
-from karl.views import baseforms
 from karl.views.api import TemplateAPI
-from karl.views.form import render_form_to_response
 from karl.views.interfaces import ISidebar
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
-from karl.views.utils import templates_formfields_path
+
 from karl.views.batch import get_container_batch
-from karl.views.baseforms import security_state as security_state_field
+
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
 
@@ -232,200 +235,217 @@ def show_blogentry_view(context, request):
         security_states = security_states,
         )
 
+tags_field = schemaish.Sequence(schemaish.String())
+text_field = schemaish.String()
+sendalert_field = schemaish.Boolean(
+    title='Send Alert',
+    description='Send email alert to community members?')
+security_field = schemaish.String(
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
+attachments_field = schemaish.Sequence(schemaish.File(),
+                                       title='Attachments')
 
-def add_blogentry_view(context, request):
+class AddBlogEntryFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IBlogEntry, 'security', context)
+        self.filestore = get_filestore(context, request, 'add-blogentry')
 
-    fieldwidgets = get_template(templates_formfields_path)
-    tags_list=request.POST.getall('tags')
-    form = AddBlogEntryForm(tags_list = tags_list)
-    workflow = get_workflow(IBlogEntry, 'security', context)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
+    def form_defaults(self):
+        defaults = {
+            'title':'',
+            'tags':[],
+            'text':'',
+            'attachments':[],
+            'sendalert':True
+            }
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-
-            name = make_unique_name(context, converted['title'])
-
-            creator = authenticated_userid(request)
-
-            blogentry = create_content(IBlogEntry,
-                converted['title'],
-                converted['text'],
-                extract_description(converted['text']),
-                creator,
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context),
                 )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        fields.append(('attachments', attachments_field))
+        fields.append(('sendalert', sendalert_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
+            
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsAddWidget(),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            'sendalert':formish.widgets.Checkbox(),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-            context[name] = blogentry
 
-            # Set up workflow
-            if workflow is not None:
-                workflow.initialize(blogentry)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(blogentry, request,
-                                                 converted['security_state'])
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Blog Entry', 'actions':()}
 
-            # Tags, attachments, alerts
-            set_tags(blogentry, request, converted['tags'])
-            store_attachments(blogentry['attachments'],
-                              request.params, creator)
-            if converted['sendalert']:
-                alerts = queryUtility(IAlerts, default=Alerts())
-                alerts.emit(blogentry, request)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            location = model_url(blogentry, request)
-            return HTTPFound(location=location)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        name = make_unique_name(context, converted['title'])
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            fill_values = {'security_state':''}
-        else:
-            fill_values = {'security_state':workflow.initial_state}
+        creator = authenticated_userid(request)
 
-    # provide client data for rendering current tags in the tagbox.
-    if 'form.submitted' in request.POST:
-        # We arrived here because the form is invalid.
-        tagbox_records = [dict(tag=tag) for tag in request.POST.getall('tags')]
-    else:
-        # Since this is a new entry, we start with no tags.
-        tagbox_records = []
-
-    client_json_data = convert_to_script(dict(
-        tags_field = dict(
-            # There is no document right now, so we leave docid empty.
-            # This will cause the count links become non-clickable.
-            records = tagbox_records,
-            ),
-    ))
-
-    # Render the form and shove some default values in
-    page_title = 'Add Blog Entry'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/add_blogentry.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=fieldwidgets,
-        fielderrors=fielderrors,
-        api=api,
-        form=form,
-        head_data=client_json_data,
-        security_states = security_states,
-        )
-
-def edit_blogentry_view(context, request):
-
-    tags_list = request.POST.getall('tags')
-    form = EditBlogEntryForm(tags_list=tags_list)
-    workflow = get_workflow(IBlogEntry, 'security', context)
-
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
-
-    if security_states:
-        form.add_field('security_state', security_state_field)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if 'security_state' in converted:
-                if workflow is not None:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.title = converted['title']
-            context.text = converted['text']
-            context.description = extract_description(converted['text'])
-
-            # Save the attachments
-            # This is handled out of the form
-            attachments = []
-            for key, value in request.params.iteritems():
-                if key.startswith('attachment') and value != '':
-                    attachments.append(value)
-
-            # Tags and attachments
-            set_tags(context, request, converted['tags'])
-            store_attachments(context['attachments'],
-                              request.params, authenticated_userid(request))
-
-            # modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(
-            title=context.title,
-            text=context.text,
-            security_state = security_state,
+        blogentry = create_content(IBlogEntry,
+            converted['title'],
+            converted['text'],
+            extract_description(converted['text']),
+            creator,
             )
 
-   # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-        )
+        context[name] = blogentry
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+        # Set up workflow
+        if workflow is not None:
+            workflow.initialize(blogentry)
+            if 'security_state' in converted:
+                workflow.transition_to_state(blogentry, request,
+                                             converted['security_state'])
 
-    return render_form_to_response(
-        'templates/edit_blogentry.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(client_json_data),
-        security_states = security_states,
-        )
+        # Tags, attachments, alerts
+        set_tags(blogentry, request, converted['tags'])
+        attachments_folder = blogentry['attachments']
+        upload_attachments(converted['attachments'], attachments_folder,
+                           creator, request)
 
-class AddBlogEntryForm(FormSchema):
-    title = baseforms.title
-    text = baseforms.text
-    tags = baseforms.tags
-    sendalert = baseforms.sendalert
+        if converted['sendalert']:
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(blogentry, request)
 
-class EditBlogEntryForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-    sendalert = baseforms.sendalert
+        location = model_url(blogentry, request)
+        self.filestore.clear()
+        return HTTPFound(location=location)
+
+class EditBlogEntryFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IBlogEntry, 'security', context)
+        self.filestore = get_filestore(context, request, 'edit-blogentry')
+
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
+
+    def form_defaults(self):
+        context = self.context
+        attachments = [SchemaFile(None, x.__name__, x.mimetype)
+                       for x in context['attachments'].values()]
+        defaults = {
+            'title':context.title,
+            'tags':[], # initial values supplied by widget
+            'text':context.text,
+            'attachments':attachments,
+            }
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(context)
+        return defaults
+
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        fields.append(('attachments', attachments_field))
+        fields.append(('sendalert', sendalert_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
+
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+             }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
+
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Edit Blog Entry', 'actions':()}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if 'security_state' in converted:
+            if workflow is not None:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
+
+        context.title = converted['title']
+        context.text = converted['text']
+        context.description = extract_description(converted['text'])
+
+        # Tags and attachments
+        set_tags(context, request, converted['tags'])
+        creator = authenticated_userid(request)
+        attachments_folder = context['attachments']
+        upload_attachments(converted['attachments'], attachments_folder,
+                           creator, request)
+        # modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        location = model_url(context, request)
+        self.filestore.clear()
+        return HTTPFound(location=location)
 
 def coarse_month_range(year, month):
     """Returns the range of coarse datetimes for a month."""
@@ -475,3 +495,4 @@ class BlogSidebar(object):
             activity_list=activity_list,
             blog_url=blog_url,
             )
+

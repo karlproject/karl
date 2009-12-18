@@ -20,10 +20,14 @@ import re
 from lxml.etree import XMLSyntaxError
 from lxml.html import document_fromstring
 
+from repoze.bfg.security import has_permission
+
 from repoze.lemonade.content import create_content
 from repoze.bfg.url import model_url
 
 from zope.component import getMultiAdapter
+
+from karl.utils import get_setting
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
@@ -62,6 +66,38 @@ def store_attachments(attachments_folder, params, creator):
             )
         check_upload_size(attachments_folder, obj, 'attachment')
 
+def upload_attachments(attachments, folder, creator, request):
+    """ This creates *and removes* attachments based on information
+    retrieved from a form"""
+    for attachment in attachments:
+        if attachment.filename:
+            mimetype = attachment.mimetype
+            filename = make_unique_name(
+                folder,
+                basename_of_filepath(attachment.filename)
+                )
+            folder[filename] = obj = create_content(
+                ICommunityFile,
+                title = filename,
+                stream = attachment.file,
+                mimetype = mimetype,
+                filename = filename,
+                creator = creator,
+                )
+            max_size = int(get_setting(folder, 'upload_limit', 0))
+            if max_size and obj.size > max_size:
+                msg = 'File size exceeds upload limit of %d.' % max_size
+                raise ValueError(msg)
+        else:
+            meta = attachment.metadata
+            if meta.get('remove') and meta.get('default'):
+                name = meta['default']
+                if name in folder:
+                    ob = folder[name]
+                    if has_permission('delete', ob, request):
+                        del folder[name]
+        
+
 
 def get_previous_next(context, request):
 
@@ -92,38 +128,6 @@ def get_previous_next(context, request):
 
     return previous, next
 
-
-from karl.content.views.interfaces import IShowIsPrivate
-from zope.component import queryMultiAdapter
-
-def get_show_is_private(context, request, form=None):
-    # Get the policy, if any, on whether to hide the "Is Private"
-    # field (for OSI, inside private communities.)
-    adapter = queryMultiAdapter((context, request), IShowIsPrivate)
-    if adapter is not None:
-        show_is_private = adapter()
-    else:
-        show_is_private = True
-    if show_is_private and form is not None:
-        # Add a field to the form
-        from karl.views.baseforms import sharing
-        form.add_field('sharing', sharing)
-    return show_is_private
-
-def add_security_state_field(context, request, form=None):
-    # Get the policy, if any, on whether to hide the security state
-    # field
-    adapter = queryMultiAdapter((context, request), IShowIsPrivate)
-    if adapter is not None:
-        show_field = adapter()
-    else:
-        show_field = True
-    if show_field and form is not None:
-        # Add a field to the form
-        from karl.views.baseforms import security_state
-        form.add_field('security_state', security_state)
-    return show_field
-    
 def extract_description(htmlstring):
     """ Get a summary-style description from the HTML in text field """
     # XXX This gets called from other units, and therefore gets tested

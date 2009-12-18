@@ -15,18 +15,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import formish
+import schemaish
+from validatish import validator
+
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
-
-from formencode import Invalid
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
-from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
 
@@ -40,14 +41,13 @@ from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
 
 from karl.views.api import TemplateAPI
-from karl.views import baseforms
 
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import make_name
 from karl.views.tags import set_tags
-from karl.views.form import render_form_to_response
-from karl.views.baseforms import security_state as security_state_field
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidators
 
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
@@ -55,120 +55,128 @@ from karl.content.views.utils import extract_description
 
 from karl.security.workflow import get_security_states
 
+_wiki_text_help = """You can create a new page by naming it and surrounding
+the name with ((double parentheses)). When you save the page, the contents
+of the parentheses will have a small + link next to it, which you can click
+to create a new page with that name."""
+
+tags_field = schemaish.Sequence(schemaish.String())
+text_field = schemaish.String(
+    title='Body text',
+    description=_wiki_text_help,
+    )
+sendalert_field = schemaish.Boolean(
+    title='Send Alert',
+    description='Send email alert to community members?')
+security_field = schemaish.String(
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
+
 def redirect_to_front_page(context, request):
 
     front_page = context['front_page']
     location = model_url(front_page, request)
     return HTTPFound(location=location)
 
-def add_wikipage_view(context, request):
 
-    tags_list = request.POST.getall('tags')
-    form = AddWikiPageForm(tags_list = tags_list)
-    workflow = get_workflow(IWikiPage, 'security', context)
+class AddWikiPageFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IWikiPage, 'security', context)
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_defaults(self):
+        defaults = {
+            'title':self.request.params.get('title', ''),
+            'tags':[],
+            'text':'',
+            'sendalert':True,
+            }
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            wikipage = create_content(
-                IWikiPage,
-                converted['title'],
-                converted['text'],
-                extract_description(converted['text']),
-                authenticated_userid(request),
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context),
                 )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        fields.append(('sendalert', sendalert_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-            name = make_name(context, converted['title'])
-            context[name] = wikipage
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Hidden(empty=''),
+            'tags':karlwidgets.TagsAddWidget(),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            'sendalert':formish.widgets.Checkbox(),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
+        
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        head_data = convert_to_script(dict(
+            text = dict(enable_wiki_plugin = True),
+            ))
+        return {'api':api, 'page_title':'Add Wiki Page', 'actions':(),
+                'head_data':head_data}
 
-            if workflow is not None:
-                workflow.initialize(wikipage)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(wikipage,
-                                                 request,
-                                                 converted['security_state'])
-                                             
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            # Save the tags on it.
-            set_tags(wikipage, request, converted['tags'])
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        workflow = self.workflow
+        wikipage = create_content(
+            IWikiPage,
+            converted['title'],
+            converted['text'],
+            extract_description(converted['text']),
+            authenticated_userid(request),
+            )
 
-            if converted['sendalert']:
-                alerts = queryUtility(IAlerts, default=Alerts())
-                alerts.emit(wikipage, request)
+        name = make_name(context, converted['title'])
+        context[name] = wikipage
 
-            msg = '?status_message=Wiki%20Page%20created'
-            location = model_url(wikipage, request) + msg
-            return HTTPFound(location=location)
+        if workflow is not None:
+            workflow.initialize(wikipage)
+            if 'security_state' in converted:
+                workflow.transition_to_state(wikipage,
+                                             request,
+                                             converted['security_state'])
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.initial_state
-        fill_values = dict(security_state=security_state)
+        # Save the tags on it.
+        set_tags(wikipage, request, converted['tags'])
 
-    # provide client data for rendering current tags in the tagbox.
-    if 'form.submitted' in request.POST:
-        # We arrived here because the form is invalid.
-        tagbox_records = [dict(tag=tag) for tag in form.formdata.getall('tags')]
-    else:
-        # Since this is a new entry, we start with no tags.
-        tagbox_records = []
+        if converted['sendalert']:
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(wikipage, request)
 
-    client_json_data = convert_to_script(dict(
-        tags_field = dict(
-            # There is no document right now, so we leave docid empty.
-            # This will cause the count links become non-clickable.
-            records = tagbox_records,
-            ),
-        text = dict(
-            # This is the simplest way to pass information
-            # to the tinyMCE widget.
-            enable_wiki_plugin = True,
-            ),
-    ))
-
-    # Wiki pages get passed a value for the title field in the query
-    # string as part of clicking on the + from the referrer.
-    title = request.params.get('title', False)
-    if title is False:
-        raise ValueError, "URL must have a title passed into it"
-
-    fill_values['title'] = title
-
-    # Render the form and shove some default values in
-    page_title = 'Add "' + title + '"'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/add_wikipage.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=client_json_data,
-        labels={'text': 'Hello There'},
-        security_states = security_states,
-        )
-
-
+        msg = '?status_message=Wiki%20Page%20created'
+        location = model_url(wikipage, request) + msg
+        return HTTPFound(location=location)
+        
 def show_wikipage_view(context, request):
 
     is_front_page = (context.__name__ == 'front_page')
@@ -210,109 +218,97 @@ def show_wikipage_view(context, request):
         backto=backto,
         )
 
-def edit_wikipage_view(context, request):
+class EditWikiPageFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(IWikiPage, 'security', context)
 
-    tags_list = request.POST.getall('tags')
-    form = EditWikiPageForm(tags_list = tags_list)
-    workflow = get_workflow(IWikiPage, 'security', context)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def form_defaults(self):
+        defaults = {
+            'title':self.context.title,
+            'tags':[],
+            'text':self.context.text,
+            }
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(self.context)
+        return defaults
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_fields(self):
+        fields = []
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(
+                    self.context.__parent__,
+                    exceptions=(self.context.title,)),
+                )
+            )
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('text', text_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
+        
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text':karlwidgets.RichTextWidget(empty=''),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        # prepare client data
+        head_data = convert_to_script(dict(
+            text = dict(enable_wiki_plugin = True),
+            ))
+        return {'api':api, 'page_title':'Add Wiki Page', 'actions':(),
+                'head_data':head_data}
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
 
-            context.text = converted['text']
-            context.description = extract_description(converted['text'])
-            newtitle = converted['title']
-            if newtitle != context.title:
-                # change_title changes the page's title but also fixes
-                # up referent links in other pages in the wiki
-                try:
-                    context.change_title(newtitle)
-                except ValueError, why:
-                    # the title may already be the title of an existing page
-                    msg = str(why)
-                    raise Invalid(msg, newtitle, None,
-                                  error_dict={'title':msg})
+        context.text = converted['text']
+        context.description = extract_description(converted['text'])
+        newtitle = converted['title']
+        if newtitle != context.title:
+            context.change_title(newtitle)
 
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
+        # Save the tags on it
+        set_tags(context, request, converted['tags'])
 
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
+        # Modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
 
-            location = model_url(context, request)
-            msg = "?status_message=Wiki%20Page%20edited"
-            return HTTPFound(location=location+msg)
+        location = model_url(context, request)
+        msg = "?status_message=Wiki%20Page%20edited"
+        return HTTPFound(location=location+msg)
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(text=context.text,
-                           title=context.title,
-                           security_state = security_state)
-
-    # prepare client data
-    client_json_data = convert_to_script(dict(
-        tags_field = get_tags_client_data(context, request),
-        # This is the simplest way to pass information
-        # to the tinyMCE widget.
-        text = dict(enable_wiki_plugin = True),
-        ))
-
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/edit_wikipage.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        help={'text': _wiki_text_help,},
-        head_data=client_json_data,
-        security_states = security_states,
-        )
-
-class AddWikiPageForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-    sendalert = baseforms.sendalert
-
-class EditWikiPageForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-
-_wiki_text_help = """You can create a new page by naming it and surrounding
-the name with ((double parentheses)). When you save the page, the contents
-of the parentheses will have a small + link next to it, which you can click
-to create a new page with that name."""

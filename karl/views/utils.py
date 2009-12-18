@@ -267,7 +267,10 @@ def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
     upload = form.get("photo", None)
     if upload is not None:
         upload_file = upload.file
-        upload_type = upload.type
+        if hasattr(upload, 'type'):
+            upload_type = upload.type # FieldStorage
+        else:
+            upload_type = upload.mimetype # Formish File object
         assert upload_type
 
         if thumbnail:

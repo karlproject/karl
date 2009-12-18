@@ -77,6 +77,7 @@ class SampleGenTests(unittest.TestCase):
         registerContentFactory(DummyBlogEntry, IBlogEntry)
 
         site = testing.DummyModel()
+        site.sessions = DummySessions()
         site.catalog = karl.testing.DummyCatalog()
         community = testing.DummyModel()
         site['community'] = community
@@ -212,3 +213,10 @@ class DummyCalendarEvent(testing.DummyModel):
 
 class DummyCommunityFile(testing.DummyModel):
     size = 3
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
+    

@@ -276,8 +276,11 @@ class CommunityInfo(object):
     @property
     def last_activity_date(self):
         if self._content_modified is None:
-            self._content_modified = self.context.content_modified.strftime(
-                "%m/%d/%Y")
+            # we avoid use of strftime here to banish it from profiler
+            # output (for /communities), although this is probably no
+            # faster IRL
+            m = self.context.content_modified
+            self._content_modified = '%02d/%02d/%s' % (m.month, m.day, m.year)
         return self._content_modified
 
     @property

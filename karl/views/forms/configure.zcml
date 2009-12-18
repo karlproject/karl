@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.repoze.org/bfg"
+           xmlns:formish="http://namespaces.repoze.org/formish">
+
+  <include package="repoze.bfg.formish" file="meta.zcml"/>
+
+  <formish:add_template_path
+     path="templates"
+   />
+
+</configure>

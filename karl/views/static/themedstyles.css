@@ -121,6 +121,14 @@ label {
   border: 1px solid #eda379;
 }
 
+/** =FORMISH FORMS
+----------------------------------------------- */
+
+label.required {
+    background-image: url(images/required.gif);
+}
+
+
 
 /** =SHARED
 ----------------------------------------------- */

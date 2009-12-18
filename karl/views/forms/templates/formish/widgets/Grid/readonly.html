@@ -1,0 +1,11 @@
+<table id="${field.cssname}"
+       tal:define="rows list(field.fields)">
+  <thead>
+    <tr tal:repeat="f rows[0].fields">
+      <th>${f.title}</th>
+    </tr>
+  </thead>
+  <tr tal:repeat="row rows">
+    <td tal:repeat="f row.fields" tal:content="structure f.widget()"></td>
+  </tr>
+</table>

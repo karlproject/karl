@@ -96,7 +96,8 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.generic_layout, renderer)
+        api.generic_layout(a=1)
+        renderer.assert_(a=1)
         
     def test_anonymous_layout(self):
         renderer = testing.registerDummyRenderer(
@@ -104,7 +105,8 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.anonymous_layout, renderer)
+        api.anonymous_layout(a=1)
+        renderer.assert_(a=1)
 
     def test_community_layout(self):
         renderer = testing.registerDummyRenderer(
@@ -112,7 +114,8 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.community_layout, renderer)
+        api.community_layout(a=1)
+        renderer.assert_(a=1)
 
     def test_getitem(self):
         context = testing.DummyModel()

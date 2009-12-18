@@ -3,13 +3,10 @@ import transaction
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 
-from repoze.bfg.router import make_app as bfg_make_app
 from repoze.bfg.traversal import model_path
 from repoze.bfg import testing
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
-from repoze.zodbconn.finder import PersistentApplicationFinder
-from repoze.who.plugins.zodb.users import Users
 
 from karl.bootstrap.interfaces import IInitialData
 from karl.bootstrap.data import DefaultInitialData
@@ -17,7 +14,7 @@ from karl.models.interfaces import IIntranets
 from karl.content.views.intranets import add_intranet_view
 from karl.models.site import Site
 from karl.models.interfaces import IProfile
-from karl.views.communities import add_community_view
+from karl.views.community import AddCommunityFormController
 
 def populate(root, do_transaction_begin=True):
     if do_transaction_begin:
@@ -86,30 +83,32 @@ def populate(root, do_transaction_begin=True):
 
     # Create a Default community
     request.POST = FauxPost(request.POST)
-    request.POST['title'] = 'default'
-    request.POST['description'] = 'Created by startup script'
-    request.POST['text'] = '<p>Default <em>values</em> in here.</p>'
-    request.POST['security_state'] = 'public'
-    for key in COMMUNIITY_INCLUDED_TOOLS:
-        request.POST[key] = True
-    request.POST['form.submitted'] = True
+    converted = {}
+    converted['title'] = 'default'
+    converted['description'] = 'Created by startup script'
+    converted['text'] = '<p>Default <em>values</em> in here.</p>'
+    converted['security_state'] = 'public'
+    converted['tags'] = ''
+    converted['tools'] = COMMUNIITY_INCLUDED_TOOLS
 
     communities = site['communities']
-    add_community_view(communities, request)
+    add_community = AddCommunityFormController(communities, request)
+    add_community.handle_submit(converted)
     communities['default'].title = 'Default Community'
 
     # Import office data, if there is any
     office_data = data.office_data
     if office_data is not None:
         INTRANET_INCLUDED_TOOLS = data.intranet_tools
-        for key in COMMUNIITY_INCLUDED_TOOLS:
-            del request.POST[key]
-        for key in INTRANET_INCLUDED_TOOLS:
-            request.POST[key] = True
-        request.POST['title'] = 'offices'
-        request.POST['description'] = 'Intranet'
-        request.POST['text'] = ''
-        add_community_view(site, request)
+        converted = {}
+        converted['title'] = 'offices'
+        converted['description'] = 'Intranet'
+        converted['text'] = ''
+        converted['security_state'] = 'public'
+        converted['tags'] = ''
+        converted['tools'] = INTRANET_INCLUDED_TOOLS
+        add_community = AddCommunityFormController(site, request)
+        add_community.handle_submit(converted)
         offices = site['offices']
         offices.title = office_data.title
 

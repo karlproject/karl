@@ -1,0 +1,22 @@
+<fieldset 
+   tal:define="addremoveclass field.widget.addremove is True and ' addremove' or '';
+               sortableclass field.widget.sortable is True and ' sortable' or ''"
+   id="${field.cssname}--field" 
+   class="${field.classes}${addremoveclass}${sortableclass}">
+  <!-- sequence/main.html -->
+  <span class="formish-sequencedata" 
+        title="batch_add_count=${field.widget.batch_add_count}"> </span>
+  <label tal:condition="field.widget.type != 'Hidden'"
+         for="${field.cssname}" tal:attributes="class field.required and 'required' or None">${field.title}</label>
+  <span class="seqgrab"></span>
+  <div tal:condition="hasattr(field.errors, 'message')">${unicode(field.error)}</div>
+  <span tal:repeat="f field.fields" tal:replace="structure f()"/>
+  <div tal:condition="str(field.description) != ''" 
+       class="description">${field.description}</div>
+  <input tal:define="urlquote import:urllib.quote"
+         tal:condition="field.type is 'sequence' and field.widget.addremove is True"
+         type="hidden"
+         class="adder"
+         name="${field.template.name}"
+         value="${urlquote(field.template().encode('utf8'))}"/>
+</fieldset>

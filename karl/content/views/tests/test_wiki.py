@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 from zope.interface import implements
 
 from repoze.bfg import testing
@@ -40,55 +40,16 @@ class TestRedirectToFrontPage(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/front_page/')
 
-class TestAddWikipageView(unittest.TestCase):
+class TestAddWikiPageFormController(unittest.TestCase):
+    def _makeOne(self, context, request):
+        from karl.content.views.wiki import AddWikiPageFormController
+        return AddWikiPageFormController(context, request)
+    
     def setUp(self):
         cleanUp()
 
-        # Register mail utility
-        from repoze.sendmail.interfaces import IMailDelivery
-        from karl.testing import DummyMailer
-        self.mailer = DummyMailer()
-        testing.registerUtility(self.mailer, IMailDelivery)
-
-        # Register WikiPageAlert adapter
-        from karl.models.interfaces import IProfile
-        from karl.content.interfaces import IWikiPage
-        from karl.content.views.adapters import WikiPageAlert
-        from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
-        testing.registerAdapter(WikiPageAlert,
-                                (IWikiPage, IProfile, IRequest),
-                                IAlert)
-
-        # Create dummy site skel
-        from karl.testing import DummyCommunity
-        self.community = DummyCommunity()
-        self.site = self.community.__parent__.__parent__
-        from karl.testing import DummyCatalog
-        self.site.catalog = DummyCatalog()
-        self.profiles = testing.DummyModel()
-        self.site["profiles"] = self.profiles
-        from karl.testing import DummyProfile
-        self.profiles["a"] = DummyProfile()
-        self.profiles["b"] = DummyProfile()
-        self.profiles["c"] = DummyProfile()
-        self.profiles["userid"] = DummyProfile()
-        for profile in self.profiles.values():
-            profile["alerts"] = testing.DummyModel()
-
-        self.community.member_names = set(["b", "c",])
-        self.community.moderator_names = set(["a",])
-
-        self.wiki = testing.DummyModel()
-        self.community["wiki"] = self.wiki
-
-
     def tearDown(self):
         cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.content.views.wiki import add_wikipage_view
-        return add_wikipage_view(context, request)
 
     def _register(self):
         from repoze.bfg import testing
@@ -99,59 +60,93 @@ class TestAddWikipageView(unittest.TestCase):
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        return registerDummyWorkflow('security')
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def test_get_with_no_title(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/add_wikipage.pt')
-        request = testing.DummyRequest()
-        from webob import MultiDict
-        request.params = request.POST = MultiDict()
+    def test_form_defaults(self):
+        workflow = self._registerSecurityWorkflow()
         context = testing.DummyModel()
-        self._registerSecurityWorkflow()
-        self.assertRaises(ValueError, self._callFUT, context, request)
-
-    def test_notsubmitted_withtitle(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/add_wikipage.pt')
-        from webob import MultiDict
-        params = MultiDict({
-                    'title': 'yo!',
-                    })
         request = testing.DummyRequest()
-        request.POST = request.params = params
-        context = testing.DummyModel()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], '')
+        self.assertEqual(defaults['sendalert'], True)
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
         self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_valid(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/add_wikipage.pt')
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title':'wikipage',
-                    'text':'text',
-                    'sendalert':True,
-                    'security_state':'public',
-                    'tags': 'thetesttag',
-                    })
-            )
-        context = self.wiki
+    def test_form_widgets(self):
+        self._registerSecurityWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('tags' in widgets)
+
+    def test___call__(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
+        from karl.testing import DummyCatalog
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import IWikiPage
+        from karl.utilities.interfaces import IAlerts
+        converted = {
+            'title':'wikipage',
+            'text':'text',
+            'sendalert':True,
+            'security_state':'public',
+            'tags': 'thetesttag',
+            }
+        context = testing.DummyModel()
+        context.catalog = DummyCatalog()
+        request = testing.DummyRequest()
         registerContentFactory(DummyWikiPage, IWikiPage)
         testing.registerDummySecurityPolicy('userid')
+        class Alerts(object):
+            def __init__(self):
+                self.emitted = []
+
+            def emit(self, context, request):
+                self.emitted.append((context, request))
+        alerts = Alerts()
+        testing.registerUtility(alerts, IAlerts)
         self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         wikipage = context['wikipage']
         self.assertEqual(wikipage.title, 'wikipage')
         self.assertEqual(wikipage.text, 'text')
         self.assertEqual(wikipage.creator, 'userid')
-        self.assertEqual(response.location,
-                         'http://example.com/communities/community/wiki/wikipage/?status_message=Wiki%20Page%20created')
+        self.assertEqual(
+            response.location,
+            'http://example.com/wikipage/?status_message=Wiki%20Page%20created')
+        self.assertEqual(len(alerts.emitted), 1)
 
 class TestShowWikipageView(unittest.TestCase):
     def setUp(self):
@@ -203,16 +198,17 @@ class TestShowWikipageView(unittest.TestCase):
         # Backlink breadcrumb thingy should appear on non-front-page
         self.assert_(renderer.backto is not False)
 
-class TestEditWikipageView(unittest.TestCase):
+class TestEditWikiPageFormController(unittest.TestCase):
+    def _makeOne(self, context, request):
+        from karl.content.views.wiki import EditWikiPageFormController
+        return EditWikiPageFormController(context, request)
+    
     def setUp(self):
         cleanUp()
 
+
     def tearDown(self):
         cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.content.views.wiki import edit_wikipage_view
-        return edit_wikipage_view(context, request)
 
     def _register(self):
         from repoze.bfg import testing
@@ -220,123 +216,135 @@ class TestEditWikipageView(unittest.TestCase):
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+
+    def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def test_notsubmitted(self):
+    def _registerAlert(self):
+        # Register WikiPageAlert adapter
+        from karl.models.interfaces import IProfile
+        from karl.content.interfaces import IWikiPage
+        from karl.content.views.adapters import WikiPageAlert
+        from karl.utilities.interfaces import IAlert
+        from repoze.bfg.interfaces import IRequest
+        testing.registerAdapter(WikiPageAlert,
+                                (IWikiPage, IProfile, IRequest),
+                                IAlert)
+
+    def test_form_defaults(self):
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_wikipage.pt')
+        self._registerSecurityWorkflow()
+        context = testing.DummyModel(title='title', text='text',
+                                     security_state='public')
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.params = request.POST = MultiDict()
-        context = testing.DummyModel(__name__ = 'Page',
-                                     title = 'title',
-                                     text = 'text',
-                                     )
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-    def test_submitted_invalid(self):
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], 'text')
+        self.assertEqual(defaults['security_state'], 'public')
+        
+    def test_form_fields(self):
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_wikipage.pt')
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = testing.DummyModel(title='oldtitle', __name__='Page',
-                                     text='thetext'
-                                     )
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+        self._registerSecurityWorkflow()
+        context = testing.DummyModel(title='', text='')
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_valid(self):
+    def test_form_widgets(self):
+        self._register()
+        self._registerSecurityWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('tags' in widgets)
+
+    def test___call__(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
         from karl.testing import DummyCatalog
         self._register()
-        renderer = testing.registerDummyRenderer('templates/edit_wikipage.pt')
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'text':'text',
-                    'title':'oldtitle',
-                    'sendalert': True,
-                    'security_state': 'public',
-                    'tags': 'thetesttag',
-                    })
-            )
+        converted = {
+            'text':'text',
+            'title':'oldtitle',
+            'sendalert': True,
+            'security_state': 'public',
+            'tags': 'thetesttag',
+            }
         context = testing.DummyModel(title='oldtitle')
         context.text = 'oldtext'
 
         context.catalog = DummyCatalog()
+        request = testing.DummyRequest()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
-        self.assertEqual(response.location,
-                         'http://example.com/?status_message=Wiki%20Page%20edited')
+        self.assertEqual(
+            response.location,
+            'http://example.com/?status_message=Wiki%20Page%20edited')
         self.assertEqual(context.text, 'text')
         self.assertEqual(context.modified_by, 'testeditor')
 
-    def test_submitted_valid_titlechange(self):
+    def test_handle_submit_titlechange(self):
         from karl.testing import DummyCatalog
         self._register()
-        renderer = testing.registerDummyRenderer('templates/edit_wikipage.pt')
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'text':'text',
-                    'title':'newtitle',
-                    'sendalert': True,
-                    'security_state': 'public',
-                    })
-            )
+        converted = {
+            'text':'text',
+            'title':'newtitle',
+            'sendalert': True,
+            'security_state': 'public',
+            'tags': 'thetesttag',
+            }
         context = testing.DummyModel(title='oldtitle')
         context.text = 'oldtext'
         def change_title(newtitle):
             context.title = newtitle
         context.change_title = change_title
         context.catalog = DummyCatalog()
+        request = testing.DummyRequest()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
-        self.assertEqual(response.location,
-                         'http://example.com/?status_message=Wiki%20Page%20edited')
+        self.assertEqual(
+            response.location,
+            'http://example.com/?status_message=Wiki%20Page%20edited')
         self.assertEqual(context.text, 'text')
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
-
-    def test_submitted_invalid_titlechange(self):
-        self._register()
-        renderer = testing.registerDummyRenderer('templates/edit_wikipage.pt')
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'text':'text',
-                    'title':'newtitle',
-                    'sendalert': True,
-                    'security_state': 'public',
-                    })
-            )
-        context = testing.DummyModel(title='oldtitle')
-        context.text = 'oldtext'
-        def change_title(newtitle):
-            raise ValueError('boo')
-        context.change_title = change_title
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+        
 
 from karl.content.interfaces import IWikiPage
 
@@ -357,16 +365,27 @@ class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
 
-class DummySecurityWorkflow:
-    def __init__(self, context):
-        self.context = context
+class DummyWorkflow:
+    state_attr = 'security_state'
+    initial_state = 'initial'
+    def __init__(self, state_info=[
+        {'name':'public', 'transitions':['private']},
+        {'name':'private', 'transitions':['public']},
+        ]):
+        self.transitioned = []
+        self._state_info = state_info
 
-    def setInitialState(self, request, **kw):
-        pass
+    def state_info(self, context, request):
+        return self._state_info
+    
+    def transition_to_state(self, content, request, to_state, context=None,
+                            guards=(), skip_same=True):
+        self.transitioned.append({'to_state':to_state, 'content':content,
+                                  'request':request, 'guards':guards,
+                                  'context':context, 'skip_same':skip_same})
 
-    def updateState(self, request, **kw):
-        pass
+    def state_of(self, content):
+        return getattr(content, self.state_attr, None)
 
-    def getStateMap(self):
-        return {}
-
+    def initialize(self, content):
+        self.initialized = content

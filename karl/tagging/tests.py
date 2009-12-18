@@ -17,8 +17,6 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
-
 from repoze.bfg import testing
 
 _marker = object()
@@ -114,10 +112,10 @@ class TagTests(unittest.TestCase):
 class TagsTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _getTargetClass(self):
         from karl.tagging import Tags

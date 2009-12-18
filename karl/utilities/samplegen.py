@@ -20,12 +20,12 @@ This is called by a script named "samplegen".
 """
 
 from cgi import escape
-from karl.content.views.blog import add_blogentry_view
+from karl.content.views.blog import AddBlogEntryFormController
 from karl.content.views.files import add_file_view
 from karl.content.views.calendar_events import add_calendarevent_view
-from karl.content.views.wiki import add_wikipage_view
+from karl.content.views.wiki import AddWikiPageFormController
+from karl.views.community import add_community
 from karl.models.interfaces import IProfile
-from karl.views.communities import add_community_view
 from repoze.bfg import testing
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
@@ -50,6 +50,7 @@ DEFAULT_ENV = {
         'repoze.who.userid': 'admin',
         'groups': ('group.KarlStaff', 'group.KarlAdmin'),
         },
+    'repoze.browserid':'1',
     }
 
 
@@ -175,11 +176,10 @@ def add_sample_community(site, add_content=True):
     request.POST['text'] = get_sample_html()
     request.POST['tags'] = ['sample']
     request.POST['security_state'] = 'public'
-    for key in ('blog', 'wiki', 'calendar', 'files'):
-        request.POST[key] = True
+    request.POST['tools'] = ('blog', 'wiki', 'calendar', 'files')
     request.POST['form.submitted'] = True
 
-    response = add_community_view(communities, request)
+    response = add_community(communities, request)
     community = _parse_add_response(request, response, communities)
 
     if add_content:
@@ -201,17 +201,19 @@ def add_sample_blog_entry(community):
     title = generate_title('SampleB')
     log.info('adding blog entry %s', title)
 
+    converted = {}
+    converted['title'] = title
+    converted['text'] = get_sample_html()
+    converted['sendalert'] = False
+    converted['security_state'] = 'inherits'
+    converted['tags'] = ['sample']
+    converted['attachments'] = ()
+
     request = testing.DummyRequest()
     request.environ.update(DEFAULT_ENV)
-    request.POST = FauxPost(request.POST)
-    request.POST['title'] = title
-    request.POST['text'] = get_sample_html()
-    request.POST['sendalert'] = False
-    request.POST['security_state'] = 'inherits'
-    request.POST['tags'] = ['sample']
-    request.POST['form.submitted'] = True
+    controller = AddBlogEntryFormController(blog, request)
+    response = controller.handle_submit(converted)
 
-    response = add_blogentry_view(blog, request)
     entry = _parse_add_response(request, response, blog)
     return entry
 
@@ -224,14 +226,11 @@ def add_sample_wiki_page(community):
 
     request = testing.DummyRequest()
     request.environ.update(DEFAULT_ENV)
-    request.POST = FauxPost(request.POST)
-    request.POST['title'] = title
-    request.POST['text'] = get_sample_html()
-    request.POST['security_state'] = 'inherits'
-    request.POST['tags'] = ['sample']
-    request.POST['form.submitted'] = True
-
-    response = add_wikipage_view(wiki, request)
+    converted = {'title':title, 'text':get_sample_html(),
+                 'security_state':'inherits', 'tags':['sample'],
+                 'sendalert':False}
+    controller = AddWikiPageFormController(wiki, request)
+    response = controller.handle_submit(converted)
     page = _parse_add_response(request, response, wiki)
 
     # add a link to the new page

@@ -17,7 +17,6 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 from zope.interface import implements
@@ -25,10 +24,10 @@ from zope.interface import implements
 
 class ShowBlogViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.content.views.blog import show_blog_view
@@ -80,10 +79,10 @@ class ShowBlogViewTests(unittest.TestCase):
 
 class ShowBlogEntryViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _register(self):
         from zope.interface import Interface
@@ -184,10 +183,8 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         self.assertEqual('before', renderer.comments[0]['text'])
         self.assertEqual('sometext', renderer.comments[1]['text'])
 
-class AddBlogEntryViewTests(unittest.TestCase):
+class AddBlogEntryFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
@@ -223,15 +220,33 @@ class AddBlogEntryViewTests(unittest.TestCase):
         self.community.member_names = set(["b", "c",])
         self.community.moderator_names = set(["a",])
 
-        self.blog = testing.DummyModel()
+        self.blog = self._makeContext()
         self.community["blog"] = self.blog
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.blog import add_blogentry_view
-        return add_blogentry_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.blog import AddBlogEntryFormController
+        return AddBlogEntryFormController(*arg, **kw)
+
+    def _makeRequest(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        return request
+
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
+
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
     def _register(self):
         from zope.interface import Interface
@@ -241,89 +256,53 @@ class AddBlogEntryViewTests(unittest.TestCase):
         from repoze.workflow.testing import registerDummyWorkflow
         return registerDummyWorkflow('security')
 
-    def test_notsubmitted(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer('templates/add_blogentry.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(0, len(self.mailer))
-        self.failIf(renderer.fielderrors)
+    def test_form_defaults(self):
+        workflow = self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], '')
+        self.assertEqual(defaults['attachments'], [])
+        self.assertEqual(defaults['sendalert'], True)
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_invalid(self):
-        context = testing.DummyModel()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1'})
-                    )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_blogentry.pt')
-        self._callFUT(context, request)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        self.assertEqual(0, len(self.mailer))
+    def test_form_widgets(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('attachments.*' in widgets)
 
-    def test_submitted_invalid_notitle(self):
-        context = testing.DummyModel()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1',
-                    #'title': '',
-                    'text': 'text',
-                    'sendalert': True})
-                    )
-        self._register()
-        renderer = testing.registerDummyRenderer('templates/add_blogentry.pt')
-        self._callFUT(context, request)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        self.assertEqual(0, len(self.mailer))
+    def test___call__(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
 
-    def test_submitted_alreadyexists(self):
-        from webob import MultiDict
-        from karl.testing import DummyCatalog
-        from karl.content.interfaces import IBlogEntry
-        from repoze.lemonade.testing import registerContentFactory
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
 
-        self._register()
-        registerContentFactory(DummyBlogEntry, IBlogEntry)
-        renderer = testing.registerDummyRenderer('templates/add_blogentry.pt')
-
-        context = self.blog
-        foo = testing.DummyModel()
-        context['foo'] = foo
-        self.site.system_email_domain = 'example.com'
-        tags = DummyTags()
-        self.site.tags = tags
-        self.site.catalog = DummyCatalog()
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('sendalert', 'true'),
-                    ('security_state', 'public'),
-                    ])
-            )
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         'http://example.com/communities/community/blog/foo-1/')
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         'http://example.com/communities/community/blog/foo-2/')
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         'http://example.com/communities/community/blog/foo-3/')
-
-    def test_submitted_valid(self):
+    def test_handle_submit(self):
         from karl.testing import registerSettings
         registerSettings()
 
@@ -333,25 +312,27 @@ class AddBlogEntryViewTests(unittest.TestCase):
         self.site.tags = tags
         from karl.testing import DummyCatalog
         self.site.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('sendalert', 'true'),
-                    ('security_state', 'public'),
-                    ])
-            )
+        self.site.sessions = DummySessions()
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename="test1.txt")
+        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
+        converted = {
+            'title':'foo',
+            'text':'text',
+            'tags':['tag1', 'tag2'],
+            'sendalert':True,
+            'security_state':'public',
+            'attachments':[attachment1, attachment2],
+            }
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_blogentry.pt')
         from karl.content.interfaces import IBlogEntry
+        from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyBlogEntry, IBlogEntry)
-        response = self._callFUT(context, request)
+        registerContentFactory(DummyFile, ICommunityFile)
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
                          'http://example.com/communities/community/blog/foo/')
         self.assertEqual(3, len(self.mailer))
@@ -361,75 +342,7 @@ class AddBlogEntryViewTests(unittest.TestCase):
         recipients.sort()
         self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
 
-    def test_submitted_valid_no_alert(self):
-        context = self.blog
-        tags = DummyTags()
-        self.site.tags = tags
-        from karl.testing import DummyCatalog
-        self.site.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('sendalert', 'false'),
-                    ('security_state', 'public'),
-                    ])
-            )
-        self._register()
-        renderer = testing.registerDummyRenderer('templates/add_blogentry.pt')
-        from karl.content.interfaces import IBlogEntry
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyBlogEntry, IBlogEntry)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         'http://example.com/communities/community/blog/foo/')
-        self.failUnless(context['foo'])
-        self.assertEqual(0, len(self.mailer))
-
-    def test_submitted_valid_attachments(self):
-        context = self.blog
-        tags = DummyTags()
-        self.site.tags = tags
-        from karl.testing import DummyCatalog
-        self.site.catalog = DummyCatalog()
-        from karl.testing import DummyUpload
-        attachment1 = DummyUpload(filename="test1.txt")
-        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('attachment', attachment1),
-                    ('attachment', attachment2),
-                    ('sendalert', 'true'),
-                    ('security_state', 'public'),
-                    ])
-            )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_blogentry.pt')
-        from karl.content.interfaces import IBlogEntry
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyBlogEntry, IBlogEntry)
-        from karl.content.interfaces import ICommunityFile
-        registerContentFactory(DummyFile, ICommunityFile)
-        response = self._callFUT(context, request)
-
         blogentry_url = "http://example.com/communities/community/blog/foo/"
-        self.assertEqual(response.location, blogentry_url)
-        self.failUnless(context['foo'])
-        self.assertEqual(3, len(self.mailer))
-        recipients = reduce(lambda x,y: x+y, [x.mto for x in self.mailer])
-        recipients.sort()
-        self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
 
         attachments_url = "%sattachments" % blogentry_url
         self.failUnless(context['foo']['attachments']['test1.txt'])
@@ -447,12 +360,22 @@ class AddBlogEntryViewTests(unittest.TestCase):
         attachment2 = context['foo']['attachments']['test2.txt']
         self.assertEqual(attachment2.filename, "test2.txt")
 
-class EditBlogEntryViewTests(unittest.TestCase):
+class EditBlogEntryFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
+
+    def _makeRequest(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        return request
+
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
 
     def _register(self):
         from repoze.bfg import testing
@@ -463,84 +386,109 @@ class EditBlogEntryViewTests(unittest.TestCase):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
-    def _callFUT(self, context, request):
-        from karl.content.views.blog import edit_blogentry_view
-        return edit_blogentry_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.blog import EditBlogEntryFormController
+        return EditBlogEntryFormController(*arg, **kw)
 
-    def test_notsubmitted(self):
-        context = DummyBlogEntry()
-        context.__name__ ='ablogentry'
-        context.title = 'atitle'
-        context.text = 'sometext'
-        request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_blogentry.pt')
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
+
+    def test_form_defaults(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        context.title = 'title'
+        context.text = 'abc'
+        context['attachments'] = testing.DummyModel()
+        context['attachments']['a'] = DummyFile(__name__='1',
+                                                mimetype='text/plain')
+        context.security_state = 'private'
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], 'abc')
+        self.assertEqual(len(defaults['attachments']), 1)
+        self.assertEqual(defaults['security_state'], 'private')
+
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
+
+    def test_form_widgets(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('attachments.*' in widgets)
+
+    def test___call__(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
+        from schemaish.type import File as SchemaFile
+        from karl.models.interfaces import IObjectModifiedEvent
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
         from karl.content.interfaces import IBlogEntry
         from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyBlogEntry, IBlogEntry)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-    def test_submitted_invalid(self):
-        context = DummyBlogEntry()
-        context.__name__ ='ablogentry'
-        context.title = 'atitle'
-        context.text = 'sometext'
-        from webob import MultiDict
         from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted': '1',
-                    'sendalert': '1',
-            })
-            )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_blogentry.pt')
-        from karl.content.interfaces import IBlogEntry
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyBlogEntry, IBlogEntry)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_submitted_valid(self):
-        self._register()
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        self._registerDummyWorkflow()
         context = DummyBlogEntry()
+        context.sessions = DummySessions()
         context.__name__ ='ablogentry'
-        from karl.testing import DummyCatalog
         context.catalog = DummyCatalog()
+        context['attachments'] = testing.DummyModel()
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1',
-                    'title':'foo',
-                    'text':'text',
-                    'sendalert': 'true',
-                    'security_state': 'public',
-                    'tags': 'thetesttag',
-                    }))
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_blogentry.pt')
-        from karl.content.interfaces import IBlogEntry
-        from repoze.lemonade.testing import registerContentFactory
+        converted = {'title':'foo',
+                     'text':'text',
+                     'security_state':'public',
+                     'tags':'thetesttag',
+                     'attachments':[SchemaFile(None, None, None)],
+                     }
         registerContentFactory(DummyBlogEntry, IBlogEntry)
-        from karl.models.interfaces import IObjectModifiedEvent
-        from zope.interface import Interface
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/ablogentry/')
         self.assertEqual(len(L), 2)
         self.assertEqual(context.title, 'foo')
         self.assertEqual(context.text, 'text')
         self.assertEqual(context.modified_by, 'testeditor')
-
 
 class MonthRangeTests(unittest.TestCase):
     def test_coarse_month_range(self):
@@ -551,10 +499,10 @@ class MonthRangeTests(unittest.TestCase):
 
 class BlogSidebarTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, api):
         from karl.content.views.blog import BlogSidebar
@@ -566,7 +514,7 @@ class BlogSidebarTests(unittest.TestCase):
         request = testing.DummyRequest()
         api = object()
         renderer = testing.registerDummyRenderer('templates/blog_sidebar.pt')
-        html = self._callFUT(context, request, api)
+        self._callFUT(context, request, api)
         self.assertEquals(renderer.api, api)
         self.assertEquals(len(renderer.activity_list), 0)
         self.assertEquals(renderer.blog_url, 'http://example.com/')
@@ -585,7 +533,7 @@ class BlogSidebarTests(unittest.TestCase):
         request = testing.DummyRequest()
         api = object()
         renderer = testing.registerDummyRenderer('templates/blog_sidebar.pt')
-        html = self._callFUT(context, request, api)
+        self._callFUT(context, request, api)
         self.assertEquals(renderer.api, api)
         self.assertEquals(len(renderer.activity_list), 1)
         self.assertEquals(renderer.activity_list[0].year, 2009)
@@ -609,6 +557,59 @@ class BlogSidebarTests(unittest.TestCase):
         self._callFUT(context, request, api)
         self.assertEquals(len(renderer.activity_list), 10)
 
+class Test_upload_attachments(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
+    def _callFUT(self, *arg, **kw):
+        from karl.content.views.blog import upload_attachments
+        return upload_attachments(*arg, **kw)
+
+    def test_with_filename(self):
+        from karl.content.interfaces import ICommunityFile
+        from StringIO import StringIO
+        attachments = [ DummyFile(filename='abc', mimetype='text/plain',
+                                  file=StringIO('abc')) ]
+        folder = testing.DummyModel()
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyFile, ICommunityFile)
+        request = testing.DummyRequest()
+        self._callFUT(attachments, folder, 'chris', request)
+        self.failUnless('abc' in folder)
+
+    def test_with_filename_too_big(self):
+        from karl.testing import registerSettings
+        from karl.content.interfaces import ICommunityFile
+        from StringIO import StringIO
+        registerSettings(upload_limit=1)
+        attachments = [ DummyFile(filename='abc', mimetype='text/plain',
+                                  file=StringIO('abc')) ]
+        folder = testing.DummyModel()
+        from repoze.lemonade.testing import registerContentFactory
+        class BigDummyFile(object):
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+                self.size = 10000
+        registerContentFactory(BigDummyFile, ICommunityFile)
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError,
+                          self._callFUT, attachments, folder, 'chris', request)
+
+    def test_without_filename_remove(self):
+        from karl.content.interfaces import ICommunityFile
+        attachment = DummyFile(filename=None, metadata={'remove':True,
+                                                        'default':'a'})
+        attachments = [ attachment ]
+        folder = testing.DummyModel()
+        folder['a'] = testing.DummyModel()
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyFile, ICommunityFile)
+        request = testing.DummyRequest()
+        self._callFUT(attachments, folder, 'chris', request)
+        self.failIf('a' in folder)
 
 class DummyComment(testing.DummyModel):
     creator = u'dummy'
@@ -673,3 +674,33 @@ class DummyFile:
 class DummyCreationDateIndex:
     def discriminator(self, obj, default):
         return obj.created
+
+
+class DummyWorkflow:
+    state_attr = 'security_state'
+    initial_state = 'initial'
+    def __init__(self, state_info=[
+        {'name':'public', 'transitions':['private']},
+        {'name':'private', 'transitions':['public']},
+        ]):
+        self.transitioned = []
+        self._state_info = state_info
+
+    def state_info(self, context, request):
+        return self._state_info
+    
+    def transition_to_state(self, content, request, to_state, context=None,
+                            guards=(), skip_same=True):
+        self.transitioned.append({'to_state':to_state, 'content':content,
+                                  'request':request, 'guards':guards,
+                                  'context':context, 'skip_same':skip_same})
+
+    def state_of(self, content):
+        return getattr(content, self.state_attr, None)
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
+    

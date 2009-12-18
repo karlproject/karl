@@ -21,8 +21,9 @@ from zope.interface import Interface
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 from repoze.bfg import testing
+
 from karl.testing import DummyCatalog
 from karl.testing import DummyLayoutProvider
 from karl.testing import DummyProfile
@@ -92,9 +93,9 @@ class TestShowForumView(unittest.TestCase):
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                                     (Interface, Interface),
-                                     ILayoutProvider)
+        testing.registerAdapter(DummyLayoutProvider,
+                                (Interface, Interface),
+                                ILayoutProvider)
 
     def test_it(self):
         self._register()
@@ -113,116 +114,176 @@ class TestShowForumView(unittest.TestCase):
         renderer = testing.registerDummyRenderer('templates/show_forum.pt')
         self._callFUT(context, request)
         actions = renderer.actions
-        topics = renderer.topics
         self.assertEqual(actions[0][0], 'Add Forum Topic')
 
-class AddForumView(unittest.TestCase):
+
+class TestAddForumFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-
+        testing.setUp()
+        
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.forum import add_forum_view
-        return add_forum_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.forum import AddForumFormController
+        return AddForumFormController(*arg, **kw)
 
-    def _registerSecurityWorkflow(self):
+    def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        return registerDummyWorkflow('security')
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def test_cancel(self):
-        request = testing.DummyRequest(params={'form.cancel':'1'})
+    def test_form_defaults(self):
+        workflow = self._registerDummyWorkflow()
         context = testing.DummyModel()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['description'], '')
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('title' in dict(fields))
+        self.failUnless('description' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
+
+    def test_form_widgets(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('title' in widgets)
+
+    def test___call__(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_submitted_bad_values(self):
-        request = testing.DummyRequest(params=dictall({'form.submitted':'1',
-                                               'title':'',
-                                               'tags':'',
-                                               'description':'',}))
-
-        context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_forum.pt')
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.assertEqual(str(renderer.fielderrors['description']),
-                         'Please enter a value')
-        self.assertEqual(str(renderer.fielderrors['title']),
-                         'Please enter a value')
-
-    def test_submitted_success(self):
+    def test_handle_submit(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import IForum
         def factory(title, desc, creator):
             return testing.DummyModel(
                 title=title, description=desc, creator=creator)
         registerContentFactory(factory, IForum)
-        request = testing.DummyRequest(params=dictall({'form.submitted':'1',
-                                               'title':'title',
-                                               'tags':'',
-                                               'description':'desc',}))
+        converted = {
+            'title':'title',
+            'description':'desc',
+            'security_state':'public'}
 
         context = testing.DummyModel()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        workflow = self._registerDummyWorkflow()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/title/')
         self.assertEqual(context['title'].title, 'title')
         self.assertEqual(context['title'].description, 'desc')
         self.assertEqual(context['title'].creator, None)
+        self.assertEqual(workflow.initialized, True)
 
-class TestAddForumTopicView(unittest.TestCase):
+class TestAddForumTopicFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-
+        testing.setUp()
+        
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.forum import add_forum_topic_view
-        return add_forum_topic_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.forum import AddForumTopicFormController
+        return AddForumTopicFormController(*arg, **kw)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                                     (Interface, Interface),
-                                     ILayoutProvider)
-
-    def _registerSecurityWorkflow(self):
-        from repoze.workflow.testing import registerDummyWorkflow
-        return registerDummyWorkflow('security')
-
-    def test_cancel(self):
+    def _makeRequest(self):
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict({'form.cancel':'1'})
-        context = testing.DummyModel()
-        self._registerLayoutProvider()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
+        request.environ['repoze.browserid'] = '1'
+        return request
+
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
+
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
+
+    def test_form_defaults(self):
+        workflow = self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], '')
+        self.assertEqual(defaults['attachments'], [])
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
+
+    def test_form_widgets(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('attachments.*' in widgets)
+
+    def test___call__(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+        self.failUnless('layout' in response)
+
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_submitted_bad_values(self):
-        self._registerLayoutProvider()
-        request = testing.DummyRequest(
-            params=dictall({'form.submitted':'1',
-                            'title':'',
-                            'text':''}))
-
-        context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_forumtopic.pt')
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.assertEqual(str(renderer.fielderrors['title']),
-                         'Please enter a value')
-
-    def test_submitted_success(self):
+    def test_handle_submit(self): 
+        from karl.testing import DummyUpload
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import IForumTopic
+        from karl.content.interfaces import ICommunityFile
+
         def factory(title, text, creator):
             topic = testing.DummyModel(
                 title=title, text=text, creator=creator)
@@ -230,22 +291,32 @@ class TestAddForumTopicView(unittest.TestCase):
             topic['attachments'] = testing.DummyModel()
             return topic
         registerContentFactory(factory, IForumTopic)
-        request = testing.DummyRequest(params=dictall({
-            'form.submitted':'1',
+        registerContentFactory(DummyFile, ICommunityFile)
+
+        attachment1 = DummyUpload(filename="test1.txt")
+        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
+
+        converted = {
             'title':'title',
             'text':'abc',
             'tags': 'thetesttag',
-            }))
+            'security_state':'public',
+            'attachments':[attachment1, attachment2],
+            }
 
-        context = testing.DummyModel()
+        context = self._makeContext()
         context.catalog = DummyCatalog()
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        workflow = self._registerDummyWorkflow()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/title/')
         self.assertEqual(context['title'].title, 'title')
         self.assertEqual(context['title'].text, 'abc')
         self.assertEqual(context['title'].creator, None)
-
+        self.assertEqual(workflow.initialized, True)
+        self.assertEqual(len(context['title']['attachments']), 2)
 
 class ShowForumTopicViewTests(unittest.TestCase):
     def setUp(self):
@@ -270,9 +341,9 @@ class ShowForumTopicViewTests(unittest.TestCase):
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                                     (Interface, Interface),
-                                     ILayoutProvider)
+        testing.registerAdapter(DummyLayoutProvider,
+                                (Interface, Interface),
+                                ILayoutProvider)
 
     def test_no_security_policy(self):
         self._register()
@@ -391,162 +462,198 @@ class ShowForumTopicViewTests(unittest.TestCase):
         self.assertEqual(renderer.comments[1]['text'],
                          'My dog has fleas.')
 
-class TestEditForumView(unittest.TestCase):
-    template_fn = 'templates/edit_forum.pt'
+
+class TestEditForumFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-        from karl.testing import registerSecurityWorkflow
-        registerSecurityWorkflow()
-
+        testing.setUp()
+        
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.forum import edit_forum_view
-        return edit_forum_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.forum import EditForumFormController
+        return EditForumFormController(*arg, **kw)
 
-    def test_notsubmitted(self):
-        renderer = testing.registerDummyRenderer(self.template_fn)
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
+
+    def test_form_defaults(self):
+        workflow = self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        context.title = 'title'
+        context.description = 'description'
+        context.security_state = 'public'
         request = testing.DummyRequest()
-        context = testing.DummyModel(
-            title = 'title',
-            description = 'description',
-            )
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['description'], 'description')
+        self.assertEqual(defaults['security_state'], 'public')
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('title' in dict(fields))
+        self.failUnless('description' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_invalid(self):
-        renderer = testing.registerDummyRenderer(self.template_fn)
-        from webob import MultiDict
+    def test_form_widgets(self):
+        self._registerDummyWorkflow()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('title' in widgets)
 
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = testing.DummyModel(title='oldtitle')
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def test___call__(self):
+        context = testing.DummyModel()
+        context.title = 'title'
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
 
-    def test_submitted_valid(self):
-        renderer = testing.registerDummyRenderer(self.template_fn)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title':'newtitle',
-                    'description':'newdescription',
-                    'tags': 'thetesttag',
-                    })
-            )
+    def test_handle_cancel(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
+        converted = {
+            'title':'newtitle',
+            'description':'newdescription',
+            }
         context = testing.DummyModel(
             title='oldtitle', description='olddescription')
         context.catalog = DummyCatalog()
         from karl.models.interfaces import IObjectModifiedEvent
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
         self.assertEqual(response.location,
-                         'http://example.com/?status_message=Forum%20edited')
+                         'http://example.com/?status_message=Forum+Edited')
         self.assertEqual(context.title, 'newtitle')
         self.assertEqual(context.description, 'newdescription')
         self.assertEqual(context.modified_by, 'testeditor')
 
-
-
-class TestEditForumTopicView(unittest.TestCase):
-    template_fn = 'templates/edit_forumtopic.pt'
+class EditForumTopicFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-        from karl.testing import registerSecurityWorkflow
-        registerSecurityWorkflow()
-        from karl.testing import registerTagbox
-        registerTagbox()
-        from karl.testing import registerLayoutProvider
-        registerLayoutProvider()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.forum import edit_forum_topic_view
-        return edit_forum_topic_view(context, request)
+    def _makeOne(self, *arg, **kw):
+        from karl.content.views.forum import EditForumTopicFormController
+        return EditForumTopicFormController(*arg, **kw)
 
-    def test_notsubmitted(self):
-        renderer = testing.registerDummyRenderer(self.template_fn)
+    def _makeRequest(self):
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        context = testing.DummyModel(
-            title = 'title',
-            text = 'text',
-            )
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+        request.environ['repoze.browserid'] = '1'
+        return request
 
-    def test_submitted_invalid(self):
-        renderer = testing.registerDummyRenderer(self.template_fn)
-        from webob import MultiDict
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
 
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = testing.DummyModel(title='oldtitle')
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def _registerDummyWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def test_submitted_valid(self):
-        context = testing.DummyModel(
-            title='oldtitle',
-            text='oldtext',
-            )
-        renderer = testing.registerDummyRenderer(self.template_fn)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title':'newtitle',
-                    'text':'newtext',
-                    })
-            )
+    def test_form_defaults(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        context.title = 'title'
+        context.text = 'text'
+        context.security_state = 'public'
         context['attachments'] = testing.DummyModel()
-        context.catalog = DummyCatalog()
-        from karl.models.interfaces import IObjectModifiedEvent
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/?status_message=Forum%20Topic%20edited')
-        self.assertEqual(L[0], context)
-        self.assertEqual(L[1].object, context)
-        self.assertEqual(context.title, 'newtitle')
-        self.assertEqual(context.text, 'newtext')
-        self.assertEqual(len(context['attachments']), 0)
-        self.assertEqual(context.modified_by, 'testeditor')
+        context['attachments']['a'] = DummyFile(__name__='1',
+                                                mimetype='text/plain')
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], 'text')
+        self.assertEqual(len(defaults['attachments']),1)
+        self.assertEqual(defaults['security_state'], 'public')
+        
+    def test_form_fields(self):
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless('tags' in dict(fields))
+        self.failUnless('security_state' in dict(fields))
 
-    def test_submitted_valid_with_attachments(self):
+    def test_form_widgets(self):
+        from karl.models.interfaces import ITagQuery
+        from zope.interface import Interface
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        widgets = controller.form_widgets({'security_state':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('attachments.*' in widgets)
+
+    def test___call__(self):
+        context = self._makeContext()
+        context.title = 'title'
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+        self.failUnless('layout' in response)
+
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
+        from karl.testing import DummyUpload
         context = testing.DummyModel(
             title='oldtitle',
             text='oldtext',
             )
-        class DummyUpload:
-            filename='test.txt'
-            file='123'
-            type='text/plain'
-        renderer = testing.registerDummyRenderer(self.template_fn)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title':'newtitle',
-                    'text':'newtext',
-                    'attachment0':DummyUpload(),
-                    })
-            )
+
+        upload = DummyUpload(filename='test.txt')
+
+        converted = {
+            'title':'newtitle',
+            'text':'newtext',
+            'tags':[],
+            'security_state':'public',
+            'attachments':[DummyUpload()],
+            }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         def factory(**args):
@@ -556,11 +663,15 @@ class TestEditForumTopicView(unittest.TestCase):
         registerContentFactory(factory, ICommunityFile)
         context['attachments'] = testing.DummyModel()
         context.catalog = DummyCatalog()
+        context.sessions = DummySessions()
         from karl.models.interfaces import IObjectModifiedEvent
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
-            'http://example.com/?status_message=Forum%20Topic%20edited')
+            'http://example.com/?status_message=Forum+Topic+Edited')
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.title, 'newtitle')
@@ -569,7 +680,8 @@ class TestEditForumTopicView(unittest.TestCase):
         self.assertEqual(context['attachments'].keys(), ['test.txt'])
         self.assertEqual(
             context['attachments']['test.txt'].mimetype, 'text/plain')
-
+        
+    
 
 class dictall(dict):
     def getall(self, name):
@@ -593,3 +705,40 @@ class DummyAdapter:
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
+
+class DummyWorkflow:
+    state_attr = 'security_state'
+    initial_state = 'initial'
+    def __init__(self, state_info=[
+        {'name':'public', 'transitions':['private']},
+        {'name':'private', 'transitions':['public']},
+        ]):
+        self.transitioned = []
+        self._state_info = state_info
+
+    def state_info(self, context, request):
+        return self._state_info
+    
+    def transition_to_state(self, content, request, to_state, context=None,
+                            guards=(), skip_same=True):
+        self.transitioned.append({'to_state':to_state, 'content':content,
+                                  'request':request, 'guards':guards,
+                                  'context':context, 'skip_same':skip_same})
+
+    def state_of(self, content):
+        return getattr(content, self.state_attr, None)
+
+    def initialize(self, context):
+        self.initialized = True
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
+
+class DummyFile:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+        self.size = 0
+

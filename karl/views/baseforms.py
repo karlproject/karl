@@ -6,10 +6,8 @@ from lxml.html import tostring
 from lxml.html.clean import clean_html
 from formencode import Schema
 from formencode import Invalid
-from formencode import ForEach
 from formencode import validators
 from copy import deepcopy
-import re
 import time
 import datetime
 from zope.component import getAdapter
@@ -19,8 +17,6 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_site
 from repoze.bfg.traversal import find_model
-
-valid_username_re = re.compile(r'[\w-]+$')
 
 _ = validators._
 
@@ -34,21 +30,6 @@ class HTMLValidator(validators.UnicodeString):
             msg = 'Unable to parse the provided HTML'
             raise Invalid(msg, value, state)
         return clean
-
-class UsernameLookup(validators.UnicodeString):
-
-    def _to_python(self, value, state):
-        if re.search('\s', value):
-            msg = 'Username must not contain spaces'
-            raise Invalid(msg, value, state)
-        if not valid_username_re.match(value):
-            msg = 'Username must contain only letters, numbers, and dashes'
-            raise Invalid(msg, value, state)
-        profiles = state.profiles
-        if value in profiles:
-            msg = 'Username %s already exists' % value
-            raise Invalid(msg, value, state)
-        return value
 
 class CountriesLookup(validators.UnicodeString):
 
@@ -75,53 +56,6 @@ class TextAreaToList(validators.UnicodeString):
 
     def _from_python(self, value, state):
         return "\n".join(value)
-
-class UserProfileLookup(validators.UnicodeString):
-
-    def _to_python(self, value, state):
-        strip_option = getattr(self, 'strip', False)
-        split_values = []
-        profiles = state.profiles
-
-        # The username values are in the hidden fields for the
-        # bubbles, not the single input that is this fieldname
-        for v in state.usernames:
-            if strip_option:
-                v2 = v.strip()
-            else:
-                v2 = v
-            # Lookup profiles
-            profile = profiles.get(v2, False)
-            if profile is False:
-                msg = 'Username %s does not exist' % v
-                raise Invalid(msg, value, state)
-            split_values.append(profile)
-
-        return split_values
-
-class NotOneOf(validators.UnicodeString):
-
-    messages = {
-        'known_value': 'Value %(value)s matches existing value',
-        }
-
-    def validate_python(self, value, state):
-        if value in self.known_values:
-            msg = self.message('known_value', state, value=value)
-            raise Invalid(msg, value, state)
-        return value
-
-class TextAreaToEmails(validators.UnicodeString):
-
-    def _to_python(self, value, state):
-        if hasattr(state, 'emails'):
-            existing = state.emails
-        else:
-            existing = ()
-        v1 = TextAreaToList(strip=True, not_empty=True)
-        lines = v1.to_python(value, state)
-        v2 = ForEach(validators.Email(), NotOneOf(known_values=existing))
-        return v2.to_python(lines)
 
 class Taglist(validators.FancyValidator):
     """ Converter to return sequence of strings for each tagbox tag """
@@ -276,7 +210,6 @@ class HomePath(validators.UnicodeString):
 
 # Make some re-usable fields
 login = validators.UnicodeString(not_empty=True, strip=True)
-username = UsernameLookup(not_empty=True, strip=True)
 old_password = validators.UnicodeString(not_empty=True, strip=True)
 password = PasswordChecker(not_empty=True, strip=True)
 password_confirm = validators.UnicodeString(not_empty=True, strip=True)
@@ -300,23 +233,14 @@ biography = validators.UnicodeString(strip=True)
 photo = Photo()
 caption = validators.UnicodeString(strip=True)
 photo_delete = validators.Bool(if_missing=False, default=False)
-terms_and_conditions = validators.StringBool(not_empty=True)
-accept_privacy_policy = validators.StringBool(not_empty=True)
-users = UserProfileLookup(not_empty=True, strip=True)
 text = validators.UnicodeString(strip=True)
 email = UniqueEmail(not_empty=True, resolve_domain=False)
-email_addresses = TextAreaToEmails(not_empty=True, strip=True)
-profile_id = validators.UnicodeString(not_empty=True)
-is_moderator = validators.Bool(if_missing=False)
-resend_info = validators.Bool(if_missing=False)
-remove_entry = validators.Bool(if_missing=False)
 add_comment = validators.UnicodeString(strip=True)
 tags = Taglist(if_missing=[])
 sendalert = validators.StringBool(if_missing=False)
 # attachment is not validated through the form
 description = validators.UnicodeString(not_empty=True, max=500)
 overview = validators.UnicodeString(strip=True)
-sharing = validators.StringBool(not_empty=True)
 start_date = DateTime()
 end_date = DateTime()
 publication_date = DateTime()

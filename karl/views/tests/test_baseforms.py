@@ -18,54 +18,6 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-class TestUsernameLookupValidator(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def test_valid(self):
-        from karl.views.baseforms import AppState
-        from karl.views.baseforms import UsernameLookup
-        val = UsernameLookup(not_empty=True, strip=True)
-        state = AppState(profiles={})
-        got = val.to_python("me", state)
-        self.assertEqual(got, "me")
-
-    def test_valid_with_trailing_spaces(self):
-        from karl.views.baseforms import AppState
-        from karl.views.baseforms import UsernameLookup
-        val = UsernameLookup(not_empty=True, strip=True)
-        state = AppState(profiles={})
-        got = val.to_python("me \r\n ", state)
-        self.assertEqual(got, "me")
-
-    def test_no_spaces(self):
-        from karl.views.baseforms import AppState
-        from karl.views.baseforms import UsernameLookup
-        from formencode.validators import Invalid
-        val = UsernameLookup(not_empty=True, strip=True)
-        state = AppState(profiles={})
-        self.assertRaises(Invalid, val.to_python, "a b", state)
-
-    def test_acceptable_characters(self):
-        from karl.views.baseforms import AppState
-        from karl.views.baseforms import UsernameLookup
-        from formencode.validators import Invalid
-        val = UsernameLookup(not_empty=True, strip=True)
-        state = AppState(profiles={})
-        self.assertRaises(Invalid, val.to_python, "a&b", state)
-
-    def test_conflict(self):
-        from karl.views.baseforms import AppState
-        from karl.views.baseforms import UsernameLookup
-        from formencode.validators import Invalid
-        val = UsernameLookup(not_empty=True, strip=True)
-        state = AppState(profiles={'me': 1})
-        self.assertRaises(Invalid, val.to_python, "me", state)
-
-
 class TestFieldsMatchValidator(unittest.TestCase):
     def setUp(self):
         cleanUp()

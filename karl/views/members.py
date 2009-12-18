@@ -20,10 +20,17 @@
 Includes invitations, per-user preferences on alerts, etc.
 """
 
+import schemaish
+import formish
+from validatish import validator
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms.filestore import get_filestore
+from karl.consts import countries
+
 import transaction
 
 from email.Message import Message
-from formencode import Invalid
 from webob import Response
 from simplejson import JSONEncoder
 
@@ -38,15 +45,16 @@ from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
+
+from repoze.bfg.formish import ValidationError
+
 from repoze.workflow import get_workflow
-from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
 from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
-from karl.views.form import render_form_to_response
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
@@ -59,10 +67,9 @@ from karl.utils import find_profiles
 from karl.utils import find_users
 from karl.utils import get_setting
 
-from karl.views import baseforms
 from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
-
+from karl.views.forms.widgets import ManageMembersWidget
 
 def _get_manage_actions(community, request):
 
@@ -165,7 +172,6 @@ def show_members_view(context, request):
             profile = profiles[moderator_name]
             if not has_permission('view', profile, request):
                 continue
-            name = profile.__name__
             derived['title'] = profile.title
             derived['href'] = model_url(profile, request)
             moderator_info.append(derived)
@@ -181,22 +187,6 @@ def show_members_view(context, request):
         hide_pictures=hp,
         )
 
-
-from formencode import Schema
-from formencode import variabledecode
-from formencode import ForEach
-
-class ManageMembersEntry(Schema):
-    id = baseforms.profile_id
-    is_moderator = baseforms.is_moderator
-    resend_info = baseforms.resend_info
-    remove = baseforms.remove_entry
-
-class ManageMembersForm(FormSchema):
-    pre_validators = [variabledecode.NestedVariables()]
-    moderators = ForEach(ManageMembersEntry())
-    members = ForEach(ManageMembersEntry())
-    invitations = ForEach(ManageMembersEntry())
 
 def _send_moderators_changed_email(community,
                                    community_href,
@@ -237,161 +227,182 @@ def _send_moderators_changed_email(community,
     message = msg.as_string()
     mailer.send(info['mfrom'], to_addrs, message)
 
+class ManageMembersFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.community = find_interface(context, ICommunity)
+        self.profiles = find_profiles(self.community)
 
-def manage_members_view(context, request):
-    """ Moderators managing the list of members"""
+    def _getInvitations(self):
+        L = []
+        for invitation in self.context.values():
+            if IInvitation.providedBy(invitation):
+                L.append(invitation)
+        return L
 
-    page_title = 'Manage Community Members'
-    api = TemplateAPI(context, request, page_title)
-
-    # Filter the actions based on permission in the **community**
-    community = find_interface(context, ICommunity)
-    community_href = model_url(community, request)
-    actions = _get_manage_actions(community, request)
-
-    form = ManageMembersForm()
-    if 'form.cancel' in request.params:
-        return HTTPFound(location=model_url(context, request))
-
-    profiles = find_profiles(community)
-    status_message=None
-    results = []
-    if 'form.submitted' in request.params:
-        try:
-            converted = form.validate(request.POST)
-            c_moderators = converted['moderators']
-            c_members = converted['members']
-            c_invitations = converted['invitations']
-
-            # Now process any changes.  These are highly specific, so
-            # let's make sure the flow of control is obvious.
-            # Invariant: Don't allow removal of the last moderator.
-            prev_moderators = community.moderator_names.copy()
-            users = find_users(context)
-            for action in c_moderators:
-                if action['remove']:
-                    name = action['id']
-                    users.remove_group(name, community.moderators_group_name)
-                    users.remove_group(name, community.members_group_name)
-                    profile = profiles[name]
-                    results.append('Removed moderator %s' % profile.title)
-
-                elif not action['is_moderator']:
-                    if not action['is_moderator']:
-                        name = action['id']
-                        users.remove_group(name,community.moderators_group_name)
-                        profile = profiles[name]
-                        results.append('%s is no longer a moderator' %
-                                       profile.title)
-
-            for action in c_members:
-                name = action['id']
-                if action['remove']:
-                    users.remove_group(name, community.members_group_name)
-                    profile = profiles[name]
-                    results.append('Removed member %s' % profile.title)
-                elif name not in community.moderator_names:
-                    if action['is_moderator']:
-                        users.add_group(name, community.moderators_group_name)
-                        profile = profiles[name]
-                        results.append('%s is now a moderator' % profile.title)
-
-            for action in c_invitations:
-                name = action['id']
-                invitation = context.get(name)
-                if IInvitation.providedBy(invitation):
-                    if action['remove']:
-                        del context[name]
-                    elif action['resend_info']:
-                        _send_invitation_email(request, community, community_href,
-                                               invitation)
-
-            if not community.moderator_names:
-                raise Invalid(
-                    "Must leave at least one moderator for community.",
-                    None, None
-                )
-
-            cur_moderators = community.moderator_names
-            new_moderators = cur_moderators - prev_moderators
-            old_moderators = prev_moderators - cur_moderators
-            if new_moderators or old_moderators:
-                _send_moderators_changed_email(community, community_href,
-                                               new_moderators, old_moderators,
-                                               cur_moderators, prev_moderators)
-
-            status_message = 'Membership information changed'
-            location = model_url(context, request, "manage.html",
-                                 query={"status_message": status_message})
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            # Since we've already monkeyed with our model graph, we need
-            # to abort transaction to undo changes.
-            transaction.manager.abort()
-            location = model_url(context, request, "manage.html",
-                                 query={"error_message": e.msg})
-            return HTTPFound(location=location)
-
-    # Assemble the grid data needed for the ZPT
-    moderators_info = []
-    members_info = []
-    invitations_info = []
-
-    def profile_sortkey(profile):
-        return '%s, %s' % (profile.lastname, profile.firstname)
-    def get_sortkey(info):
-        return info['sortkey']
-
-    for mod_name in community.moderator_names:
-        profile = profiles[mod_name]
-        moderators_info.append({
-            'sortkey': profile_sortkey(profile),
-            'id': mod_name, 'title': profile.title, 'is_moderator': True,
-            'resend_info': False, 'remove': False,
-            })
-    moderators_info.sort(key=get_sortkey)
-
-    for mem_name in community.member_names:
-        if mem_name not in community.moderator_names:
+    def form_defaults(self):
+        records = []
+        community = self.community
+        profiles = self.profiles
+        member_names = community.member_names
+        moderator_names = community.moderator_names
+        for mod_name in moderator_names:
+            profile = profiles[mod_name]
+            sortkey = (0, '%s, %s' % (profile.lastname, profile.firstname))
+            record = {
+                'sortkey':sortkey,
+                'name':mod_name,
+                'title':profile.title,
+                'moderator':True,
+                'member':True,
+                'resend':False,
+                'remove':False,
+                'invite':False,
+                }
+            records.append(record)
+        for mem_name in member_names:
+            if mem_name in moderator_names:
+                continue
             profile = profiles[mem_name]
-            members_info.append({
-                'sortkey': profile_sortkey(profile),
-                'id': mem_name, 'title': profile.title, 'is_moderator': False,
-                'resend_info': False, 'remove': False,
-                })
-    members_info.sort(key=get_sortkey)
+            sortkey = (1, '%s, %s' % (profile.lastname, profile.firstname))
+            record = {
+                'sortkey':sortkey,
+                'name':mem_name,
+                'title':profile.title,
+                'member':True,
+                'moderator':False,
+                'resend':False,
+                'remove':False,
+                'invite':False,
+                }
+            records.append(record)
+        for invitation in self._getInvitations():
+            sortkey = (2, invitation.email)
+            record = {
+                'sortkey':sortkey,
+                'title':invitation.email,
+                'name':invitation.__name__,
+                'member':False,
+                'moderator':False,
+                'resend':False,
+                'remove':False,
+                'invite':True,
+                }
+            records.append(record)
+        records.sort(key=lambda x: x['sortkey'])
+        return {'members':records}
 
-    for invite_name, invitation in context.items():
-        if IInvitation.providedBy(invitation):
-            invitations_info.append({
-                'sortkey': invitation.email,
-                'id':invite_name, 'title': invitation.email,
-                'is_moderator': False, 'resend_info': False, 'remove': False,
-                })
-    invitations_info.sort(key=get_sortkey)
+    def form_fields(self):
+        class Member(schemaish.Structure):
+            name = schemaish.String()
+            title = schemaish.String()
+            moderator = schemaish.Boolean()
+            member = schemaish.String()
+            resend = schemaish.Boolean()
+            remove = schemaish.Boolean()
+        members = schemaish.Sequence(Member())
+        members.title = ''
+        num_moderators = len(self.community.moderator_names)
+        members.num_moderators = num_moderators
+        return [('members', members)]
 
-    entries = {
-        'moderators': moderators_info,
-        'members': members_info,
-        'invitations':invitations_info,
-        }
+    def form_widgets(self, fields):
+        return {
+            'members':ManageMembersWidget(),
+            'members.*.name':formish.widgets.Hidden(),
+            'members.*.title':formish.widgets.Input(readonly=True),
+            'members.*.moderator':formish.widgets.Checkbox(),
+            'members.*.member':formish.widgets.Hidden(),
+            'members.*.resend':formish.widgets.Checkbox(),
+            'members.*.remove':formish.widgets.Checkbox(),
+            }
 
-    api.status_message = status_message
-    return render_template_to_response(
-        'templates/manage_members.pt',
-        api=api,
-        actions=actions,
-        post_url=request.url,
-        formfields=get_template('templates/formfields.pt'),
-        entries=entries,
-        results=results,
-        fielderrors={},
-        )
+    def __call__(self):
+        community = self.community
+        context = self.context
+        request = self.request
 
-class AddExistingUserForm(FormSchema):
-    users = baseforms.users
-    text = baseforms.text
+        api = TemplateAPI(context, request)
+        actions = _get_manage_actions(community, request)
+        desc = ('Use the form below to remove members or to resend invites '
+                'to people who have not accepted your invitation to join '
+                'this community.')
+        return {'api':api,
+                'actions':actions,
+                'page_title':'Manage Community Members',
+                'page_description':desc}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        results = []
+        community = self.community
+        community_href = model_url(community, self.request)
+        context = self.context
+        request = self.request
+        moderators = community.moderator_names # property
+        members = community.member_names # property
+        invitation_names = [ x.__name__ for x in self._getInvitations() ]
+
+        members_group_name = community.members_group_name
+        moderators_group_name = community.moderators_group_name
+        
+        users = find_users(context)
+
+        results = []
+
+        for record in converted['members']:
+            name = record['name']
+            if record['remove']:
+                if name in members:
+                    users.remove_group(name, members_group_name)
+                    results.append('Removed member %s' % record['title'])
+                if name in moderators:
+                    users.remove_group(name, moderators_group_name)
+                    results.append('Removed moderator %s' %
+                                   record['title'])
+                if name in invitation_names:
+                    del context[name]
+                    results.append('Removed invitation %s' %
+                                   record['title'])
+            else:
+                if record['resend']:
+                    invitation = context.get(name)
+                    _send_invitation_email(request, community, community_href,
+                                           invitation)
+                    results.append('Resent invitation to %s'%
+                                   record['title'])
+                else:
+                    if (name in moderators) and (not record['moderator']):
+                        users.remove_group(name, moderators_group_name)
+                        results.append('%s is no longer a moderator'%
+                                       record['title'])
+                    if (not name in moderators) and record['moderator']:
+                        users.add_group(name, moderators_group_name)
+                        results.append('%s is now a moderator' %
+                                       record['title'])
+
+        # Invariant: Don't allow removal of the last moderator.
+        if not community.moderator_names:
+            transaction.abort()
+            raise ValidationError(
+                members="Must leave at least one moderator for community.")
+
+        cur_moderators = community.moderator_names
+        new_moderators = cur_moderators - moderators
+        old_moderators = moderators - cur_moderators
+        if new_moderators or old_moderators:
+            _send_moderators_changed_email(community, community_href,
+                                           new_moderators, old_moderators,
+                                           cur_moderators, moderators)
+        joined_result = ', '.join(results)
+        status_message = 'Membership information changed: %s' % joined_result
+        location = model_url(context, request, "manage.html",
+                             query={"status_message": status_message})
+        return HTTPFound(location=location)
+        
 
 def _send_aeu_emails(community, community_href, profiles, text):
     # To make reading the add_existing_user_view easier, move the mail
@@ -428,61 +439,77 @@ def _send_aeu_emails(community, community_href, profiles, text):
         mailer.send(info['mfrom'], [to_email,], message)
 
 
-def add_existing_user_view(context, request):
-    """ Add an existing KARL3 user. """
+class AddExistingUserFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.community = find_interface(context, ICommunity)
+        self.profiles = find_profiles(context)
 
-    system_name = get_setting(context, 'system_name', 'KARL')
+    def form_fields(self):
+        return [
+            ('users', schemaish.Sequence(schemaish.String(
+                validator=validator.Required()
+                ))
+             ),
+            ('text', schemaish.String(
+                validator=validator.Length(max=500)
+                )
+             ),
+            ]
 
-    community = find_interface(context, ICommunity)
-    actions = _get_manage_actions(community, request)
-    profiles = find_profiles(context)
+    def form_widgets(self, fields):
+        return {
+            'users':karlwidgets.UserProfileLookupWidget(),
+            'text': karlwidgets.RichTextWidget(),
+            }
 
-    fieldwidgets = get_template('templates/formfields.pt')
-    usernames=request.POST.getall('users')
-    form = AddExistingUserForm(usernames = usernames, profiles=profiles)
+    def __call__(self):
+        community = self.community
+        context = self.context
+        request = self.request
+        profiles = self.profiles
 
-    # Handle form submission
-    if 'form.cancel' in request.params:
-        return HTTPFound(location=model_url(context, request))
+        # Handle userid passed in via GET request
+        # Moderator would get here by clicking a link in an email to grant a
+        # user's request to join this community.
+        add_user_id = request.params.get("user_id", None)
+        if add_user_id is not None:
+            profile = profiles.get(add_user_id, None)
+            if profile is not None:
+                return _add_existing_users(context, community, [profile,],
+                                           "", request)
 
-    if 'form.submitted' in request.params:
-        try:
-            converted = form.validate(request.POST)
-            return _add_existing_users(context, community, converted['users'],
-                                       converted['text'], request)
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = {}
+        system_name = get_setting(context, 'system_name', 'KARL')
 
-    # Handle userid passed in via GET request
-    # Moderator would get here by clicking a link in an email to grant a
-    # user's request to join this community.
-    add_user_id = request.params.get("user_id", None)
-    if add_user_id is not None:
-        profile = profiles.get(add_user_id, None)
-        if profile is not None:
-            return _add_existing_users(context, community, [profile,],
-                                       "", request)
+        api = TemplateAPI(context, request)
+        actions = _get_manage_actions(community, request)
+        desc = ('Type the first few letters of the name of the person you '
+                'would like to add to this community, select their name, '
+                'and press submit. The short message below is included '
+                'along with the text of your invite.')
+        return {'api':api,
+                'actions':actions,
+                'page_title':'Add Existing %s Users' % system_name,
+                'page_description':desc}
 
-    # Render the form and shove some default values in
-    page_title = 'Add Existing %s Users' % system_name
-    api = TemplateAPI(context, request, page_title)
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        community = self.community
+        profiles = self.profiles
+        usernames = converted['users']
+        users = []
+        for username in usernames:
+            if username not in profiles:
+                raise ValidationError(users='%s is not a valid profile' %
+                                      username)
+            users.append(profiles[username])
+        return _add_existing_users(context, community, users,
+                                   converted['text'], request)
 
-    return render_form_to_response(
-        'templates/add_existing_user.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=fieldwidgets,
-        fielderrors=fielderrors,
-        api=api,
-        system_name=system_name,
-        community_name=community.title,
-        actions=actions,
-        )
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
 def _add_existing_users(context, community, profiles, text, request):
     users = find_users(community)
@@ -508,26 +535,150 @@ def _add_existing_users(context, community, profiles, text, request):
                          query={'status_message': msg})
     return HTTPFound(location=location)
 
-class AcceptInvitationForm(FormSchema):
-    username = baseforms.username
-    password = baseforms.password
-    password_confirm = baseforms.password_confirm
-    firstname = baseforms.firstname
-    lastname = baseforms.lastname
-    phone = baseforms.phone
-    extension = baseforms.extension
-    organization = baseforms.organization
-    country = baseforms.country
-    location = baseforms.location
-    department = baseforms.department
-    position = baseforms.position
-    website = baseforms.website
-    languages = baseforms.languages
-    biography = baseforms.biography
-    photo = baseforms.photo
-    terms_and_conditions = baseforms.terms_and_conditions
-    accept_privacy_policy = baseforms.accept_privacy_policy
-    chained_validators = baseforms.chained_validators
+def accept_invitation_photo_view(context, request):
+    key = request.subpath[-1]
+    filestore = get_filestore(context, request, 'accept-invitation')
+    cache_tag, headers, bodyfile = filestore.get(key)
+    r = Response(headerlist=headers, app_iter=bodyfile)
+    return r
+
+class AcceptInvitationFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.community = find_interface(context, ICommunity)
+        self.profiles = find_profiles(context)
+        self.api = TemplateAPI(context, request)
+        self.filestore = get_filestore(context, request, 'accept-invitation')
+
+    def form_fields(self):
+        required = validator.Required()
+        min_pw_length = get_setting(self.context, 'min_pw_length')
+        pwlen = validator.Length(min_pw_length)
+        username = karlvalidators.RegularExpression(
+            r'^[\w-]+$',
+            'Username must contain only letters, numbers, and dashes')
+        return [
+            ('username', schemaish.String(validator=validator.All(required,
+                                                                  username))),
+            ('password', schemaish.String(
+                validator=validator.All(required, pwlen))),
+            ('password_confirm', schemaish.String(
+                validator=validator.All(required, pwlen))),
+            ('firstname', schemaish.String(validator=required)),
+            ('lastname', schemaish.String(validator=required)),
+            ('phone', schemaish.String()),
+            ('extension', schemaish.String()),
+            ('organization', schemaish.String()),
+            ('country', schemaish.String(
+                validator=validator.OneOf(countries.as_dict.keys()))),
+            ('location', schemaish.String()),
+            ('department', schemaish.String()),
+            ('position', schemaish.String()),
+            ('website', schemaish.String(validator=validator.URL())),
+            ('languages', schemaish.String()),
+            ('biography', schemaish.String()),
+            ('photo', schemaish.File()),
+            ('terms_and_conditions',
+             schemaish.Boolean(validator=validator.Equal(True))),
+            ('accept_privacy_policy',
+             schemaish.Boolean(validator=validator.Equal(True))),
+            ]
+
+    def form_widgets(self, fields):
+        default_icon = self.api.static_url + '/images/defaultUser.gif'
+        system_name = get_setting(self.context, 'system_name', 'KARL')
+        terms_text = "<div><h1>Terms and Conditions</h1><p>text</p></div>"
+        privacy_text = "<div><h1>Privacy</h1><p>text</p></div>"
+        r = queryMultiAdapter((self.context, self.request),
+                              IInvitationBoilerplate)
+        if r is not None:
+            terms_text = r.terms_and_conditions
+            privacy_text = r.privacy_statement
+
+        return {
+            'biography': karlwidgets.RichTextWidget(),
+            'password':formish.Password(),
+            'password_confirm':formish.Password(),
+            'country':formish.SelectChoice(countries),
+            'photo':karlwidgets.PhotoImageWidget(
+                filestore=self.filestore,
+                url_base=model_url(self.context, self.request, 'photo'),
+                image_thumbnail_default=default_icon),
+            'terms_and_conditions': karlwidgets.AcceptFieldWidget(
+                terms_text, 'the %s Terms and Conditions' % system_name),
+            'accept_privacy_policy': karlwidgets.AcceptFieldWidget(
+                privacy_text, 'the %s Privacy Policy' % system_name),
+            }
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        community = self.community
+        request = self.request
+        users = find_users(context)
+        profiles = self.profiles
+
+        password = converted['password']
+        password_confirm = converted['password_confirm']
+
+        if password != password_confirm:
+            msg = 'Mismatched password and confirm'
+            raise ValidationError(password_confirm=msg, password=msg)
+
+        username = converted['username']
+        if username in profiles:
+            raise ValidationError(username='Username already taken')
+            
+        community_href = model_url(community, request)
+        groups = [ community.members_group_name ]
+        users.add(username, username, password, groups)
+        plugin = request.environ['repoze.who.plugins']['auth_tkt']
+        identity = {'repoze.who.userid':username}
+        remember_headers = plugin.remember(request.environ, identity)
+        profile = create_content(
+            IProfile,
+            firstname=converted['firstname'],
+            lastname=converted['lastname'],
+            email=context.email,
+            phone=converted['phone'],
+            extension=converted['extension'],
+            department=converted['department'],
+            position=converted['position'],
+            organization=converted['organization'],
+            location=converted['location'],
+            country=converted['country'],
+            website=converted['website'],
+            languages=converted['languages']
+            )
+        profiles[username] = profile
+        workflow = get_workflow(IProfile, 'security')
+        if workflow is not None:
+            workflow.initialize(profile)
+        handle_photo_upload(profile, converted, thumbnail=True)
+
+        del context.__parent__[context.__name__]
+        url = model_url(community, request,
+                        query={'status_message':'Welcome!'})
+        _send_ai_email(community, community_href, username, profile)
+        self.filestore.clear()
+        return HTTPFound(headers=remember_headers, location=url)
+
+    def __call__(self):
+        community_name = self.community.title
+        context = self.context
+
+        system_name = get_setting(context, 'system_name', 'KARL')
+
+        desc = ('You have been invited to join the "%s" in %s.  Please begin '
+                'by creating a %s login with profile information.' %
+                (community_name, system_name, system_name))
+        return {'api':self.api,
+                'page_title':'Accept %s Invitation' % system_name,
+                'page_description':desc}
+        
 
 def _send_ai_email(community, community_href, username, profile):
     """Send email to user who has accepted a community invitation.
@@ -557,219 +708,123 @@ def _send_ai_email(community, community_href, username, profile):
     message = msg.as_string()
     mailer.send(info['mfrom'], [profile.email,], message)
 
+class InviteNewUsersFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.community = find_interface(context, ICommunity)
 
-def accept_invitation_view(context, request):
-    """ Process invitation, add KARL user, add member to community """
-    assert IInvitation.providedBy(context), \
-           "Context is expected to be an IInvitation."
+    def form_fields(self):
+        email = schemaish.String(validator=validator.Email())
+        return [
+            ('email_addresses',
+             schemaish.Sequence(email, validator=validator.Required())),
+            ('text',
+             schemaish.String(validator=validator.Length(max=500))),
+            ]
 
-    profiles = find_profiles(context)
-    system_name = get_setting(context, 'system_name', 'KARL')
-    min_pw_length = get_setting(context, 'min_pw_length')
-    community = find_interface(context, ICommunity)
-    community_name = community.title
+    def form_widgets(self, fields):
+        return {
+            'email_addresses':formish.TextArea(
+                converter_options={'delimiter':'\n'}),
+            'text':karlwidgets.RichTextWidget(),
+            }
 
-    fieldwidgets = get_template('templates/formfields.pt')
-    form = AcceptInvitationForm(profiles=profiles, min_pw_length=min_pw_length)
+    def __call__(self):
+        community = self.community
+        context = self.context
+        request = self.request
+        system_name = get_setting(context, 'system_name', 'KARL')
 
-    if 'form.cancel' in request.params:
-        return HTTPFound(location=model_url(context, request))
+        api = TemplateAPI(context, request)
+        actions = _get_manage_actions(community, request)
+        desc = ('Type email addresses (one per line) of people you would '
+                'like to add to your community. The short message below is '
+                'included along with the text of your invite.')
+        return {'api':api,
+                'actions':actions,
+                'page_title':'Invite New %s Users' % system_name,
+                'page_description':desc}
 
-    if 'form.submitted' in request.params:
-        try:
-            converted = form.validate(request.POST)
-            users = find_users(context)
-            username = converted['username']
-            password = converted['password']
-            community_href = model_url(community, request)
-            groups = [ community.members_group_name ]
-            users.add(username, username, password, groups)
-            plugin = request.environ['repoze.who.plugins']['auth_tkt']
-            identity = {'repoze.who.userid':username}
-            remember_headers = plugin.remember(request.environ, identity)
-            profile = create_content(
-                IProfile,
-                firstname=converted['firstname'],
-                lastname=converted['lastname'],
-                email=context.email,
-                phone=converted['phone'],
-                extension=converted['extension'],
-                department=converted['department'],
-                position=converted['position'],
-                organization=converted['organization'],
-                location=converted['location'],
-                country=converted['country'],
-                website=converted['website'],
-                languages=converted['languages']
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        community = self.community
+        random_id = getUtility(IRandomId)
+        members = community.member_names | community.moderator_names
+        community_href = model_url(community, request)
+
+        search = ICatalogSearch(context)
+
+        addresses = converted['email_addresses']
+        html_body = converted['text']
+
+        ninvited = nadded = nignored = 0
+
+        for email_address in addresses:
+            # Check for existing members
+            total, docids, resolver = search(email=email_address.lower(),
+                                             interfaces=[IProfile,])
+
+            if total:
+                # User is already a member of Karl
+                profile = resolver(docids[0])
+
+                if profile.__name__ in members:
+                    # User is a member of this community, do nothing
+                    nignored += 1
+
+                else:
+                    # User is in Karl but not in this community--just add
+                    # them to the community as though we had used the
+                    # add existing user form.
+                    _add_existing_users(context, community, [profile,],
+                                        html_body, request)
+                    nadded += 1
+
+            else:
+                # Invite new user to Karl
+                invitation = create_content(
+                    IInvitation,
+                    email_address,
+                    html_body
                 )
-            profiles[username] = profile
-            workflow = get_workflow(IProfile, 'security')
-            if workflow is not None:
-                workflow.initialize(profile)
-            handle_photo_upload(profile, converted, thumbnail=True)
+                while 1:
+                    name = random_id()
+                    if name not in context:
+                        context[name] = invitation
+                        break
 
-            del context.__parent__[context.__name__]
-            url = model_url(community, request,
-                            query={'status_message':'Welcome!'})
-            _send_ai_email(community, community_href, username, profile)
-            return HTTPFound(headers=remember_headers, location=url)
+                _send_invitation_email(request, community, community_href,
+                                       invitation)
+                ninvited += 1
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            try:
-                del fill_values['photo'] # rendering cant deal with photo
-            except KeyError:
-                pass
-    else:
-        fielderrors = {}
-        # hack to make chained validators work
-        fill_values = {'password':'', 'password_confirm':''}
+        status = ''
 
-    # Get text for two dialogs.  We get this from content in
-    # /offices/files, named with a special name.
-    terms_text = "<div><h1>Terms and Conditions</h1><p>text</p></div>"
-    privacy_text = "<div><h1>Privacy</h1><p>text</p></div>"
-    r = queryMultiAdapter((context, request), IInvitationBoilerplate)
-    if r is not None:
-        terms_text = r.terms_and_conditions
-        privacy_text = r.privacy_statement
+        if ninvited:
+            if ninvited == 1:
+                status = 'One user invited.  '
+            else:
+                status = '%d users invited.  ' % ninvited
 
-    # Render the form and shove some default values in
-    page_title = 'Accept Invitation'
-    api = TemplateAPI(context, request, page_title)
-    photo = {}
-    photo["url"] =  api.static_url + "/images/defaultUser.gif"
-    photo["may_delete"] = False
+        if nadded:
+            if nadded == 1:
+                status += 'One existing Karl user added to community.  '
+            else:
+                status += ('%d existing Karl users added to community.  '
+                           % nadded)
+        if nignored:
+            if nignored == 1:
+                status += 'One user already member.'
+            else:
+                status += '%d users already members.' % nignored
 
-    return render_form_to_response(
-        'templates/accept_invitation.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=fieldwidgets,
-        fielderrors=fielderrors,
-        terms_text=terms_text,
-        privacy_text=privacy_text,
-        photo=photo,
-        api=api,
-        system_name=system_name,
-        community_name=community_name,
-        )
-
-class InviteNewUsersForm(FormSchema):
-    email_addresses = baseforms.email_addresses
-    text = baseforms.text
-
-def invite_new_user_view(context, request):
-    """ Invite a new user to join KARL and thus this community. """
-    system_name = get_setting(context, 'system_name', 'KARL')
-
-    community = find_interface(context, ICommunity)
-    community_href = model_url(community, request)
-    actions = _get_manage_actions(community, request)
-
-    fieldwidgets = get_template('templates/formfields.pt')
-    form = InviteNewUsersForm()
-
-    ninvited = nadded = nignored = 0
-
-    if 'form.cancel' in request.params:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.params:
-        try:
-            converted = form.validate(request.POST)
-            addresses = converted['email_addresses']
-            random_id = getUtility(IRandomId)
-            html_body = converted['text']
-            members = community.member_names | community.moderator_names
-
-            search = ICatalogSearch(context)
-
-            for email_address in addresses:
-                # Check for existing members
-                total, docids, resolver = search(
-                    email=email_address.lower(),
-                    interfaces=[IProfile,],
-                    )
-
-                if total:
-                    # User is already a member of Karl
-                    profile = resolver(docids[0])
-
-                    if profile.__name__ in members:
-                        # User is a member of this community, do nothing
-                        nignored += 1
-
-                    else:
-                        # User is in Karl but not in this community--just add
-                        # them to the community as though we had used the
-                        # add existing user form.
-                        _add_existing_users(context, community, [profile,],
-                                            html_body, request)
-                        nadded += 1
-
-                else:
-                    # Invite new user to Karl
-                    invitation = create_content(
-                        IInvitation,
-                        email_address,
-                        html_body
-                    )
-                    while 1:
-                        name = random_id()
-                        if name not in context:
-                            context[name] = invitation
-                            break
-
-                    _send_invitation_email(request, community, community_href,
-                                           invitation)
-                    ninvited += 1
-
-            status = ''
-            if ninvited:
-                if ninvited == 1:
-                    status = 'One user invited.  '
-                else:
-                    status = '%d users invited.  ' % ninvited
-
-            if nadded:
-                if nadded == 1:
-                    status += 'One existing Karl user added to community.  '
-                else:
-                    status += ('%d existing Karl users added to community.  '
-                               % nadded)
-            if nignored:
-                if nignored == 1:
-                    status += 'One user already member.'
-                else:
-                    status += '%d users already members.' % nignored
-
-            location = model_url(context, request, 'manage.html',
-                                 query={'status_message': status})
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fill_values = {}
-        fielderrors = {}
-
-    page_title = 'Invite New %s Users' % system_name
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/invite_new_user.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=fieldwidgets,
-        fielderrors=fielderrors,
-        api=api,
-        actions=actions,
-        )
+        location = model_url(context, request, 'manage.html',
+                             query={'status_message': status})
+        return HTTPFound(location=location)
 
 def _send_invitation_email(request, community, community_href, invitation):
     mailer = getUtility(IMailDelivery)

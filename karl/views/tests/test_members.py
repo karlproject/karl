@@ -72,16 +72,16 @@ class ShowMembersViewTests(unittest.TestCase):
         self.assertEqual(renderer.submenu[1]['make_link'], False)
         self.assertEqual(searchkw['sort_index'], 'lastfirst')
 
-class AddExistingUserViewTests(unittest.TestCase):
+class AddExistingUserFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.members import add_existing_user_view
-        return add_existing_user_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.views.members import AddExistingUserFormController
+        return AddExistingUserFormController(context, request)
 
     def _getContext(self):
         context = testing.DummyModel()
@@ -99,339 +99,271 @@ class AddExistingUserViewTests(unittest.TestCase):
 
         return context
 
-    def test_cancelled(self):
+    def test_handle_cancel(self):
         context = testing.DummyModel()
-        request = testing.DummyRequest(params={'form.cancel':'1'})
-        from webob import MultiDict
-        request.POST = MultiDict({})
-        response = self._callFUT(context, request)
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_notsubmitted(self):
+    def test__call__(self):
         context = self._getContext()
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict({})
-        renderer = testing.registerDummyRenderer(
-            'templates/add_existing_user.pt')
-        self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        info = controller()
         actions = [('Manage Members', 'manage.html'),
                    ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
-        self.assertEqual(renderer.actions, actions)
+        self.assertEqual(info['actions'], actions)
+        self.failUnless('page_title' in info)
+        self.failUnless('page_description' in info)
 
-    def test_submitted_invalid(self):
-        tn = 'templates/add_existing_user.pt'
-        renderer = testing.registerDummyRenderer(tn)
-        from webob import MultiDict
-        request = testing.DummyRequest(MultiDict({'form.submitted':1}))
-        context = self._getContext()
-        self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_submitted_bad_profile(self):
-        # This is when a username comes in that doesn't match a
-        # profile
-        from repoze.sendmail.interfaces import IMailDelivery
-        renderer = testing.registerDummyRenderer(
-            'templates/add_existing_user.pt')
-        from webob import MultiDict
-        md = MultiDict({
-                'form.submitted':1,
-                'users': u'admin,nyc99',
-                'text': u'<p>some text</p>',
-                })
-        request = testing.DummyRequest(md)
-        context = self._getContext()
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-        response = self._callFUT(context, request)
-        self.failUnless('users' in renderer.fielderrors)
-
-    def test_submitted_success(self):
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        renderer = testing.registerDummyRenderer(
-            'templates/add_existing_user.pt')
-        from webob import MultiDict
-        md = MultiDict({
-                'form.submitted':1,
-                'users': u'admin',
-                'text': u'<p>some text</p>',
-                })
-        request = testing.DummyRequest(md)
-        context = self._getContext()
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-        response = self._callFUT(context, request)
-        self.assertEqual(context.users.added_groups, [('admin','members')])
-        self.assertEqual(mailer[0].mto[0], 'admin@example.com')
-        self.failUnless(
-            response.location.startswith('http://example.com/manage.html'))
-
-    def test_submitted_via_get(self):
+    def test___call__with_userid_get(self):
         from repoze.sendmail.interfaces import IMailDelivery
         request = testing.DummyRequest({"user_id": "admin"})
-        from webob import MultiDict
-        request.POST = MultiDict({})
         context = self._getContext()
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller()
         self.assertEqual(context.users.added_groups, [('admin','members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
         self.failUnless(
             response.location.startswith('http://example.com/manage.html'))
 
-class AcceptInvitationViewTests(unittest.TestCase):
+    def test_handle_submit_badprofile(self):
+        from repoze.bfg.formish import ValidationError
+        request = testing.DummyRequest()
+        context = self._getContext()
+        controller = self._makeOne(context, request)
+        converted = {'users':('admin', 'nyc99'), 'text':'some text'}
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
+    def test_handle_submit_success(self):
+        from repoze.sendmail.interfaces import IMailDelivery
+        request = testing.DummyRequest()
+        context = self._getContext()
+        mailer = karltesting.DummyMailer()
+        testing.registerUtility(mailer, IMailDelivery)
+        controller = self._makeOne(context, request)
+        converted = {'users': (u'admin',), 'text':'some_text'}
+        response = controller.handle_submit(converted)
+        self.assertEqual(context.users.added_groups, [('admin','members')])
+        self.assertEqual(mailer[0].mto[0], 'admin@example.com')
+        self.failUnless(
+            response.location.startswith('http://example.com/manage.html'))
+
+class AcceptInvitationFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.members import accept_invitation_view
-        return accept_invitation_view(context, request)
+    def _makeContext(self):
+        context = testing.DummyModel(sessions=DummySessions())
+        return context
 
-    def test_cancelled(self):
-        karltesting.registerSettings()
-        from zope.interface import directlyProvides
-        from zope.interface import alsoProvides
-        from karl.models.interfaces import IInvitation
-        context = testing.DummyModel()
-        from karl.models.interfaces import ICommunity
-        directlyProvides(context, ICommunity)
-        context.title = 'Some Community Title'
-        alsoProvides(context, IInvitation)
-        request = testing.DummyRequest(params={'form.cancel':'1'})
-        response = self._callFUT(context, request)
+    def _makeRequest(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        return request
+    
+    def _makeOne(self, context, request):
+        from karl.views.members import AcceptInvitationFormController
+        return AcceptInvitationFormController(context, request)
+
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_notsubmitted(self):
-        karltesting.registerSettings()
+    def test__call__(self):
+        from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
-        from zope.interface import alsoProvides
-        from karl.models.interfaces import IInvitation
-        context = testing.DummyModel()
-        from karl.models.interfaces import ICommunity
+        context = self._makeContext()
+        request = self._makeRequest()
         directlyProvides(context, ICommunity)
-        context.title = 'Some Community Title'
-        alsoProvides(context, IInvitation)
-        formfields = testing.registerDummyRenderer('templates/formfields.pt')
-        renderer = testing.registerDummyRenderer(
-            'templates/accept_invitation.pt')
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors, {})
+        context.title = 'The Community'
+        controller = self._makeOne(context, request)
+        info = controller()
+        self.failUnless('page_title' in info)
+        self.failUnless('page_description' in info)
+        self.failUnless('api' in info)
 
-    def test_submitted_failvalidation(self):
-        karltesting.registerSettings()
-        from zope.interface import directlyProvides
-        from zope.interface import alsoProvides
-        from karl.models.interfaces import IInvitation
-        context = testing.DummyModel()
-        from karl.models.interfaces import ICommunity
-        directlyProvides(context, ICommunity)
-        context.title = 'Some Community Title'
-        alsoProvides(context, IInvitation)
-        formfields = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        renderer = testing.registerDummyRenderer(
-            'templates/accept_invitation.pt')
-        request = testing.DummyRequest({'form.submitted':'1'})
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def test_form_fields(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless(fields)
 
-    def test_submitted_username_exists(self):
-        karltesting.registerSettings()
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        context = testing.DummyModel()
-        from karl.models.interfaces import ICommunity
-        directlyProvides(context, ICommunity)
-        context.title = 'Some Community Title'
-        context['profiles'] = testing.DummyModel()
-        fred = testing.DummyModel()
-        context['profiles']['fred'] = fred
-        directlyProvides(fred, IInvitation)
+    def test_form_widgets(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets(None)
+        self.failUnless(widgets)
 
-        formfields = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        renderer = testing.registerDummyRenderer(
-            'templates/accept_invitation.pt')
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'username':'fred',
-                                        'password':'password',
-                                        'password_confirm':'password',
-                                        'firstname':'fred',
-                                        'lastname':'flintstone',
-                                        'terms_and_conditions':'1',
-                                        'accept_privacy_policy':'1'})
-        response = self._callFUT(fred, request)
-        self.assertEqual(renderer.fielderrors['username'].msg,
-                         'Username fred already exists')
+    def test_handle_submit_password_mismatch(self):
+        from repoze.bfg.formish import ValidationError
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        converted = {'password':'1', 'password_confirm':'2'}
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
-    def test_submitted_success(self):
-        karltesting.registerSettings()
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import IInvitation
+    def test_handle_submit_username_exists(self):
+        from repoze.bfg.formish import ValidationError
+        context = self._makeContext()
+        request = self._makeRequest()
+        profiles = testing.DummyModel()
+        profiles['a'] = karltesting.DummyProfile()
+        context['profiles'] = profiles
+        controller = self._makeOne(context, request)
+        converted = {'password':'1', 'password_confirm':'1', 'username':'a'}
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
+    def test_handle_submit_success(self):
         from karl.models.interfaces import IProfile
-        from zope.interface import directlyProvides
         from repoze.lemonade.testing import registerContentFactory
         from repoze.sendmail.interfaces import IMailDelivery
         from repoze.workflow.testing import registerDummyWorkflow
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
         workflow = registerDummyWorkflow('security')
-
-        registerContentFactory(DummyContent, IProfile)
         mailer = karltesting.DummyMailer()
-
         testing.registerUtility(mailer, IMailDelivery)
-        context = testing.DummyModel()
-        context.members_group_name = 'members'
-        context.email = 'jim@example.com'
-        users = karltesting.DummyUsers()
-        context.users = users
-        context.title = "Community Title"
-        context.description = "Community Description"
-        directlyProvides(context, ICommunity)
-
-        context['profiles'] = testing.DummyModel()
-        fred = testing.DummyModel()
-        context['profiles']['fred'] = fred
-        fred.email = context.email
-        directlyProvides(fred, IInvitation)
-
-        formfields = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        renderer = testing.registerDummyRenderer(
-            'templates/accept_invitation.pt')
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'username':'jim',
-                                        'password':'password',
-                                        'password_confirm':'password',
-                                        'firstname':'fred',
-                                        'lastname':'flintstone',
-                                        'terms_and_conditions':'1',
-                                        'accept_privacy_policy':'1',
-                                        'phone':'',
-                                        'extension':'',
-                                        'organization':'',
-                                        'country':'',
-                                        'location':'',
-                                        'department':'',
-                                        'position':'',
-                                        'website':'',
-                                        'biography':'',
-                                        'languages':'',
-                                        'photo':'',
-                                        })
-        class DummyPlugin:
+        registerContentFactory(DummyContent, IProfile)
+        class DummyWhoPlugin(object):
             def remember(self, environ, identity):
                 self.identity = identity
-                return [('a', '1')]
-        plugin = DummyPlugin()
-        plugins = {'auth_tkt':plugin}
-        request.environ['repoze.who.plugins'] = plugins
-        response = self._callFUT(fred, request)
-        self.assertEqual(users.added, ('jim', 'jim', u'password', ['members']))
-        self.failUnless('jim' in context['profiles'])
-        self.failIf('fred' in context['profiles'])
-        self.assertEqual(plugin.identity['repoze.who.userid'], 'jim')
-        self.failUnless( ('a', '1') in response.headerlist )
-        self.assertEquals(1, len(mailer))
-        self.assertEquals(mailer[0].mto, ["jim@example.com",])
+                return []
+        plugin = DummyWhoPlugin()
+        whoplugins = {'auth_tkt':plugin}
+        request = self._makeRequest()
+        request.environ['repoze.who.plugins'] = whoplugins
+        community = testing.DummyModel()
+        profiles = testing.DummyModel()
+        community['profiles'] = profiles
+        community.users = karltesting.DummyUsers()
+        community.members_group_name = 'community:members'
+        directlyProvides(community, ICommunity)
+        context = self._makeContext()
+        community['invite'] = context
+        community.title = 'Community'
+        community.description = 'Community'
+        community.sessions = DummySessions()
+        context.email = 'a@example.com'
+        controller = self._makeOne(context, request)
+        converted = {'password':'1', 'password_confirm':'1',
+                     'username':'username',
+                     'firstname':'firstname', 'lastname':'lastname',
+                     'phone':'phone', 'extension':'extension',
+                     'department':'department', 'position':'position',
+                     'organization':'organization', 'location':'location',
+                     'country':'country', 'website':'website',
+                     'languages':'languages',
+                     }
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location,
+                         'http://example.com/?status_message=Welcome%21')
+        self.assertEqual(community.users.added,
+                         ('username', 'username', '1', ['community:members']))
+        self.assertEqual(plugin.identity, {'repoze.who.userid':'username'})
+        profiles = community['profiles']
+        self.failUnless('username' in profiles)
+        self.assertEqual(workflow.initialized,[profiles['username']])
+        self.failIf('invite' in community)
+        self.assertEqual(len(mailer), 1)
 
-        # Make sure workflow.initialize() called
-        self.assertEqual(workflow.initialized, [context['profiles']['jim']])
-
-class InviteNewUserViewTests(unittest.TestCase):
+class InviteNewUsersFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.members import invite_new_user_view
-        return invite_new_user_view(context, request)
+    def _getTargetClass(self):
+        from karl.views.members import InviteNewUsersFormController
+        return InviteNewUsersFormController
 
-    def _getContext(self):
-        context = testing.DummyModel()
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        directlyProvides(context, ICommunity)
-        context.member_names = set()
-        context.moderator_names = set()
-        context.users = karltesting.DummyUsers()
-        context.title = 'thetitle'
-        context.description = 'description'
-        context['profiles'] = testing.DummyModel()
-        admin = testing.DummyModel()
-        admin.email = 'admin@example.com'
-        context['profiles']['admin'] = admin
+    def _makeOne(self, context, request):
+        return self._getTargetClass()(context, request)
 
-        return context
-
-    def test_notsubmitted(self):
-        context = self._getContext()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/invite_new_user.pt')
-        self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'),
-                   ('Add Existing', 'add_existing.html'),
-                   ('Invite New', 'invite_new.html')]
-        self.assertEqual(renderer.actions, actions)
-
-    def test_cancelled(self):
-        context = self._getContext()
-        request = testing.DummyRequest(params={'form.cancel':'1'})
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/')
-
-    def test_submitted_bademail(self): # broken
+    def _registerMailer(self):
         from repoze.sendmail.interfaces import IMailDelivery
-        renderer = testing.registerDummyRenderer(
-            'templates/invite_new_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        request = testing.DummyRequest({
-                'form.submitted':1,
-                'email_addresses': u'yo\n',
-                'text': u'some text',
-                })
-        context = self._getContext()
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
-        response = self._callFUT(context, request)
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['email_addresses']),
-                         'Errors:\nAn email address must contain a single @')
+        return mailer
 
-    def test_submitted_ok_new_to_karl(self):
-        from repoze.sendmail.interfaces import IMailDelivery
+    def _makeCommunity(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel()
+        community.member_names = set(['a'])
+        community.moderator_names = set(['b', 'c'])
+        users = karltesting.DummyUsers(community)
+        community.users = users
+        directlyProvides(community, ICommunity)
+        community.moderators_group_name = 'group:community:moderators'
+        community.members_group_name = 'group:community:members'
+        community.title = 'community'
+        community.description = 'description'
+        return community
+
+    def test_form_fields(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.assertEqual(len(fields), 2)
+
+    def test_form_widgets(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets(None)
+        self.assertEqual(type(widgets), dict)
+
+    def test_call(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        result = controller()
+        self.failUnless('api' in result)
+        self.failUnless('actions' in result)
+        self.failUnless('page_title' in result)
+        self.failUnless('page_description' in result)
+
+    def test_handle_cancel(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        result = controller.handle_cancel()
+        self.assertEqual(result.location, 'http://example.com/')
+        
+    def test_handle_submit_new_to_karl(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IInvitation
         from karl.utilities.interfaces import IRandomId
-        renderer1 = testing.registerDummyRenderer(
-            'templates/invite_new_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        request = testing.DummyRequest({
-                'form.submitted':1,
-                'email_addresses': u'yo@plope.com\n',
-                'text': u'some text',
-                })
-        context = self._getContext()
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        request = testing.DummyRequest()
+        context = self._makeCommunity()
+        mailer = self._registerMailer()
         registerCatalogSearch()
         def nonrandom(size=6):
             return 'A' * size
         testing.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        converted = {
+            'email_addresses': [u'yo@plope.com'],
+            'text': u'some text',
+            }
+
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
           'http://example.com/manage.html?status_message=One+user+invited.++'
                          )
@@ -440,441 +372,283 @@ class InviteNewUserViewTests(unittest.TestCase):
         self.assertEqual(1, len(mailer))
         self.assertEqual(mailer[0].mto, [u"yo@plope.com",])
 
-    def test_submitted_ok_in_karl(self):
-        from repoze.sendmail.interfaces import IMailDelivery
+    def test_handle_submit_already_in_karl(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IInvitation
         from karl.utilities.interfaces import IRandomId
-        renderer1 = testing.registerDummyRenderer(
-            'templates/invite_new_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        request = testing.DummyRequest({
-                'form.submitted':1,
-                'email_addresses': u'a@x.org\n',
-                'text': u'some text',
-                })
-        context = self._getContext()
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        request = testing.DummyRequest()
+        context = self._makeCommunity()
+        mailer = self._registerMailer()
+        registerCatalogSearch()
         profile = karltesting.DummyProfile()
-        context['profiles']['a'] = profile
-        context.members_group_name = 'group:community:members'
-        registerCatalogSearch(results={'email=a@x.org': [profile,]})
+        profile.__name__ = 'd'
+        registerCatalogSearch(results={'email=d@x.org': [profile,]})
         def nonrandom(size=6):
             return 'A' * size
         testing.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        converted = {
+            'email_addresses': [u'd@x.org'],
+            'text': u'some text',
+            }
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
           'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups,
-                         [('a', 'group:community:members')])
+                         [('d', 'group:community:members')])
 
-    def test_submitted_ok_in_community(self):
-        from repoze.sendmail.interfaces import IMailDelivery
+    def test_handle_submit_already_in_community(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IInvitation
         from karl.utilities.interfaces import IRandomId
-        renderer1 = testing.registerDummyRenderer(
-            'templates/invite_new_user.pt')
-        renderer2 = testing.registerDummyRenderer(
-            'templates/formfields.pt')
-        request = testing.DummyRequest({
-                'form.submitted':1,
-                'email_addresses': u'a@x.org\n',
-                'text': u'some text',
-                })
-        context = self._getContext()
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        request = testing.DummyRequest()
+        context = self._makeCommunity()
+        mailer = self._registerMailer()
+        registerCatalogSearch()
         profile = karltesting.DummyProfile()
-        context['profiles']['a'] = profile
-        context.member_names.add('a')
-        context.members_group_name = 'group:community:members'
+        profile.__name__ = 'a'
         registerCatalogSearch(results={'email=a@x.org': [profile,]})
         def nonrandom(size=6):
             return 'A' * size
         testing.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        converted = {
+            'email_addresses': [u'a@x.org'],
+            'text': u'some text',
+            }
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
           'http://example.com/manage.html?status_message=One+user+already+member.'
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, [])
+        
 
-class ManageMembersViewTests(unittest.TestCase):
+class ManageMembersFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.members import manage_members_view
-        return manage_members_view(context, request)
+    def _getTargetClass(self):
+        from karl.views.members import ManageMembersFormController
+        return ManageMembersFormController
 
-    def test_cancelled(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest(params={'form.cancel':'1'})
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/')
+    def _makeOne(self, context, request):
+        return self._getTargetClass()(context, request)
 
-    def test_manage_members_notsubmitted(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
+    def _registerMailer(self):
         from repoze.sendmail.interfaces import IMailDelivery
-
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
+        return mailer
 
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b'])
-        site = context.__parent__.__parent__
+    def _makeCommunity(self):
+        from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import IInvitation
+        from zope.interface import directlyProvides
+        community = testing.DummyModel()
+        community.member_names = set(['a'])
+        community.moderator_names = set(['b', 'c'])
+        site = testing.DummyModel()
+        site['communities'] = testing.DummyModel()
+        site['communities']['community'] = community
         profiles = testing.DummyModel()
         profiles['a'] = karltesting.DummyProfile()
         profiles['b'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
+        profiles['c'] = karltesting.DummyProfile()
+        invitation = testing.DummyModel(email='foo@example.com',
+                                        message='message')
         directlyProvides(invitation, IInvitation)
+        community['invitation'] = invitation
         site['profiles'] = profiles
-        context['invitation'] = invitation
-        directlyProvides(context, ICommunity)
+        users = karltesting.DummyUsers(community)
+        site.users = users
+        directlyProvides(community, ICommunity)
+        community.moderators_group_name = 'moderators'
+        community.members_group_name = 'members'
+        return community
+
+    def test_form_defaults(self):
+        context = self._makeCommunity()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        actions = [('Manage Members', 'manage.html'),
-                   ('Add Existing', 'add_existing.html'),
-                   ('Invite New', 'invite_new.html')]
-        self.assertEqual(renderer.actions, actions)
-        self.assertEqual(renderer.entries['moderators'],
-                         [{'is_moderator': True, 'resend_info': False,
-                           'id': 'b', 'remove': False, 'title': 'title',
-                           'sortkey': 'lastname, firstname'}])
-        self.assertEqual(renderer.entries['members'],
-                         [{'is_moderator': False, 'resend_info': False,
-                           'id': 'a', 'remove': False, 'title': 'title',
-                           'sortkey': 'lastname, firstname'}])
-        self.assertEqual(renderer.entries['invitations'],
-                         [{'is_moderator': False, 'resend_info': False,
-                           'id': 'invitation', 'remove': False,
-                           'title': 'foo@example.com',
-                           'sortkey': 'foo@example.com'}])
-        self.assertEqual(0, len(mailer))
+        controller = self._makeOne(context, request)
 
-    def test_manage_members_remove_sole_moderator(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
+        defaults = controller.form_defaults()
+        members = defaults['members']
+        self.assertEqual(len(members), 4)
 
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        self.assertEqual(members[0]['member'], True)
+        self.assertEqual(members[0]['name'], 'c')
+        self.assertEqual(members[0]['moderator'], True)
 
-        context = karltesting.DummyCommunity()
-        directlyProvides(context, ICommunity)
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        context.title = "Some Community Title"
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        directlyProvides(invitation, IInvitation)
+        self.assertEqual(members[1]['member'], True)
+        self.assertEqual(members[1]['name'], 'b')
+        self.assertEqual(members[1]['moderator'], True)
+
+        self.assertEqual(members[2]['member'], True)
+        self.assertEqual(members[2]['name'], 'a')
+        self.assertEqual(members[2]['moderator'], False)
+
+        self.assertEqual(members[3]['member'], False)
+        self.assertEqual(members[3]['name'], 'invitation')
+        self.assertEqual(members[3]['moderator'], False)
+
+    def test_form_fields(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.assertEqual(len(fields), 1)
+        self.assertEqual(fields[0][1].title, '')
+
+    def test_form_widgets(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets(None)
+        self.assertEqual(type(widgets), dict)
+
+    def test_call(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        result = controller()
+        self.failUnless('api' in result)
+        self.failUnless('actions' in result)
+        self.failUnless('page_title' in result)
+
+    def test_handle_cancel(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        result = controller.handle_cancel()
+        self.assertEqual(result.location,
+                         'http://example.com/communities/community/')
+        
+    def test_handle_submit_remove_sole_moderator(self):
+        from repoze.bfg.formish import ValidationError
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[
+            {'remove':True, 'name':'b', 'resend':False,
+             'moderator':False, 'title':'buz'},
+            {'remove':True, 'name':'c', 'resend':False,
+             'moderator':False, 'title':'buz'},
+            ],
+                     }
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
+    def test_handle_submit_deop_sole_moderator(self):
+        from repoze.bfg.formish import ValidationError
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[
+            {'remove':False, 'name':'b', 'resend':False,
+             'moderator':False, 'title':'buz'},
+            {'remove':False, 'name':'c', 'resend':False,
+             'moderator':False, 'title':'buz'},
+            ],
+                     }
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
+    def test_handle_submit_remove_member(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[{'remove':True, 'name':'a', 'resend':False,
+                                 'moderator':False, 'title':'buz'}]}
+        mailer = self._registerMailer()
+        response = controller.handle_submit(converted)
         site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'moderators-0.id':'b',
-                                        'moderators-0.remove':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/manage.html?error_message=Must+leave+at+least+one+moderator+for+community.'
-        )
-
-    def test_manage_members_remove_second_moderator(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        directlyProvides(invitation, IInvitation)
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'moderators-0.id':'b',
-                                        'moderators-0.remove':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # he is removed
-        self.assertEqual(users.removed_groups,
-                         [(u'b', 'moderators'), (u'b', 'members')] )
-        self.assertEqual(1, len(mailer))
-
-    def test_manage_members_remove_member(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        directlyProvides(invitation, IInvitation)
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'members-0.id':'a',
-                                        'members-0.remove':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # he is removed
+        users = site.users
         self.assertEqual(users.removed_groups, [(u'a', 'members')])
-        self.assertEqual(0, len(mailer))
+        self.assertEqual(len(mailer), 0)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/'
+                         'manage.html?status_message='
+                         'Membership+information+changed%3A+'
+                         'Removed+member+buz')
 
-    def test_manage_members_make_member_moderator_already_moderator(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        directlyProvides(invitation, IInvitation)
+    def test_handle_submit_remove_invitation(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[{'remove':True, 'name':'invitation',
+                                 'resend':False, 'moderator':False,
+                                 'title':'buz'}]}
+        mailer = self._registerMailer()
+        response = controller.handle_submit(converted)
         site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'members-0.id':'b',
-                                        'members-0.is_moderator':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # he already a moderator
-        self.assertEqual(users.added_groups, [])
-        self.assertEqual(users.removed_groups, [])
-        self.assertEqual(0, len(mailer))
-
-    def test_manage_members_make_member_moderator_not_already_moderator(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        directlyProvides(invitation, IInvitation)
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'members-0.id':'a',
-                                        'members-0.is_moderator':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # he is now a moderator
-        self.assertEqual(users.added_groups, [(u'a', 'moderators')])
-        self.assertEqual(1, len(mailer))
-
-    def test_manage_members_make_member_remove_moderator_from_member(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IInvitation
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com')
-        directlyProvides(invitation, IInvitation)
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'moderators-0.id':'b',
-                                        'mmoderators-0.is_moderator':''})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # he is no longer a moderator
-        self.assertEqual(users.removed_groups, [(u'b', 'moderators')])
-        self.assertEqual(1, len(mailer))
-
-    def test_manage_members_remove_invitation(self):
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import IInvitation
-        from zope.interface import directlyProvides
-        context = karltesting.DummyCommunity()
-        context.member_names = set()
-        context.moderator_names = set()
-        profiles = testing.DummyModel()
-        invitation = testing.DummyModel(email='foo@example.com')
-        directlyProvides(invitation, IInvitation)
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        directlyProvides(context, ICommunity)
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'invitations-0.id':'invitation',
-                                        'invitations-0.resend_info':'0',
-                                        'invitations-0.remove':'1',
-                                        })
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-        # the invitation is removed
+        users = site.users
+        self.assertEqual(len(mailer), 0)
         self.failIf('invitation' in context)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/'
+                         'manage.html?status_message='
+                         'Membership+information+changed%3A+'
+                         'Removed+invitation+buz')
 
-    def test_manage_members_resend_invitation(self):
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import IInvitation
-        from zope.interface import directlyProvides
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com',
-                                        message='Hello there')
-        directlyProvides(invitation, IInvitation)
+    def test_handle_submit_remove_moderator(self):
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[{'remove':True, 'name':'b', 'resend':False,
+                                 'moderator':False, 'title':'buz'}]}
+        mailer = self._registerMailer()
+        response = controller.handle_submit(converted)
         site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        directlyProvides(context, ICommunity)
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'invitations-0.id':'invitation',
-                                        'invitations-0.resend_info':'1',
-                                        })
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
+        users = site.users
+        self.assertEqual(users.removed_groups, [(u'b', 'moderators')])
+        self.assertEqual(len(mailer), 0)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/'
+                         'manage.html?status_message='
+                         'Membership+information+changed%3A+'
+                         'Removed+moderator+buz')
 
-        self.assertEqual(1, len(mailer))
-        self.assertEqual(['foo@example.com',], mailer[0].mto)
+    def test_handle_submit_resend(self):
+        context = self._makeCommunity()
+        context.title = 'community'
+        context.description = 'description'
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[{'remove':False, 'name':'invitation',
+                                 'resend':True, 'moderator':False,
+                                 'title':'buz'}]}
+        mailer = self._registerMailer()
+        response = controller.handle_submit(converted)
+        self.assertEqual(len(mailer), 1)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/'
+                         'manage.html?status_message='
+                         'Membership+information+changed%3A+'
+                         'Resent+invitation+to+buz')
 
-    def test_manage_members_remove_blocks_resend_invitation(self):
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import IInvitation
-        from zope.interface import directlyProvides
-        from repoze.sendmail.interfaces import IMailDelivery
-
-        mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
-
-        context = karltesting.DummyCommunity()
-        context.member_names = set(['a'])
-        context.moderator_names = set(['b', 'c'])
-        profiles = testing.DummyModel()
-        profiles['a'] = karltesting.DummyProfile()
-        profiles['b'] = karltesting.DummyProfile()
-        profiles['c'] = karltesting.DummyProfile()
-        invitation = testing.DummyModel(email='foo@example.com',
-                                        message='Hello there')
-        directlyProvides(invitation, IInvitation)
-        site = context.__parent__.__parent__
-        site['profiles'] = profiles
-        users = karltesting.DummyUsers(context)
-        site.users = users
-        context['invitation'] = invitation
-        context.moderators_group_name = 'moderators'
-        context.members_group_name = 'members'
-        directlyProvides(context, ICommunity)
-        request = testing.DummyRequest({'form.submitted':'1',
-                                        'invitations-0.id':'invitation',
-                                        'invitations-0.resend_info':'1',
-                                        'invitations-0.remove':'1'})
-        renderer = testing.registerDummyRenderer('templates/manage_members.pt')
-        self._callFUT(context, request)
-
-        self.assertEqual(0, len(mailer))
+    def test_handle_submit_add_moderator(self):
+        context = self._makeCommunity()
+        context.title = 'community'
+        context.description = 'description'
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        converted = {'members':[{'remove':False, 'name':'a',
+                                 'resend':False, 'moderator':True,
+                                 'title':'buz'}]}
+        mailer = self._registerMailer()
+        response = controller.handle_submit(converted)
+        self.assertEqual(len(mailer), 0)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/'
+                         'manage.html?status_message='
+                         'Membership+information+changed%3A+'
+                         'buz+is+now+a+moderator')
 
 class TestJqueryMemberSearchView(unittest.TestCase):
     def setUp(self):
@@ -913,29 +687,32 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.body, '[{"text": "firstname lastname", "id": "b"}, {"text": "firstname lastname", "id": "c"}]')
 
+class TestAcceptInvitationPhotoView(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from karl.views.members import accept_invitation_photo_view
+        return accept_invitation_photo_view(context, request)
+
+    def test_it(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        request.subpath = ('a',)
+        sessions = DummySessions()
+        class DummyBlob:
+            def open(self, mode):
+                return ('abc',)
+        sessions['1'] = {'accept-invitation':
+                         {'a':([('a', '1')],None, DummyBlob())}
+                         }
+        context = testing.DummyModel(sessions=sessions)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.headerlist, [('a', '1')])
+        self.assertEqual(response.app_iter, ('abc',))
+
 class DummyMembers(testing.DummyModel):
     def __init__(self):
         testing.DummyModel.__init__(self)
         self.__parent__ = karltesting.DummyCommunity()
         self.__name__ = 'members'
-
-# temporary before bfg 0.7.0
-class StringTemplateRenderer(testing.DummyTemplateRenderer):
-    """
-    An instance of this class is returned from
-    ``registerDummyRenderer``.  It has a helper function (``assert_``)
-    that makes it possible to make an assertion which compares data
-    passed to the renderer by the view function against expected
-    key/value pairs.
-    """
-
-    def __init__(self, string_response=''):
-        testing.DummyTemplateRenderer.__init__(self)
-        self.string_response = string_response
-
-    def __call__(self, **kw):
-        self._received.update(kw)
-        return self.string_response
 
 class DummyInvitation:
     def __init__(self, email, message):
@@ -969,3 +746,9 @@ def registerCatalogSearch(results={}):
     from zope.interface import Interface
     from karl.models.interfaces import ICatalogSearch
     registerAdapter(dummy_search(results), (Interface,), ICatalogSearch)
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]

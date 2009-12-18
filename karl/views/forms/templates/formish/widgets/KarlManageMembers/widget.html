@@ -1,0 +1,84 @@
+<table id="${field.cssname}" class="content-listing"
+       tal:define="rows list(field.fields)">
+  <!-- widgets/KarlManageMembers/widgets.html -->
+  <thead>
+    <tr>
+      <th style="text-align: center">Name</th>
+      <th style="text-align: center">Moderator</th>
+      <th style="text-align: center">Resend Info</th>
+      <th style="text-align: center">Remove</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr tal:repeat="row rows">
+    <span tal:define="fields row.fields" tal:omit-tag="">
+      <input type="hidden"
+            value="${row['title'].value[0]}"
+            tal:attributes="name 'members.%s.title' % repeat['row'].index"/>
+      <input type="hidden"
+            value="${row['member'].value[0]}"
+            tal:attributes="name 'members.%s.member' % repeat['row'].index"/>
+      <input type="hidden"
+            value="${row['name'].value[0]}"
+            tal:attributes="name 'members.%s.name' % repeat['row'].index"/>
+      <td>
+        <span title="${row['name'].value[0]}">${row['title'].value[0]}</span>
+      </td>
+      <td align="center" tal:condition="row.defaults['member']">
+        <span tal:condition="field.attr.num_moderators&lt;=1
+                             and row.defaults['moderator']">
+            Sole moderator
+            <input type="hidden"
+              value="True"
+              tal:attributes="name 'members.%s.moderator' % 
+                                       repeat['row'].index"/>
+        </span>
+        <input tal:condition="field.attr.num_moderators>1 and 
+                              row.defaults['moderator']"
+           type="checkbox"
+           value="True"
+           checked="checked"
+           tal:attributes="name 'members.%s.moderator'%repeat['row'].index"/>
+        <input tal:condition="not row.defaults['moderator']"
+           type="checkbox"
+           value="True"
+           tal:attributes="name 'members.%s.moderator' % repeat['row'].index"/>
+      </td>
+      <td tal:condition="not row.defaults['member']">
+        <input
+           type="hidden"
+           value="False"
+           tal:attributes="name 'members.%s.moderator' % repeat['row'].index"/>
+      </td>
+      <td align="center">
+        <input tal:condition="not row.defaults['member']" 
+            type="checkbox"
+            value="True"
+            tal:attributes="name 'members.%s.resend' % repeat['row'].index;
+                            checked False"/>
+      </td>
+      <td align="center">
+        <input tal:condition="field.attr.num_moderators&lt;=1 and 
+                              row.defaults['moderator']"
+               type="hidden"
+               value="False"
+               tal:attributes="name 'members.%s.remove' % 
+                               repeat['row'].index"/>
+        <input tal:condition="field.attr.num_moderators>1 and 
+                              row.defaults['moderator']"
+               type="checkbox"
+               value="True"
+               tal:attributes="name 'members.%s.remove' % repeat['row'].index;
+                              checked False"/>
+        <input tal:condition="not row.defaults['moderator']"
+               type="checkbox"
+               value="True"
+               tal:attributes="name 'members.%s.remove' % repeat['row'].index;
+                               checked False"/>
+      </td>
+    </span>
+  </tr>
+  </tbody>
+</table>
+
+

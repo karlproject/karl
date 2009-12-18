@@ -1,4 +1,7 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://namespaces.repoze.org/bfg"
+           xmlns:formish="http://namespaces.repoze.org/formish">
+
+  <include package=".forms"/>
 
   <view
     for="*"
@@ -146,10 +149,7 @@
     name="manage_tags.html"
   />
 
-
-
   <!-- /stop global tagging related views -->
-
 
   <view
     for="karl.models.interfaces.ICommunities"
@@ -157,20 +157,66 @@
     permission="view"
   />
 
-  <view
-    for="karl.models.interfaces.ICommunities"
-    name="add_community.html"
-    view=".communities.add_community_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".community.AddCommunityFormController"
+     name="add_community.html"
+     permission="create"
+     renderer="forms/templates/formish_form.pt"
+     form_id="save">
 
-  <!-- We need to be able to add the intranets hierarchy at root -->
-  <view
-    for="karl.models.interfaces.ISite"
-    name="add_community.html"
-    view=".communities.add_community_view"
-    permission="create"
-  />
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".community.EditCommunityFormController"
+     for="karl.models.interfaces.ICommunity"
+     name="edit.html"
+     permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IMembers"
+     controller=".members.ManageMembersFormController"
+     permission="moderate"
+     name="manage.html"
+     renderer="forms/templates/community_formish_form.pt"
+     >
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.ICommunity"
@@ -190,13 +236,6 @@
     view=".atom.community_atom_view"
     name="atom.xml"
     permission="view"
-  />
-
-  <view
-    for="karl.models.interfaces.ICommunity"
-    name="edit.html"
-    view=".community.edit_community_view"
-    permission="moderate"
   />
 
   <view
@@ -338,30 +377,66 @@
     name="jquery_member_search"
   />
 
-  <view
-     for="karl.models.interfaces.IMembers"
-     view=".members.manage_members_view"
-     permission="moderate"
-     name="manage.html"
-     />
-
-  <view
-     for="karl.models.interfaces.IMembers"
-     view=".members.add_existing_user_view"
-     permission="moderate"
+  <formish:form
+     controller=".members.AddExistingUserFormController"
      name="add_existing.html"
-     />
-
-  <view
-     for="karl.models.interfaces.IMembers"
-     view=".members.invite_new_user_view"
      permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".members.InviteNewUsersFormController"
      name="invite_new.html"
-     />
+     permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".members.AcceptInvitationFormController"
+     for="karl.models.interfaces.IInvitation"
+     renderer="forms/templates/accept_invitation.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
      for="karl.models.interfaces.IInvitation"
-     view=".members.accept_invitation_view"
+     name="photo"
+     view=".members.accept_invitation_photo_view"
      />
 
   <!-- XXX This accompanies site.py and stays in karl.views -->

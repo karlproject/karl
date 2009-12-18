@@ -1,0 +1,9 @@
+<select id="${field.cssname}" name="${field.name}">
+  <!-- widgets/SelectChoice/widget.html -->
+  <option tal:condition="field.widget.none_option"
+          value="${field.widget.get_none_option_value(field)}">${field.widget.none_option[1]}</option>
+  <option tal:repeat="option field.widget.get_options(field)"
+          value="${option[0]}"
+          tal:attributes="selected field.widget.selected(option,field) or None"
+          >${option[1]}</option>
+</select>

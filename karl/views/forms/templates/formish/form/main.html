@@ -1,0 +1,34 @@
+<form
+  id="${form.name}"
+  action="${form.action_url or ''}"
+  class="k3_genericForm"
+  method="${form.method.lower()}"
+  enctype="multipart/form-data"
+  accept-charset="utf-8">
+  <!-- form/main.html -->
+  <div tal:condition="form.include_charset">
+    <input type="hidden" name="_charset_" /></div>
+  <div tal:condition="form.name">
+    <input type="hidden" name="__formish_form__" value="${form.name}" />
+  </div>
+  <p tal:condition="form.error" class="error">${unicode(form.error)}</p>
+  <span tal:replace="structure form.fields()"/>
+  <div class="buttons clearafter">
+    <tal:block repeat="action form._actions">
+      <tal:block condition="repeat['action'].start">
+        <button name="${action.name or ''}"
+                type="submit"
+                class="button primary_button">
+          <span>${action.value}</span>
+        </button>
+      </tal:block>
+      <tal:block condition="not repeat['action'].start">
+        <button name="${action.name or ''}"
+                type="submit"
+                class="button normal_button">
+          <span>${action.value}</span>
+        </button>
+      </tal:block>
+    </tal:block>
+  </div>
+</form>

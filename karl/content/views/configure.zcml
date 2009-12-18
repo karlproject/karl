@@ -1,4 +1,5 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://namespaces.repoze.org/bfg"
+           xmlns:formish="http://namespaces.repoze.org/formish">
 
   <view
     for="karl.content.interfaces.IBlog"
@@ -6,12 +7,47 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IBlog"
-    name="add_blogentry.html"
-    view=".blog.add_blogentry_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".blog.AddBlogEntryFormController"
+     name="add_blogentry.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".blog.EditBlogEntryFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+
 
   <view
     for="karl.content.interfaces.IBlogEntry"
@@ -45,13 +81,6 @@
     permission="edit"
   />
 
-
-  <view
-    for="karl.content.interfaces.IBlogEntry"
-    name="edit.html"
-    view=".blog.edit_blogentry_view"
-    permission="edit"
-  />
 
   <view
     for="karl.content.interfaces.ICalendar"
@@ -164,12 +193,25 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    name="add_folder.html"
-    view=".files.add_folder_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".files.AddFolderFormController"
+     name="add_folder.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
@@ -201,13 +243,6 @@
 
   <view
     for="karl.content.interfaces.ICommunityFolder"
-    name="add_folder.html"
-    view=".files.add_folder_view"
-    permission="create"
-  />
-
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
     name="add_file.html"
     view=".files.add_file_view"
     permission="create"
@@ -234,12 +269,26 @@
     permission="create"
   />
 
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    name="edit.html"
-    view=".files.edit_folder_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".files.EditFolderFormController"
+     for="karl.content.interfaces.ICommunityFolder"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICommunityFile"
@@ -327,12 +376,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IForum"
-    view=".forum.edit_forum_view"
-    name="edit.html"
-    permission="edit"
-  />
+  <formish:form
+     for="karl.content.interfaces.IForum"
+     controller=".forum.EditForumFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IForum"
@@ -350,19 +413,47 @@
   />
 
 
-  <view
-    for="karl.content.interfaces.IForumsFolder"
-    view=".forum.add_forum_view"
-    name="add_forum.html"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.IForumsFolder"
+     controller=".forum.AddForumFormController"
+     name="add_forum.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
 
-  <view
-    for="karl.content.interfaces.IForum"
-    view=".forum.add_forum_topic_view"
-    name="add_forum_topic.html"
-    permission="create"
-  />
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IForum"
+     controller=".forum.AddForumTopicFormController"
+     name="add_forum_topic.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IForumTopic"
@@ -370,13 +461,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IForumTopic"
-    view=".forum.edit_forum_topic_view"
-    name="edit.html"
-    permission="edit"
-  />
+  <formish:form
+     for="karl.content.interfaces.IForumTopic"
+     controller=".forum.EditForumTopicFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
 
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IWiki"
@@ -391,12 +495,25 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IWiki"
-    name="add_wikipage.html"
-    view=".wiki.add_wikipage_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".wiki.AddWikiPageFormController"
+     name="add_wikipage.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IWikiPage"
@@ -404,12 +521,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IWikiPage"
-    name="edit.html"
-    view=".wiki.edit_wikipage_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".wiki.EditWikiPageFormController"
+     name="edit.html"
+     for="karl.content.interfaces.IWikiPage"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IPage"

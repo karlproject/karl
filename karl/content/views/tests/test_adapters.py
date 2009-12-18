@@ -20,7 +20,7 @@ from repoze.bfg import testing
 from karl import testing as karltesting
 from datetime import datetime
 
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 class TestFileInfo(unittest.TestCase):
     def setUp(self):

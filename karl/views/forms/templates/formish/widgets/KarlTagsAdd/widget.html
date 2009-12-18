@@ -1,0 +1,28 @@
+<fieldset>
+  <span name="${field.name}" id="${field.cssname}"/>
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+        var tagdata = ${field.widget.json_taginfo(field.value)};
+        $(document).ready(function() {
+            if (! tagdata.records) {
+                throw 'tagdata has no records.';
+            }
+
+            // get global page data
+            var app_url = $("#karl-app-url")[0].content;
+            var here_url = $("#karl-here-url")[0].content;
+
+            // bind the widget
+            $("#${field.cssname}").karltagbox({
+                validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                ajax: app_url + "/jquery_tag_search",
+                prevals: tagdata.records,
+                docid: tagdata.docid,
+                showtag_url: app_url + "/showtag/",
+                tagusers_url: app_url + "/tagusers.html",
+                name: "${field.name}"
+            });
+        });
+        //]]>
+  </script>
+</fieldset>

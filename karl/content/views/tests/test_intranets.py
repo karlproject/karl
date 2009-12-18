@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
 from webob import MultiDict
