@@ -1009,12 +1009,12 @@ class Test__get_catalog_events(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, calendar, request, first_moment, last_moment,
-                 layer_name=None):
+                 layer_name=None, flatten_layers=False):
         from karl.content.views.calendar_events import _get_catalog_events
         return _get_catalog_events(calendar, request, first_moment,
-                                   last_moment, layer_name)
+                                   last_moment, layer_name, flatten_layers)
 
-    def test_it(self):
+    def test_unflattened_returns_event_lists_inside_layer_lists(self):
         import datetime
         from zope.interface import Interface
         calendar = DummyCalendar()
@@ -1030,8 +1030,36 @@ class Test__get_catalog_events(unittest.TestCase):
         testing.registerAdapter(search, (Interface), ICatalogSearch)
         event = DummyCalendarEvent('foo')
         testing.registerModels({'/foo/bar':event})
-        result = self._callFUT(calendar, request, now, now)
+        result = self._callFUT(calendar, request, 
+                               first_moment=now, 
+                               last_moment=now, 
+                               layer_name=None, 
+                               flatten_layers=False)
         self.assertEqual(result, [[event]])
+
+    def test_flattened_returns_a_single_flat_list_of_events(self):
+        import datetime
+        from zope.interface import Interface
+        calendar = DummyCalendar()
+        layer = DummyCalendarLayer('layer')
+        layer.paths = ['/foo/bar']
+        calendar['layer'] = layer
+        request = testing.DummyRequest()
+        now = datetime.datetime.now()
+        from karl.models.interfaces import ICatalogSearch
+        event = testing.DummyModel()
+        results = 1, [1], lambda *arg: event
+        search = DummySearchAdapter(results)
+        testing.registerAdapter(search, (Interface), ICatalogSearch)
+        event = DummyCalendarEvent('foo')
+        testing.registerModels({'/foo/bar':event})
+        result = self._callFUT(calendar, request, 
+                               first_moment=now, 
+                               last_moment=now, 
+                               layer_name=None, 
+                               flatten_layers=True)
+        self.assertEqual(result, [event])
+
 
 class DummyCalendarEvent(testing.DummyModel):
 

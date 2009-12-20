@@ -121,7 +121,7 @@ def _default_dates_requested(context, request):
     return startDate, endDate            
 
 def _get_catalog_events(calendar, request, first_moment, last_moment,
-                        layer_name=None):
+                        layer_name=None, flatten_layers=False):
     searcher =  ICatalogSearch(calendar)
 
     shared_params = dict(
@@ -160,7 +160,10 @@ def _get_catalog_events(calendar, request, first_moment, last_moment,
             total, docids, resolver = searcher(virtual=path, **shared_params)
             path_events = _volatiles(_resolve(_f(docids, seen), resolver),
                                      layer)
-            events.append(path_events)
+            if flatten_layers:
+                events.extend(path_events)
+            else:
+                events.append(path_events)
 
     return events
 
@@ -191,15 +194,11 @@ def _show_calendar_view(context, request, make_presenter):
 
     # find events and paint them on the calendar
     events = _get_catalog_events(context, request,
-                                 calendar.first_moment,
-                                 calendar.last_moment,
-                                 selected_layer)
-
-    flattened_events = []
-    for event_stream in events:
-        flattened_events.extend(event_stream)
-
-    calendar.paint_events(flattened_events)
+                                 first_moment=calendar.first_moment,
+                                 last_moment=calendar.last_moment,
+                                 layer_name=selected_layer,
+                                 flatten_layers=True)
+    calendar.paint_events(events)
 
     if has_permission('moderate', context, request):
         setup_url = model_url(context, request, 'setup.html')
