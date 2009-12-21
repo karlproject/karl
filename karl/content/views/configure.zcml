@@ -213,12 +213,25 @@
 
   </formish:form>
 
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    name="add_file.html"
-    view=".files.add_file_view"
-    permission="create"
-  />
+  <formish:form
+     controller=".files.AddFileFormController"
+     name="add_file.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Add"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
@@ -243,22 +256,8 @@
 
   <view
     for="karl.content.interfaces.ICommunityFolder"
-    name="add_file.html"
-    view=".files.add_file_view"
-    permission="create"
-  />
-
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
     name="add_page.html"
     view=".page.add_page_view"
-    permission="create"
-  />
-
-  <view
-    for="karl.content.interfaces.IReferenceSection"
-    name="add_file.html"
-    view=".files.add_file_view"
     permission="create"
   />
 

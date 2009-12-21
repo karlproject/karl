@@ -222,17 +222,27 @@ class TestDeleteFolderView(unittest.TestCase):
         self._callFUT(context, request, dummy_delete_resource_view)
         self.assertEqual(dummy_calls, [(context, request, 2)])
 
-class TestAddFileView(unittest.TestCase):
+class TestAddFileFormController(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
+    def _makeOne(self, context, request, check_upload_size=None):
+        from karl.content.views.files import AddFileFormController
+        controller = AddFileFormController(context, request)
+        if check_upload_size is not None:
+            controller.check_upload_size = check_upload_size
+        return controller
+
     def _register(self):
         from karl.models.interfaces import ITagQuery
+        from karl.content.views.interfaces import IShowSendalert
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                IShowSendalert)
 
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
@@ -249,19 +259,13 @@ class TestAddFileView(unittest.TestCase):
                                 (ICommunityFile, IProfile, IRequest),
                                 IAlert)
 
+    def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
-
-    def _registerSecurityWorkflow(self):
-        from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
-
-
-    def _callFUT(self, context, request, check_upload_size=None):
-        from karl.content.views.files import add_file_view
-        if check_upload_size is not None:
-            return add_file_view(context, request, check_upload_size)
-        return add_file_view(context, request)
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
@@ -269,87 +273,121 @@ class TestAddFileView(unittest.TestCase):
                         (Interface, Interface),
                         ILayoutProvider)
 
-    def test_unsubmitted(self):
-        self._registerLayoutProvider()
-        self._registerSecurityWorkflow()
-
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
-        context = testing.DummyModel()
+    def _makeRequest(self):
         request = testing.DummyRequest()
-        from webob import MultiDict
-        request.POST = MultiDict()
-        self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+        request.environ['repoze.browserid'] = '1'
+        return request
 
-    def test_submitted_invalid(self):
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
+
+    def test_form_defaults(self):
         self._register()
-        self._registerLayoutProvider()
+        workflow = self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['file'], None)
+        self.assertEqual(defaults['sendalert'], True)
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+        
+    def test_form_fields(self):
+        self._register()
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = dict(controller.form_fields())
+        self.failUnless('tags' in fields)
+        self.failUnless('security_state' in fields)
+        self.failUnless('title' in fields)
+        self.failUnless('file' in fields)
+        self.failUnless('sendalert' in fields)
 
-        context = testing.DummyModel()
-        context.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1'})
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
-        self._callFUT(context, request)
-        self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def test_form_widgets(self):
+        self._register()
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True,
+                                           'sendalert':True})
+        self.failUnless('security_state' in widgets)
+        self.failUnless('file' in widgets)
+        self.failUnless('title' in widgets)
+        self.failUnless('sendalert' in widgets)
+        self.failUnless('tags' in widgets)
 
-    def test_submitted_filename_with_only_symbols(self):
+    def test___call__(self):
+        self._register()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+        self.failUnless('layout' in response)
+
+    def test_handle_cancel(self):
+        self._register()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit_filename_with_only_symbols(self):
+        from repoze.bfg.formish import ValidationError
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
         self._register()
         self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
-        context = testing.DummyModel()
+        context = self._makeContext()
         context.catalog = DummyCatalog()
-        fs = DummyFieldStorage()
-        fs.filename = '???'
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'file': fs,
-                'title': 'a title',
-                'sendalert': '0',
-                'sharing': 'false',
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
+        from schemaish.type import File as SchemaFile
+        fs = SchemaFile(None, None, '???')
+        request = self._makeRequest()
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': '0',
+            'security_state': 'private',
+            'tags':[],
+            }
+        registerContentFactory(DummyCommunityFile, ICommunityFile)
+        controller = self._makeOne(context, request)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
+    def test_handle_submit_valid(self):
+        from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCommunityFile, ICommunityFile)
-        self._callFUT(context, request)
-        self.assertEqual(
-            renderer.fielderrors, {'file': 'The filename must not be empty'})
-
-    def test_submitted_valid(self):
+        from repoze.bfg.formish import ValidationError
         self._register()
         self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
-        context = testing.DummyModel()
+        context = self._makeContext()
         context.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'file': DummyFieldStorage(),
-                'title': 'a title',
-                'sendalert': '0',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.testing import registerContentFactory
+        fs = SchemaFile('abc', 'filename', 'x/foo')
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags':['thetesttag'],
+            }
+        request = self._makeRequest()
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/filename/')
         self.assertEqual(context['filename'].title, u'a title')
         self.assertEqual(context['filename'].creator, 'userid')
@@ -358,35 +396,32 @@ class TestAddFileView(unittest.TestCase):
         self.assertEqual(context['filename'].filename, 'filename')
 
         # attempt a duplicate upload
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors, {
-            'file': 'Filename filename already exists in this folder'})
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
-    def test_full_path_filename(self):
+    def test_handle_submit_full_path_filename(self):
+        from schemaish.type import File as SchemaFile
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.bfg.formish import ValidationError
         self._register()
         self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
-        context = testing.DummyModel()
+        context = self._makeContext()
         context.catalog = DummyCatalog()
-        upload = DummyFieldStorage()
-        upload.filename = r"C:\Documents and Settings\My Tests\filename"
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'file': upload,
-                'title': 'a title',
-                'sendalert': '0',
-                'security_state': 'public',
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.testing import registerContentFactory
+        fs = SchemaFile('abc', r"C:\Documents and Settings\My Tests\filename",
+                        'x/foo')
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags':['thetesttag'],
+            }
+        request = self._makeRequest()
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/filename/')
         self.assertEqual(context['filename'].title, u'a title')
         self.assertEqual(context['filename'].creator, 'userid')
@@ -395,11 +430,10 @@ class TestAddFileView(unittest.TestCase):
         self.assertEqual(context['filename'].filename, 'filename')
 
         # attempt a duplicate upload
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors, {
-            'file': 'Filename filename already exists in this folder'})
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
-    def test_submitted_valid_alert(self):
+
+    def test_handle_submit_valid_alert(self):
         self._register()
 
         testing.registerDummySecurityPolicy('userid')
@@ -418,20 +452,22 @@ class TestAddFileView(unittest.TestCase):
         profiles["userid"] = DummyProfile()
 
         context.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'file': DummyFieldStorage(),
-                'title': 'a title',
-                'sendalert': '1',
-                'security_state': 'public',
-                })
-            )
+        context.sessions = DummySessions()
+        request = self._makeRequest()
+        from schemaish.type import File as SchemaFile
+        fs = SchemaFile('abc', 'filename', 'x/foo')
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': True,
+            'security_state': 'public',
+            'tags':[],
+            }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        response = self._callFUT(context, request)
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/filename/')
         self.assertEqual(context['filename'].title, u'a title')
         self.assertEqual(context['filename'].creator, 'userid')
@@ -445,35 +481,29 @@ class TestAddFileView(unittest.TestCase):
         self._register()
         self._registerLayoutProvider()
 
-        from formencode import Invalid
-        class CustomInvalid(Invalid):
-            def __init__(self, error_dict):
-                self.error_dict = error_dict
+        from repoze.bfg.formish import ValidationError
 
         def check_upload_size(*args):
-            raise CustomInvalid({'file': 'TEST VALIDATION ERROR'})
+            raise ValidationError(file='TEST VALIDATION ERROR')
 
         testing.registerDummySecurityPolicy('userid')
-        context = testing.DummyModel()
+        context = self._makeContext()
         context.catalog = DummyCatalog()
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'file': DummyFieldStorage(),
-                'title': 'a title',
-                'sendalert': '0',
-                'security_state': 'public',
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/add_file.pt')
+        request = self._makeRequest()
+        from schemaish.type import File as SchemaFile
+        fs = SchemaFile('abc', 'filename', 'x/foo')
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags':[],
+            }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
-        self._callFUT(context, request, check_upload_size)
-        self.assertEqual(renderer.fielderrors, {
-            'file': 'TEST VALIDATION ERROR'})
+        controller = self._makeOne(context, request, check_upload_size)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
 class TestShowFileView(unittest.TestCase):
     def setUp(self):
@@ -1144,3 +1174,15 @@ class DummyWorkflow:
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
+
+class DummyShowSendalert(object):
+    def __init__(self, context, request):
+        pass
+    show_sendalert = True
+    

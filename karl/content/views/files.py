@@ -41,6 +41,7 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
+from repoze.bfg.formish import ValidationError
 
 from repoze.enformed import FormSchema
 
@@ -90,6 +91,8 @@ from karl.views.batch import get_container_batch
 
 from karl.views.utils import check_upload_size
 from karl.views.utils import CustomInvalid
+
+from karl.views.forms.filestore import get_filestore
 
 def show_folder_view(context, request):
 
@@ -166,6 +169,11 @@ tags_field = schemaish.Sequence(schemaish.String())
 security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
+sendalert_field = schemaish.Boolean(
+    title='Send Alert',
+    description='Send email alert to community members?')
+file_field = schemaish.File(title='File',
+                            validator=validator.Required())
 
 class AddFolderFormController(object):
     def __init__(self, context, request):
@@ -310,121 +318,126 @@ def advanced_folder_view(context, request):
         selected=selected,
         )
 
-def add_file_view(context, request, check_upload_size=check_upload_size):
 
-    tags_list=request.POST.getall('tags')
-    form = AddFileForm(tags_list=tags_list)
-    workflow = get_workflow(ICommunityFile, 'security', context)
+class AddFileFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunityFile, 'security', context)
+        self.filestore = get_filestore(context, request, 'add-file')
+        show_sendalert = queryMultiAdapter(
+            (self.context, self.request), IShowSendalert)
+        if show_sendalert is not None:
+            show_sendalert = show_sendalert.show_sendalert
+        self.show_sendalert = show_sendalert
+        self.check_upload_size = check_upload_size # for testing
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_defaults(self):
+        defaults = {
+            'title':'',
+            'tags':[],
+            'file':None,
+            }
+        if self.show_sendalert:
+            defaults['sendalert'] = True
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.initial_state
+        return defaults
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('file', file_field))
+        if self.show_sendalert:
+            fields.append(('sendalert', sendalert_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def form_widgets(self, fields):
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsAddWidget(),
+            'file':karlwidgets.FileUpload2(filestore = self.filestore),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'sendalert' in schema:
+            widgets['sendalert'] = formish.widgets.Checkbox()
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-            creator = authenticated_userid(request)
-
-            fieldstorage = request.params.get('file')
-            if not hasattr(fieldstorage, 'filename'):
-                raise CustomInvalid({
-                    'file': 'You must upload a file.',
-                    })
-            stream = fieldstorage.file
-            file = create_content(ICommunityFile,
-                                  title=converted['title'],
-                                  stream=stream,
-                                  mimetype=get_upload_mimetype(fieldstorage),
-                                  filename=fieldstorage.filename,
-                                  creator=creator,
-                                  )
-            check_upload_size(context, file, 'file')
-
-            # For file objects, OSI's policy is to store the upload file's
-            # filename as the objectid, instead of basing __name__ on the
-            # title field).
-            filename = basename_of_filepath(fieldstorage.filename)
-            file.filename = filename
-            name = make_name(context, filename, raise_error=False)
-            if not name:
-                msg = 'The filename must not be empty'
-                raise CustomInvalid({'file': msg})
-            # Is there a key in context with that filename?
-            if name in context:
-                msg = 'Filename %s already exists in this folder' % filename
-                raise CustomInvalid({'file': msg})
-            context[name] = file
-
-            if workflow is not None:
-                workflow.initialize(file)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(file, request,
-                                                 converted['security_state'])
-
-            # Tags, attachments, alerts
-            set_tags(file, request, converted['tags'])
-            if converted['sendalert']:
-                alerts = queryUtility(IAlerts, default=Alerts())
-                alerts.emit(file, request)
-
-            location = model_url(file, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        layout_provider = get_layout_provider(self.context, self.request)
+        if layout_provider is None:
+            layout = api.community_layout
         else:
-            security_state = workflow.initial_state
-        fill_values = dict(security_state=security_state)
-        tags_field = dict(records=[])
+            layout = layout_provider('community')
+        return {'api':api, 'page_title':'Add File', 'actions':(),
+                'layout':layout}
 
-    # Render the form and shove some default values in
-    page_title = 'Add File'
-    api = TemplateAPI(context, request, page_title)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-    # Get a little policy.  Should we suppress alerts?
-    show_sendalert = queryMultiAdapter((context, request), IShowSendalert)
-    if show_sendalert is not None:
-        show_sendalert_field = show_sendalert.show_sendalert
-    else:
-        show_sendalert_field = True
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        workflow = self.workflow
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+        creator = authenticated_userid(request)
 
-    return render_form_to_response(
-        'templates/add_file.pt',
-        form,
-        fill_values,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-                )),
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        show_sendalert_field=show_sendalert_field,
-        layout=layout,
-        security_states=security_states,
-        )
+        f = converted['file']
+        if not f.file:
+            raise ValidationError(file='Must upload a file')
 
+        file = create_content(ICommunityFile,
+                              title=converted['title'],
+                              stream=f.file,
+                              mimetype=get_mimetype(f.mimetype, f.filename),
+                              filename=f.filename,
+                              creator=creator,
+                              )
+        self.check_upload_size(context, file, 'file')
+
+        # For file objects, OSI's policy is to store the upload file's
+        # filename as the objectid, instead of basing __name__ on the
+        # title field).
+        filename = basename_of_filepath(f.filename)
+        file.filename = filename
+        name = make_name(context, filename, raise_error=False)
+        if not name:
+            msg = 'The filename must not be empty'
+            raise ValidationError(file=msg)
+        # Is there a key in context with that filename?
+        if name in context:
+            msg = 'Filename %s already exists in this folder' % filename
+            raise ValidationError(file=msg)
+        context[name] = file
+
+        if workflow is not None:
+            workflow.initialize(file)
+            if 'security_state' in converted:
+                workflow.transition_to_state(file, request,
+                                             converted['security_state'])
+
+        # Tags, attachments, alerts
+        set_tags(file, request, converted['tags'])
+        if converted.get('sendalert'):
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(file, request)
+
+        location = model_url(file, request)
+        return HTTPFound(location=location)
 
 def show_file_view(context, request):
 
@@ -753,6 +766,10 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
 def get_upload_mimetype(fieldstorage):
     res = fieldstorage.type
+    filename = fieldstorage.filename
+    return get_mimetype(res, filename)
+
+def get_mimetype(res, filename):
     if res in (
             'application/x-download',
             'application/x-application',
@@ -763,7 +780,7 @@ def get_upload_mimetype(fieldstorage):
         # does this to some people:
         #  https://bugs.launchpad.net/ubuntu/+source/firefox-3.0/+bug/84880
         # Try to guess a more sensible mime type from the filename.
-        guessed_type, _ = mimetypes.guess_type(fieldstorage.filename)
+        guessed_type, _ = mimetypes.guess_type(filename)
         if guessed_type:
             res = guessed_type
     return res

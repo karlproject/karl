@@ -20,8 +20,9 @@ This is called by a script named "samplegen".
 """
 
 from cgi import escape
+from schemaish.type import File as SchemaFile
 from karl.content.views.blog import AddBlogEntryFormController
-from karl.content.views.files import add_file_view
+from karl.content.views.files import AddFileFormController
 from karl.content.views.calendar_events import add_calendarevent_view
 from karl.content.views.wiki import AddWikiPageFormController
 from karl.views.community import add_community
@@ -290,21 +291,22 @@ def add_sample_file(community, i):
 
     class FakeFieldStorage:
         pass
-    fs = FakeFieldStorage()
-    fs.filename = 'sample%d-%s' % (i, os.path.basename(filename))
-    fs.file = stream
-    fs.type, _ = mimetypes.guess_type(filename)
+    filename = 'sample%d-%s' % (i, os.path.basename(filename))
+    mimetype, _ = mimetypes.guess_type(filename)
+    fs = SchemaFile(stream, filename, mimetype)
 
     request = testing.DummyRequest()
     request.environ.update(DEFAULT_ENV)
     request.POST = FauxPost(request.POST)
-    request.POST['title'] = title
-    request.params['file'] = fs
-    request.POST['security_state'] = 'inherits'
-    request.POST['tags'] = ['sample']
-    request.POST['form.submitted'] = True
 
-    response = add_file_view(files, request)
+    converted = {}
+    converted['title'] = title
+    converted['file'] = fs
+    converted['security_state'] = 'inherits'
+    converted['tags'] = ['sample']
+
+    controller = AddFileFormController(files, request)
+    response  = controller.handle_submit(converted)
     file = _parse_add_response(request, response, files)
 
     stream.close()

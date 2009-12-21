@@ -66,6 +66,7 @@ class SampleGenTests(unittest.TestCase):
         site['communities'] = testing.DummyModel()
         site.users = karl.testing.DummyUsers()
         site.catalog = karl.testing.DummyCatalog()
+        site.sessions = DummySessions()
 
         from karl.utilities.samplegen import add_sample_community
         obj = add_sample_community(site, add_content=False)
@@ -126,6 +127,7 @@ class SampleGenTests(unittest.TestCase):
 
         site = testing.DummyModel()
         site.catalog = karl.testing.DummyCatalog()
+        site.sessions = DummySessions()
         community = testing.DummyModel()
         site['community'] = community
         community['files'] = testing.DummyModel()
