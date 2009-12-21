@@ -176,23 +176,32 @@ def _calendar_filter(context, request):
     session['calendar_filter'] = filt
     return filt
 
+def _calendar_setup_url(context, request):
+    if has_permission('moderate', context, request):
+        setup_url = model_url(context, request, 'setup.html')
+    else:
+        setup_url = None
+    return setup_url
+
+def _make_calendar_presenter_url_func(context, request):
+    def url_for(*args, **kargs):
+        ctx = kargs.pop('context', context)
+        return model_url(ctx, request, *args, **kargs)
+    return url_for
+
 def _show_calendar_view(context, request, make_presenter):
     year, month, day = _date_requested(context, request)
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
-    selected_layer = _calendar_filter(context, request)
-
-    def url_for(*args, **kargs):
-        ctx = kargs.pop('context', context)
-        return model_url(ctx, request, *args, **kargs)
-
     # make the calendar presenter for this view
+    url_for = _make_calendar_presenter_url_func(context, request)
     calendar = make_presenter(focus_datetime,
                               now_datetime,
                               url_for)
 
     # find events and paint them on the calendar
+    selected_layer = _calendar_filter(context, request)
     events = _get_catalog_events(context, request,
                                  first_moment=calendar.first_moment,
                                  last_moment=calendar.last_moment,
@@ -200,12 +209,8 @@ def _show_calendar_view(context, request, make_presenter):
                                  flatten_layers=True)
     calendar.paint_events(events)
 
-    if has_permission('moderate', context, request):
-        setup_url = model_url(context, request, 'setup.html')
-    else:
-        setup_url = None
-
-    layers = _get_calendar_layers(context)
+    layers    = _get_calendar_layers(context)
+    setup_url = _calendar_setup_url(context, request)
 
     # render
     api = TemplateAPI(context, request, calendar.title)
