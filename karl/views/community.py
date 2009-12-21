@@ -282,7 +282,8 @@ class EditCommunityFormController(object):
     
     def __call__(self):
         api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Edit %s' % self.context.title}
+        return {'api':api, 'page_title':'Edit %s' % self.context.title,
+                'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
