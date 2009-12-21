@@ -17,16 +17,14 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
-
 from repoze.bfg import testing
 
 class Test_edit_acl_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, context, request):
         from karl.views.acl import edit_acl_view
@@ -548,10 +546,10 @@ class Test_edit_acl_view(unittest.TestCase):
 
 class Test_acl_tree_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, context, request):
         from karl.views.acl import acl_tree_view
