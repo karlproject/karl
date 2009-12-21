@@ -1,0 +1,28 @@
+<div id="footer">
+  <!--
+    This template in particular is likely to be overridden a good bit by
+    customization packages.
+  -->
+   <div id="offices-wrapper">
+     <tal:block condition="api.user_is_staff">
+       <ul id="offices-listing">
+         <li tal:repeat="intranet api.intranets_info">
+           <a href="${intranet['intranet_href']}">${intranet['title']}</a>
+           <span class="officeslistSeparator"
+                 tal:condition="not repeat['intranet'].end">-</span>
+         </li>
+       </ul>
+       <tal:block tal:define="ci api.current_intranet">
+         <p id="office-address"
+            tal:condition="ci is not None and ci.address">
+           <span>${ci.address}</span>
+           <span class="officeslistSeparator">|</span>
+           <span>${ci.city}</span>, <span>${ci.state}</span>
+           <span>${ci.zipcode}</span> <span>${ci.country}</span>
+           <span class="officeslistSeparator">|</span>
+           <span>Tel ${ci.telephone}</span></p>
+       </tal:block>
+     </tal:block>
+
+   </div>
+</div>
