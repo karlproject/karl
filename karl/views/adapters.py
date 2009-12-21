@@ -1,6 +1,9 @@
-from karl.models.interfaces import IToolFactory
-from karl.views.interfaces import IToolAddables
+from repoze.bfg.chameleon_zpt import render_template
 from repoze.lemonade.listitem import get_listitems
+
+from karl.models.interfaces import IToolFactory
+from karl.views.interfaces import IFooter
+from karl.views.interfaces import IToolAddables
 from zope.interface import implements
 
 class DefaultToolAddables(object):
@@ -25,3 +28,15 @@ class SiteToolAddables(DefaultToolAddables):
     """
     exclude_tools = ['wiki', 'blog',]
 
+class DefaultFooter(object):
+    implements(IFooter)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, api):
+        return render_template(
+            'templates/footer.pt',
+            api=api,
+            )

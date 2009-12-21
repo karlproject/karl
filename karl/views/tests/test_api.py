@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -84,7 +84,7 @@ class TemplateAPITests(unittest.TestCase):
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         self.assertEqual(api.people_url, 'http://example.com/profiles')
-        
+
     def test_status_message(self):
         context = testing.DummyModel()
         request = testing.DummyRequest({'status_message':'abc'})
@@ -98,7 +98,7 @@ class TemplateAPITests(unittest.TestCase):
         api = self._makeOne(context, request)
         api.generic_layout(a=1)
         renderer.assert_(a=1)
-        
+
     def test_anonymous_layout(self):
         renderer = testing.registerDummyRenderer(
             'templates/anonymous_layout.pt')
@@ -167,7 +167,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.render_footer(), '')
+        self.failUnless('likely to be overridden' in api.render_footer())
 
     def test_render_footer_w_direct_adapter(self):
         from zope.interface import Interface
@@ -222,7 +222,7 @@ class TemplateAPITests(unittest.TestCase):
 class DummyTagQuery:
     def __init__(self, context, request):
         self.tagusers = ['a']
-        
+
 
 class DummyAdapter:
     def __init__(self, context, request):
@@ -240,4 +240,4 @@ class DummySearchAdapter:
                 if thing == x:
                     return thing
         return len(results), results, resolver
-    
+

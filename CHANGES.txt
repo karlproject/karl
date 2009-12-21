@@ -29,6 +29,9 @@ Unreleased
   suitable default is found if there is no registration.  Added
   'get_folder_addables' utility method.
 
+- Created a default footer that just contains the offices listing component of
+  OSI's footer.
+
 3.15 (2009-12-14)
 -----------------
 

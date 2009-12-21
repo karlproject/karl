@@ -44,6 +44,7 @@ from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ITagQuery
+from karl.views.adapters import DefaultFooter
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ISidebar
 from karl.views.utils import get_user_home
@@ -339,11 +340,12 @@ class TemplateAPI(object):
     def render_footer(self):
         """Render the footer appropriate for the context."""
         for ancestor in lineage(self.context):
-            r = queryMultiAdapter((ancestor, self.request), IFooter)
+            r = queryMultiAdapter((ancestor, self.request), IFooter,)
             if r is not None:
                 return r(self)
-        # no footer exists for this context.
-        return ''
+
+        # no footer exists for this context, use the default.
+        return DefaultFooter(self.context, self.request)(self)
 
     @property
     def home_url(self):
