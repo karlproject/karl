@@ -295,12 +295,27 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.ICommunityFile"
-    name="edit.html"
-    view=".files.edit_file_view"
-    permission="create"
-  />
+
+  <formish:form
+     controller=".files.EditFileFormController"
+     for="karl.content.interfaces.ICommunityFile"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="Edit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICommunityFile"

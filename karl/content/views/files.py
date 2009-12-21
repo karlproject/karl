@@ -33,8 +33,6 @@ from zope.interface import noLongerProvides
 from webob import Response
 from webob.exc import HTTPFound
 
-from formencode import Invalid
-
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
 from repoze.bfg.security import authenticated_userid
@@ -43,14 +41,11 @@ from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
 from repoze.bfg.formish import ValidationError
 
-from repoze.enformed import FormSchema
-
 from repoze.lemonade.content import create_content
 
 from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
 
-from karl.views.form import render_form_to_response
 from karl.views.utils import make_name
 from karl.views.utils import make_unique_name
 from karl.views.utils import basename_of_filepath
@@ -59,7 +54,6 @@ from karl.views.tags import get_tags_client_data
 from karl.views.forms import widgets as karlwidgets
 
 from karl.views.api import TemplateAPI
-from karl.views.baseforms import security_state as security_state_field
 from karl.views.resource import delete_resource_view
 
 from karl.events import ObjectModifiedEvent
@@ -85,12 +79,10 @@ from karl.security.workflow import get_security_states
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
-from karl.views import baseforms
 from karl.views.tags import set_tags
 from karl.views.batch import get_container_batch
 
 from karl.views.utils import check_upload_size
-from karl.views.utils import CustomInvalid
 
 from karl.views.forms.filestore import get_filestore
 
@@ -397,6 +389,7 @@ class AddFileFormController(object):
         creator = authenticated_userid(request)
 
         f = converted['file']
+
         if not f.file:
             raise ValidationError(file='Must upload a file')
 
@@ -436,6 +429,7 @@ class AddFileFormController(object):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(file, request)
 
+        self.filestore.clear()
         location = model_url(file, request)
         return HTTPFound(location=location)
 
@@ -583,101 +577,104 @@ class EditFolderFormController(object):
                              {'status_message':'Folder changed'})
         return HTTPFound(location=location)
 
+class EditFileFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICommunityFile, 'security', context)
+        self.filestore = get_filestore(context, request, 'edit-file')
 
-def edit_file_view(context, request):
-    tags_list = request.POST.getall('tags')
-    form = EditFileForm(tags_list=tags_list)
-    workflow = get_workflow(ICommunityFile, 'security', context)
+    def _get_security_states(self):
+        return get_security_states(self.workflow, self.context, self.request)
+    
+    def form_defaults(self):
+        context = self.context
+        defaults = {
+            'title':context.title,
+            'tags':[], # initial values supplied by widget
+            'file':SchemaFile(None, context.filename, context.mimetype),
+            }
+        if self.workflow is not None:
+            defaults['security_state'] = self.workflow.state_of(context)
+        return defaults
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def form_fields(self):
+        fields = []
+        fields.append(('title', title_field))
+        fields.append(('tags', tags_field))
+        fields.append(('file', file_field))
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title':formish.Input(empty=''),
+            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'file':karlwidgets.FileUpload2(filestore = self.filestore),
+            }
+        security_states = self._get_security_states()
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[ (s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.title = converted['title']
-
-            fieldstorage = request.params.get('file', None)
-            if hasattr(fieldstorage, 'filename'):
-                context.upload(fieldstorage.file)
-                context.mimetype = get_upload_mimetype(fieldstorage)
-                context.filename = fieldstorage.filename
-                check_upload_size(context, context, 'file')
-
-            # Tags, attachments, alerts
-            set_tags(context, request, converted['tags'])
-
-            # modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = '?status_message=File%20changed'
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request)
+        layout_provider = get_layout_provider(self.context, self.request)
+        if layout_provider is None:
+            layout = api.community_layout
         else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(title=context.title,
-                           security_state=security_state)
+            layout = layout_provider('community')
+        return {'api':api, 'page_title':'Edit File', 'actions':(),
+                'layout':layout}
 
-   # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-        )
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow = self.workflow
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
 
-    return render_form_to_response(
-        'templates/edit_file.pt',
-        form,
-        fill_values,
-        head_data=convert_to_script(client_json_data),
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        layout=layout,
-        security_states = security_states,
-        )
+        context.title = converted['title']
 
-class AddFileForm(FormSchema):
-    ignore_key_missing = True
-    title = baseforms.title
-    tags = baseforms.tags
-    sendalert = baseforms.sendalert
+        f = converted['file']
 
-class EditFileForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
+        if f.filename:
+            context.upload(f.file)
+            context.mimetype = get_mimetype(f.mimetype, f.filename)
+            context.filename = f.filename
+            check_upload_size(context, context, 'file')
+        else:
+            meta = f.metadata
+            if meta.get('remove'):
+                raise ValidationError(file='Must supply a file')
+
+        # Tags, attachments, alerts
+        set_tags(context, request, converted['tags'])
+
+        # modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        self.filestore.clear()
+        location = model_url(context, request,
+                             query={'status_message':'File changed'})
+        return HTTPFound(location=location)
+        
 
 grid_folder_columns = [
     {"id": "mimetype", "label": "Type", "width": 64},

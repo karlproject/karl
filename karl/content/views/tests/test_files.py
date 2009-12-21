@@ -668,17 +668,34 @@ class TestEditFolderFormController(unittest.TestCase):
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.modified_by, 'testeditor')
 
-class TestEditFileView(unittest.TestCase):
+class TestEditFileFormController(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
+    def _makeOne(self, context, request):
+        from karl.content.views.files import EditFileFormController
+        return EditFileFormController(context, request)
+
+    def _makeRequest(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        return request
+
+    def _makeContext(self):
+        sessions = DummySessions()
+        context = testing.DummyModel(sessions=sessions)
+        return context
+
     def _register(self):
         from karl.models.interfaces import ITagQuery
+        from karl.content.views.interfaces import IShowSendalert
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                IShowSendalert)
 
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
@@ -686,83 +703,109 @@ class TestEditFileView(unittest.TestCase):
         self.mailer = DummyMailer()
         testing.registerUtility(self.mailer, IMailDelivery)
 
+    def _registerDummyWorkflow(self):
         # Register security workflow
         from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
+        wf = DummyWorkflow(
+            [{'transitions':['private'],'name': 'public', 'title':'Public'},
+             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+        workflow = registerDummyWorkflow('security', wf)
+        return workflow
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
-
-    def _callFUT(self, context, request):
-        from karl.content.views.files import edit_file_view
-        return edit_file_view(context, request)
-
-    def test_submitted_invalid(self):
+    def test_form_defaults(self):
         self._register()
-        self._registerLayoutProvider()
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        context.title = 'title'
+        context.security_state = 'private'
+        context.tags = []
+        context.filename = 'thefile'
+        context.mimetype = 'text/xml'
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'title')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['security_state'], 'private')
+        self.assertEqual(defaults['file'].filename, 'thefile')
+        self.assertEqual(defaults['file'].mimetype, 'text/xml')
+        
+    def test_form_fields(self):
+        self._register()
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        schema = dict(fields)
+        self.failUnless('title' in schema)
+        self.failUnless('tags' in schema)
+        self.failUnless('security_state' in schema)
+        self.failUnless('tags' in schema)
+
+    def test_form_widgets(self):
+        self._register()
+        self._registerDummyWorkflow()
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets({'security_state':True,
+                                           'sendalert':True})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('security_state' in widgets)
+        self.failUnless('tags' in widgets)
+
+    def test___call__(self):
+        context = self._makeContext()
+        context.title = 'title'
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless('page_title' in response)
+        self.failUnless('api' in response)
+        self.failUnless('layout' in response)
+        self.failUnless('actions' in response)
+
+    def test_handle_cancel(self):
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit_valid(self):
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from schemaish.type import File as SchemaFile
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.interfaces import IContentFactory
+
+        self._register()
 
         context = DummyFile(title='oldtitle')
         context.__name__ = None
         context.__parent__ = None
+        context.sessions = DummySessions()
         context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                # Empty title will cause a validation error.
-                'title': '',
-                'file': None,
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_file.pt')
-        from karl.models.interfaces import IObjectModifiedEvent
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyCommunityFile,
-                                (ICommunityFile,),
-                                IContentFactory)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_submitted_valid(self):
-        self._register()
-
-        context = DummyFile(title='oldtitle')
-        context.__name__ = None
-        context.__parent__ = None
-        context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
-        directlyProvides(context, ISite)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'title': 'new title',
-                'file': DummyFieldStorage(),
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                })
-            )
-        from karl.models.interfaces import IObjectModifiedEvent
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.interfaces import IContentFactory
+        converted = {
+            'title': 'new title',
+            'file': SchemaFile('abc', 'filename', 'x/foo'),
+            'security_state': 'public',
+            'tags': ['thetesttag'],
+            }
         testing.registerAdapter(lambda *arg: DummyCommunityFile,
                                 (ICommunityFile,),
                                 IContentFactory)
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
         testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
-                         'http://example.com/?status_message=File%20changed')
+                         'http://example.com/?status_message=File+changed')
         self.assertEqual(len(L), 2)
         self.assertEqual(context.title, u'new title')
         self.assertEqual(context.mimetype, 'x/foo')
@@ -772,91 +815,83 @@ class TestEditFileView(unittest.TestCase):
         self.assertEqual(context.stream, 'abc')
         self.assertEqual(context.modified_by, 'testeditor')
 
-    def test_submitted_valid_nofile(self):
-        #valid submission but no file, means keep existing. # NO DOCSTRINGS!
+    def test_handle_submit_valid_nofile_noremove(self):
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from schemaish.type import File as SchemaFile
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.interfaces import IContentFactory
 
         self._register()
 
         context = DummyFile(title='oldtitle')
         context.__name__ = None
         context.__parent__ = None
-        context.mimetype = 'old/blah'
-        context.filename = 'its_mine'
-        context.stream = '11010110101...'
+        context.mimetype = 'old/type'
+        context.filename = 'old_name'
+        context.stream = 'old'
+        context.sessions = DummySessions()
         context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'title': 'new title',
-                'security_state': 'public',
-                })
-            )
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_file.pt')
-        from karl.models.interfaces import IObjectModifiedEvent
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.interfaces import IContentFactory
+        converted = {
+            'title': 'new title',
+            'file': SchemaFile(None, None, None),
+            'security_state': 'public',
+            'tags': ['thetesttag'],
+            }
         testing.registerAdapter(lambda *arg: DummyCommunityFile,
                                 (ICommunityFile,),
                                 IContentFactory)
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        response = self._callFUT(context, request)
+        testing.registerDummySecurityPolicy('testeditor')
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
-                         'http://example.com/?status_message=File%20changed')
+                         'http://example.com/?status_message=File+changed')
         self.assertEqual(len(L), 2)
         self.assertEqual(context.title, u'new title')
-        self.assertEqual(context.mimetype, 'old/blah')
-        self.assertEqual(context.filename, 'its_mine')
-        self.assertEqual(context.stream, '11010110101...')
+        self.assertEqual(context.mimetype, 'old/type')
+        self.assertEqual(context.filename, 'old_name')
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
+        self.assertEqual(context.stream, 'old')
+        self.assertEqual(context.modified_by, 'testeditor')
 
-    def test_submitted_valid_emptyfile(self):
-        #valid submission with an empty input field present, means
-        # keep existing. # NO DOCSTRINGS!
+    def test_handle_submit_valid_nofile_withremove(self):
+        from repoze.bfg.formish import ValidationError
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from schemaish.type import File as SchemaFile
+        from karl.models.interfaces import IObjectModifiedEvent
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.interfaces import IContentFactory
+
         self._register()
 
         context = DummyFile(title='oldtitle')
         context.__name__ = None
         context.__parent__ = None
-        context.mimetype = 'old/blah'
-        context.filename = 'its_mine'
-        context.stream = '11010110101...'
+        context.mimetype = 'old/type'
+        context.filename = 'old_name'
+        context.stream = 'old'
+        context.sessions = DummySessions()
         context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'title': 'new title',
-                # file is empty
-                'file': '',
-                'security_state': 'public',
-                })
-            )
-        from karl.models.interfaces import IObjectModifiedEvent
-        from karl.content.interfaces import ICommunityFile
-        from repoze.lemonade.interfaces import IContentFactory
+        converted = {
+            'title': 'new title',
+            'file': SchemaFile(None, None, None, metadata={'remove':True}),
+            'security_state': 'public',
+            'tags': ['thetesttag'],
+            }
         testing.registerAdapter(lambda *arg: DummyCommunityFile,
                                 (ICommunityFile,),
                                 IContentFactory)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         'http://example.com/?status_message=File%20changed')
-        self.assertEqual(len(L), 2)
-        self.assertEqual(context.title, u'new title')
-        self.assertEqual(context.mimetype, 'old/blah')
-        self.assertEqual(context.filename, 'its_mine')
-        self.assertEqual(context.stream, '11010110101...')
-        self.assertEqual(L[0], context)
-        self.assertEqual(L[1].object, context)
+        testing.registerDummySecurityPolicy('testeditor')
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
 class TestAdvancedFolderView(unittest.TestCase):
     def setUp(self):
