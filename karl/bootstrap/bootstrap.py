@@ -117,7 +117,7 @@ def populate(root, do_transaction_begin=True):
         alsoProvides(offices, IIntranets)
         #_reindex(offices)
 
-        from karl.content.views.forum import add_forum_view
+        from karl.content.views.forum import AddForumFormController
         for office in office_data.offices:
             request.POST.clear()
             request.POST['form.submitted'] = True
@@ -136,28 +136,29 @@ def populate(root, do_transaction_begin=True):
             new_office.title = office['title']
             # Now add some forums
             for forum in office['forums']:
-                request.POST.clear()
-                request.POST['form.submitted'] = True
-                request.POST['title'] = forum['id']
-                request.POST['description'] = 'No description'
-                add_forum_view(new_office['forums'], request)
+                converted = {}
+                converted['title'] = forum['id']
+                converted['description'] = 'No description'
+                r = testing.DummyRequest()
+                c = AddForumFormController(new_office['forums'], r)
+                c.handle_submit(converted)
                 new_forum = new_office['forums'][forum['id']]
                 new_forum.title = forum['title']
 
         # Setup reference manuals, network news, network events folders
-        from karl.content.views.files import add_folder_view
+        from karl.content.views.files import AddFolderFormController
         from karl.content.views.files import advanced_folder_view
         markers = data.folder_markers
         for marker in markers:
-            request.POST.clear()
-            request.POST['form.submitted'] = True
-            request.POST['title'] = marker[0]
-            request.POST['security_state'] = 'inherits'
+            converted = {'title':marker[0], 'security_state':'inherits',
+                         'tags':[]}
             if marker[3] is None:
                 target = offices
             else:
                 target = offices[marker[3]]
-            add_folder_view(target, request)
+            r = testing.DummyRequest()
+            c = AddFolderFormController(target, r)
+            c.handle_submit(converted)
             target[marker[0]].title = marker[1]
             request.POST.clear()
             request.POST['form.submitted'] = True
