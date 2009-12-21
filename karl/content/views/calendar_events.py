@@ -295,7 +295,13 @@ def add_calendarevent_view(context, request):
 
     if 'form.submitted' in request.POST:
         try:
-            import pdb; pdb.set_trace()
+            if 'calendar_category' not in request.POST:
+                # FormEncode doesn't let us mark certain keys as being missable
+                # Either any key can be missing from form or none, so we just
+                # manually massage calendar_category, which may be missing,
+                # before performing validation.
+                request.POST['calendar_category'] = None
+
             converted = form.validate(request.POST)
 
             creator = authenticated_userid(request)
@@ -342,7 +348,6 @@ def add_calendarevent_view(context, request):
 
         except Invalid, e:
             fielderrors = e.error_dict
-            print fielderrors
             fill_values = form.convert(request.POST)
             tags_field = dict(
                 records = [dict(tag=t) for t in request.POST.getall('tags')]
@@ -537,6 +542,13 @@ def edit_calendarevent_view(context, request):
 
     if 'form.submitted' in request.POST:
         try:
+            if 'calendar_category' not in request.POST:
+                # FormEncode doesn't let us mark certain keys as being missable
+                # Either any key can be missing from form or none, so we just
+                # manually massage calendar_category, which may be missing,
+                # before performing validation.
+                request.POST['calendar_category'] = None
+
             converted = form.validate(request.POST)
 
             # *will be* modified event
@@ -631,7 +643,6 @@ def edit_calendarevent_view(context, request):
         )
 
 class AddCalendarEventForm(FormSchema):
-    ignore_key_missing = True
     chained_validators = baseforms.start_end_constraints
     #
     title = baseforms.title
@@ -647,7 +658,6 @@ class AddCalendarEventForm(FormSchema):
     sendalert = baseforms.sendalert
 
 class EditCalendarEventForm(FormSchema):
-    ignore_key_missing = True
     chained_validators = baseforms.start_end_constraints
     #
     title = baseforms.title

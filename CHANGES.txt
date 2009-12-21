@@ -32,6 +32,12 @@ Unreleased
 - Created a default footer that just contains the offices listing component of
   OSI's footer.
 
+- Bug fix: Allow add/edit forms for calendar event to still work if there is no
+  category.  Categories are not used outside of the context of the calendar
+  tool, and calendar events can appear in regular old folders in intranets.
+  This allows to again create and edit events in the 'network-news' folder used
+  in most intranets..
+
 3.15 (2009-12-14)
 -----------------
 
