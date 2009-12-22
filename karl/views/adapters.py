@@ -1,15 +1,16 @@
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.lemonade.listitem import get_listitems
 
+from karl.models.interfaces import IIntranets
+from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
+from karl.utils import find_interface
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import IToolAddables
 from zope.interface import implements
 
 class DefaultToolAddables(object):
     implements(IToolAddables)
-
-    exclude_tools = ['intranets',]
 
     def __init__(self, context, request):
         self.context = context
@@ -22,11 +23,18 @@ class DefaultToolAddables(object):
         return [tool for tool in tools if tool['name'] not in
                 self.exclude_tools]
 
+    @property
+    def exclude_tools(self):
+        # Find out if we are adding this community from somewhere
+        # inside the "intranets" side
+        intranets = find_interface(self.context, IIntranets)
+        site = ISite.providedBy(self.context)
 
-class SiteToolAddables(DefaultToolAddables):
-    """ For tools in community at site root.
-    """
-    exclude_tools = ['wiki', 'blog',]
+        if intranets or site:
+            return ['wiki', 'blog']
+
+        return ['intranets', 'forums']
+
 
 class DefaultFooter(object):
     implements(IFooter)

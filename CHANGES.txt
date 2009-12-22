@@ -20,7 +20,7 @@ Unreleased
 
 - Bug fix: Make sure acl's are properly set on profiles during import.
 
-- LP#494582 Added opensearch support to people directory.  (Ported from OSI.)
+- LP #494582 Added opensearch support to people directory.  (Ported from OSI.)
 
 - Bug fix: Make sure custom_folder_view uses get_layout_provider utility
   method.
@@ -37,6 +37,8 @@ Unreleased
   tool, and calendar events can appear in regular old folders in intranets.
   This allows to again create and edit events in the 'network-news' folder used
   in most intranets..
+
+- LP #497937 Corrected which tools are addable when creating a new community.
 
 3.15 (2009-12-14)
 -----------------
