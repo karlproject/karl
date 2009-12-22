@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- LP #497937 Corrected which tools are addable when creating a new community.
+  (Backported from trunk.)
+
 3.15 (2009-12-14)
 -----------------
 
