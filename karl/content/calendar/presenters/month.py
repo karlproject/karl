@@ -133,9 +133,11 @@ class MonthViewPresenter(BasePresenter):
                                       self.next_month.month,
                                       self.next_month.day)
 
-        nav.today_url = format % (url, self.now_datetime.year,
-                                       self.now_datetime.month,
-                                       self.now_datetime.day)
+        if not self._is_today_shown():                                      
+            nav.today_url = format % (url, self.now_datetime.year,
+                                           self.now_datetime.month,
+                                           self.now_datetime.day)
+
         self.navigation = nav
 
     def paint_events(self, events):

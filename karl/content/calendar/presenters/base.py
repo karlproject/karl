@@ -93,6 +93,12 @@ class BasePresenter(object):
         '''
         raise NotImplementedError
 
+    def _is_today_shown(self):
+        within_start = (self.now_datetime >= self.first_moment)
+        within_end   = (self.now_datetime <= self.last_moment)
+
+        return (within_start and within_end)
+
 
 class BaseEvent(object):
     def __init__(self, day, catalog_event, 

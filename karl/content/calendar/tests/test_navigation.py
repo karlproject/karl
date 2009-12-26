@@ -31,26 +31,17 @@ class CalendarNavigationTests(unittest.TestCase):
 
     # left navigation
 
-    def test_sets_today_button_img_disabled_when_day_shown(self):
+    def test_left_navigation_urls_are_initialized_to_None(self):
         focus_at = datetime.datetime(2009, 8, 1)
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter  = self._makePresenter(focus_at, now_at, dummy_url_for)
         navigation = self._makeNavigation(presenter)
 
-        self.assertTrue(navigation._is_today_shown())
-        self.assertEqual(navigation.today_button_img, 'today_disabled.png')
-
-    def test_sets_today_button_img_enabled_when_day_is_not_shown(self):
-        focus_at = datetime.datetime(2009, 7, 26)
-        now_at   = datetime.datetime(2009, 8, 26)
-
-        presenter  = self._makePresenter(focus_at, now_at, dummy_url_for)
-        navigation = self._makeNavigation(presenter)
-
-        self.assertFalse(navigation._is_today_shown())
-        self.assertEqual(navigation.today_button_img, 'today.png')
-
+        self.assert_(navigation.today_url is None)
+        self.assert_(navigation.next_url is None)
+        self.assert_(navigation.prev_url is None)
+        
     # helpers
 
     def _makePresenter(self, *args, **kargs):

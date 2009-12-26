@@ -34,12 +34,31 @@
         <!-- buttons -->
         <div class="cal_buttons clearafter">
           <div class="cal_nav">
-            <a href="${calendar.navigation.today_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.today_button_img}" /></a>&nbsp;
-            <a href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png" /></a><a href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png" /></a>
+            <!-- today button -->
+            <a tal:condition="calendar.navigation.today_url"
+               href="${calendar.navigation.today_url}"><img src="${api.static_url}/images/cal_buttons_today.png" 
+            /></a><img tal:condition="not(calendar.navigation.today_url)"
+               src="${api.static_url}/images/cal_buttons_today_disabled.png" 
+            />&nbsp;
+                                 
+            <!-- previous and next buttons -->
+            <a tal:condition="calendar.navigation.prev_url"
+               href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png" 
+            /></a><img tal:condition="not(calendar.navigation.prev_url)"
+               src="${api.static_url}/images/cal_buttons_previous.png"
+
+            /><a tal:condition="calendar.navigation.next_url"
+               href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png" 
+            /></a><img tal:condition="not(calendar.navigation.next_url)"
+               src="${api.static_url}/images/cal_buttons_next.png"/>
           </div>
 
           <div class="cal_scope">
-            <a href="${calendar.navigation.day_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.day_button_img}" /></a><a href="${calendar.navigation.week_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.week_button_img}" /></a><a href="${calendar.navigation.month_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.month_button_img}" /></a><a href="${calendar.navigation.list_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.list_button_img}" /></a>
+            <a href="${calendar.navigation.day_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.day_button_img}"
+            /></a><a href="${calendar.navigation.week_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.week_button_img}"
+            /></a><a href="${calendar.navigation.month_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.month_button_img}"
+            /></a><a href="${calendar.navigation.list_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.list_button_img}"
+            /></a>
           </div>
         </div>
       </div>

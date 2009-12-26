@@ -70,18 +70,21 @@ class ListViewPresenter(BasePresenter):
 
         # left side
         format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('list.html')
+        url = self.url_for('%s.html' % self.name)
 
         nav.prev_url = format % (url, self.prior_month.year, 
                                       self.prior_month.month,
                                       self.prior_month.day)
+
         nav.next_url = format % (url, self.next_month.year, 
                                       self.next_month.month,
                                       self.prior_month.day)
 
-        nav.today_url = format % (url, self.now_datetime.year,
-                                       self.now_datetime.month,
-                                       self.now_datetime.day)
+        if not self._is_today_shown():                                      
+            nav.today_url = format % (url, self.now_datetime.year,
+                                           self.now_datetime.month,
+                                           self.now_datetime.day)
+
         self.navigation = nav
 
     def paint_events(self, events):

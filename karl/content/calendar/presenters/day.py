@@ -95,10 +95,12 @@ class DayViewPresenter(BasePresenter):
         nav.next_url = format % (url, self.next_day.year, 
                                       self.next_day.month,
                                       self.next_day.day)
-
-        nav.today_url = format % (url, self.now_datetime.year,
-                                       self.now_datetime.month,
-                                       self.now_datetime.day)
+        
+        if not self._is_today_shown():                                      
+            nav.today_url = format % (url, self.now_datetime.year,
+                                           self.now_datetime.month,
+                                           self.now_datetime.day)
+                                                      
         self.navigation = nav
 
     def _init_hour_labels(self):

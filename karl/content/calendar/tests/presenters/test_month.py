@@ -115,7 +115,7 @@ class MonthViewPresenterTests(unittest.TestCase):
     # left navigation
     
     def test_sets_navigation_today_url(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
+        focus_at = datetime.datetime(2009, 11, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
