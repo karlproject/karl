@@ -20,7 +20,6 @@ import datetime
 import time
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
-from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month
 
@@ -32,8 +31,8 @@ class DayViewPresenter(BasePresenter):
         self._init_title()
         self.feed_url = self.url_for('atom.xml')  
 
-        self._init_prior_day()
-        self._init_next_day()
+        self._init_prev_datetime()
+        self._init_next_datetime()
         self._init_navigation()
         
         self._init_hour_labels()
@@ -51,7 +50,7 @@ class DayViewPresenter(BasePresenter):
 
         self.title_year = self.focus_datetime.year
 
-    def _init_prior_day(self):
+    def _init_prev_datetime(self):
         minus_one  = self.focus_datetime.day - 1
         
         if (minus_one < 1):
@@ -63,9 +62,9 @@ class DayViewPresenter(BasePresenter):
             month = self.focus_datetime.month
             day   = minus_one
 
-        self.prior_day = datetime.datetime(year, month, day)
+        self.prev_datetime = datetime.datetime(year, month, day)
  
-    def _init_next_day(self):
+    def _init_next_datetime(self):
         last_day = calendar.monthrange(self.focus_datetime.year,
                                        self.focus_datetime.month)[1]
 
@@ -80,28 +79,7 @@ class DayViewPresenter(BasePresenter):
             month = self.focus_datetime.month
             day   = plus_one
 
-        self.next_day = datetime.datetime(year, month, day)            
-
-    def _init_navigation(self):
-        nav = Navigation(self)
-
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('day.html')
-
-        nav.prev_url = format % (url, self.prior_day.year, 
-                                      self.prior_day.month,
-                                      self.prior_day.day)
-        nav.next_url = format % (url, self.next_day.year, 
-                                      self.next_day.month,
-                                      self.next_day.day)
-        
-        if not self._is_today_shown():                                      
-            nav.today_url = format % (url, self.now_datetime.year,
-                                           self.now_datetime.month,
-                                           self.now_datetime.day)
-                                                      
-        self.navigation = nav
+        self.next_datetime = datetime.datetime(year, month, day)            
 
     def _init_hour_labels(self):
         self.hour_labels = []

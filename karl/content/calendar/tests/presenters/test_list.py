@@ -62,47 +62,47 @@ class ListViewPresenterTests(unittest.TestCase):
         expected = datetime.datetime(2009, 8, 31, 23, 59, 59)
         self.assertEqual(presenter.last_moment, expected)
 
-    # prior & next month
+    # prev_datetime & next_datetime 
     
-    def test_computes_prior_month_preserving_day_if_in_range(self):
+    def test_computes_prev_datetime_preserving_day_if_in_range(self):
         focus_at = datetime.datetime(2009, 8, 31)
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.prior_month.year, 2009)
-        self.assertEqual(presenter.prior_month.month, 7)
-        self.assertEqual(presenter.prior_month.day, 31)
+        self.assertEqual(presenter.prev_datetime.year, 2009)
+        self.assertEqual(presenter.prev_datetime.month, 7)
+        self.assertEqual(presenter.prev_datetime.day, 31)
         
-    def test_computes_prior_month_adjusting_out_of_range_day(self):
+    def test_computes_prev_datetime_adjusting_out_of_range_day(self):
         focus_at = datetime.datetime(2009, 7, 31) # 31 not in june
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.prior_month.year, 2009)
-        self.assertEqual(presenter.prior_month.month, 6)
-        self.assertEqual(presenter.prior_month.day, 30) # adjusted
+        self.assertEqual(presenter.prev_datetime.year, 2009)
+        self.assertEqual(presenter.prev_datetime.month, 6)
+        self.assertEqual(presenter.prev_datetime.day, 30) # adjusted
 
-    def test_computes_next_month_preserving_day_if_in_range(self):
+    def test_computes_next_datetime_preserving_day_if_in_range(self):
         focus_at = datetime.datetime(2009, 7, 31) 
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.next_month.year, 2009)
-        self.assertEqual(presenter.next_month.month, 8)
-        self.assertEqual(presenter.next_month.day, 31) 
+        self.assertEqual(presenter.next_datetime.year, 2009)
+        self.assertEqual(presenter.next_datetime.month, 8)
+        self.assertEqual(presenter.next_datetime.day, 31) 
 
-    def test_computes_next_month_adjusting_out_of_range_day(self):
+    def test_computes_next_datetime_adjusting_out_of_range_day(self):
         focus_at = datetime.datetime(2009, 8, 31) # 31 not in september
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.next_month.year, 2009)
-        self.assertEqual(presenter.next_month.month, 9)
-        self.assertEqual(presenter.next_month.day, 30) # adjusted
+        self.assertEqual(presenter.next_datetime.year, 2009)
+        self.assertEqual(presenter.next_datetime.month, 9)
+        self.assertEqual(presenter.next_datetime.day, 30) # adjusted
 
     # left navigation
     

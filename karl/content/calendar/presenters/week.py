@@ -20,7 +20,6 @@ import datetime
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent           
 from karl.content.calendar.presenters.day import DayViewPresenter
-from karl.content.calendar.navigation import Navigation 
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
@@ -35,7 +34,7 @@ class WeekViewPresenter(BasePresenter):
 
         self._init_week_around_focus_datetime()
         self._init_first_and_last_moment()
-        self._init_next_and_prior_week()
+        self._init_next_and_prev_datetime()
         self._init_hour_labels()
         self._init_navigation()
         
@@ -90,31 +89,10 @@ class WeekViewPresenter(BasePresenter):
                                               last_day.day,
                                               23, 59, 59)
 
-    def _init_next_and_prior_week(self):                          
+    def _init_next_and_prev_datetime(self):                          
         seven_days = datetime.timedelta(days=7)
-        self.next_week  = self.focus_datetime + seven_days
-        self.prior_week = self.focus_datetime - seven_days
-
-    def _init_navigation(self):
-        nav = Navigation(self)
-
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('week.html')
-
-        nav.prev_url = format % (url, self.prior_week.year, 
-                                      self.prior_week.month,
-                                      self.prior_week.day)
-        nav.next_url = format % (url, self.next_week.year, 
-                                      self.next_week.month,
-                                      self.next_week.day)
-
-        if not self._is_today_shown():                                      
-            nav.today_url = format % (url, self.now_datetime.year,
-                                           self.now_datetime.month,
-                                           self.now_datetime.day)
-
-        self.navigation = nav
+        self.next_datetime  = self.focus_datetime + seven_days
+        self.prev_datetime = self.focus_datetime - seven_days
 
     def _init_hour_labels(self):
         self.hour_labels = []

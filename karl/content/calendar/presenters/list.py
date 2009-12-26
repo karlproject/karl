@@ -20,7 +20,6 @@ import datetime
 import time
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
-from karl.content.calendar.navigation import Navigation 
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
@@ -36,12 +35,12 @@ class ListViewPresenter(BasePresenter):
 
         self.events = []
 
-        self._init_prior_month()
-        self._init_next_month()
+        self._init_prev_datetime()
+        self._init_next_datetime()
         
         self._init_navigation()
 
-    def _init_prior_month(self):
+    def _init_prev_datetime(self):
         prior = prior_month(self.focus_datetime.year, 
                             self.focus_datetime.month)
         monthrange = calendar.monthrange(prior[0], prior[1])  
@@ -51,9 +50,9 @@ class ListViewPresenter(BasePresenter):
         else:
             day = monthrange[1]    
             
-        self.prior_month = datetime.datetime(prior[0], prior[1], day)
+        self.prev_datetime = datetime.datetime(prior[0], prior[1], day)
 
-    def _init_next_month(self):
+    def _init_next_datetime(self):
         next = next_month(self.focus_datetime.year, 
                           self.focus_datetime.month)
         monthrange = calendar.monthrange(next[0], next[1])
@@ -63,30 +62,8 @@ class ListViewPresenter(BasePresenter):
         else:
             day = monthrange[1]
 
-        self.next_month = datetime.datetime(next[0], next[1], day)        
+        self.next_datetime = datetime.datetime(next[0], next[1], day)        
     
-    def _init_navigation(self):
-        nav = Navigation(self)
-
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('%s.html' % self.name)
-
-        nav.prev_url = format % (url, self.prior_month.year, 
-                                      self.prior_month.month,
-                                      self.prior_month.day)
-
-        nav.next_url = format % (url, self.next_month.year, 
-                                      self.next_month.month,
-                                      self.prior_month.day)
-
-        if not self._is_today_shown():                                      
-            nav.today_url = format % (url, self.now_datetime.year,
-                                           self.now_datetime.month,
-                                           self.now_datetime.day)
-
-        self.navigation = nav
-
     def paint_events(self, events):
         shaded_row = True
         for event in events:

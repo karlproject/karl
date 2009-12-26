@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from karl.content.calendar.navigation import Navigation 
 
 class BasePresenter(object):
     '''
@@ -98,6 +99,28 @@ class BasePresenter(object):
         within_end   = (self.now_datetime <= self.last_moment)
 
         return (within_start and within_end)
+
+    def _init_navigation(self):
+        nav = Navigation(self)
+
+        # left side
+        url = self.url_for(self.name + '.html')
+        format = '%s?year=%d&month=%d&day=%d'
+
+        nav.prev_url = format % (url, self.prev_datetime.year, 
+                                      self.prev_datetime.month,
+                                      self.prev_datetime.day)
+
+        nav.next_url = format % (url, self.next_datetime.year, 
+                                      self.next_datetime.month,
+                                      self.next_datetime.day)
+        
+        if not self._is_today_shown():                                      
+            nav.today_url = format % (url, self.now_datetime.year,
+                                           self.now_datetime.month,
+                                           self.now_datetime.day)
+                                                      
+        self.navigation = nav
 
 
 class BaseEvent(object):
