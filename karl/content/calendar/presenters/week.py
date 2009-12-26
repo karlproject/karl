@@ -31,7 +31,7 @@ class WeekViewPresenter(BasePresenter):
     
     def _initialize(self):
         self._init_title()
-        self.feed_href = self.url_for('atom.xml')  
+        self.feed_url = self.url_for('atom.xml')  
 
         self._init_week_around_focus_datetime()
         self._init_first_and_last_moment()

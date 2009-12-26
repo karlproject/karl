@@ -51,7 +51,7 @@ class Navigation(object):
             sub = (url, self._presenter.focus_datetime.year, 
                         self._presenter.focus_datetime.month, 
                         self._presenter.focus_datetime.day)
-            setattr(self, '%s_button_href' % view_name, 
+            setattr(self, '%s_button_url' % view_name, 
                     format % sub)
             setattr(self, '%s_button_img' % view_name, 
                     '%s_up.png' % view_name)

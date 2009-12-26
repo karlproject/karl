@@ -32,7 +32,7 @@ class ListViewPresenter(BasePresenter):
     def _initialize(self):               
         monthname = calendar.month_name[self.focus_datetime.month]
         self.title = "%s %d" % (monthname, self.focus_datetime.year)
-        self.feed_href = self.url_for('atom.xml')  
+        self.feed_url = self.url_for('atom.xml')  
 
         self.events = []
 

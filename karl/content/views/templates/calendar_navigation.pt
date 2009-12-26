@@ -39,7 +39,7 @@
           </div>
 
           <div class="cal_scope">
-            <a href="${calendar.navigation.day_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.day_button_img}" /></a><a href="${calendar.navigation.week_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.week_button_img}" /></a><a href="${calendar.navigation.month_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.month_button_img}" /></a><a href="${calendar.navigation.list_button_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.list_button_img}" /></a>
+            <a href="${calendar.navigation.day_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.day_button_img}" /></a><a href="${calendar.navigation.week_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.week_button_img}" /></a><a href="${calendar.navigation.month_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.month_button_img}" /></a><a href="${calendar.navigation.list_button_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.list_button_img}" /></a>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
         <!-- actions -->
         <div class="cal_actions">
            <!-- <a class="cal_download" href="#">Download</a> -->
-           <a class="cal_subscribe" href="${calendar.feed_href}">Subscribe</a>
+           <a class="cal_subscribe" href="${calendar.feed_url}">Subscribe</a>
         </div>
       </div>
 

@@ -43,12 +43,12 @@ class MonthViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         self.assertEqual(presenter.title, 'August 2009')
 
-    def test_has_feed_href_url(self):
+    def test_has_feed_url(self):
         focus_at = datetime.datetime(2009, 8, 26)
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-        self.assertTrue(presenter.feed_href.endswith('atom.xml'))
+        self.assertTrue(presenter.feed_url.endswith('atom.xml'))
 
     # first & last moment
 

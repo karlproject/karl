@@ -30,7 +30,7 @@ class DayViewPresenter(BasePresenter):
     
     def _initialize(self):
         self._init_title()
-        self.feed_href = self.url_for('atom.xml')  
+        self.feed_url = self.url_for('atom.xml')  
 
         self._init_prior_day()
         self._init_next_day()
