@@ -120,33 +120,33 @@ class DayViewPresenterTests(unittest.TestCase):
 
     # left navigation
     
-    def test_sets_navigation_today_href(self):
+    def test_sets_navigation_today_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.today_href.endswith(
+        self.assertTrue(presenter.navigation.today_url.endswith(
             'day.html?year=2009&month=8&day=26'
         ))
 
-    def test_sets_navigation_prev_href(self):
+    def test_sets_navigation_prev_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.prev_href.endswith(
+        self.assertTrue(presenter.navigation.prev_url.endswith(
             'day.html?year=2009&month=7&day=31'
         ))
 
-    def test_sets_navigation_next_href(self):
+    def test_sets_navigation_next_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.next_href.endswith(
+        self.assertTrue(presenter.navigation.next_url.endswith(
             'day.html?year=2009&month=8&day=2'
         ))
 

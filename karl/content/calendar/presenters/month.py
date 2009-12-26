@@ -126,16 +126,16 @@ class MonthViewPresenter(BasePresenter):
         format = '%s?year=%d&month=%d&day=%d'
         url = self.url_for('month.html')
 
-        nav.prev_href = format % (url, self.prior_month.year, 
-                                       self.prior_month.month,
-                                       self.prior_month.day)
-        nav.next_href = format % (url, self.next_month.year, 
-                                       self.next_month.month,
-                                       self.next_month.day)
+        nav.prev_url = format % (url, self.prior_month.year, 
+                                      self.prior_month.month,
+                                      self.prior_month.day)
+        nav.next_url = format % (url, self.next_month.year, 
+                                      self.next_month.month,
+                                      self.next_month.day)
 
-        nav.today_href = format % (url, self.now_datetime.year,
-                                        self.now_datetime.month,
-                                        self.now_datetime.day)
+        nav.today_url = format % (url, self.now_datetime.year,
+                                       self.now_datetime.month,
+                                       self.now_datetime.day)
         self.navigation = nav
 
     def paint_events(self, events):

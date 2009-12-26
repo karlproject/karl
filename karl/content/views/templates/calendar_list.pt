@@ -51,7 +51,7 @@
       </tr>
 
       <tr class="cal_agenda_range">
-        <td colspan="3"><a href="${calendar.navigation.next_href}">View more events</a></td>
+        <td colspan="3"><a href="${calendar.navigation.next_url}">View more events</a></td>
       </tr>      
     </table>
 

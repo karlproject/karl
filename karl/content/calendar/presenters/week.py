@@ -102,16 +102,16 @@ class WeekViewPresenter(BasePresenter):
         format = '%s?year=%d&month=%d&day=%d'
         url = self.url_for('week.html')
 
-        nav.prev_href = format % (url, self.prior_week.year, 
-                                       self.prior_week.month,
-                                       self.prior_week.day)
-        nav.next_href = format % (url, self.next_week.year, 
-                                       self.next_week.month,
-                                       self.next_week.day)
+        nav.prev_url = format % (url, self.prior_week.year, 
+                                      self.prior_week.month,
+                                      self.prior_week.day)
+        nav.next_url = format % (url, self.next_week.year, 
+                                      self.next_week.month,
+                                      self.next_week.day)
 
-        nav.today_href = format % (url, self.now_datetime.year,
-                                        self.now_datetime.month,
-                                        self.now_datetime.day)
+        nav.today_url = format % (url, self.now_datetime.year,
+                                       self.now_datetime.month,
+                                       self.now_datetime.day)
         self.navigation = nav
 
     def _init_hour_labels(self):

@@ -34,8 +34,8 @@
         <!-- buttons -->
         <div class="cal_buttons clearafter">
           <div class="cal_nav">
-            <a href="${calendar.navigation.today_href}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.today_button_img}" /></a>&nbsp;
-            <a href="${calendar.navigation.prev_href}"><img src="${api.static_url}/images/cal_buttons_previous.png" /></a><a href="${calendar.navigation.next_href}"><img src="${api.static_url}/images/cal_buttons_next.png" /></a>
+            <a href="${calendar.navigation.today_url}"><img src="${api.static_url}/images/cal_buttons_${calendar.navigation.today_button_img}" /></a>&nbsp;
+            <a href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png" /></a><a href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png" /></a>
           </div>
 
           <div class="cal_scope">

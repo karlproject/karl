@@ -38,9 +38,9 @@ class Navigation(object):
         else:
             self.today_button_img = 'today.png'
 
-        self.today_href = ''
-        self.next_href  = ''
-        self.prev_href  = ''
+        self.today_url = ''
+        self.next_url  = ''
+        self.prev_url  = ''
 
     def _init_right_side(self):
         ''' [ Day ]  [ Week ]  [ Month ]  [ List ] '''
