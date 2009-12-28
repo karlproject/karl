@@ -45,12 +45,12 @@
             <a tal:condition="calendar.navigation.prev_url"
                href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png" 
             /></a><img tal:condition="not(calendar.navigation.prev_url)"
-               src="${api.static_url}/images/cal_buttons_previous.png"
+               src="${api.static_url}/images/cal_buttons_previous_disabled.png"
 
             /><a tal:condition="calendar.navigation.next_url"
                href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png" 
             /></a><img tal:condition="not(calendar.navigation.next_url)"
-               src="${api.static_url}/images/cal_buttons_next.png"/>
+               src="${api.static_url}/images/cal_buttons_next_disabled.png"/>
           </div>
 
           <div class="cal_scope">
