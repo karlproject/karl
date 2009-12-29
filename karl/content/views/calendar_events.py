@@ -253,8 +253,46 @@ def show_day_view(context, request):
     return _show_calendar_view(context, request, DayViewPresenter)
 
 def show_list_view(context, request):
-    return _show_calendar_view(context, request, ListViewPresenter)
-    
+    year, month, day = _date_requested(context, request)
+    focus_datetime = datetime.datetime(year, month, day)
+    now_datetime   = _now()
+
+    page     = int(request.GET.get('page', 1))
+    per_page = int(request.GET.get('per_page', 20))
+
+    # make the calendar presenter for this view
+    url_for = _make_calendar_presenter_url_func(context, request)
+    calendar = ListViewPresenter(focus_datetime,
+                                 now_datetime,
+                                 url_for)
+
+    # find events and paint them on the calendar
+    selected_layer = _calendar_filter(context, request)
+
+    events, has_more = _paginate_catalog_events(context, request,
+                                           first_moment=now_datetime,
+                                           last_moment=None,
+                                           layer_name=selected_layer,
+                                           per_page=per_page,
+                                           page=page)
+    calendar.paint_paginated_events(events, has_more, per_page, page)
+
+    layers    = _get_calendar_layers(context)
+    setup_url = _calendar_setup_url(context, request)
+
+    # render
+    api = TemplateAPI(context, request, calendar.title)
+    return render_template_to_response(
+        calendar.template_filename,
+        api=api,
+        setup_url=setup_url,
+        calendar=calendar,
+        selected_layer = selected_layer,
+        layers = layers,
+        quote = quote,
+    )
+
+
 def _get_calendar_categories(context):
     return [ x for x in context.values() if ICalendarCategory.providedBy(x) ]
 

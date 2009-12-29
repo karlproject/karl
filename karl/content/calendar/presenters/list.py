@@ -20,6 +20,7 @@ import datetime
 import time
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
+from karl.content.calendar.navigation import Navigation  
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
@@ -30,39 +31,46 @@ class ListViewPresenter(BasePresenter):
     
     def _initialize(self):               
         monthname = calendar.month_name[self.focus_datetime.month]
-        self.title = "%s %d" % (monthname, self.focus_datetime.year)
+        self.title = "Upcoming Events"
         self.feed_url = self.url_for('atom.xml')  
 
         self.events = []
-
-        self._init_prev_datetime()
-        self._init_next_datetime()
+        self.has_more = False
+        self.per_page = 20
+        self.page = 1
         
-        self._init_navigation()
+    def _init_navigation(self):
+        nav = Navigation(self)
 
-    def _init_prev_datetime(self):
-        prior = prior_month(self.focus_datetime.year, 
-                            self.focus_datetime.month)
-        monthrange = calendar.monthrange(prior[0], prior[1])  
-                                         
-        if self.focus_datetime.day <= monthrange[1]:
-            day = self.focus_datetime.day
+        base_url = '%s?year=%d&month=%d&day=%d&per_page=%d' % (
+                     self.url_for(self.name + '.html'),
+                     self.focus_datetime.year,
+                     self.focus_datetime.month,
+                     self.focus_datetime.day,
+                     self.per_page)      
+
+        # today_url
+        if self.page == 1:
+            nav.today_url = None
         else:
-            day = monthrange[1]    
+            nav.today_url = base_url + "&page=1"
+
+        # prev_url
+        if self.page == 1:
+            nav.prev_url = None
+        else:                                                
+            prev_page = self.page - 1
+            nav.prev_url = base_url + ("&page=%d" % prev_page)
+
+        # next_url
+        if not self.has_more:
+            nav.next_url = None
+        else:
+            next_page = self.page + 1
+            nav.next_url = base_url + ("&page=%d" % next_page)
             
-        self.prev_datetime = datetime.datetime(prior[0], prior[1], day)
+        self.navigation = nav    
 
-    def _init_next_datetime(self):
-        next = next_month(self.focus_datetime.year, 
-                          self.focus_datetime.month)
-        monthrange = calendar.monthrange(next[0], next[1])
-
-        if self.focus_datetime.day <= monthrange[1]:
-            day = self.focus_datetime.day
-        else:
-            day = monthrange[1]
-
-        self.next_datetime = datetime.datetime(next[0], next[1], day)        
     
     def paint_events(self, events):
         shaded_row = True
@@ -74,21 +82,14 @@ class ListViewPresenter(BasePresenter):
             self.events.append(listed_event)          
             shaded_row = not(shaded_row)
 
-    @property
-    def first_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 1, 
-                                 0, 0, 0)
-
-    @property
-    def last_moment(self):
-        last_day = calendar.monthrange(self.focus_datetime.year, 
-                                       self.focus_datetime.month)[1]
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month,
-                                 last_day, 
-                                 23, 59, 59)
+    def paint_paginated_events(self, events, has_more, per_page, page):
+        self.paint_events(events)
+        self.has_more = has_more                     
+        self.per_page = per_page
+        self.page = page
+        
+        self._init_navigation()    
+            
 
     @property
     def template_filename(self):

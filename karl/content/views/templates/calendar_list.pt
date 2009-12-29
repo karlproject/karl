@@ -16,6 +16,11 @@
     <h3 class="cal_title">${calendar.title}</h3>        
 
     <table class="cal cal_agenda">
+
+      <tr tal:condition="calendar.page != 1" class="cal_agenda_range">
+        <td colspan="3"><a href="${calendar.navigation.prev_url}">View previous events</a></td>
+      </tr>      
+
       <tr tal:repeat="event calendar.events" class="cal_agenda_day ${event.shade_class}">
         <th>
           <a href="${event.first_line_day_show_url}">${event.first_line_day}</a>
@@ -50,9 +55,10 @@
         </td>
       </tr>
 
-      <tr class="cal_agenda_range">
+      <tr tal:condition="calendar.has_more" class="cal_agenda_range">
         <td colspan="3"><a href="${calendar.navigation.next_url}">View more events</a></td>
       </tr>      
+
     </table>
 
     <div metal:use-macro="calendar.navigation.macros['footer']"/>

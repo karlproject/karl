@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #496331: Calendar list view now shows a paginated listing of upcoming 
+  events with 20 events per page.
+
 - Merged svn+ssh://osi@osi.agendaless.com/home/osi/bfgsvn/karl/branches/formish
   branch, which replaces some form-based views with formish forms.
 
