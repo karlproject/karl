@@ -120,52 +120,71 @@ def _default_dates_requested(context, request):
         endDate   = startDate + datetime.timedelta(hours=1)
     return startDate, endDate
 
-def _get_catalog_events(calendar, request, first_moment, last_moment,
-                        layer_name=None, flatten_layers=False):
-    searcher =  ICatalogSearch(calendar)
+def _get_catalog_events(calendar, request, 
+                        first_moment, last_moment, layer_name=None):
 
-    shared_params = dict(
+    searcher = ICatalogSearch(calendar)
+    search_params = dict(
         allowed={'query': effective_principals(request), 'operator': 'or'},
-        start_date=(None, coarse_datetime_repr(last_moment)),
-        end_date=(coarse_datetime_repr(first_moment),None),
         interfaces=[ICalendarEvent],
         sort_index='start_date',
         reverse=False,
         )
 
-    def _resolve(docids, resolver):
-        return [ resolver(docid) for docid in docids ]
+    if first_moment:
+        end_date = (coarse_datetime_repr(first_moment), None)
+        search_params['end_date'] = end_date
 
-    def _volatiles(obs, layer):
-        for ob in obs:
-            ob._v_layer_color = layer.color
-            ob._v_layer_title = layer.title
-        return obs
+    if last_moment:
+        start_date = (None, coarse_datetime_repr(last_moment))
+        search_params['start_date'] = start_date
 
-    events = []
-    seen = set()
-
-    def _f(docids, seen):
-        for docid in docids:
-            if not (docid in seen):
-                seen.add(docid)
-                yield docid
-
-    layers = _get_calendar_layers(calendar)
-
-    for layer in layers:
+    for layer in _get_calendar_layers(calendar):
         if layer_name and layer.__name__ != layer_name:
             continue
-        for path in layer.paths:
-            total, docids, resolver = searcher(virtual=path, **shared_params)
-            path_events = _volatiles(_resolve(_f(docids, seen), resolver),
-                                     layer)
-            if flatten_layers:
-                events.extend(path_events)
-            else:
-                events.append(path_events)
 
-    return events
+        for category_path in layer.paths:
+            total, docids, resolver = searcher(virtual=category_path, 
+                                                **search_params) 
+            events_in_category = []
+            docids_seen = set()
+
+            for docid in docids:
+                if docid not in docids_seen:
+                    docids_seen.add(docid)
+
+                    event = resolver(docid)
+                    event._v_layer_color = layer.color
+                    event._v_layer_title = layer.title
+                
+                    events_in_category.append(event) 
+        
+            for event in events_in_category:
+                yield event    
+
+def _paginate_catalog_events(calendar, request, 
+                             first_moment, last_moment, layer_name=None,
+                             per_page=20, page=1):
+    
+    all_events = _get_catalog_events(calendar, request, 
+                                     first_moment, last_moment, layer_name)
+
+    offset = (page - 1) * per_page   
+    limit  = per_page + 1
+    
+    events = []
+    i = 0
+    for event in all_events:
+        if i >= offset:
+            events.append(event)
+        if len(events) == limit:
+            break
+        i += 1
+
+    has_more = len(events) > per_page
+    events   = events[:per_page]
+    
+    return events, has_more
 
 def _calendar_filter(context, request):
     session = get_session(context, request)
@@ -202,11 +221,11 @@ def _show_calendar_view(context, request, make_presenter):
 
     # find events and paint them on the calendar
     selected_layer = _calendar_filter(context, request)
+
     events = _get_catalog_events(context, request,
                                  first_moment=calendar.first_moment,
                                  last_moment=calendar.last_moment,
-                                 layer_name=selected_layer,
-                                 flatten_layers=True)
+                                 layer_name=selected_layer)
     calendar.paint_events(events)
 
     layers    = _get_calendar_layers(context)
@@ -224,9 +243,6 @@ def _show_calendar_view(context, request, make_presenter):
         quote = quote,
     )
 
-def show_list_view(context, request):
-    return _show_calendar_view(context, request, ListViewPresenter)
-
 def show_month_view(context, request):
     return _show_calendar_view(context, request, MonthViewPresenter)
 
@@ -236,7 +252,9 @@ def show_week_view(context, request):
 def show_day_view(context, request):
     return _show_calendar_view(context, request, DayViewPresenter)
 
-
+def show_list_view(context, request):
+    return _show_calendar_view(context, request, ListViewPresenter)
+    
 def _get_calendar_categories(context):
     return [ x for x in context.values() if ICalendarCategory.providedBy(x) ]
 
