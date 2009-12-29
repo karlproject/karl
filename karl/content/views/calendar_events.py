@@ -139,6 +139,8 @@ def _get_catalog_events(calendar, request,
         start_date = (None, coarse_datetime_repr(last_moment))
         search_params['start_date'] = start_date
 
+    docids_seen = set()
+
     for layer in _get_calendar_layers(calendar):
         if layer_name and layer.__name__ != layer_name:
             continue
@@ -147,7 +149,6 @@ def _get_catalog_events(calendar, request,
             total, docids, resolver = searcher(virtual=category_path, 
                                                 **search_params) 
             events_in_category = []
-            docids_seen = set()
 
             for docid in docids:
                 if docid not in docids_seen:
