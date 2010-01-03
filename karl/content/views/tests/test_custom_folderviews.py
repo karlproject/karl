@@ -108,7 +108,7 @@ class TestShowNetworkEventsView(unittest.TestCase):
                          {'href': 'http://example.com/',
                           'title': 'Home'})
         self.assertEqual(renderer.entries, [])
-        self.assertEqual(renderer.fb_years, ['2007', '2008', '2009'])
+        self.assertEqual(renderer.fb_years[:3], ['2007', '2008', '2009'])
         self.assertEqual(len(renderer.fb_months), 12)
         self.assertEqual(renderer.searchterm, None)
         self.assertEqual(renderer.selected_year, None)
@@ -263,7 +263,7 @@ class TestShowNetworkNewsView(unittest.TestCase):
                          {'href': 'http://example.com/',
                           'title': 'Home'})
         self.assertEqual(renderer.entries, [])
-        self.assertEqual(renderer.fb_years, ['2007', '2008', '2009'])
+        self.assertEqual(renderer.fb_years[:3], ['2007', '2008', '2009'])
         self.assertEqual(len(renderer.fb_months), 12)
         self.assertEqual(renderer.searchterm, None)
         self.assertEqual(renderer.selected_year, None)
