@@ -314,6 +314,7 @@ def admin_edit_profile_view(context, request,
         editing_self=editing_self,
         is_staff=is_staff,
         staff_change_password_url=staff_change_password_url,
+        delete_url=model_url(context, request, 'delete.html'),
         )
 
 def get_profile_actions(profile, request):
