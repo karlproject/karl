@@ -46,6 +46,8 @@ Unreleased
 - LP #488152 Made initial site_acl used in boostrapping the same in core as
   what OSI uses.
 
+- LP #488854 Added link to delete user in admin edit profile view.
+
 3.15 (2009-12-14)
 -----------------
 

@@ -33,12 +33,13 @@
       <fieldset metal:use-macro="formfields.macros['languages-field']"/>
       <fieldset metal:use-macro="formfields.macros['biography-field']"/>
       <fieldset metal:use-macro="formfields.macros['photo-field']"/>
-    
+
       <fieldset metal:use-macro="formfields.macros['form-submit']"/>
 
     </div>
 
   </form>
 
+  <a href="${delete_url}">delete this user</a>
   </div>
 </html>
