@@ -9,6 +9,7 @@ from karl.bootstrap.interfaces import IInitialOfficeData
 
 from karl.security.policy import ADMINISTRATOR_PERMS
 from karl.security.policy import GUEST_PERMS
+from karl.security.policy import MEMBER_PERMS
 from karl.security.policy import MODERATOR_PERMS
 
 _marker = object()
@@ -31,8 +32,10 @@ class DefaultInitialData(object):
 
     site_acl = [
         (Allow, Authenticated, GUEST_PERMS),
+        (Allow, 'group.KarlStaff', MEMBER_PERMS),
+        (Allow, 'group.KarlModerator', MODERATOR_PERMS),
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
-        ]
+    ]
 
     profiles_acl = [
         (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS),

@@ -7,6 +7,9 @@ Unreleased
 - LP #497937 Corrected which tools are addable when creating a new community.
   (Backported from trunk.)
 
+- LP #488152 Made initial site_acl used in boostrapping the same in core as
+  what OSI uses.
+
 3.15 (2009-12-14)
 -----------------
 
