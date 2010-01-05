@@ -20,11 +20,9 @@ import datetime
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent           
 from karl.content.calendar.presenters.day import DayViewPresenter
-from karl.content.calendar.navigation import Navigation 
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-from karl.content.calendar.utils import add_days                   
 
 
 class WeekViewPresenter(BasePresenter):
@@ -32,11 +30,11 @@ class WeekViewPresenter(BasePresenter):
     
     def _initialize(self):
         self._init_title()
-        self.feed_href = self.url_for('atom.xml')  
+        self.feed_url = self.url_for('atom.xml')  
 
         self._init_week_around_focus_datetime()
         self._init_first_and_last_moment()
-        self._init_next_and_prior_week()
+        self._init_next_and_prev_datetime()
         self._init_hour_labels()
         self._init_navigation()
         
@@ -91,28 +89,10 @@ class WeekViewPresenter(BasePresenter):
                                               last_day.day,
                                               23, 59, 59)
 
-    def _init_next_and_prior_week(self):
-        self.next_week  = add_days(self.focus_datetime,  7)
-        self.prior_week = add_days(self.focus_datetime, -7)
-
-    def _init_navigation(self):
-        nav = Navigation(self)
-
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('week.html')
-
-        nav.prev_href = format % (url, self.prior_week.year, 
-                                       self.prior_week.month,
-                                       self.prior_week.day)
-        nav.next_href = format % (url, self.next_week.year, 
-                                       self.next_week.month,
-                                       self.next_week.day)
-
-        nav.today_href = format % (url, self.now_datetime.year,
-                                        self.now_datetime.month,
-                                        self.now_datetime.day)
-        self.navigation = nav
+    def _init_next_and_prev_datetime(self):                          
+        seven_days = datetime.timedelta(days=7)
+        self.next_datetime  = self.focus_datetime + seven_days
+        self.prev_datetime = self.focus_datetime - seven_days
 
     def _init_hour_labels(self):
         self.hour_labels = []
@@ -142,6 +122,7 @@ class WeekViewPresenter(BasePresenter):
 
     def _filter_events_for_day(self, events, day):
         filtered = []
+        one_day = datetime.timedelta(days=1)
         for event in events: 
             dt = event.startDate
             while dt < event.endDate:
@@ -152,7 +133,7 @@ class WeekViewPresenter(BasePresenter):
               if (same_year and same_month and same_day):
                 filtered.append(event)
 
-              dt = add_days(dt, 1) 
+              dt += one_day
         
         return filtered  
 

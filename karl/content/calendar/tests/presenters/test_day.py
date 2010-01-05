@@ -76,77 +76,77 @@ class DayViewPresenterTests(unittest.TestCase):
 
         self.assertEqual(presenter.auto_scroll_class, '')
 
-    # prior_day & next_day
+    # prev_datetime & next_datetime
     
-    def test_computes_next_day_within_the_same_month(self):
+    def test_computes_next_datetime_within_the_same_month(self):
         focus_at = datetime.datetime(2009, 8, 30) 
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.next_day.year,  2009)
-        self.assertEqual(presenter.next_day.month, 8)
-        self.assertEqual(presenter.next_day.day,   31)
+        self.assertEqual(presenter.next_datetime.year,  2009)
+        self.assertEqual(presenter.next_datetime.month, 8)
+        self.assertEqual(presenter.next_datetime.day,   31)
 
-    def test_computes_next_day_into_the_next_month(self):
+    def test_computes_next_datetime_into_the_next_month(self):
         focus_at = datetime.datetime(2009, 8, 31) 
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.next_day.year,  2009)
-        self.assertEqual(presenter.next_day.month, 9)
-        self.assertEqual(presenter.next_day.day,   1)
+        self.assertEqual(presenter.next_datetime.year,  2009)
+        self.assertEqual(presenter.next_datetime.month, 9)
+        self.assertEqual(presenter.next_datetime.day,   1)
 
-    def test_computes_prior_day_within_the_same_month(self):
+    def test_computes_prev_datetime_within_the_same_month(self):
         focus_at = datetime.datetime(2009, 8, 2) 
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.prior_day.year,  2009)
-        self.assertEqual(presenter.prior_day.month, 8)
-        self.assertEqual(presenter.prior_day.day,   1)
+        self.assertEqual(presenter.prev_datetime.year,  2009)
+        self.assertEqual(presenter.prev_datetime.month, 8)
+        self.assertEqual(presenter.prev_datetime.day,   1)
 
-    def test_computes_prior_day_into_the_prior_month(self):
+    def test_computes_prev_datetime_into_the_prior_month(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime.now()
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.prior_day.year,  2009)
-        self.assertEqual(presenter.prior_day.month, 7)
-        self.assertEqual(presenter.prior_day.day,   31)
+        self.assertEqual(presenter.prev_datetime.year,  2009)
+        self.assertEqual(presenter.prev_datetime.month, 7)
+        self.assertEqual(presenter.prev_datetime.day,   31)
 
     # left navigation
     
-    def test_sets_navigation_today_href(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
+    def test_sets_navigation_today_url(self):
+        focus_at = datetime.datetime(2009, 11, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.today_href.endswith(
+        self.assertTrue(presenter.navigation.today_url.endswith(
             'day.html?year=2009&month=8&day=26'
         ))
 
-    def test_sets_navigation_prev_href(self):
+    def test_sets_navigation_prev_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.prev_href.endswith(
+        self.assertTrue(presenter.navigation.prev_url.endswith(
             'day.html?year=2009&month=7&day=31'
         ))
 
-    def test_sets_navigation_next_href(self):
+    def test_sets_navigation_next_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertTrue(presenter.navigation.next_href.endswith(
+        self.assertTrue(presenter.navigation.next_url.endswith(
             'day.html?year=2009&month=8&day=2'
         ))
 

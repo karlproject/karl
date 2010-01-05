@@ -20,11 +20,9 @@ import datetime
 import time
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
-from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-from karl.content.calendar.utils import add_days                   
 
 
 class MonthViewPresenter(BasePresenter):
@@ -33,13 +31,13 @@ class MonthViewPresenter(BasePresenter):
     def _initialize(self):
         monthname = calendar.month_name[self.focus_datetime.month]
         self.title = "%s %d" % (monthname, self.focus_datetime.year)
-        self.feed_href = self.url_for('atom.xml')
+        self.feed_url = self.url_for('atom.xml')
         
         self._init_weeks_skeleton()
         self._init_day_indexes_from_weeks()
         
-        self._init_prior_month()
-        self._init_next_month()
+        self._init_prev_datetime()
+        self._init_next_datetime()
 
         self._init_navigation()
 
@@ -50,6 +48,7 @@ class MonthViewPresenter(BasePresenter):
         self.day_headings = skeleton.day_names
 
         weeks = skeleton.weeks
+        nine_hours = datetime.timedelta(hours=9)
         for week in weeks:
             for d, dt in enumerate(week):
                 # determine if this day is on the month in focus
@@ -64,7 +63,7 @@ class MonthViewPresenter(BasePresenter):
                 is_today = (same_year and same_month and same_day)
 
                 # url to add an event to this day
-                day_at_9am = dt + datetime.timedelta(hours=9)
+                day_at_9am = dt + nine_hours
                 starts = time.mktime(day_at_9am.timetuple())
                 add_event_url = self.url_for('add_calendarevent.html',
                                  query={'starts':int(starts)}) 
@@ -95,7 +94,7 @@ class MonthViewPresenter(BasePresenter):
         self._idx_month_day = md_index
         self._all_days = all_days         
 
-    def _init_prior_month(self):
+    def _init_prev_datetime(self):
         prior = prior_month(self.focus_datetime.year, 
                             self.focus_datetime.month)
         monthrange = calendar.monthrange(prior[0], prior[1])  
@@ -105,9 +104,9 @@ class MonthViewPresenter(BasePresenter):
         else:
             day = monthrange[1]    
             
-        self.prior_month = datetime.datetime(prior[0], prior[1], day)
+        self.prev_datetime = datetime.datetime(prior[0], prior[1], day)
 
-    def _init_next_month(self):
+    def _init_next_datetime(self):
         next = next_month(self.focus_datetime.year, 
                           self.focus_datetime.month)
         monthrange = calendar.monthrange(next[0], next[1])
@@ -117,27 +116,8 @@ class MonthViewPresenter(BasePresenter):
         else:
             day = monthrange[1]
 
-        self.next_month = datetime.datetime(next[0], next[1], day)        
+        self.next_datetime = datetime.datetime(next[0], next[1], day)        
         
-    def _init_navigation(self):
-        nav = Navigation(self)
-
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('month.html')
-
-        nav.prev_href = format % (url, self.prior_month.year, 
-                                       self.prior_month.month,
-                                       self.prior_month.day)
-        nav.next_href = format % (url, self.next_month.year, 
-                                       self.next_month.month,
-                                       self.next_month.day)
-
-        nav.today_href = format % (url, self.now_datetime.year,
-                                        self.now_datetime.month,
-                                        self.now_datetime.day)
-        self.navigation = nav
-
     def paint_events(self, events):
         events_to_bubble, other_events = self._separate_events(events)
 
@@ -285,11 +265,12 @@ class MonthViewPresenter(BasePresenter):
             ends_at = event.endDate
 
         dt = starts_at
+        one_day = datetime.timedelta(days=1)
         while dt < ends_at:                             
             days.append(
                 self._idx_month_day[dt.month][dt.day]       
             )
-            dt = add_days(dt, 1) 
+            dt += one_day
 
         return days
 

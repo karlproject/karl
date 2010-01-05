@@ -20,7 +20,7 @@ import datetime
 import time
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
-from karl.content.calendar.navigation import Navigation 
+from karl.content.calendar.navigation import Navigation  
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
@@ -31,59 +31,47 @@ class ListViewPresenter(BasePresenter):
     
     def _initialize(self):               
         monthname = calendar.month_name[self.focus_datetime.month]
-        self.title = "%s %d" % (monthname, self.focus_datetime.year)
-        self.feed_href = self.url_for('atom.xml')  
+        self.title = "Upcoming Events"
+        self.feed_url = self.url_for('atom.xml')  
 
         self.events = []
-
-        self._init_prior_month()
-        self._init_next_month()
+        self.has_more = False
+        self.per_page = 20
+        self.page = 1
         
-        self._init_navigation()
-
-    def _init_prior_month(self):
-        prior = prior_month(self.focus_datetime.year, 
-                            self.focus_datetime.month)
-        monthrange = calendar.monthrange(prior[0], prior[1])  
-                                         
-        if self.focus_datetime.day <= monthrange[1]:
-            day = self.focus_datetime.day
-        else:
-            day = monthrange[1]    
-            
-        self.prior_month = datetime.datetime(prior[0], prior[1], day)
-
-    def _init_next_month(self):
-        next = next_month(self.focus_datetime.year, 
-                          self.focus_datetime.month)
-        monthrange = calendar.monthrange(next[0], next[1])
-
-        if self.focus_datetime.day <= monthrange[1]:
-            day = self.focus_datetime.day
-        else:
-            day = monthrange[1]
-
-        self.next_month = datetime.datetime(next[0], next[1], day)        
-    
     def _init_navigation(self):
         nav = Navigation(self)
 
-        # left side
-        format = '%s?year=%d&month=%d&day=%d'
-        url = self.url_for('list.html')
+        base_url = '%s?year=%d&month=%d&day=%d&per_page=%d' % (
+                     self.url_for(self.name + '.html'),
+                     self.focus_datetime.year,
+                     self.focus_datetime.month,
+                     self.focus_datetime.day,
+                     self.per_page)      
 
-        nav.prev_href = format % (url, self.prior_month.year, 
-                                       self.prior_month.month,
-                                       self.prior_month.day)
-        nav.next_href = format % (url, self.next_month.year, 
-                                       self.next_month.month,
-                                       self.prior_month.day)
+        # today_url
+        if self.page == 1:
+            nav.today_url = None
+        else:
+            nav.today_url = base_url + "&page=1"
 
-        nav.today_href = format % (url, self.now_datetime.year,
-                                        self.now_datetime.month,
-                                        self.now_datetime.day)
-        self.navigation = nav
+        # prev_url
+        if self.page == 1:
+            nav.prev_url = None
+        else:                                                
+            prev_page = self.page - 1
+            nav.prev_url = base_url + ("&page=%d" % prev_page)
 
+        # next_url
+        if not self.has_more:
+            nav.next_url = None
+        else:
+            next_page = self.page + 1
+            nav.next_url = base_url + ("&page=%d" % next_page)
+            
+        self.navigation = nav    
+
+    
     def paint_events(self, events):
         shaded_row = True
         for event in events:
@@ -94,21 +82,14 @@ class ListViewPresenter(BasePresenter):
             self.events.append(listed_event)          
             shaded_row = not(shaded_row)
 
-    @property
-    def first_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 1, 
-                                 0, 0, 0)
-
-    @property
-    def last_moment(self):
-        last_day = calendar.monthrange(self.focus_datetime.year, 
-                                       self.focus_datetime.month)[1]
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month,
-                                 last_day, 
-                                 23, 59, 59)
+    def paint_paginated_events(self, events, has_more, per_page, page):
+        self.paint_events(events)
+        self.has_more = has_more                     
+        self.per_page = per_page
+        self.page = page
+        
+        self._init_navigation()    
+            
 
     @property
     def template_filename(self):

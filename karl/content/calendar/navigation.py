@@ -32,15 +32,9 @@ class Navigation(object):
     
     def _init_left_side(self):
         ''' [ Today ]  [ < ]  [ > ] '''
-
-        if self._is_today_shown():
-            self.today_button_img = 'today_disabled.png'
-        else:
-            self.today_button_img = 'today.png'
-
-        self.today_href = ''
-        self.next_href  = ''
-        self.prev_href  = ''
+        self.today_url = None
+        self.next_url  = None
+        self.prev_url  = None
 
     def _init_right_side(self):
         ''' [ Day ]  [ Week ]  [ Month ]  [ List ] '''
@@ -51,7 +45,7 @@ class Navigation(object):
             sub = (url, self._presenter.focus_datetime.year, 
                         self._presenter.focus_datetime.month, 
                         self._presenter.focus_datetime.day)
-            setattr(self, '%s_button_href' % view_name, 
+            setattr(self, '%s_button_url' % view_name, 
                     format % sub)
             setattr(self, '%s_button_img' % view_name, 
                     '%s_up.png' % view_name)
@@ -60,14 +54,6 @@ class Navigation(object):
         setattr(self, '%s_button_img' % self._presenter.name, 
                       '%s_down.png'   % self._presenter.name)
     
-    def _is_today_shown(self):
-        now_at   = self._presenter.now_datetime
-
-        within_start = (now_at >= self._presenter.first_moment)
-        within_end   = (now_at <= self._presenter.last_moment)
-
-        return (within_start and within_end)
-
     def _init_template(self):
         path = '../views/templates/calendar_navigation.pt'
         self._template = get_template(path)
