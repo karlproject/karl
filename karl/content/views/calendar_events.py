@@ -141,6 +141,8 @@ def _get_catalog_events(calendar, request,
 
     docids_seen = set()
 
+    events = []
+
     for layer in _get_calendar_layers(calendar):
         if layer_name and layer.__name__ != layer_name:
             continue
@@ -161,7 +163,9 @@ def _get_catalog_events(calendar, request,
                     events_in_category.append(event) 
         
             for event in events_in_category:
-                yield event    
+                events.append(event)
+
+    return events
 
 def _paginate_catalog_events(calendar, request, 
                              first_moment, last_moment, layer_name=None,
