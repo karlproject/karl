@@ -147,24 +147,20 @@ def _get_catalog_events(calendar, request,
         if layer_name and layer.__name__ != layer_name:
             continue
 
-        for category_path in layer.paths:
-            total, docids, resolver = searcher(virtual=category_path, 
-                                                **search_params) 
-            events_in_category = []
+        total, docids, resolver = searcher(
+            virtual={'query':layer.paths, 'operator':'or'},
+            **search_params)
 
-            for docid in docids:
-                if docid not in docids_seen:
-                    docids_seen.add(docid)
+        for docid in docids:
+            if docid not in docids_seen:
+                docids_seen.add(docid)
 
-                    event = resolver(docid)
-                    event._v_layer_color = layer.color
-                    event._v_layer_title = layer.title
-                
-                    events_in_category.append(event) 
-        
-            for event in events_in_category:
+                event = resolver(docid)
+                event._v_layer_color = layer.color
+                event._v_layer_title = layer.title
+
                 events.append(event)
-
+        
     return events
 
 def _paginate_catalog_events(calendar, request, 
