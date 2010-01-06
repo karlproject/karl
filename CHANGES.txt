@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #503450: Fixed that the hour and minute selectors on the add calendar
+  event page would lose their all-day state if the user entered an end date
+  that was before the start date.
+
 - LP #503442: Fixed hardcoded year left in calendar week view template. 
 
 - LP #496331: Calendar list view now shows a paginated listing of upcoming 

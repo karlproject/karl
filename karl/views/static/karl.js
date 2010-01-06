@@ -1499,8 +1499,12 @@ $.widget('ui.karldatetimepicker', {
             // Element changed.
             this.setAsDate(set_value);
             this.dateinput.effect("pulsate", {times: 1}, 800);
-            this.hourinput.effect("pulsate", {times: 1}, 800);
-            this.minuteinput.effect("pulsate", {times: 1}, 800);
+            
+            if (this.hourinput.is(":visible")) {
+              this.hourinput.effect("pulsate", {times: 1}, 800);
+              this.minuteinput.effect("pulsate", {times: 1}, 800);
+            }
+            
         }
 
     }
