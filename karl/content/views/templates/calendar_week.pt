@@ -17,7 +17,7 @@
     <table class="cal cal_week ${calendar.today_class}" cellspacing="0">
       <!-- days -->
       <tr class="cal_dates">
-        <th>2009</th>
+        <th>${calendar.week[0].year}</th>
         <th class="cal_${day.heading}" tal:repeat="day calendar.week">
           <a href="${day.show_url}">${day.heading}</a>
         </th>
