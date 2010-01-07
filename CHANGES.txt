@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #503523: AttributeError: 'CalendarEvent' object has no attribute 'color'
+
 - LP #503450: Fixed that the hour and minute selectors on the add calendar
   event page would lose their all-day state if the user entered an end date
   that was before the start date.
