@@ -239,25 +239,6 @@ class TimeSlot(object):
         if self.bubbles:
             return self.bubbles[0]
         return None
-    
-    @property
-    def shade_class(self):
-        if self.shaded_row:
-            return 'shade'
-        else:
-            return ''
-    
-    @property
-    def hour_class(self):
-        if self.is_half_hour:
-            return 'cal_half_hour'
-        else:
-            return 'cal_hour'    
-
-    def __repr__(self):
-        fmt  = "<Half Hour at %s>"
-        time = self.start_datetime.strftime('%Y-%m-%d %r')
-        return fmt % time 
 
 
 class Bubble(object):

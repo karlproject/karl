@@ -65,7 +65,11 @@
            <div class="cal_stack">     
              <!-- each time slot - one for each 1/2 hour -->  
              <!-- events that start at this time -->   
-             <div tal:repeat="slot day.half_hour_slots" class="cal_hour_event ${slot.shade_class} ${slot.hour_class}">
+                 <div tal:repeat="slot day.half_hour_slots" 
+                      tal:attributes="class python:'cal_hour_event %s %s' % (
+                                                       ('','shade')[slot.shaded_row],
+                                                       ('cal_hour','cal_half_hour')[slot.is_half_hour]
+                                                    )">
                <div class="create">
                  <a class="add" href="${slot.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
                </div>
