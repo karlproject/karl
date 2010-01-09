@@ -38,13 +38,16 @@
 
               <tal:block condition="event">
                 <div class="cal_event with_tooltip cal_event_pos_${event.rounding_class} ${event.type_class}">
-                  <a href="${event.show_url}" class="${event.caption_class}">
+                  <a href="${event.show_url}" 
+                     tal:attributes="class python:('cal_%s','cal_%s_all')[event.bubbled] % event.color">
+                   
                     <tal:block condition="event.bubbled">
                       ${event.bubble_title}
                     </tal:block>
                     <tal:block condition="not(event.bubbled)">
                       &middot; ${event.title} 
                     </tal:block>
+
                   </a>
                 </div>
 
