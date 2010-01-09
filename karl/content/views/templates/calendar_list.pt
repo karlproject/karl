@@ -22,7 +22,7 @@
       </tr>      
 
       <tr tal:repeat="event calendar.events" 
-          tal:attributes="class python:'cal_agenda_day ' + ['shade', ''][repeat['event'].odd()]">
+          tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[repeat['event'].odd()]">
         
         <th>
           <a href="${event.first_line_day_show_url}">${event.first_line_day}</a>
