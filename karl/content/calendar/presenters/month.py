@@ -322,12 +322,6 @@ class DayOnMonthView(object):
             if possible_event is not None:
                 events.append(possible_event)
         return events
-    
-    def __repr__(self):
-        format = "<Day %02d/%02d/%04d day_label='%s', today='%s'>"
-        subs = (self.month, self.day, self.year, 
-                self.day_label_class, self.today_class)
-        return (format % subs)
 
 
 class EventOnMonthView(BaseEvent):
