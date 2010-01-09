@@ -100,7 +100,9 @@ class DayViewPresenter(BasePresenter):
         for i in range(0, 48):
            is_shaded    = (i < 16) or (i > 35)
            is_half_hour = (i % 2) != 0
-           start_datetime = add_minutes(self.first_moment, (i * 30))
+
+           minutes_ahead  = datetime.timedelta(minutes=(i*30))
+           start_datetime = self.first_moment + minutes_ahead
 
            # url to add an event to this time slot           
            starts = time.mktime(start_datetime.timetuple())
@@ -280,7 +282,3 @@ class EventOnDayView(BaseEvent):
         return self.first_moment.strftime('%l:%M %p')
         
 
-def add_minutes(dtime, num_minutes):
-    unixtime = time.mktime(dtime.timetuple()) # ignores microseconds
-    unixtime += (num_minutes * 60)
-    return datetime.datetime.fromtimestamp(unixtime)
