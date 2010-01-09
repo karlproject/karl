@@ -22,8 +22,9 @@
 
       <tr tal:repeat="week calendar.weeks">
         <tal:block repeat="day week">
-          <td class="${day.today_class}">
-            <div class="label ${day.day_label_class}">
+          <td tal:attributes="class python:('','today')[day.current_day]">
+            
+            <div tal:attributes="class python:'label ' + ('faded','')[day.current_month]">
     					<a class="add" href="${day.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
     					<a class="num" href="${day.show_day_url}">${day.day}</a>
     				</div>

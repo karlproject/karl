@@ -346,26 +346,6 @@ class DayOnMonthViewTests(unittest.TestCase):
 
         events = [dummy_event, dummy_event]
         self.assertEqual(day.events, events)
-   
-    # day_label_class
-    
-    def test_day_label_class_is_empty_for_current_month(self):
-        day = self._makeOne(2009, 9, 5, current_month=True)
-        self.assertEqual(day.day_label_class, '')
-
-    def test_day_label_class_is_faded_for_other_months(self):
-        day = self._makeOne(2009, 9, 5, current_month=False)
-        self.assertEqual(day.day_label_class, 'faded')
-   
-    # today_class
-    
-    def test_today_class_is_today_for_current_day(self):
-        day = self._makeOne(2009, 9, 5, current_day=True)
-        self.assertEqual(day.today_class, 'today')
-        
-    def test_today_class_is_empty_for_other_days(self):
-        day = self._makeOne(2009, 9, 5, current_day=False)
-        self.assertEqual(day.today_class, '')
 
     # first and last moment
     

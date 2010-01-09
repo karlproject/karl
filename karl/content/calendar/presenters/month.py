@@ -323,20 +323,6 @@ class DayOnMonthView(object):
                 events.append(possible_event)
         return events
     
-    @property
-    def day_label_class(self):
-        if self.current_month:
-            return ''
-        return 'faded'
-        
-    @property
-    def today_class(self):
-        if self.current_day:
-            return 'today'
-        else:
-            return ''
-
-
     def __repr__(self):
         format = "<Day %02d/%02d/%04d day_label='%s', today='%s'>"
         subs = (self.month, self.day, self.year, 
