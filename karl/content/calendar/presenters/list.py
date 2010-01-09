@@ -73,14 +73,11 @@ class ListViewPresenter(BasePresenter):
 
     
     def paint_events(self, events):
-        shaded_row = True
         for event in events:
             listed_event = Event(catalog_event=event,
-                                shaded_row=shaded_row,
-                                show_url=self.url_for(context=event)
+                                 show_url=self.url_for(context=event)
                            )
             self.events.append(listed_event)          
-            shaded_row = not(shaded_row)
 
     def paint_paginated_events(self, events, has_more, per_page, page):
         self.paint_events(events)
@@ -100,12 +97,11 @@ class Event(object):
     DEFAULT_LAYER = '*default*'
     LAYER_SUFFIX  = ' layer'
 
-    def __init__(self, catalog_event, shaded_row=True,
+    def __init__(self, catalog_event, 
                  show_url='#', edit_url='#', delete_url='#'):
 
         self._catalog_event = catalog_event # ICalendarEvent                               
 
-        self.shaded_row = shaded_row
         self.show_url = show_url
         self.edit_url = edit_url
         self.delete_url = delete_url
@@ -128,15 +124,6 @@ class Event(object):
             title = self._catalog_event._v_layer_title
             self.layer = title.rstrip(self.LAYER_SUFFIX)
         
-    @property
-    def shade_class(self):
-        if self.shaded_row:
-            return 'shade'
-        else:
-            return ''
-
-    # date & time info: first line
-    
     def _init_date_and_time_properties(self):    
         start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
         start_time = self._format_time_of_day(self._catalog_event.startDate)

@@ -21,7 +21,9 @@
         <td colspan="3"><a href="${calendar.navigation.prev_url}">View previous events</a></td>
       </tr>      
 
-      <tr tal:repeat="event calendar.events" class="cal_agenda_day ${event.shade_class}">
+      <tr tal:repeat="event calendar.events" 
+          tal:attributes="class python:'cal_agenda_day ' + ['shade', ''][repeat['event'].odd()]">
+        
         <th>
           <a href="${event.first_line_day_show_url}">${event.first_line_day}</a>
           <br/> 
