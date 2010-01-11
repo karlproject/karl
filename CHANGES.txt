@@ -10,9 +10,9 @@ Unreleased
   event page would lose their all-day state if the user entered an end date
   that was before the start date.
 
-- LP #503442: Fixed hardcoded year left in calendar week view template. 
+- LP #503442: Fixed hardcoded year left in calendar week view template.
 
-- LP #496331: Calendar list view now shows a paginated listing of upcoming 
+- LP #496331: Calendar list view now shows a paginated listing of upcoming
   events with 20 events per page.
 
 - Merged svn+ssh://osi@osi.agendaless.com/home/osi/bfgsvn/karl/branches/formish
@@ -55,6 +55,9 @@ Unreleased
   what OSI uses.
 
 - LP #488854 Added link to delete user in admin edit profile view.
+
+- LP #505939 Fixed bug when trying to render edit form for calendar events that
+  occur in a 'network-events' folder rather than a calendar.
 
 3.15 (2009-12-14)
 -----------------

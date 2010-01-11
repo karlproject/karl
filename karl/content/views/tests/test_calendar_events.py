@@ -247,6 +247,25 @@ class EditCalendarEventViewTests(unittest.TestCase):
         self.assertEqual(renderer.fieldvalues['title'], 'atitle')
         self.assertEqual(renderer.fieldvalues['text'], 'sometext')
 
+    def test_render_no_calendar(self):
+        context = DummyCalendarEvent()
+        context.title = 'atitle'
+        context.text = 'sometext'
+        request = testing.DummyRequest()
+        from webob import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/edit_calendarevent.pt')
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fieldvalues['title'], 'atitle')
+        self.assertEqual(renderer.fieldvalues['text'], 'sometext')
+        self.failIf('calendar_category' in renderer.fieldvalues)
+
     def test_submitted_invalid(self):
         context = DummyCalendarEvent()
         DummyCalendar()['anevent'] = context

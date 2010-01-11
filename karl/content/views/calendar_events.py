@@ -120,7 +120,7 @@ def _default_dates_requested(context, request):
         endDate   = startDate + datetime.timedelta(hours=1)
     return startDate, endDate
 
-def _get_catalog_events(calendar, request, 
+def _get_catalog_events(calendar, request,
                         first_moment, last_moment, layer_name=None):
 
     searcher = ICatalogSearch(calendar)
@@ -160,19 +160,19 @@ def _get_catalog_events(calendar, request,
                 event._v_layer_title = layer.title
 
                 events.append(event)
-        
+
     return events
 
-def _paginate_catalog_events(calendar, request, 
+def _paginate_catalog_events(calendar, request,
                              first_moment, last_moment, layer_name=None,
                              per_page=20, page=1):
-    
-    all_events = _get_catalog_events(calendar, request, 
+
+    all_events = _get_catalog_events(calendar, request,
                                      first_moment, last_moment, layer_name)
 
-    offset = (page - 1) * per_page   
+    offset = (page - 1) * per_page
     limit  = per_page + 1
-    
+
     events = []
     i = 0
     for event in all_events:
@@ -184,7 +184,7 @@ def _paginate_catalog_events(calendar, request,
 
     has_more = len(events) > per_page
     events   = events[:per_page]
-    
+
     return events, has_more
 
 def _calendar_filter(context, request):
@@ -684,6 +684,7 @@ def edit_calendarevent_view(context, request):
         calendar_categories.sort(key=lambda x: x['title'])
     else:
         calendar_categories = []
+        del fill_values['calendar_category']
 
     return render_form_to_response(
         'templates/edit_calendarevent.pt',
