@@ -609,6 +609,7 @@ def edit_calendarevent_view(context, request):
         calendar_categories.sort(key=lambda x: x['title'])
     else:
         calendar_categories = []
+        del fill_values['calendar_category']
 
     return render_form_to_response(
         'templates/edit_calendarevent.pt',
