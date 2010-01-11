@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.15.1 (2010-01-11)
+-------------------
 
 - LP #503523: AttributeError: 'CalendarEvent' object has no attribute
   'color' (merge from trunk).
