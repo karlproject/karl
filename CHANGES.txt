@@ -25,6 +25,13 @@ Unreleased
 
 - LP #488854 Added link to delete user in admin edit profile view.
 
+- LP #505939 Fixed bug when trying to render edit form for calendar events that
+  occur in a 'network-events' folder rather than a calendar.
+
+- LP #505939 Fixed bug when trying to render edit form for calendar events that
+  occur in a 'network-events' folder rather than a calendar. (Backported from
+  trunk.)
+
 3.15 (2009-12-14)
 -----------------
 
