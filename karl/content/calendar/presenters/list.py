@@ -74,8 +74,19 @@ class ListViewPresenter(BasePresenter):
     
     def paint_events(self, events):
         for event in events:
+            format = '%s?year=%d&month=%d&day=%d'
+            dt = event.startDate
+            start_day_url = format % (self.url_for('day.html'),
+                                      dt.year, dt.month, dt.day)
+
+            dt = event.endDate
+            end_day_url = format % (self.url_for('day.html'),
+                                    dt.year, dt.month, dt.day)
+            
             listed_event = Event(catalog_event=event,
-                                 show_url=self.url_for(context=event)
+                                 show_url=self.url_for(context=event),
+                                 start_day_url=start_day_url,
+                                 end_day_url=end_day_url
                            )
             self.events.append(listed_event)          
 
@@ -95,16 +106,18 @@ class ListViewPresenter(BasePresenter):
 
 class Event(object):
     DEFAULT_LAYER = '*default*'
-    LAYER_SUFFIX  = ' layer'
 
     def __init__(self, catalog_event, 
-                 show_url='#', edit_url='#', delete_url='#'):
+                 show_url='#', edit_url='#', delete_url='#',
+                 start_day_url='#', end_day_url='#'):
 
         self._catalog_event = catalog_event # ICalendarEvent                               
 
         self.show_url = show_url
         self.edit_url = edit_url
         self.delete_url = delete_url
+        self.start_day_url = start_day_url
+        self.end_day_url = end_day_url
 
         self._init_properties()
         self._init_layer_properties()
@@ -122,7 +135,7 @@ class Event(object):
             self.layer = None
         else: 
             title = self._catalog_event._v_layer_title
-            self.layer = title.rstrip(self.LAYER_SUFFIX)
+            self.layer = title.rstrip(' layer')
         
     def _init_date_and_time_properties(self):    
         start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
@@ -150,12 +163,3 @@ class Event(object):
         if time.endswith(':00'):
             time = time[:-3]
         return time + ampm
-
-    
-    @property
-    def first_line_day_show_url(self):
-        return '#'
-
-    @property
-    def second_line_day_show_url(self):
-        return ''

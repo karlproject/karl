@@ -25,10 +25,10 @@
           tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[repeat['event'].odd()]">
         
         <th>
-          <a href="${event.first_line_day_show_url}">${event.first_line_day}</a>
+          <a href="${event.start_day_url}">${event.first_line_day}</a>
           <br/> 
           <tal:block condition="event.second_line_day">
-            <a href="${event.second_line_day_show_url}">${event.second_line_day}</a>
+            <a href="${event.end_day_url}">${event.second_line_day}</a>
           </tal:block>
         </th>
         
