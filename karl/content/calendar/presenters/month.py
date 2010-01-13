@@ -322,26 +322,6 @@ class DayOnMonthView(object):
             if possible_event is not None:
                 events.append(possible_event)
         return events
-    
-    @property
-    def day_label_class(self):
-        if self.current_month:
-            return ''
-        return 'faded'
-        
-    @property
-    def today_class(self):
-        if self.current_day:
-            return 'today'
-        else:
-            return ''
-
-
-    def __repr__(self):
-        format = "<Day %02d/%02d/%04d day_label='%s', today='%s'>"
-        subs = (self.month, self.day, self.year, 
-                self.day_label_class, self.today_class)
-        return (format % subs)
 
 
 class EventOnMonthView(BaseEvent):
@@ -362,9 +342,3 @@ class EventOnMonthView(BaseEvent):
         else:
             return 'at_time'
 
-    @property 
-    def caption_class(self):
-        if self.bubbled:
-            return 'cal_%s_all' % self.color
-        else:
-            return 'cal_%s' % self.color

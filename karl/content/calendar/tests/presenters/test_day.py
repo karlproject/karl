@@ -348,34 +348,6 @@ class TimeSlotTests(unittest.TestCase):
         time_slot = self._makeOne(add_event_url='http://foo')
         self.assertEqual(time_slot.add_event_url, 'http://foo')
 
-    # is_half_hour
-    
-    def test_hour_class_defaults_to_hour(self):
-        time_slot = self._makeOne()
-        self.assertEqual(time_slot.hour_class, 'cal_hour')
-
-    def test_hour_class_returns_hour_when_not_is_half_hour(self):
-        time_slot = self._makeOne(is_half_hour=False)
-        self.assertEqual(time_slot.hour_class, 'cal_hour')
-    
-    def test_hour_class_returns_half_hour_when_is_half_hour(self):
-        time_slot = self._makeOne(is_half_hour=True)
-        self.assertEqual(time_slot.hour_class, 'cal_half_hour')
- 
-    # shade_class
-
-    def test_shade_class_defaults_to_empty_string_for_no_shading(self):
-        time_slot = self._makeOne()
-        self.assertEqual(time_slot.shade_class, '')
-
-    def test_shade_class_returns_css_class_when_not_shaded_row(self):
-        time_slot = self._makeOne(shaded_row=False)
-        self.assertEqual(time_slot.shade_class, '')
-    
-    def test_shade_class_returns_empty_string_when_shaded_row(self):
-        time_slot = self._makeOne(shaded_row=True)
-        self.assertEqual(time_slot.shade_class, 'shade')
-
     # helpers
 
     def _makeOne(self, *args, **kargs):
