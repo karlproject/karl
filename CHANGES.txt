@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #503771: Fixed day links on calendar list view.
 
 3.15.1 (2010-01-11)
 -------------------
