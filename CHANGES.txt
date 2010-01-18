@@ -3,6 +3,8 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #503451: Fixed multi-day calendar event not on both days 
+  (merge from trunk).
 
 - LP #503771: Fixed day links on calendar list view.
 
