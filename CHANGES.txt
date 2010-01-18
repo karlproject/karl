@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #503451: Fixed multi-day calendar event not on both days.
+
 - LP #503771: Fixed day links on calendar list view.
 
 - LP #503523: AttributeError: 'CalendarEvent' object has no attribute 'color'

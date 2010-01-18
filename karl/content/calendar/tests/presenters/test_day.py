@@ -267,7 +267,7 @@ class DayViewPresenterTests(unittest.TestCase):
                    
         event = DummyCatalogEvent(
                     startDate=datetime.datetime(2009, 7, 25,  0, 0, 0),
-                    endDate  =datetime.datetime(2009, 8, 25, 10, 0, 0)
+                    endDate  =datetime.datetime(2009, 7, 25, 10, 0, 0)
                 )
         index = presenter._find_first_slot_index_for_event(event)
         self.assert_(index is None)
@@ -314,7 +314,7 @@ class DayViewPresenterTests(unittest.TestCase):
         self.assert_(event_2 in mapping[1])
         self.assertEqual(mapping[2], [])
 
-    def test_map_catalog_events_mapps_into_last_slot(self):
+    def test_map_catalog_events_maps_into_last_slot(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime(2009, 8, 26)
 

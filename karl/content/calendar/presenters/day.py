@@ -176,7 +176,7 @@ class DayViewPresenter(BasePresenter):
         return mapping
 
     def _find_first_slot_index_for_event(self, catalog_event):
-        if catalog_event.endDate > self.last_moment:
+        if catalog_event.endDate < self.first_moment:
             return None
 
         event_start_datetime = catalog_event.startDate
