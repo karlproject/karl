@@ -241,6 +241,17 @@ class MonthViewPresenterTests(unittest.TestCase):
         index = presenter._find_contiguous_slot_across_days(days)
         self.assert_(index is None)
 
+    def test__find_contiguous_slot_across_days_is_None_for_empty_list(self):
+        focus_at = datetime.datetime(2009, 8, 1) 
+        now_at   = datetime.datetime(2009, 8, 26)
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        days = []
+
+        index = presenter._find_contiguous_slot_across_days(days)
+        self.assert_(index is None)
+
+
     # _should_event_be_bubbled
     
     def test__should_event_be_bubbled_no_for_event_less_than_whole_day(self):

@@ -232,6 +232,9 @@ class MonthViewPresenter(BasePresenter):
     def _find_contiguous_slot_across_days(self, list_of_days):                
         ''' Find the index to a slot that is available in every day of 
         the list, or None if not possible. '''
+        if not list_of_days:
+            return None
+
         index_of_available_slot = None
         
         num_days          = len(list_of_days)
