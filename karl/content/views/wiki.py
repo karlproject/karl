@@ -278,7 +278,7 @@ class EditWikiPageFormController(object):
         head_data = convert_to_script(dict(
             text = dict(enable_wiki_plugin = True),
             ))
-        return {'api':api, 'page_title':'Add Wiki Page', 'actions':(),
+        return {'api':api, 'page_title':'Edit Wiki Page', 'actions':(),
                 'head_data':head_data}
 
     def handle_cancel(self):
