@@ -129,7 +129,7 @@ class AddCommentViewTests(unittest.TestCase):
         from karl.testing import DummyUpload
         attachment1 = DummyUpload(filename="test1.txt")
         attachment2 = DummyUpload(filename=r"C:\My Documents\I Test\test2.txt")
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('form.submitted', '1'),

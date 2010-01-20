@@ -44,7 +44,7 @@ class ShowBlogViewTests(unittest.TestCase):
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
         from karl.utilities.interfaces import IKarlDates

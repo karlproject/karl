@@ -48,7 +48,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         context = testing.DummyModel()
         context["attachments"] = testing.DummyModel()
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.POST = MultiDict()
         renderer = testing.registerDummyRenderer(
             'templates/addedit_newsitem.pt')
@@ -57,7 +57,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         
     def test_submitted_invalid(self):
         context = testing.DummyModel()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'form.submitted': '1'})
                     )
@@ -69,7 +69,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         
     def test_submitted_invalid_notitle(self):
         context = testing.DummyModel()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'form.submitted': '1',
                     #'title': '',
@@ -82,7 +82,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         self.failUnless(renderer.fielderrors)
         
     def test_submitted_alreadyexists(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.testing import DummyCatalog
         from karl.content.interfaces import INewsItem
         from repoze.lemonade.testing import registerContentFactory
@@ -127,7 +127,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         self.tags = tags
         from karl.testing import DummyCatalog
         context.catalog = DummyCatalog()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                     ('form.submitted', '1'),
@@ -155,7 +155,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         from karl.testing import DummyUpload
         attachment1 = DummyUpload(filename="test1.txt")
         attachment2 = DummyUpload(filename="test2.txt")
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                     ('form.submitted', '1'),
@@ -190,7 +190,7 @@ class AddNewsItemViewTests(unittest.TestCase):
         from karl.content.interfaces import INewsItem
         registerContentFactory(DummyNewsItem, INewsItem)
         registerContentFactory(DummyImageFile, IImageFile)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(MultiDict([
             ("form.submitted", "1"),
             ("photo", DummyUpload(
@@ -267,7 +267,7 @@ class EditNewsItemViewTests(unittest.TestCase):
     
     def test_not_submitted(self):
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._callFUT(self.news_item, request)
         self.assertEqual(self.news_item.title, "Title")
@@ -276,7 +276,7 @@ class EditNewsItemViewTests(unittest.TestCase):
         self.assertEqual(self.news_item.creator, "user1")
         
     def test_submitted_invalid(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             MultiDict([
                 ("form.submitted", "1"),
@@ -287,7 +287,7 @@ class EditNewsItemViewTests(unittest.TestCase):
                  
     def test_submitted_valid(self):
         import datetime
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             MultiDict([
                 ("form.submitted", "1"),
@@ -313,7 +313,7 @@ class EditNewsItemViewTests(unittest.TestCase):
         self.assertEqual(self.news_item.modified_by, 'testeditor')
         
     def test_upload_photo(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.testing import DummyUpload
         request = testing.DummyRequest(
             MultiDict([
@@ -336,7 +336,7 @@ class EditNewsItemViewTests(unittest.TestCase):
         self.assertEqual(photo.stream.read(), "This is an image.")
         
     def test_replace_photo(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.testing import DummyUpload
         from karl.views.tests.test_file import DummyImageFile
         self.news_item["photo.jpg"] = DummyImageFile()
@@ -363,7 +363,7 @@ class EditNewsItemViewTests(unittest.TestCase):
         self.assertEqual(photo.stream.read(), "This is another image.")
         
     def test_delete_photo(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.views.tests.test_file import DummyImageFile
         self.news_item["photo.jpg"] = DummyImageFile()
         request = testing.DummyRequest(
@@ -385,7 +385,7 @@ class EditNewsItemViewTests(unittest.TestCase):
         self.failUnless(photo is None)
     
     def test_upload_attachments(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.testing import DummyUpload
         request = testing.DummyRequest(
             MultiDict([

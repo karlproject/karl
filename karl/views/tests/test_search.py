@@ -115,7 +115,7 @@ class SearchResultsViewTests(unittest.TestCase):
         return searchresults_view(context, request)
 
     def test_no_searchterm(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict())
         from karl.models.interfaces import ICatalogSearch
@@ -126,7 +126,7 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(renderer.terms, [])
 
     def test_bad_kind(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params=MultiDict({'kind':'unknown', 'body':'yo'}))
@@ -138,7 +138,7 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertRaises(HTTPBadRequest, self._callFUT, context, request)
 
     def test_none_kind(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
@@ -153,7 +153,7 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(len(renderer.results), 1)
 
     def test_known_kind(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.models.interfaces import IGroupSearchFactory
         from repoze.lemonade.testing import registerContentFactory
         from zope.interface import Interface
@@ -177,7 +177,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_community_search(self):
         context = testing.DummyModel()
         context.title = 'Citizens'
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
@@ -195,7 +195,7 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(len(renderer.results), 1)
 
     def test_parse_error(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'the'}))
         from zope.interface import Interface
@@ -222,7 +222,7 @@ class GetBatchTests(unittest.TestCase):
         return get_batch(context, request)
 
     def test_without_kind_with_terms(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.models.interfaces import ICatalogSearch
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
@@ -233,7 +233,7 @@ class GetBatchTests(unittest.TestCase):
         self.assertEqual(result[0]['total'], 1)
 
     def test_without_kind_without_terms(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.models.interfaces import ICatalogSearch
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
@@ -245,7 +245,7 @@ class GetBatchTests(unittest.TestCase):
     def test_with_kind_with_body(self):
         from karl.models.interfaces import IGroupSearchFactory
         from repoze.lemonade.testing import registerListItem
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         content = DummyContent()
         def search_factory(*arg, **kw):
             return DummySearchFactory(content)
@@ -258,7 +258,7 @@ class GetBatchTests(unittest.TestCase):
         self.assertEqual(result[0]['total'], 1)
 
     def test_bad_kind_with_body(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from webob.exc import HTTPBadRequest
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'doesntexist'}))
@@ -268,7 +268,7 @@ class GetBatchTests(unittest.TestCase):
     def test_with_kind_without_body(self):
         from karl.models.interfaces import IGroupSearchFactory
         from repoze.lemonade.testing import registerListItem
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         def dummy_factory(context, request, term):
             def results():
                 return 0, [], None
@@ -289,7 +289,7 @@ class MakeQueryTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, params):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.views.search import make_query
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict(params))

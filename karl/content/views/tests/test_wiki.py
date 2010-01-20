@@ -189,7 +189,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.__parent__.__name__ = 'front_page'
         context.__name__ = 'other_page'
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 2)

@@ -958,7 +958,7 @@ class TestAdvancedFolderView(unittest.TestCase):
 
     def test_cancel(self):
         context = testing.DummyModel(title='Dummy')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.cancel': '1',
@@ -969,7 +969,7 @@ class TestAdvancedFolderView(unittest.TestCase):
 
     def test_submit_no_marker(self):
         context = testing.DummyModel(title='Dummy')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -982,7 +982,7 @@ class TestAdvancedFolderView(unittest.TestCase):
 
     def test_submit_reference_manual(self):
         context = testing.DummyModel(title='Dummy')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -1004,7 +1004,7 @@ class TestAdvancedFolderView(unittest.TestCase):
 
     def test_submit_network_news(self):
         context = testing.DummyModel(title='Dummy')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -1026,7 +1026,7 @@ class TestAdvancedFolderView(unittest.TestCase):
 
     def test_submit_network_events(self):
         context = testing.DummyModel(title='Dummy')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -1053,7 +1053,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         from zope.interface import alsoProvides
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, INetworkNewsMarker)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -1077,7 +1077,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         from zope.interface import alsoProvides
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, INetworkEventsMarker)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -1101,7 +1101,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         from zope.interface import alsoProvides
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, IReferencesFolder)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',

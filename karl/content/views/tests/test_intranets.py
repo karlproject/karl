@@ -19,7 +19,6 @@ import unittest
 from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
-from webob import MultiDict
 from karl.testing import DummyUsers
 from karl.testing import DummyCatalog
 
@@ -75,6 +74,7 @@ class AddIntranetViewTests(unittest.TestCase):
         self.failIf(renderer.fielderrors)
 
     def test_submitted_invalid(self):
+        from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(MultiDict({'form.submitted':1}))
         renderer = testing.registerDummyRenderer(
@@ -85,6 +85,7 @@ class AddIntranetViewTests(unittest.TestCase):
         self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid(self):
+        from webob.multidict import MultiDict
         from zope.interface import directlyProvides
         from zope.interface import alsoProvides
         from karl.models.interfaces import ISite
@@ -158,6 +159,7 @@ class EditIntranetRootViewTests(unittest.TestCase):
     def test_not_submitted(self):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.testing import registerListItem
+        from webob.multidict import MultiDict
         tool_factory = DummyToolFactory(present=True)
         registerListItem(IToolFactory, tool_factory, 'foo')
         context = testing.DummyModel()
@@ -168,7 +170,6 @@ class EditIntranetRootViewTests(unittest.TestCase):
         context.feature = 'zzz'
         context.default_tool = 'overview'
         request = testing.DummyRequest()
-        from webob import MultiDict
         request.POST = MultiDict()
         renderer = testing.registerDummyRenderer(
             'templates/edit_intranet_root.pt')
@@ -180,7 +181,7 @@ class EditIntranetRootViewTests(unittest.TestCase):
         self.assertEqual(renderer.fieldvalues['feature'], 'zzz')
 
     def test_submitted_invalid(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         context = testing.DummyModel(title='oldtitle',
                                      default_tool='overview')
         context.__name__ = 'Community'
@@ -198,7 +199,7 @@ class EditIntranetRootViewTests(unittest.TestCase):
         self.failUnless(renderer.fielderrors)
 
     def test_submitted_valid_sharingchange(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from zope.interface import Interface
         from repoze.bfg.testing import registerDummySecurityPolicy
         from karl.models.interfaces import IObjectModifiedEvent
@@ -236,7 +237,7 @@ class EditIntranetRootViewTests(unittest.TestCase):
         self.assertEqual(workflow.transitioned[0]['to_state'], 'public')
 
     def test_submitted_valid_nosharingchange(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from zope.interface import Interface
         from repoze.bfg.testing import registerDummySecurityPolicy
         from karl.models.interfaces import IObjectModifiedEvent
@@ -275,7 +276,7 @@ class EditIntranetRootViewTests(unittest.TestCase):
         self.assertEqual(workflow.transitioned[0]['to_state'], 'private')
 
     def test_submitted_changetools(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from repoze.bfg.testing import registerDummySecurityPolicy
         from karl.models.interfaces import IToolFactory
         from karl.testing import DummyCatalog

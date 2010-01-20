@@ -59,7 +59,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
         renderer = testing.registerDummyRenderer(
@@ -70,7 +70,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_submitted_invalid(self):
         context = DummyCalendar()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'form.submitted': '1'})
             )
@@ -84,7 +84,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_submitted_invalid_no_startdate(self):
         context = DummyCalendar()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -102,7 +102,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_submitted_valid(self):
         context = self.community
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -134,7 +134,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_submitted_valid_no_category(self):
         context = self.community
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -165,7 +165,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_submitted_valid_sendalert(self):
         context = self.community
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -234,7 +234,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         context.title = 'atitle'
         context.text = 'sometext'
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
         renderer = testing.registerDummyRenderer(
@@ -252,7 +252,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         context.title = 'atitle'
         context.text = 'sometext'
         request = testing.DummyRequest()
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
         renderer = testing.registerDummyRenderer(
@@ -271,7 +271,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         DummyCalendar()['anevent'] = context
         context.title = 'atitle'
         context.text = 'sometext'
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         from karl.testing import DummyCatalog
         context.catalog = DummyCatalog()
         request = testing.DummyRequest(
@@ -297,7 +297,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -339,7 +339,7 @@ class EditCalendarEventViewTests(unittest.TestCase):
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         directlyProvides(context, ISite)
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({
                 'form.submitted': '1',
@@ -833,7 +833,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
             'layer_color': 'red',
@@ -854,7 +854,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
             'layer_color': 'red',
@@ -874,7 +874,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
             'layer_color': 'red',
@@ -892,7 +892,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
             'layer_color': '',
@@ -912,7 +912,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context = DummyCalendar()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.submitted': 1,
             'layer_title': 'Announcements',
@@ -1005,7 +1005,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.edit': 1,
             'layer__name__': 'foo',
@@ -1028,7 +1028,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
             'form.edit': 1,
             'layer__name__': 'foo',

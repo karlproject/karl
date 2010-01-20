@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from webob import MultiDict
+from webob.multidict import MultiDict
 
 from zope.interface import Interface
 from repoze.bfg.testing import cleanUp
@@ -217,7 +217,6 @@ class TestEditPageView(unittest.TestCase):
         self._registerLayoutProvider()
 
         request = DummyRequest()
-        from webob import MultiDict
         request.POST = MultiDict()
         context = self.context
 
