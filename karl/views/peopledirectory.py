@@ -412,7 +412,10 @@ class ReportColumn(object):
         self.weight = weight
 
     def render_text(self, profile):
-        return unicode(getattr(profile, self.id, ''))
+        value = getattr(profile, self.id, '')
+        if value is None:
+            value = ''
+        return unicode(value)
 
     def render_html(self, profile, request):
         value = self.render_text(profile)
@@ -435,7 +438,7 @@ class NameColumn(ReportColumn):
 class PhoneColumn(ReportColumn):
 
     def render_text(self, profile):
-        value = unicode(getattr(profile, self.id, ''))
+        value = super(PhoneColumn, self).render_text(profile)
         ext = getattr(profile, 'extension', None)
         if ext and ext.strip():
             value += ' x %s' % ext

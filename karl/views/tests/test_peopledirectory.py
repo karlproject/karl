@@ -791,6 +791,10 @@ class ReportColumnTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.assertEqual(col.render_html(profile, request), '&nbsp;')
 
+    def test_render_text_none(self):
+        col = self._makeOne()
+        profile = testing.DummyModel(col1=None)
+        self.assertEqual(col.render_text(profile), '')
 
 class NameColumnTests(unittest.TestCase):
 
@@ -836,6 +840,11 @@ class PhoneColumnTests(unittest.TestCase):
     def test_render_text_no_phone(self):
         col = self._makeOne()
         profile = testing.DummyModel()
+        self.assertEqual(col.render_text(profile), '')
+
+    def test_render_text_none(self):
+        col = self._makeOne()
+        profile = testing.DummyModel(phone=None)
         self.assertEqual(col.render_text(profile), '')
 
     def test_render_html_no_phone(self):
