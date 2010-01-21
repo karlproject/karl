@@ -68,6 +68,8 @@ Unreleased
 - LP #510194 Fixed people directory report columns to properly handle None
   values.
 
+- LP #510193 Fixed indentation for IE in people directory.
+
 3.15 (2009-12-14)
 -----------------
 

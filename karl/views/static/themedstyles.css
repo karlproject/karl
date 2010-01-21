@@ -804,7 +804,7 @@ ul#peopledir-tabs li.selected a {
   margin-left: 0px;
   margin-top: 10px;
 }
-#peopledir-section ul li {
+#peopledir-section ul, li {
   list-style: none;
   padding-left: 0px;
   margin-left: 0px;
