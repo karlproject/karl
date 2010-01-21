@@ -85,13 +85,10 @@
 .ui-grid-column {
     overflow: hidden;
     cursor: pointer;
-    height: 23px;
 }
 
 .ui-grid-column div {
     padding: 0 3px 0;
-    height: 16px;
-    overflow: hidden;
 }
 
 .ui-grid-column-sort-left {
@@ -108,12 +105,12 @@
 .ui-grid-column,
 .ui-grid-row-hover .ui-grid-column,
 .ui-grid-row-selected .ui-grid-column {
-    border-top: 0; 
-    border-left: 0; 
-    border-right: 0; 
-    //XXpadding-top: 1px; 
-    padding-left: 2px; 
-    padding-right: 2px; 
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    //XXpadding-top: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 /* alternate row coloring */
@@ -174,7 +171,7 @@ li.bit-box {
   padding: 1px 15px 2px 5px !important;
 }
 li.bit-box a.closebutton {
-  background: url('/static/jquery-ui/autobox2/close.gif') !important; 
+  background: url('/static/jquery-ui/autobox2/close.gif') !important;
 }
 
 ul.autobox-list li.active {
@@ -307,8 +304,8 @@ ul.livesearch-list .showall .item a:hover {
 ul.autobox-hldr {
   width: 550px !important;
   border: 0px none !important;
-  margin-top: 0px !important; 
-  margin-left: 0px !important; 
+  margin-top: 0px !important;
+  margin-left: 0px !important;
   padding: 0 0 0 0 !important;
 }
 
@@ -353,7 +350,7 @@ ul.autobox-hldr li.autobox-input input {
     display: block;
     width: 7px; height: 7px;
     font-size: 1px;
-    background: url('/static/jquery-ui/autobox2/close.gif'); 
+    background: url('/static/jquery-ui/autobox2/close.gif');
     float: right;
     margin-top: 4px;
 }
@@ -372,8 +369,8 @@ ul.autobox-hldr li.autobox-input input {
 }
 .ui-karldatetimepicker-hourinput,
 .ui-karldatetimepicker-minuteinput {
-   margin: 0px 4px 0px 4px; 
-   vertical-align: middle; 
+   margin: 0px 4px 0px 4px;
+   vertical-align: middle;
 }
 
 /* dialog */

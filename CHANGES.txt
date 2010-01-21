@@ -70,6 +70,8 @@ Unreleased
 
 - LP #510193 Fixed indentation for IE in people directory.
 
+- LP #510204 Removed height constraints on ui grid layouts.
+
 3.15 (2009-12-14)
 -----------------
 
