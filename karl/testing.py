@@ -274,6 +274,8 @@ class DummyUsers:
         user['login'] = new_login
 
     def member_of_group(self, userid, group):
+        if userid in self._by_id:
+            return group in self._by_id[userid]['groups']
         return False
 
 class DummyUpload(object):
