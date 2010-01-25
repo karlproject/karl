@@ -130,9 +130,6 @@ def get_previous_next(context, request):
 
 def extract_description(htmlstring):
     """ Get a summary-style description from the HTML in text field """
-    # XXX This gets called from other units, and therefore gets tested
-    #     indirectly, but a unit test for this guy couldn't hurt.
-
     # Lots of resources don't have a user-visible description field,
     # which is good, as it is one less field for authors to be
     # confronted with.  We still need a description to show in blog
