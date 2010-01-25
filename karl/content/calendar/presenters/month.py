@@ -151,7 +151,10 @@ class MonthViewPresenter(BasePresenter):
 
             # bubble rounded corners
             if i == 0:
-                tpl_event.rounding_class = 'left'
+                if days_len == 1:
+                    tpl_event.rounding_class = 'full'
+                else:
+                    tpl_event.rounding_class = 'left'
 
                 if day is self._all_days[0]:
                     if event.startDate < self.first_moment:
