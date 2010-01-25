@@ -450,7 +450,7 @@ def add_calendarevent_view(context, request):
         calendar_categories.sort(key=lambda x: x['title'])
     else:
         calendar_categories = []
-
+    
     return render_form_to_response(
         'templates/add_calendarevent.pt',
         form,
@@ -581,7 +581,7 @@ def show_calendarevent_ics_view(context, request):
 
 
 def edit_calendarevent_view(context, request):
-
+    
     tags_list = request.POST.getall('tags')
     form = EditCalendarEventForm(tags_list=tags_list)
     workflow = get_workflow(ICalendarEvent, 'security', context)
@@ -644,6 +644,7 @@ def edit_calendarevent_view(context, request):
         except Invalid, e:
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
+
     else:
         fielderrors = {}
         if workflow is None:
@@ -708,6 +709,7 @@ class AddCalendarEventForm(FormSchema):
     calendar_category = validators.UnicodeString(strip=True)
     startDate = baseforms.start_date
     endDate = baseforms.end_date
+    allDay = validators.StringBoolean(if_missing=False)
     location = validators.UnicodeString(strip=True)
     text = baseforms.text
     attendees = baseforms.TextAreaToList(strip=True)
@@ -723,6 +725,7 @@ class EditCalendarEventForm(FormSchema):
     calendar_category = validators.UnicodeString(strip=True)
     startDate = baseforms.start_date
     endDate = baseforms.end_date
+    allDay = validators.StringBoolean(if_missing=False)
     location = validators.UnicodeString(strip=True)
     text = baseforms.text
     attendees = baseforms.TextAreaToList(strip=True)

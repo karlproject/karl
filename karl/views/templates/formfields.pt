@@ -744,21 +744,8 @@
       <label class="required">Start Date</label>
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="allDay" id="allDay" type="hidden" value="false" />
       <input name="startDate" id="startDate" value="1/31/2009 18:00"/>
-      <script language="javascript" type="text/javascript">
-        $(document).ready(function() {
-            // create the widget
-            $('#startDate')
-                .karldatetimepicker({
-                })
-                .bind('change.karldatetimepicker', function() {
-                    $('#endDate').karldatetimepicker('limitMinMax',
-                            // add one hour
-                            new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
-                            null);
-                });
-        });
-      </script>
     </fieldset>
 
     <fieldset metal:define-macro="end_date-field"
@@ -769,17 +756,6 @@
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input name="endDate" id="endDate" value="2/17/2009 19:45"/>
-      <script language="javascript" type="text/javascript">
-        $(document).ready(function() {
-            // create the widget
-            $('#endDate')
-                .karldatetimepicker({
-                })
-                .bind('change.karldatetimepicker', function() {
-                    $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
-                });
-        });
-      </script>
     </fieldset>
 
     <fieldset metal:define-macro="publication-date-field"

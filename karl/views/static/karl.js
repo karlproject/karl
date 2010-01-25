@@ -1866,39 +1866,84 @@ function initCalendar() {
   scrollToTime();
 }
 
-// Add Event view only
+/** =ADD/EDIT CALENDAR EVENT 
+----------------------------------------------- */  
 function initNewEvent() {
   if ($("#startdate-field").length == 0 || $("#enddate-field").length == 0) { return; }
-  
+
+  initStartDatePicker();
+  initEndDatePicker();
+
+  // initial all-day state
+  if ($("#allDay").val() == 'true') {
+    var checked = 'checked="checked"'; 
+    hideEditCalendarEventTimes();
+  } else {
+    var checked = '';
+    showEditCalendarEventTimes();
+  }
+
   // add the "all-day" checkbox
   var checkbox = '<span class="all_day">' +
-                  '<input type="checkbox" id="cal_all_day" name="allDay" value="1" />' + 
+                  '<input type="checkbox" id="cal_all_day" name="allDay" ' + checked + ' />' + 
                   '<label for="cal_all_day">All-day</label>' + 
                  '</span>';
   $("#startdate-field").append(checkbox);
 
+  // all-day checkbox handler
   $("#cal_all_day").click(function() {
-    // remove any previous validation errors
-    $('#startdate-field').removeClass('fieldError');
-    $('#startdate-field > .errorMessage').remove();
-    $('#enddate-field').removeClass('fieldError');
-    $('#enddate-field > .errorMessage').remove();
+    removeEditCalendarEventValidationErrors();
     
-    // check - hide time input
-    if (this.checked) {      
-      $('#startdate-field select').hide();
-      $('#startdate-field .ui-karldatetimepicker-colon').hide();
-      $('#enddate-field select').hide();
-      $('#enddate-field .ui-karldatetimepicker-colon').hide();
-      
-    // uncheck - show time inputs
+    if (this.checked) {
+      $('#allDay').val('true');
+      hideEditCalendarEventTimes();      
     } else {
-      $('#startdate-field select').show();
-      $('#startdate-field .ui-karldatetimepicker-colon').show();
-      $('#enddate-field select').show();
-      $('#enddate-field .ui-karldatetimepicker-colon').show();
+      $('#allDay').val('false');
+      showEditCalendarEventTimes();
     }
   });
+}
+
+function initStartDatePicker() {
+  $('#startDate')
+      .karldatetimepicker({
+      })
+      .bind('change.karldatetimepicker', function() {
+          $('#endDate').karldatetimepicker('limitMinMax',
+                  // add one hour
+                  new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
+                  null);
+      });
+}
+
+function initEndDatePicker() {
+  $('#endDate')
+      .karldatetimepicker({
+      })
+      .bind('change.karldatetimepicker', function() {
+          $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
+      });
+}
+
+function hideEditCalendarEventTimes() {
+  $('#startdate-field select').hide();
+  $('#startdate-field .ui-karldatetimepicker-colon').hide();
+  $('#enddate-field select').hide();
+  $('#enddate-field .ui-karldatetimepicker-colon').hide();
+}
+
+function showEditCalendarEventTimes() {
+  $('#startdate-field select').show();
+  $('#startdate-field .ui-karldatetimepicker-colon').show();
+  $('#enddate-field select').show();
+  $('#enddate-field .ui-karldatetimepicker-colon').show();
+}
+
+function removeEditCalendarEventValidationErrors() {
+  $('#startdate-field').removeClass('fieldError');
+  $('#startdate-field > .errorMessage').remove();
+  $('#enddate-field').removeClass('fieldError');
+  $('#enddate-field > .errorMessage').remove();
 }
      
 /** =CALENDAR SETUP
