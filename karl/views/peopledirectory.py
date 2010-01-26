@@ -415,10 +415,10 @@ class ReportColumn(object):
         value = getattr(profile, self.id, '')
         if value is None:
             value = ''
-        return unicode(value)
+        return unicode(value).strip()
 
     def render_html(self, profile, request):
-        value = self.render_text(profile)
+        value = self.render_text(profile).strip()
         if not value:
             return '&nbsp;'
         else:
@@ -427,7 +427,7 @@ class ReportColumn(object):
 class NameColumn(ReportColumn):
 
     def render_text(self, profile):
-        return unicode(profile.title)
+        return unicode(profile.title).strip()
 
     def render_html(self, profile, request):
         value = unicode(profile.title)

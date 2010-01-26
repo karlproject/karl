@@ -297,7 +297,6 @@ table.content-listing {
   padding: 0;
   font-size: 1em;
   border-bottom: 1px dashed #e4e9eb;
-clear: right;
 }
 * html table.content-listing {
   width:98%;
@@ -2837,4 +2836,22 @@ a.primary_button:visited {
     text-align: right;
     padding-right: 10px;
     margin-top: 10px;
+}
+
+/* Admin UI Styles */
+.admin_page_body {
+	margin-right: 225px;
+	position: relative;
+}
+
+#syslog {
+  border: 1px solid #CECECE;
+}
+
+#syslog .entry {
+  padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+#syslog .entry:nth-child(odd) {
+  background: #F0F2F4;
 }

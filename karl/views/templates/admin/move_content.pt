@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Move Content</h1>
+
+      <div class="koverview_body">
+        <br/>
+        <div metal:use-macro="content_select_widget"/>
+        <br/>
+
+        <form method="POST" name="select_content">
+          <div metal:use-macro="content_select_grid"/>
+          <br/>
+          <b>Move to</b>
+          <select name="to_community">
+            <option value="">Select community</option>
+            <option tal:repeat="c communities" value="${c['path']}">
+              ${c['title']}
+            </option>
+          </select>
+          <input type="submit" name="move_content" value="Move Content"/>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</html>

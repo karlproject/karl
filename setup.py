@@ -105,6 +105,7 @@ setup(name='karl',
       [paste.filter_app_factory]
       timeit = karl.timeit:main
       karlerrorpage = karl.errorpage:ErrorPageFilter
+      errorlog = karl.errorlog:make_middleware
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
       cssconcat = karl.scripts.cssconcat:main

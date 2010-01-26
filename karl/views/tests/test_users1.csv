@@ -1,0 +1,3 @@
+"username","email","firstname","lastname","phone","extension","department","position","organization","location","country","website","languages","office","room_no","biography","home_path","login","groups","password"
+"user1","user1@example.com","User","One","(212) 555-1212","x33","Homeland Ambiguity","High Sheriff","Not much","Down yonder","US and A","http://example.com","Turkish, Ebonics","1234","12","Born.  Not dead yet.","/offices/ha","hello sir","group.KarlAdmin group.community.moderator","pass1234"
+"user2","user2@example.com","User","Two","(212) 555-1212","x34","Homeland Ambiguity","High Sheriff","A little","Over there","US and A","http://example.com","Magyar, Klingon","4321","21",,"","user2","","pass1234"

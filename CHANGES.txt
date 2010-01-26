@@ -6,6 +6,8 @@ Unreleased
 
 - LP #497437: Fixed all-day event option for calendar events.
 
+- LP #503442: Fixed hardcoded year left in calendar week view template.
+
 - LP #509597: IndexError on Calendar _find_contiguous_slot_across_days
 
 - LP #503451: Fixed multi-day calendar event not on both days.
@@ -17,8 +19,6 @@ Unreleased
 - LP #503450: Fixed that the hour and minute selectors on the add calendar
   event page would lose their all-day state if the user entered an end date
   that was before the start date.
-
-- LP #503442: Fixed hardcoded year left in calendar week view template.
 
 - LP #496331: Calendar list view now shows a paginated listing of upcoming
   events with 20 events per page.
@@ -73,6 +73,11 @@ Unreleased
 - LP #510193 Fixed indentation for IE in people directory.
 
 - LP #510204 Removed height constraints on ui grid layouts.
+
+- Added an administrative UI in order to have a central place for functions
+  useful to Karl administrators.
+
+- Added syslog functionality.
 
 3.15 (2009-12-14)
 -----------------

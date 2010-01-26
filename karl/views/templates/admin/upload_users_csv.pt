@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Upload Users (CSV)</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="upload_users_csv"
+              enctype="multipart/form-data">
+          <b>Upload a CSV file.</b><br/>
+          <input type="file" name="csv"/>
+          <input type="submit" value="Upload"/>
+          <br/><br/>
+        </form>
+      </div>
+
+      <p><b>Notes on file format</b></p>
+
+      <p> CSV (comma separated value) files should be in the same format as
+      output by Excel. (Delimiter is a comma. Quote character is the double
+      quote. No extraneous whitespace between columns.) The first line is a
+      header containing the names of the columns for the rest of the file.
+      Most columns are optional and all columns may appear in any order, as
+      long as the values for each user are consistent with the columns laid
+      out in the header.</p>
+
+      <p>The user's password is required.  The password may be specified either
+      in plain text, using the <i>password</i> column, or already SHA encryped
+      (preferred) using the <i>sha_password</i> column.  One or the other of
+      these columns must be present but not both.</p>
+
+      <p>The following
+      columns are required and must always appear in the uploaded CSV file:</p>
+
+      <ul>
+        <li tal:repeat="f required_fields">${f}</li>
+        <li>password <i>or</i> sha_password</li>
+      </ul>
+
+      <p>The following columns are all optional</p>
+
+      <ul>
+        <tal:item repeat="f allowed_fields" omit-tag="">
+          <li tal:condition="f not in required_fields and
+                             not f.endswith('password')">${f}</li>
+        </tal:item>
+      </ul>
+
+    </div>
+
+  </div>
+
+</html>

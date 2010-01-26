@@ -192,15 +192,20 @@ class DummyMailer(list):
         self.append(self.DummyMessage(mfrom, mto, msg))
 
 class DummyUsers:
-    def __init__(self, community=None):
+    def __init__(self, community=None, encrypt=None):
         self.removed_users = []
         self.removed_groups = []
         self.added_groups = []
         self.community = community
         self._by_id = {}
         self._by_login = {}
+        if encrypt is None:
+            encrypt = lambda password: password
+        self.encrypt = encrypt
 
     def add(self, userid, login, password, groups, encrypted=False):
+        if not encrypted:
+            password = self.encrypt(password)
         self.added = (userid, login, password, groups)
         userinfo = {
             "id": userid,

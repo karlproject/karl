@@ -1,0 +1,58 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+
+    <!-- Content selection widget -->
+    <div metal:define-macro="widget" id="content-select-widget">
+      <form method="GET" name="filter_content">
+        <b>Community:</b>
+        <select name="community">
+          <option value="_any">Any Community</option>
+          <option tal:repeat="c communities" value="${c['path']}"
+                  selected="${c['path'] == selected_community}">
+            ${c.title}
+          </option>
+        </select>
+
+        <b>Title contains:</b>
+        <input name="title_contains" value="${title_contains}"/>
+
+        <input type="submit" name="filter_content" value="Find Content"/>
+      </form>
+    </div>
+
+    <!-- Content selection grid -->
+    <div metal:define-macro="grid" id="content-select-grid">
+      <table class="content-listing">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Title</th>
+            <th>Date Modified</th>
+            <th>Creator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="item filtered_content">
+            <td>
+              <input type="checkbox" name="selected_content" checked=""
+                     value="${item['path']}"/>
+            </td>
+            <td>
+              <a href="${item.url}" target="_blank">${item.title}</a>
+            </td>
+            <td>${item.modified}</td>
+            <td>
+              <a href="${item.creator_url}" target="_blank"
+                 tal:omit-tag="item.creator_url is None">
+                ${item.creator_name}
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </body>
+</html>

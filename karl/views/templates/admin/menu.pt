@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+    <div metal:define-macro="menu">
+      <div id="admin-ui-menu" >
+        <div class="right-portlet">
+          <h3>Content Actions</h3>
+          <ul>
+            <li>
+              <a href="${api.app_url}/move_content.html">
+                Move Content
+              </a>
+            </li>
+            <li>
+              <a href="${api.app_url}/delete_content.html">
+                Delete content
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-portlet">
+          <h3>People</h3>
+          <ul>
+            <li>
+              <a href="upload_users_csv.html">Upload users (CSV File)</a>
+            </li>
+            <li>
+              <a href="#">Manage Groups</a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-portlet">
+          <h3>Email</h3>
+          <ul>
+            <li>
+              <a href="${api.app_url}/email_users.html">
+                Email Users
+              </a>
+            </li>
+            <li>
+              <a href="${api.app_url}/mailin/quarantine">
+                View mailin quarantine
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-portlet">
+          <h3>Site Setup</h3>
+          <ul>
+            <li><a href="#">Customize logo</a></li>
+            <li><a href="#">Intranet Setup</a></li>
+          </ul>
+        </div>
+        <div class="right-portlet">
+          <h3>Logs / Analytics</h3>
+          <ul>
+            <li tal:condition="api.syslog_view_enabled">
+              <a href="${api.app_url}/syslog.html">Syslog</a>
+            </li>
+            <li>
+              <a href="${api.app_url}/__error_log__">Error Log</a>
+            </li>
+            <li tal:condition="api.has_logs">
+              <a href="${api.app_url}/logs.html">Other logs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

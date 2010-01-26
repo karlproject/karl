@@ -575,5 +575,55 @@
     permission="view"
   />
 
+  <!-- Admin UI -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.admin_view"
+    permission="administer"
+    name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.delete_content_view"
+    permission="administer"
+    name="delete_content.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.move_content_view"
+    permission="administer"
+    name="move_content.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EmailUsersView"
+    permission="administer"
+    name="email_users.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.syslog_view"
+    permission="administer"
+    name="syslog.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.logs_view"
+    permission="administer"
+    name="logs.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.UploadUsersView"
+    permission="administer"
+    name="upload_users_csv.html"
+    />
+
 </configure>
 
