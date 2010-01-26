@@ -2855,3 +2855,13 @@ a.primary_button:visited {
 #syslog .entry:nth-child(odd) {
   background: #F0F2F4;
 }
+
+ul.menu {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+ul.menu li {
+  margin-left: 0;
+  padding-left: 0;
+}

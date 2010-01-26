@@ -6,7 +6,7 @@
       <div id="admin-ui-menu" >
         <div class="right-portlet">
           <h3>Content Actions</h3>
-          <ul>
+          <ul class="menu">
             <li>
               <a href="${api.app_url}/move_content.html">
                 Move Content
@@ -21,7 +21,7 @@
         </div>
         <div class="right-portlet">
           <h3>People</h3>
-          <ul>
+          <ul class="menu">
             <li>
               <a href="upload_users_csv.html">Upload users (CSV File)</a>
             </li>
@@ -32,7 +32,7 @@
         </div>
         <div class="right-portlet">
           <h3>Email</h3>
-          <ul>
+          <ul class="menu">
             <li>
               <a href="${api.app_url}/email_users.html">
                 Email Users
@@ -46,15 +46,8 @@
           </ul>
         </div>
         <div class="right-portlet">
-          <h3>Site Setup</h3>
-          <ul>
-            <li><a href="#">Customize logo</a></li>
-            <li><a href="#">Intranet Setup</a></li>
-          </ul>
-        </div>
-        <div class="right-portlet">
           <h3>Logs / Analytics</h3>
-          <ul>
+          <ul class="menu">
             <li tal:condition="api.syslog_view_enabled">
               <a href="${api.app_url}/syslog.html">Syslog</a>
             </li>
