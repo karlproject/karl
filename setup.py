@@ -116,6 +116,7 @@ setup(name='karl',
       mvcontent = karl.scripts.mvcontent:main
       samplegen = karl.scripts.samplegen:main
       startover = karl.scripts.startover:main
+      echo_log = karl.scripts.echo_log:main
       """
       )
 
