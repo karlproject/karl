@@ -157,7 +157,7 @@ class TestDeleteContentView(unittest.TestCase):
         self.assertEqual(self.search.calls[0]['path'], '/bigendians')
 
     def test_delete_one_item(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('delete_content', '1'),
@@ -176,7 +176,7 @@ class TestDeleteContentView(unittest.TestCase):
         self.failUnless('littleendians' in self.site)
 
     def test_delete_two_items(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('delete_content', '1'),
@@ -294,7 +294,7 @@ class TestMoveContentView(unittest.TestCase):
         self.assertEqual(len(c), 0)
 
     def test_move_one_item(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
@@ -319,7 +319,7 @@ class TestMoveContentView(unittest.TestCase):
         self.failIf('entry2' in dst_blog)
 
     def test_move_two_items(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
@@ -347,7 +347,7 @@ class TestMoveContentView(unittest.TestCase):
         self.failUnless('entry2' in dst_blog)
 
     def test_move_bad_destination(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
@@ -428,7 +428,7 @@ class TestEmailUsersView(unittest.TestCase):
         ])
 
     def test_email_everyone(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(params=MultiDict({
             'from_email': 'self',
             'to_group': '',
@@ -452,7 +452,7 @@ class TestEmailUsersView(unittest.TestCase):
         self.failUnless('Foo walked into a bar' in body, body)
 
     def test_email_staff(self):
-        from webob import MultiDict
+        from webob.multidict import MultiDict
         request = testing.DummyRequest(params=MultiDict({
             'from_email': 'admin',
             'to_group': 'group.KarlStaff',
