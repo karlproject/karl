@@ -9,7 +9,7 @@ go /communities/${community_name}
 go /communities/${community_name}/files/add_file.html
 notfind "Delete"
 fv save title "${search_file}"
-formfile save file "${test_path}/files/sample_photo2.jpg" image/jpeg
+formfile save file.file "${test_path}/files/sample_photo2.jpg" image/jpeg
 submit
 url "/communities/${community_name}/files/sample_photo2.jpg"
 

@@ -5,7 +5,7 @@ set_random_word test_fileindex
 go /communities/${community_name}/files/add_file.html
 notfind "Delete"
 fv save title ${test_fileindex}
-formfile save file "${test_path}/files/sample_photo.jpg" image/jpeg
+formfile save file.file "${test_path}/files/sample_photo.jpg" image/jpeg
 submit
 url "/communities/${community_name}/files/sample_photo.jpg"
 
