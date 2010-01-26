@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #497437: Fixed all-day event option for calendar events.
+
 - LP #509597: IndexError on Calendar _find_contiguous_slot_across_days
 
 - LP #503451: Fixed multi-day calendar event not on both days.

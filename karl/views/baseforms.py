@@ -134,7 +134,8 @@ class StartEndFields(validators.FormValidator):
 
     start_field = None
     end_field = None
-    __unpackargs__ = ('start_field', 'end_field')
+    all_day_field = None
+    __unpackargs__ = ('start_field', 'end_field', 'all_day_field')
 
     messages = {
         'invalid': _("End date must follow start date."),
@@ -146,8 +147,23 @@ class StartEndFields(validators.FormValidator):
         end = field_dict[self.end_field]
         errors = {}
 
+        # can't end before start
         if end < start:
             errors[self.end_field] = self.message('invalid', state)
+
+        # adjust for datetimes for all-day event
+        elif field_dict[self.all_day_field] is True:
+            field_dict[self.start_field] = datetime.datetime(
+                start.year, start.month, start.day,
+                0, 0, 0
+            )
+            
+            field_dict[self.end_field] = datetime.datetime(
+                end.year, end.month, end.day,
+                0, 0, 0
+            ) + datetime.timedelta(days=1) 
+        
+        # event must have some duration
         elif (end - start) < datetime.timedelta(minutes=1):
             errors[self.end_field] = self.message('invalid_duration', state)
             
@@ -247,7 +263,8 @@ publication_date = DateTime()
 security_state = validators.UnicodeString(strip=True)
 
 start_end_constraints =  [StartEndFields(
-                          start_field='startDate', end_field='endDate')]
+                          start_field='startDate', end_field='endDate',
+                          all_day_field='allDay')]
 
 class AppState(object):
     """ Provide keyword-based initialization of FormEncode app state"""

@@ -25,24 +25,56 @@ class TestFieldsMatchValidator(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def test_valid(self):
+    def _makeOne(self):
         from karl.views.baseforms import StartEndFields
+        validator = StartEndFields(start_field="start", 
+                        end_field="end", 
+                        all_day_field="allDay"
+                    )
+        return validator
+
+    def test_valid(self):
         import datetime
-        val = StartEndFields(start_field="start", end_field="end")
+        val = self._makeOne()
         val.to_python(dict(
             start = datetime.datetime(2008,1,1),
-            end = datetime.datetime(2008,1,2),
+            end   = datetime.datetime(2008,1,2),
+            allDay = False
             ))
 
-    def test_invalid(self):
-        from karl.views.baseforms import StartEndFields
+    def test_invalid_when_end_date_is_before_start(self):
         import datetime
         from formencode import validators
-        val = StartEndFields(start_field="start", end_field="end")
+        val = self._makeOne()
         self.assertRaises(validators.Invalid, val.to_python, dict(
             start = datetime.datetime(2008,1,2),
-            end = datetime.datetime(2008,1,1),
+            end   = datetime.datetime(2008,1,1),
+            allDay = False
             ))
+
+    def test_invalid_when_duration_is_less_than_one_minute(self):
+        import datetime
+        from formencode import validators
+        val = self._makeOne()
+        self.assertRaises(validators.Invalid, val.to_python, dict(
+            start = datetime.datetime(2008,1,1,0,0,0),
+            end   = datetime.datetime(2008,1,1,0,0,0),
+            allDay = False
+            ))
+
+    def test_adjusts_dates_when_all_day_flag_is_set(self):
+        import datetime
+        fields = dict(
+            start = datetime.datetime(2008,1,1,1,2,3),
+            end   = datetime.datetime(2008,1,2,4,5,6),
+            allDay = True
+        )
+        val = self._makeOne()
+        val.to_python(fields)
+        self.assertEqual(fields['start'], 
+                         datetime.datetime(2008,1,1,0,0,0))
+        self.assertEqual(fields['end'],
+                         datetime.datetime(2008,1,3,0,0,0))
 
 class TestUniqueEmailValidator(unittest.TestCase):
     def setUp(self):

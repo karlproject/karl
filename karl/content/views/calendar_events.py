@@ -187,6 +187,12 @@ def _paginate_catalog_events(calendar, request,
 
     return events, has_more
 
+def _is_all_day_event(event):
+    hhmmss = (event.startDate.hour,   event.endDate.hour,
+              event.startDate.minute, event.endDate.minute,
+              event.startDate.second, event.endDate.second)
+    return hhmmss == (0, 0, 0, 0, 0, 0)
+
 def _calendar_filter(context, request):
     session = get_session(context, request)
 
@@ -332,7 +338,6 @@ def _get_all_calendar_categories(context, request):
     calendar_categories.sort(key=lambda x: x['path'])
     return calendar_categories
 
-
 def add_calendarevent_view(context, request):
 
     tags_list=request.POST.getall('tags')
@@ -380,8 +385,8 @@ def add_calendarevent_view(context, request):
                                             converted['calendar_category'],
                                            )
             calendarevent.description = extract_description(converted['text'])
-            calname = make_unique_name(context, calendarevent.title)
 
+            calname = make_unique_name(context, calendarevent.title)
             context[calname] = calendarevent
 
             # Set up workflow
@@ -450,7 +455,7 @@ def add_calendarevent_view(context, request):
         calendar_categories.sort(key=lambda x: x['title'])
     else:
         calendar_categories = []
-    
+
     return render_form_to_response(
         'templates/add_calendarevent.pt',
         form,
@@ -644,7 +649,7 @@ def edit_calendarevent_view(context, request):
         except Invalid, e:
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
-
+            
     else:
         fielderrors = {}
         if workflow is None:
@@ -663,8 +668,15 @@ def edit_calendarevent_view(context, request):
             calendar_category=context.calendar_category,
             security_state = security_state,
             )
+
         if fill_values['contact_email'] is None:
             fill_values['contact_email'] = u''
+
+        if _is_all_day_event(context):
+            fill_values['allDay'] = True 
+            fill_values['endDate'] -= datetime.timedelta(days=1)
+        else:
+            fill_values['allDay'] = False
 
     # Render the form and shove some default values in
     page_title = 'Edit ' + context.title
@@ -686,7 +698,7 @@ def edit_calendarevent_view(context, request):
     else:
         calendar_categories = []
         del fill_values['calendar_category']
-
+    
     return render_form_to_response(
         'templates/edit_calendarevent.pt',
         form,

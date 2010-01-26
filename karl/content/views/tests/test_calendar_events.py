@@ -132,6 +132,45 @@ class AddCalendarEventViewTests(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/communities/community/my-event-1/')
 
+    def test_submitted_valid_adjusts_times_when_all_day_flag_set(self):
+        import datetime
+        from webob.multidict import MultiDict
+        context = self.community
+        request = testing.DummyRequest(
+            params=MultiDict({
+                'form.submitted': '1',
+                'startDate': '1/1/2009 16:00',
+                'endDate': '1/1/2009 17:00',
+                'title': 'my event',
+                'text': 'come to a party',
+                'contact_email': 'me@example.com',
+                'contact_name': 'Me',
+                'location': 'NYC',
+                'attendees': '',
+                'security_state': 'public',
+                'tags': 'thetesttag',
+                'calendar_category': '',
+                'allDay': 'true'
+                })
+            )
+        self._register()
+        self._registerSecurityWorkflow()
+
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        
+        factory = DummyContentFactory(DummyCalendarEvent)
+        registerContentFactory(factory, ICalendarEvent)
+
+        response = self._callFUT(context, request)
+
+        event = factory.created_instances[0]
+        self.assertEqual('my event', event.title)
+        self.assertEqual(event.startDate,
+                         datetime.datetime(2009,1,1,0,0,0))
+        self.assertEqual(event.endDate,
+                         datetime.datetime(2009,1,2,0,0,0))
+
     def test_submitted_valid_no_category(self):
         context = self.community
         from webob.multidict import MultiDict
@@ -232,7 +271,10 @@ class EditCalendarEventViewTests(unittest.TestCase):
         context = DummyCalendarEvent()
         DummyCalendar()['anevent'] = context
         context.title = 'atitle'
-        context.text = 'sometext'
+        context.text = 'sometext'           
+        import datetime
+        context.startDate = datetime.datetime(2010,1,1,0,0,0)
+        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.POST = MultiDict()
@@ -247,10 +289,77 @@ class EditCalendarEventViewTests(unittest.TestCase):
         self.assertEqual(renderer.fieldvalues['title'], 'atitle')
         self.assertEqual(renderer.fieldvalues['text'], 'sometext')
 
+    def test_notsubmitted_sets_all_day_flag_if_all_day_event(self):
+        context = DummyCalendarEvent()
+        DummyCalendar()['anevent'] = context
+        context.title = 'atitle'
+        context.text = 'sometext'           
+        import datetime
+        context.startDate = datetime.datetime(2010,1,1,0,0,0)
+        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/edit_calendarevent.pt')
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fieldvalues['allDay'], True)
+
+    def test_notsubmitted_adjusts_endDate_if_all_day_event(self):
+        context = DummyCalendarEvent()
+        DummyCalendar()['anevent'] = context
+        context.title = 'atitle'
+        context.text = 'sometext'           
+        import datetime
+        context.startDate = datetime.datetime(2010,1,1,0,0,0)
+        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/edit_calendarevent.pt')
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fieldvalues['endDate'],
+                         datetime.datetime(2010,1,1,0,0,0))
+
+    def test_notsubmitted_clears_all_day_flag_if_not_all_day_event(self):
+        context = DummyCalendarEvent()
+        DummyCalendar()['anevent'] = context
+        context.title = 'atitle'
+        context.text = 'sometext'           
+        import datetime
+        context.startDate = datetime.datetime(2010,1,1,3,0,0)
+        context.endDate   = datetime.datetime(2010,1,2,4,0,0)
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/edit_calendarevent.pt')
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
+        response = self._callFUT(context, request)
+        self.failIf(renderer.fielderrors)
+        self.assertEqual(renderer.fieldvalues['allDay'], False)
+
     def test_render_no_calendar(self):
         context = DummyCalendarEvent()
         context.title = 'atitle'
         context.text = 'sometext'
+        import datetime
+        context.startDate = datetime.datetime(2010,1,1,0,0,0)
+        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.POST = MultiDict()
@@ -329,6 +438,48 @@ class EditCalendarEventViewTests(unittest.TestCase):
         self.assertEqual(context.text, 'Come to a party!')
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.calendar_category, 'cal1')
+
+    def test_submitted_valid_adjusts_times_when_all_day_flag_set(self):
+        import datetime
+        self._register()
+        context = DummyCalendarEvent()
+        DummyCalendar()['anevent'] = context
+        from karl.testing import DummyCatalog
+        context.catalog = DummyCatalog()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict({
+                'form.submitted': '1',
+                'startDate': '1/5/2009 16:00',
+                'endDate': '1/6/2009 17:00',
+                'title': 'My Event',
+                'text': 'Come to a party!',
+                'contact_email': 'me@example.com',
+                'contact_name': 'Me',
+                'location': 'NYC',
+                'attendees': '',
+                'sendalert': 'true',
+                'security_state': 'public',
+                'tags': 'thetesttag',
+                'calendar_category': 'cal1',
+                'allDay': 'true'
+                }))
+        from karl.content.interfaces import ICalendarEvent
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
+        from karl.models.interfaces import IObjectModifiedEvent
+        from zope.interface import Interface
+        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        testing.registerDummySecurityPolicy('testeditor')
+        response = self._callFUT(context, request)
+        
+        self.assertEqual(context.startDate,
+                         datetime.datetime(2009, 1, 5, 0, 0, 0))
+        self.assertEqual(context.endDate,
+                         datetime.datetime(2009, 1, 7, 0, 0, 0))
 
     def test_submitted_valid_no_category(self):
         self._register()
@@ -1127,6 +1278,17 @@ class Test__get_catalog_events(unittest.TestCase):
         self.assertEqual(list(result), [event])
 
 
+class DummyContentFactory:
+    def __init__(self, klass):
+        self._klass = klass
+        self.created_instances = []
+    
+    def __call__(self, *args, **kargs):
+        content_object = self._klass(*args, **kargs)
+        self.created_instances.append(content_object)
+        return content_object
+
+
 class DummyCalendarEvent(testing.DummyModel):
 
     def __init__(self, title='', startDate=None, endDate=None, creator=0,
@@ -1201,3 +1363,5 @@ class DummySearchAdapter:
 
 class DummyCatalogEvent(testing.DummyModel):
     pass
+
+        
