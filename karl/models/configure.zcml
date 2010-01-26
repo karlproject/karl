@@ -266,6 +266,7 @@
     factory=".mailin_monitor.KarlMailInMonitor"
     path="/mailin/*traverse"
     name="mailin_monitor"
+    use_global_views="True"
     />
 
 </configure>
