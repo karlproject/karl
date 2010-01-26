@@ -28,8 +28,6 @@ class DayViewPresenterTests(unittest.TestCase):
     def setUp(self):
         calendar.setfirstweekday(calendar.SUNDAY)
 
-    # title
-
     def test_title_is_day_name_with_numeric_month_and_day(self):
         focus_at = datetime.datetime(2009, 8, 1) 
         now_at   = datetime.datetime.now()
@@ -37,6 +35,14 @@ class DayViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
         self.assertEqual(presenter.title, 'Saturday 8/1')
+
+    def test_has_a_feed_url(self):
+        focus_at = datetime.datetime(2009, 8, 1) 
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assert_(presenter.feed_url.startswith('http'))
 
     # first & last moment
 

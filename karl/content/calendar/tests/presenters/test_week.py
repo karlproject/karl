@@ -34,6 +34,14 @@ class WeekViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         self.assertEqual(presenter.title, 'Week of Wednesday 9/2')
 
+    def test_has_a_feed_url(self):
+        focus_at = datetime.datetime(2009, 8, 1) 
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assert_(presenter.feed_url.startswith('http'))
+
     # first & last moment
 
     def test_computes_first_moment_at_first_day_of_week(self):

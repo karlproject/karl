@@ -35,6 +35,14 @@ class ListViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         self.assertEqual(presenter.name, 'list') 
 
+    def test_has_a_feed_url(self):
+        focus_at = datetime.datetime(2009, 8, 1) 
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        self.assert_(presenter.feed_url.startswith('http'))
+
     def test_title_is_month_name_and_year(self):
         focus_at = datetime.datetime(2009, 8, 26)
         now_at   = datetime.datetime.now()
