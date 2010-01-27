@@ -79,6 +79,8 @@ Unreleased
 
 - Added syslog functionality.
 
+- Fixed bug in workflow where unicode was breaking status messages.
+
 3.15 (2009-12-14)
 -----------------
 

@@ -49,7 +49,7 @@ def _reindex(ob):
                 allowed_index.reindex_doc(node.docid, node)
 
 def ts(*args):
-    return '\t'.join([str(x) for x in args])
+    return '\t'.join([unicode(x) for x in args])
 
 #------------------------------------------------------------------------------
 #   Electors
@@ -78,7 +78,7 @@ def public_community_containment(context):
             return False
         return getattr(community, 'security_state', None) == 'public'
     return False
-    
+
 #------------------------------------------------------------------------------
 #   Workflow for communities
 #------------------------------------------------------------------------------
@@ -279,7 +279,7 @@ def content_to_private(ob, info):
         ob.__acl__ = acl
         msg = ts('content-private', model_path(ob), added, removed)
     _reindex(ob)
-    return msg 
+    return msg
 
 #------------------------------------------------------------------------------
 #   Workflow for intranet content
