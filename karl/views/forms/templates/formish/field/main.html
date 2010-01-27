@@ -1,6 +1,6 @@
 <div id="${field.cssname}--field" class="${field.classes}">
   <!-- field/main.html -->
-  <label tal:condition="field.widget.type != 'Hidden'"
+  <label tal:condition="field.widget.type != 'Hidden' and '.' not in field.name"
          for="${field.cssname}" tal:attributes="class field.required and 'required' or None">${field.title}</label>
   <div class="fieldHelp" tal:condition="str(field.description) != ''">${field.description}</div>
   <div class="inputs" tal:content="structure field.widget()">
