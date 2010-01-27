@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #510187: Get the display for per-office data in People reports to
+  match the previous layout.
+
 - LP #497437: Fixed all-day event option for calendar events.
 
 - LP #503442: Fixed hardcoded year left in calendar week view template.

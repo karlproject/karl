@@ -2865,3 +2865,33 @@ ul.menu li {
   margin-left: 0;
   padding-left: 0;
 }
+
+/* Support for the layout from karl.peopledir's "hcard" idea  */
+
+.peopledir-hcard .vcard .hcard-main {
+    width: 400px;
+    float: left;
+}
+
+.peopledir-hcard .vcard .hcard-secondary {
+    text-align: right;
+    margin-left: 420px;
+}
+
+.peopledir-hcard .vcard .fn, 
+.peopledir-hcard .vcard a.fn {
+    display: block;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.peopledir-hcard .vcard .note {
+    display: block;
+    margin-top: 7px;
+}
+
+.peopledir-hcard .vcard .country-name {
+    padding-left: 5px;
+    display: inline;
+}
