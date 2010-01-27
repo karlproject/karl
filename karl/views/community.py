@@ -185,6 +185,11 @@ class AddCommunityFormController(object):
                                    converted['text'],
                                    userid,
                                    )
+        # this *must* directly follow content creation because the
+        # toolinfo add stuff depends on the community having a full
+        # path.
+        context[name] = community 
+
         # required to use moderators_group_name and
         # members_group_name
         community.__name__ = name
@@ -201,8 +206,6 @@ class AddCommunityFormController(object):
 
         for group_name in moderators_group_name, members_group_name:
             users.add_group(userid, group_name)
-
-        context[name] = community
 
         if self.workflow is not None:
             if 'security_state' in converted:
