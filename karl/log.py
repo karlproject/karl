@@ -20,19 +20,6 @@ def get_logger():
     return logger
 
 def configure_log(**config):
-    if 'syslog' not in config:
-        return
-
-    syslog = config.get('syslog')
-    if ':' in syslog:
-        host, port = syslog.split(':')
-        port = int(port)
-        address = (host, port)
-    elif '/' in syslog:
-        address = syslog
-    else:
-        address = (syslog, 514)
-
     debug = config.get('debug', False)
     if debug:
         level = logging.DEBUG
@@ -41,15 +28,33 @@ def configure_log(**config):
 
     logger = logging.getLogger(LOG_NAME)
     logger.setLevel(level)
+
+    syslog_handler = None
+    error_monitor_handler = None
     for old_handler in logger.handlers:
         if isinstance(old_handler, NullHandler):
             logger.removeHandler(old_handler)
+        if isinstance(old_handler, KarlSysLogHandler):
+            syslog_handler = old_handler
+        if isinstance(old_handler, ErrorMonitorHandler):
+            error_monitor_handler = old_handler
 
-    app_name = config.get('syslog_app_name', 'karl')
-    syslog_handler = KarlSysLogHandler(app_name, address)
-    logger.addHandler(syslog_handler)
+    if 'syslog' in config and syslog_handler is None:
+        syslog = config.get('syslog')
+        if ':' in syslog:
+            host, port = syslog.split(':')
+            port = int(port)
+            address = (host, port)
+        elif '/' in syslog:
+            address = syslog
+        else:
+            address = (syslog, 514)
 
-    if 'error_monitor_dir' in config:
+        app_name = config.get('syslog_app_name', 'karl')
+        syslog_handler = KarlSysLogHandler(app_name, address)
+        logger.addHandler(syslog_handler)
+
+    if 'error_monitor_dir' in config and error_monitor_handler is None:
         error_monitor_handler = ErrorMonitorHandler(
             os.path.abspath(config['error_monitor_dir'])
         )
