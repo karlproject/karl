@@ -19,8 +19,10 @@
 
 import os
 import sys
+import time
 from paste.deploy import loadapp
 from repoze.bfg.scripting import get_root
+from karl.log import get_logger
 
 def get_default_config():
     """Get the default configuration file name.
@@ -45,3 +47,15 @@ def open_root(config, name='karl'):
     config = os.path.abspath(os.path.normpath(config))
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
+
+def run_daemon(name, func, interval=300):
+    logger = get_logger()
+    while True:
+        try:
+            logger.info("Running %s", name)
+            func()
+            logger.info("Finished %s", name)
+        except:
+            logger.error("Error in daemon process", exc_info=True)
+        finally:
+            time.sleep(interval)
