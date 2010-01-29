@@ -1,3 +1,8 @@
+// Modified:
+// 2010 Balazs Ree <ree@greenfinity.hu>
+// - some customization for better handling of sequences
+
+
 function count_previous_fields(o) {
   return o.prevAll('.field').length;
 }   
@@ -146,8 +151,12 @@ function add_new_item(t,o) {
     var id = $(o).attr('id')+'-'+segments.join('-');
     // Decode the template.
     var html = decodeURIComponent(code);
+    // The next line will also cause the embedded js to run.
+    // This is important as we want it to be present in the
+    // document right away.
+    t.before(html);
+    var h = t.prev();
     // Add the links and mousedowns to this generated code
-    var h = $(html);
     create_addlinks(h);
     add_mousedown_to_addlinks(h);
 
@@ -173,7 +182,6 @@ function add_new_item(t,o) {
     h.find("label[for='"+id+"']").text(l);
     h.find("legend:contains('*')").text(l);
 
-    t.before(h);
     add_remove_buttons(t.parent().parent());
     add_sortables($('form'));
 }

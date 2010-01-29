@@ -23,4 +23,14 @@
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input tal:condition="not value_name" id="${field.cssname}" type="file" name="${field.name}.file" />
 <code tal:condition="value_name" id="${field.cssname}">${value_name}</code>
+
+<script language="javascript" type="text/javascript">
+  $(document).ready(function(evt) {
+    // jquery's selection fails because of the *.
+    $(document.getElementById('${field.cssname}-remove')).click(function() {
+      $(this).parent().hide('fold');
+    });
+  });
+</script>
+
 </span>
