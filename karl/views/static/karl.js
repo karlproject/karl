@@ -494,7 +494,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             .append(
                 $('<div class="statusbox"></div>')
                     .karlstatusbox()
-                )
+                );
         this.statusbox = $("*:last", newholder);
         return newholder;
     },
