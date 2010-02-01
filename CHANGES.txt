@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #506106: "accept invitation" refused with password length error
+  no matter what password length provided.
+
 - LP #510187: Get the display for per-office data in People reports to
   match the previous layout.
 

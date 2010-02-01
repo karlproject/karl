@@ -553,7 +553,7 @@ class AcceptInvitationFormController(object):
 
     def form_fields(self):
         required = validator.Required()
-        min_pw_length = get_setting(self.context, 'min_pw_length')
+        min_pw_length = int(get_setting(self.context, 'min_pw_length', 6))
         pwlen = validator.Length(min_pw_length)
         username = karlvalidators.RegularExpression(
             r'^[\w-]+$',
