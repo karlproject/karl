@@ -375,7 +375,9 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api, 'page_title':'Add File', 'actions':(),
+        return {'api':api,
+                'page_title':'Add File',
+                'actions':(),
                 'layout':layout}
 
     def handle_cancel(self):
@@ -546,8 +548,10 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api, 'page_title':'Edit Folder %s' % self.context.title,
-                'actions':(), 'layout':layout}
+        return {'api':api,
+                'page_title':'Edit %s' % self.context.title,
+                'actions':(),
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -631,7 +635,9 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api, 'page_title':'Edit File', 'actions':(),
+        return {'api':api,
+                'page_title':'Edit %s' % self.context.title,
+                'actions':(),
                 'layout':layout}
 
     def handle_cancel(self):

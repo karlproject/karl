@@ -326,7 +326,7 @@ class EditForumFormController(object):
 
     def __call__(self):
         api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Edit Forum %s' % self.context.title,
+        return {'api':api, 'page_title':'Edit %s' % self.context.title,
                 'actions':()}
 
     def handle_cancel(self):
@@ -606,7 +606,7 @@ class EditForumTopicFormController(object):
         layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request)
         return {'api':api,
-                'page_title':'Edit Forum Topic %s' % self.context.title,
+                'page_title':'Edit %s' % self.context.title,
                 'actions':(), 'layout':layout}
 
     def handle_cancel(self):

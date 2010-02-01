@@ -211,11 +211,11 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.failUnless('security_state' in widgets)
 
     def test___call__(self):
-        context = testing.DummyModel(title='mah context')
+        context = testing.DummyModel(title='title')
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
+        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
 
     def test_handle_submit_events(self):

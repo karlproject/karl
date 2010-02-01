@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #510240: Formish edit screens have wrong heading
+
 - LP #506106: "accept invitation" refused with password length error
   no matter what password length provided.
 

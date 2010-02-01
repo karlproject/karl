@@ -635,7 +635,7 @@ class TestEditFolderFormController(unittest.TestCase):
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
+        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
 
     def test_handle_cancel(self):
@@ -762,7 +762,7 @@ class TestEditFileFormController(unittest.TestCase):
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
+        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
         self.failUnless('layout' in response)
         self.failUnless('actions' in response)

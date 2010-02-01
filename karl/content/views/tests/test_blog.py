@@ -440,10 +440,11 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         context = self._makeContext()
+        context.title = 'thing'
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
+        self.assertEqual(response['page_title'], 'Edit thing')
         self.failUnless('api' in response)
 
     def test_handle_cancel(self):

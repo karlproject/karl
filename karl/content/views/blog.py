@@ -413,7 +413,8 @@ class EditBlogEntryFormController(object):
 
     def __call__(self):
         api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Edit Blog Entry', 'actions':()}
+        page_title = 'Edit ' + self.context.title
+        return {'api':api, 'page_title':page_title, 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
