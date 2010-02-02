@@ -20,6 +20,8 @@
 IMailStore-enabled maildir. The actual maildir must be named 'Maildir'
 within that folder.
 """
+from paste.deploy import loadapp
+from repoze.bfg.scripting import get_root
 from repoze.mailin.scripts.draino import Draino
 from karl.log import set_subsystem
 from karl.scripting import get_default_config
@@ -94,7 +96,15 @@ def main(argv=sys.argv, factory=MailinRunner, root=None, draino=None):
     if options.pq_file is None:
         options.pq_file = os.path.join(maildir_root, 'pending.db')
 
+    if root is None:
+        config = options.config
+        if config is None:
+            config = get_default_config()
+        app = loadapp('config:%s' % config, name='karl')
+    #else: unit test
+
     def run(root=root, draino=draino):
+        closer = lambda: None # unit test
         if draino is None and options.run_draino:
             draino_args = ['draino', '-vvv', '-p', '%s/Maildir' % maildir_root,
                            maildir_root]
@@ -103,27 +113,17 @@ def main(argv=sys.argv, factory=MailinRunner, root=None, draino=None):
             draino = Draino(draino_args)
 
         if root is None:
-            config = options.config
-            if config is None:
-                config = get_default_config()
-            root, closer = open_root(config)
+            root, closer = get_root(app)
+        #else: unit test
 
         set_subsystem('mailin')
         if options.run_draino:
             draino.run()
         runner = factory(root, maildir_root, options)
         runner()
+        closer()
 
     if options.daemon:
-        # Go ahead and open the app now to initialize logging, but let it
-        # get closed since we don't want to leave it open while the daemon
-        # process is sleeping.
-        if root is None:
-            config = options.config
-            if config is None:
-                config = get_default_config()
-            open_root(config)
-
         run_daemon('mailin', run, options.interval)
     else:
         run()
