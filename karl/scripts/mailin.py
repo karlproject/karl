@@ -32,7 +32,7 @@ import optparse
 import os
 import sys
 
-def main(argv=sys.argv, factory=MailinRunner, root=None, draino=None):
+def main(argv=sys.argv, factory=MailinRunner, root=None):
     parser = optparse.OptionParser(
         description=__doc__,
         usage="%prog [options] maildir_root",
@@ -103,9 +103,9 @@ def main(argv=sys.argv, factory=MailinRunner, root=None, draino=None):
         app = loadapp('config:%s' % config, name='karl')
     #else: unit test
 
-    def run(root=root, draino=draino):
+    def run(root=root):
         closer = lambda: None # unit test
-        if draino is None and options.run_draino:
+        if options.run_draino:
             draino_args = ['draino', '-vvv', '-p', '%s/Maildir' % maildir_root,
                            maildir_root]
             if options.dry_run:
