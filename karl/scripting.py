@@ -24,6 +24,8 @@ from paste.deploy import loadapp
 from repoze.bfg.scripting import get_root
 from karl.log import get_logger
 
+_debug_object_refs = hasattr(sys, 'getobjects')
+
 def get_default_config():
     """Get the default configuration file name.
 
@@ -55,7 +57,59 @@ def run_daemon(name, func, interval=300):
             logger.info("Running %s", name)
             func()
             logger.info("Finished %s", name)
+            if _debug_object_refs:
+                _count_object_refs()
         except:
             logger.error("Error in daemon process", exc_info=True)
         finally:
             time.sleep(interval)
+
+_ref_counts = None
+def _count_object_refs():
+    """
+    This function is used for debugging leaking references between business
+    function calls in the run_daemon function.  It relies on a cPython built
+    with Py_TRACE_REFS.  In the absence of such a Python (the standard case)
+    this function does not called and we don't do this expensive object
+    counting.
+
+    On Ubuntu I was able to get a debug version of python installed by doing:
+
+        apt-get install python2.5-dbg
+
+    Your mileage may vary on other platforms.  I had terrible problems trying
+    to build Python from source with the Py_TRACE_REFS call and do not
+    recommend trying that on Ubuntu.
+    """
+    ref_counts = {}
+
+    # Count all of the objects
+    for obj in sys.getobjects(sys.gettotalrefcount()):
+        kind = type(obj)
+        if kind in ref_counts:
+            ref_counts[kind]['count'] += 1
+        else:
+            ref_counts[kind] = dict(kind=kind, count=1, delta=0)
+
+    global _ref_counts
+    if _ref_counts == None:
+        # first time
+        _ref_counts = ref_counts
+        return
+
+    # Calculate how many were created since last time
+    for kind, record in ref_counts.items():
+        if kind in _ref_counts:
+            record['delta'] = record['count'] - _ref_counts[kind]['count']
+        else:
+            record['delta'] = record['count']
+    _ref_counts = ref_counts
+
+    # Print the top N new objects
+    N = 20
+    records = list(ref_counts.values())
+    records.sort(key=lambda x: x['delta'], reverse=True)
+    for record in records[:N]:
+        print "DEBUG: created %d new instances of %s (Total: %d)" % (
+            record['delta'], str(record['kind']), record['count'],
+        )
