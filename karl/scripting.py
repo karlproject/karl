@@ -108,7 +108,7 @@ def _count_object_refs():
     # Print the top N new objects
     N = 20
     records = list(ref_counts.values())
-    records.sort(key=lambda x: x['delta'], reverse=True)
+    records.sort(key=lambda x: (x['delta'], x['count']), reverse=True)
     for record in records[:N]:
         print "DEBUG: created %d new instances of %s (Total: %d)" % (
             record['delta'], str(record['kind']), record['count'],
