@@ -3,3 +3,4 @@ Dec 25 09:16:00 remotehost org2 CRITICAL Cookies are running low.
 -- MARKER 12/26/2009 --
 Dec 26 11:14:23 localhost org1 WARNING Mess is not going to clean itself up.
 Dec 26 11:15:23 remotehost org2 WARNING Do not pull Grandpa's finger.
+Feb  2 11:15:23 localhost org3 HELP I'm stuck in this computer.

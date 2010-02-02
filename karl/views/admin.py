@@ -351,7 +351,7 @@ def syslog_view(context, request):
                      errors='replace') as syslog:
         for line in syslog:
             try:
-                month, day, time, host, instance, message = line.split(' ', 5)
+                month, day, time, host, instance, message = line.split(None, 5)
             except ValueError:
                 # Ignore lines that don't fit the format
                 continue

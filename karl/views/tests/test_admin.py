@@ -486,7 +486,7 @@ class TestSyslogView(unittest.TestCase):
         import sys
         here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
         from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings(
+        self.settings = settings = karltesting.DummySettings(
             syslog_view=os.path.join(here, 'test.log'),
             syslog_view_instances=['org1', 'org2'],
         )
@@ -528,6 +528,18 @@ class TestSyslogView(unittest.TestCase):
         self.assertEqual(renderer.instance, 'org1')
         self.failUnless(renderer.entries[0].startswith('Dec 26 11:14:23'))
 
+    def test_single_digit_day_with_leading_space(self):
+        self.settings['syslog_view_instances'] = ['org1', 'org2', 'org3']
+        request = testing.DummyRequest(params={
+            'instance': 'org3',
+        })
+        renderer = testing.registerDummyRenderer('templates/admin/syslog.pt')
+        response = self.fut(None, request)
+        self.assertEqual(len(renderer.entries), 1)
+        self.assertEqual(renderer.instances, ['org1', 'org2', 'org3'])
+        self.assertEqual(renderer.instance, 'org3')
+        self.failUnless(renderer.entries[0].startswith('Feb  2 11:15:23'))
+
 class TestLogsView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -566,7 +578,7 @@ class TestLogsView(unittest.TestCase):
         response = self.fut(None, request)
         self.assertEqual(renderer.logs, self.logs)
         self.assertEqual(renderer.log, self.logs[0])
-        self.assertEqual(len(renderer.lines), 5)
+        self.assertEqual(len(renderer.lines), 6)
 
     def test_one_log(self):
         del self.logs[1]
@@ -575,7 +587,7 @@ class TestLogsView(unittest.TestCase):
         response = self.fut(None, request)
         self.assertEqual(len(renderer.logs), 1)
         self.assertEqual(renderer.log, self.logs[0])
-        self.assertEqual(len(renderer.lines), 5)
+        self.assertEqual(len(renderer.lines), 6)
 
     def test_protect_arbitrary_files(self):
         request = testing.DummyRequest(params={
