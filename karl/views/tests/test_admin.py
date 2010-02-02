@@ -318,6 +318,23 @@ class TestMoveContentView(unittest.TestCase):
         self.failUnless('entry2' in src_blog)
         self.failIf('entry2' in dst_blog)
 
+    def test_error_no_to_community(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/move_content.pt'
+        )
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict([
+                ('move_content', '1'),
+                ('selected_content', '/bigendians/blog/entry1'),
+            ]),
+            view_name='move_content.html',
+        )
+        response = self.fut(self.site, request)
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(renderer.api.error_message,
+                         'Please specify destination community.')
+
     def test_move_two_items(self):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(

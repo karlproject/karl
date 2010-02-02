@@ -224,12 +224,12 @@ def move_content_view(context, request):
         filtered_content = _get_filtered_content(
             context, request, [IBlogEntry, IWikiPage, ICalendarEvent])
         if not filtered_content:
-            api.status_message = 'No content matches your query.'
+            api.error_message = 'No content matches your query.'
 
     if 'move_content' in request.params:
         to_community = request.params.get('to_community', '')
         if not to_community:
-            api.status_message = 'Please specify destination community.'
+            api.error_message = 'Please specify destination community.'
         else:
             try:
                 paths = request.params.getall('selected_content')
