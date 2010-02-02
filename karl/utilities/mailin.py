@@ -163,6 +163,7 @@ class MailinRunner:
             print 'Processed %d messages' % processed
             print 'Bounced %d messages' % bounced
             print
+            sys.stdout.flush()
         if not self.dry_run:
             transaction.commit()
             self.pending.sql.commit()
