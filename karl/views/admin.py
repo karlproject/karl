@@ -400,8 +400,6 @@ def logs_view(context, request):
     )
 
 class UploadUsersView(object):
-    # XXX TODO: instructions in form, including allowed/required
-    #           fields.
     required_fields = [
         'username',
         'email',
