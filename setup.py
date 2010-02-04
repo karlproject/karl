@@ -117,6 +117,7 @@ setup(name='karl',
       samplegen = karl.scripts.samplegen:main
       startover = karl.scripts.startover:main
       echo_log = karl.scripts.echo_log:main
+      mailout = karl.scripts.mailout:main
       """
       )
 
