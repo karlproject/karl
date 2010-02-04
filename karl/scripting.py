@@ -63,6 +63,8 @@ def run_daemon(name, func, interval=300):
         except:
             logger.error("Error in daemon process", exc_info=True)
         finally:
+            sys.stderr.flush()
+            sys.stdout.flush()
             time.sleep(interval)
 
 _ref_counts = None
