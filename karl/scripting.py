@@ -17,6 +17,7 @@
 """Support code for KARL scripts
 """
 
+import gc
 import os
 import sys
 import time
@@ -81,6 +82,7 @@ def _count_object_refs():
     to build Python from source with the Py_TRACE_REFS call and do not
     recommend trying that on Ubuntu.
     """
+    gc.collect()
     ref_counts = {}
 
     # Count all of the objects
@@ -113,3 +115,7 @@ def _count_object_refs():
         print "DEBUG: created %d new instances of %s (Total: %d)" % (
             record['delta'], str(record['kind']), record['count'],
         )
+
+    if gc.garbage:
+        print "DEBUG: GARBAGE: %d/%d" % (
+            len(gc.garbage), len(gc.get_objects()))
