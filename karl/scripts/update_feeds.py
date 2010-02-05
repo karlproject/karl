@@ -17,10 +17,13 @@
 """Download each feed defined in a config file and put it into ZODB.
 """
 
+from karl.log import set_subsystem
 from karl.scripting import get_default_config
-from karl.scripting import open_root
+from karl.scripting import run_daemon
 from karl.utilities.feed import update_feeds
 import optparse
+from paste.deploy import loadapp
+from repoze.bfg.scripting import get_root
 import sys
 import transaction
 
@@ -35,6 +38,13 @@ def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
     parser.add_option('--dry-run', dest='dryrun',
         action='store_true', default=False,
         help="Don't actually commit the transaction")
+    parser.add_option('--daemon', '-D', dest='daemon',
+                      action='store_true', default=False,
+                      help='Run in daemon mode.')
+    parser.add_option('--interval', '-i', dest='interval', type='int',
+                      default=300,
+                      help='Interval, in seconds, between executions when in '
+                           'daemon mode.')
     options, args = parser.parse_args(argv[1:])
 
     if args:
@@ -44,18 +54,32 @@ def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
     if config is None:
         config = get_default_config()
     if root is None:
-        root, closer = open_root(config)
+        app = loadapp('config:%s' % config, name='karl')
+    #else: unit test
 
-    try:
-        update_func(root, config, force=options.force)
-    except:
-        tx.abort()
-        raise
-    else:
-        if options.dryrun:
+    def run(root=root):
+        closer = lambda: None  # unit test
+        try:
+            if root is None:
+                root, closer = get_root(app)
+            #else: unit test
+            set_subsystem('update_feeds')
+            update_func(root, config, force=options.force)
+        except:
             tx.abort()
+            closer()
+            raise
         else:
-            tx.commit()
+            if options.dryrun:
+                tx.abort()
+            else:
+                tx.commit()
+            closer()
+
+    if options.daemon:
+        run_daemon('update_feeds', run, options.interval)
+    else:
+        run()
 
 if __name__ == '__main__':
     main()
