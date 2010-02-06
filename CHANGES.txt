@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+- LP #513340: Calendar event blocks not formatting correctly in IE
 
 - LP #510240: Formish edit screens have wrong heading
 

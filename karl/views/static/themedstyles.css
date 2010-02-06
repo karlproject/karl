@@ -2105,28 +2105,16 @@ table.cal_scroll {
   padding: 0;
   border-bottom: 1px solid #e6e6e6;
 }
-.cal .shade {
-  background-color: #f7f9fa;
-}
 
 /* highlighting today */
-.cal_today_sun .cal_sun,
-.cal_today_mon .cal_mon,
-.cal_today_tue .cal_tue,
-.cal_today_wed .cal_wed,
-.cal_today_thu .cal_thu,
-.cal_today_fri .cal_fri,
-.cal_today_sat .cal_sat {
-  background-color: #fdffd2;
-}
-.cal_today_sun .cal_sun .shade,
-.cal_today_mon .cal_mon .shade,
-.cal_today_tue .cal_tue .shade,
-.cal_today_wed .cal_wed .shade,
-.cal_today_thu .cal_thu .shade,
-.cal_today_fri .cal_fri .shade,
-.cal_today_sat .cal_sat .shade {
-  background-color: #f5f9ce;
+.cal_today_sun .cal_sun .cal_stack,
+.cal_today_mon .cal_mon .cal_stack,
+.cal_today_tue .cal_tue .cal_stack,
+.cal_today_wed .cal_wed .cal_stack,
+.cal_today_thu .cal_thu .cal_stack,
+.cal_today_fri .cal_fri .cal_stack,
+.cal_today_sat .cal_sat .cal_stack {
+  background-position: -615px 0;
 }
 
 /* hours of the day */
@@ -2152,6 +2140,9 @@ table.cal_scroll {
 }
 .cal .cal_stack {
   line-height: 1.5em;
+}
+.cal td .cal_stack {
+  background: url("../images/cal_event_bg.png") 0 0 no-repeat;
 }
 .cal th .cal_time_label {
   height: 51px;
@@ -2189,9 +2180,8 @@ table.cal_scroll {
 
 /* hourly events */
 .cal_hour_event {
-  height: 25px;
+  height: 26px;
   position: relative;
-  border-bottom: 1px solid #e6e6e6;
   line-height: 1.15em;
   font-size: 115%;
 }
@@ -2407,7 +2397,7 @@ body .cal_hour_event .cal_event_block .time {
   overflow: hidden;
 }
 .cal_week .cal_event_block {
-  width: 80px;
+  width: 79px;
 }
 
 
