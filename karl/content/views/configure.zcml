@@ -16,12 +16,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -36,12 +36,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -202,12 +202,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -222,12 +222,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -278,12 +278,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -306,12 +306,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -400,12 +400,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -437,12 +437,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -458,12 +458,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -485,12 +485,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -518,12 +518,12 @@
 
      <formish:action
        name="submit"
-       title="Add"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
@@ -545,12 +545,12 @@
 
      <formish:action
        name="submit"
-       title="Edit"
+       title="submit"
        />
 
      <formish:action
        name="cancel"
-       title="Cancel"
+       title="cancel"
        validate="false"
        />
 
