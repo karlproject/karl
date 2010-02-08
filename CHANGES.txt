@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP# 510770: Sort categories by title rather than path.
+
 - LP #510304: Add/edit calendar event should show default category
   first always.
 
