@@ -333,10 +333,12 @@ def _get_all_calendar_categories(context, request):
         for docid in docids:
             ob = resolver(docid)
             path = model_path(ob)
+            folder = path.rsplit('/', 1)[0]
             title = _calendar_category_title(ob)
-            calendar_categories.append({'title':title, 'path':path})
+            calendar_categories.append({'title':title, 'path':path,
+                                        'folder':folder})
 
-    calendar_categories.sort(key=lambda x: x['path'])
+    calendar_categories.sort(key=lambda x: (x['folder'], x['title']))
     return calendar_categories
 
 def add_calendarevent_view(context, request):
@@ -955,7 +957,6 @@ def calendar_setup_layers_view(context, request):
     layer_names = [ x.__name__ for x in layers ]
 
     categories = _get_calendar_categories(context)
-    category_names = [ x.__name__ for x in categories ]
 
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
