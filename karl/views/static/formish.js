@@ -2,7 +2,6 @@
 // 2010 Balazs Ree <ree@greenfinity.hu>
 // - some customization for better handling of sequences
 
-
 function count_previous_fields(o) {
   return o.prevAll('.field').length;
 }   
@@ -251,7 +250,7 @@ var engine = GetBrowserEngine();
 var engine_version = GetBrowserVersion();
 
 function ie_fixsubmitbuttons() {
-    /* Work around broken button behaviour for IE 6 and 7 when enter is pressed */
+    /* Work around broken submit button behaviour for IE 6 and 7 when enter is pressed */
     if (engine==="msie" && engine_version<80) {
         $("form button[type=submit]").live("click", function() {
             var name = $(this).attr("name");
