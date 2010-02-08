@@ -234,9 +234,39 @@ function add_sortables(o) {
   
 }
 
+function GetBrowserVersion() {
+    return Number( $.browser.version.split(".", 2).join(""));
+}
 
-/* This needs to be run to allow sorting, adding and removing of sequence items */
+function GetBrowserEngine() {
+    var i, engines = [ "safari", "opera", "msie", "mozilla" ];
+    for (i=0; i<engines.length; i++) {
+        if ($.browser[engines[i]]) {
+            return engines[i];
+        }
+    }
+}
+
+var engine = GetBrowserEngine();
+var engine_version = GetBrowserVersion();
+
+function ie_fixsubmitbuttons() {
+    /* Work around broken button behaviour for IE 6 and 7 when enter is pressed */
+    if (engine==="msie" && engine_version<80) {
+        $("form button[type=submit]").live("click", function() {
+            var name = $(this).attr("name");
+            $("<input type='hidden'/>")
+                .attr("name", name)
+                .attr("value", name)
+                .appendTo(this.form);
+            $("button[type=submit]", this.form).attr("name", "_buttonfix");
+        });
+    }
+}
+
+/* This needs to be run to allow sorting, adding and removing of sequence items and submit-on-enter for IE */
 function formish() {
+    ie_fixsubmitbuttons();
     add_sortables($('form'));
     create_addlinks($('form'));
     add_mousedown_to_addlinks($('form'));
