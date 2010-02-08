@@ -29,3 +29,14 @@ class TestFriendlyRandomId(unittest.TestCase):
         self.assertEqual(len(s), 6)
         
 
+class TestUnfriendlyRandomId(unittest.TestCase):
+    def _callFUT(self, len):
+        from karl.utilities.randomid import unfriendly_random_id
+        return unfriendly_random_id(len)
+
+    def test_it(self):
+        s = self._callFUT(4)
+        self.assertEqual(len(s), 4)
+        s = self._callFUT(6)
+        self.assertEqual(len(s), 6)
+    

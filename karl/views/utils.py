@@ -17,7 +17,9 @@
 
 """Useful functions that appear in several places in the KARL UI"""
 import os
+import random
 import re
+import sys
 from cStringIO import StringIO
 
 from repoze.bfg.security import authenticated_userid
@@ -160,7 +162,6 @@ def make_unique_name(context, title):
             counter += 1
             # This could actually cause all our
             # processes hang forever :)
-
 
 def basename_of_filepath(title):
     """

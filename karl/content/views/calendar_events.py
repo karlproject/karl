@@ -53,6 +53,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
+from karl.utilities.randomid import unfriendly_random_id
 
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
@@ -887,6 +888,7 @@ def calendar_setup_categories_view(context, request):
     if 'form.submitted' in request.POST:
         try:
             converted = form.validate(request.POST)
+            name = generate_name(context)
             title = converted['category_title']
 
             if title in [ x.title for x in categories ]:
@@ -896,7 +898,7 @@ def calendar_setup_categories_view(context, request):
                           error_dict={'category_title': msg})
 
             category = create_content(ICalendarCategory, title)
-            context[title] = category
+            context[name] = category
             default_layer.paths.append(model_path(category))
             default_layer._p_changed = True
 
@@ -939,7 +941,8 @@ def calendar_setup_layers_view(context, request):
     default_layer_name = ICalendarLayer.getTaggedValue('default_name')
     layers = filter(lambda x: x.__name__ != default_layer_name,
                     _get_calendar_layers(context))
-    layer_names = [ x.__name__ for x in layers]
+    layer_titles = [ x.title for x in layers]
+    layer_names = [ x.__name__ for x in layers ]
 
     categories = _get_calendar_categories(context)
     category_names = [ x.__name__ for x in categories ]
@@ -966,16 +969,11 @@ def calendar_setup_layers_view(context, request):
         try:
             converted = form.validate(request.POST)
             category_paths = list(set(request.POST.getall('category_paths')))
+            layer_name = generate_name(context)
             layer_title = converted['layer_title']
             layer_color = converted['layer_color']
 
-            if layer_title in category_names:
-                msg = "Name is already used by a category"
-                raise Invalid(value=layer_title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'layer_title': msg})
-
-            if layer_title in layer_names:
+            if layer_title in layer_titles:
                 msg = "Name is already used"
                 raise Invalid(value=layer_title, state=None,
                           msg=msg, error_list=None,
@@ -983,7 +981,7 @@ def calendar_setup_layers_view(context, request):
 
             layer = create_content(ICalendarLayer,
                                    layer_title, layer_color, category_paths)
-            context[layer_title] = layer
+            context[layer_name] = layer
 
             location = model_url(
                 context, request,
@@ -1020,13 +1018,7 @@ def calendar_setup_layers_view(context, request):
             category_paths = list(set(request.POST.getall('category_paths')))
             layer_color = converted['layer_color']
 
-            if layer_title in category_names:
-                msg = "Name is already used by a category"
-                raise Invalid(value=layer_title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'layer_title': msg})
-
-            if (layer_title != layer.title) and (layer_title in layer_names):
+            if (layer_title != layer.title) and (layer_title in layer_titles):
                 msg = "Name is already used"
                 raise Invalid(value=layer_title, state=None,
                           msg=msg, error_list=None,
@@ -1065,3 +1057,11 @@ def calendar_setup_layers_view(context, request):
         colors = _COLORS,
         api=api,
         )
+
+def generate_name(context):
+    while True:
+        name = unfriendly_random_id()
+        if not (name in context):
+            return name
+        
+    

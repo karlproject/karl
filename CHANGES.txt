@@ -3,6 +3,7 @@ karl package Changelog
 
 Unreleased
 ----------
+
 - LP #513340: Calendar event blocks not formatting correctly in IE
 
 - LP #510240: Formish edit screens have wrong heading
@@ -16,6 +17,10 @@ Unreleased
 - LP #497437: Fixed all-day event option for calendar events.
 
 - LP #503442: Fixed hardcoded year left in calendar week view template.
+
+- LP #510285: Use opaque identifiers for new category and layer ids to
+  make it possible to add a category with the same label as a layer
+  and vice versa.
 
 - LP #509597: IndexError on Calendar _find_contiguous_slot_across_days
 
