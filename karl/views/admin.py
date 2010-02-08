@@ -1,16 +1,19 @@
 from __future__ import with_statement
 
 import codecs
+from cStringIO import StringIO
 import csv
 from email.message import Message
 import os
 import transaction
+from webob import Response
 from webob.exc import HTTPFound
 
 from zope.component import getUtility
 
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import find_model
 from repoze.bfg.traversal import model_path
@@ -40,6 +43,9 @@ class AdminTemplateAPI(TemplateAPI):
         syslog_view = get_setting(context, 'syslog_view', None)
         self.syslog_view_enabled = syslog_view != None
         self.has_logs = not not get_setting(context, 'logs_view', None)
+        self.error_monitoring = not not get_setting(
+            context, 'error_monitor_subsystems', None
+        )
 
 def _menu_macro():
     return get_template('templates/admin/menu.pt').macros['menu']
@@ -523,3 +529,69 @@ class UploadUsersView(object):
             required_fields=self.required_fields,
             allowed_fields=self.allowed_fields,
         )
+
+def _get_error_monitor_state(error_monitor_dir, subsystem):
+    status_file = os.path.join(error_monitor_dir, subsystem)
+    if os.path.exists(status_file) and os.path.getsize(status_file) > 0:
+        errors = open(status_file, 'rb').read()
+        return filter(None, [entry.strip() for entry in
+                             errors.split('ENTRY\n')])
+    return []
+
+def error_monitor_view(context, request):
+    error_monitor_dir = get_setting(context, 'error_monitor_dir', '')
+    subsystems = get_setting(context, 'error_monitor_subsystems')
+    states = {}
+    urls = {}
+    for subsystem in subsystems:
+        urls[subsystem] = model_url(context, request,
+                                    'error_monitor_subsystem.html',
+                                    query={'subsystem': subsystem})
+        states[subsystem] = _get_error_monitor_state(
+            error_monitor_dir, subsystem
+        )
+
+    return render_template_to_response(
+        'templates/admin/error_monitor.pt',
+        api=AdminTemplateAPI(context, request),
+        menu=_menu_macro(),
+        subsystems=subsystems,
+        urls=urls,
+        states=states,
+    )
+
+def error_monitor_subsystem_view(context, request):
+    error_monitor_dir = get_setting(context, 'error_monitor_dir', '')
+    subsystems = get_setting(context, 'error_monitor_subsystems')
+    subsystem = request.params.get('subsystem', None)
+    if subsystem is None or subsystem not in subsystems:
+        raise NotFound()
+
+    entries = _get_error_monitor_state(error_monitor_dir, subsystem)
+    back_url = model_url(context, request, 'error_monitor.html')
+
+    return render_template_to_response(
+        'templates/admin/error_monitor_subsystem.pt',
+        api=AdminTemplateAPI(context, request),
+        menu=_menu_macro(),
+        subsystem=subsystem,
+        entries=entries,
+        back_url=back_url,
+    )
+
+def error_monitor_status_view(context, request):
+    """
+    Simple text only view that shows only error state, for use with external
+    monitoring.
+    """
+    error_monitor_dir = get_setting(context, 'error_monitor_dir')
+    subsystems = get_setting(context, 'error_monitor_subsystems')
+
+    buf = StringIO()
+    for subsystem in subsystems:
+        if _get_error_monitor_state(error_monitor_dir, subsystem):
+            print >>buf, '%s: ERROR' % subsystem
+        else:
+            print >>buf, '%s: OK' % subsystem
+
+    return Response(buf.getvalue(), content_type='text/plain')

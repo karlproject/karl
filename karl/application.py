@@ -39,12 +39,12 @@ def make_app(global_config, **kw):
     configure_log(**config)
 
     # Set up logging admin view (coerce instances to list)
-    if 'syslog_view' in config:
-        config['syslog_view_instances'] = config.get('syslog_view_instances',
-                                             'karl').split()
-
     if 'logs_view' in config:
         config['logs_view'] = map(os.path.abspath, config['logs_view'].split())
+
+    for key in ('syslog_view_instances', 'error_monitor_subsystems'):
+        if key in config:
+            config[key] = config[key].split()
 
     # Make BFG app
     pkg_name = config.get('package', None)

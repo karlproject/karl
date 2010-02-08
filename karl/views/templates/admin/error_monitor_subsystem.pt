@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">
+        Admin Section: View Subsystem Status: ${subsystem}
+      </h1>
+
+      <p>
+        <a href="${back_url}">Back to Error Monitor</a>
+      </p>
+
+      <div class="koverview_body">
+        <div id="syslog">
+          <div class="entry" tal:condition="not entries">No entries.</div>
+          <div class="entry" tal:repeat="entry entries">${entry}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</html>

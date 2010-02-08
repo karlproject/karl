@@ -2839,7 +2839,10 @@ a.primary_button:visited {
 }
 
 #syslog .entry {
-  padding: 0.2em 0.5em 0.2em 0.5em;
+  padding: 0.5em;
+  white-space: pre;
+  font-family: monospace;
+  font-size: 9pt;
 }
 
 #syslog .entry:nth-child(odd) {
@@ -2868,7 +2871,7 @@ ul.menu li {
     margin-left: 420px;
 }
 
-.peopledir-hcard .vcard .fn, 
+.peopledir-hcard .vcard .fn,
 .peopledir-hcard .vcard a.fn {
     display: block;
     font-weight: bold;

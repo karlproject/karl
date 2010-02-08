@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import unittest
 
 from repoze.bfg import testing
@@ -856,6 +858,163 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message,
                 'Skipping user: user1: User already exists with login: user1\n'
                 'Created 1 users.')
+
+class TestErrorMonitorView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        import tempfile
+        self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
+
+        self.site = testing.DummyModel()
+
+        from repoze.bfg.interfaces import ISettings
+        settings = karltesting.DummySettings(
+            error_monitor_dir=tmpdir,
+            error_monitor_subsystems=["blonde", "red", "head"],
+        )
+        testing.registerUtility(settings, ISettings)
+
+    def log_error(self, subsystem, message):
+        import os
+        with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
+            print >>f, 'ENTRY'
+            print >>f, message
+
+    def tearDown(self):
+        cleanUp()
+
+        import shutil
+        shutil.rmtree(self.tmpdir)
+
+    def call_fut(self):
+        from karl.views.admin import error_monitor_view
+        request = testing.DummyRequest()
+        return error_monitor_view(self.site, request)
+
+    def test_all_ok(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor.pt'
+        )
+        self.call_fut()
+        self.assertEqual(renderer.subsystems, ["blonde", "red", "head"])
+        self.assertEqual(renderer.states,
+                         {"blonde": [], "red": [], "head": []})
+        self.assertEqual(renderer.urls['blonde'],
+            "http://example.com/error_monitor_subsystem.html?subsystem=blonde")
+
+    def test_bad_head(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor.pt'
+        )
+        self.log_error('head', 'Testing...')
+        self.call_fut()
+        self.assertEqual(renderer.states,
+                         {"blonde": [], "red": [], "head": ['Testing...']})
+
+class TestErrorMonitorSubsystemView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        import tempfile
+        self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
+
+        self.site = testing.DummyModel()
+
+        from repoze.bfg.interfaces import ISettings
+        settings = karltesting.DummySettings(
+            error_monitor_dir=tmpdir,
+            error_monitor_subsystems=["blonde", "red", "head"],
+        )
+        testing.registerUtility(settings, ISettings)
+
+    def log_error(self, subsystem, message):
+        import os
+        with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
+            print >>f, 'ENTRY'
+            print >>f, message
+
+    def tearDown(self):
+        cleanUp()
+
+        import shutil
+        shutil.rmtree(self.tmpdir)
+
+    def call_fut(self, subsystem=None):
+        from karl.views.admin import error_monitor_subsystem_view
+        request = testing.DummyRequest(params={})
+        if subsystem is not None:
+            request.params['subsystem'] = subsystem
+        return error_monitor_subsystem_view(self.site, request)
+
+    def test_no_subsystem(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor_subsystem.pt'
+        )
+        from repoze.bfg.exceptions import NotFound
+        self.assertRaises(NotFound, self.call_fut)
+
+    def test_no_errors(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor_subsystem.pt'
+        )
+        self.call_fut('red')
+        self.assertEqual(renderer.entries, [])
+
+    def test_bad_head(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor_subsystem.pt'
+        )
+        self.log_error('head', 'foo')
+        self.log_error('head', 'bar')
+        self.call_fut('head')
+        self.assertEqual(renderer.entries, ['foo', 'bar'])
+
+class TestErrorMonitorStatusView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        import tempfile
+        self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
+
+        self.site = testing.DummyModel()
+
+        from repoze.bfg.interfaces import ISettings
+        settings = karltesting.DummySettings(
+            error_monitor_dir=tmpdir,
+            error_monitor_subsystems=["blonde", "red", "head"],
+        )
+        testing.registerUtility(settings, ISettings)
+
+    def log_error(self, subsystem, message):
+        import os
+        with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
+            print >>f, 'ENTRY'
+            print >>f, message
+
+    def tearDown(self):
+        cleanUp()
+
+        import shutil
+        shutil.rmtree(self.tmpdir)
+
+    def call_fut(self):
+        from karl.views.admin import error_monitor_status_view
+        request = testing.DummyRequest()
+        return error_monitor_status_view(self.site, request)
+
+    def test_all_ok(self):
+        body = self.call_fut().body
+        self.assertEqual(body, "blonde: OK\n"
+                               "red: OK\n"
+                               "head: OK\n")
+
+    def test_bad_head(self):
+        self.log_error('head', 'foo')
+        body = self.call_fut().body
+        self.assertEqual(body, "blonde: OK\n"
+                               "red: OK\n"
+                               "head: ERROR\n")
 
 class DummyCatalogSearch(object):
     def __init__(self):

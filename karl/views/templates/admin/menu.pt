@@ -54,6 +54,9 @@
             <li>
               <a href="${api.app_url}/__error_log__">Error Log</a>
             </li>
+            <li tal:condition="api.error_monitoring">
+              <a href="${api.app_url}/error_monitor.html">Error Monitor</a>
+            </li>
             <li tal:condition="api.has_logs">
               <a href="${api.app_url}/logs.html">Other logs</a>
             </li>
