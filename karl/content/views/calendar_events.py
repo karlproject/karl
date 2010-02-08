@@ -956,7 +956,9 @@ def calendar_setup_layers_view(context, request):
     layer_titles = [ x.title for x in layers]
     layer_names = [ x.__name__ for x in layers ]
 
-    categories = _get_calendar_categories(context)
+    default_category_name = ICalendarCategory.getTaggedValue('default_name')
+    categories = filter(lambda x: x.__name__ != default_category_name,
+                        _get_calendar_categories(context))
 
     if 'form.delete' in request.POST:
         layer_name = request.POST['form.delete']
