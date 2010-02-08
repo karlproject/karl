@@ -635,5 +635,19 @@
       </div>
     </div>
 
+    <div class="content" id="header-user-menu"
+         metal:define-macro="header-user-menu">
+      <ul class="horListing">
+        <li tal:condition="api.user_is_admin">
+            <a href="${api.admin_url}">Admin</a> |
+        </li>
+        <li><a href="${api.home_url}">Home</a> | </li>
+        <li><a href="${api.profile_url}">My Profile</a> | </li>
+        <li class="noborder">
+          <a href="${api.app_url}/logout.html">Logout</a>
+        </li>
+      </ul>
+    </div>
+
   </body>
 </html>

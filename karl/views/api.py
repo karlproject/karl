@@ -35,6 +35,7 @@ from karl.consts import countries
 from karl.utils import find_catalog
 from karl.utils import find_intranet
 from karl.utils import find_intranets
+from karl.utils import find_site
 from karl.utils import get_setting
 from karl.utils import support_attachments
 
@@ -92,6 +93,8 @@ class TemplateAPI(object):
             self.static_url = full_static_path
         self.page_title = page_title
         self.system_name = get_setting(context, 'system_name', 'KARL')
+        self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
+        self.admin_url = model_url(find_site(context), request, 'admin.html')
 
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') == 'public'

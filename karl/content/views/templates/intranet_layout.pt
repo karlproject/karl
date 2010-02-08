@@ -13,16 +13,9 @@
   <body>
     <div class="visual-portal-wrapper">
       <div id="header" class="shadow">
-        <div class="content" id="header-user-menu">
-          <ul class="horListing">
-            <li><a href="${api.home_url}">Home</a> | </li>
-            <li><a href="${api.profile_url}">My Profile</a> | </li>
 
-            <li class="noborder">
-              <a href="${api.app_url}/logout">Logout</a>
-            </li>
-          </ul>
-        </div>
+        <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
+
         <div id="header-top">
           <div class="content" id="top-controls">
             <span id="logo">

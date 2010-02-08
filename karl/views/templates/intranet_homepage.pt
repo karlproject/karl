@@ -1,6 +1,6 @@
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:define-macro="master">
   <head>
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
@@ -13,16 +13,9 @@
   <body>
     <div class="visual-portal-wrapper">
       <div id="header" class="shadow">
-        <div class="content" id="header-user-menu">
-          <ul class="horListing">
-            <li><a href="${api.home_url}">Home</a> | </li>
-            <li><a href="${api.profile_url}">My Profile</a> | </li>
 
-            <li class="noborder">
-              <a href="${api.app_url}/logout">Logout</a>
-            </li>
-          </ul>
-        </div>
+        <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
+
         <div id="header-top">
           <div class="content" id="top-controls">
             <span id="logo">
