@@ -105,7 +105,10 @@
           <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
           <td class="name">${layer.title}</td>
           <td class="names">
-            <span tal:replace="structure '&lt;br&gt;'.join([x['title'] for x in layer._v_categories])"/>&nbsp;
+            <tal:block repeat="category layer._v_categories">
+               <span tal:replace="category['title']"/><br/>
+            </tal:block>
+            &nbsp;
           </td>
           <td class="actions">
             <a class="edit_action" id="edit_${layer.__name__}_layer" href="#">edit</a>
