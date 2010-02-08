@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #510304: Add/edit calendar event should show default category
+  first always.
+
 - LP #513340: Calendar event blocks not formatting correctly in IE
 
 - LP #510240: Formish edit screens have wrong heading

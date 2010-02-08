@@ -451,9 +451,14 @@ def add_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar:
-        calendar_categories = [ {'title':x.title, 'path':model_path(x)} for x in
-                              _get_calendar_categories(calendar) ]
-        calendar_categories.sort(key=lambda x: x['title'])
+        default_category_name = ICalendarCategory.getTaggedValue('default_name')
+        calendar_categories = [
+            {'title':x.title, 'path':model_path(x), 'name':x.__name__} for x in
+            _get_calendar_categories(calendar) ]
+        # default name always first
+        calendar_categories.sort(
+            key=lambda x: x['name'] == default_category_name and True or
+            x['title'])
     else:
         calendar_categories = []
 
@@ -693,9 +698,14 @@ def edit_calendarevent_view(context, request):
 
     calendar = find_interface(context, ICalendar)
     if calendar is not None:
-        calendar_categories = [ {'title':x.title, 'path':model_path(x)} for x in
-                              _get_calendar_categories(calendar) ]
-        calendar_categories.sort(key=lambda x: x['title'])
+        default_category_name = ICalendarCategory.getTaggedValue('default_name')
+        calendar_categories = [
+            {'title':x.title, 'path':model_path(x), 'name':x.__name__} for x in
+            _get_calendar_categories(calendar) ]
+        # default name always first
+        calendar_categories.sort(
+            key=lambda x: x['name'] == default_category_name and True or
+            x['title'])
     else:
         calendar_categories = []
         del fill_values['calendar_category']

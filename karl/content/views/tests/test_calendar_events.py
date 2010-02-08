@@ -58,6 +58,7 @@ class AddCalendarEventViewTests(unittest.TestCase):
 
     def test_notsubmitted(self):
         context = DummyCalendar()
+        context['1'] = DummyCalendarCategory('1')
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.POST = MultiDict()
@@ -67,6 +68,9 @@ class AddCalendarEventViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
+        # default category should come first
+        self.assertEqual(renderer.calendar_categories[0]['path'],
+                         '/_default_category_')
 
     def test_submitted_invalid(self):
         context = DummyCalendar()
@@ -268,8 +272,10 @@ class EditCalendarEventViewTests(unittest.TestCase):
         return edit_calendarevent_view(context, request)
 
     def test_notsubmitted(self):
+        cal = DummyCalendar()
+        cal['0'] = DummyCalendarCategory('zero')
         context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
+        cal['anevent'] = context
         context.title = 'atitle'
         context.text = 'sometext'           
         import datetime
@@ -288,6 +294,10 @@ class EditCalendarEventViewTests(unittest.TestCase):
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fieldvalues['title'], 'atitle')
         self.assertEqual(renderer.fieldvalues['text'], 'sometext')
+        # default category should come first
+        self.assertEqual(renderer.calendar_categories[0]['path'],
+                         '/_default_category_')
+        
 
     def test_notsubmitted_sets_all_day_flag_if_all_day_event(self):
         context = DummyCalendarEvent()
