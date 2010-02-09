@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -185,18 +185,21 @@ class TestGetTextRepr(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-        
+
     def _callFUT(self, object, default):
         from karl.models.site import get_textrepr
         return get_textrepr(object, default)
 
     def test_no_adapter(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
         context = testing.DummyModel()
+        directlyProvides(context, IContent)
         context.title = 'title'
         context.description = 'description'
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, 'title description')
-    
+
     def test_with_adapter(self):
         context = testing.DummyModel()
         from karl.models.interfaces import ITextIndexData
@@ -208,6 +211,13 @@ class TestGetTextRepr(unittest.TestCase):
         testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, 'stuff')
+
+    def test_not_content(self):
+        context = testing.DummyModel()
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
 
 class _TestGetDate(object):
 
@@ -247,7 +257,7 @@ class TestGetCreationDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.created = val
-        
+
 class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_modified_date
@@ -255,7 +265,7 @@ class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.modified = val
-        
+
 class TestGetStartDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_start_date
@@ -289,7 +299,7 @@ class TestGetPath(unittest.TestCase):
         context = testing.DummyModel()
         result = self._callFUT(context, None)
         self.assertEqual(result, '/')
-    
+
 class TestGetInterfaces(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_interfaces
@@ -307,7 +317,7 @@ class TestGetInterfaces(unittest.TestCase):
         alsoProvides(context, Dummy2)
         result = self._callFUT(context, None)
         self.assertEqual(sorted(result), [Dummy1, Dummy2, Interface])
-    
+
 class TestGetTitleFirstletter(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_title_firstletter
@@ -318,7 +328,7 @@ class TestGetTitleFirstletter(unittest.TestCase):
         context.title = 'AB'
         result = self._callFUT(context, None)
         self.assertEqual(result, 'A')
-    
+
     def test_notitle(self):
         context = testing.DummyModel()
         result = self._callFUT(context, None)
@@ -350,7 +360,7 @@ class TestGetName(unittest.TestCase):
         context.__name__= 'bar'
         result = self._callFUT(context, None)
         self.assertEqual(result, 'bar')
-        
+
 
 class TestGetTitle(unittest.TestCase):
     def _callFUT(self, object, default):
@@ -405,7 +415,7 @@ class TestGetVirtual(unittest.TestCase):
         context = testing.DummyModel()
         data = self._callFUT(context, None)
         self.assertEqual(data, None)
-    
+
     def test_with_adapter(self):
         context = testing.DummyModel()
         from karl.models.interfaces import IVirtualData
@@ -420,4 +430,4 @@ class TestGetVirtual(unittest.TestCase):
 
 class DummyCache(dict):
     generation = None
-    
+

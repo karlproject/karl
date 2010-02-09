@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -37,6 +37,7 @@ from repoze.catalog.indexes.path2 import CatalogPathIndex2
 from repoze.catalog.document import DocumentMap
 from repoze.folder import Folder
 from repoze.lemonade.content import create_content
+from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
 from repoze.who.plugins.zodb.users import Users
 
@@ -150,16 +151,17 @@ def get_path(object, default):
 
 def get_textrepr(object, default):
     adapter = queryAdapter(object, ITextIndexData)
-    if adapter is None:
-        fmt = "%s %s"
-        tr = fmt % (
-            getattr(object, 'title', ''), 
-            getattr(object, 'description', ''), 
-            )
-        return tr
-    else:
+    if adapter is not None:
         text = adapter()
         return text
+    elif IContent.providedBy(object):
+        fmt = "%s %s"
+        tr = fmt % (
+            getattr(object, 'title', ''),
+            getattr(object, 'description', ''),
+            )
+        return tr
+    return default
 
 def _get_date_or_datetime(object, attr, default):
     d = getattr(object, attr, None)
