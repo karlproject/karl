@@ -227,7 +227,7 @@ def _get_user_home_path(context, request):
     tdict = traverse(site, home_path)
     target = tdict['context']
     view_name = tdict['view_name']
-    subpath = tdict['subpath']
+    subpath = list(tdict['subpath'])
 
     if view_name:
         subpath.insert(0, view_name)

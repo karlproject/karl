@@ -216,6 +216,37 @@ class TestGetUserHome(unittest.TestCase):
         self.failUnless(foo is target)
         self.assertEqual(['view.html'], extra_path)
 
+    def test_user_home_path_w_subpath(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import ITraverserFactory
+        from karl.testing import DummyCommunity
+        from karl.testing import DummyProfile
+        testing.registerDummySecurityPolicy("userid")
+        c = DummyCommunity()
+        site = c.__parent__.__parent__
+        directlyProvides(site, Interface)
+        c["foo"] = foo = testing.DummyModel()
+        site["profiles"] = profiles = testing.DummyModel()
+        profiles["userid"] = profile = DummyProfile()
+        profile.home_path = "/communities/community/foo/bar/baz"
+        testing.registerAdapter(
+            dummy_traverser_factory, Interface, ITraverserFactory
+        )
+
+        from karl.views.utils import get_user_home
+        request = testing.DummyRequest()
+
+        # Test from site root
+        target, extra_path = get_user_home(site, request)
+        self.failUnless(foo is target)
+        self.assertEqual(['bar', 'baz'], extra_path)
+
+        # Test from arbitrary point in tree
+        target, extra_path = get_user_home(c, request)
+        self.failUnless(foo is target)
+        self.assertEqual(['bar', 'baz'], extra_path)
+
     def test_space_as_home_path(self):
         from zope.interface import Interface
         from repoze.bfg.interfaces import ITraverserFactory
@@ -484,14 +515,14 @@ def dummy_traverser_factory(root):
         parts = environ["PATH_INFO"][1:].split("/")
         node = root
         name = None
-        left_over = []
+        left_over = ()
         for i in xrange(len(parts)):
             part = parts.pop(0)
             if part in node:
                 node = node[part]
             else:
                 name = part
-                left_over = parts
+                left_over = tuple(parts)
                 break
         return {'context':node, 'view_name':name, 'subpath':left_over}
     return traverser
