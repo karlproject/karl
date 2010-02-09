@@ -41,6 +41,7 @@ from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
 from repoze.who.plugins.zodb.users import Users
 
+from karl.content.interfaces import ICalendarLayer
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import ISite
@@ -154,7 +155,8 @@ def get_textrepr(object, default):
     if adapter is not None:
         text = adapter()
         return text
-    elif IContent.providedBy(object):
+    elif (IContent.providedBy(object) and
+          not ICalendarLayer.providedBy(object)):
         fmt = "%s %s"
         tr = fmt % (
             getattr(object, 'title', ''),

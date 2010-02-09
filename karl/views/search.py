@@ -278,7 +278,7 @@ def jquery_livesearch_view(context, request):
     records.append_to(
         rowclass = 'showall',
         title = 'Show All',
-        href = model_url(context, request, 'searchresults.html', 
+        href = model_url(context, request, 'searchresults.html',
                     query = {'body':searchterm},
                     ),
             )

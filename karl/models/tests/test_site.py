@@ -219,6 +219,18 @@ class TestGetTextRepr(unittest.TestCase):
         textrepr = self._callFUT(context, 'default')
         self.assertEqual(textrepr, 'default')
 
+    def test_exclude_calendar_layer(self):
+        from repoze.lemonade.content import IContent
+        from karl.content.interfaces import ICalendarLayer
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, IContent)
+        directlyProvides(context, ICalendarLayer)
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr, None)
+
 class _TestGetDate(object):
 
     def test_not_set(self):

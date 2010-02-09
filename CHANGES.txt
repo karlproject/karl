@@ -115,6 +115,8 @@ Unreleased
 - Exclude objects which don't provide IContent from 'texts' catalog index.
   (Only content objects should show up in search.)
 
+- Added specific exclusion for ICalendarLayer from 'texts' catalog index.
+
 3.15 (2009-12-14)
 -----------------
 
