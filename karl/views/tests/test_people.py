@@ -792,6 +792,25 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(renderer.recent_items[0].context.title, 'doc1')
         self.assertEqual(renderer.recent_items[1].context.title, 'doc2')
 
+    def test_system_user(self):
+        self._registerTagbox()
+        self._registerCatalogSearch()
+
+        from karl.testing import DummyUsers
+        testing.registerDummySecurityPolicy('userid')
+        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        request = testing.DummyRequest()
+        context = DummyProfile()
+        context.__name__ = 'admin'
+        context.users = DummyUsers()
+        context.users.add("userid", "userlogin", "password", [])
+        context.users.add("chris", "chrislogin", "password", [])
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(len(renderer.actions), 1)
+        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
+
+
 class RecentContentTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

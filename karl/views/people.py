@@ -378,25 +378,24 @@ def show_profile_view(context, request):
     communities = {}
     communities_folder = find_communities(context)
     user_info = find_users(context).get_by_id(context.__name__)
-    if user_info is None:
-        raise KeyError(context.__name__)
+    if user_info is not None:
+        for group in user_info["groups"]:
+            if group.startswith("group.community:"):
+                unused, community_name, role = group.split(":")
+                if (communities.has_key(community_name) and
+                    role != "moderators"):
+                    continue
 
-    for group in user_info["groups"]:
-        if group.startswith("group.community:"):
-            unused, community_name, role = group.split(":")
-            if communities.has_key(community_name) and role != "moderators":
-                continue
+                community = communities_folder.get(community_name, None)
+                if community is None:
+                    continue
 
-            community = communities_folder.get(community_name, None)
-            if community is None:
-                continue
-
-            if has_permission('view', community, request):
-                communities[community_name] = {
-                    "title": community.title,
-                    "moderator": role == "moderators",
-                    "url": model_url(community, request),
-                }
+                if has_permission('view', community, request):
+                    communities[community_name] = {
+                        "title": community.title,
+                        "moderator": role == "moderators",
+                        "url": model_url(community, request),
+                    }
 
     communities = communities.values()
     communities.sort(key=lambda x:x["title"])
