@@ -37,6 +37,7 @@ class DayViewPresenter(BasePresenter):
         
         self._init_hour_labels()
         self._init_time_slots()
+        self._init_add_event_url()
 
     def _init_title(self):
         day_num = calendar.weekday(self.focus_datetime.year,
@@ -114,6 +115,12 @@ class DayViewPresenter(BasePresenter):
                            start_datetime=start_datetime,
                            add_event_url=add_event_url)
            self.half_hour_slots.append(slot)
+
+    def _init_add_event_url(self):
+        day_at_9am = self.first_moment + datetime.timedelta(hours=9)
+        starts = time.mktime(day_at_9am.timetuple())
+        self.add_event_url = self.url_for('add_calendarevent.html',
+                                query={'starts':int(starts)}) 
 
     def paint_events(self, events):
         all_day_events, events = self._separate_all_day_events(events)

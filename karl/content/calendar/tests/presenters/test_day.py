@@ -64,6 +64,20 @@ class DayViewPresenterTests(unittest.TestCase):
         expected = datetime.datetime(2009, 8, 26, 23, 59, 59)
         self.assertEqual(presenter.last_moment, expected)
 
+    # add_event_url
+
+    def test_sets_add_event_url_to_focus_day_at_9am(self):
+        focus_at = datetime.datetime(2009, 8, 26)
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        day_at_9am = focus_at + datetime.timedelta(hours=9)
+        starts = time.mktime(day_at_9am.timetuple())
+        expected_url = presenter.url_for('add_calendarevent.html',
+                                        query={'starts':int(starts)})
+        self.assertEqual(presenter.add_event_url, expected_url)
+
     # css auto_scroll_class used to trigger javascript scroll effect
     
     def test_auto_scroll_class_is_today_when_now_is_in_focus(self):
