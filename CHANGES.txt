@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- Made the (+) on all-day events on the calendar day view functional.
+- Made the (+) on all-day events on the calendar day and week
+  views functional.
 
 - Fixed links to all-day events on the calendar day view.
 

@@ -148,6 +148,19 @@ class WeekViewPresenterTests(unittest.TestCase):
         saturday = presenter.week[6]
         self.assert_('day.html' in saturday.show_url)
         self.assert_('year=2009&month=11&day=7' in saturday.show_url)
+
+    def test_each_day_is_assigned_an_add_event_url_after_paint_events(self):
+        focus_at = datetime.datetime(2009, 11, 3)
+        now_at   = datetime.datetime(2009, 11, 3)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        presenter.paint_events([])
+                                       
+        sunday = presenter.week[0]
+        self.assert_('add_calendarevent.html' in sunday.add_event_url)
+
+        saturday = presenter.week[6]
+        self.assert_('add_calendarevent.html' in saturday.add_event_url)
  
     # helpers
 
@@ -177,8 +190,12 @@ class DayOnWeekViewTests(unittest.TestCase):
         self.assertEqual(day.day,   4)
 
     def test_has_a_show_url_used_to_link_to_the_day_view(self):
-        day = self._makeOne(2009, 9, 4, 'http://the-day')
+        day = self._makeOne(2009, 9, 4, show_url='http://the-day')
         self.assertEqual(day.show_url, 'http://the-day')
+
+    def test_has_an_add_event_url(self):
+        day = self._makeOne(2009, 9, 4, add_event_url='http://add-event')
+        self.assertEqual(day.add_event_url, 'http://add-event')
 
     # start_datetime & end_datetime
     

@@ -109,16 +109,17 @@ class WeekViewPresenter(BasePresenter):
 
     def paint_events(self, events):
         for day in self.week:
-          presenter = DayViewPresenter(focus_datetime= day.start_datetime,
-                                       now_datetime  = self.now_datetime,
-                                       url_for       = self.url_for)
-
-          presenter.paint_events(
-              self._filter_events_for_day(events, day)
-          )  
-
-          day.all_day_events  = presenter.all_day_events
-          day.half_hour_slots = presenter.half_hour_slots
+            presenter = DayViewPresenter(focus_datetime= day.start_datetime,
+                                         now_datetime  = self.now_datetime,
+                                         url_for       = self.url_for)
+            
+            presenter.paint_events(
+                self._filter_events_for_day(events, day)
+            )  
+            
+            day.all_day_events  = presenter.all_day_events
+            day.half_hour_slots = presenter.half_hour_slots
+            day.add_event_url   = presenter.add_event_url
 
     def _filter_events_for_day(self, events, day):
         filtered = []
@@ -178,11 +179,12 @@ class WeekViewPresenter(BasePresenter):
 class DayOnWeekView(object):
     _css_day_abbr = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
     
-    def __init__(self, year, month, day, show_url=None):
+    def __init__(self, year, month, day, show_url=None, add_event_url=None):
         self.year     = year
         self.month    = month
         self.day      = day
         self.show_url = show_url
+        self.add_event_url = add_event_url
 
         self.start_datetime = datetime.datetime(year, month, day, 0,   0,  0)
         self.end_datetime   = datetime.datetime(year, month, day, 23, 59, 59)
