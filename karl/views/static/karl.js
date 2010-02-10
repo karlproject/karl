@@ -1854,7 +1854,7 @@ function initCalendar() {
   var scrollHours = $("#cal_hours_scroll");
   scrollHours.mouseover(mouseOverHour);
   scrollHours.mouseout(mouseOutHour);
-  $("#cal_scroll .all_day td").hover(mouseOverDay, mouseOutDay);
+  $("#all_day td").hover(mouseOverDay, mouseOutDay);
 
   // Week tooltips
   var calScroll = $("#cal_scroll");
