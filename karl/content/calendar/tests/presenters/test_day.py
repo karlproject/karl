@@ -156,6 +156,45 @@ class DayViewPresenterTests(unittest.TestCase):
             'day.html?year=2009&month=8&day=2'
         ))
 
+    # paint_events
+    
+    def test_paint_events_separates_all_day_events_from_others(self):
+        focus_at = datetime.datetime(2009, 9, 14) 
+        now_at   = datetime.datetime(2009, 8, 26)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        all_day_catalog_event = DummyCatalogEvent(
+                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
+                    endDate  =datetime.datetime(2009, 9, 15,  0,  0,  0),
+                    title    ='all-day-event'
+                )
+        other_catalog_event = DummyCatalogEvent(
+                    startDate=datetime.datetime(2009, 9, 14,  1,  0,  0),
+                    endDate  =datetime.datetime(2009, 9, 14,  2,  0,  0),
+                    title    ='other-event'
+                )
+        presenter.paint_events([all_day_catalog_event, other_catalog_event])
+
+        self.assertEqual(len(presenter.all_day_events), 1)
+        self.assertEqual(presenter.all_day_events[0].title, 'all-day-event')
+
+    def test_paint_events_wraps_all_day_event_and_assigns_show_url(self):
+        focus_at = datetime.datetime(2009, 9, 14) 
+        now_at   = datetime.datetime(2009, 8, 26)
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        all_day_catalog_event = DummyCatalogEvent(
+                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
+                    endDate  =datetime.datetime(2009, 9, 15,  0,  0,  0),
+                    title    ='all-day-event'
+                )
+        presenter.paint_events([all_day_catalog_event])
+
+        self.assertEqual(len(presenter.all_day_events), 1)
+        self.assert_(presenter.all_day_events[0].show_url.startswith('http'))
+
     # time slots
 
     def test_builds_48_half_hour_slots(self):

@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed links to all-day events on the calendar day view.
+
 - LP# 510242: change submit buttons to say "submit" (as has been the
   case in previous releases) rather than "Edit" or "Add".
 

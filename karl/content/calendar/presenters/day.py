@@ -22,7 +22,7 @@ from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month
-
+from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 
 class DayViewPresenter(BasePresenter):
     name = 'day'
@@ -116,7 +116,14 @@ class DayViewPresenter(BasePresenter):
            self.half_hour_slots.append(slot)
 
     def paint_events(self, events):
-        self.all_day_events, events = self._separate_all_day_events(events)
+        all_day_events, events = self._separate_all_day_events(events)
+        
+        # all-day events
+        self.all_day_events = []
+        for catalog_event in all_day_events:
+            event = EventOnDayView(self, catalog_event,
+                show_url=self.url_for(context=catalog_event))            
+            self.all_day_events.append(event)
 
         # [ [event], [event,event], ... ]
         mapping = self._map_catalog_events_to_slot_indices(events)
