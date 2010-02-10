@@ -10,5 +10,4 @@
   <include package="karl.cico"/>
   <include package="karl.evolve"/>
   <include package="karl.content"/>
-  <include package="repoze.mailin.monitor"/>
 </configure>

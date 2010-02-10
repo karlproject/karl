@@ -595,3 +595,45 @@ def error_monitor_status_view(context, request):
             print >>buf, '%s: OK' % subsystem
 
     return Response(buf.getvalue(), content_type='text/plain')
+
+_mailin_monitor_app = None
+def mailin_monitor_view(context, request):
+    """
+    Dispatches to a subapp from repoze.mailin.monitor.  I know this looks kind
+    of horrible, but this is the best way I know how to mount another object
+    graph onto the root object graph in BFG 1.2.  BFG 1.3 will theoretically
+    allow SCRIPT_NAME/PATH_INFO rewriting for routes of the form
+    '/some/path/*traverse', making it easier to do this with just a route,
+    rather than actually constituting a whole new bfg app just to serve this
+    subtree.
+    """
+    global _mailin_monitor_app
+    if _mailin_monitor_app is None:
+        # Keep imports local in hopes that this can be removed when BFG 1.3
+        # comes out.
+        from repoze.bfg.authorization import ACLAuthorizationPolicy
+        from repoze.bfg.configuration import Configurator
+        from karl.models.mailin_monitor import KarlMailInMonitor
+        from karl.security.policy import get_groups
+        from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
+
+        authentication_policy = RepozeWho1AuthenticationPolicy(
+            callback=get_groups
+        )
+        authorization_policy = ACLAuthorizationPolicy()
+        config = Configurator(root_factory=KarlMailInMonitor(),
+                              authentication_policy=authentication_policy,
+                              authorization_policy=authorization_policy)
+        config.begin()
+        config.load_zcml('repoze.mailin.monitor:configure.zcml')
+        config.end()
+        _mailin_monitor_app = config.make_wsgi_app()
+
+    # Dispatch to subapp
+    import webob
+    sub_environ = request.environ.copy()
+    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (model_path(context),
+                                            request.view_name)
+    sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
+    sub_request = webob.Request(sub_environ)
+    return sub_request.get_response(_mailin_monitor_app)

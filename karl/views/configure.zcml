@@ -644,5 +644,12 @@
     view="karl.views.admin.error_monitor_status_view"
     name="error_monitor_status.txt"
     />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.mailin_monitor_view"
+    name="mailin"
+    />
+
 </configure>
 

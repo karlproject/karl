@@ -5,36 +5,27 @@ from repoze.bfg.security import Deny
 from repoze.bfg.security import Everyone
 from repoze.mailin.monitor.models import MailInMonitor
 
-class KarlMailInMonitor(MailInMonitor):
-    """
-    Provide our own model for the root of the mail in monitor graph.  This way
-    we provide an acl for security and our own mechanism for getting at config
-    parameters.
-    """
-    _pending_db_path = None
-    _maildir_path = None
-    __acl__ = [
-        (Allow, 'group.KarlAdmin', ('view', 'manage')),
-        (Deny, Everyone, ('view', 'manage'))
-    ]
+def KarlMailInMonitor():
+    settings = queryUtility(ISettings)
+    pending_db_path = settings.pending_db_path
+    maildir_path = settings.maildir_path
 
-    def __init__(self, environ):
-        """ Factory for bfg router.
+    class Factory(MailInMonitor):
         """
-        # override MailInMonitor.__init__
-        pass
+        Provide our own model for the root of the mail in monitor graph.  This way
+        we provide an acl for security and our own mechanism for getting at config
+        parameters.
+        """
+        __acl__ = [
+            (Allow, 'group.KarlAdmin', ('view', 'manage')),
+            (Deny, Everyone, ('view', 'manage'))
+        ]
 
-    @property
-    def pending_db_path(self):
-        if self._pending_db_path is None:
-            settings = queryUtility(ISettings)
-            self._pending_db_path = settings.pending_db_path
-        return self._pending_db_path
+        def __init__(self, environ):
+            """ Factory for bfg router.
+            """
+            # override MailInMonitor.__init__
+            self.pending_db_path = pending_db_path
+            self.maildir_path = maildir_path
 
-    @property
-    def maildir_path(self):
-        if self._maildir_path is None:
-            settings = queryUtility(ISettings)
-            self._maildir_path = settings.maildir_path
-        return self._maildir_path
-
+    return Factory
