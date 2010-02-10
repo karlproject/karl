@@ -18,10 +18,15 @@
 """
 import optparse
 import logging
+from paste.deploy import loadapp
+from repoze.bfg.scripting import get_root
+
+from karl.log import set_subsystem
 from karl.scripting import get_default_config
-from karl.scripting import open_root
+from karl.scripting import run_daemon
+from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
-from zope.component import getUtility
+from zope.component import queryUtility
 
 def main():
     parser = optparse.OptionParser(description=__doc__)
@@ -32,6 +37,14 @@ def main():
     parser.add_option('-l', '--log-file', dest='log_file',
         default=None,
         help="log file name (default to stderr)")
+    parser.add_option('--daemon', '-D', dest='daemon',
+                      action='store_true', default=False,
+                      help='Run in daemon mode.')
+    parser.add_option('--interval', '-i', dest='interval', type='int',
+                      default=6*3600,
+                      help='Interval, in seconds, between executions when in '
+                           'daemon mode.')
+
     options, args = parser.parse_args()
 
     if options.log_file:
@@ -42,9 +55,19 @@ def main():
     config = options.config
     if config is None:
         config = get_default_config()
-    root, closer = open_root(config)
+    app = loadapp('config:%s' % config, 'karl')
+    alerts = queryUtility(IAlerts, default=Alerts())
 
-    getUtility(IAlerts).send_digests(root)
+    def run():
+        set_subsystem('digest')
+        root, closer = get_root(app)
+        alerts.send_digests(root)
+        closer()
+
+    if options.daemon:
+        run_daemon('digest', run, options.interval)
+    else:
+        run()
 
 if __name__ == '__main__':
     main()
