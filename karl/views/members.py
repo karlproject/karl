@@ -71,10 +71,6 @@ from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
 from karl.views.forms.widgets import ManageMembersWidget
 
-def _encode_utf8(s):
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return s
 
 def _get_manage_actions(community, request):
 
@@ -207,8 +203,7 @@ def _send_moderators_changed_email(community,
     profiles = find_profiles(community)
     all_moderators = cur_moderators | prev_moderators
     to_profiles = [profiles[name] for name in all_moderators]
-    to_addrs = [_encode_utf8("%s <%s>" % (p.title, p.email))
-                for p in to_profiles]
+    to_addrs = ["%s <%s>" % (p.title, p.email) for p in to_profiles]
 
     mailer = getUtility(IMailDelivery)
     msg = Message()
