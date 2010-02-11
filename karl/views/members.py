@@ -71,6 +71,11 @@ from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
 from karl.views.forms.widgets import ManageMembersWidget
 
+def _encode_utf8(s):
+    if isinstance(s, unicode):
+        s = s.encode('utf-8')
+    return s
+
 def _get_manage_actions(community, request):
 
     # Filter the actions based on permission in the **community**
@@ -202,7 +207,8 @@ def _send_moderators_changed_email(community,
     profiles = find_profiles(community)
     all_moderators = cur_moderators | prev_moderators
     to_profiles = [profiles[name] for name in all_moderators]
-    to_addrs = ["%s <%s>" % (p.title, p.email) for p in to_profiles]
+    to_addrs = [_encode_utf8("%s <%s>" % (p.title, p.email))
+                for p in to_profiles]
 
     mailer = getUtility(IMailDelivery)
     msg = Message()
@@ -348,7 +354,7 @@ class ManageMembersFormController(object):
 
         members_group_name = community.members_group_name
         moderators_group_name = community.moderators_group_name
-        
+
         users = find_users(context)
 
         results = []
@@ -402,7 +408,7 @@ class ManageMembersFormController(object):
         location = model_url(context, request, "manage.html",
                              query={"status_message": status_message})
         return HTTPFound(location=location)
-        
+
 
 def _send_aeu_emails(community, community_href, profiles, text):
     # To make reading the add_existing_user_view easier, move the mail
@@ -631,7 +637,7 @@ class AcceptInvitationFormController(object):
         username = converted['username']
         if username in profiles:
             raise ValidationError(username='Username already taken')
-            
+
         community_href = model_url(community, request)
         groups = [ community.members_group_name ]
         users.add(username, username, password, groups)
@@ -678,7 +684,7 @@ class AcceptInvitationFormController(object):
         return {'api':self.api,
                 'page_title':'Accept %s Invitation' % system_name,
                 'page_description':desc}
-        
+
 
 def _send_ai_email(community, community_href, username, profile):
     """Send email to user who has accepted a community invitation.
