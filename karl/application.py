@@ -10,6 +10,7 @@ from repoze.who.plugins.zodb.users import Users
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 from karl.log import configure_log
+from karl.log import set_subsystem
 from karl.utils import asbool
 from karl.bootstrap.bootstrap import populate
 from karl.bootstrap.interfaces import IBootstrapper
@@ -37,6 +38,7 @@ def make_app(global_config, **kw):
 
     # Set up logging
     configure_log(**config)
+    set_subsystem('karl')
 
     # Set up logging admin view (coerce instances to list)
     if 'logs_view' in config:

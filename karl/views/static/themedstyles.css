@@ -2840,7 +2840,7 @@ a.primary_button:visited {
 
 #syslog .entry {
   padding: 0.5em;
-  white-space: pre;
+  /*white-space: pre;*/
   font-family: monospace;
   font-size: 9pt;
 }
