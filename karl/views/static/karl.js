@@ -1949,16 +1949,6 @@ function removeEditCalendarEventValidationErrors() {
 /** =CALENDAR SETUP
 ----------------------------------------------- */
 function initCalendarSetup() {
-  // add unique ids to edit links/forms
-  $(".setup_group").each(function(i) {
-    $(this).find("a.edit_action").each(function(j) {
-      $(this).attr("id", "edit_" + i + "_" + j);
-    });
-    $(this).find("form.cal_edit").each(function(k) {
-      $(this).attr("id", ("edit_" + i + "_" + k + "_form"));
-    });
-  });
-
   // toggle add layers/categories calendar form
   $(".add_button").click(function(eventObject) {   
     eventObject.preventDefault();
