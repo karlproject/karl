@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add "evolve5" step which converts calendar layers and categories to
+  have opaque object ids.
+
 - Made the (+) on all-day events on the calendar day and week
   views functional.
 
