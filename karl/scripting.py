@@ -73,7 +73,7 @@ def _count_object_refs():
     This function is used for debugging leaking references between business
     function calls in the run_daemon function.  It relies on a cPython built
     with Py_TRACE_REFS.  In the absence of such a Python (the standard case)
-    this function does not called and we don't do this expensive object
+    this function does not get called and we don't do this expensive object
     counting.
 
     On Ubuntu I was able to get a debug version of python installed by doing:
