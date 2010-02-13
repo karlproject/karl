@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.16 (2010-02-12)
+-----------------
 
 - Add "evolve5" step which converts calendar layers and categories to
   have opaque object ids.
@@ -109,6 +109,8 @@ Unreleased
 
 - Added syslog functionality.
 
+- Added a monitor utility for errors in various Karl subsystems.
+
 - Fixed bug in workflow where unicode was breaking status messages.
 
 - Fixed bug in karl.views.utils._get_user_homepath.  Was expecting traverser
@@ -129,6 +131,9 @@ Unreleased
   messages.  Ended up taking entirely different approach to mounting the
   repoze.mailin.monitor subapplication.  Implementation this time around is
   messy but should look prettier when BFG 1.3 is ready.
+
+- Added daemon mode to scripts that were being called as cron jobs: mailin,
+  qp, update_feeds, and digest.
 
 3.15 (2009-12-14)
 -----------------
