@@ -364,6 +364,38 @@ class DayViewPresenterTests(unittest.TestCase):
         self.assertEqual(len(presenter.all_day_events), 1)
         self.assert_(presenter.all_day_events[0].show_url.startswith('http'))
 
+    def test_painting_an_all_day_event_does_not_bleed_into_prior_day(self):
+        focus_at = datetime.datetime(2010, 2, 13) # prior day
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        all_day_catalog_event = DummyCatalogEvent(
+                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
+                    endDate  =datetime.datetime(2009, 9, 15,  0,  0,  0),
+                    title    ='all-day-event'
+                )
+        presenter.paint_events([all_day_catalog_event])
+
+        self.assertEqual(len(presenter.all_day_events), 0)
+        self.assertEqual(len(presenter.half_hour_slots[47].bubbles), 0)
+
+    def test_painting_an_all_day_event_does_not_bleed_into_next_day(self):
+        focus_at = datetime.datetime(2010, 2, 15) # next day
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+
+        all_day_catalog_event = DummyCatalogEvent(
+                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
+                    endDate  =datetime.datetime(2009, 9, 15,  0,  0,  0),
+                    title    ='all-day-event'
+                )
+        presenter.paint_events([all_day_catalog_event])
+
+        self.assertEqual(len(presenter.all_day_events), 0)
+        self.assertEqual(len(presenter.half_hour_slots[0].bubbles), 0)
+
     # time slots
 
     def test_builds_48_half_hour_slots(self):
