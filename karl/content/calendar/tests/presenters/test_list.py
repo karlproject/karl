@@ -71,11 +71,39 @@ class ListViewPresenterTests(unittest.TestCase):
                          event.title)                           # Meeting
         self.assertEqual(painted_event.first_line_day,  
                          event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
-
+        self.assertEqual(painted_event.second_line_day, '')
+                         
         starts = painted_event._format_time_of_day(event.startDate)
         ends   = painted_event._format_time_of_day(event.endDate)
         desc   = "%s - %s" % (starts, ends)
         self.assertEqual(painted_event.first_line_time, desc)   # 1pm - 2pm
+        self.assertEqual(painted_event.second_line_time, '')
+
+    def test_paints_event_of_three_full_days(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # presenters.list.Event
+        painted_event = presenter.events[0]
+        self.assertEqual(painted_event.title,           
+                         event.title)                           # Meeting
+
+        self.assertEqual(painted_event.first_line_day,  
+                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+        self.assertEqual(painted_event.first_line_time, 'all-day')
+
+        ends_at = event.endDate - datetime.timedelta(days=1)
+        self.assertEqual(painted_event.second_line_day,  
+                         ends_at.strftime("%a, %b %e"))         # Wed, Feb 17
+        self.assertEqual(painted_event.second_line_time, '')
 
     # helpers
 

@@ -196,6 +196,68 @@ class DayViewPresenterTests(unittest.TestCase):
         # presenters.day.EventOnDayView
         painted_event = bubble_containing_event.event
         self.assertEqual(painted_event.title, "Meeting")
+
+    def test_paints_event_of_three_full_days_on_its_first_day(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # presenters.day.EventOnDayView
+        painted_event = presenter.all_day_events[0]
+        self.assertEqual(painted_event.title, "Vacation")
+
+    def test_paints_event_of_three_full_days_on_its_second_day(self):
+        focus_at = datetime.datetime(2010, 2, 16)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # presenters.day.EventOnDayView
+        painted_event = presenter.all_day_events[0]
+        self.assertEqual(painted_event.title, "Vacation")
+
+    def test_paints_event_of_three_full_days_on_its_last_day(self):
+        focus_at = datetime.datetime(2010, 2, 17)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # presenters.day.EventOnDayView
+        painted_event = presenter.all_day_events[0]
+        self.assertEqual(painted_event.title, "Vacation")
+
+    def test_paints_event_of_three_full_days_stays_within_bounds(self):
+        focus_at = datetime.datetime(2010, 2, 18) # out of bounds
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        self.assertEqual(len(presenter.all_day_events), 0)
     
     def test_paint_events_separates_all_day_events_from_others(self):
         focus_at = datetime.datetime(2009, 9, 14) 

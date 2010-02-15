@@ -86,6 +86,7 @@ from karl.content.calendar.presenters.day import DayViewPresenter
 from karl.content.calendar.presenters.week import WeekViewPresenter
 from karl.content.calendar.presenters.month import MonthViewPresenter
 from karl.content.calendar.presenters.list import ListViewPresenter
+from karl.content.calendar.utils import is_all_day_event
 
 _NOW = None
 
@@ -187,12 +188,6 @@ def _paginate_catalog_events(calendar, request,
     events   = events[:per_page]
 
     return events, has_more
-
-def _is_all_day_event(event):
-    hhmmss = (event.startDate.hour,   event.endDate.hour,
-              event.startDate.minute, event.endDate.minute,
-              event.startDate.second, event.endDate.second)
-    return hhmmss == (0, 0, 0, 0, 0, 0)
 
 def _calendar_filter(context, request):
     session = get_session(context, request)
@@ -680,7 +675,7 @@ def edit_calendarevent_view(context, request):
         if fill_values['contact_email'] is None:
             fill_values['contact_email'] = u''
 
-        if _is_all_day_event(context):
+        if is_all_day_event(context):
             fill_values['allDay'] = True 
             fill_values['endDate'] -= datetime.timedelta(days=1)
         else:

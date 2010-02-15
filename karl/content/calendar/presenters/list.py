@@ -24,7 +24,7 @@ from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-
+from karl.content.calendar.utils import is_all_day_event
 
 class ListViewPresenter(BasePresenter):
     name = 'list'
@@ -147,14 +147,23 @@ class Event(object):
         if start_day == end_day:
             self.first_line_day   = start_day
             self.first_line_time  = '%s - %s' % (start_time, end_time)
-            self.second_line_time = ''
             self.second_line_day  = ''
-
+            self.second_line_time = ''
         else:
-            self.first_line_day   = start_day
-            self.first_line_time  = '%s - ' % start_time
-            self.second_line_day  = end_day
-            self.second_line_time = end_time
+            if is_all_day_event(self._catalog_event):
+                one_day = datetime.timedelta(days=1)
+                ends_at = self._catalog_event.endDate - one_day 
+                end_day = ends_at.strftime("%a, %b %e")
+
+                self.first_line_day   = start_day
+                self.first_line_time  = 'all-day'
+                self.second_line_day  = end_day
+                self.second_line_time = ''
+            else:
+                self.first_line_day   = start_day
+                self.first_line_time  = '%s - ' % start_time
+                self.second_line_day  = end_day
+                self.second_line_time = end_time
 
     def _format_time_of_day(self, dt):
         ''' Format a time like "2pm" or "3:15pm". '''

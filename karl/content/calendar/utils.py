@@ -30,6 +30,12 @@ def next_month(year, month):
         return (year + 1, 1)
     return (year, month + 1)
 
+def is_all_day_event(event):
+    hhmmss = (event.startDate.hour,   event.endDate.hour,
+              event.startDate.minute, event.endDate.minute,
+              event.startDate.second, event.endDate.second)
+    return hhmmss == (0, 0, 0, 0, 0, 0)
+
 
 class MonthSkeleton(object):
     '''

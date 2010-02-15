@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed calendar list view to correctly show "all-day" for all-day events. 
+
 - LP# 522173: Add a "down for maintenance" HTML page in views/static
   with relative links to styling and images which can be served
   directly by Apache.
