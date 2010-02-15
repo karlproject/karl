@@ -171,6 +171,31 @@ class DayViewPresenterTests(unittest.TestCase):
         ))
 
     # paint_events
+
+    def test_paints_event_of_one_hour(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Meeting",
+                    startDate=datetime.datetime(2010, 2, 15,  13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0)
+                )        
+        presenter.paint_events([event])
+        
+        # search for 1pm time slot (dummy event starts at 1pm)
+        for time_slot in presenter.half_hour_slots:
+            if time_slot.start_datetime == event.startDate:
+                break
+        
+        # presenters.day.TimeSlot  
+        bubble_containing_event = time_slot.bubbles[0]
+        self.assertEqual(bubble_containing_event.length, 2) # 2 half hours
+
+        # presenters.day.EventOnDayView
+        painted_event = bubble_containing_event.event
+        self.assertEqual(painted_event.title, "Meeting")
     
     def test_paint_events_separates_all_day_events_from_others(self):
         focus_at = datetime.datetime(2009, 9, 14) 

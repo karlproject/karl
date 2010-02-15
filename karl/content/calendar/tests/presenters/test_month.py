@@ -287,6 +287,28 @@ class MonthViewPresenterTests(unittest.TestCase):
                 )        
         self.assertTrue(presenter._should_event_be_bubbled(event))
 
+    # paint_events
+    
+    def test_paints_event_of_one_hour(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Meeting",
+                    startDate=datetime.datetime(2010, 2, 15,  13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # find day of Feb 15 when dummy event starts
+        week_of_feb_14 = presenter.weeks[2] 
+        feb_15         = week_of_feb_14[1]    
+
+        # presenters.month.EventOnMonthView
+        painted_event  = feb_15.event_slots[0]
+        self.assertEqual(painted_event.title, "Meeting")
+
     # helpers
 
     def _makeOne(self, *args, **kargs):

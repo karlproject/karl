@@ -50,6 +50,33 @@ class ListViewPresenterTests(unittest.TestCase):
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         self.assertEqual(presenter.title, 'Upcoming Events')
 
+    # paint_events
+    
+    def test_paints_event_of_one_hour(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Meeting",
+                    startDate=datetime.datetime(2010, 2, 15,  13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0)
+                )        
+        presenter.paint_events([event])
+        
+        # presenters.list.Event
+        painted_event = presenter.events[0]
+
+        self.assertEqual(painted_event.title,           
+                         event.title)                           # Meeting
+        self.assertEqual(painted_event.first_line_day,  
+                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+
+        starts = painted_event._format_time_of_day(event.startDate)
+        ends   = painted_event._format_time_of_day(event.endDate)
+        desc   = "%s - %s" % (starts, ends)
+        self.assertEqual(painted_event.first_line_time, desc)   # 1pm - 2pm
+
     # helpers
 
     def _makeOne(self, *args, **kargs):

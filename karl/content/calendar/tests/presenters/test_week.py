@@ -21,7 +21,7 @@ import datetime
 import time
 import calendar
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for
-
+from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
  
 class WeekViewPresenterTests(unittest.TestCase):
     def setUp(self):
@@ -161,6 +161,36 @@ class WeekViewPresenterTests(unittest.TestCase):
 
         saturday = presenter.week[6]
         self.assert_('add_calendarevent.html' in saturday.add_event_url)
+
+    # paint_events
+
+    def test_paints_event_of_one_hour(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Meeting",
+                    startDate=datetime.datetime(2010, 2, 15,  13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # dummy event falls on monday
+        monday = presenter.week[1]
+        
+        # search for 1pm time slot (dummy event starts at 1pm)
+        for i, time_slot in enumerate(monday.half_hour_slots):
+            if time_slot.start_datetime == event.startDate:
+                break
+        
+        # presenters.day.TimeSlot  
+        bubble_containing_event = time_slot.bubbles[0]
+        self.assertEqual(bubble_containing_event.length, 2) # 2 half hours
+
+        # presenters.day.EventOnDayView
+        painted_event = bubble_containing_event.event
+        self.assertEqual(painted_event.title, "Meeting")
  
     # helpers
 
