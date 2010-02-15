@@ -94,7 +94,7 @@ class ListViewPresenterTests(unittest.TestCase):
         # presenters.list.Event
         painted_event = presenter.events[0]
         self.assertEqual(painted_event.title,           
-                         event.title)                           # Meeting
+                         event.title)                           # Vacation
 
         self.assertEqual(painted_event.first_line_day,  
                          event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
@@ -104,6 +104,34 @@ class ListViewPresenterTests(unittest.TestCase):
         self.assertEqual(painted_event.second_line_day,  
                          ends_at.strftime("%a, %b %e"))         # Wed, Feb 17
         self.assertEqual(painted_event.second_line_time, '')
+
+    def test_paints_event_of_three_days_with_partial_days(self):
+        focus_at = datetime.datetime(2010, 2, 17)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Travel",
+                    startDate=datetime.datetime(2010, 2, 15, 13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 17, 16,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # presenters.list.Event
+        painted_event = presenter.events[0]
+        self.assertEqual(painted_event.title,           
+                         event.title)                           # Travel
+
+        self.assertEqual(painted_event.first_line_day,  
+                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+        starts = painted_event._format_time_of_day(event.startDate)
+        desc   = "%s - " % (starts)
+        self.assertEqual(painted_event.first_line_time, desc)   # 1pm -
+
+        self.assertEqual(painted_event.second_line_day,  
+                         event.endDate.strftime("%a, %b %e"))   # Wed, Feb 17
+        ends = painted_event._format_time_of_day(event.endDate)
+        self.assertEqual(painted_event.second_line_time, ends)   # 4pm
 
     # helpers
 
