@@ -378,6 +378,65 @@ class MonthViewPresenterTests(unittest.TestCase):
         self.assertTrue(painted_event.bubbled)
         self.assertEqual(painted_event.rounding_class, "right")
 
+    def test_paints_a_complex_combination_of_events_correctly(self):
+       focus_at = datetime.datetime(2010, 2, 15)
+       now_at   = datetime.datetime.now()
+       
+       presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+       single_day_16 = DummyCatalogEvent(
+                   title="Single Day on 16",
+                   startDate=datetime.datetime(2010, 2, 16, 13,  0,  0),
+                   endDate  =datetime.datetime(2010, 2, 16, 13, 30,  0)
+               )        
+       all_day_15_16 = DummyCatalogEvent(
+                   title="All-Day on 15 & 16",
+                   startDate=datetime.datetime(2010, 2, 15, 0,  0,  0),
+                   endDate  =datetime.datetime(2010, 2, 17, 0,  0,  0)
+               )        
+       multi_day_17_19 = DummyCatalogEvent(
+                   title="Multi-Day",
+                   startDate=datetime.datetime(2010, 2, 17, 15, 15,  0),
+                   endDate  =datetime.datetime(2010, 2, 19, 16, 15,  0)
+               )        
+       all_day_16_17 = DummyCatalogEvent(
+                   title="All-Day on 16 & 17",
+                   startDate=datetime.datetime(2010, 2, 16, 0,  0,  0),
+                   endDate  =datetime.datetime(2010, 2, 18, 0,  0,  0)
+               )        
+       presenter.paint_events(
+           [single_day_16, all_day_15_16, all_day_16_17, multi_day_17_19]
+       )
+
+       week_of_feb_14 = presenter.weeks[2] 
+       feb_15         = week_of_feb_14[1] 
+       feb_16         = week_of_feb_14[2] 
+       feb_17         = week_of_feb_14[3] 
+       feb_18         = week_of_feb_14[4] 
+       feb_19         = week_of_feb_14[5]
+
+       # all-day event on 15 and 16
+       for day in (feb_15, feb_16):
+           painted_event = day.event_slots[0]
+           self.assertEqual(painted_event.title, all_day_15_16.title)
+           self.assertTrue(painted_event.bubbled)
+
+       # all-day event on 16 and 17
+       for day in (feb_16, feb_17):
+           painted_event = day.event_slots[1]
+           self.assertEqual(painted_event.title, all_day_16_17.title)
+           self.assertTrue(painted_event.bubbled)
+
+       # single day event on feb 16
+       painted_event = feb_16.event_slots[2]
+       self.assertEqual(painted_event.title, single_day_16.title)
+       self.assertFalse(painted_event.bubbled)
+       
+       # event spanning feb 17-19, starts middle of 17 and middle of 19
+       for day in (feb_17, feb_18, feb_18):
+           painted_event = day.event_slots[0]
+           self.assertEqual(painted_event.title, multi_day_17_19.title)
+           self.assertTrue(painted_event.bubbled)
+
 
     # helpers
 
