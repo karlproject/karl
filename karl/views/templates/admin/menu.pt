@@ -25,9 +25,6 @@
             <li>
               <a href="upload_users_csv.html">Upload users (CSV File)</a>
             </li>
-            <li>
-              <a href="#">Manage Groups</a>
-            </li>
           </ul>
         </div>
         <div class="right-portlet">
