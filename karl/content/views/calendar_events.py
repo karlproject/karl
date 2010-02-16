@@ -158,7 +158,7 @@ def _get_catalog_events(calendar, request,
                 docids_seen.add(docid)
 
                 event = resolver(docid)
-                event._v_layer_color = layer.color
+                event._v_layer_color = layer.color.strip()
                 event._v_layer_title = layer.title
 
                 events.append(event)
@@ -1024,7 +1024,7 @@ def calendar_setup_layers_view(context, request):
             converted = form.validate(request.POST)
             layer_title = converted['layer_title']
             category_paths = list(set(request.POST.getall('category_paths')))
-            layer_color = converted['layer_color']
+            layer_color = converted['layer_color'].strip()
 
             if (layer_title != layer.title) and (layer_title in layer_titles):
                 msg = "Name is already used"
