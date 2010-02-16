@@ -105,8 +105,6 @@ class ListViewPresenter(BasePresenter):
 
 
 class Event(object):
-    DEFAULT_LAYER = '*default*'
-
     def __init__(self, catalog_event, 
                  show_url='#', edit_url='#', delete_url='#',
                  start_day_url='#', end_day_url='#'):
@@ -130,12 +128,7 @@ class Event(object):
 
     def _init_layer_properties(self):
         self.color = self._catalog_event._v_layer_color 
-
-        if self._catalog_event._v_layer_title == self.DEFAULT_LAYER:
-            self.layer = None
-        else: 
-            title = self._catalog_event._v_layer_title
-            self.layer = title.rstrip(' layer')
+        self.layer = self._catalog_event._v_layer_title
         
     def _init_date_and_time_properties(self):    
         start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
