@@ -191,6 +191,74 @@ class WeekViewPresenterTests(unittest.TestCase):
         # presenters.day.EventOnDayView
         painted_event = bubble_containing_event.event
         self.assertEqual(painted_event.title, "Meeting")
+
+    def test_paints_event_of_three_full_days(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # find days of Feb 15, 16, 17 
+        week_of_feb_14 = presenter.week 
+        feb_15         = week_of_feb_14[1] # dummy event on feb 15  
+        feb_16         = week_of_feb_14[2] #   continues through feb 16    
+        feb_17         = week_of_feb_14[3] #   and through feb 17    
+
+        # presenters.week.EventInUpperTray
+        painted_event = feb_15.event_slots[0]
+        self.assertEqual(painted_event.title, "Vacation")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "left")
+
+        painted_event = feb_16.event_slots[0]
+        self.assertEqual(painted_event.title, "Vacation")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "center")
+
+        painted_event = feb_17.event_slots[0]
+        self.assertEqual(painted_event.title, "Vacation")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "right")
+
+    def test_paints_event_of_three_days_with_partial_days_on_ends(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Travel",
+                    startDate=datetime.datetime(2010, 2, 15, 13,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 17, 16,  0,  0)
+                )        
+        presenter.paint_events([event])
+
+        # find days of Feb 15, 16, 17 
+        week_of_feb_14 = presenter.week 
+        feb_15         = week_of_feb_14[1] # dummy event on feb 15 @ 1pm 
+        feb_16         = week_of_feb_14[2] #   continues through feb 16    
+        feb_17         = week_of_feb_14[3] #   and until feb 17  @ 4pm  
+
+        # presenters.month.EventInUpperTray
+        painted_event = feb_15.event_slots[0]
+        self.assertEqual(painted_event.title, "Travel")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "left")
+
+        painted_event = feb_16.event_slots[0]
+        self.assertEqual(painted_event.title, "Travel")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "center")
+
+        painted_event = feb_17.event_slots[0]
+        self.assertEqual(painted_event.title, "Travel")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "right")
  
     # helpers
 
