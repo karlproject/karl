@@ -82,12 +82,13 @@ class UserProfileImporter(object):
 
     def create(self, profiles):
         element = self.element
-        username = _element_value(self, element, 'username')
+        login = _element_value(self, element, 'username')
+        username = login.replace(' ', '')
         password = _element_value(self, element, 'sha_password')
         groups = self._groups(element)
 
         users = find_users(profiles)
-        users.add(username, username, password, groups, encrypted=True)
+        users.add(username, login, password, groups, encrypted=True)
 
         profile = create_content(IProfile)
         profiles[username] = profile
@@ -104,7 +105,8 @@ class UserProfileImporter(object):
         objectEventNotify(ObjectWillBeModifiedEvent(profile))
 
         element = self.element
-        username = _element_value(self, element, 'username')
+        login = _element_value(self, element, 'username')
+        username = login.replace(' ', '')
         password = _element_value(self, element, 'sha_password')
         groups = self._groups(element)
 

@@ -6,11 +6,14 @@ Unreleased
 
 - LP #503451: Calendar: Week view does not display some events
 
-- Fixed calendar list view to correctly show "all-day" for all-day events. 
+- Fixed calendar list view to correctly show "all-day" for all-day events.
 
 - LP #522173: Add a "down for maintenance" HTML page in views/static
   with relative links to styling and images which can be served
   directly by Apache.
+
+- When importing users, using cico, any space characters in the user's id are
+  now elided.
 
 3.16 (2010-02-12)
 -----------------
