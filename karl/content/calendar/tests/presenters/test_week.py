@@ -227,16 +227,16 @@ class DayOnWeekViewTests(unittest.TestCase):
         day = self._makeOne(2009, 9, 4, add_event_url='http://add-event')
         self.assertEqual(day.add_event_url, 'http://add-event')
 
-    # start_datetime & end_datetime
+    # first_moment & last_moment
     
-    def test_computes_start_datetime_at_beginning_of_day(self):
+    def test_computes_first_moment_at_beginning_of_day(self):
         day = self._makeOne(2009, 9, 4)
-        self.assertEqual(day.start_datetime, 
+        self.assertEqual(day.first_moment, 
                          datetime.datetime(2009, 9, 4, 0, 0, 0))
 
-    def test_computes_end_datetime_at_ending_of_day(self):
+    def test_computes_last_moment_at_ending_of_day(self):
         day = self._makeOne(2009, 9, 4)
-        self.assertEqual(day.end_datetime, 
+        self.assertEqual(day.last_moment, 
                          datetime.datetime(2009, 9, 4, 23, 59, 59))
 
     # helpers

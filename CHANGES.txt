@@ -4,9 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #503451: Calendar: Week view does not display some events
+
 - Fixed calendar list view to correctly show "all-day" for all-day events. 
 
-- LP# 522173: Add a "down for maintenance" HTML page in views/static
+- LP #522173: Add a "down for maintenance" HTML page in views/static
   with relative links to styling and images which can be served
   directly by Apache.
 
@@ -21,10 +23,10 @@ Unreleased
 
 - Fixed links to all-day events on the calendar day view.
 
-- LP# 510242: change submit buttons to say "submit" (as has been the
+- LP #510242: change submit buttons to say "submit" (as has been the
   case in previous releases) rather than "Edit" or "Add".
 
-- LP# 510770: Sort categories by title rather than path.
+- LP #510770: Sort categories by title rather than path.
 
 - LP #510304: Add/edit calendar event should show default category
   first always.

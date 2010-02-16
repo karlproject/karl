@@ -125,55 +125,29 @@ class MonthViewPresenter(BasePresenter):
         self._bubble_painter = BubblePainter(self)
         
     def paint_events(self, events):
-        events_to_bubble, other_events = self._separate_events(events)
-
         by_start_date = operator.attrgetter('startDate')
 
-        for event in sorted(events_to_bubble, key=by_start_date):
-            self._paint_event_with_bubble(event)
-
+        for event in sorted(events, key=by_start_date):
+            if self._bubble_painter.should_paint_event(event):
+                self._bubble_painter.paint_event(event)
+            else:
+                self._paint_event_without_bubble(event)
+                 
         self._add_bubble_titles_to_successive_weeks()
 
-        for event in sorted(other_events, key=by_start_date):
-            self._paint_event_without_bubble(event)
-
-    def _separate_events(self, events):
-        events_to_bubble = [] 
-        other_events     = []
-
-        for event in events:  
-            if self._bubble_painter.should_paint_event(event):
-                events_to_bubble.append(event)
-            else:
-                other_events.append(event)
-
-        return (events_to_bubble, other_events)
-
-    def _paint_event_with_bubble(self, event):
-        bubble_painter = BubblePainter(self)
-        bubble_painter.paint_event(event)
-
-    def _add_bubble_titles_to_successive_weeks(self):
-        for week in self.weeks:
-            leftmost_day = week[0]
-
-            for event in leftmost_day.event_slots:
-                if event and event.bubbled:
-                    event.bubble_title = event.title                 
-
     def _paint_event_without_bubble(self, event):
-        days = self._days_in_range_of_event(event)
+        days = self.days_in_range_of_event(event)
 
         for day in days:
             if None in day.event_slots:
                 slot_index = day.event_slots.index(None)
-                tpl_event = self._make_event_for_template(day, event)
+                tpl_event = self.make_event_for_template(day, event)
                 tpl_event.bubbled = False
                 day.event_slots[slot_index] = tpl_event
             else:
                 day.overflowed_events.append(event)
 
-    def _days_in_range_of_event(self, event):
+    def days_in_range_of_event(self, event):
         ''' Find all of the days (DayOnMonthView) that are affected
         by an event. '''
         days = []
@@ -198,7 +172,15 @@ class MonthViewPresenter(BasePresenter):
 
         return days
 
-    def _make_event_for_template(self, day, catalog_event):
+    def _add_bubble_titles_to_successive_weeks(self):
+        for week in self.weeks:
+            leftmost_day = week[0]
+
+            for event in leftmost_day.event_slots:
+                if event and event.bubbled:
+                    event.bubble_title = event.title                 
+
+    def make_event_for_template(self, day, catalog_event):
         tpl_event = EventOnMonthView(
                         day, catalog_event,
                         show_url=self.url_for(context=catalog_event)

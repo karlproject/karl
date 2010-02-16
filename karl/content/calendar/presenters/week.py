@@ -17,6 +17,7 @@
 
 import calendar
 import datetime
+import operator
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent           
 from karl.content.calendar.presenters.day import DayViewPresenter
@@ -37,6 +38,7 @@ class WeekViewPresenter(BasePresenter):
         self._init_next_and_prev_datetime()
         self._init_hour_labels()
         self._init_navigation()
+        self._init_indexes_to_days_in_week()
         self._init_bubble_painter()
         
     def _init_title(self):
@@ -77,6 +79,14 @@ class WeekViewPresenter(BasePresenter):
             self.week.append(
                 DayOnWeekView(dt.year, dt.month, dt.day, show_url)
             )
+
+    def _init_indexes_to_days_in_week(self):
+        self._idx_month_day = {}
+        self._all_days = [] 
+
+        for day in self.week:
+            self._idx_month_day.setdefault(day.month, {})[day.day] = day
+            self._all_days.append(day)
     
     def _init_first_and_last_moment(self):
         first_day = self.week[0]
@@ -109,18 +119,18 @@ class WeekViewPresenter(BasePresenter):
             self.hour_labels.append(label)
 
     def _init_bubble_painter(self):
-        self._bubble_painter = BubblePainter(self)
+        self._bubble_painter = BubblePainter(self, add_new_slots=True)
 
     def paint_events(self, events):
         events_to_bubble, other_events = self._separate_events(events)
-        
+
         self._paint_events_into_upper_tray(events_to_bubble)
         self._paint_events_into_time_slots(other_events)
 
     def _separate_events(self, events):
         events_to_bubble = [] 
         other_events     = []
-
+        
         for event in events:  
             if self._bubble_painter.should_paint_event(event):
                 events_to_bubble.append(event)
@@ -129,9 +139,14 @@ class WeekViewPresenter(BasePresenter):
 
         return (events_to_bubble, other_events)
 
+    def _paint_events_into_upper_tray(self, events):
+        by_start_date = operator.attrgetter('startDate')
+        for event in sorted(events, key=by_start_date):
+            self._bubble_painter.paint_event(event)
+
     def _paint_events_into_time_slots(self, events):
         for day in self.week:
-            presenter = DayViewPresenter(focus_datetime= day.start_datetime,
+            presenter = DayViewPresenter(focus_datetime= day.first_moment,
                                          now_datetime  = self.now_datetime,
                                          url_for       = self.url_for)
             
@@ -141,9 +156,6 @@ class WeekViewPresenter(BasePresenter):
             
             day.half_hour_slots = presenter.half_hour_slots
             day.add_event_url   = presenter.add_event_url
-
-    def _paint_events_into_upper_tray(self, events):
-        pass
 
     def _filter_events_for_day(self, events, day):
         filtered = []
@@ -161,6 +173,38 @@ class WeekViewPresenter(BasePresenter):
               dt += one_day
         
         return filtered  
+
+    def days_in_range_of_event(self, event):
+        ''' Find all of the days (DayOnWeekView) that are affected
+        by an event. '''
+        days = []
+
+        if event.startDate < self.first_moment:
+            starts_at = self.first_moment
+        else:
+            starts_at = event.startDate
+        
+        if event.endDate > self.last_moment:
+            ends_at = self.last_moment
+        else:
+            ends_at = event.endDate
+
+        dt = starts_at
+        one_day = datetime.timedelta(days=1)
+        while dt < ends_at:                             
+            days.append(
+                self._idx_month_day[dt.month][dt.day]       
+            )
+            dt += one_day
+
+        return days
+
+    def make_event_for_template(self, day, catalog_event):
+        tpl_event = EventInUpperTray(
+                        day, catalog_event,
+                        show_url=self.url_for(context=catalog_event)
+                    )
+        return tpl_event
 
     @property
     def today_class(self):
@@ -210,23 +254,42 @@ class DayOnWeekView(object):
         self.show_url = show_url
         self.add_event_url = add_event_url
 
-        self.start_datetime = datetime.datetime(year, month, day, 0,   0,  0)
-        self.end_datetime   = datetime.datetime(year, month, day, 23, 59, 59)
+        self.first_moment = datetime.datetime(year, month, day, 0,   0,  0)
+        self.last_moment  = datetime.datetime(year, month, day, 23, 59, 59)
 
         self._init_heading_and_css_day_abbr()
 
-        self.all_day_events  = []
-        self.half_hour_slots = []
+        self.event_slots     = [None]   # multi-day events
+        self.half_hour_slots = []   # other events
     
     def _init_heading_and_css_day_abbr(self):
-        day_idx = calendar.weekday(self.start_datetime.year,
-                                   self.start_datetime.month,
-                                   self.start_datetime.day)
+        day_idx = calendar.weekday(self.first_moment.year,
+                                   self.first_moment.month,
+                                   self.first_moment.day)
         day_abbr = calendar.day_abbr[day_idx]                               
 
         self.heading = '%s %d/%d' % (day_abbr, 
-                                     self.start_datetime.month,
-                                     self.start_datetime.day)
+                                     self.last_moment.month,
+                                     self.last_moment.day)
 
         self.css_day_abbr = self._css_day_abbr[day_idx]
+
+
+class EventInUpperTray(BaseEvent):
+    def __init__(self, day, catalog_event, 
+                 show_url='#', edit_url='#', delete_url='#'): 
+
+        BaseEvent.__init__(self, day, catalog_event, 
+                       show_url, edit_url, delete_url)         
+        
+        self.bubbled = False
+        self.rounding_class = 'center'
+        self.bubble_title = '&nbsp;'
+        
+    @property
+    def type_class(self):
+        if self.bubbled:
+            return 'all_day'
+        else:
+            return 'at_time'
 
