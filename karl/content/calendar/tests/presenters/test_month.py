@@ -206,87 +206,6 @@ class MonthViewPresenterTests(unittest.TestCase):
                                 day.year, day.month, day.day)   
                 self.assertEqual(day.show_day_url, url)
 
-    # _find_contiguous_slot_across_days
-    
-    def test__find_contiguous_slot_across_days_gets_first_available(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        days = [ DummyDayWithEvents(), DummyDayWithEvents() ]
-
-        index = presenter._find_contiguous_slot_across_days(days)
-        self.assertEqual(index, 0)
-    
-    def test__find_contiguous_slot_across_days_searches_top_down(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        days = [ DummyDayWithEvents(), DummyDayWithEvents() ]
-        days[0].event_slots[0] = DummyCatalogEvent()
-        days[1].event_slots[1] = DummyCatalogEvent()
-
-        index = presenter._find_contiguous_slot_across_days(days)
-        self.assertEqual(index, 2)
-        
-    def test__find_contiguous_slot_across_days_may_find_None(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        days = [DummyDayWithEvents]*2
-        days[0].event_slots = [DummyCatalogEvent()]*5
-
-        index = presenter._find_contiguous_slot_across_days(days)
-        self.assert_(index is None)
-
-    def test__find_contiguous_slot_across_days_is_None_for_empty_list(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        days = []
-
-        index = presenter._find_contiguous_slot_across_days(days)
-        self.assert_(index is None)
-
-
-    # _should_event_be_bubbled
-    
-    def test__should_event_be_bubbled_no_for_event_less_than_whole_day(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        event = DummyCatalogEvent(
-                    startDate=datetime.datetime(2009, 9, 14,  1,  0,  0),
-                    endDate  =datetime.datetime(2009, 9, 14,  2,  0,  0)
-                )        
-        self.assertFalse(presenter._should_event_be_bubbled(event))
-    
-    def test__should_event_be_bubbled_yes_for_whole_single_day(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        event = DummyCatalogEvent(
-                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
-                    endDate  =datetime.datetime(2009, 9, 14, 23, 59, 59)
-                )        
-        self.assertTrue(presenter._should_event_be_bubbled(event))
-
-    def test__should_event_be_bubbled_yes_for_spans_of_multiple_days(self):
-        focus_at = datetime.datetime(2009, 8, 1) 
-        now_at   = datetime.datetime(2009, 8, 26)
-        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
-
-        event = DummyCatalogEvent(
-                    startDate=datetime.datetime(2009, 9, 14,  0,  0,  0),
-                    endDate  =datetime.datetime(2009, 9, 16,  0,  0,  0)
-                )        
-        self.assertTrue(presenter._should_event_be_bubbled(event))
-
     # paint_events
     
     def test_paints_event_of_one_hour(self):
@@ -404,7 +323,7 @@ class MonthViewPresenterTests(unittest.TestCase):
                    endDate  =datetime.datetime(2010, 2, 18, 0,  0,  0)
                )        
        presenter.paint_events(
-           [single_day_16, all_day_15_16, all_day_16_17, multi_day_17_19]
+           [single_day_16, all_day_15_16, multi_day_17_19, all_day_16_17]
        )
 
        week_of_feb_14 = presenter.weeks[2] 
@@ -431,7 +350,7 @@ class MonthViewPresenterTests(unittest.TestCase):
        self.assertEqual(painted_event.title, single_day_16.title)
        self.assertFalse(painted_event.bubbled)
        
-       # event spanning feb 17-19, starts middle of 17 and middle of 19
+       # event spanning feb 17-19, starts middle of 17 and ends middle of 19
        for day in (feb_17, feb_18, feb_18):
            painted_event = day.event_slots[0]
            self.assertEqual(painted_event.title, multi_day_17_19.title)

@@ -20,10 +20,10 @@ import datetime
 from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent           
 from karl.content.calendar.presenters.day import DayViewPresenter
+from karl.content.calendar.utils import BubblePainter
 from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
-
 
 class WeekViewPresenter(BasePresenter):
     name = 'week'
@@ -37,6 +37,7 @@ class WeekViewPresenter(BasePresenter):
         self._init_next_and_prev_datetime()
         self._init_hour_labels()
         self._init_navigation()
+        self._init_bubble_painter()
         
     def _init_title(self):
         day_num = calendar.weekday(self.focus_datetime.year,
@@ -107,7 +108,28 @@ class WeekViewPresenter(BasePresenter):
                 label = '%d PM' % (hour - 12)
             self.hour_labels.append(label)
 
+    def _init_bubble_painter(self):
+        self._bubble_painter = BubblePainter(self)
+
     def paint_events(self, events):
+        events_to_bubble, other_events = self._separate_events(events)
+        
+        self._paint_events_into_upper_tray(events_to_bubble)
+        self._paint_events_into_time_slots(other_events)
+
+    def _separate_events(self, events):
+        events_to_bubble = [] 
+        other_events     = []
+
+        for event in events:  
+            if self._bubble_painter.should_paint_event(event):
+                events_to_bubble.append(event)
+            else:
+                other_events.append(event)
+
+        return (events_to_bubble, other_events)
+
+    def _paint_events_into_time_slots(self, events):
         for day in self.week:
             presenter = DayViewPresenter(focus_datetime= day.start_datetime,
                                          now_datetime  = self.now_datetime,
@@ -117,9 +139,11 @@ class WeekViewPresenter(BasePresenter):
                 self._filter_events_for_day(events, day)
             )  
             
-            day.all_day_events  = presenter.all_day_events
             day.half_hour_slots = presenter.half_hour_slots
             day.add_event_url   = presenter.add_event_url
+
+    def _paint_events_into_upper_tray(self, events):
+        pass
 
     def _filter_events_for_day(self, events, day):
         filtered = []
@@ -205,3 +229,4 @@ class DayOnWeekView(object):
                                      self.start_datetime.day)
 
         self.css_day_abbr = self._css_day_abbr[day_idx]
+

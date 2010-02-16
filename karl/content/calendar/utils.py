@@ -109,3 +109,91 @@ class MonthSkeleton(object):
 
     def make_day(self, year, month, day):
         return datetime.datetime(year, month, day) 
+
+
+class BubblePainter:
+    def __init__(self, presenter):
+        self._presenter = presenter 
+
+    def paint_event(self, event):
+        days = self._presenter._days_in_range_of_event(event)
+        slot_index = self._find_contiguous_slot_across_days(days)
+        
+        if slot_index is None:
+            for day in days:
+                day.overflowed_events.append(event)
+            return
+                                    
+        days_len = len(days)
+        for i, day in enumerate(days):
+            tpl_event = self._presenter._make_event_for_template(day, event)
+            day.event_slots[slot_index] = tpl_event
+
+            tpl_event.bubbled = True
+
+            # bubble rounded corners
+            if i == 0:
+                if days_len == 1:
+                    tpl_event.rounding_class = 'full'
+                else:
+                    tpl_event.rounding_class = 'left'
+
+                if day is self._presenter._all_days[0]:
+                    first = self._presenter._all_days[0].first_moment
+                    if event.startDate < first:
+                        tpl_event.rounding_class = 'center'
+
+            elif i == (days_len - 1):
+                tpl_event.rounding_class = 'right'
+
+                if day is self._presenter._all_days[-1]:
+                    last = self._presenter._all_days[0].last_moment
+                    if event.endDate > last:
+                        tpl_event.rounding_class = 'center'
+                       
+            # bubble title
+            if i == 0:
+                tpl_event.bubble_title = tpl_event.title
+
+    def should_paint_event(self, event):
+        ''' An event should be bubbled if it spans multiple days or
+        if it takes up an entire single day. '''
+        starts_dt = event.startDate
+        ends_dt   = event.endDate
+    
+        starts_ymd = (starts_dt.year, starts_dt.month, starts_dt.day)
+        ends_ymd   = (ends_dt.year,   ends_dt.month,   ends_dt.day)
+    
+        should_bubble = False
+        if (starts_ymd != ends_ymd): 
+            should_bubble = True # event spans multiple days
+        else:
+            starts_hms = (starts_dt.hour, starts_dt.minute, starts_dt.second)
+            ends_hms   = (ends_dt.hour,   ends_dt.minute,   ends_dt.second)
+        
+            if (starts_hms == (0, 0, 0)) and (ends_hms == (23, 59, 59)):
+                should_bubble = True # event is an entire single day
+        return should_bubble
+
+    def _find_contiguous_slot_across_days(self, list_of_days):                
+        ''' Find the index to a slot that is available in every day of 
+        the list, or None if not possible. '''
+        if not list_of_days:
+            return None
+
+        index_of_available_slot = None
+        
+        num_days          = len(list_of_days)
+        num_slots_per_day = len(list_of_days[0].event_slots)
+
+        for slot in range(0, num_slots_per_day):  
+            slot_across_days = []
+
+            for day in list_of_days:  
+                slot_across_days.append(day.event_slots[slot])
+
+            if slot_across_days.count(None) == num_days:
+                index_of_available_slot = slot
+                break
+         
+        return index_of_available_slot
