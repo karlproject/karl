@@ -260,9 +260,10 @@ class DayOnWeekView(object):
 
         self._init_heading_and_css_day_abbr()
 
-        self.event_slots     = [None]   # multi-day events
-        self.half_hour_slots = []   # other events
-    
+        self.event_slots       = [] # multi-day events for upper tray
+        self.overflowed_events = [] # multi-day events for upper tray overflow
+        self.half_hour_slots   = [] # other events for time slots
+   
     def _init_heading_and_css_day_abbr(self):
         day_idx = calendar.weekday(self.first_moment.year,
                                    self.first_moment.month,

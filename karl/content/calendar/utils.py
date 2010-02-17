@@ -178,21 +178,23 @@ class BubblePainter:
     def _find_contiguous_slot_across_days(self, list_of_days):                
         ''' Find the index to a slot that is available in every day of 
         the list, or None if not possible. '''
+        if not list_of_days:
+            return None
+
         index_of_available_slot = None
 
-        if list_of_days and list_of_days[0].event_slots:
-            num_days          = len(list_of_days)
-            num_slots_per_day = len(list_of_days[0].event_slots)
+        num_days          = len(list_of_days)
+        num_slots_per_day = len(list_of_days[0].event_slots)
 
-            for slot in range(0, num_slots_per_day):  
-                slot_across_days = []
+        for slot in range(0, num_slots_per_day):  
+            slot_across_days = []
 
-                for day in list_of_days:  
-                    slot_across_days.append(day.event_slots[slot])
+            for day in list_of_days:  
+                slot_across_days.append(day.event_slots[slot])
 
-                if slot_across_days.count(None) == num_days:
-                    index_of_available_slot = slot
-                    break
+            if slot_across_days.count(None) == num_days:
+                index_of_available_slot = slot
+                break
 
         if (index_of_available_slot is None) and (self._add_new_slots):
             for day in list_of_days:
