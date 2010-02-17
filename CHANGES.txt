@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.17 (2010-02-17)
+-----------------
 
 - LP #503451: Calendar: Week view does not display some events
 
