@@ -244,7 +244,7 @@ class WeekViewPresenterTests(unittest.TestCase):
         feb_16         = week_of_feb_14[2] #   continues through feb 16    
         feb_17         = week_of_feb_14[3] #   and until feb 17  @ 4pm  
 
-        # presenters.month.EventInUpperTray
+        # presenters.week.EventInUpperTray
         painted_event = feb_15.event_slots[0]
         self.assertEqual(painted_event.title, "Travel")
         self.assertTrue(painted_event.bubbled)
@@ -259,6 +259,34 @@ class WeekViewPresenterTests(unittest.TestCase):
         self.assertEqual(painted_event.title, "Travel")
         self.assertTrue(painted_event.bubbled)
         self.assertEqual(painted_event.rounding_class, "right")
+
+    def test_paints_event_described_in_launchpad_bug_503451(self):
+        focus_at = datetime.datetime(2010, 1, 3)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Launchpad #503451",
+                    startDate=datetime.datetime(2010, 1, 5, 11, 15,  0),
+                    endDate  =datetime.datetime(2010, 1, 6, 12, 15,  0)
+                )        
+        presenter.paint_events([event])
+
+        week_of_jan_3 = presenter.week 
+        jan_5         = week_of_jan_3[2]
+        jan_6         = week_of_jan_3[3] 
+
+        # presenters.week.EventInUpperTray
+        painted_event = jan_5.event_slots[0]
+        self.assertEqual(painted_event.title, "Launchpad #503451")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "left")
+
+        painted_event = jan_6.event_slots[0]
+        self.assertEqual(painted_event.title, "Launchpad #503451")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "right")
+
  
     # helpers
 
