@@ -1,11 +1,6 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
-
-- LP #523333: find_contiguous_slot error error in calendar
-
 3.17 (2010-02-17)
 -----------------
 
@@ -19,6 +14,8 @@ Unreleased
 
 - When importing users, using cico, any space characters in the user's id are
   now elided.
+
+- LP #523333: find_contiguous_slot error error in calendar
 
 3.16 (2010-02-12)
 -----------------
