@@ -335,6 +335,22 @@ class WeekViewPresenterTests(unittest.TestCase):
         self.assertTrue(painted_event.bubbled)
         self.assertEqual(painted_event.rounding_class, "full")
 
+    def test_painting_an_event_out_of_range_ignores_the_event(self):
+        focus_at = datetime.datetime(2008, 1, 3)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        out_of_range_event = DummyCatalogEvent(
+                    title="Out of Range of Calendar",
+                    startDate=datetime.datetime(2010, 1, 5, 11, 15,  0),
+                    endDate  =datetime.datetime(2010, 1, 6, 12, 15,  0)
+                )        
+        presenter.paint_events([out_of_range_event])
+
+        for day in presenter.week:
+            for slot in day.event_slots:
+                self.assert_(slot is None) 
+
     # helpers
 
     def _makeOne(self, *args, **kargs):
