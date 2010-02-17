@@ -82,11 +82,11 @@ class WeekViewPresenter(BasePresenter):
 
     def _init_indexes_to_days_in_week(self):
         self._idx_month_day = {}
-        self._all_days = [] 
+        self.all_days = [] 
 
         for day in self.week:
             self._idx_month_day.setdefault(day.month, {})[day.day] = day
-            self._all_days.append(day)
+            self.all_days.append(day)
     
     def _init_first_and_last_moment(self):
         first_day = self.week[0]
@@ -183,7 +183,7 @@ class WeekViewPresenter(BasePresenter):
             starts_at = self.first_moment
         else:
             starts_at = event.startDate
-        
+
         if event.endDate > self.last_moment:
             ends_at = self.last_moment
         else:

@@ -86,16 +86,13 @@ class MonthViewPresenter(BasePresenter):
         self.weeks = weeks                                          
 
     def _init_day_indexes_from_weeks(self):
-        md_index = {} 
-        all_days = []
+        self._idx_month_day = {}
+        self.all_days = []
 
         for week in self.weeks:
             for day in week:
-                md_index.setdefault(day.month, {})[day.day] = day
-                all_days.append(day)
-
-        self._idx_month_day = md_index
-        self._all_days = all_days         
+                self._idx_month_day.setdefault(day.month, {})[day.day] = day
+                self.all_days.append(day)
 
     def _init_prev_datetime(self):
         prior = prior_month(self.focus_datetime.year, 

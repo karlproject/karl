@@ -139,17 +139,16 @@ class BubblePainter:
                 else:
                     tpl_event.rounding_class = 'left'
 
-                if day is self._presenter._all_days[0]:
-                    first = self._presenter._all_days[0].first_moment
+                if day is self._presenter.all_days[0]:
+                    first = self._presenter.all_days[0].first_moment
                     if event.startDate < first:
                         tpl_event.rounding_class = 'center'
 
             elif i == (days_len - 1):
                 tpl_event.rounding_class = 'right'
 
-                if day is self._presenter._all_days[-1]:
-                    last = self._presenter._all_days[0].last_moment
-                    if event.endDate > last:
+                if day is self._presenter.all_days[-1]:
+                    if event.endDate > self._presenter.last_moment:
                         tpl_event.rounding_class = 'center'
                        
             # bubble title
