@@ -189,7 +189,8 @@ class WeekViewPresenter(BasePresenter):
         else:
             ends_at = event.endDate
 
-        dt = starts_at
+        dt = datetime.datetime(
+                starts_at.year, starts_at.month, starts_at.day)
         one_day = datetime.timedelta(days=1)
         while dt < ends_at:                             
             days.append(
