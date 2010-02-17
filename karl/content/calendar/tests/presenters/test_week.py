@@ -287,7 +287,27 @@ class WeekViewPresenterTests(unittest.TestCase):
         self.assertTrue(painted_event.bubbled)
         self.assertEqual(painted_event.rounding_class, "right")
 
- 
+    def test_paints_event_described_in_launchpad_bug_497437(self):
+        focus_at = datetime.datetime(2010, 1, 10)
+        now_at   = datetime.datetime.now()
+        
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="JimPGlenn wrote on 2010-0107",
+                    startDate=datetime.datetime(2010, 1, 12, 0, 0,  0),
+                    endDate  =datetime.datetime(2010, 1, 13, 0, 0,  0)
+                )        
+        presenter.paint_events([event])
+
+        week_of_jan_10 = presenter.week 
+        jan_12         = week_of_jan_10[2]
+
+        # presenters.week.EventInUpperTray
+        painted_event = jan_12.event_slots[0]
+        self.assertEqual(painted_event.title, "JimPGlenn wrote on 2010-0107")
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "full")
+
     # helpers
 
     def _makeOne(self, *args, **kargs):
