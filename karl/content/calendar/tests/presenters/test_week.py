@@ -351,6 +351,66 @@ class WeekViewPresenterTests(unittest.TestCase):
             for slot in day.event_slots:
                 self.assert_(slot is None) 
 
+    def test_paints_events_that_caused_launchpad_bug_523333(self):
+        focus_at = datetime.datetime(2010, 2, 14)
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        first = DummyCatalogEvent(
+                    title="First Line",
+                    startDate=datetime.datetime(2010, 2, 16, 0, 0, 0),
+                    endDate  =datetime.datetime(2010, 2, 19, 0, 0, 0)
+                )        
+        second = DummyCatalogEvent(
+                    title="Second Line",
+                    startDate=datetime.datetime(2010, 2, 17, 0, 0, 0),
+                    endDate  =datetime.datetime(2010, 2, 20, 0, 0, 0)
+                )        
+        presenter.paint_events([first, second])                
+
+        week_of_feb_14 = presenter.week 
+        feb_16         = week_of_feb_14[2]
+        feb_17         = week_of_feb_14[3]
+        feb_18         = week_of_feb_14[4]
+        feb_19         = week_of_feb_14[5]
+        feb_20         = week_of_feb_14[6]
+
+        # first line, first day
+        painted_event = feb_16.event_slots[0]
+        self.assertEqual(painted_event.title, first.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "left")
+
+        # first line, second day
+        painted_event = feb_17.event_slots[0]
+        self.assertEqual(painted_event.title, first.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "center")
+
+        # first line, last day
+        painted_event = feb_18.event_slots[0]
+        self.assertEqual(painted_event.title, first.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "right")
+
+        # second line, first day
+        painted_event = feb_17.event_slots[1]
+        self.assertEqual(painted_event.title, second.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "left")
+
+        # second line, second day
+        painted_event = feb_18.event_slots[1]
+        self.assertEqual(painted_event.title, second.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "center")
+
+        # second line, last day
+        painted_event = feb_19.event_slots[1]
+        self.assertEqual(painted_event.title, second.title)
+        self.assertTrue(painted_event.bubbled)
+        self.assertEqual(painted_event.rounding_class, "right")
+
     # helpers
 
     def _makeOne(self, *args, **kargs):

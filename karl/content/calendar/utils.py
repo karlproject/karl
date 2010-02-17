@@ -121,9 +121,15 @@ class BubblePainter:
         slot_index = self._find_contiguous_slot_across_days(days)
         
         if slot_index is None:
-            for day in days:
-                day.overflowed_events.append(event)
-            return
+            if self._add_new_slots:
+                for day in self._presenter.all_days:
+                    day.event_slots.append(None)
+                length = len(self._presenter.all_days[0].event_slots)
+                slot_index = length - 1
+            else:
+                for day in days:
+                    day.overflowed_events.append(event)
+                return
                                     
         days_len = len(days)
         for i, day in enumerate(days):
@@ -196,9 +202,4 @@ class BubblePainter:
                 index_of_available_slot = slot
                 break
 
-        if (index_of_available_slot is None) and (self._add_new_slots):
-            for day in list_of_days:
-                day.event_slots.append(None)
-            index_of_available_slot = len(list_of_days[0].event_slots) - 1
-         
         return index_of_available_slot
