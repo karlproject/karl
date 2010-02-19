@@ -803,7 +803,7 @@ ul#peopledir-tabs li.selected a {
   margin-left: 0px;
   margin-top: 10px;
 }
-#peopledir-section ul, li {
+#peopledir-section ul li {
   list-style: none;
   padding-left: 0px;
   margin-left: 0px;
@@ -1680,6 +1680,7 @@ ul.tagUsersList li {
 .portraid img {
   display: block;
   width: 75px;
+  margin-right: 30px;
 }
 .profileDetails {
  	margin-bottom: 1em;
