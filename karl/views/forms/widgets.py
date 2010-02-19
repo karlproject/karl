@@ -97,6 +97,10 @@ UNSET = object()
 class FileUpload2(Widget):
     """
     Saner file upload widget; use filename as key rather than uuid.
+    
+    In addition: a 'single' parameter injects a hidden add field in case
+    the current content is deleted. We need this parameter if the
+    field is not in a sequence.
     """
 
     type = 'FileUpload'
@@ -104,7 +108,8 @@ class FileUpload2(Widget):
     
     def __init__(self, filestore, show_file_preview=True,
                  show_download_link=False, show_image_thumbnail=False,
-                 url_base=None, css_class=None, image_thumbnail_default=None):
+                 url_base=None, css_class=None, image_thumbnail_default=None,
+                 single=False):
         """
         :arg filestore: filestore for temporary files
         :arg show_image_thumbnail: a boolean that, if set, will include an image
@@ -126,6 +131,7 @@ class FileUpload2(Widget):
         self.url_base = url_base
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
+        self.single = single
 
     def urlfactory(self, data):
         if not data:

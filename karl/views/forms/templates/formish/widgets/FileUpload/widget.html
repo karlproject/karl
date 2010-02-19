@@ -17,20 +17,40 @@
      href="${field.widget.urlfactory(value_name)}">download</a>
 </div>
 
-<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+<input tal:condition="not field.widget.single or value_name"
+       id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input tal:condition="not value_name" id="${field.cssname}" type="file" name="${field.name}.file" />
 <code tal:condition="value_name" id="${field.cssname}">${value_name}</code>
 
-<script language="javascript" type="text/javascript">
-  $(document).ready(function(evt) {
-    // jquery's selection fails because of the *.
-    $(document.getElementById('${field.cssname}-remove')).click(function() {
-      $(this).parent().hide('fold');
+<div tal:omit-tag="" tal:condition="field.widget.single and value_name">
+  <script language="javascript" type="text/javascript">
+    $(document).ready(function(evt) {
+      // This event will only execute once.
+      $('#${field.cssname}-remove').one('click', function() {
+        // User deletes file. Hide the -code- and make the file input appear.
+        $('#${field.cssname}').replaceWith(
+          '<input id="${field.cssname}" type="file" name="${field.name}.file" />'
+        );
+        // Remove the checkbox.
+        $(this).remove()
+      });
     });
-  });
-</script>
+  </script>
+</div>
+
+<div tal:omit-tag="" tal:condition="not field.widget.single">
+  <script language="javascript" type="text/javascript">
+    $(document).ready(function(evt) {
+      // jquery's selection fails because of the *.
+      $(document.getElementById('${field.cssname}-remove')).click(function() {
+        // User deletes file. Hide it from the sequence.
+        $(this).parent().hide('fold');
+      });
+    });
+  </script>
+</div>
 
 </span>

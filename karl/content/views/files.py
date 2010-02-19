@@ -355,7 +355,8 @@ class AddFileFormController(object):
         widgets = {
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsAddWidget(),
-            'file':karlwidgets.FileUpload2(filestore = self.filestore),
+            # single=True is irrelevant here, as we have nothing to delete
+            'file':karlwidgets.FileUpload2(filestore = self.filestore, single=True),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
@@ -617,7 +618,8 @@ class EditFileFormController(object):
         widgets = {
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
-            'file':karlwidgets.FileUpload2(filestore = self.filestore),
+            # single=True obligatory here, since we are out of sequence
+            'file':karlwidgets.FileUpload2(filestore = self.filestore, single=True),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
