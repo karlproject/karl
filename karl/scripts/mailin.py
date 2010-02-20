@@ -121,6 +121,10 @@ def main(argv=sys.argv, factory=MailinRunner, root=None):
             draino.run()
         runner = factory(root, maildir_root, options)
         runner()
+        p_jar = getattr(root, '_p_jar', None)
+        if p_jar is not None:
+            # Attempt to fix memory leak
+            p_jar.db().cacheMinimize()
         closer()
 
     if options.daemon:
