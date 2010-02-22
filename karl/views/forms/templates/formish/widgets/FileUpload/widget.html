@@ -23,7 +23,7 @@
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input tal:condition="not value_name" id="${field.cssname}" type="file" name="${field.name}.file" />
-<code tal:condition="value_name" id="${field.cssname}">${value_name}</code>
+<span tal:condition="value_name" id="${field.cssname}">${value_name}</span>
 
 <div tal:omit-tag="" tal:condition="field.widget.single and value_name">
   <script language="javascript" type="text/javascript">

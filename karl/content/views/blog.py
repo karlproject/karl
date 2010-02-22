@@ -244,7 +244,9 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 attachments_field = schemaish.Sequence(schemaish.File(),
-                                       title='Attachments')
+    title='Attachments',
+    description='You can remove an attachment by clicking the checkbox. Removal will come to effect after saving the page and can be reverted by cancel.',
+    )
 
 class AddBlogEntryFormController(object):
     def __init__(self, context, request):

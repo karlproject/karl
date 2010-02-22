@@ -165,7 +165,9 @@ sendalert_field = schemaish.Boolean(
     title='Send Alert',
     description='Send email alert to community members?')
 file_field = schemaish.File(title='File',
-                            validator=validator.Required())
+                            validator=validator.Required(),
+                            description='Clicking on the checkbox will select the file for replacement.',
+                            )
 
 class AddFolderFormController(object):
     def __init__(self, context, request):

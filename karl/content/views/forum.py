@@ -197,7 +197,10 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 attachments_field = schemaish.Sequence(schemaish.File(),
-                                       title='Attachments')
+    title='Attachments',
+    description='You can remove an attachment by clicking the checkbox. Removal will come to effect after submitting the page and can be reverted by cancel.',
+    )
+
 title_field = schemaish.String(
     validator=validator.All(
         validator.Length(max=100),
