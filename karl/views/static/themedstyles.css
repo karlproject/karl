@@ -792,6 +792,7 @@ ul#peopledir-tabs li.selected a {
 
 #peopledir-section ul {
   padding: 0px;
+  margin-left: 0px;
 }
 
 #peopledir-content-wrapper {
