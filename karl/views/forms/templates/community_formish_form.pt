@@ -22,7 +22,7 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
-    <h1>${page_title}</h1>
+    <h1>${api.page_title}</h1>
     <p tal:content="page_description|''"/>
     <span tal:content="structure request.form()" tal:omit-tag=""/>
     

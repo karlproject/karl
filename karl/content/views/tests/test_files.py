@@ -161,8 +161,8 @@ class TestAddFolderFormController(unittest.TestCase):
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
         self.failUnless('api' in response)
+        self.failUnless(response['api'].page_title)
 
     def test_handle_cancel(self):
         context = testing.DummyModel()
@@ -329,9 +329,9 @@ class TestAddFileFormController(unittest.TestCase):
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
         self.failUnless('api' in response)
         self.failUnless('layout' in response)
+        self.failUnless(response['api'].page_title)
 
     def test_handle_cancel(self):
         self._register()
@@ -635,8 +635,8 @@ class TestEditFolderFormController(unittest.TestCase):
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
         context = testing.DummyModel()
@@ -762,10 +762,10 @@ class TestEditFileFormController(unittest.TestCase):
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
         self.failUnless('layout' in response)
         self.failUnless('actions' in response)
+        self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
         context = self._makeContext()

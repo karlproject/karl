@@ -309,8 +309,9 @@ class AddBlogEntryFormController(object):
 
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Add Blog Entry', 'actions':()}
+        api = TemplateAPI(self.context, self.request,
+                          'Add Blog Entry')
+        return {'api':api, 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -414,9 +415,9 @@ class EditBlogEntryFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request)
         page_title = 'Edit ' + self.context.title
-        return {'api':api, 'page_title':page_title, 'actions':()}
+        api = TemplateAPI(self.context, self.request, page_title)
+        return {'api':api, 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
