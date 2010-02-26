@@ -434,6 +434,16 @@ a.chparent:hover {
   text-decoration: none;
 }
 
+/** =SITE ANNOUNCEMENT
+----------------------------------------------- */
+#site-announcement { 
+  float: left;
+  margin-left: 20px;
+  background-color: #D0D2D4;
+  border-color: #000000
+  border: 2px;
+}
+
 /** =LAYOUT STRUCTURE
 ----------------------------------------------- */
 .visual-portal-wrapper {

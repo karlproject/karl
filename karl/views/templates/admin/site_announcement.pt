@@ -1,0 +1,45 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Site Announcement</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="select_content">
+          <fieldset tal:define="error fielderrors['text']|None"
+	            class="${error and 'fieldError' or ''}"
+	            id="site-announcement-field">
+            <label>Text</label>
+            <div class="fieldHelp" tal:content="help['site-announcement']|''"></div>
+            <div tal:condition="error" class="errorMessage">${error}</div>
+            <input type="hidden" name="text_text_format" value="text/html" />
+            <textarea id="site-announcement-input"
+                      name="site-announcement-input"
+                      rows="1" cols="40"
+		      class="mceEditor karlrichtextfield">
+              ${api.site_announcement}
+            </textarea>
+          </fieldset>
+          <br/>
+          <input type="submit" name="submit-site-announcement"
+                 value="Set Site Announcement"/>
+          <input type="submit" name="remove-site-announcement"
+                 value="Remove Site Announcement"/>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+</html>

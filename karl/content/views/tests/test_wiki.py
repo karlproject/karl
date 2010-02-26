@@ -101,8 +101,8 @@ class TestAddWikiPageFormController(unittest.TestCase):
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.failUnless('page_title' in response)
         self.failUnless('api' in response)
+        self.failUnless(response['api'].page_title)
 
     def test_handle_cancel(self):
         context = testing.DummyModel()
@@ -275,8 +275,8 @@ class TestEditWikiPageFormController(unittest.TestCase):
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
-        self.assertEqual(response['page_title'], 'Edit title')
         self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
         context = testing.DummyModel()

@@ -649,5 +649,12 @@
       </ul>
     </div>
 
+    <div metal:define-macro="site-announcement"
+         tal:condition="api.site_announcement">
+      <div class="site-announcement" id="site-announcement"
+           tal:content="structure api.site_announcement">
+      </div>
+    </div>
+
   </body>
 </html>

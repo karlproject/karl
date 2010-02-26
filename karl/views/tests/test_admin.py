@@ -385,6 +385,59 @@ class TestMoveContentView(unittest.TestCase):
             'Path does not exist in destination community: /littleendians/blog'
         )
 
+class TestSiteAnnouncementView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        site = self.site = DummyModel()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_render(self):
+        from karl.views.admin import site_announcement_view
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/site_announcement.pt'
+            )
+        response = site_announcement_view(self.site, request)
+        self.assertEqual(response.status_int, 200)
+
+    def test_set_announcement(self):
+        from karl.views.admin import site_announcement_view
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/site_announcement.pt'
+            )
+        request.params['submit-site-announcement'] = None
+        annc = '<p>This is the <i>announcement</i>.</p>'
+        request.params['site-announcement-input'] = annc
+        response = site_announcement_view(self.site, request)
+        self.assertEqual(self.site.site_announcement, annc[3:-4])
+
+    def test_set_announcement_drop_extra(self):
+        from karl.views.admin import site_announcement_view
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/site_announcement.pt'
+            )
+        request.params['submit-site-announcement'] = None
+        annc = '<p>This is the <i>announcement</i>.</p><p>This is dropped.</p>'
+        request.params['site-announcement-input'] = annc
+        response = site_announcement_view(self.site, request)
+        self.assertEqual(self.site.site_announcement, annc[3:35])
+
+    def test_remove_announcement(self):
+        from karl.views.admin import site_announcement_view
+        self.site.site_announcement = 'Foo.'
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/site_announcement.pt'
+            )
+        request.params['remove-site-announcement'] = None
+        response = site_announcement_view(self.site, request)
+        self.failIf(self.site.site_announcement)
+
+
 class TestEmailUsersView(unittest.TestCase):
     def setUp(self):
         cleanUp()

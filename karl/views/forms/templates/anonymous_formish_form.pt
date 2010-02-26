@@ -21,7 +21,7 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1 class="kscreentitle">${page_title}</h1>
+    <h1 class="kscreentitle">${api.page_title}</h1>
 
       <span tal:content="structure request.form()" tal:omit-tag=""/>
     

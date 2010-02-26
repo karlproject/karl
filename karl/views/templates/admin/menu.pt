@@ -28,6 +28,16 @@
           </ul>
         </div>
         <div class="right-portlet">
+          <h3>Announce</h3>
+          <ul class="menu">
+            <li>
+              <a href="${api.app_url}/site_announcement.html">
+                Manage site announcement
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-portlet">
           <h3>Email</h3>
           <ul class="menu">
             <li>

@@ -599,6 +599,13 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.site_announcement_view"
+    permission="administer"
+    name="site_announcement.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.EmailUsersView"
     permission="administer"
     name="email_users.html"

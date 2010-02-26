@@ -94,7 +94,9 @@ class TemplateAPI(object):
         self.page_title = page_title
         self.system_name = get_setting(context, 'system_name', 'KARL')
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
-        self.admin_url = model_url(find_site(context), request, 'admin.html')
+        site = find_site(context)
+        self.admin_url = model_url(site, request, 'admin.html')
+        self.site_announcement = getattr(site, 'site_announcement', '')
 
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') == 'public'
