@@ -256,8 +256,8 @@ class AddForumFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request, 'Add Forum')
-        return {'api':api, 'actions':()}
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Forum', 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -328,9 +328,9 @@ class EditForumFormController(object):
         return widgets
 
     def __call__(self):
-        page_title = 'Edit %s' % self.context.title
-        api = TemplateAPI(self.context, self.request, page_title)
-        return {'api':api, 'actions':()}
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Edit %s' % self.context.title,
+                'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -505,8 +505,9 @@ class AddForumTopicFormController(object):
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
-        return {'api':api, 'actions':(), 'layout':layout}
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api, 'page_title':'Add Forum Topic', 'actions':(),
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -606,9 +607,10 @@ class EditForumTopicFormController(object):
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        page_title = 'Edit %s' % self.context.title,
-        api = TemplateAPI(self.context, self.request, page_title)
-        return {'api':api, 'actions':(), 'layout':layout}
+        api = TemplateAPI(self.context, self.request)
+        return {'api':api,
+                'page_title':'Edit %s' % self.context.title,
+                'actions':(), 'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))

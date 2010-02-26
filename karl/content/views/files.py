@@ -212,13 +212,14 @@ class AddFolderFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request, 'Add Folder')
+        api = TemplateAPI(self.context, self.request)
         layout_provider = get_layout_provider(self.context, self.request)
         if layout_provider is None:
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api, 'actions':(), 'layout':layout}
+        return {'api':api, 'page_title':'Add Folder', 'actions':(),
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -371,13 +372,14 @@ class AddFileFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request, 'Add File')
+        api = TemplateAPI(self.context, self.request)
         layout_provider = get_layout_provider(self.context, self.request)
         if layout_provider is None:
             layout = api.community_layout
         else:
             layout = layout_provider('community')
         return {'api':api,
+                'page_title':'Add File',
                 'actions':(),
                 'layout':layout}
 
@@ -543,14 +545,14 @@ class EditFolderFormController(object):
         return widgets
 
     def __call__(self):
-        page_title = 'Edit %s' % self.context.title
-        api = TemplateAPI(self.context, self.request, page_title)
+        api = TemplateAPI(self.context, self.request)
         layout_provider = get_layout_provider(self.context, self.request)
         if layout_provider is None:
             layout = api.community_layout
         else:
             layout = layout_provider('community')
         return {'api':api,
+                'page_title':'Edit %s' % self.context.title,
                 'actions':(),
                 'layout':layout}
 
@@ -631,14 +633,14 @@ class EditFileFormController(object):
         return widgets
 
     def __call__(self):
-        page_title = 'Edit %s' % self.context.title
-        api = TemplateAPI(self.context, self.request, page_title)
+        api = TemplateAPI(self.context, self.request)
         layout_provider = get_layout_provider(self.context, self.request)
         if layout_provider is None:
             layout = api.community_layout
         else:
             layout = layout_provider('community')
         return {'api':api,
+                'page_title':'Edit %s' % self.context.title,
                 'actions':(),
                 'layout':layout}
 
