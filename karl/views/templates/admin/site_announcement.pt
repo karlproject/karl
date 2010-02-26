@@ -16,11 +16,11 @@
 
       <div class="koverview_body">
         <form method="POST" name="select_content">
-          <fieldset tal:define="error fielderrors['text']|None"
+          <fieldset tal:define="error fielderrors['site-announcement-input']|None"
 	            class="${error and 'fieldError' or ''}"
-	            id="site-announcement-field">
+	            id="site-announcement-input-field">
             <label>Text</label>
-            <div class="fieldHelp" tal:content="help['site-announcement']|''"></div>
+            <div class="fieldHelp" tal:content="help['site-announcement-input']|''"></div>
             <div tal:condition="error" class="errorMessage">${error}</div>
             <input type="hidden" name="text_text_format" value="text/html" />
             <textarea id="site-announcement-input"
