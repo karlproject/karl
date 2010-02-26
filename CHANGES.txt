@@ -4,8 +4,19 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #528514: Specified the right widget type for blog post 'send email?'
+  field, added CSS to make the formish title fields the right size. (rafrombrc)
+
 - Fixed bug with people import where updating a profile might use a different
   user id than the profile.__name__.
+
+- LP #522179: Added template slots and admin UI for generating announcement
+  blurbs that will be exposed to all site users. (rafrombrc)
+
+- LP #523280: Rejigger formish views and templates to put page_title value in
+  TemplateAPI object instead of passing it directly into the template
+  (rafrombrc)
+
 
 3.18 (2010-02-22)
 -----------------
