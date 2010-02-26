@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fixed bug with people import where updating a profile might use a different
+  user id than the profile.__name__.
 
 3.18 (2010-02-22)
 -----------------

@@ -106,7 +106,7 @@ class UserProfileImporter(object):
 
         element = self.element
         login = _element_value(self, element, 'username')
-        username = login.replace(' ', '')
+        username = profile.__name__
         password = _element_value(self, element, 'sha_password')
         groups = self._groups(element)
 
@@ -119,7 +119,7 @@ class UserProfileImporter(object):
         groups = groups | set(community_groups)
 
         users.remove(username)
-        users.add(username, username, password, groups, encrypted=True)
+        users.add(username, login, password, groups, encrypted=True)
 
         self._populate(profile)
         reset_security_workflow(profile)
