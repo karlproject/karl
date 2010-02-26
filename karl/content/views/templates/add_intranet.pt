@@ -16,6 +16,18 @@
 
     <fieldset metal:use-macro="formfields.macros['title-field']"/>
 
+    <fieldset id="name-field"
+	      tal:define="error fielderrors['name']|None"
+	      class="${error and 'fieldError' or ''}">
+      <label>Name</label>
+      <div class="fieldHelp">
+        Short name that will be part of the URL for this intranet.
+        Will be auto-generated from the Title if left blank.
+      </div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="name" style="width: 245px"/>
+    </fieldset>
+
     <fieldset id="address-field"
 	      tal:define="error fielderrors['address']|None"
 	      class="${error and 'fieldError' or ''}">

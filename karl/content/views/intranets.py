@@ -78,8 +78,11 @@ def add_intranet_view(context, request):
         try:
             converted = form.validate(request.POST)
             # Now add the intranet community
+            name = converted.get('name')
+            if not name:
+                name = converted['title']
             try:
-                name = make_name(context, converted['title'])
+                name = make_name(context, name)
             except ValueError, why:
                 location = model_url(context, request, request.view_name)
                 msg = why[0]
@@ -406,6 +409,7 @@ from formencode import validators
 from karl.views import baseforms
 class AddIntranetForm(FormSchema):
     title = baseforms.title
+    name = validators.UnicodeString(strip=True)
     address = validators.UnicodeString(strip=True)
     city = validators.UnicodeString(strip=True)
     state = validators.UnicodeString(strip=True)

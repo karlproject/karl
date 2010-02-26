@@ -104,6 +104,7 @@ class AddIntranetViewTests(unittest.TestCase):
             MultiDict({
                     'form.submitted':1,
                     'title':'sometitle',
+                    'name': '',
                     'description':'somedescription',
                     'city': 'city',
                     'right_portlets':'',
@@ -131,6 +132,55 @@ class AddIntranetViewTests(unittest.TestCase):
         msg = 'http://example.com/?status_message=Intranet%20added'
         self.failUnless(response.location, msg)
 
+    def test_submitted_different_name(self):
+        from webob.multidict import MultiDict
+        from zope.interface import directlyProvides
+        from zope.interface import alsoProvides
+        from karl.models.interfaces import ISite
+        from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import IToolFactory
+        from karl.models.interfaces import IIntranets
+        from repoze.lemonade.interfaces import IContentFactory
+
+        context = testing.DummyModel()
+        directlyProvides(context, ISite)
+        alsoProvides(context, ICommunity)
+        alsoProvides(context, IIntranets)
+        testing.registerDummySecurityPolicy('userid')
+
+        request = testing.DummyRequest(
+            MultiDict({
+                    'form.submitted':1,
+                    'title':'Some Title',
+                    'name': 'name',
+                    'description':'somedescription',
+                    'city': 'city',
+                    'right_portlets':'',
+                    'middle_portlets':'',
+                    'country':'country',
+                    'zipcode':'zipcode',
+                    'telephone':'telephone',
+                    'state':'state',
+                    'address':'address',
+                    'navigation':'navigation',
+                    'feature':'',
+                    })
+            )
+        testing.registerUtility(None, IToolFactory, name='mytoolfactory')
+        testing.registerAdapter(lambda *arg: DummyCommunity, (ICommunity,),
+                                IContentFactory)
+        from karl.testing import registerSecurityWorkflow
+        registerSecurityWorkflow()
+        dummy_tool_factory = DummyToolFactory()
+        testing.registerUtility(dummy_tool_factory, IToolFactory, name='blog')
+        context.users = DummyUsers({})
+        context.catalog = DummyCatalog({1:'/foo'})
+
+        response = self._callFUT(context, request)
+        msg = 'http://example.com/?status_message=Intranet%20added'
+        self.failUnless(response.location, msg)
+        self.failUnless(request.params['name'] in context)
+        
 
 class EditIntranetRootViewTests(unittest.TestCase):
     def setUp(self):
