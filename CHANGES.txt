@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #497017: Added a separate 'name' field to the intranets add form
+  (rafrombrc)
+
 - LP #528514: Specified the right widget type for blog post 'send email?'
   field, added CSS to make the formish title fields the right size. (rafrombrc)
 
