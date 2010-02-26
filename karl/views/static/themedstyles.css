@@ -127,8 +127,9 @@ label {
 label.required {
     background-image: url(images/required.gif);
 }
-
-
+input#save-title { 
+    width: 490px;
+}
 
 /** =SHARED
 ----------------------------------------------- */

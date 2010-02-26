@@ -404,6 +404,7 @@ class EditBlogEntryFormController(object):
             'text':karlwidgets.RichTextWidget(empty=''),
             'attachments':formish.widgets.SequenceDefault(sortable=False),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            'sendalert':formish.widgets.Checkbox(),
              }
         security_states = self._get_security_states()
         schema = dict(fields)
