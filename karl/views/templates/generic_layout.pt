@@ -49,6 +49,7 @@
 		</a>
 	      </li>
             </ul>
+            <div metal:use-macro="api.snippets.macros['site-announcement']" />
           </div>
         </div>
         <div class="visualClear"></div>

@@ -5,6 +5,7 @@ from cStringIO import StringIO
 import csv
 from email.message import Message
 import os
+import re
 import transaction
 from webob import Response
 from webob.exc import HTTPFound
@@ -31,6 +32,7 @@ from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IProfile
 from karl.utils import find_community
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
@@ -273,6 +275,31 @@ def move_content_view(context, request):
         'templates/admin/move_content.pt',
         **parms
     )
+
+def site_announcement_view(context, request):
+    """
+    Edit the text of the site announcement, which will be displayed on
+    every page for every user of the site.
+    """
+    if 'submit-site-announcement' in request.params:
+        site = find_site(context)
+        annc = request.params.get('site-announcement-input', '').strip()
+        if annc:
+            # we only take the content of the first <p> tag, with
+            # the <p> tags stripped
+            paramatcher = re.compile('<[pP]\\b[^>]*>(.*?)</[pP]>')
+            match = paramatcher.search(annc)
+            if match is not None:
+                annc = match.groups()[0]
+            site.site_announcement = annc
+    if 'remove-site-announcement' in request.params:
+        site = find_site(context)
+        site.site_announcement = u''
+    api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
+    return render_template_to_response(
+        'templates/admin/site_announcement.pt', api=api,
+        menu=_menu_macro())
+
 
 class EmailUsersView(object):
     # The groups are a pretty obvious customization point, so we make this view
