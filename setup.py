@@ -118,6 +118,7 @@ setup(name='karl',
       startover = karl.scripts.startover:main
       echo_log = karl.scripts.echo_log:main
       mailout = karl.scripts.mailout:main
+      reset_security_workflows = karl.scripts.reset_security_workflows:main
       """
       )
 
