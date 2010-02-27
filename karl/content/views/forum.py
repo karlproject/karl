@@ -450,7 +450,7 @@ class AddForumTopicFormController(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.workflow = get_workflow(IForum, 'security', context)
+        self.workflow = get_workflow(IForumTopic, 'security', context)
         self.filestore = get_filestore(context, request, 'add-forumtopic')
 
     def _get_security_states(self):
@@ -548,7 +548,7 @@ class EditForumTopicFormController(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.workflow = get_workflow(IForum, 'security', context)
+        self.workflow = get_workflow(IForumTopic, 'security', context)
         self.filestore = get_filestore(context, request, 'edit-forumtopic')
 
     def _get_security_states(self):
