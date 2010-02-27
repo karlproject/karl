@@ -606,7 +606,7 @@ class EditForumTopicFormController(object):
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        page_title = 'Edit %s' % self.context.title,
+        page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         return {'api':api, 'actions':(), 'layout':layout}
 
