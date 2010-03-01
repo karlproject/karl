@@ -20,13 +20,29 @@
   adduser <username> <password>
 """
 
+from karl.models.interfaces import IProfile
 from karl.scripting import get_default_config
 from karl.scripting import open_root
+from karl.utils import find_profiles
+from karl.utils import find_users
 from optparse import OptionParser
+from repoze.lemonade.content import create_content
+
 import transaction
 
 def adduser(root, userid, password):
-    root.users.add(userid, userid, password, ['group.KarlAdmin'])
+    users = find_users(root)
+    if users.get_by_id(userid) is not None:
+        raise ValueError("User already exists with id: %s" % userid)
+
+    profiles = find_profiles(root)
+    if userid in profiles:
+        raise ValueError("Profile already exists with id: %s" % userid)
+
+    users.add(userid, userid, password, ['group.KarlAdmin'])
+    profiles[userid] = create_content(
+        IProfile, firstname='System', lastname='User'
+    )
 
 def main():
     parser = OptionParser(description=__doc__,

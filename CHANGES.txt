@@ -20,6 +20,8 @@ Unreleased
   TemplateAPI object instead of passing it directly into the template
   (rafrombrc)
 
+- LP #520541 Updated adduser console script to also create a user profile.
+  Added checks to avoid clobbering an existing user.
 
 3.18 (2010-02-22)
 -----------------
