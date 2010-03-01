@@ -150,7 +150,12 @@ class Event(object):
 
                 self.first_line_day   = start_day
                 self.first_line_time  = 'all-day'
-                self.second_line_day  = end_day
+                if start_day != end_day:
+                    # Spans more days, so we need a second line (to-) date.
+                    self.second_line_day = end_day
+                else:
+                    # All-day event for a single day, no second line.
+                    self.second_line_day = ''
                 self.second_line_time = ''
             else:
                 self.first_line_day   = start_day
