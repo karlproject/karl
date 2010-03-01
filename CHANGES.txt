@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #526574: Fixed the workflow association with the forum topic add and edit
+  views so the creator of the topic will have edit / delete permissions;
+  added evolve6.py function to fix existing topics. (rafrombrc)
+
 - LP #497017: Added a separate 'name' field to the intranets add form
   (rafrombrc)
 
