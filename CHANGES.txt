@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.19 (2010-03-02
+----------------
 
 - LP #526574: Fixed the workflow association with the forum topic add and edit
   views so the creator of the topic will have edit / delete permissions;
