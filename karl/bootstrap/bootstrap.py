@@ -121,6 +121,7 @@ def populate(root, do_transaction_begin=True):
         for office in office_data.offices:
             request.POST.clear()
             request.POST['form.submitted'] = True
+            request.POST['name'] = office['id']
             request.POST['title'] = office['id']
             request.POST['address'] = office['address']
             request.POST['city'] = office['city']
