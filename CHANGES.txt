@@ -6,6 +6,8 @@ Unreleased
 
 - Updated bootstrap to provide new 'name' parameter to add_intranet_view when
   creating offices.
+  
+- LP #530966, CSS fix for profile bug.  (Derek via Paul)
 
 3.19 (2010-03-02
 ----------------
