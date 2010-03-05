@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.20 (2010-03-04)
+-----------------
 
 - Updated bootstrap to provide new 'name' parameter to add_intranet_view when
   creating offices.
