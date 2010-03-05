@@ -17,6 +17,10 @@
 
 import unittest
 
+from zope.testing.cleanup import cleanUp
+from karl import testing
+from repoze.bfg import testing as bfgtesting
+
 class ExtractDescriptionTests(unittest.TestCase):
 
     def _callFUT(self, htmlstring):
@@ -56,4 +60,42 @@ class ExtractDescriptionTests(unittest.TestCase):
         self.assertEqual(len(summary), 222)
         self.assertTrue(summary.endswith('...'))
 
+class Test_get_show_sendalert(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _call_fut(self, context, request):
+        from karl.content.views.utils import get_show_sendalert
+        return get_show_sendalert(context, request)
+
+    def test_not_intranet(self):
+        context = testing.DummyModel()
+        self.failUnless(self._call_fut(context, None))
+
+    def test_in_intranet(self):
+        from karl.content.interfaces import IIntranets
+        from zope.interface import directlyProvides
+        intranet = testing.DummyModel()
+        directlyProvides(intranet, IIntranets)
+        intranet['foo'] = context = testing.DummyModel()
+        self.failIf(self._call_fut(context, None))
+
+    def test_override_adapter(self):
+        class DummyAdapter(object):
+            show_sendalert = 'foo'
+            def __init__(self, context, request):
+                pass
+
+        from zope.interface import Interface
+        from karl.content.views.interfaces import IShowSendalert
+        bfgtesting.registerAdapter(
+            DummyAdapter, (Interface, Interface), IShowSendalert
+        )
+
+        context = testing.DummyModel()
+        request = bfgtesting.DummyRequest()
+        self.assertEqual(self._call_fut(context, request), 'foo')
 

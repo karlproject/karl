@@ -77,9 +77,9 @@ from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import ICalendarCategory
 from karl.content.views.utils import extract_description
 from karl.utils import get_layout_provider
-from karl.content.views.interfaces import IShowSendalert
 
 from karl.content.views.utils import fetch_attachments
+from karl.content.views.utils import get_show_sendalert
 from karl.content.views.utils import store_attachments
 
 from karl.content.calendar.presenters.day import DayViewPresenter
@@ -467,11 +467,7 @@ def add_calendarevent_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Get a little policy.  Should we suppress alerts?
-    show_sendalert = queryMultiAdapter((context, request), IShowSendalert)
-    if show_sendalert is not None:
-        show_sendalert_field = show_sendalert.show_sendalert
-    else:
-        show_sendalert_field = True
+    show_sendalert_field = get_show_sendalert(context, request)
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
@@ -620,7 +616,7 @@ def show_calendarevent_ics_view(context, request):
 
 
 def edit_calendarevent_view(context, request):
-    
+
     tags_list = request.POST.getall('tags')
     form = EditCalendarEventForm(tags_list=tags_list)
     workflow = get_workflow(ICalendarEvent, 'security', context)
@@ -683,7 +679,7 @@ def edit_calendarevent_view(context, request):
         except Invalid, e:
             fielderrors = e.error_dict
             fill_values = form.convert(request.POST)
-            
+
     else:
         fielderrors = {}
         if workflow is None:
@@ -707,7 +703,7 @@ def edit_calendarevent_view(context, request):
             fill_values['contact_email'] = u''
 
         if is_all_day_event(context):
-            fill_values['allDay'] = True 
+            fill_values['allDay'] = True
             fill_values['endDate'] -= datetime.timedelta(days=1)
         else:
             fill_values['allDay'] = False
@@ -737,7 +733,7 @@ def edit_calendarevent_view(context, request):
     else:
         calendar_categories = []
         del fill_values['calendar_category']
-    
+
     return render_form_to_response(
         'templates/edit_calendarevent.pt',
         form,
@@ -1102,5 +1098,5 @@ def generate_name(context):
         name = unfriendly_random_id()
         if not (name in context):
             return name
-        
-    
+
+

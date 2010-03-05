@@ -68,11 +68,11 @@ from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IFolderCustomizer
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
-from karl.content.views.interfaces import IShowSendalert
 
 from karl.content.interfaces import IReferencesFolder
 
 from karl.content.views.utils import get_previous_next
+from karl.content.views.utils import get_show_sendalert
 
 from karl.security.workflow import get_security_states
 
@@ -183,7 +183,7 @@ class AddFolderFormController(object):
             'title':'',
             'tags':[],
             }
-        
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
@@ -227,7 +227,7 @@ class AddFolderFormController(object):
         context = self.context
         request = self.request
         workflow = self.workflow
-        
+
         name = make_unique_name(context, converted['title'])
         creator = authenticated_userid(request)
 
@@ -318,11 +318,7 @@ class AddFileFormController(object):
         self.request = request
         self.workflow = get_workflow(ICommunityFile, 'security', context)
         self.filestore = get_filestore(context, request, 'add-file')
-        show_sendalert = queryMultiAdapter(
-            (self.context, self.request), IShowSendalert)
-        if show_sendalert is not None:
-            show_sendalert = show_sendalert.show_sendalert
-        self.show_sendalert = show_sendalert
+        self.show_sendalert = get_show_sendalert(self.context, self.request)
         self.check_upload_size = check_upload_size # for testing
 
     def _get_security_states(self):
@@ -513,7 +509,7 @@ class EditFolderFormController(object):
             'title':self.context.title,
             'tags':[],
             }
-        
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(self.context)
         return defaults
@@ -561,7 +557,7 @@ class EditFolderFormController(object):
         context = self.context
         request = self.request
         workflow = self.workflow
-        
+
         # *will be* modified event
         objectEventNotify(ObjectWillBeModifiedEvent(context))
         if workflow is not None:
@@ -591,7 +587,7 @@ class EditFileFormController(object):
 
     def _get_security_states(self):
         return get_security_states(self.workflow, self.context, self.request)
-    
+
     def form_defaults(self):
         context = self.context
         defaults = {
@@ -682,7 +678,7 @@ class EditFileFormController(object):
         location = model_url(context, request,
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
-        
+
 
 grid_folder_columns = [
     {"id": "mimetype", "label": "Type", "width": 64},

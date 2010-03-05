@@ -26,11 +26,14 @@ from repoze.lemonade.content import create_content
 from repoze.bfg.url import model_url
 
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 
 from karl.utils import get_setting
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
+from karl.content.views.interfaces import IShowSendalert
+from karl.content.views.adapters import DefaultShowSendalert
 
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import make_unique_name
@@ -96,7 +99,7 @@ def upload_attachments(attachments, folder, creator, request):
                     ob = folder[name]
                     if has_permission('delete', ob, request):
                         del folder[name]
-        
+
 
 
 def get_previous_next(context, request):
@@ -160,3 +163,9 @@ def extract_description(htmlstring):
         summary = summary + "..."
 
     return summary
+
+def get_show_sendalert(context, request):
+    show_sendalert = queryMultiAdapter((context, request), IShowSendalert)
+    if show_sendalert is None:
+        show_sendalert = DefaultShowSendalert(context, request)
+    return show_sendalert.show_sendalert

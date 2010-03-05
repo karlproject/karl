@@ -4,14 +4,16 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Created a default policy for IShowSendalert.  Refactored code to use a
+  utility method, get_show_sendalert, to get whether or not to show a send
+  alert checkbox in a form adding content.
 
 3.20 (2010-03-04)
 -----------------
 
 - Updated bootstrap to provide new 'name' parameter to add_intranet_view when
   creating offices.
-  
+
 - LP #530966, CSS fix for profile bug.  (Derek via Paul)
 
 3.19 (2010-03-02
