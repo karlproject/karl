@@ -84,7 +84,7 @@
 
   <view
     for="karl.content.interfaces.ICalendar"
-    view=".calendar_events.show_week_view"
+    view=".calendar_events.show_view"
     permission="view"
   />
 

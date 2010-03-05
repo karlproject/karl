@@ -1221,6 +1221,239 @@ class Test__get_catalog_events(unittest.TestCase):
                                layer_name=None)
         self.assertEqual(list(result), [event])
 
+class ShowCalendarViewTests(unittest.TestCase):
+    """Test cases to check interaction of different calendar views
+    """
+
+    def setUp(self):
+        cleanUp()
+
+        # Create dummy site skeleton
+        from karl.testing import DummyCommunity
+        self.community = DummyCommunity()
+        self.site = self.community.__parent__.__parent__
+        tags = DummyTags()
+        self.site.tags = tags
+        from karl.testing import DummyCatalog
+        self.site.catalog = DummyCatalog()
+
+        # This is the cookie that stores the sticky state of the view
+        import karl.content.views.calendar_events
+        self.KARL_CALENDAR_VIEW_COOKIE = \
+            karl.content.views.calendar_events.KARL_CALENDAR_VIEW_COOKIE
+
+    def tearDown(self):
+        cleanUp()
+
+    def _register(self):
+        from zope.interface import Interface
+        from karl.views.interfaces import ILayoutProvider
+        from karl.testing import DummyLayoutProvider
+        ad = testing.registerAdapter(DummyLayoutProvider,
+                             (Interface, Interface),
+                             ILayoutProvider)
+
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(CatalogSearch, (Interface, ), ICatalogSearch)
+
+    def _registerSecurityWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
+
+    def test_day(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_day.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_day_view
+        response = show_day_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assertEqual(response.headers['Set-Cookie'], 
+            '%s=day; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+
+    def test_week(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_week.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_week_view
+        response = show_week_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assertEqual(response.headers['Set-Cookie'], 
+            '%s=week; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+
+    def test_month(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_month.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_month_view
+        response = show_month_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assertEqual(response.headers['Set-Cookie'], 
+            '%s=month; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+
+    def test_list(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        renderer = testing.registerDummyRenderer(
+            'templates/calendar_list.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_list_view
+        response = show_list_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assertEqual(response.headers['Set-Cookie'], 
+            '%s=list; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+
+    def test_default(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        self._registerSecurityWorkflow()
+
+        # There is no cookie set, which means no view
+        # had been made sticky yet
+        from karl.content.views.calendar_events import show_view
+        response = show_view(context, request)
+
+        # Redirect is expected to the default view, which is 'day'.
+        from repoze.bfg.url import model_url
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+
+    def test_default_day(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        self._registerSecurityWorkflow()
+
+        # Test with 'day' view selected as sticky
+        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'day'
+        
+        from karl.content.views.calendar_events import show_view
+        response = show_view(context, request)
+
+        # Redirect is expected to the sticky view
+        from repoze.bfg.url import model_url
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+
+    def test_default_week(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        self._registerSecurityWorkflow()
+
+        # Test with 'week' view selected as sticky
+        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'week'
+        
+        from karl.content.views.calendar_events import show_view
+        response = show_view(context, request)
+
+        # Redirect is expected to the sticky view
+        from repoze.bfg.url import model_url
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, model_url(context, request, 'week.html'))
+
+    def test_default_month(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        self._registerSecurityWorkflow()
+
+        # Test with 'month' view selected as sticky
+        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'month'
+        
+        from karl.content.views.calendar_events import show_view
+        response = show_view(context, request)
+
+        # Redirect is expected to the sticky view
+        from repoze.bfg.url import model_url
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, model_url(context, request, 'month.html'))
+
+    def test_default_list(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        self._registerSecurityWorkflow()
+
+        # Test with 'list' view selected as sticky
+        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'list'
+        
+        from karl.content.views.calendar_events import show_view
+        response = show_view(context, request)
+
+        # Redirect is expected to the sticky view
+        from repoze.bfg.url import model_url
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, model_url(context, request, 'list.html'))
+
 
 class DummyContentFactory:
     def __init__(self, klass):
@@ -1313,3 +1546,9 @@ def find_nondefault(context):
     for k, v in items:
         if not k.startswith('_default'):
             return k, v
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]

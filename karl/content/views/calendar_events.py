@@ -88,6 +88,12 @@ from karl.content.calendar.presenters.month import MonthViewPresenter
 from karl.content.calendar.presenters.list import ListViewPresenter
 from karl.content.calendar.utils import is_all_day_event
 
+# The name of the cookie that makes the calendar view sticky.
+# Possible cookie values are 'day', 'week', 'month', 'list'.
+# In case of no value or unknown value, 'day' is considered
+# as default.
+KARL_CALENDAR_VIEW_COOKIE = 'karl.calendar_view'
+
 _NOW = None
 
 def _now():
@@ -247,13 +253,19 @@ def _show_calendar_view(context, request, make_presenter):
     )
 
 def show_month_view(context, request):
-    return _show_calendar_view(context, request, MonthViewPresenter)
+    response = _show_calendar_view(context, request, MonthViewPresenter)
+    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'month')
+    return response
 
 def show_week_view(context, request):
-    return _show_calendar_view(context, request, WeekViewPresenter)
+    response = _show_calendar_view(context, request, WeekViewPresenter)
+    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'week')
+    return response
 
 def show_day_view(context, request):
-    return _show_calendar_view(context, request, DayViewPresenter)
+    response = _show_calendar_view(context, request, DayViewPresenter)
+    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'day')
+    return response
 
 def show_list_view(context, request):
     year, month, day = _date_requested(context, request)
@@ -285,7 +297,7 @@ def show_list_view(context, request):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
-    return render_template_to_response(
+    response = render_template_to_response(
         calendar.template_filename,
         api=api,
         setup_url=setup_url,
@@ -294,6 +306,25 @@ def show_list_view(context, request):
         layers = layers,
         quote = quote,
     )
+    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'list')
+    return response
+
+
+
+def show_view(context, request):
+    """Select the last used view from month, week, day, and list.
+    State is stored in a browser cookie.
+
+    We do redirect in order to maintain the working of links.
+    """
+    view_type = request.cookies.get(KARL_CALENDAR_VIEW_COOKIE, '')
+    view_name = {
+        'month': 'month.html',
+        'week': 'week.html',
+        'day': 'day.html',
+        'list': 'list.html',
+        }.get(view_type, 'day.html')
+    return HTTPFound(location=model_url(context, request, view_name))
 
 
 def _get_calendar_categories(context):
