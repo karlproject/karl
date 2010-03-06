@@ -63,7 +63,7 @@ def make_app(global_config, **kw):
         filename = 'karl.includes:standalone.zcml'
         app = bfg_make_app(get_root, filename=filename, options=config)
 
-    exercise(app)
+    #exercise(app) # experimental
     return app
 
 def exercise(app):
