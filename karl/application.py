@@ -2,15 +2,20 @@ import logging
 import os
 import sys
 import transaction
+import webob
 
 from zope.component import queryUtility
 
 from repoze.bfg.router import make_app as bfg_make_app
+from repoze.bfg.scripting import get_root
+from repoze.bfg.traversal import model_path
 from repoze.who.plugins.zodb.users import Users
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 from karl.log import configure_log
+from karl.log import get_logger
 from karl.log import set_subsystem
+from karl.views.utils import get_user_home
 from karl.utils import asbool
 from karl.bootstrap.bootstrap import populate
 from karl.bootstrap.interfaces import IBootstrapper
@@ -58,7 +63,38 @@ def make_app(global_config, **kw):
         filename = 'karl.includes:standalone.zcml'
         app = bfg_make_app(get_root, filename=filename, options=config)
 
+    exercise(app)
     return app
+
+def exercise(app):
+    """
+    Simulate the first request to the application in order to prime the ZODB
+    cache.
+
+    Performing this operation during start up, it is hoped to delay user
+    requests being handed off to this worker by mod_wsgi until after the cache
+    is already primed.  Otherwise the first, slow, cache priming request would
+    fall to an unlucky user.
+    """
+    # Need to be logged in as somebody.  Use the first user we find that is a
+    # member of some group.
+    root, closer = get_root(app)
+    for profile in root['profiles'].values():
+        user = root.users.get_by_id(profile.__name__)
+        if user['groups']:
+            break
+
+    request = webob.Request.blank('/')
+    request.environ['repoze.who.identity'] = user
+    user['repoze.who.userid'] = user['id']
+    home, extra_path = get_user_home(root, request)
+    path = model_path(home, *extra_path)
+    request.path_info = path
+    response = request.get_response(app)
+    if response.status_int != 200:
+        logger = get_logger()
+        logger.warn('Status of %s when priming cache.  Response body:\n%s' %
+                    (response.status, response.body))
 
 def find_users(root):
     # Called by repoze.who
