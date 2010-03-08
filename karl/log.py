@@ -3,6 +3,7 @@ from __future__ import with_statement
 import logging
 from logging.handlers import SysLogHandler
 import os
+import time
 
 """
 Manages a logging utility that logs messages to a syslog, possibly located on
@@ -111,6 +112,7 @@ class ErrorMonitorHandler(logging.Handler):
 
         with open(self.file, 'a') as out:
             print >>out, 'ENTRY'
+            print >>out, time.ctime()
             print >>out, self.format(record)
 
 # Copied verbatim from Python logging documentation
