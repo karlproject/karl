@@ -27,7 +27,7 @@ def redirect_up_view(context, request):
 
 def redirect_favicon(context, request):
     api = TemplateAPI(context, request)
-    location = '%s/favicon.ico' % api.static_url
+    location = '%s/images/favicon.ico' % api.static_url
     return HTTPFound(location=location)
 
 def redirect_rss_view_xml(context, request):

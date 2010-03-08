@@ -43,7 +43,7 @@ class Test_redirect_favicon_view(unittest.TestCase):
         context = testing.DummyModel()
         response = self._callFUT(context, testing.DummyRequest())
         self.assertEqual(response.location,
-                         "http://example.com/static/r%d/favicon.ico"
+                         "http://example.com/static/r%d/images/favicon.ico"
                                 % _start_time)
 
 
