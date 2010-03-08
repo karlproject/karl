@@ -17,7 +17,6 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 
