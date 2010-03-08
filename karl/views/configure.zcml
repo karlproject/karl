@@ -484,7 +484,7 @@
 
   <view
     for="karl.models.interfaces.IAttachmentsFolder"
-    view=".redirect_up.redirect_up_view"
+    view=".redirects.redirect_up_view"
     />
 
   <view

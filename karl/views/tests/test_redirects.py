@@ -23,7 +23,7 @@ from repoze.bfg import testing
 
 class TestRedirectUpView(unittest.TestCase):
     def _callFUT(self, context, request):
-        from karl.views.redirect_up import redirect_up_view
+        from karl.views.redirects import redirect_up_view
         return redirect_up_view(context, request)
 
     def test_it(self):
