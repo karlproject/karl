@@ -488,6 +488,20 @@
     />
 
   <view
+    for="karl.models.interfaces.ISite"
+    name="favicon.ico"
+    view=".redirects.redirect_favicon"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="rss_view.xml"
+    view=".redirects.redirect_rss_view_xml"
+    permission="view"
+  />
+
+  <view
     for="karl.models.interfaces.IPeopleDirectory"
     view=".peopledirectory.peopledirectory_view"
     permission="view"
