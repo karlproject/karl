@@ -45,3 +45,14 @@ class Test_redirect_favicon_view(unittest.TestCase):
         self.assertEqual(response.location,
                          "http://example.com/static/r%d/favicon.ico"
                                 % _start_time)
+
+
+class Test_redirect_rss_view_xml(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from karl.views.redirects import redirect_rss_view_xml
+        return redirect_rss_view_xml(context, request)
+
+    def test_it(self):
+        context = testing.DummyModel()
+        response = self._callFUT(context, testing.DummyRequest())
+        self.assertEqual(response.location, "http://example.com/atom.xml")

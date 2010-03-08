@@ -5,7 +5,7 @@ Unreleased
 ----------
 
 - LP #520570:  redirect '/favicon.ico' requests onto the correct static
-  URL.
+  URL, and 'rss_view.xml' requests to the equivalent 'atom.xml' URLs.
 
 3.21 (2010-03-06)
 -----------------
