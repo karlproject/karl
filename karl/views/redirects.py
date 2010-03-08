@@ -19,6 +19,13 @@
 from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
 
+from karl.views.api import TemplateAPI
+
 def redirect_up_view(context, request):
     location = model_url(context.__parent__, request)
+    return HTTPFound(location=location)
+
+def redirect_favicon(context, request):
+    api = TemplateAPI(context, request)
+    location = '%s/favicon.ico' % api.static_url
     return HTTPFound(location=location)

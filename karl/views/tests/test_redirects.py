@@ -20,7 +20,7 @@ import unittest
 from repoze.bfg import testing
 
 
-class TestRedirectUpView(unittest.TestCase):
+class Test_redirect_up_view(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.redirects import redirect_up_view
         return redirect_up_view(context, request)
@@ -31,3 +31,17 @@ class TestRedirectUpView(unittest.TestCase):
         context = parent["bar"] = testing.DummyModel()
         response = self._callFUT(context, testing.DummyRequest())
         self.assertEqual(response.location, "http://example.com/foo/")
+
+
+class Test_redirect_favicon_view(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from karl.views.redirects import redirect_favicon
+        return redirect_favicon(context, request)
+
+    def test_it(self):
+        from karl.views.api import _start_time
+        context = testing.DummyModel()
+        response = self._callFUT(context, testing.DummyRequest())
+        self.assertEqual(response.location,
+                         "http://example.com/static/r%d/favicon.ico"
+                                % _start_time)

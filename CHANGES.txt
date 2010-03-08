@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #520570:  redirect '/favicon.ico' requests onto the correct static
+  URL.
 
 3.21 (2010-03-06)
 -----------------
