@@ -186,7 +186,9 @@ class DummyMailer(list):
             self.mfrom = mfrom
             self.mto = mto
             self.msg = msg
-            assert isinstance(msg, str)
+
+            from email.message import Message
+            assert isinstance(msg, Message), type(msg)
 
     def send(self, mfrom, mto, msg):
         self.append(self.DummyMessage(mfrom, mto, msg))

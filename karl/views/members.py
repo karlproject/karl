@@ -225,8 +225,7 @@ def _send_moderators_changed_email(community,
 
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
-    message = msg.as_string()
-    mailer.send(info['mfrom'], to_addrs, message)
+    mailer.send(info['mfrom'], to_addrs, msg)
 
 class ManageMembersFormController(object):
     def __init__(self, context, request):
@@ -436,8 +435,7 @@ def _send_aeu_emails(community, community_href, profiles, text):
 
         msg.set_payload(body, "UTF-8")
         msg.set_type('text/html')
-        message = msg.as_string()
-        mailer.send(info['mfrom'], [to_email,], message)
+        mailer.send(info['mfrom'], [to_email,], msg)
 
 
 class AddExistingUserFormController(object):
@@ -706,8 +704,7 @@ def _send_ai_email(community, community_href, username, profile):
 
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
-    message = msg.as_string()
-    mailer.send(info['mfrom'], [profile.email,], message)
+    mailer.send(info['mfrom'], [profile.email,], msg)
 
 class InviteNewUsersFormController(object):
     def __init__(self, context, request):
@@ -854,8 +851,7 @@ def _send_invitation_email(request, community, community_href, invitation):
 
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
-    message = msg.as_string()
-    mailer.send(info['mfrom'], [invitation.email,], message)
+    mailer.send(info['mfrom'], [invitation.email,], msg)
 
 def jquery_member_search_view(context, request):
     prefix = request.params['val'].lower()

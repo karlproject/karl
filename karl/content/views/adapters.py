@@ -21,9 +21,9 @@ import datetime
 import math
 
 from email import Encoders
-from email.message import Message
+from karl.mail import Message
+from karl.mail import MIMEMultipart
 from email.mime.multipart import MIMEBase
-from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from lxml.html import fragment_fromstring

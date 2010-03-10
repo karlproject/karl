@@ -268,7 +268,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.assertEqual(defaults['attachments'], [])
         self.assertEqual(defaults['sendalert'], True)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = self._makeContext()
@@ -348,8 +348,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.failUnless(context['foo']['attachments']['test2.txt'])
 
         from base64 import decodestring
-        header, body = self.mailer[0].msg.split('\n\n', 1)
-        body = decodestring(body)
+        body = self.mailer[0].msg.get_payload(decode=True)
         self.failUnless("%s/test1.txt" % attachments_url in body)
         self.failUnless("%s/test2.txt" % attachments_url in body)
 
@@ -563,7 +562,7 @@ class Test_upload_attachments(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        
+
     def _callFUT(self, *arg, **kw):
         from karl.content.views.blog import upload_attachments
         return upload_attachments(*arg, **kw)
@@ -688,7 +687,7 @@ class DummyWorkflow:
 
     def state_info(self, context, request):
         return self._state_info
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,
@@ -703,4 +702,4 @@ class DummySessions(dict):
         if name not in self:
             self[name] = {}
         return self[name]
-    
+

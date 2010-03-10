@@ -3,7 +3,7 @@ from __future__ import with_statement
 import codecs
 from cStringIO import StringIO
 import csv
-from email.message import Message
+from karl.mail import Message
 import os
 import re
 import transaction
@@ -354,7 +354,7 @@ class EmailUsersView(object):
                 message.set_payload(body.encode('UTF-8'), 'UTF-8')
                 message.set_type('text/html')
 
-                mailer.send(message_from, [profile.email], message.as_string())
+                mailer.send(message_from, [profile.email], message)
                 n += 1
 
             status_message = "Sent message to %d users." % n

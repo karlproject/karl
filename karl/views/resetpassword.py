@@ -34,7 +34,7 @@ from webob.exc import HTTPFound
 from zope.component import getAdapter
 from zope.component import getUtility
 import datetime
-import email.message
+import karl.mail
 import random
 import urllib
 
@@ -108,7 +108,7 @@ def reset_request_view(context, request):
                 "?key=%s" % profile.password_reset_key)
 
             # send email
-            mail = email.message.Message()
+            mail = karl.mail.Message()
             admin_email = get_setting(context, 'admin_email')
             mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
             mail["To"] = "%s <%s>" % (profile.title, profile.email)
@@ -128,7 +128,7 @@ def reset_request_view(context, request):
 
             recipients = [profile.email]
             mailer = getUtility(IMailDelivery)
-            mailer.send(admin_email, recipients, mail.as_string())
+            mailer.send(admin_email, recipients, mail)
 
             url = model_url(context, request, 'reset_sent.html') + (
                 '?email=%s' % urllib.quote_plus(address))

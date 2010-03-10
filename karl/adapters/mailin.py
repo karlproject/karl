@@ -3,6 +3,7 @@ import re
 from zope.interface import implements
 from zope.component import getUtility
 from karl.adapters.interfaces import IMailinDispatcher
+from karl.mail import decode_header
 from karl.utilities.interfaces import IMailinTextScrubber
 from karl.utils import find_communities
 from karl.utils import find_profiles
@@ -25,6 +26,7 @@ class MailinDispatcher(object):
         addrs = message.get_all(name)
         if addrs is None:
             return []
+        addrs = map(decode_header, addrs)
         return getaddresses(addrs)
 
     def isCommunity(self, name):
@@ -125,7 +127,7 @@ class MailinDispatcher(object):
 
         info['author'] = author
 
-        subject = message['Subject']
+        subject = decode_header(message['Subject'])
         if not subject:
             info['error'] = 'missing Subject:'
             return info
@@ -145,19 +147,20 @@ class MailinDispatcher(object):
         # Like Mailman, if a message has "Precedence: bulk|junk|list",
         # discard it.  The Precedence header is non-standard, yet
         # widely supported.
-        precedence = message.get('Precedence', '').lower()
+        precedence = decode_header(message.get('Precedence', '')).lower()
         if precedence in ('bulk', 'junk', 'list'):
             info['error'] = 'Precedence: %s' % precedence
             return info
 
         # rfc3834 is the standard way to discard automated responses, but
         # it is not yet widely supported.
-        auto_submitted = message.get('Auto-Submitted', '').lower()
+        auto_submitted = decode_header(
+            message.get('Auto-Submitted', '')).lower()
         if auto_submitted.startswith('auto'):
             info['error'] = 'Auto-Submitted: %s' % auto_submitted
             return info
 
-        subject_lower = message.get('Subject', '').lower()
+        subject_lower = decode_header(message.get('Subject', '')).lower()
         if 'autoreply' in subject_lower or 'out of office' in subject_lower:
             info['error'] = 'vacation message'
             return info

@@ -193,7 +193,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -207,7 +207,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -222,7 +222,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -297,7 +297,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -319,7 +319,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -340,7 +340,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
@@ -417,7 +417,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')
@@ -440,7 +440,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')
@@ -504,7 +504,7 @@ class TestCommunityFileAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from email.message import Message
+        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')

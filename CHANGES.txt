@@ -4,9 +4,17 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #530893 Updated mail sending code to use repoze.sendmail 2.0.
+
 - LP #520570:  redirect '/favicon.ico' requests onto the correct static
   URL, and 'rss_view.xml' requests to the equivalent 'atom.xml' URLs.
 
+- LP #530893 Added handling for RFC 2047 (Unicode) headers to all generated
+  emails.
+
+- LP #530893 Added handling for RFC 2047 (Unicode) headers to mailin.
+
+=======
 3.21 (2010-03-06)
 -----------------
 

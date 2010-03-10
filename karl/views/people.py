@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import email.message
+import karl.mail
 import urllib
 
 from formencode import Invalid
@@ -608,7 +608,7 @@ def change_password_view(context, request):
 
             # send email
             system_name = get_setting(context, 'system_name', 'KARL')
-            mail = email.message.Message()
+            mail = karl.mail.Message()
             admin_email = get_setting(context, 'admin_email')
             mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
             mail["To"] = "%s <%s>" % (context.title, context.email)
@@ -629,7 +629,7 @@ def change_password_view(context, request):
 
             recipients = [context.email]
             mailer = getUtility(IMailDelivery)
-            mailer.send(admin_email, recipients, mail.as_string())
+            mailer.send(admin_email, recipients, mail)
 
             path = model_url(context, request)
             msg = '?status_message=Password%20changed'

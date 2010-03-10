@@ -8,7 +8,6 @@ from zope.component import queryUtility
 from repoze.bfg.interfaces import ISettings
 from repoze.sendmail.delivery import QueuedMailDelivery
 from repoze.sendmail.interfaces import IMailDelivery
-from repoze.sendmail.interfaces import IQueuedMailDelivery
 
 def boolean(s):
     s = s.lower()
@@ -60,8 +59,8 @@ class FakeMailDelivery:
             print 'Message:', msg
 
 class WhiteListMailDelivery(object):
-    """Decorates an IQueuedMailDelivery with a recipient whitelist"""
-    implements(IQueuedMailDelivery)
+    """Decorates an IMailDelivery with a recipient whitelist"""
+    implements(IMailDelivery)
 
     def __init__(self, md):
         self.md = md

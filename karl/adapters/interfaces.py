@@ -67,7 +67,7 @@ class IMailinDispatcher(Interface):
         o 'attachments':  a sequence of file attachment info, where
            each item is a tuple, (filename, mimetype, data) corresponding
            to message parts which have filenames.
-            
+
            - 'mimetype' defaults to 'application/octet-stream', if the
              corresponding part contains no 'Content-Type' header.
 
@@ -82,7 +82,7 @@ class IMailinHandler(Interface):
     def handle(message, info, text, attachments):
         """ Do the Right Thing (TM).
 
-        o 'message' is an email.message.Message instance.
+        o 'message' is an karl.mail.Message instance.
 
         o 'info' is a mapping extracted from the message by
           IMailinDispatcher.crackHeaders.

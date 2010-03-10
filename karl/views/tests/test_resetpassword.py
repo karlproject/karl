@@ -117,8 +117,7 @@ class ResetRequestViewTests(unittest.TestCase):
         from base64 import decodestring
         url = ('http://example.com/reset_confirm.html?key=%s' %
              profile.password_reset_key)
-        header, body = msg.msg.split("\n\n", 1)
-        body = decodestring(body)
+        body = msg.msg.get_payload(decode=True)
         self.assert_(url in body, "%s not in %s" % (url, body))
 
 

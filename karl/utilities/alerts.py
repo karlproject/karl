@@ -15,8 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import base64
-from email.message import Message
+from karl.mail import Message
 from email.mime.multipart import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -62,7 +61,7 @@ class Alerts(object):
     def _send_immediately(self, context, profile, request):
         mailer = getUtility(IMailDelivery)
         alert = getMultiAdapter((context, profile, request), IAlert)
-        mailer.send(alert.mfrom, alert.mto, alert.message.as_string())
+        mailer.send(alert.mfrom, alert.mto, alert.message)
 
     def _queue_digest(self, context, profile, request):
         alert = getMultiAdapter((context, profile, request), IAlert)
@@ -73,10 +72,10 @@ class Alerts(object):
         # First part contains body text, the rest contain attachments.
         if message.is_multipart():
             parts = message.get_payload()
-            body = base64.b64decode(parts[0].get_payload())
+            body = parts[0].get_payload(decode=True)
             attachments = parts[1:]
         else:
-            body = base64.b64decode(message.get_payload())
+            body = message.get_payload(decode=True)
             attachments = []
 
         profile._pending_alerts.append(
@@ -131,7 +130,7 @@ class Alerts(object):
                 for attachment in attachments:
                     msg.attach(attachment)
 
-                mailer.send(sent_from, [profile.email,], msg.as_string())
+                mailer.send(sent_from, [profile.email,], msg)
                 del profile._pending_alerts[:]
                 transaction.manager.commit()
 

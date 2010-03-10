@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -54,38 +54,38 @@ class ISpellChecker(Interface):
     """ A utility that provides a wrapper for interacting with an
         external Aspell spell checker subprocess. """
 
-#XXX Does this go here? 
+#XXX Does this go here?
 class IAlert(Interface):
     """An alert message, suitable for emailing or digesting."""
-  
+
     mfrom = Attribute("Email address of sender.")
     mto = Attribute("Sequence of email addresses for all recipients.")
-    message = Attribute("An instance of email.message.Message to be mailed.")
+    message = Attribute("An instance of karl.mail.Message to be mailed.")
     digest = Attribute("""Boolean, can be set by caller to indicate alert
                        should be formatted for digest.""")
-    
+
 class IAlerts(Interface):
     """A utility which emits activity alerts to community members.
     """
     def emit(context, factory, request):
         """Emits an alert.
-        
-        For each user to be alerted will either send the alert immediately, 
+
+        For each user to be alerted will either send the alert immediately,
         add to a digest queue, or not send at all, according to member
         preferences.
-        
+
           o context is place in model tree in which alert is occuring.
           o factory is a callable which can generate an IAlert instance and
             has the signature: (context, profile) where context is the same
             object as above and profile is the user being alerted.
         """
-        
+
     def send_digests(context):
         """Iterates over all user profiles and sends digested alerts.  Will
         generally be called by a console script which in turn is called by
-        cron.  
-        
+        cron.
+
         o context can be an model object in the site hierarchy, usually the
           root.
-          
+
         """

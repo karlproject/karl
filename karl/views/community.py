@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import email.message
+import karl.mail
 
 import schemaish
 import formish
@@ -132,7 +132,7 @@ class AddCommunityFormController(object):
     def form_defaults(self):
         defaults = {
         'title':'',
-        'tags': [], 
+        'tags': [],
         'description':'',
         'text':'',
         'tools':[ t[0] for t in self.tools ],
@@ -155,7 +155,7 @@ class AddCommunityFormController(object):
         if security_states:
             fields.insert(4, ('security_state', security_field))
         return fields
-        
+
     def form_widgets(self, fields):
         widgets = shared_widgets(self)
         widgets['tags'] = karlwidgets.TagsAddWidget()
@@ -188,7 +188,7 @@ class AddCommunityFormController(object):
         # this *must* directly follow content creation because the
         # toolinfo add stuff depends on the community having a full
         # path.
-        context[name] = community 
+        context[name] = community
 
         # required to use moderators_group_name and
         # members_group_name
@@ -241,7 +241,7 @@ class EditCommunityFormController(object):
             if present:
                 selected_tools.append((info['name'], info['title']))
         self.selected_tools = selected_tools
-        
+
     def form_defaults(self):
         context = self.context
         defaults = {
@@ -282,7 +282,7 @@ class EditCommunityFormController(object):
                 options=[ (s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
-    
+
     def __call__(self):
         api = TemplateAPI(self.context, self.request)
         return {'api':api, 'page_title':'Edit %s' % self.context.title,
@@ -409,7 +409,7 @@ def join_community_view(context, request):
     if "form.submitted" in request.POST:
         message = request.POST.get("message", "")
         moderators = [profiles[id] for id in context.moderator_names]
-        mail = email.message.Message()
+        mail = karl.mail.Message()
         mail["From"] = "%s <%s>" % (profile.title, profile.email)
         mail["To"] = ",".join(
             ["%s <%s>" % (p.title, p.email) for p in moderators]
@@ -436,7 +436,7 @@ def join_community_view(context, request):
 
         recipients = [p.email for p in moderators]
         mailer = getUtility(IMailDelivery)
-        mailer.send(profile.email, recipients, mail.as_string())
+        mailer.send(profile.email, recipients, mail)
 
         status_message = "Your request has been sent to the moderators."
         location = model_url(context, request,
