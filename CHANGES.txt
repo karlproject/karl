@@ -14,6 +14,9 @@ Unreleased
 
 - LP #530893 Added handling for RFC 2047 (Unicode) headers to mailin.
 
+- LP #531360 Fixed bug in people import where categories were not being
+  properly reset at import time.
+
 =======
 3.21 (2010-03-06)
 -----------------

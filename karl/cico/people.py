@@ -129,6 +129,7 @@ class UserProfileImporter(object):
     def _populate(self, profile):
         # Iterate over each child node in root element, calling appropriate
         # handlers.
+        profile.categories = {}
         for element in self.element.iterchildren():
             tag = element.tag
             if not tag.startswith(self.NS_PREFIX):
@@ -149,8 +150,6 @@ class UserProfileImporter(object):
         setattr(profile, attr, value)
 
     def _pop_category_section(self, profile, element, section):
-        if not hasattr(profile, 'categories'):
-            profile.categories = {}
         categories = [item.text.strip() for item in
                       element.iterchildren(self.NS_PREFIX + 'item')]
         root = find_site(profile)

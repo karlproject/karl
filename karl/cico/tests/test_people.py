@@ -168,6 +168,21 @@ class UserProfileImporterTests(unittest.TestCase):
         self.assertEqual(user['password'], 'password')
         self.assertEqual(user['groups'], set([]))
 
+    def test_update_remove_categories(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from zope.interface import Interface
+        registerContentFactory(testing.DummyModel, Interface)
+        adapter = self._make_one()
+        adapter.create(self.profiles)
+        profile = self.profiles['crossi']
+        self.failUnless(profile.categories['entities'])
+        self.failUnless(profile.categories['offices'])
+        self.failUnless(profile.categories['departments'])
+
+        adapter = self._make_one('test_profile2.xml')
+        adapter.update(profile)
+        self.assertEqual(profile.categories, {})
+
 
 class PeopleCategoryImporterTests(unittest.TestCase):
 
