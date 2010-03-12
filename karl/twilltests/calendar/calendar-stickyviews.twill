@@ -1,0 +1,40 @@
+go /communities/${community_name}/calendar/day.html
+xpath "count(//table[contains(@class, 'cal_day')])" 2.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar
+xpath "count(//table[contains(@class, 'cal_day')])" 2.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar/week.html
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 2.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 2.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar/month.html
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 1.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 1.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 0.0
+go /communities/${community_name}/calendar/list.html
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 1.0
+go /communities/${community_name}/calendar
+xpath "count(//table[contains(@class, 'cal_day')])" 0.0
+xpath "count(//table[contains(@class, 'cal_week')])" 0.0
+xpath "count(//table[contains(@class, 'cal_month')])" 0.0
+xpath "count(//table[contains(@class, 'cal_agenda')])" 1.0
