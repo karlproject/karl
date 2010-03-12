@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.22 (2010-03-12)
+-----------------
 
 - LP #530893 Updated mail sending code to use repoze.sendmail 2.0.
 
