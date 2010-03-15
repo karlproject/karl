@@ -24,6 +24,7 @@ from karl.utilities.feed import update_feeds
 import optparse
 from paste.deploy import loadapp
 from repoze.bfg.scripting import get_root
+import socket
 import sys
 import transaction
 
@@ -45,6 +46,9 @@ def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
                       default=300,
                       help='Interval, in seconds, between executions when in '
                            'daemon mode.')
+    parser.add_option('--timeout', '-t', dest='timeout', type='int',
+                      default=None,
+                      help='Timeout, in seconds, for URL requests.')
     options, args = parser.parse_args(argv[1:])
 
     if args:
@@ -75,6 +79,9 @@ def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
             else:
                 tx.commit()
             closer()
+
+    if options.timeout is not None:
+        socket.setdefaulttimeout(options.timeout)
 
     if options.daemon:
         run_daemon('update_feeds', run, options.interval)

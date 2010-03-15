@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #538273:  Added a '--timeout' option to 'update_feeds' script:  if
+  passed, sets the global socket timeout accordingly.
 
 3.22 (2010-03-12)
 -----------------
@@ -22,7 +23,6 @@ Unreleased
 - LP #531360 Fixed bug in people import where categories were not being
   properly reset at import time.
 
-=======
 3.21 (2010-03-06)
 -----------------
 

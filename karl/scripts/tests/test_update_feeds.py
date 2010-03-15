@@ -18,7 +18,15 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
+_marker = object()
 class UpdateFeedsScriptTests(unittest.TestCase):
+
+    _old_timeout = _marker
+
+    def tearDown(self):
+        if self._old_timeout is not _marker:
+            import socket
+            socket.setdefaulttimeout(self._old_timeout)
 
     def _callFUT(self, args=[]):
         from karl.scripts.update_feeds import main
@@ -37,18 +45,35 @@ class UpdateFeedsScriptTests(unittest.TestCase):
         self.assert_('etc' in config)
         self.assertEqual(force, False)
 
-    def test_config(self):
+    def test_config_short(self):
         root, config, force = self._callFUT(['-C', '/my/karl.ini'])
         self.assertEqual(config, '/my/karl.ini')
+
+    def test_config_long(self):
         root, config, force = self._callFUT(
             ['--config', '/my/karl2.ini'])
         self.assertEqual(config, '/my/karl2.ini')
 
-    def test_force(self):
+    def test_force_short(self):
         root, config, force = self._callFUT(['-f'])
         self.assertEqual(force, True)
+
+    def test_force_long(self):
         root, config, force = self._callFUT(['--force'])
         self.assertEqual(force, True)
+
+    def test_timeout_short(self):
+        import socket
+        self._old_timeout = socket.getdefaulttimeout()
+        self._callFUT(['-t', '1'])
+        self.assertEqual(socket.getdefaulttimeout(), 1)
+
+    def test_timeout_long(self):
+        import socket
+        self._old_timeout = socket.getdefaulttimeout()
+        self._callFUT(['--timeout', '1'])
+        self.assertEqual(socket.getdefaulttimeout(), 1)
+
 
 class DummyTransaction(object):
     def commit(self):
