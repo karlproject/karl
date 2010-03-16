@@ -15,7 +15,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import errno
 import os
+import signal
 from subprocess import Popen
 from subprocess import PIPE
 import threading
@@ -52,7 +54,7 @@ class BaseConverter:
         try:
             PO.communicate()
         except OSError, e:
-            if e.errno != 10: # No child process
+            if e.errno != errno.ECHILD: # No child process
                 raise
             # else:
             #    subprocess finished so quickly that os.wait() call failed
@@ -124,23 +126,15 @@ class _ProcTimeout(threading.Thread):
         time.sleep(poll_interval)
         while self._run and not process.poll():
             elapsed = time.time() - start_time
-            if hasattr(process, "terminate"): # >=2.6
-                if elapsed > timeout * 2:
-                    process.kill()
-                elif elapsed > timeout:
-                    process.terminate()
-            else: # < 2.6
-                # Will (hopefully) fail quietly on Windows
-                # Occasionally it seems that process.poll() tells us we are
-                # still running even when we're not, so we check the error
-                # status code from os.system() and break out if there is an
-                # error, usually because there is no such process.
-                if elapsed > timeout * 2:
-                    if os.system("kill -KILL %d > /dev/null 2>&1" % process.pid) != 0:
-                        break
-                elif elapsed > timeout:
-                    if os.system("kill %d > /dev/null 2>&1" % process.pid) != 0:
-                        break
+            # Will (hopefully) fail quietly on Windows
+            # Occasionally it seems that process.poll() tells us we are
+            # still running even when we're not, so we check the error
+            # status code from os.system() and break out if there is an
+            # error, usually because there is no such process.
+            if elapsed > timeout * 2:
+                os.kill(process.pid, signal.SIGKILL)
+            elif elapsed > timeout:
+                os.kill(process.pid, signal.SIGTERM)
             time.sleep(poll_interval)
 
     def stop(self):

@@ -76,7 +76,7 @@ class BaseConverterTests(unittest.TestCase):
             content_description = "With a Rubber Hose"
             timeout = 0.5
             def convert(self):
-                # Will hang waiting on stdin
+                # Will hang waiting on /dev/zero
                 return self.execute('grep . </dev/zero 2>/dev/null')
 
         out = HangingConverter().convert()
