@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.23 (2010-03-16)
+-----------------
 
 - LP #533366 Added simple retry capability to run_daemon, primarily to 
   avoid tripping the error monitor when conflict errors ocurr.
