@@ -168,8 +168,8 @@ class AddCommunityFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Add Community'}
+        api = TemplateAPI(self.context, self.request, 'Add Community')
+        return {'api':api}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -284,9 +284,9 @@ class EditCommunityFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request)
-        return {'api':api, 'page_title':'Edit %s' % self.context.title,
-                'actions':()}
+        page_title = 'Edit %s' % self.context.title
+        api = TemplateAPI(self.context, self.request, page_title)
+        return {'api':api, 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
