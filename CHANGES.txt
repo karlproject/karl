@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #533366 Added simple retry capability to run_daemon, primarily to 
+  avoid tripping the error monitor when conflict errors ocurr.
+
 - LP #538273:  Added a '--timeout' option to 'update_feeds' script:  if
   passed, sets the global socket timeout accordingly.
 

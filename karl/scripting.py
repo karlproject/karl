@@ -22,6 +22,7 @@ import os
 import sys
 import time
 from paste.deploy import loadapp
+from ZODB.POSException import ConflictError
 from repoze.bfg.scripting import get_root
 from karl.log import get_logger
 
@@ -51,21 +52,34 @@ def open_root(config, name='karl'):
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
 
-def run_daemon(name, func, interval=300):
+def run_daemon(name, func, interval=300, tries=3, retryable=None):
     logger = get_logger()
+
+    if retryable is None:
+        retryable = (ConflictError,)
+
     while True:
-        try:
-            logger.info("Running %s", name)
-            func()
-            logger.info("Finished %s", name)
-            if _debug_object_refs:
-                _count_object_refs()
-        except:
-            logger.error("Error in daemon process", exc_info=True)
-        finally:
-            sys.stderr.flush()
-            sys.stdout.flush()
-            time.sleep(interval)
+        tried = 0
+        logger.info("Running %s", name)
+        while True:
+            try:
+                func()
+                logger.info("Finished %s", name)
+                break
+            except retryable:
+                tried += 1
+                if tried == tries:
+                    logger.error("Error after %s tries" % tries, exc_info=True)
+                    break
+                logger.info("Retrying, count = %s" % tried, exc_info=True)
+            except:
+                logger.error("Error in daemon process", exc_info=True)
+                break
+        if _debug_object_refs:
+            _count_object_refs()
+        sys.stderr.flush()
+        sys.stdout.flush()
+        time.sleep(interval)
 
 _ref_counts = None
 def _count_object_refs():
