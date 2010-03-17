@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+import htmlentitydefs
 import urllib
 
 from persistent import Persistent
@@ -57,15 +58,38 @@ class Wiki(Folder):
             creator,
             )
 
-_rm_chars = re.compile('[\W]')
+_rm_chars = re.compile('[\W]', re.U)
 def _eq_loose(s1, s2):
     """
     Performs a 'loose' string comparison--case insenstitive, ignoring
-    non-alphanumeric characters.
+    non-alphanumeric characters and unescaping any html entities.
     """
+    s1 = _unescape(s1)
+    s2 = _unescape(s2)
     s1 = _rm_chars.sub('', s1.lower())
     s2 = _rm_chars.sub('', s2.lower())
     return s1 == s2
+
+def _unescape(text):
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
 
 class WikiPage(Persistent):
     implements(IWikiPage)

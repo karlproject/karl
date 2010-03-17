@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- The wiki links would not work for non-ascii characters because the
+  title was saved as unicode and the text as html entities, causing
+  the link matching code to return zero matches. Added function to
+  unescape entities from links before comparison to fix this.
+
 - LP #530799 (partial): Converted the following forms to use formish
   instead of enformed for form generation and validations: profile edit,
   admin profile edit, add user, add news item, edit news item, add

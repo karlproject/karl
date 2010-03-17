@@ -119,6 +119,21 @@ class WikiPageTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.assertEqual(wp.cook(request), EXPECTED)
 
+    def test_cook_w_wiki_markup_and_entities_w_match(self):
+        TEXT = (u'Now is the time for ((L&#225;)) '
+                 'to come to the aid of the Party')
+        EXPECTED = (u'Now is the time for '
+                     '<a href="http://example.com/whatever/">'
+                     '<span class="wicked_resolved">L&#225;</span></a> '
+                     'to come to the aid of the Party')
+        parent = testing.DummyModel()
+        parent['whatever'] = testing.DummyModel(title=u'L\u00e1;')
+        wp = self._makeOne(text=TEXT)
+        wp.__parent__ = parent
+        wp.__name__ = 'wikipage'
+        request = testing.DummyRequest()
+        self.assertEqual(wp.cook(request), EXPECTED)
+
     def test_instance_has_valid_construction(self):
         instance = self._makeOne()
         self.assertEqual(instance.title, u'title')
