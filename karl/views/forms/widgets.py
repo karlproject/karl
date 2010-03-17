@@ -3,8 +3,8 @@ from simplejson import JSONEncoder
 from formish.widgets import Widget
 from formish.widgets import Grid
 from formish.widgets import Input
-from formish.widgets import FileUpload
 from formish.widgets import Checkbox
+from formish.widgets import CheckedPassword
 
 from schemaish.type import File as SchemaFile
 
@@ -66,6 +66,9 @@ class TagsAddWidget(TagsWidget): # widget for add forms (deferred til submit)
 class ManageMembersWidget(Grid):
     template = 'field.KarlManageMembers'
 
+class KarlCheckedPassword(CheckedPassword):
+    template = 'field.KarlCheckedPassword'
+
 class UserProfileLookupWidget(Input):
     template = 'field.KarlUserProfileLookup'
     
@@ -81,10 +84,7 @@ class UserProfileLookupWidget(Input):
                 converter_options=self.converter_options)
             L.append(value)
         return L
-    
-class PhotoImageWidget(FileUpload):
-    template = 'field.KarlPhotoImage'
-    
+
 class AcceptFieldWidget(Checkbox):
     template = 'field.KarlAcceptField'
     def __init__(self, text, description, **kw):
@@ -101,24 +101,26 @@ class FileUpload2(Widget):
     In addition: a 'single' parameter injects a hidden add field in case
     the current content is deleted. We need this parameter if the
     field is not in a sequence.
-    """
 
+    And: support for optionally injecting add'l path into the file's
+    URL path when we know we're working w/ a temporary file from the
+    filestore during the current request.
+    """
     type = 'FileUpload'
     template = 'field.FileUpload'
     
     def __init__(self, filestore, show_file_preview=True,
                  show_download_link=False, show_image_thumbnail=False,
                  url_base=None, css_class=None, image_thumbnail_default=None,
-                 single=False):
+                 single=False, filestore_path=''):
         """
-        :arg filestore: filestore for temporary files
-        :arg show_image_thumbnail: a boolean that, if set, will include an image
-            thumbnail with the widget
-        :arg css_class: extra css classes to apply to the widget
-        :arg image_thumbnail_default: a default url to 
-        XXX image_thumbnail_default -> default_image 
-        XXX allow_clear -> allow_delete 
-        XXX url_ident_factory -> filestore_key_factory
+        Changes from the default implementation:
+        - require ``filestore`` argument (no default)
+        - we don't use any ``url_ident_factory``
+        - ``single`` argument
+        - ``filestore_path`` argument
+        - add ``self.from_filestore`` flag which will tell the template
+          when we're dealing with a temp file coming from the filestore
         """
         # Setup defaults.
         if url_base is None:
@@ -132,13 +134,27 @@ class FileUpload2(Widget):
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
         self.single = single
+        self.filestore_path = filestore_path
+        self.from_filestore = False
 
     def urlfactory(self, data):
+        """
+        Possibly inject filestore path into the file's URL.
+        """
         if not data:
             return self.image_thumbnail_default
-        return '%s/%s' % (self.url_base, data)
+        url_base = self.url_base
+        if not url_base.endswith('/'):
+            url_base += '/'
+        if self.from_filestore and self.filestore_path:
+            return '%s%s/%s' % (url_base, self.filestore_path, data)
+        return '%s%s' % (url_base, data)
     
     def to_request_data(self, field, data):
+        """
+        Varies from default in that we use the filename (w/ an
+        optional path prefix) as the 'name' of our file object.
+        """
         if isinstance(data, SchemaFile):
             default = data.filename
             mimetype = data.mimetype
@@ -148,6 +164,10 @@ class FileUpload2(Widget):
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
     
     def pre_parse_incoming_request_data(self, field, data):
+        """
+        Varies from default in that we use the filename as the tmp
+        file lookup key.
+        """
         if data is None:
             data = {}
         if data.get('remove', [None])[0] is not None:
@@ -168,6 +188,11 @@ class FileUpload2(Widget):
         return data
     
     def from_request_data(self, field, request_data):
+        """
+        Differs from default for better handling of SchemaFile's
+        metadata when no file is in the request, and to set a flag on
+        self when we're working w/ a file in the tmp filestore.
+        """
         if request_data['name'] == ['']:
             remove = request_data.get('remove', [None])[0] is not None
             default = request_data.get('default', [None])[0]
@@ -182,6 +207,51 @@ class FileUpload2(Widget):
                 cache_tag, headers, f = self.filestore.get(key)
             except (KeyError, TypeError):
                 return None
+            self.from_filestore = True
             headers = dict(headers)
             return SchemaFile(f, headers['Filename'], headers['Content-Type'])
 
+class PhotoImageWidget(FileUpload2):
+    template = 'field.KarlPhotoImage'
+    filestore_path = 'photo_from_filestore'
+
+    def __init__(self, filestore, show_file_preview=True,
+                 show_download_link=False, show_image_thumbnail=True,
+                 url_base=None, css_class=None, image_thumbnail_default=None,
+                 show_remove_checkbox=False):
+        super(PhotoImageWidget, self).__init__(
+            filestore, show_file_preview, show_download_link,
+            show_image_thumbnail, url_base, css_class, image_thumbnail_default,
+            single=True, filestore_path='photo_from_filestore')
+        self.show_remove_checkbox = show_remove_checkbox
+
+    def from_request_data(self, field, request_data):
+        """
+        Add some logic for figuring out whether or not to show the
+        'remove' checkbox.
+        """
+        if request_data.get('default', [False])[0]:
+            # we have a default value that can be removed
+            self.show_remove_checkbox = True
+        if request_data['name'] == ['']:
+            remove = request_data.get('remove', [None])[0] is not None
+            default = request_data.get('default', [None])[0]
+            name = request_data.get('name', [None])[0]
+            meta = {'remove':remove, 'default':default, 'name':name}
+            return SchemaFile(None, None, None, metadata=meta)
+        elif request_data['name'] == request_data['default']:
+            return SchemaFile(None, None, None)
+        else:
+            key = request_data['name'][0]
+            try:
+                cache_tag, headers, f = self.filestore.get(key)
+            except (KeyError, TypeError):
+                return None
+            # we have a photo from the filestore that can be removed
+            self.show_remove_checkbox = True
+            self.from_filestore = True
+            headers = dict(headers)
+            return SchemaFile(f, headers['Filename'], headers['Content-Type'])
+
+class DateTime(Widget):
+    template = 'field.DateTime'

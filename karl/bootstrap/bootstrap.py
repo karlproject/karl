@@ -11,7 +11,7 @@ from repoze.lemonade.content import create_content
 from karl.bootstrap.interfaces import IInitialData
 from karl.bootstrap.data import DefaultInitialData
 from karl.models.interfaces import IIntranets
-from karl.content.views.intranets import add_intranet_view
+from karl.content.views.intranets import AddIntranetFormController
 from karl.models.site import Site
 from karl.models.interfaces import IProfile
 from karl.views.community import AddCommunityFormController
@@ -119,20 +119,20 @@ def populate(root, do_transaction_begin=True):
 
         from karl.content.views.forum import AddForumFormController
         for office in office_data.offices:
-            request.POST.clear()
-            request.POST['form.submitted'] = True
-            request.POST['name'] = office['id']
-            request.POST['title'] = office['id']
-            request.POST['address'] = office['address']
-            request.POST['city'] = office['city']
-            request.POST['state'] = office['state']
-            request.POST['country'] = office['country']
-            request.POST['zipcode'] = office['zipcode']
-            request.POST['telephone'] = office['telephone']
-            request.POST['navigation'] = office['navmenu']
-            request.POST['middle_portlets'] = '\n'.join(office['middle_portlets'])
-            request.POST['right_portlets'] = '\n'.join(office['right_portlets'])
-            add_intranet_view(offices, request)
+            converted = {}
+            converted['name'] = office['id']
+            converted['title'] = office['id']
+            converted['address'] = office['address']
+            converted['city'] = office['city']
+            converted['state'] = office['state']
+            converted['country'] = office['country']
+            converted['zipcode'] = office['zipcode']
+            converted['telephone'] = office['telephone']
+            converted['navigation'] = office['navmenu']
+            converted['middle_portlets'] = '\n'.join(office['middle_portlets'])
+            converted['right_portlets'] = '\n'.join(office['right_portlets'])
+            add_intranet_view = AddIntranetFormController(offices, request)
+            add_intranet_view.handle_submit(converted)
             new_office = offices[office['id']]
             new_office.title = office['title']
             # Now add some forums

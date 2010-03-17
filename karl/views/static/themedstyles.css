@@ -130,6 +130,21 @@ label.required {
 input#save-title { 
     width: 490px;
 }
+input#save-caption { 
+    width: 490px;
+}
+input#save-address { 
+    width: 490px;
+}
+input#save-city { 
+    width: 490px;
+}
+input#save-name { 
+    width: 245px;
+}
+input#save-state { 
+    width: 40px;
+}
 
 /** =SHARED
 ----------------------------------------------- */
@@ -1770,17 +1785,17 @@ table#staffprofile-content td a:hover {
 ----------------------------------------------- */
 
 /* Hide certain form fields when staff edits a profile */
-.k3_staff_role #firstname-field, .k3_staff_role #lastname-field,
-.k3_staff_role #phone-field,
-.k3_staff_role #extension-field, .k3_staff_role #department-field,
-.k3_staff_role #organization-field, .k3_staff_role #position-field,
-.k3_staff_role #location-field, .k3_staff_role #country-field {
+.k3_staff_role #save-firstname--field, .k3_staff_role #save-lastname--field,
+.k3_staff_role #save-phone--field,
+.k3_staff_role #save-extension--field, .k3_staff_role #save-department--field,
+.k3_staff_role #save-organization--field, .k3_staff_role #save-position--field,
+.k3_staff_role #save-location--field, .k3_staff_role #save-country--field {
   /* Changed to display: block to facilitate testing, temporarily. */
   display: none;
 }
 
 /* XXX Temporarily allow editing by staff of email field to allow testing*/
-.k3_staff_role #email-field {
+.k3_staff_role #save-email--field {
   display: block;
 }
 

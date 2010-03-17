@@ -278,26 +278,81 @@
     view=".login.logout_view"
   />
 
-  <view
-    for="karl.models.interfaces.IProfile"
-    view=".people.edit_profile_view"
-    name="edit_profile.html"
-    permission="edit"
-  />
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.EditProfileFormController"
+     name="edit_profile.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+  </formish:form>
 
   <view
-    for="karl.models.interfaces.IProfiles"
-    view=".people.add_user_view"
-    name="add.html"
-    permission="administer"
-  />
+     for="karl.models.interfaces.IProfile"
+     view=".people.edit_profile_filestore_photo_view"
+     name="photo_from_filestore"
+     permission="edit"
+     />
 
   <view
-    for="karl.models.interfaces.IProfile"
-    view=".people.admin_edit_profile_view"
-    name="admin_edit_profile.html"
-    permission="administer"
-  />
+     for="karl.models.interfaces.IProfiles"
+     view=".people.add_user_filestore_photo_view"
+     name="photo_from_filestore"
+     permission="edit"
+     />
+
+  <formish:form
+     for="karl.models.interfaces.IProfiles"
+     controller=".people.AddUserFormController"
+     name="add.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.AdminEditProfileFormController"
+     name="admin_edit_profile.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.IProfile"
@@ -397,6 +452,7 @@
   </formish:form>
 
   <formish:form
+     for="karl.models.interfaces.IMembers"
      controller=".members.InviteNewUsersFormController"
      name="invite_new.html"
      permission="moderate"

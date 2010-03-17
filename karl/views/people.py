@@ -16,12 +16,15 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import karl.mail
-import urllib
+import formish
+import schemaish
+from schemaish.type import File as SchemaFile
+from validatish import validator
 
 from formencode import Invalid
-from formencode import validators
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.formish import ValidationError
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
@@ -47,6 +50,7 @@ from karl.models.interfaces import IProfile
 from karl.utils import find_communities
 from karl.utils import find_tags
 from karl.utils import find_users
+from karl.utils import get_layout_provider
 from karl.utils import get_setting
 from karl.views import baseforms
 from karl.views.api import TemplateAPI
@@ -56,83 +60,41 @@ from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import CustomInvalid
 from karl.views.utils import handle_photo_upload
+from karl.views.utils import photo_from_filestore_view
 from karl.views.form import render_form_to_response
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms.filestore import get_filestore
 
-def edit_profile_view(context, request):
-    form = EditProfileForm(context=context)
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+def edit_profile_filestore_photo_view(context, request):
+    return photo_from_filestore_view(context, request, 'edit-profile')
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
+def add_user_filestore_photo_view(context, request):
+    return photo_from_filestore_view(context, request, 'add-user')
 
-            # Handle simple fields
-            for name in form.simple_field_names:
-                setattr(context, name, converted.get(name))
+firstname_field = schemaish.String(validator=validator.Required(),
+                                   title='First Name')
+lastname_field = schemaish.String(validator=validator.Required(),
+                                  title='Last Name')
+phone_field = schemaish.String(title='Phone Number')
+extension_field = schemaish.String()
+department_field = schemaish.String()
+position_field = schemaish.String()
+organization_field = schemaish.String()
+location_field = schemaish.String()
+country_field = schemaish.String()
+website_field = schemaish.String(validator=validator.Any(validator.URL(),
+                                                         validator.Equal('')))
+languages_field = schemaish.String()
+photo_field = schemaish.File()
+biography_field = schemaish.String()
 
-            handle_photo_upload(context, converted, thumbnail=True)
-
-            # Emit a modified event for recataloging
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            path = model_url(context, request)
-            msg = '?status_message=Profile%20edited'
-            return HTTPFound(location=path+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            try:
-                del fill_values['photo'] # filler cant handle photo field
-            except KeyError:
-                pass
-    else:
-        fielderrors = {}
-        fill_values = {}
-
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Display portrait
-    photo = context.get_photo()
-    display_photo = {}
-    if photo is not None:
-        display_photo["url"] = model_url(photo, request)
-        display_photo["may_delete"] = True
-    else:
-        display_photo["url"] = api.static_url + "/images/defaultUser.gif"
-        display_photo["may_delete"] = False
-
-    # Enable hiding of certain fields via CSS descendent selectors
-    if api.user_is_staff:
-        staff_role_classname = 'k3_staff_role'
-    else:
-        staff_role_classname = 'k3_nonstaff_role'
-
-    staff_change_password_url = '%s?username=%s&email=%s&came_from=%s' % (
-        get_setting(context, "staff_change_password_url"),
-        urllib.quote_plus(context.__name__),
-        urllib.quote_plus(context.email),
-        urllib.quote_plus(api.here_url)
-        )
-
-    return render_form_to_response(
-        'templates/edit_profile.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        photo=display_photo,
-        staff_role_classname=staff_role_classname,
-        staff_change_password_url=staff_change_password_url,
-        )
-
-class EditProfileForm(FormSchema):
+class EditProfileFormController(object):
+    """
+    Formish controller for the profile edit form.  Also the base class
+    for the controllers for the admin profile edit and add user forms.
+    """
     simple_field_names = [
         "firstname",
         "lastname",
@@ -151,171 +113,323 @@ class EditProfileForm(FormSchema):
         "biography",
     ]
 
-    firstname = baseforms.firstname
-    lastname = baseforms.lastname
-    email = baseforms.email
-    phone = baseforms.phone
-    extension = baseforms.extension
-    department = baseforms.department
-    position = baseforms.position
-    organization = baseforms.organization
-    location = baseforms.location
-    country = baseforms.country
-    website = baseforms.website
-    languages = baseforms.languages
-    photo = baseforms.photo
-    photo_delete = baseforms.photo_delete
-    biography = baseforms.biography
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore = get_filestore(context, request, 'edit-profile')
+        page_title = "Edit %s" % context.title
+        self.api = TemplateAPI(context, request, page_title)
+        photo = context.get_photo()
+        if photo is not None:
+            photo = SchemaFile(None, photo.__name__, photo.mimetype)
+        self.photo = photo
 
-    def from_python(self, values, state=None):
-        # Convert model object to dict and then call super method
-        if state is None:
-            state = self._state
-        context = state.context
+    def form_fields(self):
+        email_field = schemaish.String(
+            validator=validator.All(validator.Required(),
+                                    validator.Email(),
+                                    karlvalidators.UniqueEmail(self.context)))
+        fields = [('firstname', firstname_field),
+                  ('lastname', lastname_field),
+                  ('email', email_field),
+                  ('phone', phone_field),
+                  ('extension', extension_field),
+                  ('department', department_field),
+                  ('position', position_field),
+                  ('organization', organization_field),
+                  ('location', location_field),
+                  ('country', country_field),
+                  ('website', website_field),
+                  ('languages', languages_field),
+                  ('biography', biography_field),
+                  ('photo', photo_field)]
+        return fields
 
-        model_values = {}
+    def form_widgets(self, fields):
+        default_icon = '%s/images/defaultUser.gif' % self.api.static_url
+        show_remove_checkbox = self.photo is not None
+        widgets = {'firstname': formish.Input(empty=''),
+                   'lastname': formish.Input(empty=''),
+                   'email': formish.Input(),
+                   'phone': formish.Input(empty=''),
+                   'extension': formish.Input(empty=''),
+                   'department': formish.Input(empty=''),
+                   'position': formish.Input(empty=''),
+                   'organization': formish.Input(empty=''),
+                   'location': formish.Input(empty=''),
+                   'country': formish.SelectChoice(options=countries),
+                   'website': formish.Input(empty=''),
+                   'languages': formish.Input(empty=''),
+                   'photo': karlwidgets.PhotoImageWidget(
+                       filestore=self.filestore,
+                       url_base=model_url(self.context, self.request),
+                       image_thumbnail_default=default_icon,
+                       show_remove_checkbox=show_remove_checkbox),
+                   'biography': karlwidgets.RichTextWidget(empty=''),
+                   }
+        return widgets
+
+    def form_defaults(self):
+        context = self.context
+        defaults = {'firstname': context.firstname,
+                    'lastname': context.lastname,
+                    'email': context.email,
+                    'phone': context.phone,
+                    'extension': context.extension,
+                    'department': context.department,
+                    'position': context.position,
+                    'organization': context.organization,
+                    'location': context.location,
+                    'country': context.country,
+                    'website': context.website,
+                    'languages': context.languages,
+                    'photo': self.photo,
+                    'biography': context.biography,
+                    }
+        return defaults
+
+    def __call__(self):
+        api = self.api
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('generic')
+        if api.user_is_staff:
+            self.request.form.edge_div_class = 'k3_staff_role'
+        else:
+            self.request.form.edge_div_class = 'k3_nonstaff_role'
+        form_title = 'Edit Profile'
+        return {'api':api, 'actions':(), 'layout':layout,
+                'form_title': form_title, 'include_blurb': True}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        # Handle the easy ones
         for name in self.simple_field_names:
-            if hasattr(context, name):
-                model_values[name] = getattr(context, name)
+            setattr(context, name, converted.get(name))
+        # Handle the picture and clear the temporary filestore
+        handle_photo_upload(context, converted, thumbnail=True)
+        self.filestore.clear()
+        # Emit a modified event for recataloging
+        objectEventNotify(ObjectModifiedEvent(context))
+        # Whew, we made it!
+        path = model_url(context, request)
+        msg = '?status_message=Profile%20edited'
+        return HTTPFound(location=path+msg)
 
-        model_values["photo"] = context.get("photo", None)
-        model_values["photo_delete"] = False
-        model_values.update(values)
+login_field = schemaish.String(validator=validator.Required())
+groups_field = schemaish.Sequence(schemaish.String(),
+                                  title='Group Memberships')
 
-        return super(EditProfileForm, self).from_python(model_values, state)
+class AdminEditProfileFormController(EditProfileFormController):
+    """
+    Extends the default profile edit controller w/ all of the extra
+    logic that the admin form requires.
+    """
+    simple_field_names = EditProfileFormController.simple_field_names
+    simple_field_names += ['home_path']
 
-def get_group_fields(context):
-    group_fields = []
+    def __init__(self, context, request):
+        super(AdminEditProfileFormController, self).__init__(context, request)
+        self.users = find_users(context)
+        self.userid = context.__name__
+        self.user = self.users.get_by_id(self.userid)
+        self.user_groups = set(self.user['groups'])
+        self.group_options = get_group_options(self.context)
+
+    def form_fields(self):
+        context = self.context
+        min_pw_length = get_setting(context, 'min_pw_length')
+        home_path_field = schemaish.String(
+            validator=karlvalidators.PathExists(context),
+            description=('The first page to show after logging in. '
+                         'Leave blank to show a community or the '
+                         'community list.'))
+        password_field = schemaish.String(
+            validator=karlvalidators.PasswordChecker(min_pw_length),
+            title='Reset Password',
+            description=('Enter a new password for the user here, '
+                         'or leave blank to leave the password '
+                         'unchanged.'))
+        fields = [('login', login_field),
+                  ('groups', groups_field),
+                  ('home_path', home_path_field),
+                  ('password', password_field)]
+        fields += super(AdminEditProfileFormController, self).form_fields()
+        return fields
+
+    def form_widgets(self, fields):
+        widgets = super(AdminEditProfileFormController, self).form_widgets(fields)
+        groups_widget = formish.CheckboxMultiChoice(self.group_options)
+        widgets.update({'login': formish.Input(empty=''),
+                        'groups': groups_widget,
+                        'home_path': formish.Input(empty=''),
+                        'password': karlwidgets.KarlCheckedPassword()})
+        return widgets
+
+    def form_defaults(self):
+        defaults = super(AdminEditProfileFormController, self).form_defaults()
+        context = self.context
+        defaults.update({'login': self.user['login'],
+                         'groups': self.user_groups,
+                         'home_path': context.home_path,
+                         'password': ''})
+        return defaults
+
+    def __call__(self):
+        api = self.api
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('generic')
+        self.request.form.edge_div_class = 'k3_admin_role'
+        form_title = 'Edit User and Profile Information'
+        return {'api':api, 'actions':(), 'layout':layout,
+                'form_title': form_title, 'include_blurb': False,
+                'admin_edit': True}
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        users = self.users
+        userid = self.userid
+        user = users.get_by_id(userid)
+        login = converted.get('login')
+        login_changed = users.get_by_login(login) != user
+        if (login_changed and
+            (users.get_by_id(login) is not None or
+             users.get_by_login(login) is not None or
+             login in context)):
+            msg = "Login '%s' is already in use" % login
+            raise ValidationError(login=msg)
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        # Set new login
+        try:
+            users.change_login(userid, converted['login'])
+        except ValueError, e:
+            raise ValidationError(login=str(e))
+        # Set group memberships
+        user_groups = self.user_groups
+        chosen_groups = set(converted['groups'])
+        if user_groups != chosen_groups:
+            for group in chosen_groups.difference(user_groups):
+                users.add_user_to_group(userid, group)
+            for group in user_groups.difference(chosen_groups):
+                users.remove_user_from_group(userid, group)
+        # Edit password
+        if converted.get('password', None):
+            users.change_password(userid, converted['password'])
+        # Handle the easy ones
+        for name in self.simple_field_names:
+            setattr(context, name, converted.get(name))
+        # Handle the picture and clear the temporary filestore
+        handle_photo_upload(context, converted, thumbnail=True)
+        self.filestore.clear()
+        # Emit a modified event for recataloging
+        objectEventNotify(ObjectModifiedEvent(context))
+        # Whew, we made it!
+        path = model_url(context, request)
+        msg = '?status_message=User%20edited'
+        return HTTPFound(location=path+msg)
+
+def get_group_options(context):
+    group_options = []
     for group in get_setting(context, "selectable_groups").split():
         if group.startswith('group.'):
             title = group[6:]
         else:
             title = group
-        # make the field name compatible with CSS
-        fieldname = 'groupfield-%s' % group.replace('.', '-')
-        group_fields.append({
-            'group': group,
-            'fieldname': fieldname,
-            'title': title,
-            })
-    return group_fields
+        group_options.append((group, title))
+    return group_options    
 
-class AdminEditProfileForm(EditProfileForm):
-    login = baseforms.login
-    home_path = baseforms.HomePath(strip=True)
-    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
-    password = baseforms.PasswordChecker(strip=True)
-    password_confirm = validators.UnicodeString(strip=True)
-    chained_validators = baseforms.chained_validators
+class AddUserFormController(EditProfileFormController):
+    """
+    Very similar to the AdminEditProfileFormController, but with just
+    enough difference to make it more sane to not try to reuse it, so
+    they both inherit from the same base.
+    """
+    simple_field_names = EditProfileFormController.simple_field_names
+    simple_field_names += ['home_path']
 
-def admin_edit_profile_view(context, request,
-                            form_factory=AdminEditProfileForm):
-    min_pw_length = get_setting(context, 'min_pw_length')
-    form = form_factory(min_pw_length=min_pw_length, context=context)
-    group_fields = get_group_fields(context)
-    for field in group_fields:
-        validator = validators.Bool(if_missing=False, default=False)
-        form.add_field(field['fieldname'], validator)
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore = get_filestore(context, request, 'add-user')
+        page_title = 'Add User'
+        self.api = TemplateAPI(context, request, page_title)
+        self.photo = None
+        self.users = find_users(context)
+        self.group_options = get_group_options(self.context)
 
-    users = find_users(context)
-    userid = context.__name__
-    user = users.get_by_id(userid)
-    user_groups = set(user['groups'])
+    def form_fields(self):
+        context = self.context
+        min_pw_length = get_setting(context, 'min_pw_length')
+        home_path_field = schemaish.String(
+            validator=karlvalidators.PathExists(context),
+            description=('The first page to show after logging in. '
+                         'Leave blank to show a community or the '
+                         'community list.'))
+        password_field = schemaish.String(
+            validator=(validator.All(
+                karlvalidators.PasswordChecker(min_pw_length),
+                validator.Required())))
+        fields = [('login', login_field),
+                  ('groups', groups_field),
+                  ('home_path', home_path_field),
+                  ('password', password_field)]
+        fields += super(AddUserFormController, self).form_fields()
+        return fields
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_widgets(self, fields):
+        widgets = super(AddUserFormController, self).form_widgets(fields)
+        groups_widget = formish.CheckboxMultiChoice(self.group_options)
+        widgets.update({'login': formish.Input(empty=''),
+                        'groups': groups_widget,
+                        'home_path': formish.Input(empty=''),
+                        'password': karlwidgets.KarlCheckedPassword()})
+        return widgets
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
+    def form_defaults(self):
+        return
 
-            try:
-                users.change_login(userid, converted['login'])
-            except ValueError, e:
-                raise CustomInvalid({'login': str(e)})
+    def __call__(self):
+        api = self.api
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('generic')
+        self.request.form.edge_div_class = 'k3_admin_role'
+        form_title = 'Add User'
+        return {'api':api, 'actions':(), 'layout':layout,
+                'form_title': form_title, 'include_blurb': False}
 
-            for field in group_fields:
-                group = field['group']
-                fieldname = field['fieldname']
-                if converted[fieldname]:
-                    if group not in user_groups:
-                        users.add_user_to_group(userid, group)
-                else:
-                    if group in user_groups:
-                        users.remove_user_from_group(userid, group)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        userid = converted['login']
+        users = self.users
+        if (users.get_by_id(userid) is not None or
+            users.get_by_login(userid) is not None or
+            userid in context):
+            msg = "User ID '%s' is already in use" % userid
+            raise ValidationError(login=msg)
+        users.add(userid, userid, converted['password'], converted['groups'])
 
-            if converted.get('password', None):
-                users.change_password(userid, converted['password'])
+        kw = {}
+        for k, v in converted.items():
+            if k in ('login', 'password', 'password_confirm',
+                     'photo', 'groups'):
+                continue
+            kw[k] = v
+        profile = create_content(IProfile, **kw)
+        context[userid] = profile
 
-            # Handle simple fields
-            for name in form.simple_field_names:
-                setattr(context, name, converted.get(name))
+        workflow = get_workflow(IProfile, 'security', context)
+        if workflow is not None:
+            workflow.initialize(profile)
 
-            handle_photo_upload(context, converted, thumbnail=True)
-
-            # Emit a modified event for recataloging
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            path = model_url(context, request)
-            msg = '?status_message=User%20edited'
-            return HTTPFound(location=path+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            try:
-                del fill_values['photo'] # filler cant handle photo field
-            except KeyError:
-                pass
-    else:
-        fielderrors = {}
-
-        # pre-fill form with model values
-        fill_values = form.from_python({})
-        fill_values['login'] = user['login']
-
-        for field in group_fields:
-            group = field['group']
-            fieldname = field['fieldname']
-            fill_values[fieldname] = group in user_groups
-
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-    editing_self = authenticated_userid(request) == context.__name__
-    is_staff = users.member_of_group(context.__name__, 'group.KarlStaff')
-    staff_change_password_url = '%s?username=%s&email=%s&came_from=%s' % (
-        get_setting(context, "staff_change_password_url"),
-        urllib.quote_plus(context.__name__),
-        urllib.quote_plus(context.email),
-        urllib.quote_plus(api.here_url)
-        )
-
-    # Display portrait
-    photo = context.get_photo()
-    display_photo = {}
-    if photo is not None:
-        display_photo["url"] = model_url(photo, request)
-        display_photo["may_delete"] = True
-    else:
-        display_photo["url"] = api.static_url + "/images/defaultUser.gif"
-        display_photo["may_delete"] = False
-
-    return render_form_to_response(
-        'templates/admin_edit_profile.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        photo=display_photo,
-        group_fields=group_fields,
-        editing_self=editing_self,
-        is_staff=is_staff,
-        staff_change_password_url=staff_change_password_url,
-        delete_url=model_url(context, request, 'delete.html'),
-        )
+        handle_photo_upload(profile, converted, thumbnail=True)
+        location = model_url(profile, request)
+        return HTTPFound(location=location)
 
 def get_profile_actions(profile, request):
     actions = []
@@ -688,87 +802,3 @@ def delete_profile_view(context, request):
         'templates/delete_profile.pt',
         api=api,
         )
-
-def add_user_view(context, request):
-    min_pw_length = get_setting(context, 'min_pw_length')
-    form = AddUserForm(context=context, min_pw_length=min_pw_length)
-    group_fields = get_group_fields(context)
-
-    workflow = get_workflow(IProfile, 'security', context)
-
-    for field in group_fields:
-        validator = validators.Bool(if_missing=False, default=False)
-        form.add_field(field['fieldname'], validator)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            userid = converted['login']
-            users = find_users(context)
-            if users.get_by_id(userid) is not None or userid in context:
-                raise CustomInvalid(
-                    {'login': "User ID '%s' already exists" % userid})
-
-            groups = []
-            for field in group_fields:
-                fieldname = field['fieldname']
-                if converted[fieldname]:
-                    groups.append(field['group'])
-
-            users.add(userid, userid, converted['password'], groups)
-
-            kw = {}
-            for k, v in converted.items():
-                if k in ('login', 'password', 'password_confirm',
-                        'photo', 'photo_delete'):
-                    continue
-                if k.startswith('groupfield-'):
-                    continue
-                kw[k] = v
-            profile = create_content(IProfile, **kw)
-
-            context[userid] = profile
-
-            if workflow is not None:
-                workflow.initialize(profile)
-
-            handle_photo_upload(profile, converted, thumbnail=True)
-
-            location = model_url(profile, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            try:
-                del fill_values['photo'] # rendering cant deal with photo
-            except KeyError:
-                pass
-    else:
-        fielderrors = {}
-        fill_values = {}
-
-    page_title = 'Add User'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/add_user.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        group_fields=group_fields,
-        api=api,
-        )
-
-class AddUserForm(EditProfileForm):
-    login = baseforms.login
-    home_path = validators.UnicodeString(strip=True)
-    simple_field_names = EditProfileForm.simple_field_names + ['home_path']
-    password = baseforms.password
-    password_confirm = baseforms.password_confirm
-    chained_validators = baseforms.chained_validators

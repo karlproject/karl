@@ -19,15 +19,21 @@ import unittest
 
 from repoze.bfg.testing import cleanUp
 from repoze.bfg import testing
+from karl.testing import DummySessions
 
-class AddNewsItemViewTests(unittest.TestCase):
+class AddNewsItemFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
         self._register()
+        context = testing.DummyModel(sessions=DummySessions())
+        self.context = context
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
-        
+
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
@@ -40,204 +46,133 @@ class AddNewsItemViewTests(unittest.TestCase):
                                      (Interface, Interface),
                                      ILayoutProvider)
 
-    def _callFUT(self, context, request):
-        from karl.content.views.newsitem import add_newsitem_view
-        return add_newsitem_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.newsitem import AddNewsItemFormController
+        return AddNewsItemFormController(context, request)
 
-    def test_notsubmitted(self):
-        context = testing.DummyModel()
-        context["attachments"] = testing.DummyModel()
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        renderer = testing.registerDummyRenderer(
-            'templates/addedit_newsitem.pt')
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        
-    def test_submitted_invalid(self):
-        context = testing.DummyModel()
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1'})
-                    )
-        renderer = testing.registerDummyRenderer(
-            'templates/addedit_newsitem.pt')
-        self._callFUT(context, request)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        
-    def test_submitted_invalid_notitle(self):
-        context = testing.DummyModel()
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1',
-                    #'title': '',
-                    'text': 'text',})
-                    )
-        renderer = testing.registerDummyRenderer(
-            'templates/addedit_newsitem.pt')
-        self._callFUT(context, request)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        
-    def test_submitted_alreadyexists(self):
-        from webob.multidict import MultiDict
+    def test_form_defaults(self):
+        from karl.content.views.newsitem import _now
+        prenow = _now()
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        for field, value in defaults.items():
+            if field != 'publication_date':
+                self.failIf(value)
+        self.failUnless(defaults['publication_date'] > prenow)
+
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('title' in fields)
+        self.failUnless('tags' in fields)
+        self.failUnless('text' in fields)
+        self.failUnless('attachments' in fields)
+        self.failUnless('photo' in fields)
+        self.failUnless('caption' in fields)
+        self.failUnless('publication_date' in fields)
+
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('text' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('attachments.*' in widgets)
+        self.failUnless('photo' in widgets)
+        self.failUnless('caption' in widgets)
+        self.failUnless('publication_date' in widgets)
+
+    def test____call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Add News Item')
+        self.failUnless('layout' in response)
+
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit(self):
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        site = testing.DummyModel(sessions=DummySessions())
+        directlyProvides(site, ISite)
         from karl.testing import DummyCatalog
-        from karl.content.interfaces import INewsItem
-        from repoze.lemonade.testing import registerContentFactory
-
-        registerContentFactory(DummyNewsItem, INewsItem)
-        context = testing.DummyModel()
-        foo = testing.DummyModel()
-        context['foo'] = foo
+        from karl.models.adapters import CatalogSearch
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        site.catalog = DummyCatalog()
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        context = self.context
+        site['newsfolder'] = context
         tags = DummyTags()
-        self.tags = tags
-        context.catalog = DummyCatalog()
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('sendalert', 'true'),
-                    ('sharing', False),
-                    ('photo', None),
-                    ('caption', 'caption'),
-                    ('publication_date', '3/21/2009 18:30',)
-                    ])
-            )
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 
-                         'http://example.com/foo-1/')
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 
-                         'http://example.com/foo-2/')
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 
-                         'http://example.com/foo-3/')
-
-    def test_submitted_valid(self):
-        context = testing.DummyModel()
-        tags = DummyTags()
-        self.tags = tags
-        from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('photo', None),
-                    ('caption', 'caption'),
-                    ('publication_date', '3/21/2009 18:30'),
-                    ])
-            )
-        from karl.content.interfaces import INewsItem
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyNewsItem, INewsItem)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/foo/')
-        
-    def test_submitted_valid_attachments(self):
-        context = testing.DummyModel()
-        tags = DummyTags()
-        self.tags = tags
-        from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        from karl.testing import DummyUpload
-        attachment1 = DummyUpload(filename="test1.txt")
-        attachment2 = DummyUpload(filename="test2.txt")
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                    ('form.submitted', '1'),
-                    ('title', 'foo'),
-                    ('text', 'text'),
-                    ('tags', 'tag1'),
-                    ('tags', 'tag2'),
-                    ('attachment', attachment1),
-                    ('attachment', attachment2),
-                    ('sharing', False),
-                    ('photo', None),
-                    ('caption', 'caption'),
-                    ('publication_date', '3/21/2009 18:30'),
-                    ])
-            )
-        from karl.content.interfaces import INewsItem
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyNewsItem, INewsItem)
-        from karl.content.interfaces import ICommunityFile
-        registerContentFactory(DummyFile, ICommunityFile)
-
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/foo/")
-        self.failUnless(context['foo'])
-        
-    def test_upload_photo(self):
+        site.tags = tags
+        controller = self._makeOne(context, self.request)
+        from karl.content.views.newsitem import _now
         from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        photo = DummyUpload(filename='test.jpg',
+                            mimetype='image/jpeg',
+                            data=dummy_photo)
+        now = _now()
+        converted = {
+            'title': 'Foo',
+            'text': 'text',
+            'publication_date': now,
+            'caption': 'caption',
+            'tags': ['tag1', 'tag2'],
+            'attachments': [attachment1, attachment2],
+            'photo': photo
+            }
+        from karl.content.interfaces import INewsItem
         from karl.models.interfaces import IImageFile
+        from karl.content.interfaces import ICommunityFile
         from karl.views.tests.test_file import DummyImageFile
         from repoze.lemonade.testing import registerContentFactory
-        from karl.content.interfaces import INewsItem
         registerContentFactory(DummyNewsItem, INewsItem)
         registerContentFactory(DummyImageFile, IImageFile)
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(MultiDict([
-            ("form.submitted", "1"),
-            ("photo", DummyUpload(
-                filename="test.jpg",
-                mimetype="image/jpeg",
-                data=dummy_photo)),
-            ("title", "foo"),
-            ("text", "text"),
-            ("caption", "caption"),
-            ("publication_date", "3/21/2009 18:30",)
-            ]
-        ))
+        registerContentFactory(DummyFile, ICommunityFile)
+        response = controller.handle_submit(converted)
+        newsitem_url = 'http://example.com/newsfolder/foo/'
+        self.assertEqual(response.location, newsitem_url)
+        self.failUnless('foo' in context)
+        newsitem = context['foo']
+        self.assertEqual(newsitem.title, 'Foo')
+        self.assertEqual(newsitem.text, 'text')
+        self.assertEqual(newsitem.publication_date, now)
+        self.assertEqual(newsitem.caption, 'caption')
+        self.failUnless('attachments' in newsitem)
+        attachments_folder = newsitem['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        self.assertEqual(attachments_folder['test1.txt'].filename,
+                         'test1.txt')
+        self.assertEqual(attachments_folder['test2.txt'].filename,
+                         'test2.txt')
+        self.failUnless('photo.jpg' in newsitem)
+        self.failUnless(len(newsitem['photo.jpg'].stream.read()) > 0)
+        self.assertEqual(site.tags._called_with[1]['tags'],
+                         ['tag1', 'tag2'])
 
-        from karl.testing import DummyCatalog
-        context = testing.DummyModel()
-        context.catalog = DummyCatalog()
-        response = self._callFUT(context, request)
-        
-        self.assertEqual(context["foo"]["photo.jpg"].stream.read(), 
-                         dummy_photo)
-        self.assertEqual(response.location, 
-                         'http://example.com/foo/')
-         
-class EditNewsItemViewTests(unittest.TestCase):
+class EditNewsItemFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
         self._register()
+        context = DummyNewsItem(sessions=DummySessions())
+        context.title = 'Foo'
+        self.context = context
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
-        import datetime
-        self.now = datetime.datetime.now()
-        self.news_item = DummyNewsItem(
-            title="Title",
-            text="Some Text",
-            publication_date=self.now,
-            creator="user1",
-            caption=None,
-        )
-        
-        parent = testing.DummyModel()
-        parent["foo"] = self.news_item
-        
-        from karl.testing import DummyCatalog
-        parent.catalog = DummyCatalog()
-        
     def tearDown(self):
         cleanUp()
-        
+
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
@@ -249,180 +184,108 @@ class EditNewsItemViewTests(unittest.TestCase):
         ad = testing.registerAdapter(DummyLayoutProvider, 
                                      (Interface, Interface),
                                      ILayoutProvider)
-        
-        self.renderer = testing.registerDummyRenderer(
-            'templates/addedit_newsitem.pt')
 
-        from repoze.lemonade.testing import registerContentFactory
-        from karl.views.tests.test_file import DummyImageFile
+    def _makeOne(self, context, request):
+        from karl.content.views.newsitem import EditNewsItemFormController
+        return EditNewsItemFormController(context, request)
+
+    def test_form_defaults(self):
+        context = self.context
+        context.text = 'text'
+        context.caption = 'caption'
+        from karl.content.views.newsitem import _now
+        now = _now()
+        context.publication_date = now
+        attachment1 = DummyFile(mimetype="text/plain")
+        attachment2 = DummyFile(mimetype="text/html")
+        context['attachments']['test1.txt'] = attachment1
+        context['attachments']['test2.html'] = attachment2
+        photo = DummyFile(mimetype='image/jpeg')
+        context['photo.jpg'] = photo
+        controller = self._makeOne(context, self.request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'Foo')
+        self.assertEqual(defaults['text'], 'text')
+        self.assertEqual(defaults['caption'], 'caption')
+        self.assertEqual(defaults['publication_date'], now)
+        self.assertEqual(len(defaults['attachments']), 2)
+        attachnames = [a.filename for a in defaults['attachments']]
+        self.failUnless('test1.txt' in attachnames)
+        self.failUnless('test2.html' in attachnames)
+        self.assertEqual(defaults['photo'].filename, 'photo.jpg')
+        self.assertEqual(defaults['photo'].mimetype, 'image/jpeg')
+
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('text' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('attachments.*' in widgets)
+        self.failUnless('photo' in widgets)
+        self.failUnless('caption' in widgets)
+        self.failUnless('publication_date' in widgets)
+
+    def test_handle_submit(self):
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        site = testing.DummyModel(sessions=DummySessions())
+        directlyProvides(site, ISite)
+        from karl.testing import DummyCatalog
+        from karl.models.adapters import CatalogSearch
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        site.catalog = DummyCatalog()
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        context = self.context
+        site['newsitem'] = context
+        tags = DummyTags()
+        site.tags = tags
+        controller = self._makeOne(context, self.request)
+        from karl.content.views.newsitem import _now
+        now = _now()
+        simple = {
+            'title': 'NewFoo',
+            'text': 'text',
+            'caption': 'caption',
+            'publication_date': now
+            }
+        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        photo = DummyUpload(filename='test.jpg',
+                            mimetype='image/jpeg',
+                            data=dummy_photo)
+        converted = {
+            'tags': ['tag1', 'tag2'],
+            'attachments': [attachment1, attachment2],
+            'photo': photo,
+            }
+        converted.update(simple)
         from karl.models.interfaces import IImageFile
-        registerContentFactory(DummyImageFile, IImageFile)
-        
         from karl.content.interfaces import ICommunityFile
+        from karl.views.tests.test_file import DummyImageFile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyImageFile, IImageFile)
         registerContentFactory(DummyFile, ICommunityFile)
-        
-    def _callFUT(self, context, request):
-        from karl.content.views.newsitem import edit_newsitem_view
-        return edit_newsitem_view(context, request)
-    
-    def test_not_submitted(self):
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        self._callFUT(self.news_item, request)
-        self.assertEqual(self.news_item.title, "Title")
-        self.assertEqual(self.news_item.text, "Some Text")
-        self.assertEqual(self.news_item.publication_date, self.now)
-        self.assertEqual(self.news_item.creator, "user1")
-        
-    def test_submitted_invalid(self):
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-            ])
-        )
-        self._callFUT(self.news_item, request)
-        self.failUnless(self.renderer.fielderrors)
-                 
-    def test_submitted_valid(self):
-        import datetime
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-                ("title", "New Title"),
-                ("text", "New Text"),
-                ("publication_date", "7/7/1975 7:45"),
-                ("photo", None),
-                ("caption", None),
-                ('tags', 'thetesttag'),
-            ])
-        )
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(self.news_item, request)
-        fielderrors = getattr(self.renderer, "fielderrors", None)
-        self.failUnless(fielderrors is None, fielderrors)
-        self.assertEqual(response.location, 
-            "http://example.com/foo/?status_message=News%20Item%20edited")
-        self.assertEqual(self.news_item.title, "New Title")
-        self.assertEqual(self.news_item.text, "New Text")
-        self.assertEqual(self.news_item.publication_date, 
-                         datetime.datetime(1975, 7, 7, 7, 45))
-        self.failIf(self.news_item.get_photo())
-        self.assertEqual(self.news_item.modified_by, 'testeditor')
-        
-    def test_upload_photo(self):
-        from webob.multidict import MultiDict
-        from karl.testing import DummyUpload
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-                ("title", "New Title"),
-                ("text", "New Text"),
-                ("publication_date", "7/7/1975 7:45"),
-                ("photo", DummyUpload(
-                    filename="whatever.jpg",
-                    mimetype="image/jpeg",
-                    data="This is an image.")),
-                ("caption", None),
-            ])
-        )
-        response = self._callFUT(self.news_item, request)
-        self.assertEqual(response.location, 
-            "http://example.com/foo/?status_message=News%20Item%20edited")
-        photo = self.news_item.get_photo()
-        self.failIf(photo is None)
-        self.assertEqual(photo.stream.read(), "This is an image.")
-        
-    def test_replace_photo(self):
-        from webob.multidict import MultiDict
-        from karl.testing import DummyUpload
-        from karl.views.tests.test_file import DummyImageFile
-        self.news_item["photo.jpg"] = DummyImageFile()
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-                ("title", "New Title"),
-                ("text", "New Text"),
-                ("publication_date", "7/7/1975 7:45"),
-                ("photo", DummyUpload(
-                    filename="whatever.jpg",
-                    mimetype="image/jpeg",
-                    data="This is another image.")),
-                ("caption", None),
-            ])
-        )
-        self.assertNotEqual(self.news_item.get_photo().stream.read(),
-                            "This is another image.")
-        response = self._callFUT(self.news_item, request)
-        self.assertEqual(response.location, 
-            "http://example.com/foo/?status_message=News%20Item%20edited")
-        photo = self.news_item.get_photo()
-        self.failIf(photo is None)
-        self.assertEqual(photo.stream.read(), "This is another image.")
-        
-    def test_delete_photo(self):
-        from webob.multidict import MultiDict
-        from karl.views.tests.test_file import DummyImageFile
-        self.news_item["photo.jpg"] = DummyImageFile()
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-                ("title", "New Title"),
-                ("text", "New Text"),
-                ("publication_date", "7/7/1975 7:45"),
-                ("photo", None),
-                ("photo_delete", "1"),
-                ("caption", None),
-            ])
-        )
-        self.failUnless(self.news_item.get_photo())
-        response = self._callFUT(self.news_item, request)
-        self.assertEqual(response.location, 
-            "http://example.com/foo/?status_message=News%20Item%20edited")
-        photo = self.news_item.get_photo()
-        self.failUnless(photo is None)
-    
-    def test_upload_attachments(self):
-        from webob.multidict import MultiDict
-        from karl.testing import DummyUpload
-        request = testing.DummyRequest(
-            MultiDict([
-                ("form.submitted", "1"),
-                ("title", "New Title"),
-                ("text", "New Text"),
-                ("publication_date", "7/7/1975 7:45"),
-                ("photo", None),
-                ("attachment", DummyUpload(
-                    filename="whatever.txt",
-                    mimetype="text/plain",
-                    data="This is an attachment.")),
-                ("attachment", DummyUpload(
-                    filename="whatever.pdf",
-                    mimetype="application/pdf",
-                    data="This is another attachment.")),
-                ("caption", None),
-            ])
-        )
-        response = self._callFUT(self.news_item, request)
-        self.assertEqual(response.location, 
-            "http://example.com/foo/?status_message=News%20Item%20edited")
-
-        attachments = self.news_item["attachments"].values()
-        self.assertEqual(len(attachments), 2)
-        attachments.sort(key=lambda x: x.filename)
-        
-        attachment = attachments.pop(0)
-        self.assertEqual(attachment.stream.read(), "This is another attachment.")
-        self.assertEqual(attachment.filename, "whatever.pdf")
-        self.assertEqual(attachment.mimetype, "application/pdf")
-
-        attachment = attachments.pop(0)
-        self.assertEqual(attachment.stream.read(), "This is an attachment.")
-        self.assertEqual(attachment.filename, "whatever.txt")
-        self.assertEqual(attachment.mimetype, "text/plain")
-
+        response = controller.handle_submit(converted)
+        msg = "?status_message=News%20Item%20edited"
+        self.assertEqual(response.location,
+                         'http://example.com/newsitem/%s' % msg)
+        for field, value in simple.items():
+            self.assertEqual(getattr(context, field), value)
+        attachments_folder = context['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        self.assertEqual(attachments_folder['test1.txt'].filename,
+                         'test1.txt')
+        self.assertEqual(attachments_folder['test2.txt'].filename,
+                         'test2.txt')
+        self.failUnless('photo.jpg' in context)
+        self.assertEqual(site.tags._called_with[1]['tags'],
+                         ['tag1', 'tag2'])
         
 class DummyNewsItem(testing.DummyModel):
     def __init__(self, *args, **kwargs):

@@ -5,40 +5,36 @@
                   mimetype (not star) and field.value['mimetype'][0] or '';
                   mimetype mimetype or '';"
       >
-  
-  <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
-  <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
-  <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
-  <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
-  <input id="${field.cssname}" type="file" name="${field.name}.file" />
-  
-  <div class="preview">
-
-    <div class="icon ${mimetype.replace('/','_')}">
-      
-      <span tal:condition="mimetype" tal:omit-tag="">
-        
-        <img height="100" width="75" 
-             style="width=75px; float: left;" align="right"
-             src="${field.widget.urlfactory(value_name)}"/>
-        
-        <div style="clear: both;"/>
-
-      </span>
-        
-      <span tal:condition="not mimetype" tal:omit-tag="">
-        
-        <img height="100" width="75" 
-             style="width=75px; float: left;" align="right"
-             src="${field.widget.image_thumbnail_default}"/>
-        
-        <div style="clear: both;"/>
-      
-      </span>
-
+  <div style="width: 50%; float: left;">
+    <div>
+      <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
+      <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
+      <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
+      <input id="${field.cssname}" type="file" name="${field.name}.file" />
     </div>
-      
+    <span tal:omit-tag="" tal:condition="field.widget.show_remove_checkbox">
+      <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+      delete photo
+    </span>
   </div>
+
+  <span tal:omit-tag="" tal:condition="field.widget.show_image_thumbnail">
+    <div class="preview"
+         tal:define="preview_url field.widget.urlfactory(value_name)">
+
+      <div class="icon ${mimetype.replace('/','_')}"
+           tal:condition="preview_url is not None">
+        <img height="100" width="75" 
+             src="${preview_url}"/>
+      </div>
+
+      <!--div style="clear: both;"
+           tal:condition="preview_url is None" /-->
+      
+    </div>
+  </span>
+
+  <div style="clear: both;"></div>
 
   
 </span>

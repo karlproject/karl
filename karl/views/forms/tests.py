@@ -1,5 +1,6 @@
 import unittest
 import schemaish
+from zope.testing.cleanup import cleanUp
 
 from repoze.bfg import testing
 
@@ -80,9 +81,95 @@ class TestRegularExpressionValidator(unittest.TestCase):
         self.assertRaises(Invalid, validator, 'b')
 
     def test_nofail(self):
-        from validatish.error import Invalid
         validator = self._makeOne('a', 'not valid')
         self.assertEqual(validator('a'), None)
+
+class TestPathExistsValidator(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        site = self.site = testing.DummyModel()
+        context = self.context = testing.DummyModel()
+        site['context'] = context
+
+    def tearDown(self):
+        cleanUp()
+
+    def _makeOne(self, context):
+        from karl.views.forms.validators import PathExists
+        return PathExists(context)
+
+    def test_found(self):
+        validator = self._makeOne(self.site)
+        self.assertEqual(validator('/context'), None)
+
+    def test_notfound(self):
+        from validatish.error import Invalid
+        validator = self._makeOne(self.site)
+        self.assertRaises(Invalid, validator, '/doesnotexist')
+
+    def test_foundsite(self):
+        from validatish.error import Invalid
+        validator = self._makeOne(self.site)
+        self.assertRaises(Invalid, validator, '/')
+
+class TestPasswordCheckerValidator(unittest.TestCase):
+    def _makeOne(self, min_pw_length):
+        from karl.views.forms.validators import PasswordChecker
+        return PasswordChecker(min_pw_length)
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        validator = self._makeOne(6)
+        self.assertRaises(Invalid, validator, 'secre')
+
+    def test_nofail(self):
+        validator = self._makeOne(6)
+        self.assertEqual(validator('secret'), None)
+
+class TestUniqueEmailValidator(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        self.context = testing.DummyModel()
+        from karl.testing import registerCatalogSearch
+        registerCatalogSearch()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _makeOne(self, context):
+        from karl.views.forms.validators import UniqueEmail
+        return UniqueEmail(context)
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        validator = self._makeOne(self.context)
+        self.assertRaises(Invalid, validator, 'match@x.org')
+
+    def test_nofail(self):
+        validator = self._makeOne(self.context)
+        self.assertEqual(validator('nomatch@x.org'), None)
+
+    def test_nofail_on_self_match(self):
+        email = 'match@x.org'
+        self.context.email = email
+        validator = self._makeOne(self.context)
+        self.assertEqual(validator(email), None)
+
+class TestHTMLValidator(unittest.TestCase):
+    def _makeOne(self):
+        from karl.views.forms.validators import HTML
+        return HTML()
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        validator = self._makeOne()
+        bad_html = "</failure>"
+        self.assertRaises(Invalid, validator, bad_html)
+
+    def test_nofail(self):
+        validator = self._makeOne()
+        good_html = "<html><body> is well formed </body></html>"
+        self.assertEqual(validator(good_html), None)
 
 class TestAcceptFieldWidget(unittest.TestCase):
     def _makeOne(self, text, description, **kw):
@@ -283,6 +370,34 @@ class Test_get_filestore(unittest.TestCase):
         result = self._callFUT(context, request, 'formid')
         self.assertEqual(result.__class__, ZODBFileStore)
         self.assertEqual(result.persistent_map.__class__, PersistentMapping)
+
+class Test_KarlDateTime(unittest.TestCase):
+    def test_can_create(self):
+        from karl.views.forms.attr import KarlDateTime
+        kdt = KarlDateTime()
+        self.assertEqual(kdt.type, 'KarlDateTime')
+
+class Test_KarlDateTimeToStringConverter(unittest.TestCase):
+    def _makeOne(self):
+        from karl.views.forms.convert import KarlDateTimeToStringConverter
+        return KarlDateTimeToStringConverter('KarlDateTime')
+
+    def test_from_type(self):
+        from datetime import datetime
+        converter = self._makeOne()
+        dt = datetime(2010, 3, 14, 1, 59, 26)
+        converted = converter.from_type(dt)
+        self.assertEqual(converted, '03/14/2010 01:45')
+
+    def test_to_type(self):
+        from datetime import datetime
+        converter = self._makeOne()
+        converted = converter.to_type('03/14/2010 01:45')
+        self.assertEqual(converted, datetime(2010, 3, 14, 1, 45, 0, 0))
+        from convertish.convert import ConvertError
+        self.assertRaises(ConvertError, converter.to_type, 'bo/gus/val')
+        self.assertRaises(ConvertError, converter.to_type, '12/12')
+        self.assertRaises(ConvertError, converter.to_type, '12/21/2012 1212')
 
 class DummyAttr:
     def __init__(self):

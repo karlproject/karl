@@ -18,18 +18,17 @@
 from webob.exc import HTTPFound
 
 from zope.component.event import objectEventNotify
-from zope.component import getMultiAdapter
 
-from formencode import Invalid
+from schemaish.type import File as SchemaFile
+from validatish import validator
+import formish
+import schemaish
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.chameleon_zpt import render_template
 
 from repoze.bfg.url import model_url
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
-
-from repoze.enformed import FormSchema
 
 from repoze.lemonade.content import create_content
 
@@ -40,9 +39,10 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.utils import find_community
 
 from karl.views.api import TemplateAPI
-from karl.views import baseforms
 
-from karl.views.form import render_form_to_response
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms.filestore import get_filestore
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.views.tags import set_tags
@@ -50,81 +50,189 @@ from karl.views.tags import get_tags_client_data
 
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import get_previous_next
-from karl.content.views.utils import store_attachments
 from karl.content.views.utils import fetch_attachments
+from karl.content.views.utils import upload_attachments
 
 from karl.utils import get_layout_provider
 
-def add_page_view(context, request):
-    tags_list=request.POST.getall('tags')
-    form = AddPageForm(tags_list=tags_list)
+tags_field = schemaish.Sequence(schemaish.String())
+text_field = schemaish.String()
+attachments_field = schemaish.Sequence(
+    schemaish.File(),
+    title='Attachments',
+    description='You can remove an attachment by clicking the checkbox. '
+    'Removal will come to effect after saving the page and can be '
+    'reverted by cancel.')
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+class AddPageFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore = get_filestore(context, request, 'page')
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # Create the page and store it
-            creator = authenticated_userid(request)
-            page = create_content(IPage,
-                                  converted['title'],
-                                  converted['text'],
-                                  extract_description(converted['text']),
-                                  creator,
-                                  )
-            name = make_unique_name(context, converted['title'])
-            context[name] = page
+    def form_defaults(self):
+        defaults = {
+            'title': '',
+            'tags': [],
+            'text': '',
+            'attachments': [],
+            }
+        return defaults
 
-            # Tags and attachments
-            set_tags(page, request, converted['tags'])
-            store_attachments(page['attachments'], request.params, creator)
-
-            # Update ordering if in ordered container
-            if hasattr(context, 'ordering'):
-                context.ordering.add(name)
-
-            location = model_url(page, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context),
                 )
+            )
+        fields = [('title', title_field),
+                  ('tags', tags_field),
+                  ('text', text_field),
+                  ('attachments', attachments_field),
+                  ]
+        return fields
 
-    else:
-        fielderrors = {}
-        fill_values = {}
-        tags_field = dict(records=[])
+    def form_widgets(self, fields):
+        widgets = {
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsAddWidget(),
+            'text': karlwidgets.RichTextWidget(empty=''),
+            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        return widgets
 
-    # Render the form and shove some default values in
-    page_title = 'Add Page'
-    api = TemplateAPI(context, request, page_title)
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request, 'Add Page')
+        community = find_community(context)
+        layout_provider = get_layout_provider(context, request)
+        if community is not None:
+            layout = layout_provider('community')
+        else:
+            layout = layout_provider('generic')
+        return {'api': api, 'actions': (), 'layout': layout}
 
-    # Get a layout
-    community = find_community(context)
-    layout_provider = get_layout_provider(context, request)
-    if community is not None:
-        layout = layout_provider('community')
-    else:
-        layout = layout_provider('generic')
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-    return render_form_to_response(
-        'templates/addedit_page.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        form=form,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-                )),
-        layout=layout,
-        )
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        # create the page and store it
+        creator = authenticated_userid(request)
+        page = create_content(IPage,
+                              converted['title'],
+                              converted['text'],
+                              extract_description(converted['text']),
+                              creator,
+                              )
+        name = make_unique_name(context, converted['title'])
+        context[name] = page
+
+        # tags and attachments
+        set_tags(page, request, converted['tags'])
+        attachments_folder = page['attachments']
+        upload_attachments(converted['attachments'], attachments_folder,
+                           creator, request)
+
+        # update ordering if in ordered container
+        if hasattr(context, 'ordering'):
+            context.ordering.add(name)
+
+        location = model_url(page, request)
+        self.filestore.clear()
+        return HTTPFound(location=location)
+
+class EditPageFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore  = get_filestore(context, request, 'page')
+
+
+    def form_defaults(self):
+        context = self.context
+        attachments = [SchemaFile(None, x.__name__, x.mimetype)
+                       for x in context['attachments'].values()]
+        defaults = {
+            'title': context.title,
+            'tags': [], # initial values supplied by widget
+            'text': context.text,
+            'attachments': attachments,
+            }
+        return defaults
+
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                )
+            )
+        fields = [('title', title_field),
+                  ('tags', tags_field),
+                  ('text', text_field),
+                  ('attachments', attachments_field),
+                  ]
+        return fields
+
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text': karlwidgets.RichTextWidget(empty=''),
+            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        return widgets
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        page_title = 'Edit %s' % context.title
+        api = TemplateAPI(context, request, page_title)
+        community = find_community(context)
+        layout_provider = get_layout_provider(context, request)
+        if community is not None:
+            layout = layout_provider('community')
+        else:
+            layout = layout_provider('generic')
+        return {'api': api, 'actions': (), 'layout': layout}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        userid = authenticated_userid(request)
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+
+        context.title = converted['title']
+        context.text = converted['text']
+        context.description = extract_description(converted['text'])
+
+        # tags and attachments
+        set_tags(context, request, converted['tags'])
+        creator = userid
+        attachments_folder = context['attachments']
+        upload_attachments(converted['attachments'], attachments_folder,
+                           creator, request)
+
+        # modified
+        context.modified_by = userid
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        self.filestore.clear()
+        location = model_url(context, request)
+        msg = "?status_message=Page%20edited"
+        return HTTPFound(location=location+msg)
 
 def show_page_view(context, request):
 
@@ -173,87 +281,3 @@ def show_page_view(context, request):
         next=next,
         layout=layout,
         )
-
-
-def edit_page_view(context, request):
-
-    tags_list = request.POST.getall('tags')
-    form = EditPageForm(tags_list=tags_list)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-
-            context.title = converted['title']
-            context.text = converted['text']
-            context.description = extract_description(converted['text'])
-
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
-
-            # Save new attachments
-            creator = authenticated_userid(request)
-            store_attachments(context['attachments'], request.params, creator)
-
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = "?status_message=Page%20edited"
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = dict(
-            title = context.title,
-            text = context.text,
-            )
-
-    # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-        )
-
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    community = find_community(context)
-    layout_provider = get_layout_provider(context, request)
-    if community is not None:
-        layout = layout_provider('community')
-    else:
-        layout = layout_provider('generic')
-
-    return render_form_to_response(
-        'templates/addedit_page.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(client_json_data),
-        layout=layout,
-        )
-
-class AddPageForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-
-class EditPageForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    text = baseforms.text
-

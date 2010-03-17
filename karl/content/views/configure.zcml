@@ -233,11 +233,51 @@
 
   </formish:form>
 
+  <formish:form
+     controller=".page.AddPageFormController"
+     name="add_page.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IPage"
+     controller=".page.EditPageFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
   <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    name="add_page.html"
-    view=".page.add_page_view"
-    permission="create"
+    for="karl.content.interfaces.IPage"
+    view=".page.show_page_view"
+    permission="view"
   />
 
   <view
@@ -250,21 +290,6 @@
     for="karl.content.interfaces.ICommunityFolder"
     view=".files.advanced_folder_view"
     name="advanced.html"
-    permission="create"
-  />
-
-
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    name="add_page.html"
-    view=".page.add_page_view"
-    permission="create"
-  />
-
-  <view
-    for="karl.content.interfaces.IReferenceSection"
-    name="add_page.html"
-    view=".page.add_page_view"
     permission="create"
   />
 
@@ -557,37 +582,66 @@
   </formish:form>
 
   <view
-    for="karl.content.interfaces.IPage"
-    view=".page.show_page_view"
-    permission="view"
-  />
-
-  <view
-    for="karl.content.interfaces.IPage"
-    name="edit.html"
-    view=".page.edit_page_view"
-    permission="create"
-  />
-
-  <view
     for="karl.content.interfaces.INewsItem"
     view=".newsitem.show_newsitem_view"
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    name="add_newsitem.html"
-    view=".newsitem.add_newsitem_view"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.views.interfaces.INetworkNewsMarker"
+     controller=".newsitem.AddNewsItemFormController"
+     name="add_newsitem.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
-    for="karl.content.interfaces.INewsItem"
-    name="edit.html"
-    view=".newsitem.edit_newsitem_view"
-    permission="create"
-  />
+     for="karl.content.views.interfaces.INetworkNewsMarker"
+     view=".newsitem.newsitem_photo_filestore_view"
+     name="photo_from_filestore"
+     permission="create"
+     />
+
+  <view
+     for="karl.content.interfaces.INewsItem"
+     view=".newsitem.newsitem_photo_filestore_view"
+     name="photo_from_filestore"
+     permission="create"
+     />
+
+  <formish:form
+     for="karl.content.interfaces.INewsItem"
+     controller=".newsitem.EditNewsItemFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <adapter
       for="karl.content.interfaces.IWikiPage
@@ -774,26 +828,68 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IIntranetsTool"
-    view=".intranets.add_intranet_view"
-    name="add_intranet.html"
-    permission="administer"
-  />
+  <formish:form
+     for="karl.content.interfaces.IIntranetsTool"
+     controller=".intranets.AddIntranetFormController"
+     name="add_intranet.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
 
-  <view
-    for="karl.models.interfaces.IIntranet"
-    view=".intranets.edit_intranet_view"
-    name="edit_intranet.html"
-    permission="administer"
-  />
+    <formish:action
+       name="submit"
+       title="submit"
+       />
 
-  <view
-    for="karl.models.interfaces.IIntranets"
-    view=".intranets.edit_intranet_root_view"
-    name="edit.html"
-    permission="administer"
-  />
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IIntranet"
+     controller=".intranets.EditIntranetFormController"
+     name="edit_intranet.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IIntranets"
+     controller=".intranets.EditIntranetRootFormController"
+     name="edit.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICommunityRootFolder"

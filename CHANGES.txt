@@ -4,10 +4,16 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #530799 (partial): Converted the following forms to use formish
+  instead of enformed for form generation and validations: profile edit,
+  admin profile edit, add user, add news item, edit news item, add
+  intranet, edit intranet, edit intranets root, add page, edit page.
 
 3.23 (2010-03-16)
 -----------------
+
+- LP #538272: Fixed add / edit community forms to pass the page_title
+  in to the TemplateAPI object instead of directly to the template.
 
 - LP #533366 Added simple retry capability to run_daemon, primarily to 
   avoid tripping the error monitor when conflict errors ocurr.

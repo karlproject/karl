@@ -178,7 +178,7 @@ def show_forum_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+    layout = layout_provider('generic')
 
     return render_template_to_response(
         'templates/show_forum.pt',

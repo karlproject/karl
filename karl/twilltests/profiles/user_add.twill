@@ -1,15 +1,15 @@
 # Add a new user
 go /profiles/add.html
 fv save login "tempuser"
-fv save password "password"
-fv save password_confirm "password"
+fv save password.password "password"
+fv save password.confirm "password"
 fv save firstname "Test"
 fv save lastname "User"
 fv save country "AF"
-fv save groupfield-group-KarlStaff "on"
+fv save groups "group.KarlStaff"
 fv save email "tempuser@example.com"
 fv save biography "User account (Test User/tempuser) added by Twill test (profiles.user_add.twill)"
-formfile save photo "${test_path}/profiles/profile.jpg" image/jpeg
+formfile save photo.file "${test_path}/profiles/profile.jpg" image/jpeg
 submit
 
 # Verify user added

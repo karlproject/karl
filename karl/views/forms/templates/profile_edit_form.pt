@@ -1,0 +1,47 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <script type="text/javascript" 
+        src="${api.static_url}/jquery-ui/1.7/ui/ui.sortable.js">//</script>
+    <script type="text/javascript" 
+        src="${api.static_url}/formish.js">//</script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        formish();
+      });
+      //]]>
+    </script>
+  </span>
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">${form_title}</h1>
+
+    <div tal:condition="include_blurb">
+        <p>
+        Use the following form to edit your profile information. If
+        you would like to delete your ${api.system_name} account and remove yourself
+        from all communities, click this <a
+        href="${api.here_url}delete.html" id="deleteuserlink">delete
+        account</a> link and say <em>yes</em> to the confirmation
+        window. If you would like to change your password, please click
+        <a href="${api.here_url}change_password.html">Change Password</a>.
+        </p>
+    </div>
+
+    <span tal:content="structure request.form()" tal:omit-tag=""/>
+
+    <a tal:condition="admin_edit|False"
+       href="${api.here_url}delete.html"
+       id="deleteuserlink">delete this user</a>
+    
+  </div>
+  
+</div>
+

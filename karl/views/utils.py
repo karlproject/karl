@@ -37,9 +37,12 @@ from karl.utils import get_setting
 from karl.models.interfaces import IImageFile
 from karl.models.image import mimetypes as image_mimetypes
 
+from karl.views.forms.filestore import get_filestore
+
 from simplejson import JSONEncoder
 from textwrap import dedent
 from PIL import Image
+from webob import Response
 import transaction
 
 _convert_to_dashes = re.compile(r"""[\s/:"']""") # ' damn you emacs
@@ -264,9 +267,16 @@ def get_user_home(context, request):
 
     return communities, []
 
+def photo_from_filestore_view(context, request, form_id):
+    key = request.subpath[-1]
+    filestore = get_filestore(context, request, form_id)
+    cache_tag, headers, bodyfile = filestore.get(key)
+    r = Response(headerlist=headers, app_iter=bodyfile)
+    return r
+
 def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
     upload = form.get("photo", None)
-    if upload is not None:
+    if upload is not None and upload.file is not None:
         upload_file = upload.file
         if hasattr(upload, 'type'):
             upload_type = upload.type # FieldStorage
@@ -317,7 +327,8 @@ def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
         check_upload_size(context, photo, 'photo')
 
     # Handle delete photo (ignore if photo also uploaded)
-    elif form.get("photo_delete", False):
+    elif (form.get("photo_delete", False) or
+          (upload and upload.metadata.get("remove", False))):
         photo = context.get_photo()
         if photo is not None:
             del context[photo.__name__]

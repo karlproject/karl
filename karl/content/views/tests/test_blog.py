@@ -21,6 +21,10 @@ from repoze.bfg import testing
 
 from zope.interface import implements
 
+from karl.testing import DummyFile
+from karl.testing import DummySessions
+from karl.testing import DummyTags
+from karl.testing import DummyTagQuery
 
 class ShowBlogViewTests(unittest.TestCase):
     def setUp(self):
@@ -657,23 +661,9 @@ class DummyAdapter:
         self.context = context
         self.request = request
 
-class DummyTagQuery(DummyAdapter):
-    tagswithcounts = []
-    docid = 'ABCDEF01'
-
-class DummyTags:
-    def update(self, *args, **kw):
-        self._called_with = (args, kw)
-
-class DummyFile:
-    def __init__(self, **kw):
-        self.__dict__.update(kw)
-        self.size = 0
-
 class DummyCreationDateIndex:
     def discriminator(self, obj, default):
         return obj.created
-
 
 class DummyWorkflow:
     state_attr = 'security_state'
@@ -696,10 +686,4 @@ class DummyWorkflow:
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
-
-class DummySessions(dict):
-    def get(self, name, default=None):
-        if name not in self:
-            self[name] = {}
-        return self[name]
 

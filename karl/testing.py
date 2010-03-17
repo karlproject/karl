@@ -193,6 +193,11 @@ class DummyMailer(list):
     def send(self, mfrom, mto, msg):
         self.append(self.DummyMessage(mfrom, mto, msg))
 
+class DummyFile:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+        self.size = 0
+
 class DummyUsers:
     def __init__(self, community=None, encrypt=None):
         self.removed_users = []
@@ -275,6 +280,8 @@ class DummyUsers:
         self._by_id[userid]["password"] = get_sha_password(password)
 
     def change_login(self, userid, new_login):
+        if new_login == 'raise_value_error':
+            raise ValueError, 'This is the error message.'
         user = self._by_id[userid]
         del self._by_login[user['login']]
         self._by_login[new_login] = user
@@ -307,11 +314,19 @@ class DummySearchAdapter:
             # simulate a text index parse exception
             from zope.index.text.parsetree import ParseError
             raise ParseError("Query contains only common words: 'the'")
+        if kw.get('email') == ['match@x.org']:
+            # simulate finding a match for an email address
+            profile = DummyProfile(__name__='match')
+            return 1, [1], [profile]
         return 0, [], None
 
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
+
+class DummyTags:
+    def update(self, *args, **kw):
+        self._called_with = (args, kw)
 
 class DummyFolderAddables(DummyAdapter):
     def __init__(self, context, request):
@@ -378,6 +393,12 @@ class DummySecurityWorkflow:
 
     def execute(self, request, transition_id):
         self.context.transition_id = transition_id
+
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
 
 def registerLayoutProvider():
     from karl.views.interfaces import ILayoutProvider

@@ -69,6 +69,7 @@ from karl.utils import get_setting
 
 from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
+from karl.views.utils import photo_from_filestore_view
 from karl.views.forms.widgets import ManageMembersWidget
 
 
@@ -535,11 +536,7 @@ def _add_existing_users(context, community, profiles, text, request):
     return HTTPFound(location=location)
 
 def accept_invitation_photo_view(context, request):
-    key = request.subpath[-1]
-    filestore = get_filestore(context, request, 'accept-invitation')
-    cache_tag, headers, bodyfile = filestore.get(key)
-    r = Response(headerlist=headers, app_iter=bodyfile)
-    return r
+    return photo_from_filestore_view(context, request, 'accept-invitation')
 
 class AcceptInvitationFormController(object):
     def __init__(self, context, request):
