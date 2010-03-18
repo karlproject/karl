@@ -426,6 +426,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
 
     _delBox: function(li, /*optional*/ initializing) {
         var self = this;
+        li = $(li);
         // Update bubble if counter > 1
         var tagkey = li.find('input')[0].value;
         var cached = this.bubbles[tagkey];
