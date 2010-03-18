@@ -167,13 +167,16 @@ def populate(root, do_transaction_begin=True):
             advanced_folder_view(target[marker[0]], request)
 
         # Now the terms and conditions, and privacy statement
-        from karl.content.views.page import add_page_view
+        from karl.content.views.page import AddPageFormController
         for page in office_data.pages:
-            request.POST.clear()
-            request.POST['form.submitted'] = True
-            request.POST['title'] = page[0]
-            request.POST['text'] = page[2]
-            add_page_view(offices['files'], request)
+            converted = {'title': page[0],
+                         'text': page[2],
+                         'tags': [],
+                         'attachments': [],
+                         }
+            request.environ['repoze.browserid'] = '1'
+            controller = AddPageFormController(offices['files'], request)
+            response = controller.handle_submit(converted)
             offices['files'][page[0]].title = page[1]
 
 
