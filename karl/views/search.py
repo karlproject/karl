@@ -291,7 +291,10 @@ def jquery_livesearch_view(context, request):
         if factory is None:
             continue
 
-        num, docids, resolver = factory()
+        try:
+            num, docids, resolver = factory()
+        except ParseError:
+            continue
 
         groupname = listitem['title']
 

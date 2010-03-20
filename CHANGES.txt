@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #532879 Added a try/except block to catch ParseError exceptions
+  in JQuery live search view to avoid contaminating error logs with
+  ignored exceptions.
+
 - The wiki links would not work for non-ascii characters because the
   title was saved as unicode and the text as html entities, causing
   the link matching code to return zero matches. Added function to
