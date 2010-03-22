@@ -247,7 +247,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('testing+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
-        self.failIf(info.get('errors'))
+        self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
@@ -261,7 +261,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('with-hyphen+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
-        self.failIf(info.get('errors'), info)
+        self.failIf(info.get('error'), info)
         self.assertEqual(info['community'], 'with-hyphen')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
@@ -301,14 +301,17 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_crackHeaders_default_ok(self):
+        from karl.testing import DummyUsers
         context = self._makeContext()
+        context.users = DummyUsers()
         profile = self._makeContext()
         profile.__name__ = 'extant'
         by_email = {'extant@example.com': profile}
         pf = context['profiles'] = self._makeContext()
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
-        cf['testing'] = self._makeContext()
+        community = cf['testing'] = self._makeContext()
+        tool = community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -317,7 +320,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.subject = 'subject'
 
         info = mailin.crackHeaders(message)
-        self.failIf(info.get('errors'))
+        self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
@@ -325,14 +328,17 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['subject'], 'subject')
 
     def test_crackHeaders_default_community_in_CC(self):
+        from karl.testing import DummyUsers
         context = self._makeContext()
+        context.users = DummyUsers()
         profile = self._makeContext()
         profile.__name__ = 'extant'
         by_email = {'extant@example.com': profile}
         pf = context['profiles'] = self._makeContext()
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
-        cf['testing'] = self._makeContext()
+        community = cf['testing'] = self._makeContext()
+        tool = community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -342,12 +348,36 @@ class MailinDispatcherTests(unittest.TestCase):
         message.subject = 'subject'
 
         info = mailin.crackHeaders(message)
-        self.failIf(info.get('errors'))
+        self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
         self.assertEqual(info['author'], 'extant')
         self.assertEqual(info['subject'], 'subject')
+
+    def test_crackHeaders_permission_denied(self):
+        from repoze.bfg.testing import registerDummySecurityPolicy
+        registerDummySecurityPolicy('someuser', permissive=False)
+        from karl.testing import DummyUsers
+        context = self._makeContext()
+        context.users = DummyUsers()
+        profile = self._makeContext()
+        profile.__name__ = 'extant'
+        by_email = {'extant@example.com': profile}
+        pf = context['profiles'] = self._makeContext()
+        pf.getProfileByEmail = lambda email: by_email.get(email)
+        cf = context['communities'] = self._makeContext()
+        community = cf['testing'] = self._makeContext()
+        tool = community['default'] = self._makeContext()
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('testing@example.com',)
+        message.from_ = ('extant@example.com',)
+        message.subject = 'subject'
+
+        info = mailin.crackHeaders(message)
+        self.assertEqual(info.get('error'), 'Permission Denied')
 
     def test_crackPayload_empty(self):
         mailin = self._makeOne()

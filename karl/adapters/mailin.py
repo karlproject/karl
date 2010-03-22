@@ -1,12 +1,16 @@
+import webob
+
 from email.utils import getaddresses
 import re
 from zope.interface import implements
 from zope.component import getUtility
+from repoze.bfg.security import has_permission
 from karl.adapters.interfaces import IMailinDispatcher
 from karl.mail import decode_header
 from karl.utilities.interfaces import IMailinTextScrubber
 from karl.utils import find_communities
 from karl.utils import find_profiles
+from karl.utils import find_users
 
 REPLY_REGX = re.compile(r'(?P<community>\w+(-\w+)*)\+(?P<tool>\w+)'
                          '-(?P<reply>\w+)@')
@@ -167,6 +171,28 @@ class MailinDispatcher(object):
 
         return info
 
+    def checkPermission(self, info):
+        """
+        Uses ACL security policy to determine whether user has permission to
+        author content in the given context.
+        """
+        communities = find_communities(self.context)
+        community = communities[info['community']]
+        target = community[info['tool']]
+        users = find_users(self.context)
+        user = users.get_by_id(info['author'])
+        permission = "create"   # XXX In theory could depend on target
+
+        # BFG Security API always assumes http request, so we fabricate a fake
+        # request.
+        request = webob.Request.blank('/')
+        request.environ['repoze.who.identity'] = user
+
+        info = {}
+        if not has_permission(permission, target, request):
+            info['error'] = 'Permission Denied'
+        return info
+
     def crackHeaders(self, message):
         """ See IMailinDispatcher.
         """
@@ -181,6 +207,11 @@ class MailinDispatcher(object):
         # Next, add the necessary info for creating an object from the
         # message.
         info.update(self.getMessageAuthorAndSubject(message))
+        if info.get('error'):
+            return info
+
+        # Check that author has permission to create content in the target
+        info.update(self.checkPermission(info))
         if info.get('error'):
             return info
 

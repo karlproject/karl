@@ -18,13 +18,15 @@ Unreleased
   admin profile edit, add user, add news item, edit news item, add
   intranet, edit intranet, edit intranets root, add page, edit page.
 
+- LP #544201 Added check for 'create' permission on target for mailin.
+
 3.23 (2010-03-16)
 -----------------
 
 - LP #538272: Fixed add / edit community forms to pass the page_title
   in to the TemplateAPI object instead of directly to the template.
 
-- LP #533366 Added simple retry capability to run_daemon, primarily to 
+- LP #533366 Added simple retry capability to run_daemon, primarily to
   avoid tripping the error monitor when conflict errors ocurr.
 
 - LP #538273:  Added a '--timeout' option to 'update_feeds' script:  if
