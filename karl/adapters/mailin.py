@@ -181,6 +181,7 @@ class MailinDispatcher(object):
         target = community[info['tool']]
         users = find_users(self.context)
         user = users.get_by_id(info['author'])
+        user['repoze.who.userid'] = info['author']
         permission = "create"   # XXX In theory could depend on target
 
         # BFG Security API always assumes http request, so we fabricate a fake
