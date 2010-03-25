@@ -1,11 +1,14 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.25 (2010-03-25)
+-----------------
 
 - LP #546902: Removed the 500 character limit validator from the 'text'
   field on the community member and new user invite forms.
+
+- Fixed a failing unittest for mailin dispatcher.  Did not affect production
+  usage.
 
 3.24 (2010-03-22)
 -----------------
