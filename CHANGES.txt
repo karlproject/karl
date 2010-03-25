@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #546902: Removed the 500 character limit validator from the 'text'
+  field on the community member and new user invite forms.
 
 3.24 (2010-03-22)
 -----------------
