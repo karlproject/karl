@@ -452,9 +452,7 @@ class AddExistingUserFormController(object):
                 validator=validator.Required()
                 ))
              ),
-            ('text', schemaish.String(
-                validator=validator.Length(max=500)
-                )
+            ('text', schemaish.String()
              ),
             ]
 
@@ -715,7 +713,7 @@ class InviteNewUsersFormController(object):
             ('email_addresses',
              schemaish.Sequence(email, validator=validator.Required())),
             ('text',
-             schemaish.String(validator=validator.Length(max=500))),
+             schemaish.String()),
             ]
 
     def form_widgets(self, fields):
