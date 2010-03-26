@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.26 (2010-03-26)
+-----------------
 
 - LP #548352 Fixed bug which caused alerts to fail if a community had a comma
   in it's title.
