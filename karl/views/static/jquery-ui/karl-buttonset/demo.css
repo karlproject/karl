@@ -1,0 +1,17 @@
+
+body {
+    font-family: sans-serif;
+    margin: 2em;
+    color: black;
+    background-color: white;
+}
+
+/* Style the toolbar and the buttons in it */
+
+.toolbar {
+    width: 500px;
+    padding: .4em;
+    font-size: 80.0%;
+}
+
+
