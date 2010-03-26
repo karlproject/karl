@@ -151,7 +151,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         karltesting.registerSettings()
 
         # Create dummy site skel
-        community = karltesting.DummyCommunity()
+        self.community = community = karltesting.DummyCommunity()
         site = community.__parent__.__parent__
 
         profiles = testing.DummyModel()
@@ -197,6 +197,21 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
                          alert.message["reply-to"])
+
+    def test_community_name_has_commas(self):
+        self.community.title = 'Dummy, Community'
+        request = testing.DummyRequest()
+        alert = self._makeOne(self.blogentry, self.profile, request)
+        self.assertEqual("community@karl3.example.com",
+                         alert.mfrom)
+        self.assertEqual(1, len(alert.mto))
+        self.assertEqual("member@x.org", alert.mto[0])
+
+        from karl.mail import Message
+        self.failUnless(isinstance(alert.message, Message))
+        self.assertEqual(u"Dummy Community <community+blog-7FFFFFFF@karl3.example.com>",
+                         alert.message["reply-to"])
+
 
     def test_digest(self):
         request = testing.DummyRequest()

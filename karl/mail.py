@@ -69,7 +69,10 @@ def encode_header(name, value):
                     str(Header(user)), addr.encode('ascii')
                 )
             else:
-                addr = addr.encode('ascii')
+                try:
+                    addr = addr.encode('ascii')
+                except:
+                    raise Exception("wtf %s %s %s", (name, value, addr))
             addrs.append(addr)
         value = ', '.join(addrs)
 

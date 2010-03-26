@@ -275,7 +275,7 @@ class BlogAlert(Alert):
         system_name = get_setting(self.context, "system_name", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
-        reply_to = "%s <%s+blog-%s@%s>" % (community.title,
+        reply_to = "%s <%s+blog-%s@%s>" % (community.title.replace(',', ''),
                                            community.__name__,
                                            docid_to_hex(blogentry.docid),
                                            system_email_domain)
