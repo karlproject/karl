@@ -1016,10 +1016,19 @@ class TestErrorMonitorSubsystemView(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/admin/error_monitor_subsystem.pt'
         )
-        self.log_error('head', 'foo')
+        self.log_error('head', u'fo\xf2'.encode('utf-8'))
         self.log_error('head', 'bar')
         self.call_fut('head')
-        self.assertEqual(renderer.entries, ['foo', 'bar'])
+        self.assertEqual(renderer.entries, [u'fo\xf2', 'bar'])
+
+    def test_bad_head_bad_characters(self):
+        renderer = testing.registerDummyRenderer(
+            'templates/admin/error_monitor_subsystem.pt'
+        )
+        self.log_error('head', 'fo\x92')
+        self.log_error('head', 'bar')
+        self.call_fut('head')
+        self.assertEqual(renderer.entries, [u'fo\x92', 'bar'])
 
 class TestErrorMonitorStatusView(unittest.TestCase):
     def setUp(self):

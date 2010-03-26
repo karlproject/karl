@@ -7,6 +7,9 @@ Unreleased
 - LP #548352 Fixed bug which caused alerts to fail if a community had a comma
   in it's title.
 
+- LP #548352 Fixed bug in error monitor where log messages containing unknown
+  character encoding data could render the log unviewable.
+
 3.25 (2010-03-25)
 -----------------
 

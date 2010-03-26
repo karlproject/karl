@@ -383,6 +383,7 @@ def syslog_view(context, request):
     with codecs.open(syslog_path, encoding='utf-8',
                      errors='replace') as syslog:
         for line in syslog:
+            line = _decode(line)
             try:
                 month, day, time, host, instance, message = line.split(None, 5)
             except ValueError:
@@ -557,11 +558,22 @@ class UploadUsersView(object):
             allowed_fields=self.allowed_fields,
         )
 
+def _decode(s):
+    """
+    Convert to unicode, by hook or crook.
+    """
+    try:
+        return s.decode('utf-8')
+    except UnicodeDecodeError:
+        # Will probably result in some junk characters but it's better than
+        # nothing.
+        return s.decode('latin-1')
+
 def _get_error_monitor_state(error_monitor_dir, subsystem):
     status_file = os.path.join(error_monitor_dir, subsystem)
     if os.path.exists(status_file) and os.path.getsize(status_file) > 0:
         errors = open(status_file, 'rb').read()
-        return filter(None, [entry.strip() for entry in
+        return filter(None, [_decode(entry.strip()) for entry in
                              errors.split('ENTRY\n')])
     return []
 
