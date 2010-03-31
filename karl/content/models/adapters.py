@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -85,12 +85,21 @@ def _extract_file_data(context):
     if converter is None:
         return ''
     try:
-        filename = context.blobfile._current_filename()
+        blobfile = context.blobfile
+        if hasattr(blobfile, '_current_filename'):
+            # ZODB < 3.9
+            filename = context.blobfile._current_filename()
+        else:
+            # ZODB >= 3.9
+            filename = blobfile._p_blob_uncommitted
+            if not filename:
+                filename = blobfile._p_blob_committed
+            assert filename, "Can't find filename for blob."
     except POSKeyError, why:
         if why[0] != 'No blob file':
             raise
         return ''
-        
+
     try:
         stream, encoding = converter.convert(filename, encoding=None,
                                              mimetype=context.mimetype)
@@ -98,7 +107,7 @@ def _extract_file_data(context):
         # Just won't get indexed
         log.exception("Error converting file %s" % filename)
         return ''
-    
+
     datum = stream.read(1<<21) # XXX dont read too much into RAM
     if encoding is not None:
         try:
@@ -106,7 +115,7 @@ def _extract_file_data(context):
         except UnicodeDecodeError:
             # XXX Temporary workaround to get import working
             # The "encoding" is a lie.  Coerce to ascii.
-            log.error("Converted text is not %s: %s" % 
+            log.error("Converted text is not %s: %s" %
                         (encoding, filename))
             if len(datum) > 0:
                 datum = repr(datum)[2:-2]
@@ -129,6 +138,6 @@ class CalendarEventCategoryData(object):
             category = model_path(calendar)
         return category
 
-        
-                
-    
+
+
+
