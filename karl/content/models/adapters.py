@@ -94,7 +94,9 @@ def _extract_file_data(context):
             filename = blobfile._p_blob_uncommitted
             if not filename:
                 filename = blobfile._p_blob_committed
-            assert filename, "Can't find filename for blob."
+            if not filename:
+                # Blob file does not exist on filesystem
+                return ''
     except POSKeyError, why:
         if why[0] != 'No blob file':
             raise
