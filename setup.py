@@ -119,6 +119,7 @@ setup(name='karl',
       echo_log = karl.scripts.echo_log:main
       mailout = karl.scripts.mailout:main
       reset_security_workflows = karl.scripts.reset_security_workflows:main
+      use_pgtextindex = karl.scripts.use_pgtextindex:main
       """
       )
 

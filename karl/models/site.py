@@ -167,6 +167,31 @@ def get_textrepr(object, default):
         return tr
     return default
 
+def get_weighted_textrepr(object, default):
+    # For use with experimental pgtextindex, which uses a list of strings,
+    # in descending order by weight.
+
+    # The so called 'standard' repr already has a weight of sorts applied to
+    # it, accomplished by repeating the elements that are supposed to be more
+    # heavily weighted.  For the purposes of supporting both types of text
+    # indexes, this double weighting is fine.
+    standard_repr = get_textrepr(object, default)
+
+    # If we wouldn't normally index it, then we can stop now
+    if standard_repr is default:
+        return default
+
+    # Weight title most, description second, then whatever get_textrepr returns
+    reprs = []
+    for attr in ('title', 'description'):
+        value = getattr(object, attr, '')
+        if not isinstance(value, basestring):
+            value = ''
+        reprs.append(value)
+    reprs.append(standard_repr)
+
+    return reprs
+
 def _get_date_or_datetime(object, attr, default):
     d = getattr(object, attr, None)
     if (isinstance(d, datetime.datetime) or
