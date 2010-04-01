@@ -402,7 +402,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // use error sent by server, if available
         var error = json && json.error;
         if (! error) {
-            error = 'Server error when adding tag';
+            error = 'Adding tag failed';
         }
         // Report the error
         this._appendStatusWithBubble(error, cached.li);
@@ -470,7 +470,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // use error sent by server, if available
         var error = json && json.error;
         if (! error) {
-            error = 'Server error when deleting tag';
+            error = 'Deleting tag failed';
         }
         // Report the error
         this._appendStatusWithBubble(error, cached.li);
