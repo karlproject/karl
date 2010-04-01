@@ -262,6 +262,21 @@ class TestFileUpload2(unittest.TestCase):
         self.assertEqual(result.metadata, {})
         self.assertEqual(result.filename, None)
 
+    def test_from_request_data_name_equals_default_with_upload(self):
+        from schemaish.type import File as SchemaFile
+        filestore = DummyFileStore()
+        filestore['abc'] = ('tag', [('Filename', 'abc'), ('Content-Type',
+                                     'content-type')], 'file')
+        widget = self._makeOne(filestore)
+        field = DummyField()
+        storage = DummyFieldStorage()
+        result = widget.from_request_data(field,
+                                          {'name':['abc'], 'default':['abc'],
+                                           'file': [storage]})
+        self.assertEqual(result.__class__, SchemaFile)
+        self.assertEqual(result.metadata, {})
+        self.assertEqual(result.filename, 'abc')
+
     def test_from_request_data_name_notequal_default_missing(self):
         filestore = DummyFileStore()
         widget = self._makeOne(filestore)

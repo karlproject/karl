@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- LP #552517: Fixed bug where new uploads w/ the same filename would fail
+  to actually update the stored file.
 
 3.26 (2010-03-26)
 -----------------

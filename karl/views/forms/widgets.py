@@ -199,7 +199,9 @@ class FileUpload2(Widget):
             name = request_data.get('name', [None])[0]
             meta = {'remove':remove, 'default':default, 'name':name}
             return SchemaFile(None, None, None, metadata=meta)
-        elif request_data['name'] == request_data['default']:
+        elif (request_data['name'] == request_data['default']
+              and request_data.get('file') is None):
+            # no file submitted -> no change to the file value
             return SchemaFile(None, None, None)
         else:
             key = request_data['name'][0]
