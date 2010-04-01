@@ -18,6 +18,7 @@
 import errno
 import os
 import signal
+import shlex
 from subprocess import Popen
 from subprocess import PIPE
 import threading
@@ -48,7 +49,9 @@ class BaseConverter:
 
     def execute(self, com):
         out = tempfile.TemporaryFile()
-        PO = Popen(com, shell=True, stdout=out, close_fds=True)
+        args = shlex.split(com)
+        PO = Popen(args, shell=False, stdout=out, stdin=PIPE, stderr=PIPE,
+                   close_fds=True)
         timeout = _ProcTimeout(PO, timeout=self.timeout)
         timeout.start()
         try:

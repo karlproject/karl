@@ -40,11 +40,11 @@ class Converter(BaseConverter):
         
         if sys.platform == 'win32':
             return self.execute(
-                'wvWare -c utf-8 --nographics -x "%s" "%s" 2> nul:' % (
+                'wvWare -c utf-8 --nographics -x "%s" "%s"' % (
                 wvConf_file, filename)), 'utf-8'
         else:
             return self.execute(
-                'wvWare -c utf-8 --nographics -x "%s" "%s" 2> /dev/null' % (
+                'wvWare -c utf-8 --nographics -x "%s" "%s"' % (
                 wvConf_file, filename)), 'utf-8'
 
 DocConverter = Converter()

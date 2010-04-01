@@ -23,7 +23,6 @@ $Id: ppt.py 1331 2005-09-23 07:21:47Z ajung $
 
 import sys
 from karl.utilities.converters.baseconverter import BaseConverter
-from karl.utilities.converters.stripogram import html2text
 
 
 class Converter(BaseConverter):
@@ -38,8 +37,8 @@ class Converter(BaseConverter):
         # XXX don't read entire file into RAM
         
         if sys.platform == 'win32':
-            return self.execute('ppthtml "%s" 2> nul:' % filename), 'utf-8'
+            return self.execute('ppthtml "%s"' % filename), 'utf-8'
         else:
-            return self.execute('ppthtml "%s" 2> /dev/null' % filename), 'utf-8'
+            return self.execute('ppthtml "%s"' % filename), 'utf-8'
 
 PPTConverter = Converter()

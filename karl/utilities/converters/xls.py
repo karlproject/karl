@@ -36,9 +36,9 @@ class Converter(BaseConverter):
 
         if sys.platform == 'win32':
             return self.execute(
-                'xls2csv -d 8859-1 -q 0 "%s" 2> nul:' % filename), 'iso-8859-15'
+                'xls2csv -d 8859-1 -q 0 "%s"' % filename), 'iso-8859-15'
         else:
             return self.execute(
-                'xls2csv -d 8859-1 -q 0 "%s" 2> /dev/null' % filename), 'iso-8859-15'
+                'xls2csv -d 8859-1 -q 0 "%s"' % filename), 'iso-8859-15'
 
 XLSConverter = Converter()

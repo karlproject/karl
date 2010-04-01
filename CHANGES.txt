@@ -4,6 +4,23 @@ karl package Changelog
 Unreleased
 ----------
 
+- In order to be able to kill runaway converter processes correctly,
+  change ``karl.utilities.baseconverter.BaseConverter.execute``: when
+  creating a subprocess, don't use a shell to start the process
+  (``shell=False``), use ``subprocess.PIPE`` as stdin, use
+  ``subprocess.PIPE`` as stderr.
+
+- Change converters that use ``execute``: don't try to redirect stderr
+  output via the command.
+
+- Change rtf2xml converter to not change directory to /tmp (not sure
+  why it was doing that in the first place) as part of its execute
+  command.
+
+- Change rtf2xml converter to not pass ``--no-dtd`` on the command
+  line.  This option has no effect on any recent rtf2xml command I can
+  find.
+
 - LP #552517: Fixed bug where new uploads w/ the same filename would fail
   to actually update the stored file.
 

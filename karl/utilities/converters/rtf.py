@@ -50,8 +50,7 @@ class Converter(BaseConverter):
         """ convert RTF Document """
         # XXX: dont read entire file into RAM
         handler = RTFtextHandler()
-        xmlstr = self.execute(
-            'cd /tmp && rtf2xml --no-dtd "%s"' % filename).read()
+        xmlstr = self.execute('rtf2xml "%s"' % filename).read()
         xml.sax.parseString(xmlstr, handler)
         return handler.getStream(), 'utf-8'
 
