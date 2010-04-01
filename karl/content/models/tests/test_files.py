@@ -101,6 +101,60 @@ class CommunityFileTests(unittest.TestCase):
         self.assertEqual(instance.size, 11)
         self.assertEqual(instance.mimetype, 'text/plain')
         self.assertEqual(instance.filename, 'afile.txt')
+        self.failIf(instance.is_image)
+
+        from karl.content.interfaces import IImage
+        self.failIf(IImage.providedBy(instance))
+
+    def test_jpg(self):
+        from karl.content.interfaces import IImage
+        from pkg_resources import resource_stream
+        stream = resource_stream('karl.content.models.tests', 'test.jpg')
+        o = self._makeOne(stream=stream, mimetype='image/jpeg')
+        self.failUnless(o.is_image)
+        self.failUnless(IImage.providedBy(o))
+        self.assertEqual(o.image_size, (390, 569))
+        self.assertEqual(o.image().size, (390, 569))
+
+        from zope.interface.verify import verifyObject
+        verifyObject(IImage, o)
+
+    def test_bad_image(self):
+        o = self._makeOne(mimetype='image/jpeg')
+        self.failIf(o.is_image)
+
+    def test_thumbnail(self):
+        from pkg_resources import resource_stream
+        stream = resource_stream('karl.content.models.tests', 'test.jpg')
+        o = self._makeOne(stream=stream, mimetype='image/jpeg')
+        thumb = o.thumbnail((200, 200))
+        self.assertEqual(thumb.image_size, (137, 200))
+
+class TestThumbnail(unittest.TestCase):
+    def _getTargetClass(self):
+        from karl.content.models.files import Thumbnail
+        return Thumbnail
+
+    def _makeOne(self, pil_img=None, size=(200, 200)):
+        if pil_img is None:
+            import pkg_resources
+            img_file = pkg_resources.resource_stream(
+                'karl.content.models.tests', 'test.jpg'
+            )
+            import PIL.Image
+            pil_img = PIL.Image.open(img_file)
+
+        return self._getTargetClass()(pil_img, size)
+
+    def test_thumb(self):
+        thumb = self._makeOne()
+        self.assertEqual(thumb.image_size, (137, 200))
+        self.assertEqual(thumb.image().size, (137, 200))
+
+    def test_wide_thumb(self):
+        thumb = self._makeOne(size=(200, 600))
+        self.assertEqual(thumb.image_size, (200, 291))
+        self.assertEqual(thumb.image().size, (200, 291))
 
 class TestFilesToolFactory(unittest.TestCase):
     def setUp(self):

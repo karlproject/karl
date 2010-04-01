@@ -113,7 +113,7 @@ class IWiki(IFolder):
 
     title = Attribute(u'Title needed for backlinks')
 
-class IWikiPage(ICommunityContent, IPages):
+class IWikiPage(IFolder, ICommunityContent, IPages):
     """A page using wiki markup
     """
     taggedValue('name', 'Wiki Page')
@@ -169,6 +169,22 @@ class ICommunityFile(ICommunityContent, IFiles):
     mimetype = Attribute(u'Content type')
     filename = Attribute(u'Uploaded filename')
     size = Attribute(u'Size in bytes')
+
+class IImage(Interface):
+    """ An image. """
+
+    image_size = Attribute(u'Tuple of (width, height) in pixels.')
+
+    def thumbnail(size):
+        """
+        Returns resized image bound by size, which is a tuple of
+        (width, height).
+        """
+
+    def image():
+        """
+        Returns instance of PIL.Image.
+        """
 
 class IForumsFolder(IFolder):
     """ A folder that contains forums """

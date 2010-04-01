@@ -136,7 +136,7 @@ class TestAddFolderFormController(unittest.TestCase):
         self.assertEqual(defaults['title'], '')
         self.assertEqual(defaults['tags'], [])
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = testing.DummyModel()
@@ -197,7 +197,7 @@ class TestAddFolderFormController(unittest.TestCase):
         self.assertEqual(context['a-title'].userid, 'userid')
         self.assertEqual(context.tags.updated,
             [(None, 'userid', ['thetesttag'])])
-    
+
 class TestDeleteFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -295,7 +295,7 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(defaults['file'], None)
         self.assertEqual(defaults['sendalert'], True)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._register()
         self._registerDummyWorkflow()
@@ -561,11 +561,49 @@ class TestDownloadFileView(unittest.TestCase):
         context.blobfile = blobfile
         context.mimetype = 'x/foo'
         context.filename = 'thefilename'
+        context.size = 42
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response.headerlist[0],
+        self.assertEqual(response.headerlist[1],
                          ('Content-Type', 'x/foo'))
+        self.assertEqual(response.headerlist[2],
+                         ('Content-Length', '42'))
         self.assertEqual(response.app_iter, blobfile)
+
+class TestThumbnailView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _get_context(self):
+        # A little easier to do an integration test here.
+        from pkg_resources import resource_stream
+        from karl.content.models.files import CommunityFile
+        return CommunityFile(
+            'Title',
+            resource_stream('karl.content.models.tests', 'test.jpg'),
+            'image/jpeg',
+            'test.jpg',
+            'chris',
+        )
+
+    def _callFUT(self, context, request):
+        from karl.content.views.files import thumbnail_view
+        return thumbnail_view(context, request)
+
+    def test_it(self):
+        import PIL.Image
+        from cStringIO import StringIO
+        context = self._get_context()
+        request = testing.DummyRequest()
+        request.subpath = ('300x200.jpg',)
+
+        response = self._callFUT(context, request)
+        self.assertEqual(response.content_type, 'image/jpeg')
+        image = PIL.Image.open(StringIO(response.body))
+        self.assertEqual(image.size, (137, 200))
 
 class TestEditFolderFormController(unittest.TestCase):
     def setUp(self):
@@ -608,7 +646,7 @@ class TestEditFolderFormController(unittest.TestCase):
         self.assertEqual(defaults['title'], 'title')
         self.assertEqual(defaults['tags'], [])
         self.assertEqual(defaults['security_state'], 'private')
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = testing.DummyModel()
@@ -729,7 +767,7 @@ class TestEditFileFormController(unittest.TestCase):
         self.assertEqual(defaults['security_state'], 'private')
         self.assertEqual(defaults['file'].filename, 'thefile')
         self.assertEqual(defaults['file'].mimetype, 'text/xml')
-        
+
     def test_form_fields(self):
         self._register()
         self._registerDummyWorkflow()
@@ -1220,4 +1258,4 @@ class DummyShowSendalert(object):
     def __init__(self, context, request):
         pass
     show_sendalert = True
-    
+

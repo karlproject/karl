@@ -652,6 +652,9 @@ class DummyBlogEntry(testing.DummyModel):
         from datetime import datetime
         self.created = datetime.now()
 
+    def get_attachments(self):
+        return self
+
 d1 = 'Wednesday, January 28, 2009 08:32 AM'
 def dummy(date, flavor):
     return d1

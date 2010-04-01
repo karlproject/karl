@@ -9,11 +9,18 @@
  *
  * Depends:
  *	ui.core.js
+ *
+ * - (c) 2010 Balazs Ree <ree@greenfinity.hu>
+ *       A trivial bugfix that prevented the slider to ever
+ *       reach value 0
  */
 
 (function($) {
 
 $.widget("ui.slider", $.extend({}, $.ui.mouse, {
+
+        // XXX Mark the 'value cannot reach 0' fix
+        _uiHash_patched: true,
 
 	_init: function() {
 
@@ -480,11 +487,26 @@ $.widget("ui.slider", $.extend({}, $.ui.mouse, {
 	_uiHash: function(index, value, values) {
 		
 		var multiple = this.options.values && this.options.values.length;
+                // XXX A trivial bug fixed below. See original version in comments.
+                // XXX Apparently fixed (and refactored) on the trunk, so we will 
+                // XXX get the fix with some upgrade.
+		//return {
+		//	handle: this.handles[index],
+		//	value: value || (multiple ? this.values(index) : this.value()),
+		//	values: values || (multiple && this.values())
+		//};
+                if (value === undefined) {
+                    value = multiple ? this.values(index) : this.value();
+                }
+                if (values === undefined) {
+		    values = multiple && this.values();
+                }
 		return {
 			handle: this.handles[index],
-			value: value || (multiple ? this.values(index) : this.value()),
-			values: values || (multiple && this.values())
+			value: value,
+			values: values
 		};
+
 
 	}
 

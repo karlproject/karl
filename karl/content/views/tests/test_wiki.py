@@ -44,7 +44,7 @@ class TestAddWikiPageFormController(unittest.TestCase):
     def _makeOne(self, context, request):
         from karl.content.views.wiki import AddWikiPageFormController
         return AddWikiPageFormController(context, request)
-    
+
     def setUp(self):
         cleanUp()
 
@@ -77,7 +77,7 @@ class TestAddWikiPageFormController(unittest.TestCase):
         self.assertEqual(defaults['text'], '')
         self.assertEqual(defaults['sendalert'], True)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._registerSecurityWorkflow()
         context = testing.DummyModel()
@@ -202,7 +202,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
     def _makeOne(self, context, request):
         from karl.content.views.wiki import EditWikiPageFormController
         return EditWikiPageFormController(context, request)
-    
+
     def setUp(self):
         cleanUp()
 
@@ -248,7 +248,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(defaults['tags'], [])
         self.assertEqual(defaults['text'], 'text')
         self.assertEqual(defaults['security_state'], 'public')
-        
+
     def test_form_fields(self):
         self._register()
         self._registerSecurityWorkflow()
@@ -345,7 +345,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.text, 'text')
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
-        
+
 
 from karl.content.interfaces import IWikiPage
 
@@ -356,6 +356,9 @@ class DummyWikiPage:
         self.text = text
         self.description = description
         self.creator = creator
+
+    def get_attachments(self):
+        return self
 
 class DummyAdapter:
     def __init__(self, context, request):
@@ -378,7 +381,7 @@ class DummyWorkflow:
 
     def state_info(self, context, request):
         return self._state_info
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,

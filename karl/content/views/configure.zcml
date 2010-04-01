@@ -350,6 +350,13 @@
   />
 
   <view
+    for="karl.content.interfaces.IImage"
+    view=".files.thumbnail_view"
+    name="thumb"
+    permission="view"
+    />
+
+  <view
     for="karl.content.interfaces.ICommunityRootFolder"
     name="add_referencemanual.html"
     view=".references.add_referencemanual_view"

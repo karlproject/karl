@@ -31,9 +31,9 @@ class ImageFileTests(unittest.TestCase):
         self.assertEqual(instance.mimetype, 'image/jpeg')
 
     def test_invalid_type(self):
-        self.assertRaises(ValueError, self._makeOne, 
+        self.assertRaises(ValueError, self._makeOne,
                           mimetype="application/pdf")
-        
+
     def test_extension(self):
         image = self._makeOne(mimetype="image/jpeg")
         self.assertEqual("jpg", image.extension)
@@ -41,11 +41,11 @@ class ImageFileTests(unittest.TestCase):
         self.assertEqual("gif", image.extension)
         image = self._makeOne(mimetype="image/png")
         self.assertEqual("png", image.extension)
-        
+
     def test_stream(self):
         image = self._makeOne()
         self.assertEqual(one_pixel_jpeg, image.stream.read())
-        
+
 one_pixel_jpeg = [
     0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01,
     0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43, 0x00, 0x05,
@@ -72,11 +72,11 @@ one_pixel_jpeg = [
 ]
 
 one_pixel_jpeg = ''.join([chr(x) for x in one_pixel_jpeg])
-                         
+
 class DummyFile:
     def __init__(self, content=one_pixel_jpeg):
         self.content = content
-    
+
     def read(self, num):
         content = self.content[:num]
         self.content = self.content[num:]

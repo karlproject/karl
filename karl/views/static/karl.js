@@ -60,17 +60,23 @@ var loadTinyMCE = function loadTinyMCE() {
         mark('plugins/wicked/langs/en');
         mark('plugins/spellchecker/editor_plugin');
         mark('plugins/embedmedia/editor_plugin');
+        mark('plugins/imagedrawer/editor_plugin');
+        mark('plugins/imagedrawer/langs/en');
 
         // See if the wiki plugin needs to be enabled.
         var widget_data = window.karl_client_data && karl_client_data.text || {};
-        var plugins = 'paste,embedmedia';
+        var plugins = 'paste,embedmedia,spellchecker,imagedrawer';
         if (widget_data.enable_wiki_plugin) {
             plugins += ',wicked';
         }
-        plugins += ',spellchecker'
+     
+        // Url that contains the context prefix 
+        var here_url = $('#karl-here-url')[0].content;
 
         // Do the init.
         tinyMCE.init({
+            //content_css: false,
+            //editor_css: false,
             theme: 'advanced',
             skin: 'karl',
             mode: 'specific_textareas',
@@ -100,8 +106,11 @@ var loadTinyMCE = function loadTinyMCE() {
             relative_urls : false,
             forced_root_block : 'p',
             spellchecker_rpc_url: "/tinymce_spellcheck",
-            spellchecker_languages : "+English=en"
-            
+            spellchecker_languages : "+English=en",
+            // options for imagedrawer
+            imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
+            imagedrawer_upload_url: here_url + 'drawer_upload_view.html',
+            imagedrawer_data_url: here_url + 'drawer_data_view.html'
         });  
     } else {
         // XXX raise an error here?

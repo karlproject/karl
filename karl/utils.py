@@ -34,6 +34,7 @@ from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IAttachmentPolicy
 from karl.models.interfaces import IPeopleDirectory
+from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
@@ -167,3 +168,8 @@ def get_folder_addables(context, request):
     return queryMultiAdapter((context, request), IFolderAddables,
                              default=DefaultFolderAddables(context,request))
 
+def find_tempfolder(context):
+    root = find_root(context)
+    if not 'TEMP' in root:
+        root['TEMP'] = TempFolder()
+    return root['TEMP']

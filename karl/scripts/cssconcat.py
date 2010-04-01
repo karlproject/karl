@@ -55,6 +55,7 @@ def main(argv=sys.argv):
             # selected components come here
             filesindir(theme_dir, 'ui.datepicker.css'),
             filesindir(theme_dir, 'ui.dialog.css'),
+            filesindir(theme_dir, 'ui.slider.css'),
             #
             filesindir(theme_dir, 'ui.theme.css'),
             ):

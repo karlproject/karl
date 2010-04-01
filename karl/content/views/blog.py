@@ -48,6 +48,7 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.security.workflow import get_security_states
 from karl.utilities.alerts import Alerts
+from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_interface
@@ -288,7 +289,7 @@ class AddBlogEntryFormController(object):
         if security_states:
             fields.append(('security_state', security_field))
         return fields
-            
+
     def form_widgets(self, fields):
         widgets = {
             'title':formish.Input(empty=''),
@@ -340,11 +341,12 @@ class AddBlogEntryFormController(object):
                 workflow.transition_to_state(blogentry, request,
                                              converted['security_state'])
 
-        # Tags, attachments, alerts
+        # Tags, attachments, alerts, images
         set_tags(blogentry, request, converted['tags'])
         attachments_folder = blogentry['attachments']
         upload_attachments(converted['attachments'], attachments_folder,
                            creator, request)
+        relocate_temp_images(blogentry, request)
 
         if converted['sendalert']:
             alerts = queryUtility(IAlerts, default=Alerts())

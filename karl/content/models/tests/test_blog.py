@@ -73,6 +73,10 @@ class BlogEntryTests(unittest.TestCase):
         from karl.models.interfaces import ICommentsFolder
         verifyObject(ICommentsFolder, instance['comments'])
 
+    def test_get_attachments(self):
+        instance = self._makeOne()
+        self.assertEqual(instance.get_attachments(), instance['attachments'])
+
 class TestBlogToolFactory(unittest.TestCase):
     def setUp(self):
         cleanUp()

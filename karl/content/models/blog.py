@@ -52,6 +52,8 @@ class BlogEntry(Folder):
         self['comments'] = CommentsFolder()
         self['attachments'] = AttachmentsFolder()
 
+    def get_attachments(self):
+        return self['attachments']
 
 class BlogToolFactory(ToolFactory):
     implements(IToolFactory)

@@ -19,8 +19,6 @@ import re
 import htmlentitydefs
 import urllib
 
-from persistent import Persistent
-
 from repoze.bfg.security import authenticated_userid
 from repoze.lemonade.content import create_content
 
@@ -91,11 +89,12 @@ def _unescape(text):
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
 
-class WikiPage(Persistent):
+class WikiPage(Folder):
     implements(IWikiPage)
     modified_by = None
 
     def __init__(self, title, text, description, creator):
+        super(WikiPage, self).__init__()
         self.title = unicode(title)
         if text is None:
             self.text = u''
@@ -176,6 +175,9 @@ class WikiPage(Persistent):
         if changes:
             self.text = new_text
         return changes
+
+    def get_attachments(self):
+        return self
 
 FRONT_PAGE_CONTENT = u"""\
 This is the front page of your wiki.

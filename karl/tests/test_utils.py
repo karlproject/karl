@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -33,21 +33,21 @@ class TestUtilFunctions(unittest.TestCase):
         self.assertEqual(find_catalog(context), None)
         context.catalog = '1'
         self.assertEqual(find_catalog(context), '1')
-        
+
     def test_find_tags(self):
         from karl.utils import find_tags
         context = testing.DummyModel()
         self.assertEqual(find_tags(context), None)
         context.tags = '1'
         self.assertEqual(find_tags(context), '1')
-        
+
     def test_find_profiles(self):
         from karl.utils import find_profiles
         context = testing.DummyModel()
         self.assertEqual(find_profiles(context), None)
         pf = context['profiles'] = testing.DummyModel()
         self.failUnless(find_profiles(context) is pf)
-        
+
     def test_find_communities(self):
         from karl.utils import find_communities
         context = testing.DummyModel()
@@ -112,6 +112,19 @@ class TestUtilFunctions(unittest.TestCase):
         self.assertEqual(coarse_datetime_repr(
             datetime.datetime(2009, 2, 13, 23, 31, 40)), 12345679)
 
+    def test_find_tempfolder_exists(self):
+        from karl.utils import find_tempfolder
+        root = testing.DummyModel()
+        root['TEMP'] = tempfolder = testing.DummyModel()
+        self.assertEqual(find_tempfolder(root), tempfolder)
+
+    def test_find_tempfolder_create(self):
+        from karl.models.tempfolder import TempFolder
+        from karl.utils import find_tempfolder
+        root = testing.DummyModel()
+        tempfolder = find_tempfolder(root)
+        self.failUnless(isinstance(tempfolder, TempFolder))
+        self.assertEqual(root['TEMP'], tempfolder)
 
 class TestDebugSearch(unittest.TestCase):
     def _callFUT(self, context, **kw):
@@ -167,4 +180,3 @@ class TestPersistentBBB(unittest.TestCase):
         self.assertEqual(d.__dict__, {})
         L2 = d.attr
         self.failIf(L is L2)
-        

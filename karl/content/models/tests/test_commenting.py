@@ -87,3 +87,11 @@ class CommentTests(unittest.TestCase):
     def test_instance_construct_with_none(self):
         instance = self._makeOne(text=None)
         self.assertEqual(instance.text, u'')
+
+    def test_instance_construct_with_no_description(self):
+        instance = self._makeOne(description=None)
+        self.assertEqual(instance.description, u'')
+
+    def test_get_attachments(self):
+        instance = self._makeOne(text=None)
+        self.assertEqual(instance.get_attachments(), instance)

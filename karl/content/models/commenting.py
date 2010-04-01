@@ -59,3 +59,6 @@ class Comment(Folder):
             self.description = unicode(description)
         self.creator = unicode(creator)
         self.modified_by = self.creator
+
+    def get_attachments(self):
+        return self

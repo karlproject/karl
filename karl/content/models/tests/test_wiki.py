@@ -77,6 +77,10 @@ class WikiPageTests(unittest.TestCase):
         instance = self._makeOne(text=None)
         self.assertEqual(instance.text, u'')
 
+    def test_instance_construct_description_is_none(self):
+        instance = self._makeOne(description=None)
+        self.assertEqual(instance.description, u'')
+
     def test_cook_empty(self):
         wp = self._makeOne()
         request = testing.DummyRequest()
@@ -204,6 +208,9 @@ class WikiPageTests(unittest.TestCase):
         self.assertEqual(changes, [])
         self.assertEqual(wiki['two'].text, 'I link to ((one missing page))')
 
+    def test_get_attachements(self):
+        page = self._makeOne()
+        self.assertEqual(page.get_attachments(), page)
 
 class TestWikiToolFactory(unittest.TestCase):
     def setUp(self):

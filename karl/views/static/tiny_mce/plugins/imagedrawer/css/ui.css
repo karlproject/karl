@@ -1,0 +1,109 @@
+
+/* imagedrawer classes */
+
+.tiny-imagedrawer-dialog {
+    text-align: left;
+}
+
+.tiny-imagedrawer-panel {
+    padding: 0.5em;
+}
+
+/* hide title bar */
+.tiny-imagedrawer-dialog .ui-dialog-titlebar {
+    display: none;
+}
+
+/* set back what label overwrites globally */
+.tiny-imagedrawer-panel-info label {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+/* a darker overlay. XXX Rather change the theme than overwrite here! */
+.ui-widget-overlay {
+    background: none repeat-x scroll 0 0 #777777;
+    opacity: 0.7;
+}
+
+/* info panel */
+
+.tiny-imagedrawer-info-title {
+    font-size: 1.6em;
+}
+
+.tiny-imagedrawer-info-label {
+    margin-left: -75px;
+    float: left;
+}
+
+.tiny-imagedrawer-info-columnwrapper {
+    padding-left: 75px;
+}
+
+/* XXX temporarily, until panel is filled */
+.tiny-imagedrawer-buttonset-save {
+    position: absolute;
+    top: 435px;
+}
+
+.tiny-imagedrawer-buttonset-upload {
+    margin-left: 0;
+    margin-top: 1.5em;
+}
+
+/* Image listing */
+.tiny-imagedrawer-panel-images {
+    overflow: hidden;
+}
+
+ul.tiny-imagedrawer-imagestripe {
+    padding: 0;
+    margin: 0;
+    border: 0 none transparent;
+    height: 122px; /* must match height of the li */
+
+}
+ul.tiny-imagedrawer-imagestripe li {
+    display: inline-block;
+    height: 120px; /* must match height of the ul */
+    border: 1px solid transparent;
+    text-align: center;
+}
+
+.tiny-imagedrawer-scrollbar {
+    margin: 0 0.5em;
+}
+
+/* Vertical and horizontal positioning 
+ * of the thumbnail inside a fixed size
+ * wrapper. Thumb must fit the wrapper's
+ * dimensions. */
+div.tiny-imagedrawer-image {
+    /* making the dimensions bigger than the image
+     * will add a natural margin. */
+    width: 93px; /* 4px + 85px + 4px */
+    height: 93px; /* 4px + 85px + 4px */
+    display: table-cell;
+    vertical-align: middle;
+}
+
+div.tiny-imagedrawer-image img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /* To be sure. But this should only
+     * have a role with stale oversize thumbs.*/
+    max-height: 85px;
+    max-width: 85px;
+    overflow: hidden;
+}
+
+span.tiny-imagedrawer-imagelabel {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 85px;
+    overflow: hidden;
+    white-space: nowrap;
+}

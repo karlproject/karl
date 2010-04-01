@@ -184,12 +184,18 @@ class DummyBlogEntry(testing.DummyModel):
         from datetime import datetime
         self.created = datetime.now()
 
+    def get_attachments(self):
+        return self
+
 class DummyWikiPage:
     def __init__(self, title, text, description, creator):
         self.title = title
         self.text = text
         self.description = description
         self.creator = creator
+
+    def get_attachments(self):
+        return self
 
 class DummyCalendarEvent(testing.DummyModel):
 
@@ -221,4 +227,4 @@ class DummySessions(dict):
         if name not in self:
             self[name] = {}
         return self[name]
-    
+

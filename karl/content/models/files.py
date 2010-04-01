@@ -15,12 +15,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from persistent import Persistent
+from cStringIO import StringIO
+import PIL.Image
 
+from persistent import Persistent
+from BTrees.OOBTree import OOBTree
 from repoze.lemonade.content import create_content
 
+from zope.interface import alsoProvides
 from zope.interface import implements
 
+from karl.content.interfaces import IImage
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
@@ -47,7 +52,8 @@ class CommunityFolder(Folder):
 
 class CommunityFile(Persistent):
     implements(ICommunityFile)
-    modified_by = None
+    modified_by = None  # Sorry, persistence
+    is_image = False    # Sorry, persistence
 
     def __init__(self, title, stream, mimetype, filename, creator=u''):
         self.title = unicode(title)
@@ -57,6 +63,33 @@ class CommunityFile(Persistent):
         self.modified_by = self.creator
         self.blobfile = Blob()
         self.upload(stream)
+        self._init_image()
+
+    def _init_image(self):
+        if not self.mimetype.startswith('image'):
+            return
+
+        try:
+            image = PIL.Image.open(self.blobfile.open())
+        except IOError:
+            return
+
+        self._thumbs = OOBTree()
+        self.image_size = image.size
+        self.is_image = True
+        alsoProvides(self, IImage)
+
+    def image(self):
+        assert self.is_image, "Not an image."
+        return PIL.Image.open(self.blobfile.open())
+
+    def thumbnail(self, size):
+        assert self.is_image, "Not an image."
+        key = '%dx%d' % size
+        thumbnail = self._thumbs.get(key, None)
+        if thumbnail is None:
+            self._thumbs[key] = thumbnail = Thumbnail(self.image(), size)
+        return thumbnail
 
     def upload(self, stream):
         f = self.blobfile.open('w')
@@ -73,6 +106,42 @@ def upload_stream(stream, file):
         size += len(data)
         file.write(data)
     return size
+
+class Thumbnail(Persistent):
+    mimetype = 'image/jpeg'
+
+    def __init__(self, image, max_size):
+        thumb_size = _thumb_size(image.size, max_size)
+        thumb_img = image.resize(thumb_size, PIL.Image.ANTIALIAS)
+        img_buf = StringIO()
+        thumb_img.save(img_buf, 'JPEG', quality=90)
+
+        data = img_buf.getvalue()
+        self.size = len(data)
+        self.blobfile = blob = Blob()
+        blob.open('w').write(data)
+        self.image_size = thumb_img.size
+
+    def image(self):
+        return PIL.Image.open(self.blobfile.open())
+
+def _thumb_size(orig_size, max_size):
+    orig_x, orig_y = orig_size
+    max_x, max_y = max_size
+
+    x = max_x
+    ratio = float(max_x) / float(orig_x)
+    y = int(orig_y * ratio)
+
+    if y <= max_y:
+        return x, y
+
+    y = max_y
+    ratio = float(max_y) / float(orig_y)
+    x = int(orig_x * ratio)
+
+    assert x < max_x
+    return x, y
 
 class FilesToolFactory(ToolFactory):
     implements(IToolFactory)

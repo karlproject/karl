@@ -728,5 +728,27 @@
     name="mailin"
     />
 
+  <!-- imagedrawer ajax  -->
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_dialog_view"
+    permission="view"
+    name="drawer_dialog_view.html"
+  />
+
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_data_view"
+    permission="view"
+    name="drawer_data_view.html"
+  />
+
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_upload_view"
+    permission="create"
+    name="drawer_upload_view.html"
+  />
+
 </configure>
 

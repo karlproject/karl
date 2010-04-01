@@ -62,6 +62,7 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityRootFolder
+from karl.content.interfaces import IImage
 from karl.content.interfaces import IIntranetRootFolder
 
 from karl.content.views.interfaces import IFileInfo
@@ -484,16 +485,27 @@ def show_file_view(context, request):
         )
 
 def download_file_view(context, request):
+    # To view image-ish files in-line, use thumbnail_view.
     f = context.blobfile.open()
     headers = [
-# Let's not send content-disposition, otherwise you can't use
-# image-ish Files in, say, wiki pages.
-#        ('Content-Disposition', 'attachment; filename=%s' % context.filename),
+        ('Content-Disposition', 'attachment; filename=%s' % context.filename),
         ('Content-Type', context.mimetype),
-        ]
+        ('Content-Length', str(context.size)),
+    ]
 
     response = Response(headerlist=headers, app_iter=f)
     return response
+
+def thumbnail_view(context, request):
+    assert IImage.providedBy(context), "Context must be an image."
+    filename = request.subpath[0] # <width>x<length>.jpg
+    size = map(int, filename[:-4].split('x'))
+    thumb = context.thumbnail(tuple(size))
+
+    # XXX Allow browser caching be setting Last-modified and Expires
+    #     and respecting If-Modified-Since requests with 302 responses.
+    data = thumb.blobfile.open().read()
+    return Response(body=data, content_type=thumb.mimetype)
 
 class EditFolderFormController(object):
     def __init__(self, context, request):

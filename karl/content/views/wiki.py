@@ -37,6 +37,7 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import ICommunity
 
 from karl.utilities.alerts import Alerts
+from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
 
@@ -132,7 +133,7 @@ class AddWikiPageFormController(object):
                 options=[ (s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
-        
+
     def __call__(self):
         api = TemplateAPI(self.context, self.request,
                           'Add Wiki Page')
@@ -169,6 +170,8 @@ class AddWikiPageFormController(object):
         # Save the tags on it.
         set_tags(wikipage, request, converted['tags'])
 
+        relocate_temp_images(wikipage, request)
+
         if converted['sendalert']:
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(wikipage, request)
@@ -176,7 +179,7 @@ class AddWikiPageFormController(object):
         msg = '?status_message=Wiki%20Page%20created'
         location = model_url(wikipage, request) + msg
         return HTTPFound(location=location)
-        
+
 def show_wikipage_view(context, request):
 
     is_front_page = (context.__name__ == 'front_page')
@@ -255,7 +258,7 @@ class EditWikiPageFormController(object):
         if security_states:
             fields.append(('security_state', security_field))
         return fields
-        
+
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
         widgets = {

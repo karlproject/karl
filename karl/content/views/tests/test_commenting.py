@@ -333,3 +333,6 @@ class DummyComment(testing.DummyModel):
             text=text,
             description=description,
             )
+
+    def get_attachments(self):
+        return self

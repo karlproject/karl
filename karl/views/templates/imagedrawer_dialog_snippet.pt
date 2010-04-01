@@ -1,0 +1,110 @@
+<div> 
+  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel">
+    <span class="tiny-imagedrawer-title">Insert Image</span>
+    <a style="float: right;" href="javascript://return false;">help</a>
+    <br />
+    <span style="float: left; margin-right: 0.5em; margin-top: 1.05em; font-weight: normal;">Source</span>
+    <select class="karl-buttonset compact tiny-imagedrawer-buttonset-tabselect">
+      <option value="myrecent" selected="selected"
+          title="Display images that you have recently uploaded yourself"
+          >My Recent</option>
+      <option value="thiscommunity" disabled="1"
+          title="Display images from this community"
+          >This Community</option>
+      <option value="allkarlexternal" disabled="1"
+          title="Display images external to KARL"
+          >All Karl External</option>
+      <option value="uploadnew"
+          title="Upload images into the current page"
+          >Upload New</option>
+    </select>
+    
+  </div>
+
+  <div class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-download">
+    <div style="" class="ui-helper-clearfix">
+      <div style="width: 374px; float: left; height: 380px;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-images">
+        <ul class="tiny-imagedrawer-imagestripe">
+          <!-- The following is used as the prototype image -->
+          <li>
+            <div class="tiny-imagedrawer-image">
+              <img src="http://foo.bar/thumb.jpg"/>
+            </div>
+            <span class="tiny-imagedrawer-imagelabel">
+              An Image
+            </span>
+          </li>
+          <!--  -->
+        </ul>
+        <ul class="tiny-imagedrawer-imagestripe"></ul>
+        <ul class="tiny-imagedrawer-imagestripe"></ul>
+        <div class="tiny-imagedrawer-scrollbar"></div>
+      </div>
+      <div style="width: 257px; float: right;">
+        <div style="height: 380px;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-info">
+          <span class="tiny-imagedrawer-info-title"></span>
+          <br />
+          <br />
+          <div class="tiny-imagedrawer-info-columnwrapper">
+            <span class="tiny-imagedrawer-info-label">Location</span>
+            <span class="tiny-imagedrawer-info-location"></span>
+            <br />
+            <span class="tiny-imagedrawer-info-label">Author</span>
+            <span class="tiny-imagedrawer-info-author"></span>
+            <br />
+            <span class="tiny-imagedrawer-info-label">Modified</span>
+            <span class="tiny-imagedrawer-info-modified"></span>
+            <br />
+            <br />
+            <span class="tiny-imagedrawer-info-label">Caption</span>
+            <input type="checkbox" name="blah_0" value="" />
+            <span>yes</span>
+            <br />
+            <span class="tiny-imagedrawer-info-label">Alignment</span>
+            <input id="tiny-imagedrawer-input-align-0" value="left"
+                type="radio" checked="checked" name="tiny-imagedrawer-input-align" />
+            <label for="tiny-imagedrawer-input-align-0">Left</label>
+            <br />
+            <input id="tiny-imagedrawer-input-align-1" value="right"
+                type="radio" name="tiny-imagedrawer-input-align" />
+            <label for="tiny-imagedrawer-input-align-1">Right</label>
+            <br />
+            <input id="tiny-imagedrawer-input-align-2" value="center"
+                type="radio" name="tiny-imagedrawer-input-align" />
+            <label for="tiny-imagedrawer-input-align-2">Center</label>
+            <br />
+            <span class="tiny-imagedrawer-info-label">Size</span>
+            <select name="tiny-imagedrawer-input-dimension">
+              <option value="original">Original (max. 530 x 530)</option>
+              <option value="large">Large (400 x 400)</option>
+              <option value="medium" selected="selected">Medium (250 x 250)</option>
+              <option value="small">Small (100 x 100)</option>
+            </select>
+            <br />
+          </div>
+          <div class="karl-buttonset tiny-imagedrawer-buttonset-save" style="">
+            <button class="ui-icon-plusthick" disabled="1">Insert</button>
+            <button class="ui-icon-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-upload"
+        style="height: 370px;">
+      <p>
+        Select file to upload, then press the Upload button!
+        File will be uploaded into the current page.
+      </p>
+      <input type="file" class="tiny-imagedrawer-fileinput" />
+      <br />
+      <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
+        <button class="ui-icon-transferthick-e-w">Upload</button>
+        <button class="ui-icon-cancel">Cancel</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

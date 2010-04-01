@@ -73,6 +73,19 @@ class ISite(IFolder):
     def update_indexes():
         """Add and remove catalog indexes to match a fixed schema"""
 
+class ITempFolder(IFolder):
+    """ A container for temporary storage of documents. """
+
+    def add_document(doc):
+        """
+        Adds a document to the temporary folder, assigning a unique identifier.
+        """
+
+    def cleanup():
+        """
+        Removes 'old' documents from the folder.
+        """
+
 class ICommunities(IFolder):
     """ Communities folder """
     taggedValue('name', 'Communities')
@@ -186,7 +199,10 @@ IProfile.ALERT_DIGEST = 1
 IProfile.ALERT_NEVER = 2
 
 class IFile(Interface):
-    """ A model object which provides a file-like interface analogous to
+    """
+    XXX Deprcated
+
+    A model object which provides a file-like interface analogous to
     static resource.
     """
     stream = Attribute(u'A read-only stream for getting file contents.')
@@ -194,7 +210,8 @@ class IFile(Interface):
     size = Attribute(u'Size in bytes of file')
 
 class IImageFile(IFile):
-    """ An image file.
+    """
+    XXX Deprecated
     """
     extension = Attribute(u'File extension based on mime type')
 

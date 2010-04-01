@@ -34,6 +34,7 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.views.api import TemplateAPI
 from karl.utilities.alerts import Alerts
+from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 
 from karl.utils import get_layout_provider
@@ -159,6 +160,7 @@ def add_comment_view(context, request):
 
         if support_attachments(c):
             store_attachments(c, request.params, creator)
+        relocate_temp_images(c, request)
 
         url = model_url(parent, request)
         msg = 'Comment added'
