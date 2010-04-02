@@ -81,9 +81,10 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        fields = controller.form_fields()
-        self.failUnless('tags' in dict(fields))
-        self.failUnless('security_state' in dict(fields))
+        fields = dict(controller.form_fields())
+        self.failUnless('tags' in fields)
+        self.failUnless('security_state' in fields)
+        self.failUnless('default_tool' in fields)
 
     def test_form_widgets(self):
         self._registerDummyWorkflow()
@@ -93,6 +94,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         widgets = controller.form_widgets([('security_state', True)])
         self.failUnless('tags' in widgets)
         self.failUnless('security_state' in widgets)
+        self.failUnless('default_tool' in widgets)
 
     def test___call__(self):
         context = testing.DummyModel()
@@ -140,6 +142,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
                      'tools': ['blog'],
                      'security_state': 'private',
                      'tags': ['foo'],
+                     'default_tool': 'blog',
                      }
         result = controller.handle_submit(converted)
         rl = 'http://example.com/thetitle-yo/members/add_existing.html'
@@ -148,6 +151,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(community.title, 'Thetitle yo')
         self.assertEqual(community.description, 'thedescription')
         self.assertEqual(community.text, 'thetext')
+        self.assertEqual(community.default_tool, 'blog')
         self.assertEqual(
             context.users.added_groups, 
             [('userid', 'moderators'), ('userid', 'members') ] 
@@ -158,6 +162,13 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(_tagged[0][1], 'userid')
         self.assertEqual(_tagged[0][2], ['foo'])
         self.assertEqual(workflow.transitioned[0]['to_state'], 'private')
+
+        # try again w/ an invalid default_tool
+        converted['title'] = 'Another title yo'
+        converted['default_tool'] = 'wiki'
+        result = controller.handle_submit(converted)
+        community = context['another-title-yo']
+        self.failUnless(community.default_tool is None)
 
 class EditCommunityFormControllerTests(FormControllerTestBase):
     def _makeOne(self, context, request):

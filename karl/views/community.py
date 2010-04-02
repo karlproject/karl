@@ -154,11 +154,14 @@ class AddCommunityFormController(object):
         security_states = self._get_security_states()
         if security_states:
             fields.insert(4, ('security_state', security_field))
+        fields.append(('default_tool', default_tool_field))
         return fields
 
     def form_widgets(self, fields):
         widgets = shared_widgets(self)
         widgets['tags'] = karlwidgets.TagsAddWidget()
+        widgets['default_tool'] = formish.SelectChoice(
+            options=self.tools, none_option=('', 'Overview'))
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
@@ -193,12 +196,17 @@ class AddCommunityFormController(object):
         # required to use moderators_group_name and
         # members_group_name
         community.__name__ = name
+        tools_present = []
         for toolinfo in self.available_tools:
             if toolinfo['name'] in converted.get('tools', []):
                 toolinfo['component'].add(community, request)
+                tools_present.append(toolinfo['name'])
 
-        # By default the "default tool" is None (indicating 'overview')
-        community.default_tool = None
+        # Set the default tool
+        if converted.get('default_tool') in tools_present:
+            community.default_tool = converted['default_tool']
+        else:
+            community.default_tool = None
 
         users = find_users(context)
         moderators_group_name = community.moderators_group_name

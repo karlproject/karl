@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Re-add "default tool" dropdown to the add community form
+  (fixes LP#554031)
+
 - In order to be able to kill runaway converter processes correctly,
   change ``karl.utilities.baseconverter.BaseConverter.execute``: when
   creating a subprocess, don't use a shell to start the process
