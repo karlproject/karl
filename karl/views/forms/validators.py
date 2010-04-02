@@ -1,6 +1,7 @@
 import re
 
 from lxml.html.clean import clean_html
+from validatish import validate
 from validatish.validator import Validator
 from validatish.error import Invalid
 from zope.component import getAdapter
@@ -100,3 +101,15 @@ class HTML(Validator):
             except:
                 raise Invalid('Unable to parse the provided HTML')
 
+class WebURL(Validator):
+    """Custom web URL validation.  Value must either be empty or start
+    with 'http://', 'https://', or 'www.'"""
+    def __call__(self, v):
+        if v:
+            if v.startswith('www.'):
+                v = 'http://%s' % v
+            try:
+                validate.is_url(v, with_scheme=True)
+            except Invalid, e:
+                msg = u"Must start with 'http://', 'https://', or 'www.'"
+                raise Invalid(msg, validator=self)

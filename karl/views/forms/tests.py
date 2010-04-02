@@ -53,7 +53,6 @@ class TestFolderNameAvailableValidator(unittest.TestCase):
         self.assertRaises(Invalid, validator, 'foo')
 
     def test_exception_success(self):
-        from validatish.error import Invalid
         container = testing.DummyModel()
         container['foo'] = testing.DummyModel()
         validator = self._makeOne(container, exceptions=('foo',))
@@ -170,6 +169,27 @@ class TestHTMLValidator(unittest.TestCase):
         validator = self._makeOne()
         good_html = "<html><body> is well formed </body></html>"
         self.assertEqual(validator(good_html), None)
+
+class TestWebURLValidator(unittest.TestCase):
+    def _makeOne(self):
+        from karl.views.forms.validators import WebURL
+        return WebURL()
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        validator = self._makeOne()
+        self.assertRaises(Invalid, validator, 'http:/something.com')
+        self.assertRaises(Invalid, validator, 'something.com')
+        self.assertRaises(Invalid, validator, 'http://')
+
+    def test_nofail(self):
+        validator = self._makeOne()
+        self.assertEqual(validator('http://s'), None)
+        self.assertEqual(validator('https://s'), None)
+        self.assertEqual(validator('http://something.com'), None)
+        self.assertEqual(validator('www.fooo.com'), None)
+        # empty is okay too
+        self.assertEqual(validator(''), None)
 
 class TestAcceptFieldWidget(unittest.TestCase):
     def _makeOne(self, text, description, **kw):

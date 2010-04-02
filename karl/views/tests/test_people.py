@@ -180,6 +180,11 @@ class TestEditProfileFormController(unittest.TestCase):
         self.failUnless('photo.jpg' in self.context)
         self.failUnless(len(self.context['photo.jpg'].stream.read()) > 1)
 
+        # make sure the www. URLs get prepended
+        converted['website'] = 'www.example.com'
+        controller.handle_submit(converted)
+        self.assertEqual(self.context.website, 'http://www.example.com')
+
 class TestAdminEditProfileFormController(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -268,6 +273,11 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/profile/'
                          '?status_message=User%20edited')
+
+        # make sure the www. URLs get prepended
+        converted['website'] = 'www.example.com'
+        controller.handle_submit(converted)
+        self.assertEqual(self.context.website, 'http://www.example.com')
 
         # try again w/ a login already in use
         context['inuse'] = testing.DummyModel()
@@ -381,6 +391,13 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         profile = self.context['login']
         self.failIf(profile.firstname != 'firstname')
+
+        # once more, testing URL prepending
+        converted['login'] = 'newlogin'
+        converted['website'] = 'www.example.com'
+        response = controller.handle_submit(converted)
+        profile = self.context['newlogin']
+        self.assertEqual(profile.website, 'http://www.example.com')
 
 class GetGroupOptionsTests(unittest.TestCase):
     def setUp(self):

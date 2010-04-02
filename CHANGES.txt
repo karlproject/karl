@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Profile 'website' field now requires submitted values to start with
+  'http://', 'https://', or 'www.'; if the last one is used 'http://' will be
+  prepended to the stored value (fixes LP#554013)
+
 - Re-add "default tool" dropdown to the add community form
   (fixes LP#554031)
 

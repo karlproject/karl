@@ -84,8 +84,7 @@ position_field = schemaish.String()
 organization_field = schemaish.String()
 location_field = schemaish.String()
 country_field = schemaish.String()
-website_field = schemaish.String(validator=validator.Any(validator.URL(),
-                                                         validator.Equal('')))
+website_field = schemaish.String(validator=karlvalidators.WebURL())
 languages_field = schemaish.String()
 photo_field = schemaish.File()
 biography_field = schemaish.String()
@@ -207,6 +206,9 @@ class EditProfileFormController(object):
         context = self.context
         request = self.request
         objectEventNotify(ObjectWillBeModifiedEvent(context))
+        # prepend http:// to the website URL if necessary
+        if converted.get('website', '').startswith('www.'):
+            converted['website'] = 'http://%s' % converted['website']
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -320,6 +322,9 @@ class AdminEditProfileFormController(EditProfileFormController):
         # Edit password
         if converted.get('password', None):
             users.change_password(userid, converted['password'])
+        # prepend http:// to the website URL if necessary
+        if converted.get('website', '').startswith('www.'):
+            converted['website'] = 'http://%s' % converted['website']
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -414,6 +419,9 @@ class AddUserFormController(EditProfileFormController):
             raise ValidationError(login=msg)
         users.add(userid, userid, converted['password'], converted['groups'])
 
+        # prepend http:// to the website URL if necessary
+        if converted.get('website', '').startswith('www.'):
+            converted['website'] = 'http://%s' % converted['website']
         kw = {}
         for k, v in converted.items():
             if k in ('login', 'password', 'password_confirm',
