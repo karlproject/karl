@@ -18,8 +18,6 @@
 import calendar
 import datetime
 
-from zope.component import getMultiAdapter
-from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
 from repoze.bfg.url import model_url
@@ -36,7 +34,6 @@ from karl.views.utils import get_user_home
 
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import INewsItem
-from karl.views.interfaces import ILayoutProvider
 
 from karl.utils import coarse_datetime_repr
 from karl.utils import get_folder_addables
