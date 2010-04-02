@@ -65,10 +65,10 @@ def split_lines(lines):
     and returns a list of the non-empty results.
     """
     result = []
-    for line in lines.split('\r'):
+    for line in lines.split('\n'):
         stripped = line.strip()
         if stripped:
-            result.append(line)
+            result.append(stripped)
     return result
 
 # title and/or name field require name checking validation,
@@ -244,8 +244,8 @@ class EditIntranetFormController(AddIntranetFormController):
                     'zipcode': context.zipcode,
                     'telephone': context.telephone,
                     'navigation': context.navigation,
-                    'middle_portlets': '\r'.join(context.middle_portlets),
-                    'right_portlets': '\r'.join(context.right_portlets),
+                    'middle_portlets': '\n'.join(context.middle_portlets),
+                    'right_portlets': '\n'.join(context.right_portlets),
                     }
         return defaults
 
@@ -280,7 +280,7 @@ class EditIntranetFormController(AddIntranetFormController):
         context.right_portlets = right_portlets
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
-        
+
         location = model_url(context.__parent__['intranets'], request)
         return HTTPFound(location=location)
 
@@ -358,7 +358,7 @@ class EditIntranetRootFormController(EditCommunityFormController):
         objectEventNotify(ObjectModifiedEvent(context))
         location = model_url(context, request)
         return HTTPFound(location=location)
-        
+
 
 sample_middle_portlets = ['network-news', 'network-events', 'interesting-feed']
 sample_right_portlets = ['my-site-news', 'my-site-personals']

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -108,8 +108,8 @@ class AddIntranetFormControllerTests(unittest.TestCase):
                      'zipcode': 'zipcode',
                      'telephone': 'telephone',
                      'navigation': '<ul><li>something</li>',
-                     'middle_portlets': 'one\rtwo\rthree',
-                     'right_portlets': 'four\rfive\rsix',
+                     'middle_portlets': 'one\ntwo\nthree',
+                     'right_portlets': 'four\nfive\nsix',
                      }
         response = controller.handle_submit(converted)
         self.failUnless('url_name' in context)
@@ -207,9 +207,9 @@ class EditIntranetFormControllerTests(unittest.TestCase):
         self.assertEqual(defaults['zipcode'], 'zipcode')
         self.assertEqual(defaults['telephone'], 'telephone')
         self.assertEqual(defaults['navigation'], '<ul><li>navigation</ul>')
-        self.assertEqual(defaults['middle_portlets'], 'one\rtwo')
-        self.assertEqual(defaults['right_portlets'], 'three\rfour')
-        
+        self.assertEqual(defaults['middle_portlets'], 'one\ntwo')
+        self.assertEqual(defaults['right_portlets'], 'three\nfour')
+
     def test_handle_submit(self):
         converted = {'title': 'New Title',
                      'address': 'address',
@@ -219,8 +219,8 @@ class EditIntranetFormControllerTests(unittest.TestCase):
                      'zipcode': 'zipcode',
                      'telephone': 'telephone',
                      'navigation': '<ul><li>navigation</ul>',
-                     'middle_portlets': 'one\rtwo',
-                     'right_portlets': 'three\rfour',
+                     'middle_portlets': 'one\ntwo',
+                     'right_portlets': 'three\nfour',
                      }
         context = self.context
         controller = self._makeOne(context, self.request)
@@ -408,7 +408,7 @@ class DummyWorkflow:
 
     def initialize(self, content):
         self.initialized = True
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,
