@@ -24,7 +24,7 @@ Unreleased
 - LP #552517: Fixed bug where new uploads w/ the same filename would fail
   to actually update the stored file.
 
-- LP #553959 Fixed bug in edit_intranet form that would corrupt the portals.
+- LP #553959 Fixed bug in edit_intranet form that would corrupt the portlets.
 
 3.26 (2010-03-26)
 -----------------
