@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add evolve script to retroactively prepend 'http://' to any profile website
+  URLs that start with 'www.' (see LP#554013)
+
 - Fix profile admin edit form so that the community memberships don't
   disappear when the groups are updated (fixes LP#556679)
 
