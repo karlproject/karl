@@ -407,6 +407,7 @@ test("Extra container class", function() {
     $('#template1').karlbuttonset('destroy');
 });
 
+/*
 test("Disables work with noselection", function() {
 
     $('#template4').karlbuttonset();
@@ -587,6 +588,7 @@ test("Disables works with the change event", function() {
     $('#template5').karlbuttonset('destroy');
 
 });
+*/
 
 test("getButton method returns a button control by its index", function() {
 
