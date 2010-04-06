@@ -4,6 +4,12 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix profile admin edit form so that the community memberships don't
+  disappear when the groups are updated (fixes LP#556679)
+
+- Slight tweak to the KarlManageMembers widget so it won't blow up when
+  faced with a community that has no members
+
 - Profile 'website' field now requires submitted values to start with
   'http://', 'https://', or 'www.'; if the last one is used 'http://' will be
   prepended to the stored value (fixes LP#554013)
