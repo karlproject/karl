@@ -11,7 +11,9 @@
   </thead>
   <tbody>
   <tr tal:repeat="row rows">
-    <span tal:define="fields row.fields" tal:omit-tag="">
+    <span tal:define="fields row.fields"
+          tal:condition="len(row.form.defaults['members']) > 0"
+          tal:omit-tag="">
       <input type="hidden"
             value="${row['title'].value[0]}"
             tal:attributes="name 'members.%s.title' % repeat['row'].index"/>
