@@ -314,10 +314,10 @@ class AdminEditProfileFormController(EditProfileFormController):
         # Set group memberships
         user_groups = self.user_groups
         chosen_groups = set(converted['groups'])
-        if user_groups != chosen_groups:
-            for group in chosen_groups.difference(user_groups):
+        for group, group_title in self.group_options:
+            if group in chosen_groups and group not in user_groups:
                 users.add_user_to_group(userid, group)
-            for group in user_groups.difference(chosen_groups):
+            if group in user_groups and group not in chosen_groups:
                 users.remove_user_from_group(userid, group)
         # Edit password
         if converted.get('password', None):
