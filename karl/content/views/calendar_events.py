@@ -60,6 +60,7 @@ from karl.utils import find_interface
 from karl.utils import find_community
 from karl.utils import get_session
 
+from karl.security.policy import CREATE
 from karl.security.workflow import get_security_states
 
 from karl.views import baseforms
@@ -250,6 +251,7 @@ def _show_calendar_view(context, request, make_presenter):
         selected_layer = selected_layer,
         layers = layers,
         quote = quote,
+        may_create = has_permission(CREATE, context, request),
     )
 
 def show_month_view(context, request):
@@ -305,6 +307,7 @@ def show_list_view(context, request):
         selected_layer = selected_layer,
         layers = layers,
         quote = quote,
+        may_create = has_permission(CREATE, context, request),
     )
     response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'list')
     return response

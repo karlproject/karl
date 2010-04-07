@@ -4,7 +4,7 @@
 
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml" 
+    <link rel="alternate" type="application/atom+xml"
 	  title="${calendar.title}" href="${calendar.feed_url}"
 	  />
   </span>
@@ -30,26 +30,26 @@
         <td class="cal_${day.css_day_abbr}" tal:repeat="day calendar.week">
         <div class="all_day_block">
           <div class="create">
-            <a class="add" href="${day.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+            <a class="add" href="${day.add_event_url}" tal:condition="may_create"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
           </div>
           <div tal:repeat="event day.event_slots">
 
             <tal:block condition="not(event)">
               <div class="cal_event">
                 &nbsp;
-              </div>  
+              </div>
             </tal:block>
 
             <tal:block condition="event">
               <div class="cal_event cal_event_pos_${event.rounding_class} ${event.type_class}">
                 <a href="${event.show_url}" class="cal_${event.color}">${event.bubble_title}</a>
-              </div>  
+              </div>
             </tal:block>
 
           </div>
         </div>
         </td>
-        <td class="last">&nbsp;</td>   
+        <td class="last">&nbsp;</td>
       </tr>
 
       <tr class="divider">
@@ -73,18 +73,18 @@
             </div>
           </th>
 
-         <!-- each day this week -->                        
+         <!-- each day this week -->
          <td tal:repeat="day calendar.week" class="cal_${day.css_day_abbr}">
-           <div class="cal_stack">     
-             <!-- each time slot - one for each 1/2 hour -->  
-             <!-- events that start at this time -->   
-                 <div tal:repeat="slot day.half_hour_slots" 
+           <div class="cal_stack">
+             <!-- each time slot - one for each 1/2 hour -->
+             <!-- events that start at this time -->
+                 <div tal:repeat="slot day.half_hour_slots"
                       tal:attributes="class python:'cal_hour_event %s %s' % (
                                                        ('','shade')[slot.shaded_row],
                                                        ('cal_hour','cal_half_hour')[slot.is_half_hour]
                                                     )">
                <div class="create">
-                 <a class="add" href="${slot.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+                 <a class="add" href="${slot.add_event_url}" tal:condition="may_create"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
                </div>
 
                <tal:block condition="slot.bubble">
@@ -99,7 +99,7 @@
                  <div class="cal_tool_time">${slot.bubble.event.time_of_first_moment}</div>
                  <div class="cal_tool_title">
                    <a href="${slot.bubble.event.show_url}">${slot.bubble.event.title}</a>
-                   <span tal:condition="slot.bubble.event.location" class="cal_tool_loc"> 
+                   <span tal:condition="slot.bubble.event.location" class="cal_tool_loc">
                      <strong>-</strong> ${slot.bubble.event.location}
                    </span>
                  </div>
@@ -109,10 +109,10 @@
              </div>
            </div>
          </td>
-           
+
         </tr>
       </table>
-                        
+
     </div>
 
     <div metal:use-macro="calendar.navigation.macros['footer']"/>

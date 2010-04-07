@@ -45,6 +45,9 @@ Unreleased
 - LP #554024 Changed the 'delete community' operation to use a new permission,
   'delete community' rather than overload the 'moderate' permission.
 
+- LP #556673 Only display buttons to add calendar events if user has permission
+  to create events in the calendar.
+
 3.26 (2010-03-26)
 -----------------
 

@@ -4,72 +4,72 @@
 
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml" 
-	  title="${calendar.title}" href="${calendar.feed_url}"
-	  />
+    <link rel="alternate" type="application/atom+xml"
+      title="${calendar.title}" href="${calendar.feed_url}"
+      />
   </span>
 
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="calendar.navigation.macros['header']"/>
+  <div metal:use-macro="calendar.navigation.macros['header']"/>
 
-    <h3 class="cal_title">${calendar.title}</h3>        
- 
-    <table id="cal_month" class="cal cal_month" cellspacing="0">
-      <tr class="days">
-        <th tal:repeat="day calendar.day_headings">${day}</th>
-      </tr>
+  <h3 class="cal_title">${calendar.title}</h3>
 
-      <tr tal:repeat="week calendar.weeks">
-        <tal:block repeat="day week">
-          <td tal:attributes="class python:('','today')[day.current_day]">
-            
-            <div tal:attributes="class python:'label ' + ('faded','')[day.current_month]">
-    					<a class="add" href="${day.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
-    					<a class="num" href="${day.show_day_url}">${day.day}</a>
-    				</div>
-            
-            <tal:block repeat="event day.event_slots">
-              <tal:block condition="not(event)">
-                <div class="cal_event">
-                  &nbsp;
-                </div>  
-              </tal:block>
+  <table id="cal_month" class="cal cal_month" cellspacing="0">
+    <tr class="days">
+      <th tal:repeat="day calendar.day_headings">${day}</th>
+    </tr>
 
-              <tal:block condition="event">
-                <div class="cal_event with_tooltip cal_event_pos_${event.rounding_class} ${event.type_class}">
-                  <a href="${event.show_url}" 
-                     tal:attributes="class python:('cal_%s','cal_%s_all')[event.bubbled] % event.color">
-                   
-                    <tal:block condition="event.bubbled">
-                      ${event.bubble_title}
-                    </tal:block>
-                    <tal:block condition="not(event.bubbled)">
-                      &middot; ${event.title} 
-                    </tal:block>
+  <tr tal:repeat="week calendar.weeks">
+    <tal:block repeat="day week">
+      <td tal:attributes="class python:('','today')[day.current_day]">
 
-                  </a>
-                </div>
+  <div tal:attributes="class python:'label ' + ('faded','')[day.current_month]">
+    <a class="add" href="${day.add_event_url}" tal:condition="may_create"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+    <a class="num" href="${day.show_day_url}">${day.day}</a>
+  </div>
 
-                <div class="tooltip">
-                  <div class="cal_tool_time">
-                    ${event.time_in_words}
-                  </div>
-                  <div class="cal_tool_title">
-                    <a href="${event.show_url}">${event.title}</a>
-                    <span tal:condition="event.location" class="cal_tool_loc"> 
-                      <strong>-</strong> ${event.location}
-                    </span>
-                  </div>
-                </div>
-              </tal:block>
-            </tal:block>
-          </td>
-        </tal:block>
-      </tr>
-    </table>
+  <tal:block repeat="event day.event_slots">
+    <tal:block condition="not(event)">
+      <div class="cal_event">
+        &nbsp;
+      </div>
+    </tal:block>
 
-    <div metal:use-macro="calendar.navigation.macros['footer']"/>
+  <tal:block condition="event">
+    <div class="cal_event with_tooltip cal_event_pos_${event.rounding_class} ${event.type_class}">
+      <a href="${event.show_url}"
+        tal:attributes="class python:('cal_%s','cal_%s_all')[event.bubbled] % event.color">
+
+  <tal:block condition="event.bubbled">
+    ${event.bubble_title}
+  </tal:block>
+  <tal:block condition="not(event.bubbled)">
+    &middot; ${event.title}
+  </tal:block>
+
+  </a>
+</div>
+
+  <div class="tooltip">
+    <div class="cal_tool_time">
+      ${event.time_in_words}
+    </div>
+    <div class="cal_tool_title">
+      <a href="${event.show_url}">${event.title}</a>
+      <span tal:condition="event.location" class="cal_tool_loc">
+        <strong>-</strong> ${event.location}
+      </span>
+    </div>
+  </div>
+</tal:block>
+</tal:block>
+</td>
+</tal:block>
+</tr>
+</table>
+
+  <div metal:use-macro="calendar.navigation.macros['footer']"/>
 
   </div>
 

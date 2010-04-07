@@ -4,7 +4,7 @@
 
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml" 
+    <link rel="alternate" type="application/atom+xml"
 	  title="${calendar.title}" href="${calendar.feed_url}"
 	  />
   </span>
@@ -27,7 +27,7 @@
 
         <td>
           <div class="all_day_block">
-            <div class="create">
+            <div class="create" tal:condition="may_create">
               <a class="add" href="${calendar.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
             </div>
 
@@ -62,12 +62,12 @@
             <!-- time slots -->
             <td class="cal_fri">
               <div class="cal_stack">
-                 <div tal:repeat="slot calendar.half_hour_slots" 
+                 <div tal:repeat="slot calendar.half_hour_slots"
                       tal:attributes="class python:'cal_hour_event %s %s' % (
                                                        ('','shade')[slot.shaded_row],
                                                        ('cal_hour','cal_half_hour')[slot.is_half_hour]
                                                     )">
-                   <div class="create">
+                   <div class="create" tal:condition="may_create">
                      <a class="add" href="${slot.add_event_url}"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
                    </div>
 
@@ -82,7 +82,7 @@
 
                  </div>
               </div>
-            </td>        
+            </td>
         </tr>
       </table>
     </div>

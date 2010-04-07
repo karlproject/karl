@@ -5,29 +5,29 @@
         <div class="cal_calendars clearafter" >
           <div class="cal_choose">
             <label for="">
-              Layer: 
+              Layer:
             </label>
             <select id="cal_picker">
-              <option 
+              <option
                       tal:attributes="value api.request.path_url + '?filter=';
-                                      class 'group'" 
+                                      class 'group'"
                       >All layers</option>
-              <option 
+              <option
                       tal:repeat="layer layers"
-                      tal:attributes="value api.request.path_url + '?filter=' + layer.__name__; 
+                      tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
                                       class 'color cal_' +layer.color;
                                       selected layer.__name__ == selected_layer"
                       >${layer.title}</option>
-            </select>                       
-            
-            <tal:block condition="setup_url"> 
+            </select>
+
+            <tal:block condition="setup_url">
               (<a href="${setup_url}">Setup</a>)
             </tal:block>
           </div>
 
           <!-- new event -->
-          <div class="cal_new_event">
-            <a href="${calendar.add_event_url}">Add Event</a>    
+          <div class="cal_new_event" tal:condition="may_create">
+            <a href="${calendar.add_event_url}">Add Event</a>
           </div>
         </div>
 
@@ -36,19 +36,19 @@
           <div class="cal_nav">
             <!-- today button -->
             <a tal:condition="calendar.navigation.today_url"
-               href="${calendar.navigation.today_url}"><img src="${api.static_url}/images/cal_buttons_today.png" 
+               href="${calendar.navigation.today_url}"><img src="${api.static_url}/images/cal_buttons_today.png"
             /></a><img tal:condition="not(calendar.navigation.today_url)"
-               src="${api.static_url}/images/cal_buttons_today_disabled.png" 
+               src="${api.static_url}/images/cal_buttons_today_disabled.png"
             />&nbsp;
-                                 
+
             <!-- previous and next buttons -->
             <a tal:condition="calendar.navigation.prev_url"
-               href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png" 
+               href="${calendar.navigation.prev_url}"><img src="${api.static_url}/images/cal_buttons_previous.png"
             /></a><img tal:condition="not(calendar.navigation.prev_url)"
                src="${api.static_url}/images/cal_buttons_previous_disabled.png"
 
             /><a tal:condition="calendar.navigation.next_url"
-               href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png" 
+               href="${calendar.navigation.next_url}"><img src="${api.static_url}/images/cal_buttons_next.png"
             /></a><img tal:condition="not(calendar.navigation.next_url)"
                src="${api.static_url}/images/cal_buttons_next_disabled.png"/>
           </div>
