@@ -22,7 +22,7 @@ from webob import Response
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import find_model
+from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
@@ -30,12 +30,11 @@ from repoze.workflow import get_workflow
 from karl.content.interfaces import ICommunityFile
 from karl.content.views.files import get_upload_mimetype
 from karl.models.interfaces import ICommunity
-from karl.security.workflow import get_security_states
 from karl.utilities.image import get_images_batch
 from karl.utilities.image import thumb_url
 from karl.utils import find_profiles
 from karl.utils import find_tempfolder
-from karl.views.api import TemplateAPI
+from karl.utils import find_community
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import check_upload_size
 from karl.views.utils import make_name
@@ -178,15 +177,22 @@ MINIMAL_BATCH = 12
 def batch_images(context, request,
                  get_image_info=get_image_info, # unittest
                  get_images_batch=get_images_batch): # unittest
-    # My Recent
-    creator = request.params.get('creator', None)
 
-    # This Community
-    community_path = request.params.get('community', None)
-    if community_path is not None:
-        community = find_model(context, community_path)
-    else:
-        community = None
+    # Find query parameters based on the 'source' param,
+    # which signifies the selection index of the source button
+    # in the imagedrawer dialog.
+    source = int(request.params.get('source', '0'))
+    if source == 0:     # My Recent
+        creator = 'admin'
+        community_path = None
+    elif source == 1:   # This Community
+        creator = None
+        community = find_community(context)
+        # batching api requires the community path
+        community_path = model_path(community)
+    else:               # All Karl
+        creator = None
+        community_path = None
 
     # batching
     # Decide start and size here, don't let the lower levels
@@ -203,7 +209,7 @@ def batch_images(context, request,
 
     search_params = dict(
         creator=creator,
-        community=community,
+        community=community_path,
         batch_start=batch_start,
         batch_size=batch_size,
     )

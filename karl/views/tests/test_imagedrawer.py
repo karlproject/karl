@@ -122,7 +122,7 @@ class Test_batch_images(unittest.TestCase):
         return batch_images(context, request, self.make_record, self.batcher)
 
     def test_global_search(self):
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(params={'source': '2'})  # All Karl
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(batch['records'][0]['title'], 'A')
@@ -132,21 +132,25 @@ class Test_batch_images(unittest.TestCase):
         self.assertEqual(self.batcher.called, (context, request, None, None, 0, 12))
 
     def test_search_by_creator(self):
-        request = testing.DummyRequest(params={'creator': 'chris'})
+        request = testing.DummyRequest(params={'source': '0'}) # My Recent
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(
-            self.batcher.called, (context, request, 'chris', None, 0, 12)
+            # XXX the test are run as admin, so this is what we search for
+            self.batcher.called, (context, request, 'admin', None, 0, 12)
         )
 
     def test_search_by_community(self):
         root = testing.DummyModel()
         community = root['foo'] = testing.DummyModel()
-        request = testing.DummyRequest(params={'community': '/foo'})
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        directlyProvides(community, ICommunity)
+        request = testing.DummyRequest(params={'source': '1'})  # This Community
         context = community['bar'] = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(
-            self.batcher.called, (context, request, None, community, 0, 12)
+            self.batcher.called, (context, request, None, '/foo', 0, 12)
         )
 
 class Test_drawer_dialog_view(unittest.TestCase):
