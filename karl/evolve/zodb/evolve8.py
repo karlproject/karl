@@ -15,6 +15,6 @@ def evolve(context):
         obj = resolver(docid)
         if obj is None:
             continue # Work around catalog bug
-        if obj.website.startswith('www.'):
+        if obj.website and obj.website.startswith('www.'):
             print "Prepend 'http://' to profile website URL: %s" % model_path(obj)
             obj.website = "http://%s" % obj.website
