@@ -68,6 +68,8 @@ from karl.views.tags import set_tags
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 
+from karl.security.policy import DELETE_COMMUNITY
+from karl.security.policy import MODERATE
 from karl.security.workflow import get_security_states
 
 security_field = schemaish.String(
@@ -373,14 +375,14 @@ def show_community_view(context, request):
 
     # Filter the actions based on permission
     actions = []
-    if has_permission('moderate', context, request):
+    if has_permission(MODERATE, context, request):
         actions.append(('Edit', 'edit.html'))
 
     # If user has permission to see this view then has permission to join.
     if not(user in context.member_names or user in context.moderator_names):
         actions.append(('Join', 'join.html'))
 
-    if has_permission('moderate', context, request):
+    if has_permission(DELETE_COMMUNITY, context, request):
         actions.append(('Delete', 'delete.html'))
 
     recent_items = []

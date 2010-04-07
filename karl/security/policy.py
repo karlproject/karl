@@ -10,6 +10,7 @@ VIEW = 'view'
 EDIT = 'edit'
 CREATE = 'create'
 DELETE = 'delete'
+DELETE_COMMUNITY = 'delete community'
 MODERATE = 'moderate'
 ADMINISTER = 'administer'
 COMMENT = 'comment'
@@ -17,7 +18,7 @@ COMMENT = 'comment'
 GUEST_PERMS = (VIEW, COMMENT)
 MEMBER_PERMS = GUEST_PERMS + (EDIT, CREATE, DELETE)
 MODERATOR_PERMS = MEMBER_PERMS + (MODERATE,)
-ADMINISTRATOR_PERMS = MODERATOR_PERMS + (ADMINISTER,)
+ADMINISTRATOR_PERMS = MODERATOR_PERMS + (ADMINISTER, DELETE_COMMUNITY)
 
 ALL = AllPermissionsList()
 NO_INHERIT = (Deny, Everyone, ALL)
@@ -56,7 +57,7 @@ class ACLChecker(object):
                             # deny of any means deny all of everything
                             return False
         return False
-    
+
 def get_groups(identity, request):
     if 'groups' in identity:
         return identity['groups']

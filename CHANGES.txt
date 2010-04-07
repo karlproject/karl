@@ -42,6 +42,9 @@ Unreleased
 
 - LP #553959 Fixed bug in edit_intranet form that would corrupt the portlets.
 
+- LP #554024 Changed the 'delete community' operation to use a new permission,
+  'delete community' rather than overload the 'moderate' permission.
+
 3.26 (2010-03-26)
 -----------------
 

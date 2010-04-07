@@ -242,7 +242,7 @@
     for="karl.models.interfaces.ICommunity"
     name="delete.html"
     view=".community.delete_community_view"
-    permission="moderate"
+    permission="delete community"
   />
 
   <view
