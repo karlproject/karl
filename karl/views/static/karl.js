@@ -65,9 +65,12 @@ var loadTinyMCE = function loadTinyMCE() {
 
         // See if the wiki plugin needs to be enabled.
         var widget_data = window.karl_client_data && karl_client_data.text || {};
-        var plugins = 'paste,embedmedia,spellchecker,imagedrawer';
+        var plugins = 'paste,embedmedia,spellchecker';
         if (widget_data.enable_wiki_plugin) {
             plugins += ',wicked';
+        }
+        if (widget_data.enable_experimental_imagedrawer_plugin) {
+            plugins += ',imagedrawer';
         }
      
         // Url that contains the context prefix 
