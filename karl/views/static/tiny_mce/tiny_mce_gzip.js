@@ -928,14 +928,22 @@ tinyMCE.addI18n('en.wicked',{
                     var target = button_index < 3 ? download_panel : upload_panel;
                     if (value) {
                         target.show();
+                        // Did the source change?
+                        if (button_index != self.selected_source) {
+                            // Yes. Reset the results
+                            // and do a new query.
+                            self._requestRecords(0, 12, true);   // XXX XXX
+                            self.selected_source = button_index;
+                        }
                     } else {
                         target.hide();
                     }
                 });
+            this.selected_source = this.buttonset[0].selectedIndex; 
             // panels are shown based on initial selection
             // (Note: we use the index, not the option values,
             // which are irrelevant for the working of this code.)
-            if (this.buttonset[0].selectedIndex < 3) {
+            if (this.selected_source < 3) {
                 download_panel.show();
                 upload_panel.hide();
             } else {
@@ -1071,10 +1079,6 @@ tinyMCE.addI18n('en.wicked',{
             });
             // A counter to enable rejection of obsolate batches
             this.region_id = 0;
-            // Reset the region control
-            this.region_start = 0;
-            this.region_end = 0;
-            this.region_total = json.images_info.totalRecords;
 
             // Wire the scrollbar
             this.scrollbar = this.images_panel.find('.tiny-imagedrawer-scrollbar')
@@ -1094,11 +1098,8 @@ tinyMCE.addI18n('en.wicked',{
             
             //
             // Render the first batch of images
-            this.region_start = 0;
-            this.region_end = json.images_info.records.length;
-            this.visible_columns = 4;
-            this._preloadRegion(this.region_start, this.region_end);
-            this._moveStripe(this.scrollbar.slider('value') / 100);
+            //
+            this._initImages(json.images_info);
             this._loadRecords(json.images_info);
 
             // force initial selection to null 
@@ -1106,6 +1107,19 @@ tinyMCE.addI18n('en.wicked',{
 
             // Finally, open the dialog.
             this.dialog.dialog('open');
+        },
+            
+        // Initialize images for the given search criteria.
+        _initImages: function(images_info) {
+            // Reset the region control
+            this.region_start = 0;
+            this.region_end = images_info.records.length;
+            this.region_total = images_info.totalRecords;
+            this._resetStripe();
+            // Preload the region
+            this.visible_columns = 4;
+            this._preloadRegion(this.region_start, this.region_end);
+            this._moveStripe(this.scrollbar.slider('value') / 100);
         },
 
         _dialogError: function(json) {
@@ -1118,7 +1132,8 @@ tinyMCE.addI18n('en.wicked',{
             alert(error);
         },
 
-        _dataSuccess: function(json, region_id) {
+        _dataSuccess: function(json, region_id, initial) {
+
             var self = this;
             var ed = this.editor;
             // use error sent by server, if available
@@ -1137,8 +1152,10 @@ tinyMCE.addI18n('en.wicked',{
                 return;
             }
             
-            // XXX check totalRecords, etc.
-            //
+            // if this is an initial batch: set up the size
+            if (initial) {
+               this._initImages(json.images_info); 
+            }
 
             // load the records 
             this._loadRecords(json.images_info);
@@ -1319,26 +1336,11 @@ tinyMCE.addI18n('en.wicked',{
                 }
                 
                 if (needed_start < needed_end) {
-                    // Something to do here.
-
                     ////console.log('Preloading', needed_start, needed_end);
                     this._preloadRegion(needed_start, needed_end);
                     var region_id = this.region_id;
-                    // XXX load it too
-                    $.ajax({
-                        type: 'GET',
-                        url: this.editor.getParam('imagedrawer_data_url'),
-                        data: {
-                            start: needed_start, 
-                            limit: needed_end - needed_start,
-                            sort_on: 'creation_date',
-                            reverse: '1'
-                        },
-                        success: function(json) { self._dataSuccess(json, region_id); },
-                        error: function(json) { self._dataError(json); },
-                        dataType: 'json'
-                    });
-
+                    // load the required data
+                    this._requestRecords(needed_start, needed_end - needed_start, false);
                 }
 
             }
@@ -1348,6 +1350,26 @@ tinyMCE.addI18n('en.wicked',{
                 this.moveTo(slider_index);
             });
 
+        },
+
+        _requestRecords: function(start, limit, /*optional*/ initial) {
+            var self = this;
+            // load the required data
+            var region_id = this.region_id;
+            $.ajax({
+                type: 'GET',
+                url: this.editor.getParam('imagedrawer_data_url'),
+                data: {
+                    start: start, 
+                    limit: limit,
+                    sort_on: 'creation_date',
+                    reverse: '1',
+                    source: this.buttonset[0].selectedIndex 
+                },
+                success: function(json) { self._dataSuccess(json, region_id, initial); },
+                error: function(json) { self._dataError(json); },
+                dataType: 'json'
+            });
         },
 
         _loadRecords: function(images_info) {
