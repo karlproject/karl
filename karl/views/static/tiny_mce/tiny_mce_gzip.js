@@ -690,7 +690,7 @@ tinyMCE.addI18n('en.wicked',{
                 defaults: {
                     record: null,
                     insertButtonEnabled: null,
-                    insertButtonLabel: null,
+                    insertButtonLabel: null
                 }
         });
 

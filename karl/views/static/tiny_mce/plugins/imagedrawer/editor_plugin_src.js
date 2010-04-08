@@ -176,7 +176,7 @@
                 defaults: {
                     record: null,
                     insertButtonEnabled: null,
-                    insertButtonLabel: null,
+                    insertButtonLabel: null
                 }
         });
 
