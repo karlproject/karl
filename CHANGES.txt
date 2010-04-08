@@ -48,6 +48,8 @@ Unreleased
 - LP #556673 Only display buttons to add calendar events if user has permission
   to create events in the calendar.
 
+- LP #556036 Get static revision from subversion revision, if possible.
+
 3.26 (2010-03-26)
 -----------------
 

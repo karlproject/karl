@@ -15,6 +15,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+from subprocess import PIPE
+from subprocess import Popen
+import sys
+import time
+
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
@@ -52,9 +58,6 @@ from karl.views.utils import get_user_home
 
 from repoze.bfg.traversal import find_interface
 
-import time
-_start_time = int(time.time())
-
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
 
@@ -81,7 +84,7 @@ class TemplateAPI(object):
         settings = queryUtility(ISettings)
         self.js_devel_mode = settings and getattr(settings,
                                                   'js_devel_mode', None)
-        self.static_url = '%s/static/r%s' % (app_url, _start_time)
+        self.static_url = '%s/static/%s' % (app_url, _get_static_rev())
 
         # Provide a setting in the INI to fully control the entire URL
         # to the static.  This is when the proxy runs a different port
@@ -381,3 +384,30 @@ class SettingsReader:
     def __getattr__(self, name):
         return get_setting(self._context, name)
 
+_static_rev = None
+
+def _get_static_rev():
+    global _static_rev
+    if _static_rev is None:
+        # See if we can get a subversion revision.  This is more fragile but
+        # ensures that the static revision is the same across processes
+        _static_rev = _get_svn_rev()
+
+    if _static_rev is None:
+        # Fallback to just using a timestamp.  This is guaranteed not to fail
+        # but will create different revisions for each process, resulting in
+        # some extra static resource downloads
+        _static_rev = 'r%d' % int(time.time())
+
+    return _static_rev
+
+def _get_svn_rev():
+    module = sys.modules[__name__]
+    path = os.path.dirname(os.path.abspath(module.__file__))
+    proc = Popen(['svn', 'info', path], stdout=PIPE, close_fds=True)
+    output = proc.stdout.readlines()
+    proc.stdout.close()
+    for line in output:
+        if line.startswith('Revision:'):
+            rev = int(line.split(':')[1])
+            return 'r%d' % rev

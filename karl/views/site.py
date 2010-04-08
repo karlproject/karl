@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -32,7 +32,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 # five year expires time
 static_view = static('static', cache_max_age=157680000)
 
-version_match = re.compile(r'^r\d{10,19}$').match
+version_match = re.compile(r'^r\d{1,19}$').match
 # version number is "r" plus an intified timetime, e.g. r1234567890
 
 def versioning_static_view(context, request):
@@ -50,4 +50,4 @@ def site_view(context, request):
 class StaticRootFactory(object):
     def __init__(self, environ):
         pass
-    
+
