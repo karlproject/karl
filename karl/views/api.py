@@ -404,10 +404,13 @@ def _get_static_rev():
 def _get_svn_rev():
     module = sys.modules[__name__]
     path = os.path.dirname(os.path.abspath(module.__file__))
-    proc = Popen(['svn', 'info', path], stdout=PIPE, close_fds=True)
-    output = proc.stdout.readlines()
-    proc.stdout.close()
-    for line in output:
-        if line.startswith('Revision:'):
-            rev = int(line.split(':')[1])
-            return 'r%d' % rev
+    try:
+        proc = Popen(['svn', 'info', path], stdout=PIPE, close_fds=True)
+        output = proc.stdout.readlines()
+        proc.stdout.close()
+        for line in output:
+            if line.startswith('Revision:'):
+                rev = int(line.split(':')[1])
+                return 'r%d' % rev
+    except OSError:
+        pass
