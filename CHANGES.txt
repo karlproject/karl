@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.27 (2010-04-08)
+-----------------
 
 - Add evolve script to retroactively prepend 'http://' to any profile website
   URLs that start with 'www.' (see LP#554013)
