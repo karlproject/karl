@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -39,12 +39,12 @@ class Test_redirect_favicon_view(unittest.TestCase):
         return redirect_favicon(context, request)
 
     def test_it(self):
-        from karl.views.api import _start_time
+        from karl.views.api import _get_static_rev
         context = testing.DummyModel()
         response = self._callFUT(context, testing.DummyRequest())
         self.assertEqual(response.location,
-                         "http://example.com/static/r%d/images/favicon.ico"
-                                % _start_time)
+                         "http://example.com/static/%s/images/favicon.ico"
+                                % _get_static_rev())
 
 
 class Test_redirect_rss_view_xml(unittest.TestCase):

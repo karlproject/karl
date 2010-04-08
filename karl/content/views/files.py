@@ -34,6 +34,7 @@ from webob import Response
 from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.traversal import find_interface
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -64,6 +65,7 @@ from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import IImage
 from karl.content.interfaces import IIntranetRootFolder
+from karl.content.interfaces import IIntranets
 
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IFolderCustomizer
@@ -110,7 +112,9 @@ def show_folder_view(context, request):
         if has_permission('create', context, request):
             actions.append(('Edit', 'edit.html'))
             actions.append(('Delete', 'delete.html'))
-        if has_permission('administer', context, request):
+
+        in_intranets = find_interface(context, IIntranets) is not None
+        if has_permission('administer', context, request) and in_intranets:
             # admins see an Advanced action that puts markers on a
             # folder.
             actions.append(

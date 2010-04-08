@@ -74,7 +74,7 @@ class TestShowFolderView(unittest.TestCase):
         renderer  = testing.registerDummyRenderer('templates/show_folder.pt')
         self._callFUT(context, request)
         actions = renderer.actions
-        self.assertEqual(len(actions), 5)
+        self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
         self.assertEqual(actions[2][1], 'edit.html')

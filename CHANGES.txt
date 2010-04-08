@@ -50,6 +50,8 @@ Unreleased
 
 - LP #556036 Get static revision from subversion revision, if possible.
 
+- LP #510248 Hide 'Advanced' button on folders outside of intranets.
+
 3.26 (2010-03-26)
 -----------------
 
