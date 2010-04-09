@@ -17,7 +17,6 @@
 
 from zope.interface import implements
 from repoze.folder import Folder
-from karl.models.image import extensions as image_extensions
 from karl.content.interfaces import INewsItem
 from karl.content.models.attachments import AttachmentsFolder
 
@@ -41,10 +40,3 @@ class NewsItem(Folder):
         self.caption = caption
 
         self["attachments"] = AttachmentsFolder()
-
-    def get_photo(self):
-        for ext in image_extensions.values():
-            name = "photo." + ext
-            if name in self:
-                return self[name]
-        return None

@@ -26,7 +26,6 @@ from repoze.folder import Folder
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
-from karl.models.image import extensions as image_extensions
 
 class Profile(Folder):
 
@@ -85,13 +84,6 @@ class Profile(Folder):
         return unicode(
             '%s %s' % (self.firstname.strip(), self.lastname.strip())
             )
-
-    def get_photo(self):
-        for ext in image_extensions.values():
-            name = "photo." + ext
-            if name in self:
-                return self[name]
-        return None
 
     def get_alerts_preference(self, community_name):
         return self._alert_prefs.get(community_name,

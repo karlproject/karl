@@ -101,7 +101,6 @@ class TestEditProfileFormController(unittest.TestCase):
 
     def test_make_one_with_photo(self):
         context = self.context
-        from karl.views.tests.test_file import DummyImageFile
         context['photo'] = DummyImageFile()
         controller = self._makeOne(context, self.request)
         self.failUnless(controller.photo is not None)
@@ -131,7 +130,7 @@ class TestEditProfileFormController(unittest.TestCase):
         widgets = controller.form_widgets({})
         for fieldname in profile_data:
             self.failUnless(fieldname in widgets)
-        
+
     def test___call__(self):
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
@@ -145,13 +144,13 @@ class TestEditProfileFormController(unittest.TestCase):
         controller = self._makeOne(self.context, self.request)
         controller.api._isStaff = True
         response = controller()
-        self.failUnless(response['api'].user_is_staff)        
+        self.failUnless(response['api'].user_is_staff)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
-        
+
     def test_handle_submit(self):
         controller = self._makeOne(self.context, self.request)
         converted = {}
@@ -161,12 +160,11 @@ class TestEditProfileFormController(unittest.TestCase):
                 continue
             converted[fieldname] = value
         # then set up with the photo
-        from karl.models.interfaces import IImageFile
+        from karl.content.interfaces import ICommunityFile
         from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
-        from karl.views.tests.test_file import DummyImageFile
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
+        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
                                 IContentFactory)
         converted['photo'] = DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
@@ -177,8 +175,8 @@ class TestEditProfileFormController(unittest.TestCase):
             if fieldname == 'photo':
                 continue
             self.assertEqual(getattr(self.context, fieldname), value)
-        self.failUnless('photo.jpg' in self.context)
-        self.failUnless(len(self.context['photo.jpg'].stream.read()) > 1)
+        self.failUnless('photo' in self.context)
+        self.assertEqual(self.context['photo'].data, one_pixel_jpeg)
 
         # make sure the www. URLs get prepended
         converted['website'] = 'www.example.com'
@@ -355,13 +353,12 @@ class AddUserFormControllerTests(unittest.TestCase):
                 continue
             converted[fieldname] = value
         # then set up the photo
-        from karl.models.interfaces import IImageFile
+        from karl.content.interfaces import ICommunityFile
         from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
-        from karl.views.tests.test_file import DummyImageFile
         from repoze.lemonade.interfaces import IContentFactory
         from repoze.lemonade.testing import registerContentFactory
-        testing.registerAdapter(lambda *arg: DummyImageFile, (IImageFile,),
+        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
                                 IContentFactory)
         converted['photo'] = DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
@@ -382,8 +379,8 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(len(workflow.initialized), 1)
         self.failUnless('login' in self.context)
         profile = self.context['login']
-        self.failUnless('photo.jpg' in profile)
-        self.failUnless(len(profile['photo.jpg'].stream.read()) > 0)
+        self.failUnless('photo' in profile)
+        self.assertEqual(profile['photo'].data, one_pixel_jpeg)
 
         # try again and make sure it fails
         converted['firstname'] = 'different'
@@ -1123,3 +1120,46 @@ class TestDeleteProfileView(unittest.TestCase):
         self.assertEqual(response.status, '401 Unauthorized')
         self.failIf('userid' in parent)
         self.assertEqual(users.removed_users, ['userid'])
+
+class DummyImageFile(object):
+    is_image = True
+
+    def __init__(self, title=None, stream=None, mimetype=None, filename=None,
+                 creator=None):
+        self.title = title
+        self.mimetype = mimetype
+        if stream is not None:
+            self.data = stream.read()
+        else:
+            self.data = one_pixel_jpeg
+        self.size = len(self.data)
+        self.mimetype = mimetype
+        self.filename= filename
+        self.creator = creator
+
+one_pixel_jpeg = [
+    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01,
+    0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43, 0x00, 0x05,
+    0x03, 0x04, 0x04, 0x04, 0x03, 0x05, 0x04, 0x04, 0x04, 0x05, 0x05, 0x05, 0x06,
+    0x07, 0x0c, 0x08, 0x07, 0x07, 0x07, 0x07, 0x0f, 0x0b, 0x0b, 0x09, 0x0c, 0x11,
+    0x0f, 0x12, 0x12, 0x11, 0x0f, 0x11, 0x11, 0x13, 0x16, 0x1c, 0x17, 0x13, 0x14,
+    0x1a, 0x15, 0x11, 0x11, 0x18, 0x21, 0x18, 0x1a, 0x1d, 0x1d, 0x1f, 0x1f, 0x1f,
+    0x13, 0x17, 0x22, 0x24, 0x22, 0x1e, 0x24, 0x1c, 0x1e, 0x1f, 0x1e, 0xff, 0xdb,
+    0x00, 0x43, 0x01, 0x05, 0x05, 0x05, 0x07, 0x06, 0x07, 0x0e, 0x08, 0x08, 0x0e,
+    0x1e, 0x14, 0x11, 0x14, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0x03, 0x01,
+    0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xff, 0xc4, 0x00, 0x15, 0x00,
+    0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x08, 0xff, 0xc4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0xff, 0xc4, 0x00, 0x14, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xc4, 0x00,
+    0x14, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xda, 0x00, 0x0c, 0x03, 0x01, 0x00,
+    0x02, 0x11, 0x03, 0x11, 0x00, 0x3f, 0x00, 0xb2, 0xc0, 0x07, 0xff, 0xd9
+]
+
+one_pixel_jpeg = ''.join([chr(x) for x in one_pixel_jpeg])

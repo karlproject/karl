@@ -12,7 +12,6 @@ import time
 import datetime
 from zope.component import getAdapter
 from karl.consts import countries
-from karl.models.image import mimetypes as image_mimetypes
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_site
@@ -80,12 +79,8 @@ class PasswordChecker(validators.UnicodeString):
         return value
 
 class Photo(validators.FieldStorageUploadConverter):
-    invalid_message = u"Image file must be jpeg, gif or png"
-    def _to_python(self, value, state):
-        if value.type not in image_mimetypes:
-            raise Invalid(self.invalid_message, value, state)
-
-        return super(Photo, self)._to_python(value, state)
+    """ Deprecated. """
+    pass
 
 class DateTime(validators.FancyValidator):
     """Convert dates"""
@@ -157,16 +152,16 @@ class StartEndFields(validators.FormValidator):
                 start.year, start.month, start.day,
                 0, 0, 0
             )
-            
+
             field_dict[self.end_field] = datetime.datetime(
                 end.year, end.month, end.day,
                 0, 0, 0
-            ) + datetime.timedelta(days=1) 
-        
+            ) + datetime.timedelta(days=1)
+
         # event must have some duration
         elif (end - start) < datetime.timedelta(minutes=1):
             errors[self.end_field] = self.message('invalid_duration', state)
-            
+
         if errors:
             error_list = errors.items()
             error_list.sort()

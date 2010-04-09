@@ -46,23 +46,23 @@ class TagsWidget(Widget):
         if data is None:
             return []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
-    
+
     def from_request_data(self, field, request_data):
         """
         Iterating to convert back to the source data
         """
-        
+
         result = filter(None,
                         [string_converter(field.attr.attr).to_type(d) for d in
                          request_data])
         return result
-            
+
 class TagsEditWidget(TagsWidget): # widget for edit forms (ajax-add-immediate)
     template = 'field.KarlTagsEdit'
 
 class TagsAddWidget(TagsWidget): # widget for add forms (deferred til submit)
     template = 'field.KarlTagsAdd'
-    
+
 class ManageMembersWidget(Grid):
     template = 'field.KarlManageMembers'
 
@@ -71,7 +71,7 @@ class KarlCheckedPassword(CheckedPassword):
 
 class UserProfileLookupWidget(Input):
     template = 'field.KarlUserProfileLookup'
-    
+
     def from_request_data(self, field, request_data):
         L = []
         for string_data in request_data:
@@ -97,7 +97,7 @@ UNSET = object()
 class FileUpload2(Widget):
     """
     Saner file upload widget; use filename as key rather than uuid.
-    
+
     In addition: a 'single' parameter injects a hidden add field in case
     the current content is deleted. We need this parameter if the
     field is not in a sequence.
@@ -108,7 +108,7 @@ class FileUpload2(Widget):
     """
     type = 'FileUpload'
     template = 'field.FileUpload'
-    
+
     def __init__(self, filestore, show_file_preview=True,
                  show_download_link=False, show_image_thumbnail=False,
                  url_base=None, css_class=None, image_thumbnail_default=None,
@@ -149,7 +149,7 @@ class FileUpload2(Widget):
         if self.from_filestore and self.filestore_path:
             return '%s%s/%s' % (url_base, self.filestore_path, data)
         return '%s%s' % (url_base, data)
-    
+
     def to_request_data(self, field, data):
         """
         Varies from default in that we use the filename (w/ an
@@ -162,7 +162,7 @@ class FileUpload2(Widget):
             default = ''
             mimetype = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
-    
+
     def pre_parse_incoming_request_data(self, field, data):
         """
         Varies from default in that we use the filename as the tmp
@@ -186,7 +186,7 @@ class FileUpload2(Widget):
             data['name'] = [key]
             data['mimetype'] = [fieldstorage.type]
         return data
-    
+
     def from_request_data(self, field, request_data):
         """
         Differs from default for better handling of SchemaFile's
@@ -254,6 +254,12 @@ class PhotoImageWidget(FileUpload2):
             self.from_filestore = True
             headers = dict(headers)
             return SchemaFile(f, headers['Filename'], headers['Content-Type'])
+
+    def urlfactory(self, data):
+        url = super(PhotoImageWidget, self).urlfactory(data)
+        if url and 'static' not in url:
+            url += '/thumb/100x100.jpg'
+        return url
 
 class DateTime(Widget):
     template = 'field.DateTime'

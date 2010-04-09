@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
-     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout.macros['master']">
 
   <div metal:fill-slot="content">
@@ -10,7 +10,7 @@
 
     <h1 class="kscreentitle">${profile.firstname} ${profile.lastname}</h1>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div class="rightcol">
 
@@ -34,7 +34,7 @@
         <dd tal:condition="not communities">
           <strong>No communities</strong>
         </dd>
-        
+
         <dd tal:repeat="c communities">
           <strong tal:omit-tag="not c.moderator">
             <a href="${c.url}">${c.title}</a>
@@ -44,10 +44,9 @@
     </div>
     <div class="profile_page_body">
       <span class="portraid">
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect 
+        <!-- XXX Browser scaling with fixed dims will not preserve aspect
                  ratio. -->
-        <img height="100" width="75" src="${profile.photo.url}"
-             style="width: 75px"/>
+        <img src="${profile.photo.url}" style="width: 75px"/>
       </span>
       <div class="wrapper">
         <div class="profileDetails">

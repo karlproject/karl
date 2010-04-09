@@ -34,8 +34,7 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 
-from karl.models.interfaces import IImageFile
-from karl.models.image import mimetypes as image_mimetypes
+from karl.content.interfaces import ICommunityFile
 
 from karl.views.forms.filestore import get_filestore
 
@@ -274,7 +273,7 @@ def photo_from_filestore_view(context, request, form_id):
     r = Response(headerlist=headers, app_iter=bodyfile)
     return r
 
-def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
+def handle_photo_upload(context, form):
     upload = form.get("photo", None)
     if upload is not None and upload.file is not None:
         upload_file = upload.file
@@ -284,159 +283,29 @@ def handle_photo_upload(context, form, thumbnail=False, handle_exc=True):
             upload_type = upload.mimetype # Formish File object
         assert upload_type
 
-        if thumbnail:
-            if not hasattr(upload_file, 'seek'):
-                upload_file = StringIO(upload_file.read())
-
-            # save the source photo (in case we later decide to use
-            # a different thumbnail size)
-            source_photo = create_content(IImageFile, upload_file, upload_type)
-            upload_file.seek(0)
-
-            # make the thumbnail
-            try:
-                upload_file, upload_type = make_thumbnail(
-                    upload_file, upload_type)
-            except IOError, e:
-                if not handle_exc:
-                    raise
-                transaction.get().doom()
-                raise CustomInvalid({"photo": str(e)})
-
-            if 'source_photo' in context:
-                del context['source_photo']
-            context['source_photo'] = source_photo
-
-        photo = context.get_photo()
-        if photo is None:
-            photo = create_content(
-                IImageFile,
-                upload_file,
-                upload_type
+        photo = create_content(
+            ICommunityFile,
+            title='Photo of ' + context.title,
+            stream=upload_file,
+            mimetype=upload_type,
+            filename=basename_of_filepath(upload.filename),
+            creator=context.__name__
+        )
+        if not photo.is_image:
+            transaction.get().doom()
+            raise CustomInvalid(
+                {'photo': 'Uploaded file is not a valid image.'}
             )
-            name = "photo.%s" % photo.extension
-            context[name] = photo
-
-        else:
-            if photo.mimetype != upload_type:
-                del context[photo.__name__]
-                photo.mimetype = upload_type
-                name = "photo.%s" % photo.extension
-                context[name] = photo
-            photo.upload(upload_file)
+        if 'photo' in context:
+            del context['photo']
+        context['photo'] = photo
         check_upload_size(context, photo, 'photo')
 
     # Handle delete photo (ignore if photo also uploaded)
     elif (form.get("photo_delete", False) or
           (upload and upload.metadata.get("remove", False))):
-        photo = context.get_photo()
-        if photo is not None:
-            del context[photo.__name__]
-
-def make_thumbnail_fit(image_file, image_type, max_width, max_height):
-    """Returns the thumbnail file, as well as the dimensions of the original
-    image and the thumbnail.
-
-    As a difference from the make_thumbnail:
-
-        - make_thumbnail_fit will fit the thumbnail to the maximum area, and
-          either the width or the height may be less then the allowed maximum.
-
-          while, make_thumbnail will stretch the thumbnail to the size of the
-          allowed maximum, and crop the longer edge (???), to ensure that the
-          image area is filled. This is used for handling the photos in the profile.
-
-        - make_thumbnail_fit will never blow up an image.
-
-        - make_thumbnail_fit will return the source image dimensions in addition to
-          the thumb_file and thumb_type, so the return value is a dict.
-
-    Returns:
-        {
-        thumb_file: ...,
-        thumb_type: ...,
-        image_width: ...,
-        image_height: ...,
-        )
-    """
-    img = Image.open(image_file).convert('RGB')
-    image_width, image_height = img.size
-
-    if (image_width <= max_width and
-            image_height <= max_height and
-            image_type in image_mimetypes):
-        # already the right size and format
-        image_file.seek(0)
-        return dict(
-            thumb_file = image_file,
-            thumb_type = image_type,
-            image_width = image_width,
-            image_height = image_height,
-            )
-
-    # scale to fit
-    image_ratio = float(image_width) / float(image_height)
-    container_ratio = float(max_width) / float(max_height)
-    if image_ratio >= container_ratio:
-        # wide image
-        thumb_width = max_width
-        thumb_height = int(max_width / image_ratio)
-    else:
-        # tall image
-        thumb_width = int(max_height * image_ratio)
-        thumb_height = max_height
-    img = img.resize((thumb_width, thumb_height), Image.ANTIALIAS)
-
-    thumb_file = StringIO()
-    img.save(thumb_file, 'JPEG', quality=90)
-    thumb_file.seek(0)
-    thumb_type = 'image/jpeg'
-    return dict(
-        thumb_file = thumb_file,
-        thumb_type = thumb_type,
-        image_width = image_width,
-        image_height = image_height,
-        )
-
-def make_thumbnail(upload_file, upload_type, max_width=75, max_height=100):
-    img = Image.open(upload_file).convert('RGB')
-    width, height = img.size
-
-    if (width == max_width and
-            height == max_height and
-            upload_type in image_mimetypes):
-        # already the right size and format
-        upload_file.seek(0)
-        return upload_file, upload_type
-
-    # scale
-    image_ratio = float(width) / float(height)
-    container_ratio = float(max_width) / float(max_height)
-    if image_ratio >= container_ratio:
-        # wide image
-        width = int(max_height * image_ratio)
-        height = max_height
-    else:
-        # tall image
-        width = max_width
-        height = int(max_width / image_ratio)
-    img = img.resize((width, height), Image.ANTIALIAS)
-
-    # crop
-    if width > max_width:
-        margin = (width - max_width) / 2
-        img = img.crop((margin, 0, margin + max_width, height))
-        width = max_width
-    if height > max_height:
-        margin = (height - max_height) / 2
-        img = img.crop((0, margin, width, margin + max_height))
-        height = max_height
-
-    upload_file = StringIO()
-    img.save(upload_file, 'JPEG', quality=90)
-    upload_file.seek(0)
-    upload_type = 'image/jpeg'
-    return upload_file, upload_type
+        if 'photo' in context:
+            del context['photo']
 
 class CustomInvalid(Invalid):
 

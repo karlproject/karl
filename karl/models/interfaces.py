@@ -163,14 +163,6 @@ class IProfile(IFolder, IPeople):
         u"Datetime when password reset was requested.  "
         u"Not for display or editing.")
 
-    def get_photo():
-        """Gets this user's photo object, an instance of IImageFile.
-
-        Photo is a full fledged model that is a child of the profile and is
-        looked up according to a naming heuristic.
-
-        """
-
     def get_alerts_preference(community_name):
         """Returns constant value representing user's alert preference for
         the given community.
@@ -200,20 +192,15 @@ IProfile.ALERT_NEVER = 2
 
 class IFile(Interface):
     """
-    XXX Deprcated
-
-    A model object which provides a file-like interface analogous to
-    static resource.
+    XXX Deprecated.  Can be removed once all Karl instances are evolved to
+        Rev 10.
     """
-    stream = Attribute(u'A read-only stream for getting file contents.')
-    mimetype = Attribute(u'Mime type of file')
-    size = Attribute(u'Size in bytes of file')
 
 class IImageFile(IFile):
     """
-    XXX Deprecated
+    XXX Deprecated.  Can be removed once all Karl instances are evolved to
+        Rev 10.
     """
-    extension = Attribute(u'File extension based on mime type')
 
 class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """

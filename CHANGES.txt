@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Converted profile and news item photos to use the newer, image drawer
+  compatible image and thumb nails.  Deprecated and removed older image
+  handling code previously used to support these.
+
 3.27 (2010-04-08)
 -----------------
 

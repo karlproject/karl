@@ -93,9 +93,6 @@ class INewsItem(ICommunityContent, IFolder):
     creator = Attribute(u'User id of user that created this news item.')
     caption = Attribute(u'Caption that appears under photo for this article.')
 
-    def get_photo():
-        """ Get photo, if any, for this news item.
-        """
 
 class IReferenceManual(IFolder, ICommunityContent, IPages):
     """A reference manual in a community"""

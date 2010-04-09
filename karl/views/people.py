@@ -47,6 +47,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
+from karl.utilities.image import thumb_url
 from karl.utils import find_communities
 from karl.utils import find_tags
 from karl.utils import find_users
@@ -66,6 +67,7 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
 
+PROFILE_THUMB_SIZE = (75, 100)
 
 def edit_profile_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'edit-profile')
@@ -213,7 +215,7 @@ class EditProfileFormController(object):
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
         # Handle the picture and clear the temporary filestore
-        handle_photo_upload(context, converted, thumbnail=True)
+        handle_photo_upload(context, converted)
         self.filestore.clear()
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
@@ -329,7 +331,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
         # Handle the picture and clear the temporary filestore
-        handle_photo_upload(context, converted, thumbnail=True)
+        handle_photo_upload(context, converted)
         self.filestore.clear()
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
@@ -346,7 +348,7 @@ def get_group_options(context):
         else:
             title = group
         group_options.append((group, title))
-    return group_options    
+    return group_options
 
 class AddUserFormController(EditProfileFormController):
     """
@@ -435,7 +437,7 @@ class AddUserFormController(EditProfileFormController):
         if workflow is not None:
             workflow.initialize(profile)
 
-        handle_photo_upload(profile, converted, thumbnail=True)
+        handle_photo_upload(profile, converted)
         location = model_url(profile, request)
         return HTTPFound(location=location)
 
@@ -482,10 +484,10 @@ def show_profile_view(context, request):
         profile["country"] = country
 
     # Display portrait
-    photo = context.get_photo()
+    photo = context.get('photo')
     display_photo = {}
     if photo is not None:
-        display_photo["url"] = model_url(photo, request)
+        display_photo["url"] = thumb_url(photo, request, PROFILE_THUMB_SIZE)
     else:
         display_photo["url"] = api.static_url + "/images/defaultUser.gif"
     profile["photo"] = display_photo

@@ -93,7 +93,7 @@
         this?
         </p>
       </div>
-      <script language="javascript" type="text/javascript" 
+      <script language="javascript" type="text/javascript"
           tal:condition="show_sharing_warning|False">
         $(document).ready(function() {
             // create the dialog from the embedded content
@@ -548,10 +548,7 @@
 	  <input type="checkbox" name="photo_delete" class="noborder"/> delete photo
 	</div>
       </div>
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect
-                 ratio. -->
         <img tal:condition="photo.url|None"
-	     height="100" width="75"
              src="${photo.url}"
           style="width: 75px; float: left;"
 	  align="right"/>

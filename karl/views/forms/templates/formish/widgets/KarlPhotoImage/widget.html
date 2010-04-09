@@ -24,17 +24,16 @@
 
       <div class="icon ${mimetype.replace('/','_')}"
            tal:condition="preview_url is not None">
-        <img height="100" width="75" 
-             src="${preview_url}"/>
+        <img src="${preview_url}"/>
       </div>
 
       <!--div style="clear: both;"
            tal:condition="preview_url is None" /-->
-      
+
     </div>
   </span>
 
   <div style="clear: both;"></div>
 
-  
+
 </span>

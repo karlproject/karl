@@ -61,6 +61,7 @@ from karl.models.interfaces import IProfile
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IInvitation
 
+from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IRandomId
 
 from karl.utils import find_profiles
@@ -72,6 +73,7 @@ from karl.views.utils import handle_photo_upload
 from karl.views.utils import photo_from_filestore_view
 from karl.views.forms.widgets import ManageMembersWidget
 
+PROFILE_THUMB_SIZE = (75, 100)
 
 def _get_manage_actions(community, request):
 
@@ -151,9 +153,10 @@ def show_members_view(context, request):
         derived['email'] = entry.email
         derived['city'] = entry.location
 
-        photo = entry.get_photo()
+        photo = entry.get('photo')
         if photo is not None:
-            derived['photo_url'] = model_url(photo, request)
+            derived['photo_url'] = thumb_url(photo, request,
+                                             PROFILE_THUMB_SIZE)
         else:
             derived['photo_url'] = api.static_url + "/images/defaultUser.gif"
 
@@ -651,7 +654,7 @@ class AcceptInvitationFormController(object):
         workflow = get_workflow(IProfile, 'security')
         if workflow is not None:
             workflow.initialize(profile)
-        handle_photo_upload(profile, converted, thumbnail=True)
+        handle_photo_upload(profile, converted)
 
         del context.__parent__[context.__name__]
         url = model_url(community, request,

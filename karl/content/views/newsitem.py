@@ -38,8 +38,9 @@ from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
-from karl.views.api import TemplateAPI
+from karl.utilities.image import thumb_url
 
+from karl.views.api import TemplateAPI
 from karl.views.forms import attr as karlattr
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms import widgets as karlwidgets
@@ -64,6 +65,8 @@ def _now():
     if _NOW is not None:
         return _NOW
     return datetime.datetime.now()
+
+PHOTO_DISPLAY_SIZE = (400, 400) # XXX Wild guess. Any idea what this should be?
 
 tags_field = schemaish.Sequence(schemaish.String())
 text_field = schemaish.String()
@@ -136,7 +139,7 @@ class AddNewsItemFormController(object):
     def handle_submit(self, converted):
         request = self.request
         context = self.context
-        
+
         #create the news item and store it
         creator = authenticated_userid(request)
         newsitem = create_content(
@@ -191,10 +194,10 @@ def show_newsitem_view(context, request):
         )
 
     # Display photo
-    photo = context.get_photo()
+    photo = context.get('photo')
     if photo is not None:
         photo = {
-            "url": model_url(photo, request),
+            "url": thumb_url(photo, request, PHOTO_DISPLAY_SIZE),
         }
 
     # Get a layout
@@ -219,7 +222,7 @@ class EditNewsItemFormController(AddNewsItemFormController):
     def __init__(self, context, request):
         self.page_title = 'Edit %s' % context.title
         super(EditNewsItemFormController, self).__init__(context, request)
-        photo = context.get_photo()
+        photo = context.get('photo')
         if photo is not None:
             photo = SchemaFile(None, photo.__name__, photo.mimetype)
         self.photo = photo

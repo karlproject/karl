@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -42,7 +42,7 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider, 
+        ad = testing.registerAdapter(DummyLayoutProvider,
                                      (Interface, Interface),
                                      ILayoutProvider)
 
@@ -112,7 +112,6 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
         site.tags = tags
         controller = self._makeOne(context, self.request)
         from karl.content.views.newsitem import _now
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         attachment1 = DummyUpload(filename='test1.txt')
         attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
@@ -130,12 +129,9 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
             'photo': photo
             }
         from karl.content.interfaces import INewsItem
-        from karl.models.interfaces import IImageFile
         from karl.content.interfaces import ICommunityFile
-        from karl.views.tests.test_file import DummyImageFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyNewsItem, INewsItem)
-        registerContentFactory(DummyImageFile, IImageFile)
         registerContentFactory(DummyFile, ICommunityFile)
         response = controller.handle_submit(converted)
         newsitem_url = 'http://example.com/newsfolder/foo/'
@@ -154,8 +150,8 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
                          'test1.txt')
         self.assertEqual(attachments_folder['test2.txt'].filename,
                          'test2.txt')
-        self.failUnless('photo.jpg' in newsitem)
-        self.failUnless(len(newsitem['photo.jpg'].stream.read()) > 0)
+        self.failUnless('photo' in newsitem)
+        self.assertEqual(newsitem['photo'].data, dummy_photo)
         self.assertEqual(site.tags._called_with[1]['tags'],
                          ['tag1', 'tag2'])
 
@@ -181,7 +177,7 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider, 
+        ad = testing.registerAdapter(DummyLayoutProvider,
                                      (Interface, Interface),
                                      ILayoutProvider)
 
@@ -201,7 +197,7 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
         context['attachments']['test1.txt'] = attachment1
         context['attachments']['test2.html'] = attachment2
         photo = DummyFile(mimetype='image/jpeg')
-        context['photo.jpg'] = photo
+        context['photo'] = photo
         controller = self._makeOne(context, self.request)
         defaults = controller.form_defaults()
         self.assertEqual(defaults['title'], 'Foo')
@@ -212,7 +208,7 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
         attachnames = [a.filename for a in defaults['attachments']]
         self.failUnless('test1.txt' in attachnames)
         self.failUnless('test2.html' in attachnames)
-        self.assertEqual(defaults['photo'].filename, 'photo.jpg')
+        self.assertEqual(defaults['photo'].filename, 'photo')
         self.assertEqual(defaults['photo'].mimetype, 'image/jpeg')
 
     def test_form_widgets(self):
@@ -251,7 +247,6 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
             'caption': 'caption',
             'publication_date': now
             }
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         attachment1 = DummyUpload(filename='test1.txt')
         attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
@@ -264,11 +259,8 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
             'photo': photo,
             }
         converted.update(simple)
-        from karl.models.interfaces import IImageFile
         from karl.content.interfaces import ICommunityFile
-        from karl.views.tests.test_file import DummyImageFile
         from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyImageFile, IImageFile)
         registerContentFactory(DummyFile, ICommunityFile)
         response = controller.handle_submit(converted)
         msg = "?status_message=News%20Item%20edited"
@@ -283,18 +275,15 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
                          'test1.txt')
         self.assertEqual(attachments_folder['test2.txt'].filename,
                          'test2.txt')
-        self.failUnless('photo.jpg' in context)
+        self.failUnless('photo' in context)
         self.assertEqual(site.tags._called_with[1]['tags'],
                          ['tag1', 'tag2'])
-        
+
 class DummyNewsItem(testing.DummyModel):
     def __init__(self, *args, **kwargs):
         testing.DummyModel.__init__(self, *args, **kwargs)
         self["attachments"] = testing.DummyModel()
-        
-    def get_photo(self):
-        return self.get("photo.jpg", None)
-    
+
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
@@ -309,6 +298,38 @@ class DummyTags:
         self._called_with = (args, kw)
 
 class DummyFile:
+    is_image = True
+
     def __init__(self, **kw):
+        stream = kw.pop('stream', None)
         self.__dict__.update(kw)
         self.size = 0
+        if stream is not None:
+            self.data = stream.read()
+
+one_pixel_jpeg = [
+    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01,
+    0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43, 0x00, 0x05,
+    0x03, 0x04, 0x04, 0x04, 0x03, 0x05, 0x04, 0x04, 0x04, 0x05, 0x05, 0x05, 0x06,
+    0x07, 0x0c, 0x08, 0x07, 0x07, 0x07, 0x07, 0x0f, 0x0b, 0x0b, 0x09, 0x0c, 0x11,
+    0x0f, 0x12, 0x12, 0x11, 0x0f, 0x11, 0x11, 0x13, 0x16, 0x1c, 0x17, 0x13, 0x14,
+    0x1a, 0x15, 0x11, 0x11, 0x18, 0x21, 0x18, 0x1a, 0x1d, 0x1d, 0x1f, 0x1f, 0x1f,
+    0x13, 0x17, 0x22, 0x24, 0x22, 0x1e, 0x24, 0x1c, 0x1e, 0x1f, 0x1e, 0xff, 0xdb,
+    0x00, 0x43, 0x01, 0x05, 0x05, 0x05, 0x07, 0x06, 0x07, 0x0e, 0x08, 0x08, 0x0e,
+    0x1e, 0x14, 0x11, 0x14, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
+    0x1e, 0x1e, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0x03, 0x01,
+    0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xff, 0xc4, 0x00, 0x15, 0x00,
+    0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x08, 0xff, 0xc4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0xff, 0xc4, 0x00, 0x14, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xc4, 0x00,
+    0x14, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xda, 0x00, 0x0c, 0x03, 0x01, 0x00,
+    0x02, 0x11, 0x03, 0x11, 0x00, 0x3f, 0x00, 0xb2, 0xc0, 0x07, 0xff, 0xd9
+]
+
+dummy_photo = ''.join([chr(x) for x in one_pixel_jpeg])
