@@ -71,7 +71,7 @@ class Test_get_image_info(unittest.TestCase):
         self.assertEqual(info['author_name'], 'Chris Rossi')
         self.assertEqual(
             info['image_url'],
-            'http://example.com/community/foo.jpg/thumb/800x800.jpg'
+            '/community/foo.jpg/thumb/800x800.jpg'
         )
         self.assertEqual(
             info['thumbnail_url'],

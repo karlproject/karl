@@ -17,6 +17,7 @@
 
 from simplejson import JSONEncoder
 import transaction
+import urlparse
 from webob import Response
 
 from repoze.bfg.chameleon_zpt import render_template
@@ -156,13 +157,14 @@ def get_image_info(image, request):
     profiles = find_profiles(image)
     creator = profiles[image.creator]
     width, height = image.image_size
+    image_url = urlparse.urlparse(thumb_url(image, request, DISPLAY_SIZE))
 
     return dict(
         name = image.__name__,
         title = image.title,
         author_name = creator.title,
         location = breadcrumbs(image, request),
-        image_url = thumb_url(image, request, DISPLAY_SIZE),
+        image_url = image_url.path,
         image_width = width,
         image_height = height,
         image_size = image.size,
