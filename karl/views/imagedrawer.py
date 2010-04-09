@@ -105,7 +105,7 @@ None of these requests should be cacheable at all.
 # DISPLAY_SIZE is size of images displayed after they inserted into a document.
 # This is hardcoded for now but should be chosen by user when inserting the
 # image, eg: small, medium, large
-DISPLAY_SIZE = (400, 400)
+DISPLAY_SIZE = (800, 800)
 
 # Size of thumbnails displayed in image drawer when browsing images.
 THUMB_SIZE = (85, 85)
