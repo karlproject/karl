@@ -630,18 +630,17 @@ tinyMCE.addI18n('en.wicked',{
 
                 if (value === undefined) {
                     // Geting value.
-                    return this.insert_button_label[0].lastChild.textContent;
+                    return this.insert_button_label.text();
                 }
 
                 // Seting value.
                 //
                 this.insert_button_label.attr('title', value);
-                this.insert_button_label[0].lastChild.textContent = value;
+                this.insert_button_label.text(value);
 
                 // XXX this will work in jquery.ui >= 1.8
                 return this;
             },
-
 
             record: function(value) {
                 var self = this;
@@ -897,7 +896,8 @@ tinyMCE.addI18n('en.wicked',{
             this.dialog.hide().appendTo('body');
             this.dialog.dialog({
                 // the next options are adjustable if the style changes
-                width: 666,
+                ///width: 666,
+                width: 700,
                 dialogClass: 'tiny-imagedrawer-dialog',
                 // the next options are mandatory for desired behaviour
                 autoOpen: false,
