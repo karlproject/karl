@@ -15,522 +15,582 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from zope.interface import implements
 import unittest
 from repoze.bfg import testing
+from repoze.bfg.formish import ValidationError
 from repoze.bfg.testing import cleanUp
+from karl.content.interfaces import ICalendarEvent
 
+d1 = 'Thursday, October 7, 2010 04:20 PM'
+def dummy(date, flavor):
+    return d1
 
-class AddCalendarEventViewTests(unittest.TestCase):
+class AddCalendarEventFormControllerTests(unittest.TestCase):
+    test_states = [{'current': True, 'name': 'foo', 'transitions': True},
+                   {'name': 'bar', 'transitions': True}]
+
     def setUp(self):
         cleanUp()
-
         # Create dummy site skeleton
         from karl.testing import DummyCommunity
-        self.community = DummyCommunity()
-        self.site = self.community.__parent__.__parent__
+        context = DummyCommunity()
+        context.member_names = set(["b", "c",])
+        context.moderator_names = set(["a",])
+        self.site = context.__parent__.__parent__
+        self.site.sessions = DummySessions()
+        self.context = context
         tags = DummyTags()
         self.site.tags = tags
         from karl.testing import DummyCatalog
         self.site.catalog = DummyCatalog()
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
+        self._registerSecurityWorkflow()
+
+        self.profiles = testing.DummyModel()
+        self.site["profiles"] = self.profiles
+        from karl.testing import DummyProfile
+        self.profiles["a"] = DummyProfile()
+        self.profiles["b"] = DummyProfile()
+        self.profiles["c"] = DummyProfile()
+        for profile in self.profiles.values():
+            profile["alerts"] = testing.DummyModel()
+        testing.registerDummySecurityPolicy('a')
 
     def tearDown(self):
         cleanUp()
-
-    def _register(self):
-        from zope.interface import Interface
-        from karl.views.interfaces import ILayoutProvider
-        from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
-
-        from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
-    def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import add_calendarevent_view
-        return add_calendarevent_view(context, request)
-
-    def test_notsubmitted(self):
-        context = DummyCalendar()
-        context['1'] = DummyCalendarCategory('1')
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_calendarevent.pt')
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        # default category should come first
-        self.assertEqual(renderer.calendar_categories[0]['path'],
-                         '/_default_category_')
-
-    def test_submitted_invalid(self):
-        context = DummyCalendar()
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({'form.submitted': '1'})
-            )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_calendarevent.pt')
-        self._registerSecurityWorkflow()
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        self.assertTrue('startDate' in renderer.fielderrors)
-
-    def test_submitted_invalid_no_startdate(self):
-        context = DummyCalendar()
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                })
-            )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/add_calendarevent.pt')
-        self._registerSecurityWorkflow()
-        self._callFUT(context, request)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-        self.assertFalse('startDate' in renderer.fielderrors)
-
-    def test_submitted_valid(self):
-        context = self.community
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'my event',
-                'text': 'come to a party',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                'calendar_category': '',
-                })
-            )
-        self._register()
-        self._registerSecurityWorkflow()
-
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/my-event/')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/my-event-1/')
-
-    def test_submitted_valid_adjusts_times_when_all_day_flag_set(self):
-        import datetime
-        from webob.multidict import MultiDict
-        context = self.community
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'my event',
-                'text': 'come to a party',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                'calendar_category': '',
-                'allDay': 'true'
-                })
-            )
-        self._register()
-        self._registerSecurityWorkflow()
-
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        
-        factory = DummyContentFactory(DummyCalendarEvent)
-        registerContentFactory(factory, ICalendarEvent)
-
-        response = self._callFUT(context, request)
-
-        event = factory.created_instances[0]
-        self.assertEqual('my event', event.title)
-        self.assertEqual(event.startDate,
-                         datetime.datetime(2009,1,1,0,0,0))
-        self.assertEqual(event.endDate,
-                         datetime.datetime(2009,1,2,0,0,0))
-
-    def test_submitted_valid_no_category(self):
-        context = self.community
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'my event',
-                'text': 'come to a party',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                })
-            )
-        self._register()
-        self._registerSecurityWorkflow()
-
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/my-event/')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/my-event-1/')
-
-    def test_submitted_valid_sendalert(self):
-        context = self.community
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'my event',
-                'text': 'come to a party',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'sendalert': 'true',
-                'security_state': 'public',
-                'calendar_category': '',
-                })
-            )
-        self._register()
-        self._registerSecurityWorkflow()
-
-        alerts = []
-
-        class DummyAlerts(object):
-            def emit(self, event, request):
-                alerts.append((event, request))
-
-        from karl.utilities.interfaces import IAlerts
-        testing.registerUtility(DummyAlerts(), IAlerts)
-
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/communities/community/my-event/')
-        self.assertEqual(1, len(alerts))
-        self.assertEqual(alerts[0][0].title, 'my event')
-
-
-class EditCalendarEventViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
+    def _attachStateInfoToController(self, controller):
+        def dummy_state_info(content, request, context=None, from_state=None):
+            return self.test_states
+        controller.workflow.state_info = dummy_state_info
 
     def _register(self):
+        # layout provider
         from zope.interface import Interface
-        from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-        from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
         ad = testing.registerAdapter(DummyLayoutProvider,
                              (Interface, Interface),
                              ILayoutProvider)
 
-    def _callFUT(self, context, request):
-        from karl.content.views.calendar_events import edit_calendarevent_view
-        return edit_calendarevent_view(context, request)
+        # tags
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
 
-    def test_notsubmitted(self):
-        cal = DummyCalendar()
-        cal['0'] = DummyCalendarCategory('zero')
-        context = DummyCalendarEvent()
-        cal['anevent'] = context
-        context.title = 'atitle'
-        context.text = 'sometext'           
-        import datetime
-        context.startDate = datetime.datetime(2010,1,1,0,0,0)
-        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
+        # mail utility
+        from repoze.sendmail.interfaces import IMailDelivery
+        from karl.testing import DummyMailer
+        self.mailer = DummyMailer()
+        from repoze.bfg.threadlocal import manager
+        from repoze.bfg.registry import Registry
+        manager.stack[0]['registry'] = Registry('testing')
+        testing.registerUtility(self.mailer, IMailDelivery)
+
+        # CalendarEventAlert adapter
+        from karl.models.interfaces import IProfile
         from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['title'], 'atitle')
-        self.assertEqual(renderer.fieldvalues['text'], 'sometext')
-        # default category should come first
-        self.assertEqual(renderer.calendar_categories[0]['path'],
-                         '/_default_category_')
-        
+        from karl.content.views.adapters import CalendarEventAlert
+        from karl.utilities.interfaces import IAlert
+        from repoze.bfg.interfaces import IRequest
+        testing.registerAdapter(CalendarEventAlert,
+                                (ICalendarEvent, IProfile, IRequest),
+                                IAlert)
 
-    def test_notsubmitted_sets_all_day_flag_if_all_day_event(self):
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        context.title = 'atitle'
-        context.text = 'sometext'           
-        import datetime
-        context.startDate = datetime.datetime(2010,1,1,0,0,0)
-        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
+        # IKarlDates
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+
+        # content factories
+        from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['allDay'], True)
+        from karl.content.interfaces import ICommunityFile
+        registerContentFactory(DummyFile, ICommunityFile)
 
-    def test_notsubmitted_adjusts_endDate_if_all_day_event(self):
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        context.title = 'atitle'
-        context.text = 'sometext'           
-        import datetime
-        context.startDate = datetime.datetime(2010,1,1,0,0,0)
-        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
+    def _makeOne(self, context, request):
+        from karl.content.views.calendar_events import AddCalendarEventFormController
+        return AddCalendarEventFormController(context, request)
+
+    def test__get_security_states(self):
+        controller = self._makeOne(self.context, self.request)
+        self._attachStateInfoToController(controller)
+        security_states = controller._get_security_states()
+        self.assertEqual(security_states, self.test_states)
+
+    def test_form_defaults(self):
+        from karl.content.views import calendar_events
+        from datetime import datetime
+        original_NOW = calendar_events._NOW
+        calendar_events._NOW = datetime(2010, 10, 07, 16, 20)
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['start_date'],
+                         datetime(2010, 10, 07, 16, 20))
+        self.assertEqual(defaults['end_date'],
+                         datetime(2010, 10, 07, 17, 20))
+        self.failIf('security_state' in defaults)
+        calendar_events._NOW = original_NOW
+
+        self._attachStateInfoToController(controller)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['security_state'], 'foo')
+
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('title' in fields)
+        self.failUnless('tags' in fields)
+        self.failUnless('category' in fields)
+        self.failUnless('all_day' in fields)
+        self.failUnless('start_date' in fields)
+        self.failUnless('end_date' in fields)
+        self.failUnless('location' in fields)
+        self.failUnless('text' in fields)
+        self.failUnless('attendees' in fields)
+        self.failUnless('contact_name' in fields)
+        self.failUnless('contact_email' in fields)
+        self.failUnless('attachments' in fields)
+        self.failUnless('sendalert' in fields)
+        self.failIf('security_state' in fields)
+        self._attachStateInfoToController(controller)
+        self.failUnless('security_state' in dict(controller.form_fields()))
+
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('category' in widgets)
+        self.failUnless('all_day' in widgets)
+        self.failUnless('start_date' in widgets)
+        self.failUnless('end_date' in widgets)
+        self.failUnless('location' in widgets)
+        self.failUnless('text' in widgets)
+        self.failUnless('attendees' in widgets)
+        self.failUnless('contact_name' in widgets)
+        self.failUnless('contact_email' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('sendalert' in widgets)
+        self.failIf('security_state' in widgets)
+        widgets = controller.form_widgets({'security_state': True})
+        self.failUnless('security_state' in widgets)
+
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Add Calendar Entry')
+        self.failUnless('actions' in response)
+        self.failUnless('layout' in response)
+
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/')
+
+    def test_handle_submit_invalid_dates(self):
+        controller = self._makeOne(self.context, self.request)
+        from datetime import datetime
+        from datetime import timedelta
+        now = datetime.now()
+        converted = {'start_date': now,
+                     'end_date': now - timedelta(minutes=60),
+                     'all_day': False}
+        self.assertRaises(ValidationError, controller.handle_submit,
+                          converted)
+        converted['end_date'] = now
+        self.assertRaises(ValidationError, controller.handle_submit,
+                          converted)
+
+    def test_handle_submit_with_times(self):
+        context = self.context
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['endDate'],
-                         datetime.datetime(2010,1,1,0,0,0))
+        controller = self._makeOne(self.context, self.request)
+        from datetime import datetime
+        from datetime import timedelta
+        start_date = datetime(2010, 10, 04, 16, 20)
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        converted = {'title': u'Event Title',
+                     'start_date': start_date,
+                     'end_date': start_date + timedelta(minutes=60),
+                     'all_day': False,
+                     'text': u'event text',
+                     'location': u'event location',
+                     'attendees': u'one\ntwo\nthree',
+                     'contact_name': u'event contact name',
+                     'contact_email': u'eventcontact@example.com',
+                     'category': u'event/category',
+                     'security_state': u'default',
+                     'tags': [u'foo', u'bar'],
+                     'attachments': [attachment1, attachment2],
+                     'sendalert': True,
+                     }
+        response = controller.handle_submit(converted)
+        self.failUnless('event-title' in context)
+        event = context['event-title']
+        # check basic attribute values
+        self.assertEqual(event.title, u'Event Title')
+        self.assertEqual(event.startDate, start_date)
+        self.assertEqual(event.endDate, start_date+timedelta(minutes=60))
+        self.assertEqual(event.text, u'event text')
+        self.assertEqual(event.location, u'event location')
+        self.assertEqual(event.attendees, [u'one', u'two', u'three'])
+        self.assertEqual(event.contact_name, u'event contact name')
+        self.assertEqual(event.contact_email, u'eventcontact@example.com')
+        self.assertEqual(event.creator, u'a')
+        self.assertEqual(event.calendar_category, u'event/category')
+        # attachments were saved?
+        attachments_folder = event['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        # alerts went out?
+        self.assertEqual(len(self.mailer), 3)
+        recips = [msg.mto[0] for msg in self.mailer]
+        recips.sort()
+        self.assertEqual(['a@x.org', 'b@x.org', 'c@x.org'], recips)
+        # tags?
+        self.assertEqual(self.site.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
 
-    def test_notsubmitted_clears_all_day_flag_if_not_all_day_event(self):
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        context.title = 'atitle'
-        context.text = 'sometext'           
-        import datetime
-        context.startDate = datetime.datetime(2010,1,1,3,0,0)
-        context.endDate   = datetime.datetime(2010,1,2,4,0,0)
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
+    def test_handle_submit_all_day(self):
+        context = self.context
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['allDay'], False)
+        controller = self._makeOne(self.context, self.request)
+        from datetime import datetime
+        from datetime import timedelta
+        start_date = datetime(2010, 10, 07, 16, 20)
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        converted = {'title': u'Event Title',
+                     'start_date': start_date,
+                     'end_date': start_date + timedelta(minutes=60),
+                     'all_day': True,
+                     'text': u'event text',
+                     'location': u'event location',
+                     'attendees': u'one\ntwo\nthree',
+                     'contact_name': u'event contact name',
+                     'contact_email': u'eventcontact@example.com',
+                     'category': u'event/category',
+                     'security_state': u'default',
+                     'tags': [u'foo', u'bar'],
+                     'attachments': [attachment1, attachment2],
+                     'sendalert': True,
+                     }
+        response = controller.handle_submit(converted)
+        self.failUnless('event-title' in context)
+        event = context['event-title']
+        # check basic attribute values
+        self.assertEqual(event.title, u'Event Title')
+        self.assertEqual(event.startDate, datetime(2010, 10, 7, 0, 0, 0))
+        self.assertEqual(event.endDate, datetime(2010, 10, 8, 0, 0, 0))
+        self.assertEqual(event.text, u'event text')
+        self.assertEqual(event.location, u'event location')
+        self.assertEqual(event.attendees, [u'one', u'two', u'three'])
+        self.assertEqual(event.contact_name, u'event contact name')
+        self.assertEqual(event.contact_email, u'eventcontact@example.com')
+        self.assertEqual(event.creator, u'a')
+        self.assertEqual(event.calendar_category, u'event/category')
+        # attachments were saved?
+        attachments_folder = event['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        # alerts went out?
+        self.assertEqual(len(self.mailer), 3)
+        recips = [msg.mto[0] for msg in self.mailer]
+        recips.sort()
+        self.assertEqual(['a@x.org', 'b@x.org', 'c@x.org'], recips)
+        # tags?
+        self.assertEqual(self.site.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
 
-    def test_render_no_calendar(self):
-        context = DummyCalendarEvent()
-        context.title = 'atitle'
-        context.text = 'sometext'
-        import datetime
-        context.startDate = datetime.datetime(2010,1,1,0,0,0)
-        context.endDate   = datetime.datetime(2010,1,2,0,0,0)
-        request = testing.DummyRequest()
-        from webob.multidict import MultiDict
-        request.POST = MultiDict()
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['title'], 'atitle')
-        self.assertEqual(renderer.fieldvalues['text'], 'sometext')
-        self.failIf('calendar_category' in renderer.fieldvalues)
 
-    def test_submitted_invalid(self):
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        context.title = 'atitle'
-        context.text = 'sometext'
-        from webob.multidict import MultiDict
+class EditCalendarEventFormControllerTests(unittest.TestCase):
+    """Edit and add calendar event form controllers share a lot of
+    code, in cases where shared code is tested in the add form
+    controller tests above the same code is not tested here."""
+    test_states = [{'current': True, 'name': 'foo', 'transitions': True},
+                   {'name': 'bar', 'transitions': True}]
+
+    def setUp(self):
+        cleanUp()
+        # Create dummy site skeleton
+        from karl.testing import DummyCommunity
+        community = DummyCommunity()
+        community.member_names = set(["b", "c",])
+        community.moderator_names = set(["a",])
+        self.site = community.__parent__.__parent__
+        self.site.sessions = DummySessions()
+        self.community = community
+        tags = DummyTags()
+        self.site.tags = tags
         from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        request = testing.DummyRequest(
-            MultiDict({
-                    'form.submitted': '1',
-            })
+        self.site.catalog = DummyCatalog()
+        from datetime import datetime
+        from datetime import timedelta
+        self.start_date = start_date = datetime.now()
+        event = DummyCalendarEvent(
+            title='Dummy Calendar Event Title',
+            startDate=start_date,
+            endDate=start_date + timedelta(hours=1),
+            creator = 'a',
+            text='event text',
+            location='event location',
+            attendees=[u'a', u'b', u'c'],
+            contact_name='event contact name',
+            contact_email='email@eventcontact.com',
+            calendar_category='event category',
             )
-        self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/edit_calendarevent.pt')
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        response = self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+        community['event'] = event
+        self.context = event
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
+        self._registerSecurityWorkflow()
 
-    def test_submitted_valid(self):
-        self._register()
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
-        directlyProvides(context, ISite)
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'My Event',
-                'text': 'Come to a party!',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'sendalert': 'true',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                'calendar_category': 'cal1',
-                }))
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        from karl.models.interfaces import IObjectModifiedEvent
-        from zope.interface import Interface
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        self.assertTrue(response.location.startswith(
-            'http://example.com/anevent/'))
-        self.assertEqual(len(L), 2)
-        self.assertEqual(context.title, 'My Event')
-        self.assertEqual(context.text, 'Come to a party!')
-        self.assertEqual(context.modified_by, 'testeditor')
-        self.assertEqual(context.calendar_category, 'cal1')
+        self.profiles = testing.DummyModel()
+        self.site["profiles"] = self.profiles
+        from karl.testing import DummyProfile
+        self.profiles["a"] = DummyProfile()
+        self.profiles["b"] = DummyProfile()
+        self.profiles["c"] = DummyProfile()
+        for profile in self.profiles.values():
+            profile["alerts"] = testing.DummyModel()
+        testing.registerDummySecurityPolicy('a')
 
-    def test_submitted_valid_adjusts_times_when_all_day_flag_set(self):
-        import datetime
-        self._register()
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
-        directlyProvides(context, ISite)
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/5/2009 16:00',
-                'endDate': '1/6/2009 17:00',
-                'title': 'My Event',
-                'text': 'Come to a party!',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'sendalert': 'true',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                'calendar_category': 'cal1',
-                'allDay': 'true'
-                }))
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        from karl.models.interfaces import IObjectModifiedEvent
-        from zope.interface import Interface
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        
-        self.assertEqual(context.startDate,
-                         datetime.datetime(2009, 1, 5, 0, 0, 0))
-        self.assertEqual(context.endDate,
-                         datetime.datetime(2009, 1, 7, 0, 0, 0))
+    def tearDown(self):
+        cleanUp()
 
-    def test_submitted_valid_no_category(self):
-        self._register()
-        context = DummyCalendarEvent()
-        DummyCalendar()['anevent'] = context
-        from karl.testing import DummyCatalog
-        context.catalog = DummyCatalog()
-        from karl.models.interfaces import ISite
-        from zope.interface import directlyProvides
-        directlyProvides(context, ISite)
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict({
-                'form.submitted': '1',
-                'startDate': '1/1/2009 16:00',
-                'endDate': '1/1/2009 17:00',
-                'title': 'My Event',
-                'text': 'Come to a party!',
-                'contact_email': 'me@example.com',
-                'contact_name': 'Me',
-                'location': 'NYC',
-                'attendees': '',
-                'sendalert': 'true',
-                'security_state': 'public',
-                'tags': 'thetesttag',
-                }))
-        from karl.content.interfaces import ICalendarEvent
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyCalendarEvent, ICalendarEvent)
-        from karl.models.interfaces import IObjectModifiedEvent
+    def _registerSecurityWorkflow(self):
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
+
+    def _attachStateInfoToController(self, controller):
+        def dummy_state_info(content, request, context=None, from_state=None):
+            return self.test_states
+        controller.workflow.state_info = dummy_state_info
+        self.context.state = 'foo'
+
+    def _register(self):
+        # layout provider
         from zope.interface import Interface
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        self.assertTrue(response.location.startswith(
-            'http://example.com/anevent/'))
-        self.assertEqual(len(L), 2)
-        self.assertEqual(context.title, 'My Event')
-        self.assertEqual(context.text, 'Come to a party!')
-        self.assertEqual(context.modified_by, 'testeditor')
-        self.assertEqual(context.calendar_category, '')
+        from karl.views.interfaces import ILayoutProvider
+        from karl.testing import DummyLayoutProvider
+        ad = testing.registerAdapter(DummyLayoutProvider,
+                             (Interface, Interface),
+                             ILayoutProvider)
+
+        # tags
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+
+        # mail utility
+        from repoze.sendmail.interfaces import IMailDelivery
+        from karl.testing import DummyMailer
+        self.mailer = DummyMailer()
+        from repoze.bfg.threadlocal import manager
+        from repoze.bfg.registry import Registry
+        manager.stack[0]['registry'] = Registry('testing')
+        testing.registerUtility(self.mailer, IMailDelivery)
+
+        # CalendarEventAlert adapter
+        from karl.models.interfaces import IProfile
+        from karl.content.interfaces import ICalendarEvent
+        from karl.content.views.adapters import CalendarEventAlert
+        from karl.utilities.interfaces import IAlert
+        from repoze.bfg.interfaces import IRequest
+        testing.registerAdapter(CalendarEventAlert,
+                                (ICalendarEvent, IProfile, IRequest),
+                                IAlert)
+
+        # IKarlDates
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+
+        # content factories
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.content.interfaces import ICommunityFile
+        registerContentFactory(DummyFile, ICommunityFile)
+
+    def _makeOne(self, context, request):
+        from karl.content.views.calendar_events \
+             import EditCalendarEventFormController
+        return EditCalendarEventFormController(context, request)
+
+    def test_form_defaults(self):
+        from datetime import datetime
+        from datetime import timedelta
+        context = self.context
+        controller = self._makeOne(context, self.request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'Dummy Calendar Event Title')
+        self.assertEqual(defaults['text'], 'event text')
+        self.assertEqual(defaults['start_date'], self.start_date)
+        self.assertEqual(defaults['end_date'],
+                         self.start_date + timedelta(hours=1))
+        self.assertEqual(defaults['location'], 'event location')
+        self.assertEqual(defaults['attendees'], u'a\nb\nc')
+        self.assertEqual(defaults['contact_name'], 'event contact name')
+        self.assertEqual(defaults['contact_email'], 'email@eventcontact.com')
+        self.assertEqual(defaults['category'], 'event category')
+        self.failIf(defaults['security_state'])
+        self.failIf(defaults['all_day'])
+
+        # now with security_state and all_day
+        self._attachStateInfoToController(controller)
+        all_day_start_date = datetime(2010, 10, 7, 0, 0, 0)
+        context.startDate = all_day_start_date
+        context.endDate = all_day_start_date + timedelta(days=1)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['security_state'], 'foo')
+        self.failUnless(defaults['all_day'])
+        self.assertEqual(defaults['end_date'], all_day_start_date)
+
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('title' in fields)
+        self.failUnless('tags' in fields)
+        self.failUnless('category' in fields)
+        self.failUnless('all_day' in fields)
+        self.failUnless('start_date' in fields)
+        self.failUnless('end_date' in fields)
+        self.failUnless('location' in fields)
+        self.failUnless('text' in fields)
+        self.failUnless('attendees' in fields)
+        self.failUnless('contact_name' in fields)
+        self.failUnless('contact_email' in fields)
+        self.failUnless('attachments' in fields)
+        self.failIf('security_state' in fields)
+        self._attachStateInfoToController(controller)
+        self.failUnless('security_state' in dict(controller.form_fields()))
+
+    def test_form_widgets(self):
+        # need to register so tag lookup will work
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('category' in widgets)
+        self.failUnless('all_day' in widgets)
+        self.failUnless('start_date' in widgets)
+        self.failUnless('end_date' in widgets)
+        self.failUnless('location' in widgets)
+        self.failUnless('text' in widgets)
+        self.failUnless('attendees' in widgets)
+        self.failUnless('contact_name' in widgets)
+        self.failUnless('contact_email' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failIf('security_state' in widgets)
+        widgets = controller.form_widgets({'security_state': True})
+        self.failUnless('security_state' in widgets)
+
+    def test_handle_submit_with_times(self):
+        context = self.context
+        self._register()
+        controller = self._makeOne(self.context, self.request)
+        from datetime import datetime
+        from datetime import timedelta
+        start_date = datetime(2010, 10, 04, 16, 20)
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        converted = {'title': u'Different Event Title',
+                     'start_date': start_date,
+                     'end_date': start_date + timedelta(minutes=60),
+                     'all_day': False,
+                     'text': u'new event text',
+                     'location': u'new event location',
+                     'attendees': u'one\ntwo\nthree\nmore',
+                     'contact_name': u'new contact name',
+                     'contact_email': u'newcontact@example.com',
+                     'category': u'event/newcategory',
+                     'security_state': u'new default',
+                     'tags': [u'foo', u'bar'],
+                     'attachments': [attachment1, attachment2],
+                     }
+        response = controller.handle_submit(converted)
+        event = context
+        # check basic attribute values
+        self.assertEqual(event.title, u'Different Event Title')
+        self.assertEqual(event.startDate, start_date)
+        self.assertEqual(event.endDate, start_date+timedelta(minutes=60))
+        self.assertEqual(event.text, u'new event text')
+        self.assertEqual(event.location, u'new event location')
+        self.assertEqual(event.attendees, [u'one', u'two', u'three', u'more'])
+        self.assertEqual(event.contact_name, u'new contact name')
+        self.assertEqual(event.contact_email, u'newcontact@example.com')
+        self.assertEqual(event.modified_by, u'a')
+        self.assertEqual(event.calendar_category, u'event/newcategory')
+        # attachments were saved?
+        attachments_folder = event['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        # tags?
+        self.assertEqual(self.site.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
+
+    def test_handle_submit_all_day(self):
+        context = self.context
+        self._register()
+        controller = self._makeOne(self.context, self.request)
+        from datetime import datetime
+        from datetime import timedelta
+        start_date = datetime(2010, 10, 07, 16, 20)
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename='test1.txt')
+        attachment2 = DummyUpload(filename=r'C:\My Documents\Ha Ha\test2.txt')
+        converted = {'title': u'Different Event Title',
+                     'start_date': start_date,
+                     'end_date': start_date + timedelta(minutes=60),
+                     'all_day': True,
+                     'text': u'new event text',
+                     'location': u'new event location',
+                     'attendees': u'one\ntwo\nthree\nmore',
+                     'contact_name': u'new contact name',
+                     'contact_email': u'newcontact@example.com',
+                     'category': u'event/newcategory',
+                     'security_state': u'new default',
+                     'tags': [u'foo', u'bar'],
+                     'attachments': [attachment1, attachment2],
+                     }
+        response = controller.handle_submit(converted)
+        event = context
+        # check basic attribute values
+        self.assertEqual(event.title, u'Different Event Title')
+        self.assertEqual(event.startDate, datetime(2010, 10, 7, 0, 0, 0))
+        self.assertEqual(event.endDate, datetime(2010, 10, 8, 0, 0, 0))
+        self.assertEqual(event.text, u'new event text')
+        self.assertEqual(event.location, u'new event location')
+        self.assertEqual(event.attendees, [u'one', u'two', u'three', u'more'])
+        self.assertEqual(event.contact_name, u'new contact name')
+        self.assertEqual(event.contact_email, u'newcontact@example.com')
+        self.assertEqual(event.modified_by, u'a')
+        self.assertEqual(event.calendar_category, u'event/newcategory')
+        # attachments were saved?
+        attachments_folder = event['attachments']
+        self.failUnless('test1.txt' in attachments_folder)
+        self.failUnless('test2.txt' in attachments_folder)
+        # tags?
+        self.assertEqual(self.site.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
+    
 
 class Test_show_calendarevent_ics_view(unittest.TestCase):
 
@@ -995,12 +1055,15 @@ class CalendarLayersViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(post=MultiDict({
+        post = MultiDict({
             'form.edit': 1,
             'layer__name__': 'foo',
             'layer_color': 'red',
-            'layer_title': 'bar'
-            }))
+            'layer_title': 'bar',
+            })
+        post.add('category_paths', 'a/b')
+        post.add('category_paths', 'c/d')
+        request = testing.DummyRequest(post=post)
 
         response = self._callFUT(context, request)
 
@@ -1128,11 +1191,12 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        request = testing.DummyRequest(post={
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(post=MultiDict({
             'form.edit': 1,
             'layer__name__': 'foo',
             'layer_title': ''
-            })
+            }))
 
         response = self._callFUT(context, request)
 
@@ -1467,7 +1531,8 @@ class DummyContentFactory:
 
 
 class DummyCalendarEvent(testing.DummyModel):
-
+    implements(ICalendarEvent)
+    
     def __init__(self, title='', startDate=None, endDate=None, creator=0,
                  text='', location='', attendees=[], contact_name='',
                  contact_email='', calendar_category=''):
@@ -1552,3 +1617,8 @@ class DummySessions(dict):
         if name not in self:
             self[name] = {}
         return self[name]
+
+class DummyFile:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+        self.size = 0

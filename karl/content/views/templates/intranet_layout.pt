@@ -58,8 +58,9 @@
         <div id="center" class="clearafter center_boards">
           <div metal:define-slot="content"/>
         </div>
-	<div class="visualClear"/>
+	<div class="visualClear"></div>
       </div>
+
       <div id="footer" tal:content="structure api.render_footer()"/>
     </div>
   </body>

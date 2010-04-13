@@ -32,6 +32,8 @@ from zope.interface import implements
 
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.formish import Form
+from repoze.bfg.formish.zcml import FormAction
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
@@ -40,6 +42,7 @@ from repoze.lemonade.content import create_content
 
 from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
+from karl.content.views.commenting import AddCommentFormController
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import fetch_attachments
@@ -147,7 +150,6 @@ def show_blog_view(context, request):
         security_states=security_states,
         )
 
-
 def show_blogentry_view(context, request):
 
     post_url = model_url(context, request, "comments", "add_comment.html")
@@ -222,6 +224,26 @@ def show_blogentry_view(context, request):
         'title': blog.title,
         }
 
+    # manually construct formish comment form
+    controller = AddCommentFormController(context['comments'], request)
+    form_schema = schemaish.Structure()
+    form_fields = controller.form_fields()
+    for fieldname, field in form_fields:
+        form_schema.add(fieldname, field)
+    form_action_url = '%sadd_comment.html' % model_url(context['comments'],
+                                                       request)
+    comment_form = Form(form_schema, add_default_action=False, name='save',
+                        action_url=form_action_url)
+
+    form_actions = [FormAction('submit', 'submit'),
+                    FormAction('cancel', 'cancel', validate=False)]
+    for action in form_actions:
+        comment_form.add_action(action.name, action.title)
+
+    widgets = controller.form_widgets(form_fields)
+    for name, widget in widgets.items():
+        comment_form[name].widget = widget
+
     return render_template_to_response(
         'templates/show_blogentry.pt',
         api=api,
@@ -229,12 +251,13 @@ def show_blogentry_view(context, request):
         comments=comments,
         attachments=fetch_attachments(context['attachments'], request),
         head_data=convert_to_script(client_json_data),
-        formfields=api.formfields,
+        comment_form=comment_form,
         post_url=post_url,
         byline_info=byline_info,
         backto=backto,
         security_states = security_states,
         )
+
 
 tags_field = schemaish.Sequence(schemaish.String())
 text_field = schemaish.String()
@@ -299,7 +322,6 @@ class AddBlogEntryFormController(object):
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
             'sendalert':formish.widgets.Checkbox(),
             }
-        security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()

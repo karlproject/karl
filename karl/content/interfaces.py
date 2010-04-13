@@ -47,7 +47,10 @@ class IBlogEntry(ICommunityContent, IPosts):
     taggedValue('name', 'Blog Entry')
     taggedValue('search_option', True)
 
-class ICalendar(IFolder):
+class IEventContainer(IFolder):
+    """A folder that supports storage of calendar events"""
+
+class ICalendar(IEventContainer):
     """A folder that holds a community's calendar events"""
     taggedValue('name', 'Calendar')
 

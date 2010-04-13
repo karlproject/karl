@@ -20,6 +20,7 @@ import formish
 import schemaish
 from validatish import validator
 from karl.content.interfaces import IIntranetRootFolder
+from karl.content.views.utils import split_lines
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import ICommunity
@@ -59,17 +60,6 @@ def show_intranets_view(context, request):
         intranets_info=api.intranets_info,
         )
 
-def split_lines(lines):
-    """
-    Splits the provided text value by line breaks, strips each result,
-    and returns a list of the non-empty results.
-    """
-    result = []
-    for line in lines.split('\n'):
-        stripped = line.strip()
-        if stripped:
-            result.append(stripped)
-    return result
 
 # title and/or name field require name checking validation,
 # but this is happening in handle_submit b/c it requires a

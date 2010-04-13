@@ -285,7 +285,6 @@ class TestHandlePhotoUpload(unittest.TestCase):
 
     def test_upload_photo(self):
         from cStringIO import StringIO
-        from karl.models.tests.test_image import one_pixel_jpeg
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         def make_image(title, stream, mimetype, filename, creator):
@@ -314,7 +313,6 @@ class TestHandlePhotoUpload(unittest.TestCase):
 
     def test_replace_photo(self):
         from cStringIO import StringIO
-        from karl.models.tests.test_image import one_pixel_jpeg
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         def make_image(title, stream, mimetype, filename, creator):
@@ -352,10 +350,9 @@ class TestHandlePhotoUpload(unittest.TestCase):
 
     def test_invalid_image(self):
         from cStringIO import StringIO
-        from karl.models.tests.test_image import one_pixel_jpeg
+        from karl.views.utils import Invalid
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        from karl.views.utils import CustomInvalid
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -371,7 +368,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         context.title = 'Howdy Doody'
         context.__name__ = 'howdydoody'
         form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
-        self.assertRaises(CustomInvalid, self._callFUT, context, form)
+        self.assertRaises(Invalid, self._callFUT, context, form)
         self.assertTrue('photo' not in context)
 
 
@@ -385,7 +382,6 @@ class TestHandlePhotoUpload(unittest.TestCase):
 
     def test_upload_has_mimetype_instead_of_type(self):
         from cStringIO import StringIO
-        from karl.models.tests.test_image import one_pixel_jpeg
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         def make_image(title, stream, mimetype, filename, creator):

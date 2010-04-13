@@ -35,7 +35,6 @@ except IOError:
 requires = [
     'coverage',
     'feedparser',
-    'FormEncode',
     'icalendar',
     'lxml',
     'markdown2',
@@ -44,7 +43,6 @@ requires = [
     'repoze.bfg >= 1.2a6',
     'repoze.browserid',
     'repoze.catalog',
-    'repoze.enformed',
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',

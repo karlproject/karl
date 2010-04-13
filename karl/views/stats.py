@@ -3,14 +3,6 @@ import sys
 import os
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.security import has_permission
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.url import model_url
-from repoze.workflow import get_workflow
-from repoze.enformed import FormSchema
 from karl.views.api import TemplateAPI
 
 def stats(context, request):

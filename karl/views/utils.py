@@ -17,16 +17,12 @@
 
 """Useful functions that appear in several places in the KARL UI"""
 import os
-import random
 import re
-import sys
 from cStringIO import StringIO
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import traverse
 from repoze.lemonade.content import create_content
-
-from formencode import Invalid
 
 from karl.utils import find_communities
 from karl.utils import find_profiles
@@ -293,7 +289,7 @@ def handle_photo_upload(context, form):
         )
         if not photo.is_image:
             transaction.get().doom()
-            raise CustomInvalid(
+            raise Invalid(
                 {'photo': 'Uploaded file is not a valid image.'}
             )
         if 'photo' in context:
@@ -307,8 +303,7 @@ def handle_photo_upload(context, form):
         if 'photo' in context:
             del context['photo']
 
-class CustomInvalid(Invalid):
-
+class Invalid(Exception):
     def __init__(self, error_dict):
         self.error_dict = error_dict
 
@@ -317,7 +312,7 @@ def check_upload_size(context, obj, field_name):
     if max_size and obj.size > max_size:
         msg = 'File size exceeds upload limit of %d.' % max_size
         transaction.get().doom()
-        raise CustomInvalid({field_name: msg})
+        raise Invalid({field_name: msg})
 
 # Used to map HTML entity names to numeric entities that can be used in XML
 # Source: http://elizabethcastro.com/html/extras/entities.html

@@ -37,37 +37,10 @@ from karl.content.views.adapters import DefaultShowSendalert
 
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import make_unique_name
-from karl.views.utils import check_upload_size
 
 def fetch_attachments(attachments_folder, request):
     return [getMultiAdapter((attachment, request), IFileInfo)
                    for attachment in attachments_folder.values()]
-
-def store_attachments(attachments_folder, params, creator):
-    """Given some request data, pick apart and store attachments"""
-
-    # Get the attachments out of the form data.  We do iteritems
-    # becauser there might be multiple with the name prefixed by
-    # attachment.
-    new_attachments = []
-    for key, value in params.iteritems():
-        if key.startswith('attachment') and value != '':
-            new_attachments.append(value)
-
-    # Iterate through the new attachments and create content to store in
-    # the attachments folder.
-    for attachment in new_attachments:
-        filename = make_unique_name(attachments_folder,
-                                    basename_of_filepath(attachment.filename))
-        attachments_folder[filename] = obj = create_content(
-            ICommunityFile,
-            title = filename,
-            stream = attachment.file,
-            mimetype = attachment.type,
-            filename = filename,
-            creator = creator,
-            )
-        check_upload_size(attachments_folder, obj, 'attachment')
 
 def upload_attachments(attachments, folder, creator, request):
     """ This creates *and removes* attachments based on information
@@ -99,8 +72,6 @@ def upload_attachments(attachments, folder, creator, request):
                     ob = folder[name]
                     if has_permission('delete', ob, request):
                         del folder[name]
-
-
 
 def get_previous_next(context, request):
 
@@ -169,3 +140,15 @@ def get_show_sendalert(context, request):
     if show_sendalert is None:
         show_sendalert = DefaultShowSendalert(context, request)
     return show_sendalert.show_sendalert
+
+def split_lines(lines):
+    """
+    Splits the provided text value by line breaks, strips each result,
+    and returns a list of the non-empty results.
+    """
+    result = []
+    for line in lines.split('\n'):
+        stripped = line.strip()
+        if stripped:
+            result.append(stripped)
+    return result

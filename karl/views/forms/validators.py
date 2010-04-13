@@ -6,6 +6,7 @@ from validatish.validator import Validator
 from validatish.error import Invalid
 from zope.component import getAdapter
 from repoze.bfg.traversal import find_model
+from repoze.who.plugins.zodb.users import get_sha_password
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_site
@@ -62,7 +63,7 @@ class PathExists(Validator):
             if target is site:
                 raise Invalid("Path must not point to the site root")
 
-class PasswordChecker(Validator):
+class PasswordLength(Validator):
     def __init__(self, min_pw_length):
         self.min_pw_length = min_pw_length
         
@@ -71,6 +72,19 @@ class PasswordChecker(Validator):
             fmt = "Password must be at least %s characters"
             msg = fmt % self.min_pw_length
             raise Invalid(msg, v)
+
+class CorrectUserPassword(Validator):
+    def __init__(self, user):
+        self.user = user
+
+    def __call__(self, v):
+        # XXX: repoze.who.plugins.zodb.interfaces.IUsers
+        # really should have a check_password(id, password)
+        # method.  We shouldn't have to use get_sha_password
+        # directly.
+        enc = get_sha_password(v)
+        if enc != self.user['password']:
+            raise Invalid('Incorrect password', v)
 
 class UniqueEmail(Validator):
     def __init__(self, context):

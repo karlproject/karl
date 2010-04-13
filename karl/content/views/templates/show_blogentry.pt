@@ -3,6 +3,20 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="api.community_layout.macros['master']">
 
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <script type="text/javascript" 
+        src="${api.static_url}/jquery-ui/1.7/ui/ui.sortable.js">//</script>
+    <script type="text/javascript" 
+        src="${api.static_url}/formish.js">//</script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        formish();
+      });
+      //]]>
+    </script>
+  </span>
+
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
@@ -24,18 +38,9 @@
 
     <div metal:use-macro="api.snippets.macros['show_comments']"/>
 
+    <a name="addcomment"></a>
+    <span tal:content="structure comment_form()" tal:omit-tag=""/>
 
-    <form method="post" action="${post_url}" class="k3_genericForm"
-	  enctype="multipart/form-data" name="save">
-
-      <fieldset metal:use-macro="formfields.macros['add_comment-field']"/>
-      <fieldset metal:use-macro="formfields.macros['attachment-field']"/>
-      <fieldset metal:use-macro="formfields.macros['sendalert-field']"/>
-	  <div style="display:none">
-      	<fieldset metal:use-macro="formfields.macros['security-state-field']"/>
-      </div>
-      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
-    </form>
   </div>
 
 </html>

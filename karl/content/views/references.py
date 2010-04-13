@@ -15,13 +15,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from formencode import Invalid
-from formencode import validators
-
 from webob.exc import HTTPFound
 from zope.component import getMultiAdapter
-from zope.component import queryMultiAdapter
 from zope.component.event import objectEventNotify
+
+from validatish import validator
+import formish
+import schemaish
 
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -29,16 +29,14 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 
-from repoze.enformed import FormSchema
-
 from repoze.lemonade.content import create_content
 
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
-from karl.views import baseforms
 from karl.views.api import TemplateAPI
-from karl.views.form import render_form_to_response
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms import widgets as karlwidgets
 from karl.views.tags import set_tags
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
@@ -54,64 +52,75 @@ from karl.content.views.utils import get_previous_next
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
-def add_referencemanual_view(context, request):
-    tags_list=request.POST.getall('tags')
-    form = AddReferenceManualForm(tags_list=tags_list)
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+tags_field = schemaish.Sequence(schemaish.String())
+description_field = schemaish.String(
+    description="A summary of the reference manual - subject and scope. "
+    "Will be displayed on every page of the manual.")
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # Create the reference manual and store it
-            creator = authenticated_userid(request)
-            reference_manual = create_content(IReferenceManual,
-                                              converted['title'],
-                                              converted['description'],
-                                              creator,
-                                              )
-            name = make_unique_name(context, converted['title'])
-            context[name] = reference_manual
 
-            # Save the tags on it.
-            set_tags(reference_manual, request, converted['tags'])
+class AddReferenceFCBase(object):
+    """Base class for the form controllers for adding a reference
+    manual and a reference section, since they are very similar."""
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-            location = model_url(reference_manual, request)
-            return HTTPFound(location=location)
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context)))
+        fields = [('title', title_field),
+                  ('tags', tags_field),
+                  ('description', description_field),
+                  ]
+        return fields
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-    else:
-        fielderrors = {}
-        fill_values = {}
-        tags_field = dict(records=[])
+    def form_widgets(self, fields):
+        widgets = {'title': formish.Input(empty=''),
+                   'tags': karlwidgets.TagsAddWidget(),
+                   'description': formish.TextArea(rows=5, cols=60, empty=''),
+                   }
+        return widgets
 
-    # Render the form and shove some default values in
-    page_title = 'Add Reference Manual'
-    api = TemplateAPI(context, request, page_title)
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request, self.page_title)
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
+        layout_provider = get_layout_provider(context, request)
+        layout = layout_provider('intranet')
+        return {'api': api, 'layout': layout, 'actions': []}
 
-    return render_form_to_response(
-        'templates/addedit_referencemanual.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-            )),
-        layout=layout,
-        )
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        creator = authenticated_userid(request)
+        reference_object = create_content(self.content_iface,
+                                          converted['title'],
+                                          converted['description'],
+                                          creator,
+                                          )
+        # give the subclasses a handle to the object
+        self._ref_object = reference_object
+        name = make_unique_name(context, converted['title'])
+        context[name] = reference_object
+        # save the tags
+        set_tags(reference_object, request, converted['tags'])
+
+        location = model_url(reference_object, request)
+        return HTTPFound(location=location)
+
+
+class AddReferenceManualFormController(AddReferenceFCBase):
+    page_title = u'Add Reference Manual'
+    content_iface = IReferenceManual
+
 
 def _get_toc(context, here_url):
     """Get the nested data used by ZPT for showing the refman TOC"""
@@ -201,7 +210,6 @@ def _get_viewall(context, request, api):
         sections.append(item)
 
     return sections
-
 
 
 def show_referencemanual_view(context, request):
@@ -303,138 +311,86 @@ def viewall_referencemanual_view(context, request):
         )
 
 
-def edit_referencemanual_view(context, request):
+class EditReferenceFCBase(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-    tags_list = request.POST.getall('tags')
-    form = EditReferenceManualForm(tags_list=tags_list)
+    def form_defaults(self):
+        context = self.context
+        defaults = {'title': context.title,
+                    'tags': [], # initial values supplied by widget
+                    'description': context.description,
+                    }
+        return defaults
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                ))
+        fields = [('title', title_field),
+                  ('tags', tags_field),
+                  ('description', description_field),
+                  ]
+        return fields
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
+    def form_widgets(self, fields):
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets = {'title': formish.Input(empty=''),
+                   'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
+                   'description': formish.TextArea(rows=5, cols=60, empty=''),
+                   }
+        return widgets
 
-            context.title = converted['title']
-            context.description = converted['description']
+    def __call__(self):
+        context = self.context
+        request = self.request
+        page_title = 'Edit %s' % context.title
+        api = TemplateAPI(context, request, page_title)
 
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
+        layout_provider = get_layout_provider(context, request)
+        layout = layout_provider('intranet')
+        return {'api': api, 'layout': layout, 'actions': []}
 
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            location = model_url(context, request)
-            msg = "?status_message=Reference%20manual%20edited"
-            return HTTPFound(location=location+msg)
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = dict(
-            title = context.title,
-            description = context.description,
-            )
+        context.title = converted['title']
+        context.description = converted['description']
+        # save the tags
+        set_tags(context, request, converted['tags'])
 
-    # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-    )
-
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    return render_form_to_response(
-        'templates/addedit_referencemanual.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(client_json_data),
-        layout=layout,
-        )
+        # modified
+        context.modified_by = authenticated_userid(request)
+        objectEventNotify(ObjectModifiedEvent(context))
+        location = model_url(context, request)
+        msg = "?status_message=%s" % self.success_msg
+        return HTTPFound(location='%s%s' % (location, msg))
 
 
+class EditReferenceManualFormController(EditReferenceFCBase):
+    success_msg = 'Reference%20manual%20edited'
 
-def add_referencesection_view(context, request):
 
-    tags_list=request.POST.getall('tags')
-    form = AddReferenceSectionForm(tags_list = tags_list)
+class AddReferenceSectionFormController(AddReferenceFCBase):
+    page_title = u'Add Reference Section'
+    content_iface = IReferenceSection
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-
-            # Be a chicken and sync the ordering every time before
-            # adding something, just to make sure nothing gets lost.
-            context.ordering.sync(context.keys())
-
-            # Create the reference section and store it
-            creator = authenticated_userid(request)
-            reference_section = create_content(IReferenceSection,
-                                               converted['title'],
-                                               converted['description'],
-                                               creator,
-                                               )
-            name = make_unique_name(context, converted['title'])
-            context[name] = reference_section
-
-            # Save the tags on it.
-            set_tags(reference_section, request, converted['tags'])
-
-            # Update the ordering
-            context.ordering.add(name)
-
-            location = model_url(reference_section, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-    else:
-        fielderrors = {}
-        fill_values = {}
-        tags_field = dict(records=[])
-
-    # Render the form and shove some default values in
-    page_title = 'Add Reference Section'
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    return render_form_to_response(
-        'templates/addedit_referencesection.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-            )),
-        layout=layout,
-        )
+    def handle_submit(self, converted):
+        context = self.context
+        context.ordering.sync(context.keys())
+        response = super(AddReferenceSectionFormController,
+                         self).handle_submit(converted)
+        context.ordering.add(self._ref_object.__name__)
+        return response
 
 
 def _get_ordered_listing(context, request):
@@ -494,88 +450,6 @@ def show_referencesection_view(context, request):
         layout=layout,
         )
 
-def edit_referencesection_view(context, request):
 
-    tags_list = request.POST.getall('tags')
-    form = EditReferenceSectionForm(tags_list=tags_list)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-
-            context.title = converted['title']
-            context.description = converted['description']
-
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
-
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = "?status_message=Reference%20section%20edited"
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = dict(
-            title = context.title,
-            description = context.description,
-            )
-
-    # prepare client data
-    client_json_data = dict(
-        tags_field = get_tags_client_data(context, request),
-    )
-
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    return render_form_to_response(
-        'templates/addedit_referencesection.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        head_data=convert_to_script(client_json_data),
-        layout=layout,
-        )
-
-
-
-class AddReferenceManualForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    description = validators.UnicodeString(strip=True)
-
-class EditReferenceManualForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    description = validators.UnicodeString(strip=True)
-
-class AddReferenceSectionForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    description = validators.UnicodeString(strip=True)
-
-class EditReferenceSectionForm(FormSchema):
-    title = baseforms.title
-    tags = baseforms.tags
-    description = validators.UnicodeString(strip=True)
-
+class EditReferenceSectionFormController(EditReferenceFCBase):
+    success_msg = 'Reference%20section%20edited'

@@ -48,19 +48,31 @@
   </formish:form>
 
 
-
   <view
     for="karl.content.interfaces.IBlogEntry"
     view=".blog.show_blogentry_view"
     permission="view"
   />
 
-  <view
-    for="karl.models.interfaces.ICommentsFolder"
-    view=".commenting.add_comment_view"
-    name="add_comment.html"
-    permission="comment"
-  />
+  <formish:form
+     controller=".commenting.AddCommentFormController"
+     name="add_comment.html"
+     permission="comment"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.ICommentsFolder"
@@ -74,13 +86,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.models.interfaces.IComment"
-    name="edit.html"
-    view=".commenting.edit_comment_view"
-    permission="edit"
-  />
+  <formish:form
+     for="karl.models.interfaces.IComment"
+     controller=".commenting.EditCommentFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
 
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICalendar"
@@ -138,26 +163,26 @@
     permission="moderate"
   />
 
-  <view
-    for="karl.content.interfaces.ICalendar"
-    name="add_calendarevent.html"
-    view=".calendar_events.add_calendarevent_view"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.IEventContainer"
+     controller=".calendar_events.AddCalendarEventFormController"
+     name="add_calendarevent.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
 
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    name="add_calendarevent.html"
-    view=".calendar_events.add_calendarevent_view"
-    permission="create"
-  />
+     <formish:action
+       name="submit"
+       title="submit"
+       />
 
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    name="add_calendarevent.html"
-    view=".calendar_events.add_calendarevent_view"
-    permission="create"
-  />
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.ICalendarEvent"
@@ -172,12 +197,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.ICalendarEvent"
-    name="edit.html"
-    view=".calendar_events.edit_calendarevent_view"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.ICalendarEvent"
+     controller=".calendar_events.EditCalendarEventFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <adapter
     for="karl.content.interfaces.ICalendarEvent
@@ -356,19 +395,47 @@
     permission="view"
     />
 
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    name="add_referencemanual.html"
-    view=".references.add_referencemanual_view"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.ICommunityRootFolder"
+     controller=".references.AddReferenceManualFormController"
+     name="add_referencemanual.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
 
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    name="add_referencemanual.html"
-    view=".references.add_referencemanual_view"
-    permission="create"
-  />
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.ICommunityFolder"
+     controller=".references.AddReferenceManualFormController"
+     name="add_referencemanual.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IReferenceManual"
@@ -383,19 +450,47 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IReferenceManual"
-    view=".references.edit_referencemanual_view"
-    name="edit.html"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.IReferenceManual"
+     controller=".references.EditReferenceManualFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
 
-  <view
-    for="karl.content.interfaces.IReferenceManual"
-    view=".references.add_referencesection_view"
-    name="add_referencesection.html"
-    permission="create"
-  />
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IReferenceManual"
+     controller=".references.AddReferenceSectionFormController"
+     name="add_referencesection.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IReferenceSection"
@@ -403,12 +498,26 @@
     permission="view"
   />
 
-  <view
-    for="karl.content.interfaces.IReferenceSection"
-    view=".references.edit_referencesection_view"
-    name="edit.html"
-    permission="create"
-  />
+  <formish:form
+     for="karl.content.interfaces.IReferenceSection"
+     controller=".references.EditReferenceSectionFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.content.interfaces.IForumsFolder"

@@ -110,7 +110,7 @@ class SampleGenTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarEvent
         registerContentFactory(DummyCalendarEvent, ICalendarEvent)
 
-        site = testing.DummyModel()
+        site = testing.DummyModel(sessions=DummySessions())
         site.catalog = karl.testing.DummyCatalog()
         community = testing.DummyModel()
         site['community'] = community

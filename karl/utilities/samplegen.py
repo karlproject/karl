@@ -23,7 +23,7 @@ from cgi import escape
 from schemaish.type import File as SchemaFile
 from karl.content.views.blog import AddBlogEntryFormController
 from karl.content.views.files import AddFileFormController
-from karl.content.views.calendar_events import add_calendarevent_view
+from karl.content.views.calendar_events import AddCalendarEventFormController
 from karl.content.views.wiki import AddWikiPageFormController
 from karl.views.community import add_community
 from karl.models.interfaces import IProfile
@@ -256,26 +256,28 @@ def add_sample_calendar_event(community):
         second=0,
         )
     end = start.replace(hour = start.hour + 1)
-    start_str = start.strftime('%m/%d/%Y %H:%M')
-    end_str = end.strftime('%m/%d/%Y %H:%M')
 
     request = testing.DummyRequest()
     request.environ.update(DEFAULT_ENV)
-    request.POST = FauxPost(request.POST)
-    request.POST['title'] = title
-    request.POST['calendar_category'] = ''
-    request.POST['startDate'] = start_str
-    request.POST['endDate'] = end_str
-    request.POST['location'] = 'Sample Location'
-    request.POST['attendees'] = ''
-    request.POST['contact_name'] = ''
-    request.POST['contact_email'] = ''
-    request.POST['text'] = get_sample_html()
-    request.POST['security_state'] = 'inherits'
-    request.POST['tags'] = ['sample']
-    request.POST['form.submitted'] = True
+    converted = {}
+    converted['title'] = title
+    converted['category'] = ''
+    converted['start_date'] = start
+    converted['end_date'] = end
+    converted['location'] = 'Sample Location'
+    converted['attendees'] = ''
+    converted['contact_name'] = ''
+    converted['contact_email'] = ''
+    converted['text'] = get_sample_html()
+    converted['security_state'] = 'inherits'
+    converted['tags'] = ['sample']
+    converted['form.submitted'] = True
+    converted['all_day'] = False
+    converted['attachments'] = []
+    converted['sendalert'] = False
 
-    response = add_calendarevent_view(calendar, request)
+    controller = AddCalendarEventFormController(calendar, request)
+    response = controller.handle_submit(converted)
     event = _parse_add_response(request, response, calendar)
     return event
 

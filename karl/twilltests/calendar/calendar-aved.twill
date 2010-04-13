@@ -3,8 +3,8 @@ set_random_word titleword
 go /communities
 go /communities/${community_name}/calendar/add_calendarevent.html
 fv save title "${titleword}"
-fv save startDate "04/20/2009 12:30"
-fv save endDate "04/21/2009 12:30"
+fv save start_date "04/20/2009 12:30"
+fv save end_date "04/21/2009 12:30"
 fv save location "our house with two cats in the yard"
 fv save attendees "Staff One, Staff Two, Affili Atay"
 fv save contact_name "Staff One"

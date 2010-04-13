@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from webob.multidict import MultiDict
 
 from zope.interface import Interface
 from repoze.bfg.testing import cleanUp
@@ -26,11 +25,8 @@ from repoze.bfg.testing import DummyModel
 from repoze.bfg.testing import DummyRequest
 from repoze.bfg.testing import registerDummyRenderer
 from repoze.bfg.testing import registerAdapter
-from repoze.bfg.testing import registerEventListener
 
 from repoze.lemonade.testing import registerContentFactory
-
-from karl.models.interfaces import IObjectModifiedEvent
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyFolderAddables
@@ -41,18 +37,20 @@ from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
 
 
-class TestAddReferenceManualView(unittest.TestCase):
+class AddReferenceManualFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-
-        self.template_fn = 'templates/addedit_referencemanual.pt'
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
+        self.context = testing.DummyModel()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.references import add_referencemanual_view
-        return add_referencemanual_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.references import AddReferenceManualFormController
+        return AddReferenceManualFormController(context, request)
 
     def _registerFactory(self):
         def factory(title, description, creator):
@@ -61,68 +59,56 @@ class TestAddReferenceManualView(unittest.TestCase):
             return rm
         registerContentFactory(factory, IReferenceManual)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        from karl.testing import DummyLayoutProvider
-        ad = registerAdapter(DummyLayoutProvider, 
-                             (Interface, Interface),
-                             ILayoutProvider)
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('title' in fields)
+        self.failUnless('tags' in fields)
+        self.failUnless('description' in fields)
 
-    def test_cancel(self):
-        request = DummyRequest()
-        request.POST = MultiDict({'form.cancel':'1'})
-        context = DummyModel()
-        response = self._callFUT(context, request)
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('description' in widgets)
+
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Add Reference Manual')
+        self.failUnless('layout' in response)
+        self.failUnless('actions' in response)
+
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_submitted_missing_values(self):
-        self._registerLayoutProvider()
+    def test_handle_submit(self):
+        context = self.context
+        converted = {'title': u'Ref Manual Title',
+                     'tags': [u'foo', u'bar'],
+                     'description': u'ref manual description',
+                     }
 
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = DummyModel()
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Missing value')
-        self.assertEqual(str(errors['description']), 'Missing value')
-
-    def test_submitted_empty_values(self):
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    'title': '',
-                    'description': '',
-                    })
-            )
-        context = DummyModel()
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Please enter a value')
-
-    def test_submitted_success(self):
         self._registerFactory()
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    'title':'title',
-                    'description':'abc',
-                    'tags': 'thetesttag',
-                    })
-            )
-        context = DummyModel()
+
+        # set up tags infrastructure
+        from karl.testing import DummyTags
+        context.tags = DummyTags()
         context.catalog = DummyCatalog()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/title/')
-        self.assertEqual(context['title'].title, 'title')
-        self.assertEqual(context['title'].description, 'abc')
-        self.assertEqual(context['title'].creator, None)
+
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+
+        self.failUnless(u'ref-manual-title' in context)
+        manual = context[u'ref-manual-title']
+        self.assertEqual(manual.title, u'Ref Manual Title')
+        self.assertEqual(manual.description, u'ref manual description')
+        self.assertEqual(context.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
 
 
 class ShowReferenceManualViewTests(unittest.TestCase):
@@ -176,128 +162,106 @@ class ShowReferenceManualViewTests(unittest.TestCase):
         self._callFUT(context, request)
         self.assertEqual(renderer.api.page_title, 'dummytitle')
 
-class TestEditReferenceManualView(unittest.TestCase):
 
+class EditReferenceManualFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-
-        self.template_fn = 'templates/addedit_referencemanual.pt'
-
-        self.parent = DummyModel(title='dummyparent')
-        self.context = DummyModel(title='dummytitle', 
-                                  description='dummydescription')
-        self.context['attachments'] = DummyModel()
-        self.parent['child'] = self.context
-        self.parent.catalog = DummyCatalog()
+        parent = DummyModel(title='dummyparent')
+        context = DummyModel(title='dummytitle', 
+                             description='dummydescription')
+        parent['dummytitle'] = context
+        self.parent = parent
+        self.context = context
+        request = DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.references import edit_referencemanual_view
-        return edit_referencemanual_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.references import EditReferenceManualFormController
+        return EditReferenceManualFormController(context, request)
 
-    def _registerTagbox(self):
+    def _registerTags(self, site):
         from karl.models.interfaces import ITagQuery
         registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+                        ITagQuery)
+        from karl.testing import DummyTags
+        site.tags = DummyTags()
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        from karl.testing import DummyLayoutProvider
-        ad = registerAdapter(DummyLayoutProvider, 
-                             (Interface, Interface),
-                             ILayoutProvider)
+    def test_form_defaults(self):
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], 'dummytitle')
+        self.assertEqual(defaults['description'], 'dummydescription')
 
-    def test_notsubmitted(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('title' in fields)
+        self.failUnless('tags' in fields)
+        self.failUnless('description' in fields)
 
-        request = DummyRequest()
-        request.POST = MultiDict()
+    def test_form_widgets(self):
+        self._registerTags(self.parent)
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('title' in widgets)
+        self.failUnless('tags' in widgets)
+        self.failUnless('description' in widgets)
+
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title,
+                         'Edit dummytitle')
+        self.failUnless('layout' in response)
+        self.failUnless('actions' in response)
+
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location,
+                         'http://example.com/dummytitle/')
+
+    def handle_submit(self):
+        converted = {'title': u'New Title',
+                     'tags': [u'foo', u'bar'],
+                     'description': u'new description',
+                     }
+        self._registerTags(self.parent)
         context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-        
-    def test_submitted_missing_values(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Missing value')
-
-    def test_submitted_invalid(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title': '',
-                    })
-            )
-        context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Please enter a value')
-
-    def test_submitted_valid(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title': 'newtitle',
-                    'description': 'newdescription',
-                    'tags': 'thetesttag',
-                    })
-            )
-        context = self.context
-
-        L = registerEventListener((Interface, IObjectModifiedEvent))
-
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-
-        self.assertEqual(L[0], context)
-        self.assertEqual(L[1].object, context)
-        msg = 'http://example.com/child/?status_message=Reference%20manual%20edited'
-        self.assertEqual(response.location, msg)
-        self.assertEqual(context.title, 'newtitle')
-        self.assertEqual(context.description, 'newdescription')
-        self.assertEqual(context.modified_by, 'testeditor')
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+        self.failUnless('Reference%20manual%20edited' in
+                        response.location)
+        self.failUnless(response.location.startswith(
+            'http://example.com/dummytitle/'))
+        self.assertEqual(context.title, u'New Title')
+        self.assertEqual(context.description, u'new description')
+        self.assertEqual(self.parent.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
 
 
-
-class TestAddReferenceSectionView(unittest.TestCase):
+class AddReferenceSectionFormControllerTests(unittest.TestCase):
+    # Most of this controller code is shared w/ the add reference
+    # manual form controller, so here we are only testing the
+    # differences
     def setUp(self):
         cleanUp()
-
-        self.template_fn = 'templates/addedit_referencesection.pt'
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
+        self.context = testing.DummyModel()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.references import add_referencesection_view
-        return add_referencesection_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.references import AddReferenceSectionFormController
+        return AddReferenceSectionFormController(context, request)
 
     def _registerFactory(self):
         def factory(title, description, creator):
@@ -306,73 +270,31 @@ class TestAddReferenceSectionView(unittest.TestCase):
             return rm
         registerContentFactory(factory, IReferenceSection)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        from karl.testing import DummyLayoutProvider
-        ad = registerAdapter(DummyLayoutProvider, 
-                             (Interface, Interface),
-                             ILayoutProvider)
+    def test_handle_submit(self):
+        context = self.context
+        converted = {'title': u'Ref Section Title',
+                     'tags': [u'foo', u'bar'],
+                     'description': u'ref section description',
+                     }
 
-    def test_cancel(self):
-        self._registerLayoutProvider()
-
-        request = DummyRequest()
-        request.POST = MultiDict({'form.cancel':'1'})
-        context = DummyModel()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/')
-
-    def test_submitted_missing_values(self):
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = DummyModel()
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Missing value')
-        self.assertEqual(str(errors['description']), 'Missing value')
-
-    def test_submitted_empty_values(self):
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    'title': '',
-                    'description': '',
-                    })
-            )
-        context = DummyModel()
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Please enter a value')
-
-    def test_submitted_success(self):
         self._registerFactory()
-        self._registerLayoutProvider()
 
-        request = DummyRequest(
-            params=MultiDict({
-                    'form.submitted':'1',
-                    'title':'title',
-                    'description':'abc',
-                    'tags': 'thetesttag',
-                    })
-            )
-        context = DummyModel()
-        context.ordering = DummyOrdering()
+        # set up tags infrastructure
+        from karl.testing import DummyTags
+        context.tags = DummyTags()
         context.catalog = DummyCatalog()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/title/')
-        self.assertEqual(context['title'].title, 'title')
-        self.assertEqual(context['title'].description, 'abc')
-        self.assertEqual(context['title'].creator, None)
+        # set up ordering
+        context.ordering = DummyOrdering()
+
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+
+        self.failUnless(u'ref-section-title' in context)
+        manual = context[u'ref-section-title']
+        self.assertEqual(manual.title, u'Ref Section Title')
+        self.assertEqual(manual.description, u'ref section description')
+        self.assertEqual(context.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
 
 
 class ShowReferenceSectionViewTests(unittest.TestCase):
@@ -428,113 +350,51 @@ class ShowReferenceSectionViewTests(unittest.TestCase):
         self._callFUT(context, request)
         self.assertEqual(renderer.api.page_title, 'dummytitle')
 
-class TestEditReferenceSectionView(unittest.TestCase):
 
+class EditReferenceSectionFormControllerTests(unittest.TestCase):
+    # this form controller shares nearly all of its code w/ the
+    # edit reference manual form controller, so only the parts that
+    # are different are tested here.
     def setUp(self):
         cleanUp()
-
-        self.template_fn = 'templates/addedit_referencesection.pt'
-
-        self.parent = DummyModel(title='dummyparent')
-        self.context = DummyModel(title='dummytitle', 
-                                  description='dummydescription')
-        self.context['attachments'] = DummyModel()
-        self.parent['child'] = self.context
-        self.parent.catalog = DummyCatalog()
+        parent = DummyModel(title='dummyparent')
+        context = DummyModel(title='dummytitle', 
+                             description='dummydescription')
+        parent['dummytitle'] = context
+        self.parent = parent
+        self.context = context
+        request = DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.references import edit_referencesection_view
-        return edit_referencesection_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.references import EditReferenceSectionFormController
+        return EditReferenceSectionFormController(context, request)
 
-    def _registerTagbox(self):
+    def _registerTags(self, site):
         from karl.models.interfaces import ITagQuery
         registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+                        ITagQuery)
+        from karl.testing import DummyTags
+        site.tags = DummyTags()
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        from karl.testing import DummyLayoutProvider
-        ad = registerAdapter(DummyLayoutProvider, 
-                             (Interface, Interface),
-                             ILayoutProvider)
-
-    def test_notsubmitted(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest()
-        request.POST = MultiDict()
+    def handle_submit(self):
+        converted = {'title': u'New Title',
+                     'tags': [u'foo', u'bar'],
+                     'description': u'new description',
+                     }
+        self._registerTags(self.parent)
         context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-        
-    def test_submitted_missing_values(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    })
-            )
-        context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Missing value')
-
-    def test_submitted_invalid(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title': '',
-                    })
-            )
-        context = self.context
-
-        renderer = registerDummyRenderer(self.template_fn)
-        response = self._callFUT(context, request)
-
-        errors = renderer.fielderrors
-        self.assertEqual(str(errors['title']), 'Please enter a value')
-
-    def test_submitted_valid(self):
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        request = DummyRequest(
-            MultiDict({
-                    'form.submitted':'1',
-                    'title': 'newtitle',
-                    'description': 'newdescription',
-                    'tags': 'thetesttag',
-                    })
-            )
-        context = self.context
-
-        L = registerEventListener((Interface, IObjectModifiedEvent))
-
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-
-        self.assertEqual(L[0], context)
-        self.assertEqual(L[1].object, context)
-        msg = 'http://example.com/child/?status_message=Reference%20section%20edited'
-        self.assertEqual(response.location, msg)
-        self.assertEqual(context.title, 'newtitle')
-        self.assertEqual(context.description, 'newdescription')
-        self.assertEqual(context.modified_by, 'testeditor')
-
-
-
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+        self.failUnless('Reference%20section%20edited' in
+                        response.location)
+        self.failUnless(response.location.startswith(
+            'http://example.com/dummytitle/'))
+        self.assertEqual(context.title, u'New Title')
+        self.assertEqual(context.description, u'new description')
+        self.assertEqual(self.parent.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])

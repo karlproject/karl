@@ -16,109 +16,120 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+from zope.interface import directlyProvides
 from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
+from repoze.bfg.configuration import Configurator
+from repoze.bfg.threadlocal import get_current_registry
+from karl.testing import DummySessions
 
-class ResetRequestViewTests(unittest.TestCase):
+class ResetRequestFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
         from karl.testing import registerSettings
         registerSettings()
+        from karl.models.interfaces import ISite
+        site = testing.DummyModel(sessions=DummySessions())
+        directlyProvides(site, ISite)
+        self.context = site
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.resetpassword import reset_request_view
-        return reset_request_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.views.resetpassword import ResetRequestFormController
+        return ResetRequestFormController(context, request)
 
-    def test_not_submitted(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_request.pt')
-        self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = controller.form_fields()
+        self.assertEqual(len(fields), 1)
+        self.assertEqual('email', fields[0][0])
 
-    def test_unknown_email(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest({
-            'form.submitted': True,
-            'email': 'bogus@example.com',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_request.pt')
-        from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
-        self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors,
-            {'email':
-             'karl3test has no account with the email address: bogus@example.com'}
-             )
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.assertEqual(len(widgets), 1)
+        self.failUnless('email' in widgets)
 
-    def test_karl_staff(self):
-        from karl.testing import DummyUsers
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title,
+                         u'Forgot Password Request')
+        self.failUnless('blurb_macro' in response)
 
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', ['group.KarlStaff'])
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
 
-        from karl.models.interfaces import ICatalogSearch
-        from zope.interface import Interface
-        testing.registerAdapter(
-            DummyProfileSearch, (Interface,), ICatalogSearch)
+    def test_handle_submit(self):
+        context = self.context
+        request = self.request
 
-        request = testing.DummyRequest({
-            'form.submitted': True,
-            'email': 'me@example.com',
-            })
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://login.example.com/resetpassword?email=me%40example.com'
-            '&came_from=http%3A%2F%2Fexample.com%2Flogin.html')
-
-    def test_non_staff(self):
-        from karl.testing import DummyUsers
-
-        context = testing.DummyModel()
-        context.admin_email = 'admin@example.com'
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
-
-        from karl.models.interfaces import ICatalogSearch
-        from zope.interface import Interface
-        profile_search = DummyProfileSearch(None)
-        def search_adapter(context):
-            return profile_search
-        testing.registerAdapter(search_adapter, (Interface,), ICatalogSearch)
-
-        request = testing.DummyRequest({
-            'form.submitted': True,
-            'email': 'me@example.com',
-            })
-
+        # fake the mailer
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         mailer = DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
 
-        response = self._callFUT(context, request)
+        # fake catalog search
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        testing.registerAdapter(
+            DummyProfileSearch, (Interface,), ICatalogSearch)
 
+        # fake a staff user
+        from karl.testing import DummyUsers
+        context.users = DummyUsers()
+        context.users.add('me', 'me', 'password', ['group.KarlStaff'])
+
+        # register dummy renderer for email template
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/email_reset_password.pt')
+
+        # test w/ staff user
+        controller = self._makeOne(context, request)
+        converted = {'email': 'me@example.com'}
+        response = controller.handle_submit(converted)
+        self.failIf(len(mailer))
+        self.assertEqual(response.location,
+            'http://login.example.com/resetpassword?email=me%40example.com'
+            '&came_from=http%3A%2F%2Fexample.com%2Flogin.html')
+
+        # register dummy profile search
+        profile_search = DummyProfileSearch(None)
+        def search_adapter(context):
+            return profile_search
+        testing.registerAdapter(search_adapter, (Interface,), ICatalogSearch)
+
+        # convert to non-staff user and test again, email should
+        # go out this time
+        context.users._by_id['me']['groups'] = []
+        response = controller.handle_submit(converted)
         self.assertEqual(response.location,
             'http://example.com/reset_sent.html?email=me%40example.com')
         profile = profile_search.profile
-        self.assert_(profile.password_reset_key)
-        self.assert_(profile.password_reset_time)
+        self.failUnless(profile.password_reset_key)
+        self.failUnless(profile.password_reset_time)
         self.assertEqual(len(mailer), 1)
         msg = mailer.pop()
-        self.assertEqual(msg.mto, ['me@example.com'])
-        self.assertEqual(msg.mfrom, "admin@example.com")
-
-        from base64 import decodestring
+        self.assertEqual(len(msg.mto), 1)
+        self.assertEqual(msg.mto[0], 'me@example.com')
+        self.assertEqual(dict(msg.msg._headers)['Subject'],
+                         'karl3test Password Reset Request')
         url = ('http://example.com/reset_confirm.html?key=%s' %
-             profile.password_reset_key)
-        body = msg.msg.get_payload(decode=True)
-        self.assert_(url in body, "%s not in %s" % (url, body))
+               profile.password_reset_key)
+        renderer.assert_(login='me', system_name='karl3test')
+        self.failUnless(hasattr(renderer, 'reset_url'))
+        self.failUnless(renderer.reset_url.startswith(
+            'http://example.com/reset_confirm.html?key='))
 
 
 class ResetSentViewTests(unittest.TestCase):
@@ -141,182 +152,208 @@ class ResetSentViewTests(unittest.TestCase):
         self.assertEqual(renderer.email, 'x@example.com')
 
 
-class ResetConfirmViewTests(unittest.TestCase):
+class ResetConfirmFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        from karl.testing import registerSettings
-        registerSettings()
+        from karl.models.interfaces import ISite
+        site = testing.DummyModel(sessions=DummySessions())
+        directlyProvides(site, ISite)
+        self.context = site
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.resetpassword import reset_confirm_view
-        return reset_confirm_view(context, request)
-
-    def test_bad_key(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest({'key': '1' * 39})
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_failed.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
-        self.assertEqual(renderer.api.page_title, 'Password Reset URL Problem')
-
-    def test_not_submitted(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest({'key': '1' * 40})
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_confirm.pt')
-        self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-
-    def test_password_mismatch(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'winwinwin',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_confirm.pt')
-        self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors,
-            {'password_confirm': u'Fields do not match'})
-
-    def test_no_such_login(self):
+    def _makeOne(self, context, request):
+        from karl.views.resetpassword import ResetConfirmFormController
+        return ResetConfirmFormController(context, request)
+    
+    def _setupUsers(self):
         from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_confirm.pt')
-        self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors,
-            {'login': 'No such user account exists'})
+        self.context.users = DummyUsers()
+        self.context.users.add('me', 'me', 'password', [])
 
-    def test_no_such_profile(self):
-        from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
-        context['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_confirm.pt')
-        self._callFUT(context, request)
-        self.assertEqual(renderer.fielderrors,
-            {'login': 'No such profile exists'})
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.assertEqual(len(fields), 2)
+        self.failUnless('login' in fields)
+        self.failUnless('password' in fields)
 
-    def test_reset_with_no_key_set(self):
-        from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
-        context['profiles'] = testing.DummyModel()
-        context['profiles']['me'] = testing.DummyModel()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_failed.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.assertEqual(len(widgets), 2)
+        self.failUnless('login' in widgets)
+        self.failUnless('password' in widgets)
+
+    def test___call__bad_key(self):
+        # register dummy renderer for the email template
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+
+        request = self.request
+        # no key
+        controller = self._makeOne(self.context, request)
+        response = controller()
+        from webob.response import Response
+        self.assertEqual(response.__class__, Response)
+        self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
-            'Password Reset Confirmation Problem')
+                         'Password Reset URL Problem')
 
-    def test_reset_key_mismatch(self):
-        from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
-        context['profiles'] = testing.DummyModel()
-        context['profiles']['me'] = testing.DummyModel()
-        context['profiles']['me'].password_reset_key = '2' * 40
-        import datetime
-        context['profiles']['me'].password_reset_time = datetime.datetime.now()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_failed.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
+        # reset renderer.api value so we know the test is useful
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+        # key of wrong length
+        request.params['key'] = 'foofoofoo'
+        controller = self._makeOne(self.context, request)
+        response = controller()
+        from webob.response import Response
+        self.assertEqual(response.__class__, Response)
+        self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
-            'Password Reset Confirmation Problem')
+                         'Password Reset URL Problem')
 
-    def test_reset_attempt_expired(self):
-        from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
+    def test___call__(self):
+        request = self.request
+        request.params['key'] = '0' * 40
+        controller = self._makeOne(self.context, request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, u'Reset Password')
+        self.failUnless('blurb_macro' in response)
+        from chameleon.core.template import Macro
+        self.failUnless(response['blurb_macro'].__class__ is Macro)
+
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location, 'http://example.com/')
+
+    def test_handle_submit_bad_key(self):
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+        request = self.request
+        request.params['key'] = 'foofoofoo'
+        controller = self._makeOne(self.context, request)
+        response = controller.handle_submit({})
+        self.failUnless(hasattr(renderer, 'api'))
+        self.assertEqual(renderer.api.page_title,
+                         'Password Reset URL Problem')
+
+    def test_handle_submit_bad_login(self):
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        controller = self._makeOne(self.context, request)
+        converted = {'login': 'bogus'}
+        from repoze.bfg.formish import ValidationError
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        try:
+            response = controller.handle_submit(converted)
+        except ValidationError, e:
+            self.assertEqual(e.errors['login'], 'No such user account exists')
+
+    def test_handle_submit_no_profile(self):
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        self.context['profiles'] = testing.DummyModel()
+        controller = self._makeOne(self.context, request)
+        converted = {'login': 'me'}
+        from repoze.bfg.formish import ValidationError
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        try:
+            response = controller.handle_submit(converted)
+        except ValidationError, e:
+            self.assertEqual(e.errors['login'], 'No such profile exists')
+
+    def test_handle_submit_wrong_key(self):
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        context = self.context
         context['profiles'] = testing.DummyModel()
         context['profiles']['me'] = testing.DummyModel()
+        controller = self._makeOne(context, request)
+        converted = {'login': 'me'}
+        # first w/ no profile reset key
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
+        self.assertEqual(renderer.api.page_title,
+                         'Password Reset Confirmation Problem')
+
+        # now w/ wrong profile reset key
+        renderer = config.testing_add_template('templates/reset_failed.pt')
         context['profiles']['me'].password_reset_key = '1' * 40
-        import datetime
-        context['profiles']['me'].password_reset_time = datetime.datetime(
-            1990, 1, 1)
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_failed.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
-            'Password Reset Confirmation Key Expired')
+                         'Password Reset Confirmation Problem')
 
-    def test_reset_success(self):
-        from karl.testing import DummyUsers
-        context = testing.DummyModel()
-        context.users = DummyUsers()
-        context.users.add('me', 'me', 'password', [])
+    def test_handle_submit_key_expired(self):
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        context = self.context
         context['profiles'] = testing.DummyModel()
-        context['profiles']['me'] = testing.DummyModel()
-        context['profiles']['me'].password_reset_key = '1' * 40
-        import datetime
-        context['profiles']['me'].password_reset_time = datetime.datetime.now()
-        request = testing.DummyRequest({
-            'key': '1' * 40,
-            'form.submitted': True,
-            'login': 'me',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/reset_complete.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
+        profile = context['profiles']['me'] = testing.DummyModel()
+        profile.password_reset_key = '0' * 40
+        controller = self._makeOne(context, request)
+        converted = {'login': 'me'}
+        # first w/ no profile reset time
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
-            'Password Reset Complete')
-        self.assertEqual(renderer.login, 'me')
-        self.assertEqual(renderer.password, 'newnewnew')
+                         'Password Reset Confirmation Key Expired')
+
+        # now w/ expired key
+        renderer = config.testing_add_template('templates/reset_failed.pt')
+        from karl.views.resetpassword import max_reset_timedelta
+        import datetime
+        keytime = datetime.datetime.now() - max_reset_timedelta
+        profile.password_reset_time = keytime
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
+        self.assertEqual(renderer.api.page_title,
+                         'Password Reset Confirmation Key Expired')
+
+    def test_handle_submit(self):
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_complete.pt')
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        context = self.context
+        context['profiles'] = testing.DummyModel()
+        profile = context['profiles']['me'] = testing.DummyModel()
+        profile.password_reset_key = '0' * 40
+        controller = self._makeOne(context, request)
+        converted = {'login': 'me', 'password': 'secret'}
+        import datetime
+        keytime = datetime.datetime.now()
+        profile.password_reset_time = keytime
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
+        self.assertEqual(renderer.api.page_title,
+                         'Password Reset Complete')
+        renderer.assert_(login='me', password='secret')
+        self.failUnless(profile.password_reset_key is None)
+        self.failUnless(profile.password_reset_time is None)
+        user = self.context.users.get(login='me')
+        from repoze.who.plugins.zodb.users import get_sha_password
+        self.assertEqual(user['password'], get_sha_password('secret'))
 
 
 class DummyProfileSearch:

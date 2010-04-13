@@ -26,6 +26,7 @@ from validatish import validator
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
+from karl.views.utils import Invalid
 from karl.consts import countries
 
 import transaction
@@ -654,7 +655,10 @@ class AcceptInvitationFormController(object):
         workflow = get_workflow(IProfile, 'security')
         if workflow is not None:
             workflow.initialize(profile)
-        handle_photo_upload(profile, converted)
+        try:
+            handle_photo_upload(profile, converted)
+        except Invalid, e:
+            raise ValidationError(**e.error_dict)
 
         del context.__parent__[context.__name__]
         url = model_url(community, request,

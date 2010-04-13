@@ -32,16 +32,17 @@ from karl.models.interfaces import IToolFactory
 from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityFile
+from karl.content.interfaces import IEventContainer
 
 from repoze.folder import Folder
 from ZODB.blob import Blob
 
 class CommunityRootFolder(Folder):
-    implements(ICommunityRootFolder)
+    implements(ICommunityRootFolder, IEventContainer)
     title = u'Files'
 
 class CommunityFolder(Folder):
-    implements(ICommunityFolder)
+    implements(ICommunityFolder, IEventContainer)
     modified_by = None
 
     def __init__(self, title, creator):

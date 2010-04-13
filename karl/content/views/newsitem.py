@@ -26,6 +26,7 @@ from validatish import validator
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
+from repoze.bfg.formish import ValidationError
 from repoze.bfg.url import model_url
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -47,6 +48,7 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
+from karl.views.utils import Invalid
 from karl.views.utils import convert_to_script
 from karl.views.utils import handle_photo_upload
 from karl.views.utils import make_unique_name
@@ -158,7 +160,10 @@ class AddNewsItemFormController(object):
         attachments_folder = newsitem['attachments']
         upload_attachments(converted['attachments'], attachments_folder,
                            creator, request)
-        handle_photo_upload(newsitem, converted)
+        try:
+            handle_photo_upload(newsitem, converted)
+        except Invalid, e:
+            raise ValidationError(**e.error_dict)
         self.filestore.clear()
 
         location = model_url(newsitem, request)

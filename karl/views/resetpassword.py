@@ -15,27 +15,30 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from formencode import Invalid
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_profiles
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
-from karl.views import baseforms
-from karl.views.form import render_form_to_response
-from karl.views.utils import CustomInvalid
+from karl.views.api import xhtml
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms import widgets as karlwidgets
+from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.formish import ValidationError
 from repoze.bfg.url import model_url
-from repoze.enformed import FormSchema
 from repoze.sendmail.interfaces import IMailDelivery
+from validatish import validator
 from webob.exc import HTTPFound
 from zope.component import getAdapter
 from zope.component import getUtility
 import datetime
+import formish
 import karl.mail
 import random
+import schemaish
 import urllib
 
 
@@ -47,113 +50,109 @@ except ImportError:
 
 max_reset_timedelta = datetime.timedelta(3)  # days
 
+email_field = schemaish.String(
+    validator=validator.All(validator.Required(),
+                            validator.Email(),
+                            )
+    )
 
-class ResetRequestForm(FormSchema):
-    email = baseforms.email()
+class ResetRequestFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-def reset_request_view(context, request):
+    def form_fields(self):
+        return [('email', email_field)]
 
-    form = ResetRequestForm()
-    system_name = get_setting(context, 'system_name', 'KARL')
+    def form_widgets(self, fields):
+        return {'email': formish.Input(empty='')}
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def __call__(self):
+        page_title = u"Forgot Password Request"
+        snippets = get_template('forms/templates/snippets.pt')
+        snippets.doctype = xhtml
+        blurb_macro = snippets.macros['reset_request_blurb']
+        api = TemplateAPI(self.context, self.request, page_title)
+        return {'api': api, 'blurb_macro': blurb_macro}
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
 
-            address = converted['email']
-            if address:
-                address = address.lower()
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        system_name = get_setting(context, 'system_name', 'KARL')
+        address = converted['email']
+        if address:
+            address = address.lower()
 
-            search = getAdapter(context, ICatalogSearch)
-            count, docids, resolver = search(
-                interfaces=[IProfile], email=[address])
+        search = getAdapter(context, ICatalogSearch)
+        count, docids, resolver = search(
+            interfaces=[IProfile], email=[address])
 
-            users = find_users(context)
-            for docid in docids:
-                profile = resolver(docid)
-                if profile is None:
-                    continue
-                userid = profile.__name__
-                user = users.get_by_id(userid)
-                if user is None:
-                    continue
-                # found the profile and user
-                break
-            else:
-                raise CustomInvalid({"email":
-                    "%s has no account with the email address: %s" %
-                    (system_name, address)})
+        users = find_users(context)
+        for docid in docids:
+            profile = resolver(docid)
+            if profile is None:
+                continue
+            userid = profile.__name__
+            user = users.get_by_id(userid)
+            if user is None:
+                continue
+            # found the profile and user
+            break
+        else:
+            raise ValidationError(**{"email":
+                "%s has no account with the email address: %s" %
+                (system_name, address)})
 
-            groups = user['groups']
-            if groups and 'group.KarlStaff' in groups:
-                # because staff accounts are managed centrally, staff
-                # must use the forgot_password_url if it is set.
-                forgot_password_url = get_setting(
-                    context, 'forgot_password_url')
-                if forgot_password_url:
-                    came_from = model_url(context, request, "login.html")
-                    url = '%s?email=%s&came_from=%s' % (
-                        forgot_password_url, urllib.quote_plus(address),
-                        urllib.quote_plus(came_from))
-                    return HTTPFound(location=url)
+        groups = user['groups']
+        if groups and 'group.KarlStaff' in groups:
+            # because staff accounts are managed centrally, staff
+            # must use the forgot_password_url if it is set.
+            forgot_password_url = get_setting(
+                context, 'forgot_password_url')
+            if forgot_password_url:
+                came_from = model_url(context, request, "login.html")
+                url = '%s?email=%s&came_from=%s' % (
+                    forgot_password_url, urllib.quote_plus(address),
+                    urllib.quote_plus(came_from))
+                return HTTPFound(location=url)
 
-            profile.password_reset_key = sha1(
-                str(random.random())).hexdigest()
-            profile.password_reset_time = datetime.datetime.now()
-            reset_url = model_url(
-                context, request, "reset_confirm.html") + (
-                "?key=%s" % profile.password_reset_key)
+        profile.password_reset_key = sha1(
+            str(random.random())).hexdigest()
+        profile.password_reset_time = datetime.datetime.now()
+        reset_url = model_url(
+            context, request, "reset_confirm.html") + (
+            "?key=%s" % profile.password_reset_key)
 
-            # send email
-            mail = karl.mail.Message()
-            admin_email = get_setting(context, 'admin_email')
-            mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
-            mail["To"] = "%s <%s>" % (profile.title, profile.email)
-            mail["Subject"] = "%s Password Reset Request" % system_name
-            body = render_template(
-                "templates/email_reset_password.pt",
-                login=user['login'],
-                reset_url=reset_url,
-                system_name=system_name,
-            )
-
-            if isinstance(body, unicode):
-                body = body.encode("UTF-8")
-
-            mail.set_payload(body, "UTF-8")
-            mail.set_type("text/html")
-
-            recipients = [profile.email]
-            mailer = getUtility(IMailDelivery)
-            mailer.send(admin_email, recipients, mail)
-
-            url = model_url(context, request, 'reset_sent.html') + (
-                '?email=%s' % urllib.quote_plus(address))
-            return HTTPFound(location=url)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        fill_values = {}
-
-    page_title = 'Forgot Password Request'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/reset_request.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
+        # send email
+        mail = karl.mail.Message()
+        admin_email = get_setting(context, 'admin_email')
+        mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+        mail["To"] = "%s <%s>" % (profile.title, profile.email)
+        mail["Subject"] = "%s Password Reset Request" % system_name
+        body = render_template(
+            "templates/email_reset_password.pt",
+            login=user['login'],
+            reset_url=reset_url,
+            system_name=system_name,
         )
 
+        if isinstance(body, unicode):
+            body = body.encode("UTF-8")
+
+        mail.set_payload(body, "UTF-8")
+        mail.set_type("text/html")
+
+        recipients = [profile.email]
+        mailer = getUtility(IMailDelivery)
+        mailer.send(admin_email, recipients, mail)
+
+        url = model_url(context, request, 'reset_sent.html') + (
+            '?email=%s' % urllib.quote_plus(address))
+        return HTTPFound(location=url)
+        
 
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'
@@ -164,36 +163,60 @@ def reset_sent_view(context, request):
         email=request.params.get('email'),
         )
 
-class ResetConfirmForm(FormSchema):
-    login = baseforms.login
-    password = baseforms.password
-    password_confirm = baseforms.password_confirm
-    chained_validators = baseforms.chained_validators
 
-def reset_confirm_view(context, request):
-    key = request.params.get('key')
-    if not key or len(key) != 40:
-        page_title = 'Password Reset URL Problem'
-        api = TemplateAPI(context, request, page_title)
-        return render_template_to_response(
-            'templates/reset_failed.pt',
-            api=api,
-            )
+min_pw_length = get_setting(None, 'min_pw_length')
+login_field = schemaish.String(validator=validator.Required())
+password_field = schemaish.String(
+    validator=validator.All(
+        validator.Required(),
+        karlvalidators.PasswordLength(min_pw_length)),
+    title='New Password')
 
-    min_pw_length = get_setting(context, 'min_pw_length')
-    form = ResetConfirmForm(min_pw_length=min_pw_length)
+class ResetConfirmFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def form_fields(self):
+        fields = [('login', login_field),
+                  ('password', password_field),
+                  ]
+        return fields
 
-    if 'form.submitted' in request.POST:
+    def form_widgets(self, fields):
+        widgets = {'login': formish.Input(empty=''),
+                   'password': karlwidgets.KarlCheckedPassword()}
+        return widgets
+
+    def __call__(self):
+        key = self.request.params.get('key')
+        if not key or len(key) != 40:
+            api = TemplateAPI(self.context, self.request,
+                              'Password Reset URL Problem')
+            return render_template_to_response('templates/reset_failed.pt',
+                                               api=api)
+        snippets = get_template('forms/templates/snippets.pt')
+        snippets.doctype = xhtml
+        blurb_macro = snippets.macros['reset_confirm_blurb']
+        api = TemplateAPI(self.context, self.request, 'Reset Password')
+        return {'api': api, 'blurb_macro': blurb_macro}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
         try:
-            converted = form.validate(request.POST)
-
+            context = self.context
+            request = self.request
+            key = request.params.get('key')
+            if not key or len(key) != 40:
+                e = ResetFailed()
+                e.page_title = 'Password Reset URL Problem'
+                raise e
             users = find_users(context)
             user = users.get_by_login(converted['login'])
             if user is None:
-                raise CustomInvalid({'login': 'No such user account exists'})
+                raise ValidationError(login='No such user account exists')
             userid = user.get('id')
             if userid is None:
                 userid = user['login']
@@ -201,25 +224,19 @@ def reset_confirm_view(context, request):
             profiles = find_profiles(context)
             profile = profiles.get(userid)
             if profile is None:
-                raise CustomInvalid({'login': 'No such profile exists'})
+                raise ValidationError(login='No such profile exists')
 
             if key != getattr(profile, 'password_reset_key', None):
-                page_title = 'Password Reset Confirmation Problem'
-                api = TemplateAPI(context, request, page_title)
-                return render_template_to_response(
-                    'templates/reset_failed.pt',
-                    api=api,
-                    )
+                e = ResetFailed()
+                e.page_title = 'Password Reset Confirmation Problem'
+                raise e
 
             now = datetime.datetime.now()
             t = getattr(profile, 'password_reset_time', None)
             if t is None or now - t > max_reset_timedelta:
-                page_title = 'Password Reset Confirmation Key Expired'
-                api = TemplateAPI(context, request, page_title)
-                return render_template_to_response(
-                    'templates/reset_failed.pt',
-                    api=api,
-                    )
+                e = ResetFailed()
+                e.page_title = 'Password Reset Confirmation Key Expired'
+                raise e
 
             # The key matched.  Clear the key and reset the password.
             profile.password_reset_key = None
@@ -234,25 +251,11 @@ def reset_confirm_view(context, request):
                 login=converted['login'],
                 password=converted['password'],
                 )
+            
+        except ResetFailed, e:
+            api = TemplateAPI(context, request, e.page_title)
+            return render_template_to_response('templates/reset_failed.pt',
+                                               api=api)
 
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        # need to fill in these fields for the chained validator
-        # to work properly during non-submitted rendering
-        fill_values = {'password':'', 'password_confirm':''}
-
-    page_title = 'Reset Password'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/reset_confirm.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        )
+class ResetFailed(Exception):
+    pass

@@ -18,12 +18,16 @@
 import urllib
 
 from webob.exc import HTTPFound
+from webob.exc import HTTPExpectationFailed
 from zope.component.event import objectEventNotify
 
 from zope.component import getMultiAdapter
 from zope.component import queryUtility
 
-from repoze.enformed import FormSchema
+from schemaish.type import File as SchemaFile
+import formish
+import schemaish
+
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -46,21 +50,12 @@ from karl.models.interfaces import IComment
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForumTopic
 from karl.content.views.utils import extract_description
+from karl.content.views.utils import upload_attachments
 from karl.content.views.interfaces import IBylineInfo
-from karl.views.form import render_form_to_response
-from karl.views.baseforms import security_state as security_state_field
+from karl.views.forms.filestore import get_filestore
+from karl.views.forms import widgets as karlwidgets
 from karl.content.views.utils import fetch_attachments
-from karl.content.views.utils import store_attachments
 
-from karl.security.workflow import get_security_states
-from karl.views import baseforms
-from formencode import Invalid
-
-class AddCommentForm(FormSchema):
-    add_comment = baseforms.add_comment
-    sendalert = baseforms.sendalert
-
-EditCommentForm = AddCommentForm
 
 def redirect_comments_view(context, request):
     # When deleting a comment, we get redirected to the parent.  It's
@@ -115,35 +110,53 @@ def show_comment_view(context, request):
         layout=layout,
         )
 
-def add_comment_view(context, request):
-    # This is NOT a self-posting form.  The BlogEntry has the form
-    # that submits to this view.  Thus, we only need to handle
-    # submission requests, then redirect back to the parent (the blog
-    # entry).
+add_comment_field = schemaish.String(
+    title='Add Comment',
+    description='Enter your comments below.')
+sendalert_field = schemaish.Boolean(
+    title='Send Alert',
+    description='Send email alert to community members?')
+attachments_field = schemaish.Sequence(schemaish.File(),
+    title='Attachments',
+    description='You can remove an attachment by clicking the checkbox. Removal will come to effect after saving the page and can be reverted by cancel.',
+    )
 
-    # Handle the Add Comment form
-    #post_url = model_url(context, request, "comments/add_comment.html")
-    form = AddCommentForm()
-    # add the security state field if appropriate for the context
-    workflow = get_workflow(IComment, 'security', context)
+class AddCommentFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore = get_filestore(context, request, 'comment')
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
+    def form_fields(self):
+        fields = [('add_comment', add_comment_field),
+                  ('attachments', attachments_field),
+                  ('sendalert', sendalert_field),
+                  ]
+        return fields
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def form_widgets(self, fields):
+        widgets = {
+            'add_comment': karlwidgets.RichTextWidget(empty=''),
+            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            'sendalert': formish.widgets.Checkbox(),
+            }
+        return widgets
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context.__parent__, request))
+    def __call__(self):
+        raise HTTPExpectationFailed(u'This is not a self-posting form. '
+                                     u'It is submit only.')
 
-    if 'form.submitted' in request.POST:
-        converted = form.validate(request.POST)
-        form.is_valid = True
+    def handle_cancel(self):
+        location = model_url(self.context.__parent__, self.request)
+        return HTTPFound(location=location)
+
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
         parent = context.__parent__
         creator = authenticated_userid(request)
-        c = create_content(
+        comment = create_content(
             IComment,
             'Re: %s' % parent.title,
             converted['add_comment'],
@@ -151,112 +164,92 @@ def add_comment_view(context, request):
             creator,
             )
         next_id = parent['comments'].next_id
-        parent['comments'][next_id] = c
+        parent['comments'][next_id] = comment
+        workflow = get_workflow(IComment, 'security', context)
         if workflow is not None:
-            workflow.initialize(c)
+            workflow.initialize(comment)
             if 'security_state' in converted:
-                workflow.transition_to_state(c, request,
+                workflow.transition_to_state(comment, request,
                                              converted['security_state'])
 
-        if support_attachments(c):
-            store_attachments(c, request.params, creator)
-        relocate_temp_images(c, request)
-
-        url = model_url(parent, request)
-        msg = 'Comment added'
-        url = url + '?status_message=%s' % urllib.quote(msg)
+        if support_attachments(comment):
+            upload_attachments(converted['attachments'], comment,
+                               creator, request)
+        relocate_temp_images(comment, request)
 
         blogentry = find_interface(context, IBlogEntry)
         if converted['sendalert']:
             alerts = queryUtility(IAlerts, default=Alerts())
-            alerts.emit(c, request)
+            alerts.emit(comment, request)
 
-        return HTTPFound(location=url)
+        location = model_url(parent, request)
+        msg = 'Comment added'
+        location = '%s?status_message=%s' % (location, urllib.quote(msg))
+        self.filestore.clear()
+        return HTTPFound(location=location)
 
-    # XXX Need different flow of control here, since it isn't
-    # self-posting.
+class EditCommentFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.filestore = get_filestore(context, request, 'comment')
 
-    else:
-        raise Invalid('This is not a self-posting form. It is submit only.',
-                      None, None)
+    def form_fields(self):
+        fields = [('add_comment', add_comment_field),
+                  ('attachments', attachments_field),
+                  ]
+        return fields
 
-def edit_comment_view(context, request):
+    def form_widgets(self, fields):
+        widgets = {
+            'add_comment': karlwidgets.RichTextWidget(empty=''),
+            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        return widgets
 
-    form = EditCommentForm()
-    workflow = get_workflow(IComment, 'security', context)
+    def form_defaults(self):
+        context = self.context
+        attachments = [SchemaFile(None, x.__name__, x.mimetype)
+                       for x in context.values()]
+        defaults = {'add_comment': context.text,
+                    'attachments': attachments,
+                    }
+        return defaults
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
+    def __call__(self):
+        context = self.context
+        request = self.request
+        page_title = 'Edit %s' % context.title
+        api = TemplateAPI(context, self.request, page_title)
+        # Get a layout
+        layout_provider = get_layout_provider(context, request)
+        layout = layout_provider('community')
+        return {'api': api, 'actions': (), 'layout': layout}
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+    def handle_cancel(self):
+        context = self.context
+        blogentry = find_interface(self.context, IBlogEntry)
+        return HTTPFound(location=model_url(blogentry, self.request))
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context.__parent__, request))
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        workflow =  get_workflow(IComment, 'security', context)
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            form.is_valid = True
-
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.text  = converted['add_comment']
-            context.description = extract_description(context.text)
-
-            creator = authenticated_userid(request)
-            if support_attachments(context):
-                store_attachments(context, request.params, creator)
-
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        fielderrors = {}
-        state = baseforms.AppState()
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(
-            add_comment=context.text,
-            security_state = security_state)
-
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
-
-    if support_attachments(context):
-        attachments = fetch_attachments(context, request)
-    else:
-        attachments = ()
-
-    return render_form_to_response(
-        'templates/edit_comment.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        attachments=attachments,
-        layout=layout,
-        security_states = security_states,
-        )
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if workflow is not None:
+            if 'security_state' in converted:
+                workflow.transition_to_state(context, request,
+                                             converted['security_state'])
+        context.text = converted['add_comment']
+        context.description = extract_description(context.text)
+        creator = authenticated_userid(request)
+        if support_attachments(context):
+            upload_attachments(converted['attachments'], context, creator,
+                               request)
+        context.modified_by = creator
+        objectEventNotify(ObjectModifiedEvent(context))
+        location = model_url(context, request)
+        self.filestore.clear()
+        return HTTPFound(location=location)

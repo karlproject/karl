@@ -354,12 +354,26 @@
 
   </formish:form>
 
-  <view
-    for="karl.models.interfaces.IProfile"
-    view=".people.change_password_view"
-    name="change_password.html"
-    permission="edit"
-  />
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.ChangePasswordFormController"
+     name="change_password.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.IProfile"
@@ -368,11 +382,25 @@
     permission="view"
   />
 
-  <view
-    for="karl.models.interfaces.ISite"
-    name="reset_request.html"
-    view=".resetpassword.reset_request_view"
-  />
+  <formish:form
+     for="karl.models.interfaces.ISite"
+     controller=".resetpassword.ResetRequestFormController"
+     name="reset_request.html"
+     renderer="karl.views.forms:templates/anonymous_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.ISite"
@@ -380,11 +408,25 @@
     view=".resetpassword.reset_sent_view"
   />
 
-  <view
-    for="karl.models.interfaces.ISite"
-    name="reset_confirm.html"
-    view=".resetpassword.reset_confirm_view"
-  />
+  <formish:form
+     for="karl.models.interfaces.ISite"
+     controller=".resetpassword.ResetConfirmFormController"
+     name="reset_confirm.html"
+     renderer="karl.views.forms:templates/anonymous_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
   <view
     for="karl.models.interfaces.IProfile"

@@ -120,6 +120,9 @@ label {
 .k3_genericForm .fieldError input {
   border: 1px solid #eda379;
 }
+.k3_genericForm .fieldError select {
+  border: 1px solid #eda379;
+}
 
 /** =FORMISH FORMS
 ----------------------------------------------- */

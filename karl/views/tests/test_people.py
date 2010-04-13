@@ -161,14 +161,13 @@ class TestEditProfileFormController(unittest.TestCase):
             converted[fieldname] = value
         # then set up with the photo
         from karl.content.interfaces import ICommunityFile
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         from repoze.lemonade.interfaces import IContentFactory
         testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
                                 IContentFactory)
         converted['photo'] = DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
-                                         data=dummy_photo)
+                                         data=one_pixel_jpeg)
         # finally submit
         controller.handle_submit(converted)
         for fieldname, value in profile_data.items():
@@ -354,7 +353,6 @@ class AddUserFormControllerTests(unittest.TestCase):
             converted[fieldname] = value
         # then set up the photo
         from karl.content.interfaces import ICommunityFile
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         from repoze.lemonade.interfaces import IContentFactory
         from repoze.lemonade.testing import registerContentFactory
@@ -362,7 +360,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                                 IContentFactory)
         converted['photo'] = DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
-                                         data=dummy_photo)
+                                         data=one_pixel_jpeg)
         # next the workflow
         from repoze.workflow.testing import registerDummyWorkflow
         workflow = registerDummyWorkflow('security')
@@ -429,7 +427,6 @@ class FilestorePhotoViewTests(unittest.TestCase):
 
     def test_edit_profile_filestore_photo_view(self):
         from karl.views.forms.filestore import get_filestore
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         context = self.context
         request = self.request
@@ -437,16 +434,15 @@ class FilestorePhotoViewTests(unittest.TestCase):
         key = request.subpath[-1]
         upload = DummyUpload(filename='test.jpg',
                              mimetype='image/jpeg',
-                             data=dummy_photo)
+                             data=one_pixel_jpeg)
         filestore.put(key, upload.file, 'cache_tag', [])
         from karl.views.people import edit_profile_filestore_photo_view
         response = edit_profile_filestore_photo_view(context, request)
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.body, dummy_photo)
+        self.assertEqual(response.body, one_pixel_jpeg)
 
     def test_add_user_filestore_photo_view(self):
         from karl.views.forms.filestore import get_filestore
-        from karl.models.tests.test_image import one_pixel_jpeg as dummy_photo
         from karl.testing import DummyUpload
         context = self.context
         request = self.request
@@ -454,12 +450,12 @@ class FilestorePhotoViewTests(unittest.TestCase):
         key = request.subpath[-1]
         upload = DummyUpload(filename='test.jpg',
                              mimetype='image/jpeg',
-                             data=dummy_photo)
+                             data=one_pixel_jpeg)
         filestore.put(key, upload.file, 'cache_tag', [])
         from karl.views.people import add_user_filestore_photo_view
         response = add_user_filestore_photo_view(context, request)
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.body, dummy_photo)
+        self.assertEqual(response.body, one_pixel_jpeg)
 
 class ShowProfileTests(unittest.TestCase):
     def setUp(self):
@@ -962,114 +958,85 @@ class ShowProfilesViewTests(unittest.TestCase):
         self.assertEqual(profiles[0], foo)
 
 
-class ChangePasswordViewTests(unittest.TestCase):
+class ChangePasswordFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
         karltesting.registerSettings()
+        from karl.testing import DummyUsers
+        # Set up dummy skel
+        site = testing.DummyModel()
+        site.users = DummyUsers()
+        site['profiles'] = testing.DummyModel()
+        self.site = site
+        self.context = site['profiles']['profile'] = DummyProfile()
+        self.request = testing.DummyRequest()
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.people import change_password_view
-        return change_password_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.views.people import ChangePasswordFormController
+        return ChangePasswordFormController(context, request)
 
-    def _old_password(self):
-        from repoze.who.plugins.zodb.users import get_sha_password
-        return get_sha_password('oldoldold')
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('old_password' in fields)
+        self.failUnless('password' in fields)
+        self.assertEqual(len(fields), 2)
 
-    def test_show_form(self):
-        context = DummyProfile()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/change_password.pt')
-        response = self._callFUT(context, request)
-        self.failIf(response.location)
-        self.failIf(renderer.fielderrors)
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('old_password' in widgets)
+        self.failUnless('password' in widgets)
+        self.assertEqual(len(widgets), 2)
 
-    def test_submitted_incomplete(self):
-        context = DummyProfile()
-        request = testing.DummyRequest({
-            'form.submitted':1
-            })
-        renderer = testing.registerDummyRenderer('templates/change_password.pt')
-        self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Change Password')
+        self.failUnless('layout' in response)
+        self.failUnless('actions' in response)
+        self.failIf(response['actions'])
+        self.failUnless('blurb_macro' in response)
 
-    def test_wrong_old_password(self):
-        from karl.testing import DummyUsers
-        context = DummyProfile()
-        context.__name__ = 'me'
-        context.users = DummyUsers()
-        context.users.add('me', 'me', self._old_password(), [])
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location,
+                         'http://example.com/profiles/profile/')
 
-        request = testing.DummyRequest({
-            'form.submitted': 1,
-            'old_password': 'idontknow',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer('templates/change_password.pt')
-
-        self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_new_password_mismatch(self):
-        from karl.testing import DummyUsers
-        context = DummyProfile()
-        context.__name__ = 'me'
-        context.users = DummyUsers()
-        context.users.add('me', 'me', self._old_password(), [])
-
-        request = testing.DummyRequest({
-            'form.submitted': 1,
-            'old_password': 'oldoldold',
-            'password': 'newnewnew',
-            'password_confirm': 'winwinwin',
-            })
-        renderer = testing.registerDummyRenderer('templates/change_password.pt')
-
-        self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_success(self):
-        from karl.testing import DummyUsers
-        context = DummyProfile()
-        context.__name__ = 'me'
-        parent = testing.DummyModel()
-        parent.__name__ = ''
-        parent.__parent__ = None
-        context.__parent__ = parent
-        context.title = 'Me'
-        context.email = 'me@example.com'
-        parent.users = DummyUsers()
-        parent.users.add('me', 'me', self._old_password(), [])
-
-        request = testing.DummyRequest({
-            'form.submitted': 1,
-            'old_password': 'oldoldold',
-            'password': 'newnewnew',
-            'password_confirm': 'newnewnew',
-            })
-        renderer = testing.registerDummyRenderer(
-            'templates/change_password.pt')
-
+    def test_handle_submit(self):
+        # first create the fake user
+        users = self.site.users
+        users.add('profile', 'profile', 'oldoldold', [])
+        # now dress up the profile object a bit
+        profile = self.site['profiles']['profile']
+        profile.title = 'Pro File'
+        profile.email = 'profile@example.com'
+        converted = {'old_password': 'oldoldold',
+                     'password': 'newnewnew',
+                     }
+        # register fake mailer
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         mailer = DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
-
-        response = self._callFUT(context, request)
+        
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_submit(converted)
 
         from repoze.who.plugins.zodb.users import get_sha_password
         new_enc = get_sha_password('newnewnew')
-        self.assertEqual(parent.users.get_by_id('me')['password'], new_enc)
-
+        self.assertEqual(users.get_by_id('profile')['password'], new_enc)
         self.assertEqual(response.location,
-            'http://example.com/me/?status_message=Password%20changed')
+            'http://example.com/profiles/profile/?status_message=Password%20changed')
 
         self.assertEqual(len(mailer), 1)
         msg = mailer.pop()
-        self.assertEqual(msg.mto, ['me@example.com'])
+        self.assertEqual(msg.mto, ['profile@example.com'])
         self.assertEqual(msg.mfrom, "admin@example.com")
 
 

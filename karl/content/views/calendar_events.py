@@ -22,17 +22,19 @@ import time
 
 from urllib import quote
 
+from validatish import validator
+import formish
+import schemaish
+
 from zope.component.event import objectEventNotify
-from zope.component import queryMultiAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
 
 from webob.exc import HTTPFound
-from formencode import Invalid
-from formencode import validators
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.formish import ValidationError
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
@@ -42,7 +44,6 @@ from repoze.bfg.traversal import find_model
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
 
-from repoze.enformed import FormSchema
 from repoze.lemonade.content import create_content
 
 from karl.events import ObjectModifiedEvent
@@ -63,25 +64,27 @@ from karl.utils import get_session
 from karl.security.policy import CREATE
 from karl.security.workflow import get_security_states
 
-from karl.views import baseforms
 from karl.views.api import TemplateAPI
-from karl.views.form import render_form_to_response
+from karl.views.forms import attr as karlattr
+from karl.views.forms import validators as karlvalidators
+from karl.views.forms import widgets as karlwidgets
+from karl.views.forms.filestore import get_filestore
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
-from karl.views.baseforms import security_state as security_state_field
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import ICalendarCategory
 from karl.content.views.utils import extract_description
+from karl.content.views.utils import split_lines
+from karl.content.views.utils import upload_attachments
 from karl.utils import get_layout_provider
 
 from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import get_show_sendalert
-from karl.content.views.utils import store_attachments
 
 from karl.content.calendar.presenters.day import DayViewPresenter
 from karl.content.calendar.presenters.week import WeekViewPresenter
@@ -370,141 +373,221 @@ def _get_all_calendar_categories(context, request):
     calendar_categories.sort(key=lambda x: (x['folder'], x['title']))
     return calendar_categories
 
-def add_calendarevent_view(context, request):
 
-    tags_list=request.POST.getall('tags')
-    form = AddCalendarEventForm(tags_list=tags_list)
-    workflow = get_workflow(ICalendarEvent, 'security', context)
+tags_field = schemaish.Sequence(schemaish.String())
+category_field = schemaish.String()
+all_day_field = schemaish.Boolean()
+start_date_field = karlattr.KarlDateTime(validator=validator.Required())
+end_date_field = karlattr.KarlDateTime(validator=validator.Required())
+location_field = schemaish.String()
+text_field = schemaish.String()
+attendees_field = schemaish.String(description='One per line')
+contact_name_field = schemaish.String()
+contact_email_field = schemaish.String(
+    validator=validator.Any(validator.Email(), validator.Equal(''))
+    )
+attachments_field = schemaish.Sequence(
+    schemaish.File(),
+    title='Attachments',
+    description='You can remove an attachment by clicking the '
+    'checkbox. Removal will come to effect after saving the page '
+    'and can be reverted by cancel.')
+sendalert_field = schemaish.Boolean(
+    title='Send Alert',
+    description='Send email alert to community members?')
+security_field = schemaish.String(
+    title='Is this private?',
+    validator=validator.Required(),
+    description=('Items marked as private can only be seen by '
+                 'members of this community.'))
 
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, None, request)
 
-    if security_states:
-        form.add_field('security_state', security_state_field)
+class CalendarEventFormControllerBase(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.workflow = get_workflow(ICalendarEvent, 'security', context)
+        self.filestore = get_filestore(context, request, 'calendar-event')
 
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+    def _get_security_states(self):
+        return get_security_states(self.workflow, None, self.request)
 
-    if 'form.submitted' in request.POST:
-        try:
-            if 'calendar_category' not in request.POST:
-                # FormEncode doesn't let us mark certain keys as being missable
-                # Either any key can be missing from form or none, so we just
-                # manually massage calendar_category, which may be missing,
-                # before performing validation.
-                request.POST['calendar_category'] = None
+    def form_fields(self):
+        fields = [('tags', tags_field),
+                  ('category', category_field),
+                  ('all_day', all_day_field),
+                  ('start_date', start_date_field),
+                  ('end_date', end_date_field),
+                  ('location', location_field),
+                  ('text', text_field),
+                  ('attendees', attendees_field),
+                  ('contact_name', contact_name_field),
+                  ('contact_email', contact_email_field),
+                  ('attachments', attachments_field),
+                  ]
+        security_states = self._get_security_states()
+        if security_states:
+            fields.append(('security_state', security_field))
+        return fields
 
-            converted = form.validate(request.POST)
-
-            creator = authenticated_userid(request)
-            if converted['contact_email'] is None:
-                # Couldn't convince the email validator to call
-                # _to_python
-                converted['contact_email'] = u''
-            calendarevent = create_content(ICalendarEvent,
-                                           converted['title'],
-                                           converted['startDate'],
-                                           converted['endDate'],
-                                           creator,
-                                           converted['text'],
-                                           converted['location'],
-                                           converted['attendees'],
-                                           converted['contact_name'],
-                                           converted['contact_email'],
-                                           calendar_category=
-                                            converted['calendar_category'],
-                                           )
-            calendarevent.description = extract_description(converted['text'])
-
-            calname = make_unique_name(context, calendarevent.title)
-            context[calname] = calendarevent
-
-            # Set up workflow
-            if workflow is not None:
-                workflow.initialize(calendarevent)
-                if 'security_state' in converted:
-                    workflow.transition_to_state(calendarevent, request,
-                                                 converted['security_state'])
-
-            # Save the tags on it.
-            set_tags(calendarevent, request, converted['tags'])
-            store_attachments(calendarevent['attachments'],
-                              request.params, creator)
-
-            if converted['sendalert']:
-                alerts = queryUtility(IAlerts, default=Alerts())
-                alerts.emit(calendarevent, request)
-
-            location = model_url(calendarevent, request)
-            return HTTPFound(location=location)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-            tags_field = dict(
-                records = [dict(tag=t) for t in request.POST.getall('tags')]
-                )
-
-    else:
-        fielderrors = {}
-        if workflow is None:
-            security_state = ''
-        else:
-            security_state = workflow.initial_state
-
-        startDate, endDate = _default_dates_requested(context, request)
-
-        fill_values = dict(
-            startDate = startDate,
-            endDate = endDate,
-            tags = u'',
-            security_state = security_state,
-            )
-        fill_values['contact_email'] = u''
-        tags_field = dict(records=[])
-
-    # Render the form and shove some default values in
-    page_title = 'Add Calendar Event'
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a little policy.  Should we suppress alerts?
-    show_sendalert_field = get_show_sendalert(context, request)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
-
-    calendar = find_interface(context, ICalendar)
-    if calendar:
-        default_category_name = ICalendarCategory.getTaggedValue('default_name')
-        calendar_categories = [
-            {'title':x.title, 'path':model_path(x), 'name':x.__name__} for x in
-            _get_calendar_categories(calendar) ]
-        # default name always first
-        calendar_categories.sort(
-            key=lambda x: x['name'] == default_category_name and True or
-            x['title'])
-    else:
+    def form_widgets(self, fields):
+        # compute category values
         calendar_categories = []
+        default_category = None
+        calendar = find_interface(self.context, ICalendar)
+        if calendar:
+            default_category_name = ICalendarCategory.getTaggedValue('default_name')
+            for category in _get_calendar_categories(calendar):
+                category_tuple = (model_path(category), category.title)
+                if category.__name__ == default_category_name:
+                    default_category = category_tuple
+                else:
+                    calendar_categories.append(category_tuple)
+            calendar_categories.sort(key=lambda x: x[1])
+        category_widget = formish.SelectChoice(calendar_categories)
+        if default_category:
+            category_widget.none_option = default_category
+        widgets = {
+            'title': formish.Input(empty=''),
+            'category': category_widget,
+            'all_day': formish.Hidden(),
+            'start_date': karlwidgets.DateTime(),
+            'end_date': karlwidgets.DateTime(),
+            'location': formish.Input(empty=''),
+            'text': karlwidgets.RichTextWidget(empty=''),
+            'attendees': formish.TextArea(rows=5, cols=60),
+            'contact_name': formish.Input(empty=''),
+            'contact_email': formish.Input(empty=''),
+            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            }
+        schema = dict(fields)
+        if 'security_state' in schema:
+            security_states = self._get_security_states()
+            widgets['security_state'] = formish.RadioChoice(
+                options=[(s['name'], s['title']) for s in security_states],
+                none_option=None)
+        return widgets
 
-    return render_form_to_response(
-        'templates/add_calendarevent.pt',
-        form,
-        fill_values,
-        head_data=convert_to_script(dict(
-                tags_field = tags_field,
-                )),
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        calendar_categories=calendar_categories,
-        show_sendalert_field=show_sendalert_field,
-        layout=layout,
-        security_states = security_states,
-        )
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request, self.page_title)
+        layout_provider = get_layout_provider(context, request)
+        layout = layout_provider('community')
+        return {'api': api, 'actions': (), 'layout': layout}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        # first do the start / end date validation
+        start_date = converted['start_date']
+        end_date = converted['end_date']
+        if end_date < start_date:
+            errors = {'end_date': u'End date must follow start date'}
+            raise ValidationError(**errors)
+        elif converted['all_day']:
+            # massage into all day values if necessary
+            converted['start_date'] = datetime.datetime(
+                start_date.year, start_date.month, start_date.day,
+                0, 0, 0
+                )
+            converted['end_date'] = datetime.datetime(
+                end_date.year, end_date.month, end_date.day,
+                0, 0, 0
+                ) + datetime.timedelta(days=1)
+        elif (end_date - start_date) < datetime.timedelta(minutes=1):
+            errors = {'end_date':
+                      u'Event duration must be at least one minute'}
+            raise ValidationError(**errors)
+
+        # split the lines for the attendees
+        if converted['attendees']:
+            converted['attendees'] = split_lines(converted['attendees'])
+
+
+class AddCalendarEventFormController(CalendarEventFormControllerBase):
+    page_title = u'Add Calendar Entry'
+    
+    def form_defaults(self):
+        start_date, end_date = _default_dates_requested(self.context,
+                                                        self.request)
+        defaults ={'start_date': start_date,
+                   'end_date': end_date,
+                   }
+        security_states = self._get_security_states()
+        if security_states:
+            defaults['security_state'] = security_states[0]['name']
+        return defaults
+
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                karlvalidators.FolderNameAvailable(self.context),
+                )
+            )
+        fields = [('title', title_field)]
+        fields.extend(super(AddCalendarEventFormController, self).form_fields())
+        if get_show_sendalert(self.context, self.request):
+            fields.insert(-1, ('sendalert', sendalert_field),)
+        return fields
+
+    def form_widgets(self, fields):
+        widgets = super(AddCalendarEventFormController, self).form_widgets(fields)
+        widgets['tags'] = karlwidgets.TagsAddWidget()
+        if get_show_sendalert(self.context, self.request):
+            widgets['sendalert'] = formish.widgets.Checkbox()
+        return widgets
+
+    def handle_submit(self, converted):
+        # base class does some validation and simple massaging
+        super(AddCalendarEventFormController, self).handle_submit(converted)
+
+        # we create the event and handle other details
+        context = self.context
+        request = self.request
+        creator = authenticated_userid(request)
+        calendar_event = create_content(ICalendarEvent,
+                                        converted['title'],
+                                        converted['start_date'],
+                                        converted['end_date'],
+                                        creator,
+                                        converted['text'],
+                                        converted['location'],
+                                        converted['attendees'],
+                                        converted['contact_name'],
+                                        converted['contact_email'],
+                                        calendar_category=converted['category'],
+                                        )
+        calendar_event.description = extract_description(converted['text'])
+        calname = make_unique_name(context, calendar_event.title)
+        context[calname] = calendar_event
+
+        # set up workflow
+        workflow = get_workflow(ICalendarEvent, 'security', context)
+        if workflow is not None:
+            workflow.initialize(calendar_event)
+            if 'security_state' in converted:
+                workflow.transition_to_state(calendar_event, request,
+                                             converted['security_state'])
+
+        # save tags and attachments
+        set_tags(calendar_event, request, converted['tags'])
+        upload_attachments(converted['attachments'],
+                           calendar_event['attachments'],
+                           creator, request)
+
+        # send alert
+        if converted['sendalert']:
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(calendar_event, request)
+
+        self.filestore.clear()
+        return HTTPFound(location=model_url(calendar_event, request))
+        
 
 def show_calendarevent_view(context, request):
 
@@ -532,7 +615,7 @@ def show_calendarevent_view(context, request):
     startDate = karldates(context.startDate, 'longform')
     endDate = karldates(context.endDate, 'longform')
     attendees = None
-    if context.attendees is not []:
+    if context.attendees:
         attendees = '; '.join(context.attendees)
     location = context.location
     contact_name = context.contact_name
@@ -618,172 +701,99 @@ def show_calendarevent_ics_view(context, request):
                    )
 
 
-def edit_calendarevent_view(context, request):
+class EditCalendarEventFormController(CalendarEventFormControllerBase):
+    def __init__(self, context, request):
+        super(EditCalendarEventFormController, self).__init__(context, request)
+        self.page_title = 'Edit %s' % context.title
 
-    tags_list = request.POST.getall('tags')
-    form = EditCalendarEventForm(tags_list=tags_list)
-    workflow = get_workflow(ICalendarEvent, 'security', context)
-
-    if workflow is None:
-        security_states = []
-    else:
-        security_states = get_security_states(workflow, context, request)
-
-    if security_states:
-        form.add_field('security_state', security_state_field)
-
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
-
-    if 'form.submitted' in request.POST:
-        try:
-            if 'calendar_category' not in request.POST:
-                # FormEncode doesn't let us mark certain keys as being missable
-                # Either any key can be missing from form or none, so we just
-                # manually massage calendar_category, which may be missing,
-                # before performing validation.
-                request.POST['calendar_category'] = None
-
-            converted = form.validate(request.POST)
-
-            # *will be* modified event
-            objectEventNotify(ObjectWillBeModifiedEvent(context))
-            if workflow is not None:
-                if 'security_state' in converted:
-                    workflow.transition_to_state(context, request,
-                                                 converted['security_state'])
-
-            context.title = converted['title']
-            context.startDate = converted['startDate']
-            context.endDate = converted['endDate']
-            context.text = converted['text']
-            context.location = converted['location']
-            context.attendees = converted['attendees']
-            context.contact_name = converted['contact_name']
-            context.contact_email = converted['contact_email']
-            context.calendar_category = converted['calendar_category']
-            context.description = extract_description(converted['text'])
-
-            # Save the tags on it
-            set_tags(context, request, converted['tags'])
-
-            # Save new attachments
-            creator = authenticated_userid(request)
-            store_attachments(context['attachments'], request.params, creator)
-
-            # Modified
-            context.modified_by = authenticated_userid(request)
-            objectEventNotify(ObjectModifiedEvent(context))
-
-            location = model_url(context, request)
-            msg = "?status_message=Calendar%20Event%20edited"
-            return HTTPFound(location=location+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-
-    else:
-        fielderrors = {}
-        if workflow is None:
+    def form_defaults(self):
+        context = self.context
+        if self.workflow is None:
             security_state = ''
         else:
-            security_state = workflow.state_of(context)
-        fill_values = dict(
+            security_state = self.workflow.state_of(context)
+        defaults = dict(
             title=context.title,
             text=context.text,
-            startDate=context.startDate,
-            endDate=context.endDate,
+            start_date=context.startDate,
+            end_date=context.endDate,
             location=context.location,
-            attendees=context.attendees,
+            attendees=u'\n'.join([i for i in context.attendees if i]),
             contact_name=context.contact_name,
             contact_email=context.contact_email,
-            calendar_category=context.calendar_category,
+            category=context.calendar_category,
             security_state = security_state,
             )
 
-        if fill_values['contact_email'] is None:
-            fill_values['contact_email'] = u''
+        if defaults['contact_email'] is None:
+            defaults['contact_email'] = u''
 
         if is_all_day_event(context):
-            fill_values['allDay'] = True
-            fill_values['endDate'] -= datetime.timedelta(days=1)
+            defaults['all_day'] = True
+            defaults['end_date'] -= datetime.timedelta(days=1)
         else:
-            fill_values['allDay'] = False
+            defaults['all_day'] = False
+        return defaults
 
-    # Render the form and shove some default values in
-    page_title = 'Edit ' + context.title
-    api = TemplateAPI(context, request, page_title)
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                )
+            )
+        fields = [('title', title_field)]
+        fields.extend(super(EditCalendarEventFormController, self).form_fields())
+        return fields
 
-    client_json_data = convert_to_script(dict(
-        tags_field = get_tags_client_data(context, request),
-        ))
+    def form_widgets(self, fields):
+        widgets = super(EditCalendarEventFormController, self).form_widgets(fields)
+        tagdata = get_tags_client_data(self.context, self.request)
+        widgets['tags'] = karlwidgets.TagsEditWidget(tagdata=tagdata)
+        return widgets
 
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+    def handle_submit(self, converted):
+        # base class does some validation and simple massaging
+        super(EditCalendarEventFormController, self).handle_submit(converted)
 
-    calendar = find_interface(context, ICalendar)
-    if calendar is not None:
-        default_category_name = ICalendarCategory.getTaggedValue('default_name')
-        calendar_categories = [
-            {'title':x.title, 'path':model_path(x), 'name':x.__name__} for x in
-            _get_calendar_categories(calendar) ]
-        # default name always first
-        calendar_categories.sort(
-            key=lambda x: x['name'] == default_category_name and True or
-            x['title'])
-    else:
-        calendar_categories = []
-        del fill_values['calendar_category']
+        context = self.context
+        request = self.request
+        # *will be* modified event
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+        if self.workflow is not None:
+            if 'security_state' in converted:
+                self.workflow.transition_to_state(context, request,
+                                                  converted['security_state'])
 
-    return render_form_to_response(
-        'templates/edit_calendarevent.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        calendar_categories=calendar_categories,
-        head_data=client_json_data,
-        layout=layout,
-        security_states=security_states,
-        )
+        context.title = converted['title']
+        context.startDate = converted['start_date']
+        context.endDate = converted['end_date']
+        context.text = converted['text']
+        context.location = converted['location']
+        context.attendees = converted['attendees']
+        context.contact_name = converted['contact_name']
+        context.contact_email = converted['contact_email']
+        context.calendar_category = converted['category']
+        context.description = extract_description(converted['text'])
 
-class AddCalendarEventForm(FormSchema):
-    chained_validators = baseforms.start_end_constraints
-    #
-    title = baseforms.title
-    tags = baseforms.tags
-    calendar_category = validators.UnicodeString(strip=True)
-    startDate = baseforms.start_date
-    endDate = baseforms.end_date
-    allDay = validators.StringBoolean(if_missing=False)
-    location = validators.UnicodeString(strip=True)
-    text = baseforms.text
-    attendees = baseforms.TextAreaToList(strip=True)
-    contact_name = validators.UnicodeString(strip=True)
-    contact_email = validators.Email(not_empty=False, strip=True)
-    sendalert = baseforms.sendalert
+        # Save the tags on it
+        set_tags(context, request, converted['tags'])
 
-class EditCalendarEventForm(FormSchema):
-    chained_validators = baseforms.start_end_constraints
-    #
-    title = baseforms.title
-    tags = baseforms.tags
-    calendar_category = validators.UnicodeString(strip=True)
-    startDate = baseforms.start_date
-    endDate = baseforms.end_date
-    allDay = validators.StringBoolean(if_missing=False)
-    location = validators.UnicodeString(strip=True)
-    text = baseforms.text
-    attendees = baseforms.TextAreaToList(strip=True)
-    contact_name = validators.UnicodeString(strip=True)
-    contact_email = validators.Email(not_empty=False, strip=True)
+        # Save new attachments
+        userid = authenticated_userid(request)
+        attachments_folder = context['attachments']
+        upload_attachments(converted['attachments'], attachments_folder,
+                           userid, request)
 
-class CalendarCategoriesForm(FormSchema):
-    category_title = validators.UnicodeString(strip=True, not_empty=True)
+        # Modified
+        context.modified_by = userid
+        objectEventNotify(ObjectModifiedEvent(context))
+
+        self.filestore.clear()
+        location = model_url(context, request)
+        msg = "?status_message=Calendar%20Event%20edited"
+        return HTTPFound(location='%s%s' % (location, msg))
+
 
 def _calendar_category_title(ob):
     community = find_community(ob)
@@ -825,9 +835,32 @@ def calendar_setup_view(context, request):
         )
 
 
-def calendar_setup_categories_view(context, request):
-    form = CalendarCategoriesForm()
+class Invalid(Exception):
+    def __init__(self, msg, error_dict=None):
+        Exception.__init__(self, msg)
+        self.msg = msg
+        self.error_dict = error_dict
 
+def convert_to_unicode(value, field_name, encoding='utf-8'):
+    """Stolen from formencode.validators.UnicodeString."""
+    if isinstance(value, unicode):
+        return value
+    if not isinstance(value, unicode):
+        if hasattr(value, '__unicode__'):
+            value = unicode(value)
+            return value
+        else:
+            value = str(value)
+    try:
+        return unicode(value, encoding)
+    except UnicodeDecodeError:
+        msg = 'Invalid data or incorrect encoding'
+        raise Invalid(msg, error_dict={field_name: msg})
+    except TypeError:
+        msg = 'Invalid type'
+        raise Invalid(msg, error_dict={field_name: msg})
+
+def calendar_setup_categories_view(context, request):
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     default_category = context[default_category_name]
     default_category_path = model_path(default_category)
@@ -872,8 +905,6 @@ def calendar_setup_categories_view(context, request):
         else:
             message = 'Category is invalid'
 
-
-
         location = model_url(context, request, 'categories.html',
                              query={'status_message': message})
         return HTTPFound(location=location)
@@ -901,14 +932,15 @@ def calendar_setup_categories_view(context, request):
         category = context[category_name]
 
         try:
-            converted = form.validate(request.POST)
-            title = converted['category_title']
+            title = request.POST['category_title'].strip()
+            if not title:
+                msg = 'Please enter a value'
+                raise Invalid(msg, error_dict={'category_title': msg})
+            title = convert_to_unicode(title, 'category_title')
 
             if title in [ x.title for x in categories]:
                 msg = "Name is already used"
-                raise Invalid(value=title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'category_title': msg})
+                raise Invalid(msg=msg, error_dict={'category_title': msg})
 
             else:
                 category.title = title
@@ -924,15 +956,16 @@ def calendar_setup_categories_view(context, request):
 
     if 'form.submitted' in request.POST:
         try:
-            converted = form.validate(request.POST)
+            title = request.POST['category_title'].strip()
+            if not title:
+                msg = 'Please enter a value'
+                raise Invalid(msg, error_dict={'category_title': msg})
             name = generate_name(context)
-            title = converted['category_title']
+            title = convert_to_unicode(title, 'category_title')
 
             if title in [ x.title for x in categories ]:
                 msg = "Name is already used"
-                raise Invalid(value=title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'category_title': msg})
+                raise Invalid(msg=msg, error_dict={'category_title': msg})
 
             category = create_content(ICalendarCategory, title)
             context[name] = category
@@ -958,7 +991,6 @@ def calendar_setup_categories_view(context, request):
         back_to_calendar_url=model_url(context, request),
         categories_url=model_url(context, request, 'categories.html'),
         layers_url=model_url(context, request, 'layers.html'),
-        formfields=api.formfields,
         fielderrors=fielderrors,
         fielderrors_target = fielderrors_target,
         api=api,
@@ -968,13 +1000,7 @@ def calendar_setup_categories_view(context, request):
         colors = _COLORS,
         )
 
-class CalendarLayersForm(FormSchema):
-    layer_title = validators.UnicodeString(strip=True, not_empty=True)
-    layer_color = validators.UnicodeString(strip=True, not_empty=True)
-
 def calendar_setup_layers_view(context, request):
-    form = CalendarLayersForm()
-
     default_layer_name = ICalendarLayer.getTaggedValue('default_name')
     layers = filter(lambda x: x.__name__ != default_layer_name,
                     _get_calendar_layers(context))
@@ -1005,17 +1031,27 @@ def calendar_setup_layers_view(context, request):
 
     if 'form.submitted' in request.POST:
         try:
-            converted = form.validate(request.POST)
+            error_dict = {}
             category_paths = list(set(request.POST.getall('category_paths')))
-            layer_name = generate_name(context)
-            layer_title = converted['layer_title']
-            layer_color = converted['layer_color']
+            category_paths = [path for path in category_paths if path]
+            if not category_paths:
+                error_dict['category_paths'] = 'Please enter a value'
+            layer_title = request.POST['layer_title']
+            if not layer_title:
+                error_dict['layer_title'] = 'Please enter a value'
+            layer_color = request.POST.get('layer_color')
+            if not layer_color:
+                error_dict['layer_color'] = 'Please enter a value'
+            if error_dict:
+                raise Invalid(msg='Please correct the following errors',
+                              error_dict=error_dict)
+            layer_title = convert_to_unicode(layer_title, 'layer_title')
+            layer_color = convert_to_unicode(layer_color, 'layer_color')
 
+            layer_name = generate_name(context)
             if layer_title in layer_titles:
                 msg = "Name is already used"
-                raise Invalid(value=layer_title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'layer_title': msg})
+                raise Invalid(msg=msg, error_dict={'layer_title': msg})
 
             layer = create_content(ICalendarLayer,
                                    layer_title, layer_color, category_paths)
@@ -1051,20 +1087,30 @@ def calendar_setup_layers_view(context, request):
         layer = context[layer_name]
 
         try:
-            converted = form.validate(request.POST)
-            layer_title = converted['layer_title']
+            error_dict = {}
             category_paths = list(set(request.POST.getall('category_paths')))
-            layer_color = converted['layer_color'].strip()
+            category_paths = [path for path in category_paths if path]
+            if not category_paths:
+                error_dict['category_paths'] = 'Please enter a value'
+            layer_title = request.POST.get('layer_title')
+            if not layer_title:
+                error_dict['layer_title'] = 'Please enter a value'
+            layer_color = request.POST.get('layer_color')
+            if not layer_color:
+                error_dict['layer_color'] = 'Please enter a value'
+            if error_dict:
+                raise Invalid(msg='Please correct the following errors',
+                              error_dict=error_dict)
+            layer_title = convert_to_unicode(layer_title, 'layer_title')
+            layer_color = convert_to_unicode(layer_color, 'layer_color')
 
             if (layer_title != layer.title) and (layer_title in layer_titles):
                 msg = "Name is already used"
-                raise Invalid(value=layer_title, state=None,
-                          msg=msg, error_list=None,
-                          error_dict={'layer_title': msg})
+                raise Invalid(msg=msg, error_dict={'layer_title': msg})
 
             else:
                 layer.title = layer_title
-                layer.paths = list(set(request.POST.getall('category_paths')))
+                layer.paths = category_paths
                 layer.color = layer_color
 
                 location = model_url(
@@ -1101,5 +1147,3 @@ def generate_name(context):
         name = unfriendly_random_id()
         if not (name in context):
             return name
-
-

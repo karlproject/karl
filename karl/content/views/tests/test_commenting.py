@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from datetime import datetime
 import unittest
 
 from zope.interface import implements
@@ -28,12 +29,13 @@ from repoze.bfg.testing import registerAdapter
 from karl.content.interfaces import IBlogEntry
 from karl.models.interfaces import IComment
 
+from karl.testing import DummyFile
 from karl.testing import DummyLayoutProvider
+from karl.testing import DummySessions
 
-class AddCommentViewTests(unittest.TestCase):
+class AddCommentFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
@@ -55,196 +57,227 @@ class AddCommentViewTests(unittest.TestCase):
         from karl.testing import DummyProfile
         community = DummyCommunity()
         site = community.__parent__.__parent__
-
+        site.sessions = DummySessions()
         profiles = testing.DummyModel()
         site["profiles"] = profiles
         profiles["a"] = DummyProfile()
         profiles["b"] = DummyProfile()
         profiles["c"] = DummyProfile()
-
         community.member_names = set(["b", "c",])
         community.moderator_names = set(["a",])
-
         blog = testing.DummyModel()
         community["blog"] = blog
-
         blogentry = blog["foo"] = DummyBlogEntry()
-
         self.context = blogentry["comments"]
+
+        # Create dummy request
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
+
+    def tearDown(self):
+        cleanUp()
+
+    def _makeOne(self, context, request):
+        from karl.content.views.commenting import AddCommentFormController
+        return AddCommentFormController(context, request)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         return registerDummyWorkflow('security')
 
-    def tearDown(self):
-        cleanUp()
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('add_comment' in fields)
+        self.failUnless('attachments' in fields)
+        self.failUnless('sendalert' in fields)
 
-    def _callFUT(self, context, request):
-        from karl.content.views.commenting import add_comment_view
-        return add_comment_view(context, request)
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('add_comment' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('attachments.*' in widgets)
+        self.failUnless('sendalert' in widgets)
 
-    def test_notsubmitted(self):
-        from formencode import Invalid
-        request = testing.DummyRequest()
-        self.assertRaises(Invalid, self._callFUT, self.context, request)
-        self.assertEqual(0, len(self.mailer))
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        from webob.exc import HTTPExpectationFailed
+        self.assertRaises(HTTPExpectationFailed, controller)
 
-    def test_submitted_invalid(self):
-        from formencode import Invalid
-        request = testing.DummyRequest(
-            params={
-                'form.submitted': '1',
-                }
-            )
-        request.method = 'POST'
-        self.assertRaises(Invalid, self._callFUT, self.context, request)
-        self.assertEqual(0, len(self.mailer))
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/blog/foo/')
 
-    def test_submitted_valid(self):
-        self._registerSecurityWorkflow()
-        testing.registerDummyRenderer("templates/email_blog_comment_alert.pt")
-
-        request = testing.DummyRequest(
-            params={
-                'form.submitted': '1',
-                'add_comment': '<p>Some Text</p>',
-                'security_state': 'public',
-                'sendalert': '1',
-                }
-            )
-        request.method = 'POST'
-        from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyComment,
-                                (Interface, ),
-                                IContentFactory)
-        response = self._callFUT(self.context, request)
-        msg = 'http://example.com/communities/community/blog/foo/?status_message=Comment%20added'
-        self.assertEqual(response.location, msg)
-        self.assertEqual(3, len(self.mailer))
-        self.assertEqual(self.context['99'].title, 'Re: Dummy Blog Entry')
-
-    def test_submitted_valid_w_attachments(self):
-        self._registerSecurityWorkflow()
+    def test_handle_submit(self):
+        from karl.models.interfaces import IComment
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyComment, IComment)
+        registerContentFactory(DummyFile, ICommunityFile)
 
         from karl.testing import DummyUpload
         attachment1 = DummyUpload(filename="test1.txt")
-        attachment2 = DummyUpload(filename=r"C:\My Documents\I Test\test2.txt")
-        from webob.multidict import MultiDict
-        request = testing.DummyRequest(
-            params=MultiDict([
-                ('form.submitted', '1'),
-                ('add_comment', '<p>Some Text</p>'),
-                ('attachment', attachment1),
-                ('attachment', attachment2),
-                ('security_state', 'public'),
-                ('sendalert', '1'),
-            ])
-        )
-
-        testing.registerDummyRenderer("templates/email_blog_comment_alert.pt")
-
-        request.method = 'POST'
-        from repoze.lemonade.interfaces import IContentFactory
-        from karl.models.interfaces import IComment
-        testing.registerAdapter(lambda *arg: DummyComment,
-                                (IComment, ),
-                                IContentFactory)
-
-        testing.registerAdapter(lambda *arg: testing.DummyModel,
-                                (Interface, ),
-                                IContentFactory)
-
+        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
+        converted = {'add_comment': u'This is my comment',
+                     'attachments': [attachment1, attachment2],
+                     'sendalert': False}
         context = self.context
-        response = self._callFUT(context, request)
-        self.failUnless(context['99'])
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+        location = ('http://example.com/communities/community/blog/foo/'
+                    '?status_message=Comment%20added')
+        self.assertEqual(response.location, location)
+        self.failUnless(u'99' in context)
+        comment = context[u'99']
+        self.assertEqual(comment.title, 'Re: Dummy Blog Entry')
+        self.assertEqual(comment.text, u'This is my comment')
+        self.assertEqual(len(comment), 2)
+        self.failUnless('test1.txt' in comment)
+        self.failUnless('test2.txt' in comment)
 
-        msg = 'http://example.com/communities/community/blog/foo/?status_message=Comment%20added'
-        self.assertEqual(response.location, msg)
-        self.assertEqual(3, len(self.mailer))
+        # try again w/ a workflow, and w/ sendalert == True
+        del context[u'99']
+        workflow = self._registerSecurityWorkflow()
+        blogentry = context.__parent__
+        blogentry.creator = 'b'
+        blogentry.created = datetime.now()
+        blogentry.text = u'Blog entry text'
+        converted = {'add_comment': u'This is my OTHER comment',
+                     'attachments': [],
+                     'sendalert': True,
+                     'security_state': 'public'}
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location, location)
+        self.failUnless(u'99' in context)
+        comment = context[u'99']
+        self.assertEqual(len(comment), 0)
+        mailer = self.mailer
+        self.assertEqual(len(mailer), 3)
+        recipients = [mail.mto[0] for mail in mailer]
+        self.failUnless('a@x.org' in recipients)
+        self.failUnless('b@x.org' in recipients)
+        self.failUnless('c@x.org' in recipients)
+        self.failUnless(comment in workflow.initialized)
+        self.assertEqual(len(workflow.transitioned), 1)
+        transition = workflow.transitioned[0]
+        self.failUnless(transition['content'] is comment)
+        self.assertEqual(transition['to_state'], 'public')
 
-        comment = context['99']
-        self.failUnless(comment['test1.txt'])
-        self.assertEqual(comment['test1.txt'].filename, "test1.txt")
-        self.failUnless(comment['test2.txt'])
-        self.assertEqual(comment['test2.txt'].filename, "test2.txt")
 
-    def test_with_get(self):
-        from formencode import Invalid
-        request = testing.DummyRequest()
-        self.assertRaises(Invalid, self._callFUT, self.context, request)
-
-class EditCommentViewTests(unittest.TestCase):
+class EditCommentFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+
+        # Create dummy site skel
+        from karl.testing import DummyCommunity
+        community = DummyCommunity()
+        site = community.__parent__.__parent__
+        site.sessions = DummySessions()
+        blog = testing.DummyModel()
+        community["blog"] = blog
+        blogentry = blog["foo"] = DummyBlogEntry()
+        container = blogentry["comments"]
+        comment = container["99"] = DummyComment('Re: foo', 'text',
+                                                 'description',
+                                                 'creator')
+        self.context = comment
+
+        # Create dummy request
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        self.request = request
 
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.content.views.commenting import edit_comment_view
-        return edit_comment_view(context, request)
+    def _makeOne(self, context, request):
+        from karl.content.views.commenting import EditCommentFormController
+        return EditCommentFormController(context, request)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         return registerDummyWorkflow('security')
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+    def test_form_fields(self):
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('add_comment' in fields)
+        self.failUnless('attachments' in fields)
 
-    def test_notsubmitted(self):
-        self._registerLayoutProvider()
-        self._registerSecurityWorkflow()
+    def test_form_widgets(self):
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('add_comment' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('attachments.*' in widgets)
 
-        context = testing.DummyModel(title='thetitle', text='thetext')
-        context.__name__ = 'thecomment'
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_comment.pt')
-        response =self._callFUT(context, request)
-        self.failIf(renderer.fielderrors)
-        self.assertEqual(renderer.fieldvalues['add_comment'], 'thetext')
+    def test___call__(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Edit Re: foo')
+        self.failUnless('actions' in response)
+        self.failUnless('layout' in response)
 
-    def test_submitted_invalid(self):
-        self._registerLayoutProvider()
-        self._registerSecurityWorkflow()
-
-        context = testing.DummyModel(title='thetitle', text='thetext')
-        context.__name__ = 'thecomment'
-        context.text = 'text'
-        request = testing.DummyRequest(
-            params={
-                'form.submitted': '1',
-                'sharing': False,
-                }
-            )
-        renderer = testing.registerDummyRenderer('templates/edit_comment.pt')
-        response =self._callFUT(context, request)
-        self.failUnless(renderer.fielderrors)
-
-    def test_submitted_valid(self):
-        self._registerSecurityWorkflow()
-
-        blog_entry = DummyBlogEntry()
-        context = blog_entry.comments
-        context.__name__ = 'thecomment'
-        context.text = 'yup'
-        request = testing.DummyRequest(
-            params={
-                'form.submitted': '1',
-                'add_comment': 'Some Text',
-                'security_state': 'public',
-                }
-            )
-        L = testing.registerEventListener((Interface, Interface))
-        testing.registerDummySecurityPolicy('testeditor')
-        response = self._callFUT(context, request)
-        self.assertEqual(context.text, 'Some Text')
-        self.assertEqual(len(L), 4)
+    def test_handle_cancel(self):
+        controller = self._makeOne(self.context, self.request)
+        response = controller.handle_cancel()
         self.assertEqual(response.location,
-                         'http://example.com/thecomment/')
-        self.assertEqual(context.modified_by, 'testeditor')
+                         'http://example.com/communities/community/blog/foo/')
+
+    def test_handle_submit(self):
+        from karl.models.interfaces import IComment
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyComment, IComment)
+        registerContentFactory(DummyFile, ICommunityFile)
+
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename="test1.txt")
+        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
+        converted = {'add_comment': u'This is my comment',
+                     'attachments': [attachment1, attachment2],
+                     'sendalert': False}
+        context = self.context
+        controller = self._makeOne(context, self.request)
+        response = controller.handle_submit(converted)
+        location = ('http://example.com/communities/community/blog/foo/'
+                    'comments/99/')
+        self.assertEqual(response.location, location)
+        self.assertEqual(context.title, 'Re: foo')
+        self.assertEqual(context.text, u'This is my comment')
+        self.assertEqual(len(context), 2)
+        self.failUnless('test1.txt' in context)
+        self.failUnless('test2.txt' in context)
+
+        # try again w/ a workflow, and delete an attachment
+        blogentry = context.__parent__
+        workflow = self._registerSecurityWorkflow()
+        blogentry.text = u'Blog entry text'
+        attachment1 = DummyUpload(None, None)
+        attachment1.file = None
+        attachment1.metadata = {}
+        attachment2 = DummyUpload(None, None)
+        attachment2.file = None
+        attachment2.metadata = {'default': 'test2.txt',
+                                'remove': True,
+                                'name': ''}
+        converted = {'add_comment': u'This is my OTHER comment',
+                     'attachments': [attachment1, attachment2],
+                     'security_state': 'public'}
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location, location)
+        self.assertEqual(len(context), 1)
+        self.failUnless('test1.txt' in context)
+        self.failIf('test2.txt' in context)
+        self.assertEqual(len(workflow.transitioned), 1)
+        transition = workflow.transitioned[0]
+        self.failUnless(transition['content'] is context)
+        self.assertEqual(transition['to_state'], 'public')
 
 class ShowCommentViewTests(unittest.TestCase):
     def setUp(self):

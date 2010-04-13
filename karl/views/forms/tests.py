@@ -3,6 +3,7 @@ import schemaish
 from zope.testing.cleanup import cleanUp
 
 from repoze.bfg import testing
+from repoze.who.plugins.zodb.users import get_sha_password
 
 class TestTagsWidget(unittest.TestCase):
     def _makeOne(self, **kw):
@@ -111,10 +112,10 @@ class TestPathExistsValidator(unittest.TestCase):
         validator = self._makeOne(self.site)
         self.assertRaises(Invalid, validator, '/')
 
-class TestPasswordCheckerValidator(unittest.TestCase):
+class TestPasswordLengthValidator(unittest.TestCase):
     def _makeOne(self, min_pw_length):
-        from karl.views.forms.validators import PasswordChecker
-        return PasswordChecker(min_pw_length)
+        from karl.views.forms.validators import PasswordLength
+        return PasswordLength(min_pw_length)
 
     def test_fail(self):
         from validatish.error import Invalid
@@ -124,6 +125,22 @@ class TestPasswordCheckerValidator(unittest.TestCase):
     def test_nofail(self):
         validator = self._makeOne(6)
         self.assertEqual(validator('secret'), None)
+
+class TestCorrectUserPassword(unittest.TestCase):
+    password = 'foofoofoo'
+    def _makeOne(self):
+        from karl.views.forms.validators import CorrectUserPassword
+        user = {'password': get_sha_password(self.password)}
+        return CorrectUserPassword(user)
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        validator = self._makeOne()
+        self.assertRaises(Invalid, validator, 'fofofo')
+
+    def test_nofail(self):
+        validator = self._makeOne()
+        self.assertEqual(validator('foofoofoo'), None)
 
 class TestUniqueEmailValidator(unittest.TestCase):
     def setUp(self):

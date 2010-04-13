@@ -4,6 +4,22 @@ karl package Changelog
 Unreleased
 ----------
 
+- Remove FormEncode and repoze.enformed dependencies and all dependent code.
+
+- Convert change password form to formish.
+
+- Convert calendar setup form to not use FormEncode / repoze.enformed.
+
+- Convert calendar event add / edit forms to formish.
+
+- Convert comment add / edit forms to formish.
+
+- Convert reference section add / edit forms to formish.
+
+- Convert reference manual add / edit forms to formish.
+
+- Convert password reset request and confirm forms to formish.
+
 - Converted profile and news item photos to use the newer, image drawer
   compatible image and thumb nails.  Deprecated and removed older image
   handling code previously used to support these.

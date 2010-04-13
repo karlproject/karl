@@ -104,6 +104,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
 
     def test_no_security_policy(self):
         context = DummyBlogEntry()
+        context.sessions = DummySessions()
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from karl.testing import DummyProfile
@@ -115,6 +116,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -141,9 +143,12 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         from karl.content.interfaces import IBlog
         from zope.interface import alsoProvides
         context = DummyBlogEntry()
+        context.sessions = DummySessions()
+        context.__parent__.sessions = DummySessions()
         alsoProvides(context, IBlog)
         alsoProvides(context, IBlogEntry)
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -160,6 +165,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
 
     def test_comment_ordering(self):
         context = DummyBlogEntry()
+        context.sessions = DummySessions()
         context['comments']['2'] = DummyComment(now=1233149510, text=u'before')
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
@@ -172,6 +178,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -193,6 +200,9 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
+        from repoze.bfg.threadlocal import manager
+        from repoze.bfg.registry import Registry
+        manager.stack[0]['registry'] = Registry('testing')
         testing.registerUtility(self.mailer, IMailDelivery)
 
         # Register BlogEntryAlert adapter

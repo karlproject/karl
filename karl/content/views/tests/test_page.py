@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from webob.multidict import MultiDict
 
 from zope.interface import Interface
 from repoze.bfg.testing import cleanUp
@@ -26,11 +25,8 @@ from repoze.bfg.testing import DummyModel
 from repoze.bfg.testing import DummyRequest
 from repoze.bfg.testing import registerDummyRenderer
 from repoze.bfg.testing import registerAdapter
-from repoze.bfg.testing import registerEventListener
 
 from repoze.lemonade.testing import registerContentFactory
-
-from karl.models.interfaces import IObjectModifiedEvent
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyLayoutProvider

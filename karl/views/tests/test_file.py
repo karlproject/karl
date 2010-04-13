@@ -7,7 +7,7 @@ from zope.testing.cleanup import cleanUp
 
 from repoze.bfg import testing
 
-from karl.models.tests.test_image import one_pixel_jpeg
+from karl.views.tests.test_utils import one_pixel_jpeg
 from karl.models.interfaces import IImageFile
 
 class TestServeFileView(unittest.TestCase):

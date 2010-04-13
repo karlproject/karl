@@ -21,7 +21,7 @@ import schemaish
 from schemaish.type import File as SchemaFile
 from validatish import validator
 
-from formencode import Invalid
+from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.formish import ValidationError
@@ -30,11 +30,9 @@ from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
-from repoze.enformed import FormSchema
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.sendmail.interfaces import IMailDelivery
-from repoze.who.plugins.zodb.users import get_sha_password
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
@@ -53,16 +51,15 @@ from karl.utils import find_tags
 from karl.utils import find_users
 from karl.utils import get_layout_provider
 from karl.utils import get_setting
-from karl.views import baseforms
 from karl.views.api import TemplateAPI
+from karl.views.api import xhtml
 from karl.views.batch import get_catalog_batch
 from karl.views.login import logout_view
 from karl.views.tags import get_tags_client_data
+from karl.views.utils import Invalid
 from karl.views.utils import convert_to_script
-from karl.views.utils import CustomInvalid
 from karl.views.utils import handle_photo_upload
 from karl.views.utils import photo_from_filestore_view
-from karl.views.form import render_form_to_response
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
@@ -74,6 +71,11 @@ def edit_profile_filestore_photo_view(context, request):
 
 def add_user_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'add-user')
+
+
+# 'context' arg isn't actually used in the get_setting call, we can
+# use None and it will still work
+min_pw_length = get_setting(None, 'min_pw_length')
 
 firstname_field = schemaish.String(validator=validator.Required(),
                                    title='First Name')
@@ -215,7 +217,10 @@ class EditProfileFormController(object):
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
         # Handle the picture and clear the temporary filestore
-        handle_photo_upload(context, converted)
+        try:
+            handle_photo_upload(context, converted)
+        except Invalid, e:
+            raise ValidationError(*e.error_dict)
         self.filestore.clear()
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
@@ -246,14 +251,13 @@ class AdminEditProfileFormController(EditProfileFormController):
 
     def form_fields(self):
         context = self.context
-        min_pw_length = get_setting(context, 'min_pw_length')
         home_path_field = schemaish.String(
             validator=karlvalidators.PathExists(context),
             description=('The first page to show after logging in. '
                          'Leave blank to show a community or the '
                          'community list.'))
         password_field = schemaish.String(
-            validator=karlvalidators.PasswordChecker(min_pw_length),
+            validator=karlvalidators.PasswordLength(min_pw_length),
             title='Reset Password',
             description=('Enter a new password for the user here, '
                          'or leave blank to leave the password '
@@ -331,7 +335,10 @@ class AdminEditProfileFormController(EditProfileFormController):
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
         # Handle the picture and clear the temporary filestore
-        handle_photo_upload(context, converted)
+        try:
+            handle_photo_upload(context, converted)
+        except Invalid, e:
+            raise ValidationError(**e.error_dict)
         self.filestore.clear()
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
@@ -371,7 +378,6 @@ class AddUserFormController(EditProfileFormController):
 
     def form_fields(self):
         context = self.context
-        min_pw_length = get_setting(context, 'min_pw_length')
         home_path_field = schemaish.String(
             validator=karlvalidators.PathExists(context),
             description=('The first page to show after logging in. '
@@ -379,7 +385,7 @@ class AddUserFormController(EditProfileFormController):
                          'community list.'))
         password_field = schemaish.String(
             validator=(validator.All(
-                karlvalidators.PasswordChecker(min_pw_length),
+                karlvalidators.PasswordLength(min_pw_length),
                 validator.Required())))
         fields = [('login', login_field),
                   ('groups', groups_field),
@@ -437,7 +443,10 @@ class AddUserFormController(EditProfileFormController):
         if workflow is not None:
             workflow.initialize(profile)
 
-        handle_photo_upload(profile, converted)
+        try:
+            handle_photo_upload(profile, converted)
+        except Invalid, e:
+            raise ValidationError(**e.error_dict)
         location = model_url(profile, request)
         return HTTPFound(location=location)
 
@@ -706,86 +715,89 @@ def show_profiles_view(context, request):
         letters=letter_info,
         )
 
-def change_password_view(context, request):
-    min_pw_length = get_setting(context, 'min_pw_length')
-    form = ChangePasswordForm(min_pw_length=min_pw_length)
-    if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
 
-    if 'form.submitted' in request.POST:
-        try:
-            converted = form.validate(request.POST)
-            users = find_users(context)
-            userid = context.__name__
-            user = users.get_by_id(userid)
+new_password_field = schemaish.String(
+    title="New Password",
+    validator=validator.All(karlvalidators.PasswordLength(min_pw_length),
+                            validator.Required())
+    )
 
-            # check the old password
-            # XXX: repoze.who.plugins.zodb.interfaces.IUsers
-            # really should have a check_password(id, password)
-            # method.  We shouldn't have to use get_sha_password
-            # directly.
-            enc = get_sha_password(converted['old_password'])
-            if enc != user['password']:
-                raise CustomInvalid({'old_password': 'Incorrect password'})
+class ChangePasswordFormController(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-            users.change_password(userid, converted['password'])
+    def form_fields(self):
+        users = find_users(self.context)
+        userid = self.context.__name__
+        user = users.get_by_id(userid)
+        old_password_field = schemaish.String(
+            title="Old Password",
+            validator=validator.All(
+                validator.Required(),
+                karlvalidators.CorrectUserPassword(user),
+                )
+            )
+        fields = [('old_password', old_password_field),
+                  ('password', new_password_field),
+                  ]
+        return fields
 
-            # send email
-            system_name = get_setting(context, 'system_name', 'KARL')
-            mail = karl.mail.Message()
-            admin_email = get_setting(context, 'admin_email')
-            mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
-            mail["To"] = "%s <%s>" % (context.title, context.email)
-            mail["Subject"] = "%s Password Change Notification" % system_name
-            system_name = get_setting(context, 'system_name', 'KARL')
-            body = render_template(
-                "templates/email_change_password.pt",
-                login=user['login'],
-                password=converted['password'],
-                system_name=system_name,
+    def form_widgets(self, fields):
+        widgets = {'old_password': formish.Password(),
+                   'password': karlwidgets.KarlCheckedPassword()}
+        return widgets
+
+    def __call__(self):
+        api = TemplateAPI(self.context, self.request, 'Change Password')
+        layout_provider = get_layout_provider(self.context, self.request)
+        layout = layout_provider('generic')
+        snippets = get_template('forms/templates/snippets.pt')
+        snippets.doctime = xhtml
+        blurb_macro = snippets.macros['change_password_blurb']
+        return {'api': api, 'layout': layout, 'actions': [],
+                'blurb_macro': blurb_macro}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        context = self.context
+        users = find_users(context)
+        userid = context.__name__
+        user = users.get_by_id(userid)
+
+        users.change_password(userid, converted['password'])
+
+        # send email
+        system_name = get_setting(context, 'system_name', 'KARL')
+        mail = karl.mail.Message()
+        admin_email = get_setting(context, 'admin_email')
+        mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+        mail["To"] = "%s <%s>" % (context.title, context.email)
+        mail["Subject"] = "%s Password Change Notification" % system_name
+        system_name = get_setting(context, 'system_name', 'KARL')
+        body = render_template(
+            "templates/email_change_password.pt",
+            login=user['login'],
+            password=converted['password'],
+            system_name=system_name,
             )
 
-            if isinstance(body, unicode):
-                body = body.encode("UTF-8")
+        if isinstance(body, unicode):
+            body = body.encode("UTF-8")
 
-            mail.set_payload(body, "UTF-8")
-            mail.set_type("text/html")
+        mail.set_payload(body, "UTF-8")
+        mail.set_type("text/html")
 
-            recipients = [context.email]
-            mailer = getUtility(IMailDelivery)
-            mailer.send(admin_email, recipients, mail)
+        recipients = [context.email]
+        mailer = getUtility(IMailDelivery)
+        mailer.send(admin_email, recipients, mail)
 
-            path = model_url(context, request)
-            msg = '?status_message=Password%20changed'
-            return HTTPFound(location=path+msg)
-
-        except Invalid, e:
-            fielderrors = e.error_dict
-            fill_values = form.convert(request.POST)
-    else:
-        # fill_values not empty to work around chained validator
-        # for password and password_confirm
-        fill_values = {'password':'', 'password_confirm':''}
-        fielderrors = {}
-
-    page_title = 'Change Password'
-    api = TemplateAPI(context, request, page_title)
-
-    return render_form_to_response(
-        'templates/change_password.pt',
-        form,
-        fill_values,
-        post_url=request.url,
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        api=api,
-        )
-
-class ChangePasswordForm(FormSchema):
-    old_password = baseforms.old_password
-    password = baseforms.password
-    password_confirm = baseforms.password_confirm
-    chained_validators = baseforms.chained_validators
+        path = model_url(context, self.request)
+        msg = '?status_message=Password%20changed'
+        return HTTPFound(location=path+msg)
+        
 
 def delete_profile_view(context, request):
 
