@@ -19,11 +19,13 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
+from karl.utilities.image import thumb_url
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import convert_to_script
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -184,9 +186,9 @@ def profile_photo_rows(entries, request, api, columns=3):
     """
     row = []
     for profile in entries:
-        photo = profile.get_photo()
+        photo = profile.get('photo')
         if photo is not None:
-            photo_url = model_url(photo, request)
+            photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
         else:
             photo_url = api.static_url + "/images/defaultUser.gif"
         url = model_url(profile, request)

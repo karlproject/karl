@@ -54,12 +54,14 @@ from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import support_attachments
+from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
 
 from karl.views.api import TemplateAPI
 
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
+from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.views.tags import set_tags
@@ -70,7 +72,7 @@ from karl.content.views.utils import extract_description
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import upload_attachments
 from karl.content.views.utils import fetch_attachments
- 
+
 def titlesort(one, two):
     return cmp(one.title, two.title)
 
@@ -227,7 +229,7 @@ class AddForumFormController(object):
         defaults = {
             'title':'',
             'description':''}
-        
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
@@ -294,12 +296,12 @@ class EditForumFormController(object):
 
     def _get_security_states(self):
         return get_security_states(self.workflow, self.context, self.request)
-        
+
     def form_defaults(self):
         defaults = {
             'title':self.context.title,
             'description':self.context.description}
-        
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(self.context)
         return defaults
@@ -390,10 +392,10 @@ def show_forum_topic_view(context, request):
             newc['delete_url'] = None
 
         # Display portrait
-        photo = profile.get_photo()
+        photo = profile.get('photo')
         photo_url = {}
         if photo is not None:
-            photo_url = model_url(photo, request)
+            photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
         else:
             photo_url = api.static_url + "/images/defaultUser.gif"
         newc["portrait_url"] = photo_url
@@ -463,7 +465,7 @@ class AddForumTopicFormController(object):
             'text':'',
             'attachments':[],
             }
-            
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
@@ -563,7 +565,7 @@ class EditForumTopicFormController(object):
             'text':self.context.text,
             'attachments':attachments,
             }
-            
+
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(self.context)
         return defaults

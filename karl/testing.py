@@ -113,9 +113,6 @@ class DummyProfile(DummyModel):
     def email(self):
         return "%s@x.org" % self.__name__
 
-    def get_photo(self):
-        return None
-
     def get_alerts_preference(self, community_name):
         return self._alert_prefs.get(community_name,
                                      IProfile.ALERT_IMMEDIATELY)

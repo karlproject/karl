@@ -68,8 +68,8 @@ class TestKarlTwill:
         # while we're at it, stop twill from running off at the mouth...
         # Comment out for debugging.
         # XXX How do we suppress the annoying "AT LINE: " output?
-        outp = StringIO()
-        twill.set_output(outp)
+        #outp = StringIO()
+        #twill.set_output(outp)
 
     def tearDown(self):
         # remove intercept

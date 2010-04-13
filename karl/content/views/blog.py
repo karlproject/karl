@@ -52,6 +52,7 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.security.workflow import get_security_states
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
+from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_interface
@@ -60,6 +61,7 @@ from karl.utils import get_setting
 from karl.utils import coarse_datetime_repr
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import ISidebar
+from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
@@ -185,10 +187,9 @@ def show_blogentry_view(context, request):
             newc['delete_url'] = None
 
         # Display portrait
-        photo = profile.get_photo()
-        photo_url = {}
+        photo = profile.get('photo')
         if photo is not None:
-            photo_url = model_url(photo, request)
+            photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
         else:
             photo_url = api.static_url + "/images/defaultUser.gif"
         newc["portrait_url"] = photo_url

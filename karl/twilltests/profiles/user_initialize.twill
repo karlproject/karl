@@ -14,9 +14,11 @@ fv save email "testuser@example.com"
 fv save biography "User account (Test User) added by Twill test (profiles.user_initialize.twill)"
 formfile save photo.file "${test_path}/profiles/profile.jpg" image/jpeg
 submit
+show
 
 # Verify user added
 go /profiles/testuser
+show
 find Afghanistan
 find testuser@example.com
 

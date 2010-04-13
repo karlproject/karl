@@ -122,7 +122,7 @@ class EditProfileFormController(object):
         self.filestore = get_filestore(context, request, 'edit-profile')
         page_title = "Edit %s" % context.title
         self.api = TemplateAPI(context, request, page_title)
-        photo = context.get_photo()
+        photo = context.get('photo')
         if photo is not None:
             photo = SchemaFile(None, photo.__name__, photo.mimetype)
         self.photo = photo
@@ -797,7 +797,7 @@ class ChangePasswordFormController(object):
         path = model_url(context, self.request)
         msg = '?status_message=Password%20changed'
         return HTTPFound(location=path+msg)
-        
+
 
 def delete_profile_view(context, request):
 

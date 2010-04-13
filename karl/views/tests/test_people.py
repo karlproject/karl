@@ -49,12 +49,6 @@ class DummyProfile(testing.DummyModel):
             raise KeyError(u"An object named %s already exists" % name)
         testing.DummyModel.__setitem__(self, name, value)
 
-    def get_photo(self):
-        for name in self.keys():
-            if name.startswith("photo"):
-                return self[name]
-        return None
-
 class DummyLetterManager:
     def __init__(self, context):
         self.context = context
@@ -1024,7 +1018,7 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         from karl.testing import DummyMailer
         mailer = DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
-        
+
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_submit(converted)
 
