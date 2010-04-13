@@ -74,8 +74,11 @@ def add_user_filestore_photo_view(context, request):
 
 
 # 'context' arg isn't actually used in the get_setting call, we can
-# use None and it will still work
-min_pw_length = get_setting(None, 'min_pw_length')
+# use None and it will still work; for some reason, however, the
+# settings aren't initialized when we use the 'test_all' script (even
+# though they are when we use 'test' or 'test_twill'), so we provide a
+# default
+min_pw_length = get_setting(None, 'min_pw_length', 8)
 
 firstname_field = schemaish.String(validator=validator.Required(),
                                    title='First Name')

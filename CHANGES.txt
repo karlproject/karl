@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Sacrifice a chicken and provide a default value for the 'min_pw_length'
+  setting since certain invocations of the test framework cause that to not
+  yet be initialized.
+
 - Remove FormEncode and repoze.enformed dependencies and all dependent code.
 
 - Convert change password form to formish.
