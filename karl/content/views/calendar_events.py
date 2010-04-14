@@ -581,7 +581,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
                            creator, request)
 
         # send alert
-        if converted['sendalert']:
+        if converted.get('sendalert', False):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(calendar_event, request)
 
