@@ -16,6 +16,31 @@
             // widgets registered already
             return;
         }
+        $.tiny = {};
+
+        // I was getting desperate to solve this from css,
+        // but this iterator seems to be more stable.
+        $.fn.tiny_fixIEPanelSize = function(widthdiff, heightdiff) {
+            if (!jQuery.boxModel) {
+                return this.each(function() {
+                    var el = $(this);
+                    var w = el.css('width');
+                    if (w && w != 'auto') {
+                        el.width(parseInt(w) + widthdiff);
+                    }
+                    var h = el.css('height');
+                    if (h && h != 'auto') {
+                        el.height(parseInt(h) + heightdiff);
+                    }
+                });
+            }
+            return this;
+        };
+
+        // the sizes we use all imagedrawer panels:
+        // contain 6px padding + 1px border in each direction.
+        $.tiny.PANEL_WD = 14;
+        $.tiny.PANEL_HD = 14;
 
         // actually, register the widgets.
         $.widget('tiny.imagedrawerimage', {
@@ -202,7 +227,7 @@
                 var self = this;
 
                 var oldstart = this.offset;
-                var oldend = oldstart + this.container.children().length;
+                var oldend = oldstart + this.items().length;
 
                 // Check if we are beyond region.
                 if ((oldend - oldstart > 0) && 
@@ -238,7 +263,7 @@
                     // No change in offset. At this point we
                     // check if we are after a reset, and initiate
                     // the margin according to the offset.
-                    if (this.container.children().length == 0) {
+                    if (this.items().length == 0) {
                         // No previous region.
                         this.offset = start;
                     }
@@ -259,21 +284,52 @@
 
                 // set the length of the container to
                 // always hold all the elements
-                this.container.width(this.container.children().length 
+                this.container.width(this.items().length 
                     * this.column_width + 25);
 
             },
 
-            // Move the stripe to this index position
+            insertRecord: function(index, value) {
+                // inserts a record at the given position
+                // this pushes all following records to the right.
+                
+                // Generates the item.
+                var newItem = self.proto_image
+                    .clone(true)
+                    .imagedrawerimage({
+                        record: value
+                    });
+
+                if (index - this.offset == this.items().length) {
+                    // Allow appending the item right at the
+                    // end of the stored region.
+                    newItem.appendTo(this.container);
+                } else {
+                    // Insert the item before the given index.
+                    var item = this.item(index);
+                    // Check if we store this item.
+                    if (item.length != 1) {
+                        throw new Error('insertRecord must extend a region continously.');
+                    }
+                    newItem.insertBefore(item);
+                }
+
+            },
+
             moveTo: function(start) {
                 this.container.css('margin-left',
                     Math.round((this.offset - start) * this.column_width) 
                     + 'px');
             },
 
+            items: function() {
+                // Return all items.
+                return this.container.children();
+            },
+
             item: function(index) {
                 // Get the item at the given index.
-                return this.container.children().eq(index - this.offset);
+                return this.items().eq(index - this.offset);
             },
 
             recordAt: function(index, value) {
@@ -382,8 +438,9 @@
             this.dialog.hide().appendTo('body');
             this.dialog.dialog({
                 // the next options are adjustable if the style changes
-                ///width: 666,
-                width: 700,
+                // Full width is computed from width border and padding.
+                // IE's quirkmode is also taken to consideration.
+                width: 6 + 388 + 7 + 320 + 6 + (jQuery.boxModel ? 0 : 8),
                 dialogClass: 'tiny-imagedrawer-dialog',
                 // the next options are mandatory for desired behaviour
                 autoOpen: false,
@@ -393,7 +450,18 @@
             });
             // remove these classes from the dialog. This is to avoid
             // the outside border that this class adds by default.
-            this.dialog.removeClass('ui-dialog-content ui-widget-content');
+            // Instead we add our own panel, with the advantage that
+            // sizes can be set correctly even on IE.
+            // XXX actually one problem is that we get rid of the header,
+            // and the component does not really support this oob.
+            this.dialog
+                .css('border', '0')
+                .css('padding', '0')
+                .css('overflow', 'hidden')
+                .parents('.ui-dialog')
+                    //.removeClass('ui-dialog-content ui-widget-content')
+                    .removeClass('ui-dialog-content')
+                    .css('overflow', 'hidden')
 
             //
             // Wire up the dialog
@@ -402,7 +470,8 @@
             // each tab panel gets selected by a button
             // from the source selection buttonset
             var download_panel = this.dialog.find('.tiny-imagedrawer-panel-download');
-            var upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload');
+            var upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload')
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // source selection buttonset
             this.buttonset = this.dialog
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-tabselect');
@@ -440,7 +509,8 @@
             // Wire up the info panel
             this.info_panel = this.dialog.find('.tiny-imagedrawer-panel-info')
                 .imagedrawerinfopanel({
-                });
+                })
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // Wire up the Insert / Cancel buttons in the info panel
             this.info_panel.data('imagedrawerinfopanel').buttonset_save
                 .bind('change.karlbuttonset', function(event, button_index, value) {
@@ -514,7 +584,8 @@
             // Wire the image list
             // 
             this.images_panel = this.dialog
-                .find('.tiny-imagedrawer-panel-images');
+                .find('.tiny-imagedrawer-panel-images')
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // First, it contains a single image. We save
             // this as hidden, and will use it
             // to clone any images.
