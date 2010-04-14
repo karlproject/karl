@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Slight tweaks to the Network Events search UI and behavior to improve user
+  experience (see LP#554028)
+
 - Sacrifice a chicken and provide a default value for the 'min_pw_length'
   setting since certain invocations of the test framework cause that to not
   yet be initialized.
