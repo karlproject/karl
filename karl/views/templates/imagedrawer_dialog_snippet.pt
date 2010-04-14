@@ -59,7 +59,7 @@
           <br />
           <span class="tiny-imagedrawer-info-label">Caption</span>
           <input type="checkbox" name="blah_0" value="" />
-          <span>yes</span>
+          <span style="color: red;">yes</span>
           <br />
           <span class="tiny-imagedrawer-info-label">Alignment</span>
           <input id="tiny-imagedrawer-input-align-0" value="left"
@@ -74,7 +74,7 @@
           <span class="tiny-imagedrawer-info-label"></span>
           <input id="tiny-imagedrawer-input-align-2" value="center"
               type="radio" name="tiny-imagedrawer-input-align" />
-          <label for="tiny-imagedrawer-input-align-2">Center</label>
+          <label style="color: red;" for="tiny-imagedrawer-input-align-2">Center</label>
           <br />
           <span class="tiny-imagedrawer-info-label">Size</span>
           <select name="tiny-imagedrawer-input-dimension">
