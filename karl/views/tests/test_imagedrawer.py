@@ -132,6 +132,7 @@ class Test_batch_images(unittest.TestCase):
         self.assertEqual(self.batcher.called, (context, request, None, None, 0, 12))
 
     def test_search_by_creator(self):
+        testing.registerDummySecurityPolicy('admin')
         request = testing.DummyRequest(params={'source': '0'}) # My Recent
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
