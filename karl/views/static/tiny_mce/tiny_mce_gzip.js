@@ -949,7 +949,7 @@ tinyMCE.addI18n('en.wicked',{
                 // the next options are adjustable if the style changes
                 // Full width is computed from width border and padding.
                 // IE's quirkmode is also taken to consideration.
-                width: 6 + 388 + 7 + 320 + 6 + (jQuery.boxModel ? 0 : 8),
+                width: 6 + 390 + 7 + 320 + 6 + (jQuery.boxModel ? 0 : 10), // ?? XXX
                 dialogClass: 'tiny-imagedrawer-dialog',
                 // the next options are mandatory for desired behaviour
                 autoOpen: false,

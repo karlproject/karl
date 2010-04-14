@@ -28,7 +28,7 @@
 
   <div class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-download">
     <div style="" class="ui-helper-clearfix">
-      <div style="width: 374px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-images">
+      <div style="width: 376px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-images">
         <ul class="tiny-imagedrawer-imagestripe">
           <!-- The following is used as the prototype image -->
           <li>
@@ -46,7 +46,7 @@
         <div class="tiny-imagedrawer-scrollbar"></div>
       </div>
 
-      <div style="width: 374px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
+      <div style="width: 376px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
         <p>
           Select the url of the external image to be used in your document!
         </p>
@@ -99,11 +99,13 @@
             <option value="medium" selected="selected">Medium (250 x 250)</option>
             <option value="small">Small (100 x 100)</option>
           </select>
+          <div style="clear: both; height: 0"></div>
         </div>
         <div class="karl-buttonset tiny-imagedrawer-buttonset-save" style="">
           <button class="ui-icon-plusthick" disabled="1">Insert</button>
           <button class="ui-icon-cancel">Cancel</button>
         </div>
+        <div style="clear: both; height: 0"></div>
       </div>
     </div>
   </div>
