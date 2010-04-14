@@ -185,7 +185,7 @@ def batch_images(context, request,
     # in the imagedrawer dialog.
     source = int(request.params.get('source', '0'))
     if source == 0:     # My Recent
-        creator = 'admin'
+        creator = authenticated_userid(request)
         community_path = None
     elif source == 1:   # This Community
         creator = None
