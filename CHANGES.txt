@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add "overflow: auto" to the #right div CSS to prevent bad rendering when
+  poorly formed (read: very long words w/ no word break, e.g. a long URL)
+  content is pulled into a side portlet (see LP#540296)
+
 - Slight tweaks to the Network Events search UI and behavior to improve user
   experience (see LP#554028)
 
