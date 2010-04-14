@@ -115,6 +115,8 @@ class Thumbnail(Persistent):
         thumb_size = _thumb_size(image.size, max_size)
         thumb_img = image.resize(thumb_size, PIL.Image.ANTIALIAS)
         img_buf = StringIO()
+        if thumb_img.mode != 'RGB':
+            thumb_imb = thumb_img.convert('RGB')
         thumb_img.save(img_buf, 'JPEG', quality=90)
 
         data = img_buf.getvalue()
