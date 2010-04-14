@@ -107,9 +107,6 @@
                 this.insert_button_label = this.insert_button
                     .find('a');
                 // Initial value
-                if (this.options.insertButtonEnabled != null) {
-                    this.insertButtonEnabled(this.options.insertButtonEnabled);
-                }
                 if (this.options.insertButtonLabel) {
                     this.insertButtonLabel(this.options.insertButtonLabel);
                 }
@@ -153,24 +150,22 @@
                 return this;
             },
 
-            record: function(value) {
+            record: function(/*optional*/ value) {
                 var self = this;
 
                 if (typeof value == 'undefined') {
-                    throw new Error('tiny.imagedrawerinfopanel record is write-only.');
+                    // Geting value.
+                    return this._record;
                 }
 
-                // Seting value.
-                //
                 // Store the record.
                 this._record = value;
 
-                // Show the new values in the widget
-                if (value.title) {
-                    this.info_title.text(value.title);
-                } else {
-                    this.info_title.text('No selection');
-                }
+                // Setting values, taking care of sensible defaults.
+                this.info_title.text(value.title || 'No selection');
+                this.info_author.text(value.author_name || '');
+                this.info_modified.text(value.last_modified || '');
+
                 // iterate on the location chain and render it
                 this.info_location.html('');
                 $(value.location).each(function(i) {
@@ -186,9 +181,9 @@
                             .attr('href', this.href)
                         );
                 });
-                // set the rest of the infos
-                this.info_author.text(value.author_name);
-                this.info_modified.text(value.last_modified);
+
+                // handle the insert button enabled state
+                this.insertButtonEnabled(value.image_url);
 
                 // XXX this will work in jquery.ui >= 1.8
                 return this;
@@ -197,9 +192,9 @@
         });
 
         $.extend($.tiny.imagedrawerinfopanel, {
+                getter: "record",
                 defaults: {
                     record: null,
-                    insertButtonEnabled: null,
                     insertButtonLabel: null
                 }
         });
@@ -472,6 +467,10 @@
             var download_panel = this.dialog.find('.tiny-imagedrawer-panel-download');
             var upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
+            var images_panel = download_panel.find('.tiny-imagedrawer-panel-images')
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
+            var external_panel = download_panel.find('.tiny-imagedrawer-panel-external')
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // source selection buttonset
             this.buttonset = this.dialog
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-tabselect');
@@ -480,15 +479,30 @@
                     clsContainer: 'tiny-imagedrawer-buttonset-tabselect'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    var target = button_index < 3 ? download_panel : upload_panel;
+                    var target = button_index < 4 ? download_panel : upload_panel;
                     if (value) {
                         target.show();
-                        // Did the source change?
-                        if (button_index != self.selected_source) {
-                            // Yes. Reset the results
-                            // and do a new query.
-                            self._requestRecords(0, 12, true);   // XXX XXX
-                            self.selected_source = button_index;
+                        if (button_index < 3) {
+                            // Handle the search result browsers
+                            // Did the source change?
+                            if (button_index != self.selected_source) {
+                                // Yes. Reset the results
+                                // and do a new query.
+                                self._requestRecords(0, 12, true);   // XXX XXX
+                                self.selected_source = button_index;
+                                // The selection will resetted, but we
+                                // also need to reset the info panel.
+                                self.info_panel.imagedrawerinfopanel('record', {});
+                            }
+                            images_panel.show();
+                            external_panel.hide();
+                        } else if (button_index == 3) {
+                            // Handle the External tab
+                            images_panel.hide();
+                            external_panel.show();
+                            // erase the info in the panel
+                            self.info_panel.imagedrawerinfopanel('record', {});
+                            self.selected_source = 3;
                         }
                     } else {
                         target.hide();
@@ -498,7 +512,14 @@
             // panels are shown based on initial selection
             // (Note: we use the index, not the option values,
             // which are irrelevant for the working of this code.)
-            if (this.selected_source < 3) {
+            if (this.selected_source < 4) {
+                if (this.selected_source < 3) {
+                    images_panel.show();
+                    external_panel.hide();
+                } else {
+                    images_panel.hide();
+                    external_panel.show();
+                }
                 download_panel.show();
                 upload_panel.hide();
             } else {
@@ -520,13 +541,48 @@
                             return;
                         }
                         // Insert the selected one to the editor.
-                        self._insertToEditor(self.selected_item);
+                        self._insertToEditor();
                         // Done. Close.
                         self.dialog.dialog('close');
                     } else { // Cancel.
                         self.dialog.dialog('close');
                     }
                 });
+
+            // Wire up the external panel
+            var urlinput = external_panel.find('.tiny-imagedrawer-urlinput');
+            external_panel.find('.karl-buttonset.tiny-imagedrawer-buttonset-check')
+                .karlbuttonset({
+                    clsContainer: 'tiny-imagedrawer-buttonset-check'
+                })
+                .bind('change.karlbuttonset', function(event) {
+                    // preload this image.
+                    var image_url = urlinput.val();
+                    var img = new Image();
+                    $(img)
+                        .attr('src', image_url)
+                        .load(function() {
+                            // TODO ...
+                            // update the info panel
+                            self.info_panel.imagedrawerinfopanel('record', {
+                                title: 'External image',
+                                image_url: image_url,
+                                location: [{
+                                    title: image_url,
+                                    href: image_url
+                                    }],
+                                image_width: this.width,
+                                image_height: this.height
+                            });
+                        })
+                        .error(function() {
+                            // reset the info panel
+                            self.info_panel.imagedrawerinfopanel('record', {
+                            });
+                            //alert('Error... url is not good');
+                        });
+                });
+
 
             // Give the file input field a unique id
             this.fileinputid = 'tiny-imagedrawer-fileinputid-' + next_fileinputid;
@@ -794,13 +850,9 @@
                 // select new one
                 // (Use active rather than highlight.)
                 item.addClass('ui-state-default ui-state-active');
-                // Make interaction cue of Insert button Enabled
-                this.info_panel.imagedrawerinfopanel('insertButtonEnabled', true);
                 var record = item.imagedrawerimage('record');
                 this.info_panel.imagedrawerinfopanel('record', record);
             } else {
-                // Make interaction cue of Insert button Disabled
-                this.info_panel.imagedrawerinfopanel('insertButtonEnabled', false);
                 this.info_panel.imagedrawerinfopanel('record', {});
             }
 
@@ -826,6 +878,8 @@
             });
             // increase region counter
             this.region_id += 1;
+            // reset the selection
+            this._setSelection(null);
         },
 
         _moveStripe: function(percentage_float) {
@@ -942,9 +996,16 @@
             });
         },
 
-        _insertToEditor: function(item) {
-
-            var record = $(item).imagedrawerimage('record');
+        _insertToEditor: function(/*optional*/ item) {
+    
+            var record;
+            if (item) {
+                // allow to shortcut insert a given image item
+                record = $(item).imagedrawerimage('record');
+            } else {
+                // normally, we're inserting what shows in the info panel
+                record = this.info_panel.imagedrawerinfopanel('record');
+            }
 
             var ed = this.editor;
             var v;

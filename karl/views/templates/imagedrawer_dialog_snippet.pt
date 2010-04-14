@@ -10,12 +10,15 @@
         <option value="myrecent" selected="selected"
             title="Display images that you have recently uploaded yourself"
             >My Recent</option>
-        <option value="thiscommunity" disabled="1"
+        <option value="thiscommunity"
             title="Display images from this community"
             >This Community</option>
-        <option value="allkarlexternal" disabled="1"
-            title="Display images external to KARL"
-            >All Karl External</option>
+        <option value="allkarl"
+            title="Display images from all KARL"
+            >All Karl</option>
+        <option value="external"
+            title="Display images from external websites"
+            >External</option>
         <option value="uploadnew"
             title="Upload images into the current page"
             >Upload New</option>
@@ -42,6 +45,19 @@
         <ul class="tiny-imagedrawer-imagestripe"></ul>
         <div class="tiny-imagedrawer-scrollbar"></div>
       </div>
+
+      <div style="width: 374px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
+        <p>
+          Select the url of the external image to be used in your document!
+        </p>
+        <input type="text" class="tiny-imagedrawer-urlinput" />
+        <br />
+        <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
+          <button class="ui-icon-gear">Check</button>
+        </div>
+
+      </div>
+
       <div style="width: 306px; height: 380px; float: right;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-info">
         <span class="tiny-imagedrawer-info-title"></span>
         <br />
