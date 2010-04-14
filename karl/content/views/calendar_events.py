@@ -550,6 +550,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
         context = self.context
         request = self.request
         creator = authenticated_userid(request)
+        attendees = converted.get('attendees') or []
         calendar_event = create_content(ICalendarEvent,
                                         converted['title'],
                                         converted['start_date'],
@@ -557,7 +558,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
                                         creator,
                                         converted['text'],
                                         converted['location'],
-                                        converted['attendees'],
+                                        attendees,
                                         converted['contact_name'],
                                         converted['contact_email'],
                                         calendar_category=converted['category'],
@@ -712,13 +713,14 @@ class EditCalendarEventFormController(CalendarEventFormControllerBase):
             security_state = ''
         else:
             security_state = self.workflow.state_of(context)
+        attendees = getattr(context, 'attendees', [])
         defaults = dict(
             title=context.title,
             text=context.text,
             start_date=context.startDate,
             end_date=context.endDate,
             location=context.location,
-            attendees=u'\n'.join([i for i in context.attendees if i]),
+            attendees=u'\n'.join([i for i in attendees if i]),
             contact_name=context.contact_name,
             contact_email=context.contact_email,
             category=context.calendar_category,
@@ -770,7 +772,7 @@ class EditCalendarEventFormController(CalendarEventFormControllerBase):
         context.endDate = converted['end_date']
         context.text = converted['text']
         context.location = converted['location']
-        context.attendees = converted['attendees']
+        context.attendees = converted.get('attendees') or []
         context.contact_name = converted['contact_name']
         context.contact_email = converted['contact_email']
         context.calendar_category = converted['category']

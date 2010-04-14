@@ -56,7 +56,10 @@ def get_catalog_events(context, request,
     if searchterm is not None:
         query['texts'] = searchterm
 
-    if year is not None or month is not None:
+    if searchterm is not None and year is None and month is None:
+        # all years, all months, don't add anything to the query
+        pass
+    elif year is not None or month is not None:
         if year is not None:
             year = int(year)
         else:
@@ -286,14 +289,16 @@ class NetworkEventsView(CustomFolderView):
 
     @property
     def past_events_url(self):
-        if not self._past_events:
+        if (not self.year and not self.searchterm
+            and not self._past_events):
             return model_url(self.context, self.request,
                              query={"past_events":"True"})
         return None
 
     @property
     def future_events_url(self):
-        if self._past_events:
+        if (not self.year and not self.searchterm
+            and self._past_events):
             return model_url(self.context, self.request,
                              query={"past_events":"False"})
         return None

@@ -42,8 +42,8 @@
 	      </tal:block>
               <label for="year">Year</label>
               <select name="year">
-                <option value="all">All</option>
-		<tal:block repeat="year fb_years">
+                <option value="all"></option>
+		<tal:block repeat="year sorted(fb_years, reverse=True)">
 		  <tal:block condition="year==selected_year">
                     <option value="${year}" selected="selected">${year}</option>
 		  </tal:block>
@@ -54,7 +54,7 @@
               </select>
               <label for="month">Month</label>
               <select name="month" id="month">
-                <option value="all">All</option>
+                <option value="all"></option>
 		<tal:block repeat="month fb_months">
 		  <tal:block condition="month[0]==selected_month">
                     <option value="${month[0]}" 
