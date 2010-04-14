@@ -794,7 +794,7 @@ tinyMCE.addI18n('en.wicked',{
                 // set the length of the container to
                 // always hold all the elements
                 this.container.width(this.items().length 
-                    * this.column_width + 25);
+                    * (this.column_width + 20) + 100);
 
             },
 
@@ -981,9 +981,10 @@ tinyMCE.addI18n('en.wicked',{
             var download_panel = this.dialog.find('.tiny-imagedrawer-panel-download');
             var upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
-            var images_panel = download_panel.find('.tiny-imagedrawer-panel-images')
-                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             var external_panel = download_panel.find('.tiny-imagedrawer-panel-external')
+                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
+            this.images_panel = this.dialog
+                .find('.tiny-imagedrawer-panel-images')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // source selection buttonset
             this.buttonset = this.dialog
@@ -1008,11 +1009,11 @@ tinyMCE.addI18n('en.wicked',{
                                 // also need to reset the info panel.
                                 self.info_panel.imagedrawerinfopanel('record', {});
                             }
-                            images_panel.show();
+                            self.images_panel.show();
                             external_panel.hide();
                         } else if (button_index == 3) {
                             // Handle the External tab
-                            images_panel.hide();
+                            self.images_panel.hide();
                             external_panel.show();
                             // erase the info in the panel
                             self.info_panel.imagedrawerinfopanel('record', {});
@@ -1028,10 +1029,10 @@ tinyMCE.addI18n('en.wicked',{
             // which are irrelevant for the working of this code.)
             if (this.selected_source < 4) {
                 if (this.selected_source < 3) {
-                    images_panel.show();
+                    this.images_panel.show();
                     external_panel.hide();
                 } else {
-                    images_panel.hide();
+                    this.images_panel.hide();
                     external_panel.show();
                 }
                 download_panel.show();
@@ -1153,9 +1154,6 @@ tinyMCE.addI18n('en.wicked',{
 
             // Wire the image list
             // 
-            this.images_panel = this.dialog
-                .find('.tiny-imagedrawer-panel-images')
-                .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // First, it contains a single image. We save
             // this as hidden, and will use it
             // to clone any images.

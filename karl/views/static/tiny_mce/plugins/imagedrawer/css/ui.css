@@ -41,14 +41,6 @@
     padding-left: 75px;
 }
 
-/* XXX temporarily, until panel is filled */
-/*
-//.tXXX XXX XXX XXX XXXiny-imagedrawer-buttonset-save {
-//    position: absolute;
-//    top: 435px;
-//}
-*/
-
 .tiny-imagedrawer-buttonset-upload {
     margin-left: 0;
     margin-top: 1.5em;
@@ -64,13 +56,15 @@ ul.tiny-imagedrawer-imagestripe {
     margin: 0;
     border: 0 none transparent;
     height: 122px; /* must match height of the li */
-
+    overflow: hidden;
 }
 ul.tiny-imagedrawer-imagestripe li {
     display: inline-block;
+    width: 93px; /* 4px + 85px + 4px */
     height: 120px; /* must match height of the ul */
     border: 1px solid transparent;
     text-align: center;
+    float: left;
 }
 
 .tiny-imagedrawer-scrollbar {
@@ -98,7 +92,6 @@ div.tiny-imagedrawer-image img {
      * have a role with stale oversize thumbs.*/
     max-height: 85px;
     max-width: 85px;
-    overflow: hidden;
 }
 
 span.tiny-imagedrawer-imagelabel {
