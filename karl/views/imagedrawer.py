@@ -132,13 +132,16 @@ def breadcrumbs(doc, request):
     it will begin with the site root.  For each object in the path returns
     a dict of 'title' and 'href'.
     """
+    def title_or_id(context):
+        return getattr(context, 'title', context.__name__)
+
     def visit(node):
         if not (ICommunity.providedBy(node) or
                 getattr(node, '__parent__', None) is None):
             for ancestor in visit(node.__parent__):
                 yield ancestor
 
-        yield dict(title=node.title, href=model_url(node, request))
+        yield dict(title=title_or_id(node), href=model_url(node, request))
 
     return list(visit(doc))
 
