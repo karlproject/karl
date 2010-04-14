@@ -69,8 +69,8 @@
 
                 // Show the new values in the widget
                 var shortened_title = value.title;
-                if (shortened_title && shortened_title.length > 10) {
-                    shortened_title = shortened_title.substr(0, 10) + '...';
+                if (shortened_title && shortened_title.length > 9) {
+                    shortened_title = shortened_title.substr(0, 9) + '...';
                 }
                 this.label.text(shortened_title);
                 this.image.attr('src', value.thumbnail_url); 

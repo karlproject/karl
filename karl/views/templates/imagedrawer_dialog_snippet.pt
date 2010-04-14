@@ -62,7 +62,7 @@
         <span class="tiny-imagedrawer-info-title"></span>
         <br />
         <br />
-        <div class="tiny-imagedrawer-info-columnwrapper">
+        <div class="ui-helper-clearfix tiny-imagedrawer-info-columnwrapper">
           <span class="tiny-imagedrawer-info-label">Location</span>
           <span class="tiny-imagedrawer-info-location"></span>
           <br />
