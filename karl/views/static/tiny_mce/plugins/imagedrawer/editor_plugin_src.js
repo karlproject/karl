@@ -878,6 +878,8 @@
             this.region_id += 1;
             // reset the selection
             this._setSelection(null);
+            // reset the scrollbar
+            this.scrollbar.slider('value', 0);
         },
 
         _moveStripe: function(percentage_float) {
