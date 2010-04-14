@@ -130,6 +130,19 @@ class CommunityFileTests(unittest.TestCase):
         thumb = o.thumbnail((200, 200))
         self.assertEqual(thumb.image_size, (137, 200))
 
+    def test_non_rgb_thumbnail(self):
+        from cStringIO import StringIO
+        from PIL import Image
+        from pkg_resources import resource_stream
+        stream = resource_stream('karl.content.models.tests', 'test.jpg')
+        image = Image.open(stream)
+        buf = StringIO()
+        image.save(buf, 'GIF')
+        buf.seek(0)
+        o = self._makeOne(stream=buf, mimetype='image/jpeg')
+        thumb = o.thumbnail((200, 200))
+        self.assertEqual(thumb.image_size, (137, 200))
+
 class TestThumbnail(unittest.TestCase):
     def _getTargetClass(self):
         from karl.content.models.files import Thumbnail
