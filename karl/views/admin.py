@@ -117,7 +117,6 @@ def _get_filtered_content(context, request, interfaces=None):
     search = ICatalogSearch(context)
     search_terms = dict(
         interfaces={'query': interfaces, 'operator': 'or'},
-        sort_index='title',
     )
 
     community = request.params.get('community', '_any')
@@ -146,6 +145,7 @@ def _get_filtered_content(context, request, interfaces=None):
         if hasattr(item, '_p_deactivate'):
             item._p_deactivate()
 
+    items.sort(key=lambda x: x['path'])
     return items
 
 def delete_content_view(context, request):

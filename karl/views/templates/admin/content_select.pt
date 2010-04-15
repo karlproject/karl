@@ -29,6 +29,7 @@
           <tr>
             <th>Select</th>
             <th>Title</th>
+            <th>Path</th>
             <th>Date Modified</th>
             <th>Creator</th>
           </tr>
@@ -41,6 +42,9 @@
             </td>
             <td>
               <a href="${item.url}" target="_blank">${item.title}</a>
+            </td>
+            <td>
+              <a href="${item.url}" target="_blank">${item.path}</a>
             </td>
             <td>${item.modified}</td>
             <td>

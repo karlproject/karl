@@ -38,6 +38,9 @@ Unreleased
 - LP# 544199 Fixed KeyError in Admin Delete Content view when nested nodes are
   selected for deletion.
 
+- LP# 544199 Added 'path' to content selection grid used in some admin views.
+  Changed sort index to 'path' for content selection grid.
+
 3.27 (2010-04-08)
 -----------------
 
