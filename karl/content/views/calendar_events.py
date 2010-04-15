@@ -509,13 +509,19 @@ class CalendarEventFormControllerBase(object):
 
 class AddCalendarEventFormController(CalendarEventFormControllerBase):
     page_title = u'Add Calendar Entry'
-    
+
+    def __init__(self, context, request):
+        super(AddCalendarEventFormController, self).__init__(context, request)
+        self.show_sendalert = get_show_sendalert(self.context, self.request)
+        
     def form_defaults(self):
         start_date, end_date = _default_dates_requested(self.context,
                                                         self.request)
         defaults ={'start_date': start_date,
                    'end_date': end_date,
                    }
+        if self.show_sendalert:
+            defaults['sendalert'] = True
         security_states = self._get_security_states()
         if security_states:
             defaults['security_state'] = security_states[0]['name']
@@ -531,14 +537,14 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
             )
         fields = [('title', title_field)]
         fields.extend(super(AddCalendarEventFormController, self).form_fields())
-        if get_show_sendalert(self.context, self.request):
+        if self.show_sendalert:
             fields.insert(-1, ('sendalert', sendalert_field),)
         return fields
 
     def form_widgets(self, fields):
         widgets = super(AddCalendarEventFormController, self).form_widgets(fields)
         widgets['tags'] = karlwidgets.TagsAddWidget()
-        if get_show_sendalert(self.context, self.request):
+        if self.show_sendalert:
             widgets['sendalert'] = formish.widgets.Checkbox()
         return widgets
 

@@ -136,6 +136,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
                          datetime(2010, 10, 07, 16, 20))
         self.assertEqual(defaults['end_date'],
                          datetime(2010, 10, 07, 17, 20))
+        self.failUnless('sendalert' in defaults and defaults['sendalert'])
         self.failIf('security_state' in defaults)
         calendar_events._NOW = original_NOW
 

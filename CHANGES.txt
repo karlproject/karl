@@ -4,9 +4,12 @@ karl package Changelog
 Unreleased
 ----------
 
+- Re-specify default 'sendalert' value as True on calendar event add form
+  (fixes LP#564115)
+
 - Add "overflow: auto" to the #right div CSS to prevent bad rendering when
   poorly formed (read: very long words w/ no word break, e.g. a long URL)
-  content is pulled into a side portlet (see LP#540296)
+  content is pulled into a side portlet (fixes LP#540296)
 
 - Slight tweaks to the Network Events search UI and behavior to improve user
   experience (see LP#554028)
