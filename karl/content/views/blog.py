@@ -235,6 +235,9 @@ def show_blogentry_view(context, request):
                                                        request)
     comment_form = Form(form_schema, add_default_action=False, name='save',
                         action_url=form_action_url)
+    form_defaults = controller.form_defaults()
+    comment_form.defaults = form_defaults
+    request.form_defaults = form_defaults
 
     form_actions = [FormAction('submit', 'submit'),
                     FormAction('cancel', 'cancel', validate=False)]
@@ -263,8 +266,7 @@ def show_blogentry_view(context, request):
 tags_field = schemaish.Sequence(schemaish.String())
 text_field = schemaish.String()
 sendalert_field = schemaish.Boolean(
-    title='Send Alert',
-    description='Send email alert to community members?')
+    title='Send email alert to community members?')
 security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
@@ -321,7 +323,7 @@ class AddBlogEntryFormController(object):
             'text':karlwidgets.RichTextWidget(empty=''),
             'attachments':formish.widgets.SequenceDefault(sortable=False),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
-            'sendalert':formish.widgets.Checkbox(),
+            'sendalert':karlwidgets.SendAlertCheckbox(),
             }
         schema = dict(fields)
         if 'security_state' in schema:
@@ -415,7 +417,6 @@ class EditBlogEntryFormController(object):
         fields.append(('tags', tags_field))
         fields.append(('text', text_field))
         fields.append(('attachments', attachments_field))
-        fields.append(('sendalert', sendalert_field))
         security_states = self._get_security_states()
         if security_states:
             fields.append(('security_state', security_field))
@@ -429,7 +430,6 @@ class EditBlogEntryFormController(object):
             'text':karlwidgets.RichTextWidget(empty=''),
             'attachments':formish.widgets.SequenceDefault(sortable=False),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
-            'sendalert':formish.widgets.Checkbox(),
              }
         security_states = self._get_security_states()
         schema = dict(fields)

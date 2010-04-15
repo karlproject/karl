@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Improve usability on the formish 'sendalert' fields (see LP#564131)
+
 - Re-specify default 'sendalert' value as True on calendar event add form
   (fixes LP#564115)
 

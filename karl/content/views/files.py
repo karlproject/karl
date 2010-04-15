@@ -167,8 +167,7 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 sendalert_field = schemaish.Boolean(
-    title='Send Alert',
-    description='Send email alert to community members?')
+    title='Send email alert to community members?')
 file_field = schemaish.File(title='File',
                             validator=validator.Required(),
                             description='You can replace the file by clicking the checkbox.',
@@ -363,7 +362,7 @@ class AddFileFormController(object):
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'sendalert' in schema:
-            widgets['sendalert'] = formish.widgets.Checkbox()
+            widgets['sendalert'] = karlwidgets.SendAlertCheckbox()
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(

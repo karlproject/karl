@@ -114,8 +114,7 @@ add_comment_field = schemaish.String(
     title='Add Comment',
     description='Enter your comments below.')
 sendalert_field = schemaish.Boolean(
-    title='Send Alert',
-    description='Send email alert to community members?')
+    title='Send email alert to community members?')
 attachments_field = schemaish.Sequence(schemaish.File(),
     title='Attachments',
     description='You can remove an attachment by clicking the checkbox. Removal will come to effect after saving the page and can be reverted by cancel.',
@@ -126,6 +125,9 @@ class AddCommentFormController(object):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'comment')
+
+    def form_defaults(self):
+        return {'sendalert': True}
 
     def form_fields(self):
         fields = [('add_comment', add_comment_field),
@@ -139,7 +141,7 @@ class AddCommentFormController(object):
             'add_comment': karlwidgets.RichTextWidget(empty=''),
             'attachments': formish.widgets.SequenceDefault(sortable=False),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
-            'sendalert': formish.widgets.Checkbox(),
+            'sendalert': karlwidgets.SendAlertCheckbox(),
             }
         return widgets
 

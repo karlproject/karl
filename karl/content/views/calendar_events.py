@@ -393,8 +393,7 @@ attachments_field = schemaish.Sequence(
     'checkbox. Removal will come to effect after saving the page '
     'and can be reverted by cancel.')
 sendalert_field = schemaish.Boolean(
-    title='Send Alert',
-    description='Send email alert to community members?')
+    title='Send email alert to community members?')
 security_field = schemaish.String(
     title='Is this private?',
     validator=validator.Required(),
@@ -544,8 +543,8 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
     def form_widgets(self, fields):
         widgets = super(AddCalendarEventFormController, self).form_widgets(fields)
         widgets['tags'] = karlwidgets.TagsAddWidget()
-        if self.show_sendalert:
-            widgets['sendalert'] = formish.widgets.Checkbox()
+        if 'sendalert' in dict(fields):
+            widgets['sendalert'] = karlwidgets.SendAlertCheckbox()
         return widgets
 
     def handle_submit(self, converted):

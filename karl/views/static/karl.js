@@ -1376,7 +1376,7 @@ $.widget('ui.karldatetimepicker', {
         if (! jQuery.nodeName(this.element[0], 'input')) {
             throw new Error('ui.karldatetimepicker can only be bound to <input> nodes.');
         }
-        // Creare a container to hold the new inputs.
+        // Create a container to hold the new inputs.
         this.container = $('<span class="ui-karldatetimepicker-container"></span>');
         // Position the container after the old input element,
         // which in turn gets hidden.

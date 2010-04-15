@@ -86,6 +86,11 @@ class AddCommentFormControllerTests(unittest.TestCase):
         from repoze.workflow.testing import registerDummyWorkflow
         return registerDummyWorkflow('security')
 
+    def test_form_defaults(self):
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        self.failUnless('sendalert' in defaults and defaults['sendalert'])
+
     def test_form_fields(self):
         controller = self._makeOne(self.context, self.request)
         fields = dict(controller.form_fields())

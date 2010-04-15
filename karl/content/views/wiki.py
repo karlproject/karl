@@ -67,8 +67,7 @@ text_field = schemaish.String(
     description=_wiki_text_help,
     )
 sendalert_field = schemaish.Boolean(
-    title='Send Alert',
-    description='Send email alert to community members?')
+    title='Send email alert to community members?')
 security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
@@ -123,7 +122,7 @@ class AddWikiPageFormController(object):
             'title':formish.Hidden(empty=''),
             'tags':karlwidgets.TagsAddWidget(),
             'text':karlwidgets.RichTextWidget(empty=''),
-            'sendalert':formish.widgets.Checkbox(),
+            'sendalert':karlwidgets.SendAlertCheckbox(),
             }
         security_states = self._get_security_states()
         schema = dict(fields)

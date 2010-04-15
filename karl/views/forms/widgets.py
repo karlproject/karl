@@ -92,6 +92,9 @@ class AcceptFieldWidget(Checkbox):
         self.description = description
         Checkbox.__init__(self, **kw)
 
+class SendAlertCheckbox(Checkbox):
+    checkbox_label = u'Yes, send an alert'
+
 UNSET = object()
 
 class FileUpload2(Widget):

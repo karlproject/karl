@@ -179,9 +179,11 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         self.failUnless('contact_name' in widgets)
         self.failUnless('contact_email' in widgets)
         self.failUnless('attachments' in widgets)
-        self.failUnless('sendalert' in widgets)
+        self.failIf('sendalert' in widgets)
         self.failIf('security_state' in widgets)
-        widgets = controller.form_widgets({'security_state': True})
+        widgets = controller.form_widgets({'security_state': True,
+                                           'sendalert': True})
+        self.failUnless('sendalert' in widgets)
         self.failUnless('security_state' in widgets)
 
     def test___call__(self):
