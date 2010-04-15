@@ -100,6 +100,9 @@ class TemplateAPI(object):
         site = find_site(context)
         self.admin_url = model_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
+        if hasattr(request, 'form') and getattr(request.form, 'errors', False):
+            # This is a failed form submission request, specify an error message
+            self.error_message = u'Please correct the indicated errors.'
 
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') == 'public'
