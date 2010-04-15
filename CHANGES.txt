@@ -35,6 +35,9 @@ Unreleased
   compatible image and thumb nails.  Deprecated and removed older image
   handling code previously used to support these.
 
+- LP# 544199 Fixed KeyError in Admin Delete Content view when nested nodes are
+  selected for deletion.
+
 3.27 (2010-04-08)
 -----------------
 

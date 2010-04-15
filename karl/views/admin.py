@@ -161,8 +161,14 @@ def delete_content_view(context, request):
         paths = request.params.getall('selected_content')
         if paths:
             for path in paths:
-                content = find_model(context, path)
-                del content.__parent__[content.__name__]
+                try:
+                    content = find_model(context, path)
+                    del content.__parent__[content.__name__]
+                except KeyError:
+                    # Thrown by find_model if we've already deleted an
+                    # ancestor of this node.  Can safely ignore becuase child
+                    # node has been deleted along with ancestor.
+                    pass
 
             if len(paths) == 1:
                 status_message = 'Deleted one content item.'

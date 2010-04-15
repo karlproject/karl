@@ -198,6 +198,28 @@ class TestDeleteContentView(unittest.TestCase):
         self.failIf('bigendians' in self.site)
         self.failIf('littleendians' in self.site)
 
+    def test_delete_nested_items(self):
+        parent = self.site['bigendians']
+        parent['macrobots'] = child = DummyModel()
+
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict([
+                ('delete_content', '1'),
+                ('selected_content', '/bigendians'),
+                ('selected_content', '/bigendians/macrobots'),
+            ]),
+            view_name='delete_content.html',
+        )
+        self.failUnless('bigendians' in self.site)
+        response = self.fut(self.site, request)
+        self.assertEqual(
+            response.location,
+            "http://example.com/delete_content.html"
+            "?status_message=Deleted+2+content+items."
+        )
+        self.failIf('bigendians' in self.site)
+
 class TestMoveContentView(unittest.TestCase):
     def setUp(self):
         cleanUp()
