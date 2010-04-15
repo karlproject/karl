@@ -324,7 +324,10 @@ class EditIntranetRootFormController(EditCommunityFormController):
         context.title = converted['title']
         context.description = converted['description']
         context.text = converted['text']
-        context.feature = clean_html(converted['feature'])
+        if converted.get('feature'):
+            context.feature = clean_html(converted['feature'])
+        else:
+            context.feature = sample_feature
         # NB: this is an edit form, so tags are added immediately via
         # AJAX; we needn't deal with setting them in the form post
         tools_present = [None]

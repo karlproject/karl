@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Get intranets root edit form to correctly default to the sample_feature
+  value when the feature field is left blank.
+
 - TemplateAPI object now sets an 'error_message' attribute for formish
   form submission requests w/ validation errors; templates will notice
   this and render a top-of-form error message (fixes LP#564134).

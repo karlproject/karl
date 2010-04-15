@@ -348,6 +348,11 @@ class EditIntranetRootFormControllerTests(unittest.TestCase):
         self.failUnless(laser_factory.removed)
         self.assertEqual(context.default_tool, 'drill')
 
+        converted['feature'] = u''
+        controller.handle_submit(converted)
+        from karl.content.views.intranets import sample_feature
+        self.assertEqual(context.feature, sample_feature)
+
 class DummyAdapter:
     url = 'someurl'
     title = 'sometitle'
