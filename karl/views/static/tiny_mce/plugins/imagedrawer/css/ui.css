@@ -51,6 +51,10 @@
     overflow: hidden;
 }
 
+.tiny-imagedrawer-scrollbar {
+    margin: 0 0.5em;
+}
+
 ul.tiny-imagedrawer-imagestripe {
     padding: 0;
     margin: 0;
@@ -58,30 +62,47 @@ ul.tiny-imagedrawer-imagestripe {
     height: 122px; /* must match height of the li */
     overflow: hidden;
 }
-ul.tiny-imagedrawer-imagestripe li {
-    display: inline-block;
-    width: 93px; /* 4px + 85px + 4px */
-    height: 120px; /* must match height of the ul */
-    border: 1px solid transparent;
-    text-align: center;
-    float: left;
-}
 
-.tiny-imagedrawer-scrollbar {
-    margin: 0 0.5em;
-}
+
 
 /* Vertical and horizontal positioning 
  * of the thumbnail inside a fixed size
  * wrapper. Thumb must fit the wrapper's
- * dimensions. */
+ * dimensions. 
+ *
+ * The current solution works on all browsers
+ * including IE6, IE>7, FF3, Safari.
+ * For non-w3c browsers a hack is used that
+ * makes the css non-validating.
+ * */
+
+ul.tiny-imagedrawer-imagestripe li {
+    display: inline-block;
+    width: 93px; /* 4px + 85px + 4px */
+    height: 120px; /* must match height of the ul */
+    border: 1px solid white;
+    text-align: center;
+    float: left;
+}
+
 div.tiny-imagedrawer-image {
     /* making the dimensions bigger than the image
      * will add a natural margin. */
     width: 93px; /* 4px + 85px + 4px */
     height: 93px; /* 4px + 85px + 4px */
+    display: table;
+    overflow: hidden;
+    /* non-w3c hacks: */
+    #position: relative;
+}
+
+div.tiny-imagedrawer-image div {
     display: table-cell;
     vertical-align: middle;
+    /* non-w3c hacks: */
+    #position: absolute;
+    #top: 50%;
+    #left: 50%;
 }
 
 div.tiny-imagedrawer-image img {
@@ -93,6 +114,10 @@ div.tiny-imagedrawer-image img {
     max-height: 85px;
     max-width: 85px;
     overflow: hidden;
+    /* non-w3c hacks: */
+    #position: relative;
+    #top: -50%;
+    #left: -50%;
 }
 
 span.tiny-imagedrawer-imagelabel {

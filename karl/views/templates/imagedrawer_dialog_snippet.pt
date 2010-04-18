@@ -33,7 +33,9 @@
           <!-- The following is used as the prototype image -->
           <li>
             <div class="tiny-imagedrawer-image">
-              <img src="http://foo.bar/thumb.jpg"/>
+              <div>
+                <img src="http://foo.bar/thumb.jpg"/>
+              </div>
             </div>
             <span class="tiny-imagedrawer-imagelabel">
               An Image
