@@ -83,7 +83,7 @@
                   </li>
                 </ul>
               </div>
-              <div id="screenid-community-overview" class="ccontent">
+              <div id="screenid-community-overview" class="ccontent ui-helper-clearfix">
                 <div metal:define-slot="content"/>
               </div>
             </div>

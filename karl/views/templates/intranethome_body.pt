@@ -8,7 +8,7 @@
   </div>
 
   <div id="center" class="center_intranet">
-    <div id="screenid-office-view" class="ccontent">
+    <div id="screenid-office-view" class="ccontent ui-helper-clearfix">
       <span tal:replace="structure feature"/>
       <div class="visualClear"> </div>
       <span tal:replace="structure middle_portlet_html"/>
