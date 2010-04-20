@@ -17,13 +17,17 @@
      href="${field.widget.urlfactory(value_name)}">download</a>
 </div>
 
-<input tal:condition="not field.widget.single or value_name"
-       id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input tal:condition="not value_name" id="${field.cssname}" type="file" name="${field.name}.file" />
 <span tal:condition="value_name" id="${field.cssname}">${value_name}</span>
+<span tal:condition="not field.widget.single or value_name" tal:omit-tag="">
+  <a id="${field.cssname}-remove">remove</a>
+  <input type="hidden" name="${field.name}.remove"
+         id="${field.cssname}-remove-input"
+         value=""/>
+</span>
 
 <div tal:omit-tag="" tal:condition="field.widget.single and value_name">
   <script language="javascript" type="text/javascript">
@@ -47,6 +51,7 @@
       // jquery's selection fails because of the *.
       $(document.getElementById('${field.cssname}-remove')).click(function() {
         // User deletes file. Hide it from the sequence.
+        $(this).next('input').val('true');
         $(this).parent().hide('fold');
       });
     });

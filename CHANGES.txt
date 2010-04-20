@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Introduce trivial AttachmentsSequence widget, along with slight markup and
+  javascript tweaks, to get the attachment field on the various formish forms
+  to work more like the pre-formish implementation (see LP#564130).
+
 - Get intranets root edit form to correctly default to the sample_feature
   value when the feature field is left blank.
 

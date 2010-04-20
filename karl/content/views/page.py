@@ -60,9 +60,7 @@ text_field = schemaish.String()
 attachments_field = schemaish.Sequence(
     schemaish.File(),
     title='Attachments',
-    description='You can remove an attachment by clicking the checkbox. '
-    'Removal will come to effect after saving the page and can be '
-    'reverted by cancel.')
+    )
 
 class AddPageFormController(object):
     def __init__(self, context, request):
@@ -99,7 +97,8 @@ class AddPageFormController(object):
             'title': formish.Input(empty=''),
             'tags': karlwidgets.TagsAddWidget(),
             'text': karlwidgets.RichTextWidget(empty=''),
-            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
             }
         return widgets
@@ -186,7 +185,8 @@ class EditPageFormController(object):
             'title': formish.Input(empty=''),
             'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
             'text': karlwidgets.RichTextWidget(empty=''),
-            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
             }
         return widgets

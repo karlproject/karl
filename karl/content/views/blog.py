@@ -271,9 +271,8 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 attachments_field = schemaish.Sequence(schemaish.File(),
-    title='Attachments',
-    description='You can remove an attachment by clicking the checkbox. Removal will come to effect after saving the page and can be reverted by cancel.',
-    )
+                                       title='Attachments',
+                                       )
 
 class AddBlogEntryFormController(object):
     def __init__(self, context, request):
@@ -321,7 +320,8 @@ class AddBlogEntryFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsAddWidget(),
             'text':karlwidgets.RichTextWidget(empty=''),
-            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
             'sendalert':karlwidgets.SendAlertCheckbox(),
             }
@@ -428,7 +428,8 @@ class EditBlogEntryFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
             'text':karlwidgets.RichTextWidget(empty=''),
-            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
              }
         security_states = self._get_security_states()

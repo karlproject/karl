@@ -200,7 +200,6 @@ security_field = schemaish.String(
                  'members of this community.'))
 attachments_field = schemaish.Sequence(schemaish.File(),
     title='Attachments',
-    description='You can remove an attachment by clicking the checkbox. Removal will come to effect after submitting the page and can be reverted by cancel.',
     )
 
 title_field = schemaish.String(
@@ -492,7 +491,8 @@ class AddForumTopicFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsAddWidget(),
             'text':karlwidgets.RichTextWidget(empty=''),
-            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
             }
         security_states = self._get_security_states()
@@ -593,7 +593,8 @@ class EditForumTopicFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
             'text':karlwidgets.RichTextWidget(empty=''),
-            'attachments':formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
             }
         security_states = self._get_security_states()

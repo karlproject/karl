@@ -389,9 +389,7 @@ contact_email_field = schemaish.String(
 attachments_field = schemaish.Sequence(
     schemaish.File(),
     title='Attachments',
-    description='You can remove an attachment by clicking the '
-    'checkbox. Removal will come to effect after saving the page '
-    'and can be reverted by cancel.')
+    )
 sendalert_field = schemaish.Boolean(
     title='Send email alert to community members?')
 security_field = schemaish.String(
@@ -457,7 +455,8 @@ class CalendarEventFormControllerBase(object):
             'attendees': formish.TextArea(rows=5, cols=60),
             'contact_name': formish.Input(empty=''),
             'contact_email': formish.Input(empty=''),
-            'attachments': formish.widgets.SequenceDefault(sortable=False),
+            'attachments': karlwidgets.AttachmentsSequence(sortable=False,
+                                                           min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
             }
         schema = dict(fields)

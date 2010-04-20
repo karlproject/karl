@@ -8,7 +8,13 @@ function count_previous_fields(o) {
    
 function create_addlinks(o) {
   o.find('.adder').each(function() {
-    $(this).before('<a class="adderlink">Add</a>');
+    var add_tag = '<a class="adderlink">{add_string}</a>';
+    var add_string = 'Add';
+    if ($(this).attr('add_string')) {
+        add_string = $(this).attr('add_string');
+    }
+    add_tag = add_tag.replace("{add_string}", add_string);
+    $(this).before(add_tag);
   });
 }
 

@@ -5,6 +5,7 @@ from formish.widgets import Grid
 from formish.widgets import Input
 from formish.widgets import Checkbox
 from formish.widgets import CheckedPassword
+from formish.widgets import SequenceDefault
 
 from schemaish.type import File as SchemaFile
 
@@ -95,6 +96,9 @@ class AcceptFieldWidget(Checkbox):
 class SendAlertCheckbox(Checkbox):
     checkbox_label = u'Yes, send an alert'
 
+class AttachmentsSequence(SequenceDefault):
+    add_string = 'Attach another file'
+
 UNSET = object()
 
 class FileUpload2(Widget):
@@ -173,7 +177,7 @@ class FileUpload2(Widget):
         """
         if data is None:
             data = {}
-        if data.get('remove', [None])[0] is not None:
+        if data.get('remove', [None])[0]:
             data['name'] = ['']
             data['mimetype'] = ['']
             return data

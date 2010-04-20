@@ -13,10 +13,12 @@
   <span tal:repeat="f field.fields" tal:replace="structure f()"/>
   <div tal:condition="str(field.description) != ''" 
        class="description">${field.description}</div>
+  <br />
   <input tal:define="urlquote import:urllib.quote"
          tal:condition="field.type is 'sequence' and field.widget.addremove is True"
          type="hidden"
          class="adder"
          name="${field.template.name}"
-         value="${urlquote(field.template().encode('utf8'))}"/>
+         value="${urlquote(field.template().encode('utf8'))}"
+         add_string="${field.widget.add_string|None}"/>
 </fieldset>

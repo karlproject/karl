@@ -118,7 +118,9 @@ class AddNewsItemFormController(object):
         widgets = {'title': formish.Input(empty=''),
                    'tags': karlwidgets.TagsAddWidget(),
                    'text': karlwidgets.RichTextWidget(empty=''),
-                   'attachments': formish.SequenceDefault(sortable=False),
+                   'attachments': karlwidgets.AttachmentsSequence(
+                       sortable=False,
+                       min_start_fields=0),
                    'attachments.*': karlwidgets.FileUpload2(
                        filestore=self.filestore),
                    'photo': karlwidgets.PhotoImageWidget(
@@ -253,7 +255,9 @@ class EditNewsItemFormController(AddNewsItemFormController):
         widgets = {'title': formish.Input(empty=''),
                    'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
                    'text': karlwidgets.RichTextWidget(empty=''),
-                   'attachments': formish.SequenceDefault(sortable=False),
+                   'attachments': karlwidgets.AttachmentsSequence(
+                       sortable=False,
+                       min_start_fields=0),
                    'attachments.*': karlwidgets.FileUpload2(
                        filestore=self.filestore),
                    'photo': karlwidgets.PhotoImageWidget(
