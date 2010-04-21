@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -19,52 +19,63 @@ _LOOKUP = {
     'application/msword': {
         'small_icon_name': 'doc_small.gif',
         'large_icon_name': 'doc_big.gif',
-        'title': 'Word'
+        'title': 'Word',
+        'viewable': False,
         },
     'application/pdf': {
         'small_icon_name': 'pdf_small.gif',
         'large_icon_name': 'pdf_big.gif',
-        'title': 'PDF'
+        'title': 'PDF',
+        'viewable': True,
         },
     'application/vnd.ms-excel': {
         'small_icon_name': 'xls_small.gif',
         'large_icon_name': 'xls_big.gif',
-        'title': 'Excel'
+        'title': 'Excel',
+        'viewable': False,
         },
     'application/vnd.ms-powerpoint': {
-        'small_icon_name': 'ppt_small.gif', 
+        'small_icon_name': 'ppt_small.gif',
         'large_icon_name': 'ppt_big.gif',
-        'title': 'PowerPoint'
+        'title': 'PowerPoint',
+        'viewable': False,
         },
     'audio/mpeg': {
-        'small_icon_name': 'mp3_small.gif', 
-        'large_icon_name': 'mp3_big.gif', 
-        'title': 'MP3'
+        'small_icon_name': 'mp3_small.gif',
+        'large_icon_name': 'mp3_big.gif',
+        'title': 'MP3',
+        'viewable': True,
         },
     'image/gif': {
         'small_icon_name': 'gif_small.gif',
         'large_icon_name': 'gif_big.gif',
-        'title': 'GIF Image'
+        'title': 'GIF Image',
+        'viewable': True,
         },
     'image/jpeg': {
-        'small_icon_name': 'jpg_small.gif', 
+        'small_icon_name': 'jpg_small.gif',
         'large_icon_name': 'jpg_big.gif',
-        'title': 'JPEG Image'
+        'title': 'JPEG Image',
+        'viewable': True,
         },
     'image/png': {
-        'small_icon_name': 'png_small.gif', 
+        'small_icon_name': 'png_small.gif',
         'large_icon_name': 'png_big.gif',
+        'viewable': True,
         'title': 'PNG Image'
         },
     'text/plain': {
-        'small_icon_name': 'txt_small.gif', 
+        'small_icon_name': 'txt_small.gif',
         'large_icon_name': 'txt_big.gif',
-        'title': 'Text File'
+        'title': 'Text File',
+        'viewable': True,
         },
     'text/html': {
-        'small_icon_name': 'html_small.gif', 
+        'small_icon_name': 'html_small.gif',
         'large_icon_name': 'html_big.gif',
-        'title': 'HTML File'},
+        'title': 'HTML File',
+        'viewable': True,
+        },
     }
 
 def mime_info(mime_type):
@@ -78,7 +89,8 @@ def mime_info(mime_type):
         info = {
             'small_icon_name': 'files_file_small.png',
             'large_icon_name': 'files_file_big.png',
-            'title':title
+            'title':title,
+            'viewable': False,
         }
 
     return info

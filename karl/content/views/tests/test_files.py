@@ -555,7 +555,7 @@ class TestDownloadFileView(unittest.TestCase):
         from karl.content.views.files import download_file_view
         return download_file_view(context, request)
 
-    def test_it(self):
+    def test_view(self):
         context = testing.DummyModel()
         blobfile = DummyBlobFile()
         context.blobfile = blobfile
@@ -564,10 +564,28 @@ class TestDownloadFileView(unittest.TestCase):
         context.size = 42
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response.headerlist[1],
+        self.assertEqual(response.headerlist[0],
                          ('Content-Type', 'x/foo'))
-        self.assertEqual(response.headerlist[2],
+        self.assertEqual(response.headerlist[1],
                          ('Content-Length', '42'))
+        self.assertEqual(response.app_iter, blobfile)
+
+    def test_save(self):
+        context = testing.DummyModel()
+        blobfile = DummyBlobFile()
+        context.blobfile = blobfile
+        context.mimetype = 'x/foo'
+        context.filename = 'thefilename'
+        context.size = 42
+        request = testing.DummyRequest(params=dict(save=1))
+        response = self._callFUT(context, request)
+        self.assertEqual(response.headerlist[0],
+                         ('Content-Type', 'x/foo'))
+        self.assertEqual(response.headerlist[1],
+                         ('Content-Length', '42'))
+        self.assertEqual(response.headerlist[2],
+                         ('Content-Disposition',
+                          'attachment; filename=thefilename'))
         self.assertEqual(response.app_iter, blobfile)
 
 class TestThumbnailView(unittest.TestCase):
