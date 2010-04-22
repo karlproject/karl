@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.28 (2010-04-22)
+-----------------
 
 - Introduce trivial AttachmentsSequence widget, along with slight markup and
   javascript tweaks, to get the attachment field on the various formish forms
