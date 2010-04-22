@@ -7,7 +7,10 @@
     <div>
       <span style="float: left; margin-right: 0.5em; margin-top: 1.05em; font-weight: normal;">Source</span>
       <select class="karl-buttonset compact tiny-imagedrawer-buttonset-tabselect">
-        <option value="myrecent" selected="selected"
+        <option value="uploadnew" selected="selected"
+            title="Upload images into the current page"
+            >Upload New</option>
+        <option value="myrecent"
             title="Display images that you have recently uploaded yourself"
             >My Recent</option>
         <option value="thiscommunity"
@@ -19,9 +22,6 @@
         <option value="external"
             title="Display images from external websites"
             >External</option>
-        <option value="uploadnew"
-            title="Upload images into the current page"
-            >Upload New</option>
       </select>
     </div>
   </div>

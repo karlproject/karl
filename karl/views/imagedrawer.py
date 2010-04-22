@@ -186,11 +186,13 @@ def batch_images(context, request,
     # Find query parameters based on the 'source' param,
     # which signifies the selection index of the source button
     # in the imagedrawer dialog.
-    source = int(request.params.get('source', '0'))
-    if source == 0:     # My Recent
+    source = request.params.get('source')
+    assert source in ('myrecent', 'thiscommunity', 'allkarl')
+
+    if source == 'myrecent':
         creator = authenticated_userid(request)
         community_path = None
-    elif source == 1:   # This Community
+    elif source == 'thiscommunity':
         creator = None
         community = find_community(context)
         # batching api requires the community path
@@ -245,7 +247,10 @@ def drawer_dialog_view(context, request,
 
         dialog_snippet: the html of the dialog
 
-        images_info: the first batch of the image listing
+        [[images_info: the first batch of the image listing
+          * since the default source is now upload which is
+          a non-data source, this value is omitted.
+          ]]  
 
         error: ... explicitely raise an error
     """
@@ -255,7 +260,7 @@ def drawer_dialog_view(context, request,
 
     return dict(
         dialog_snippet=dialog_snippet,
-        images_info=batch_images(context, request),
+        ##images_info=batch_images(context, request),
     )
 
 @jsonview()

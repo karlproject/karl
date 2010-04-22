@@ -122,7 +122,7 @@ class Test_batch_images(unittest.TestCase):
         return batch_images(context, request, self.make_record, self.batcher)
 
     def test_global_search(self):
-        request = testing.DummyRequest(params={'source': '2'})  # All Karl
+        request = testing.DummyRequest(params={'source': 'allkarl'})
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(batch['records'][0]['title'], 'A')
@@ -133,7 +133,7 @@ class Test_batch_images(unittest.TestCase):
 
     def test_search_by_creator(self):
         testing.registerDummySecurityPolicy('admin')
-        request = testing.DummyRequest(params={'source': '0'}) # My Recent
+        request = testing.DummyRequest(params={'source': 'myrecent'}) # My Recent
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(
@@ -147,12 +147,34 @@ class Test_batch_images(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(community, ICommunity)
-        request = testing.DummyRequest(params={'source': '1'})  # This Community
+        request = testing.DummyRequest(params={'source': 'thiscommunity'})  # This Community
         context = community['bar'] = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(
             self.batcher.called, (context, request, None, '/foo', 0, 12)
         )
+
+    def test_search_bad_sources(self):
+        """Test that the non-image sources are rejected."""
+        root = testing.DummyModel()
+        community = root['foo'] = testing.DummyModel()
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        directlyProvides(community, ICommunity)
+        #
+        # External source is not accepted:
+        request = testing.DummyRequest(params={'source': 'external'})
+        context = community['bar'] = testing.DummyModel()
+        self.assertRaises(AssertionError,
+            self._call_fut, context, request)
+        #
+        # Upload source is not accepted:
+        request = testing.DummyRequest(params={'source': 'uploadnew'})
+        context = community['bar'] = testing.DummyModel()
+        self.assertRaises(AssertionError,
+            self._call_fut, context, request)
+
+
 
 class Test_drawer_dialog_view(unittest.TestCase):
     def setUp(self):

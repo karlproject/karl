@@ -480,10 +480,12 @@
                     clsContainer: 'tiny-imagedrawer-buttonset-tabselect'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    var target = button_index < 4 ? download_panel : upload_panel;
+                    // XXX TODO change this also to use sensible identifiers
+                    // instead of indexes.
+                    var target = (button_index != 0) ? download_panel : upload_panel;
                     if (value) {
                         target.show();
-                        if (button_index < 3) {
+                        if (button_index >= 1 && button_index <= 3) {
                             // Handle the search result browsers
                             // Did the source change?
                             if (button_index != self.selected_source) {
@@ -497,13 +499,13 @@
                             }
                             self.images_panel.show();
                             external_panel.hide();
-                        } else if (button_index == 3) {
+                        } else if (button_index == 4) {
                             // Handle the External tab
                             self.images_panel.hide();
                             external_panel.show();
                             // erase the info in the panel
                             self.info_panel.imagedrawerinfopanel('record', {});
-                            self.selected_source = 3;
+                            self.selected_source = button_index;
                         }
                     } else {
                         target.hide();
@@ -513,8 +515,11 @@
             // panels are shown based on initial selection
             // (Note: we use the index, not the option values,
             // which are irrelevant for the working of this code.)
-            if (this.selected_source < 4) {
-                if (this.selected_source < 3) {
+
+            // XXX TODO switch from index to identifier here as well.
+
+            if (this.selected_source != 0) {
+                if (this.selected_source >= 1 && this.selected_source <= 3) {
                     this.images_panel.show();
                     external_panel.hide();
                 } else {
@@ -710,8 +715,10 @@
             //
             // Render the first batch of images
             //
-            this._initImages(json.images_info);
-            this._loadRecords(json.images_info);
+            if (json.images_info) {
+                this._initImages(json.images_info);
+                this._loadRecords(json.images_info);
+            }
 
             // force initial selection to null 
             self._setSelection(null);
@@ -975,7 +982,7 @@
                     limit: limit,
                     sort_on: 'creation_date',
                     reverse: '1',
-                    source: this.buttonset[0].selectedIndex 
+                    source: this.buttonset.val()
                 },
                 success: function(json) { self._dataSuccess(json, region_id, initial); },
                 error: function(json) { self._dataError(json); },
