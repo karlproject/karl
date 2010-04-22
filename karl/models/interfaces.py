@@ -137,14 +137,23 @@ class IProfile(IFolder, IPeople):
     # they don't need to be documented as interface attributes at all.
     phone = Attribute(u"User's phone number.")
     extension = Attribute(u"User's phone extension.")
-    department = Attribute(u"User's department.")  # XXX redundant with categories?
+
+    # XXX redundant with categories?
+    department = Attribute(u"User's department.")
+
     position = Attribute(u"User's position.")
-    organization = Attribute(u"User's organization")  # XXX redundant with categories?
+
+    # XXX redundant with categories?
+    organization = Attribute(u"User's organization") 
+
     location = Attribute(u"User's location.")
     country = Attribute(u"User's country.")
     website = Attribute(u"User's website url.")
     languages = Attribute(u"User's spoken languages.")
-    office = Attribute(u"User's office.")  # XXX redundant with categories?
+
+    # XXX redundant with categories?
+    office = Attribute(u"User's office.")
+
     room_no = Attribute(u"User's room number.")
     biography = Attribute(u"User's biography.")
 
