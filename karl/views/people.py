@@ -86,6 +86,7 @@ lastname_field = schemaish.String(validator=validator.Required(),
                                   title='Last Name')
 phone_field = schemaish.String(title='Phone Number')
 extension_field = schemaish.String()
+fax_field = schemaish.String(title='Fax Number')
 department_field = schemaish.String()
 position_field = schemaish.String()
 organization_field = schemaish.String()
@@ -107,6 +108,7 @@ class EditProfileFormController(object):
         "email",
         "phone",
         "extension",
+        "fax",
         "department",
         "position",
         "organization",
@@ -140,6 +142,7 @@ class EditProfileFormController(object):
                   ('email', email_field),
                   ('phone', phone_field),
                   ('extension', extension_field),
+                  ('fax', fax_field),
                   ('department', department_field),
                   ('position', position_field),
                   ('organization', organization_field),
@@ -159,6 +162,7 @@ class EditProfileFormController(object):
                    'email': formish.Input(),
                    'phone': formish.Input(empty=''),
                    'extension': formish.Input(empty=''),
+                   'fax': formish.Input(empty=''),
                    'department': formish.Input(empty=''),
                    'position': formish.Input(empty=''),
                    'organization': formish.Input(empty=''),
@@ -182,6 +186,7 @@ class EditProfileFormController(object):
                     'email': context.email,
                     'phone': context.phone,
                     'extension': context.extension,
+                    'fax': context.fax,
                     'department': context.department,
                     'position': context.position,
                     'organization': context.organization,

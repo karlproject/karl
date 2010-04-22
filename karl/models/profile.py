@@ -32,6 +32,7 @@ class Profile(Folder):
     implements(IProfile)
 
     alert_attachments = 'link'
+    fax = '' # BBB
 
     def __init__(self,
                  firstname = '',
@@ -39,6 +40,7 @@ class Profile(Folder):
                  email = '',
                  phone = '',
                  extension = '',
+                 fax = '',
                  department = '',
                  position = '',
                  organization = '',
@@ -57,6 +59,7 @@ class Profile(Folder):
         self.lastname = lastname
         self.email = email
         self.phone = phone
+        self.fax = fax
         self.extension = extension
         self.department = department
         self.position = position

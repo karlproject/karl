@@ -137,6 +137,7 @@ class IProfile(IFolder, IPeople):
     # they don't need to be documented as interface attributes at all.
     phone = Attribute(u"User's phone number.")
     extension = Attribute(u"User's phone extension.")
+    fax = Attribute(u"User's fax number.")
 
     # XXX redundant with categories?
     department = Attribute(u"User's department.")

@@ -98,6 +98,7 @@ class DummyProfile(DummyModel):
     organization = 'organization'
     phone = 'phone'
     extension = 'extension'
+    fax = 'fax'
     department = 'department1'
     location = 'location'
     alert_attachments = 'link'
