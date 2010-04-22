@@ -202,7 +202,10 @@ class Test_drawer_dialog_view(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
         self.assertEqual(data['dialog_snippet'], 'template body')
-        self.assertEqual(data['images_info'], ['foo', 'bar'])
+        # the default source has no image
+        # and this is the only way to launch the dialog right now.
+        ###self.assertEqual(data['images_info'], ['foo', 'bar'])
+        self.assert_('images_info' not in data)
 
 class Test_drawer_data_view(unittest.TestCase):
     def setUp(self):
