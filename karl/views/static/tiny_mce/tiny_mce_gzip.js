@@ -963,14 +963,23 @@ tinyMCE.addI18n('en.wicked',{
             // sizes can be set correctly even on IE.
             // XXX actually one problem is that we get rid of the header,
             // and the component does not really support this oob.
-            this.dialog
+            var dialog_parent = this.dialog
                 .css('border', '0')
                 .css('padding', '0')
                 .css('overflow', 'hidden')
-                .parents('.ui-dialog')
+                .parents('.ui-dialog');
+            dialog_parent
                     //.removeClass('ui-dialog-content ui-widget-content')
                     .removeClass('ui-dialog-content')
-                    .css('overflow', 'hidden')
+                    .css('overflow', 'hidden');
+            // We need a close button. For simplicity, we just move the
+            // close button from the header here, since it's already wired
+            // up correctly.
+            dialog_parent.find('.ui-dialog-titlebar-close').eq(0)
+                .appendTo(this.dialog.find('.tiny-imagedrawer-panel-top'))
+                .removeClass('ui-dialog-titlebar-close')
+                .addClass('tiny-imagedrawer-button-close');
+            
 
             //
             // Wire up the dialog

@@ -1,7 +1,7 @@
 <div>
-  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel">
-    <div>
-      <span class="tiny-imagedrawer-title">Insert Image</span>
+  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">
+    <div class="ui-helper-clearfix tiny-imagedrawer-titlebar">
+      <span style="float: left;" class="tiny-imagedrawer-title">Insert Image</span>
       <a style="float: right;" href="javascript://return false;">help</a>
     </div>
     <div>
