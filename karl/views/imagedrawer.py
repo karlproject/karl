@@ -59,6 +59,11 @@ None of these requests should be cacheable at all.
         {
         dialog_snippet: ...the html of the dialog
         images_info: ...the first batch of the image listing
+            (in case, the initial image source needs one.
+            Otherwise, it is missing. Since the server selects
+            the initial image source, it knows if the images_info
+            is needed and provides it. This saves one ajax
+            request for the client.)
         error: ... explicitely raise an error
         }
 
