@@ -18,7 +18,6 @@
 import re
 from zope.component import getMultiAdapter
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
@@ -49,7 +48,14 @@ def show_communities_view(context, request):
     return response
 
 
+def _set_cookie_via_request(request, value):
+    header = ('Set-Cookie', '%s=%s; Path=/' %
+                    (KARL_COMMUNITIES_VIEW_COOKIE, value))
+    request.response_headerlist = [header]
+
+
 def show_all_communities_view(context, request):
+    _set_cookie_via_request(request, 'all')
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s Communities' % system_name
     actions = []

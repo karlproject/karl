@@ -20,11 +20,14 @@ from repoze.bfg import testing
 from karl import testing as karltesting
 
 
-def _checkCookie(response, target):
+def _checkCookie(request_or_response, target):
     from karl.views.communities import KARL_COMMUNITIES_VIEW_COOKIE
     header = ('Set-Cookie',
               '%s=%s; Path=/' % (KARL_COMMUNITIES_VIEW_COOKIE, target))
-    assert header in response.headerlist, response.headerlist
+    headerlist = getattr(request_or_response, 'headerlist', None)
+    if headerlist is None:
+        headerlist = getattr(request_or_response, 'response_headerlist')
+    assert header in headerlist
 
 
 class Test_show_communities_view(unittest.TestCase):
@@ -61,20 +64,22 @@ class Test_show_all_communities_view(unittest.TestCase):
         from karl.views.communities import show_all_communities_view
         return show_all_communities_view(context, request)
 
-    def test_it(self):
+    def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import ILetterManager
         from karl.models.adapters import CatalogSearch
-        catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
+
+    def test_wo_groups(self):
+        self._register()
         context = testing.DummyModel()
-        context.catalog = catalog
+        context.catalog = karltesting.DummyCatalog({1:'/foo'})
         foo = testing.DummyModel()
         testing.registerModels({'/foo':foo})
         request = testing.DummyRequest(
@@ -85,26 +90,18 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.assertEqual(communities[0].context, foo)
         self.failUnless(communities)
         self.failUnless(info['actions'])
+        self.failIf(info['my_communities'])
+        _checkCookie(request, 'all')
 
-    def test_my_communities(self):
-        from zope.interface import Interface
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import ILetterManager
-        from karl.models.adapters import CatalogSearch
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
-                                ILetterManager)
+    def test_w_groups(self):
+        self._register()
         testing.registerDummySecurityPolicy('admin',
                                             ['group.community:yum:bar'])
         context = testing.DummyModel()
         yum = testing.DummyModel()
         context['yum'] = yum
         yum.title = 'Yum!'
-        context.catalog = catalog
+        context.catalog = karltesting.DummyCatalog({1:'/foo'})
         foo = testing.DummyModel()
         testing.registerModels({'/foo':foo})
         request = testing.DummyRequest(
@@ -117,14 +114,16 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.failUnless(info['actions'])
         my_communities = info['my_communities']
         self.failUnless(my_communities[0].context, yum)
+        _checkCookie(request, 'all')
 
 
 class Test_get_community_groups(unittest.TestCase):
+
     def _callFUT(self, principals):
         from karl.views.communities import get_community_groups
         return get_community_groups(principals)
 
-    def test_it(self):
+    def test_ignores_non_groups(self):
         principals = [
             'a',
             'group.community:yo:members',
@@ -135,6 +134,7 @@ class Test_get_community_groups(unittest.TestCase):
 
 
 class Test_get_my_communities(unittest.TestCase):
+
     def _callFUT(self, context, request):
         from karl.views.communities import get_my_communities
         return get_my_communities(context, request)
@@ -166,7 +166,7 @@ class Test_get_my_communities(unittest.TestCase):
         self.assertEqual(result[0].context, yi)
         self.assertEqual(result[1].context, yo)
         
-    def test_overflow(self):
+    def test_w_overflow(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         context = testing.DummyModel()
