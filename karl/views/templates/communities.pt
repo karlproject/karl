@@ -1,6 +1,7 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
-  xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="api.generic_layout.macros['master']">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="api.generic_layout.macros['master']">
 
   <div metal:fill-slot="content">
 
@@ -15,7 +16,8 @@
 
     <div metal:use-macro="api.snippets.macros['letter_box']"/>
 
-    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+    <metal:script
+        metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
     <table tal:condition="batch_info['batching_required']" width="70%">
       <tr class="ui-grid-footer">
         <th class="ui-widget-header">
