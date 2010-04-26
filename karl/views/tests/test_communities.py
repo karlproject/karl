@@ -16,16 +16,16 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.interface import Interface
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 from karl import testing as karltesting
 
 class Test_show_all_communities_view(unittest.TestCase):
     def setUp(self):
+        from zope.testing.cleanup import cleanUp
         cleanUp()
 
     def tearDown(self):
+        from zope.testing.cleanup import cleanUp
         cleanUp()
 
     def _callFUT(self, context, request):
@@ -33,6 +33,7 @@ class Test_show_all_communities_view(unittest.TestCase):
         return show_all_communities_view(context, request)
 
     def test_it(self):
+        from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import ILetterManager
