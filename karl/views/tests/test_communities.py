@@ -20,28 +20,33 @@ from repoze.bfg import testing
 from karl import testing as karltesting
 
 
+def _checkCookie(response, target):
+    from karl.views.communities import KARL_COMMUNITIES_VIEW_COOKIE
+    header = ('Set-Cookie',
+              '%s=%s; Path=/' % (KARL_COMMUNITIES_VIEW_COOKIE, target))
+    assert header in response.headerlist, response.headerlist
+
+
 class Test_show_communities_view(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import show_communities_view
         return show_communities_view(context, request)
 
-    def _checkResponse(self, response, context, view_name, redirect=False):
+    def _checkResponse(self, response, target):
         from webob.exc import HTTPFound
-        from repoze.bfg.url import model_url
-        from karl.views.communities import KARL_COMMUNITIES_VIEW_COOKIE
-        target = model_url(context, request, view_name)
-        self.assertEqual(response.cookies[KARL_COMMUNITIES_VIEW_COOKIE],
-                         target)
-        if redirect:
-            self.failUnless(isinstance(response), HTTPFound)
-            self.assertEqual(response.location, target)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, target)
 
     def test_no_cookie(self):
+        from repoze.bfg.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self._checkRedirect(response, context, 'all_communities.html', True)
+        self._checkResponse(response,
+                            model_url(context, request, 'all_communities.html'))
+        _checkCookie(response, 'all')
+
 
 class Test_show_all_communities_view(unittest.TestCase):
     def setUp(self):

@@ -18,19 +18,36 @@
 import re
 from zope.component import getMultiAdapter
 
+from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
+from repoze.bfg.url import model_url
+from webob.exc import HTTPFound
 
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.utils import get_setting
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
+
+
+# The name of the cookie that makes the communites view sticky.
+# Possible cookie values are 'mine', 'all', 'active'.
+# In case of no value or unknown value, 'mine' is considered
+# as default.
+KARL_COMMUNITIES_VIEW_COOKIE = 'karl.communities_view'
+
+
+def show_communities_view(context, request):
+    target = model_url(context, request, 'all_communities.html')
+    response = HTTPFound(location=target)
+    response.set_cookie(KARL_COMMUNITIES_VIEW_COOKIE, 'all')
+    return response
+
 
 def show_all_communities_view(context, request):
     system_name = get_setting(context, 'system_name', 'KARL')
@@ -77,6 +94,7 @@ def show_all_communities_view(context, request):
         letters=letter_info,
         )
 
+
 def get_my_communities(communities_folder, request):
     # sorted by title
     principals = effective_principals(request)
@@ -100,14 +118,16 @@ def get_my_communities(communities_folder, request):
         my_communities.append(adapted)
     return my_communities
 
-community_name_regex = re.compile(
+
+COMMUNITY_NAME_REGEX = re.compile(
     r'^group.community:(?P<name>\S+):(?P<role>\S+)$'
     )
+
 
 def get_community_groups(principals):
     groups = []
     for principal in principals:
-        match = community_name_regex.match(principal)
+        match = COMMUNITY_NAME_REGEX.match(principal)
         if match:
             name, role = match.groups()
             groups.append((name, role))
