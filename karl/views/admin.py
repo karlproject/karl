@@ -266,7 +266,7 @@ def move_content_view(context, request):
                 )
                 return HTTPFound(location=redirect_to)
             except _DstNotFound, error:
-                api.error_message = error.message
+                api.error_message = str(error)
 
     parms = dict(
         api=api,
