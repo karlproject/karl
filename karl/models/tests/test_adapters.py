@@ -577,6 +577,33 @@ class TestCommunityInfo(unittest.TestCase):
         self.assertEqual(tags[3], {'tag': 'foo', 'count': 3})
         self.assertEqual(tags[4], {'tag': 'spam', 'count': 2})
 
+    def test_is_member_direct(self):
+        context = self._makeCommunity()
+        context.member_names = ['dummy', 'foo']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('dummy')
+        adapter = self._makeOne(context, request)
+
+        self.assertEqual(adapter.member, True)
+
+    def test_is_member_via_group(self):
+        context = self._makeCommunity()
+        context.member_names = ['a_group', 'foo']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('dummy', ['a_group'])
+        adapter = self._makeOne(context, request)
+
+        self.assertEqual(adapter.member, True)
+
+    def test_is_not_member(self):
+        context = self._makeCommunity()
+        context.member_names = ['foo', 'bar']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('dummy')
+        adapter = self._makeOne(context, request)
+
+        self.assertEqual(adapter.member, False)
+
     def test_is_moderator(self):
         context = self._makeCommunity()
         context.moderator_names = ['dummy', 'foo']

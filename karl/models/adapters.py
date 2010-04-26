@@ -25,6 +25,7 @@ from repoze.bfg.traversal import find_model
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.security import effective_principals
 from repoze.bfg.url import model_url
 
 from repoze.lemonade.listitem import get_listitems
@@ -334,6 +335,12 @@ class CommunityInfo(object):
         for tag, count in sorted(raw, key=lambda x: x[1], reverse=True)[:5]:
             result.append({'tag': tag, 'count': count})
         return result
+
+    @property
+    def member(self):
+        principals = set(effective_principals(self.request))
+        members = set(self.context.member_names)
+        return bool(principals & members)
 
     @property
     def moderator(self):

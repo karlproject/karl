@@ -10,6 +10,15 @@
 
     <h1>Communities</h1>
 
+    <div id="community_scope" style="padding-bottom: 0.5em">
+     <tal:loop tal:repeat="subview_class subview_classes">
+     <a href="${subview_class['urlname']}"
+     >${subview_class['title']}</a>
+        <tal:if tal:condition="not repeat.subview_class.end"
+        >&nbsp;|&nbsp;</tal:if>
+     </tal:loop>
+    </div>
+
     <div metal:use-macro="api.snippets.macros['letter_box']"/>
 
     <metal:script

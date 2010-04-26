@@ -35,10 +35,15 @@ from karl.models.interfaces import ICommunity
 
 
 # The name of the cookie that makes the communites view sticky.
-# Possible cookie values are 'mine', 'all', 'active'.
+# Possible cookie values are 'mine', 'active', 'all'.
 # In case of no value or unknown value, 'mine' is considered
 # as default.
 KARL_COMMUNITIES_VIEW_COOKIE = 'karl.communities_view'
+KARL_COMMUNITIES_VIEWS = [
+    ('mine', 'Mine', 'my_communities.html'),
+    ('active', 'Active', 'active_communities.html'),
+    ('all', 'All', 'all_communities.html'),
+]
 
 
 def show_communities_view(context, request):
@@ -54,16 +59,7 @@ def _set_cookie_via_request(request, value):
     request.response_headerlist = [header]
 
 
-def show_all_communities_view(context, request):
-    _set_cookie_via_request(request, 'all')
-    system_name = get_setting(context, 'system_name', 'KARL')
-    page_title = '%s Communities' % system_name
-    actions = []
-
-    if has_permission('create', context, request):
-        actions.append(('Add Community', 'add_community.html'))
-    api = TemplateAPI(context, request, page_title)
-
+def _show_communities_view_helper(context, request, test=lambda x: True):
     # Grab the data for the two listings, main communities and portlet
     communities_path = model_path(context)
 
@@ -83,18 +79,37 @@ def show_all_communities_view(context, request):
     communities = []
     for community in batch_info['entries']:
         adapted = getMultiAdapter((community, request), ICommunityInfo)
-        communities.append(adapted)
+        if test(adapted):
+            communities.append(adapted)
 
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
 
-    return {
-        'api': api,
-        'actions': actions,
-        'communities': communities,
-        'batch_info': batch_info,
-        'letters': letter_info,
-    }
+    view_cookie = request.cookies.get(KARL_COMMUNITIES_VIEW_COOKIE)
+    classes = []
+    for name, title, urlname in KARL_COMMUNITIES_VIEWS:
+        classes.append({'name': name, 'title': title, 'urlname': urlname})
+
+    return {'communities': communities,
+            'batch_info': batch_info,
+            'letters': letter_info,
+            'subview_classes': classes,
+           }
+
+def show_all_communities_view(context, request):
+    _set_cookie_via_request(request, 'all')
+
+    info = _show_communities_view_helper(context, request)
+
+    system_name = get_setting(context, 'system_name', 'KARL')
+    page_title = '%s Communities' % system_name
+    info['api'] = TemplateAPI(context, request, page_title)
+
+    actions = info['actions'] = []
+    if has_permission('create', context, request):
+        actions.append(('Add Community', 'add_community.html'))
+
+    return info
 
 
 def get_my_communities(communities_folder, request):

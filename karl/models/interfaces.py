@@ -287,9 +287,14 @@ class ICommunityInfo(Interface):
     name = Attribute('The name of the community')
     title = Attribute('The title of the community')
     description = Attribute('The description of the community')
-    url = Attribute("Community URL")
+    tags = Attribute("Tags applied to the community")
     number_of_members = Attribute("Number of members in the community")
+    url = Attribute("Community URL")
     last_activity_date = Attribute("Date content was last modified")
+    tabs = Attribute("Information on tabs available for the community view")
+    community_tags = Attribute("Tags most used in the community")
+    member = Attribute("Is the current user a member of the community?")
+    moderator = Attribute("Is the current user a moderator of the community?")
 
 class ICatalogSearch(Interface):
     """Centralize policies about searching"""
