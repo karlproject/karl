@@ -19,6 +19,7 @@ import unittest
 from repoze.bfg import testing
 from karl import testing as karltesting
 
+
 class Test_show_all_communities_view(unittest.TestCase):
     def setUp(self):
         from zope.testing.cleanup import cleanUp
@@ -88,6 +89,7 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.failUnless(renderer.actions)
         self.failUnless(renderer.my_communities[0].context, yum)
 
+
 class Test_get_community_groups(unittest.TestCase):
     def _callFUT(self, principals):
         from karl.views.communities import get_community_groups
@@ -101,6 +103,7 @@ class Test_get_community_groups(unittest.TestCase):
             ]
         groups = self._callFUT(principals)
         self.assertEqual(groups, [('yo', 'members'), ('yo', 'other_role')])
+
 
 class Test_get_my_communities(unittest.TestCase):
     def _callFUT(self, context, request):
@@ -159,20 +162,26 @@ class Test_get_my_communities(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].context, yi)
+
         
 class DummyAdapter:
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
+
 class DummyLetterManager:
+
     def __init__(self, context):
         self.context = context
         
     def get_info(self, request):
         return {}
 
+
 class DummyToolFactory:
+
     def __init__(self, present=False):
         self.present = present
         self.added = False
@@ -180,7 +189,9 @@ class DummyToolFactory:
     def add(self, context, request):
         self.added = True
 
+
 class DummySecurityWorkflow:
+
     def __init__(self, context):
         self.context = context
 
@@ -190,15 +201,19 @@ class DummySecurityWorkflow:
     def execute(self, request, transition_id):
         self.context.transition_id = transition_id
 
+
 class DummyToolAddables(DummyAdapter):
+
     def __call__(self):
         from karl.models.interfaces import IToolFactory
         from repoze.lemonade.listitem import get_listitems
         return get_listitems(IToolFactory)
 
+
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
+
     def __init__(self, state_info=[
         {'name':'public', 'transitions':['private']},
         {'name':'private', 'transitions':['public']},
