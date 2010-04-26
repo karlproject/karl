@@ -21,7 +21,7 @@ from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 from karl import testing as karltesting
 
-class ShowCommunitiesViewTests(unittest.TestCase):
+class Test_show_all_communities_view(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -29,8 +29,8 @@ class ShowCommunitiesViewTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.views.communities import show_communities_view
-        return show_communities_view(context, request)
+        from karl.views.communities import show_all_communities_view
+        return show_all_communities_view(context, request)
 
     def test_it(self):
         from karl.models.interfaces import ICommunityInfo

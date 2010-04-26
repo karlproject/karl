@@ -153,7 +153,7 @@
 
   <view
     for="karl.models.interfaces.ICommunities"
-    view=".communities.show_communities_view"
+    view=".communities.show_all_communities_view"
     permission="view"
   />
 

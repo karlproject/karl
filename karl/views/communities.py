@@ -32,7 +32,7 @@ from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 
-def show_communities_view(context, request):
+def show_all_communities_view(context, request):
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s Communities' % system_name
     actions = []
