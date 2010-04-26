@@ -79,12 +79,12 @@ class Test_show_all_communities_view(unittest.TestCase):
         testing.registerModels({'/foo':foo})
         request = testing.DummyRequest(
             params={'titlestartswith':'A'})
-        renderer = testing.registerDummyRenderer('templates/communities.pt')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.communities), 1)
-        self.assertEqual(renderer.communities[0].context, foo)
-        self.failUnless(renderer.communities)
-        self.failUnless(renderer.actions)
+        info = self._callFUT(context, request)
+        communities = info['communities']
+        self.assertEqual(len(communities), 1)
+        self.assertEqual(communities[0].context, foo)
+        self.failUnless(communities)
+        self.failUnless(info['actions'])
 
     def test_my_communities(self):
         from zope.interface import Interface
@@ -109,13 +109,14 @@ class Test_show_all_communities_view(unittest.TestCase):
         testing.registerModels({'/foo':foo})
         request = testing.DummyRequest(
             params={'titlestartswith':'A'})
-        renderer = testing.registerDummyRenderer('templates/communities.pt')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.communities), 1)
-        self.assertEqual(renderer.communities[0].context, foo)
-        self.failUnless(renderer.communities)
-        self.failUnless(renderer.actions)
-        self.failUnless(renderer.my_communities[0].context, yum)
+        info = self._callFUT(context, request)
+        communities = info['communities']
+        self.assertEqual(len(communities), 1)
+        self.assertEqual(communities[0].context, foo)
+        self.failUnless(communities)
+        self.failUnless(info['actions'])
+        my_communities = info['my_communities']
+        self.failUnless(my_communities[0].context, yum)
 
 
 class Test_get_community_groups(unittest.TestCase):

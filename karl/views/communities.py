@@ -84,15 +84,14 @@ def show_all_communities_view(context, request):
 
     my_communities = get_my_communities(context, request)
 
-    return render_template_to_response(
-        'templates/communities.pt',
-        api=api,
-        actions=actions,
-        communities=communities,
-        my_communities=my_communities,
-        batch_info=batch_info,
-        letters=letter_info,
-        )
+    return {
+        'api': api,
+        'actions': actions,
+        'communities': communities,
+        'my_communities': my_communities,
+        'batch_info': batch_info,
+        'letters': letter_info,
+    }
 
 
 def get_my_communities(communities_folder, request):

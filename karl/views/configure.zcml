@@ -154,6 +154,7 @@
   <view
     for="karl.models.interfaces.ICommunities"
     view=".communities.show_all_communities_view"
+    renderer="templates/communities.pt"
     permission="view"
   />
 
