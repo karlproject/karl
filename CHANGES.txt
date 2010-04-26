@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- Add 'fax' field to user profiles.
+- Add 'fax' field to user profiles (fixes LP#570204).
 
 3.28 (2010-04-22)
 -----------------
