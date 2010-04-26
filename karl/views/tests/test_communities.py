@@ -87,7 +87,7 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.failUnless(renderer.actions)
         self.failUnless(renderer.my_communities[0].context, yum)
 
-class TestGetCommunityGroups(unittest.TestCase):
+class Test_get_community_groups(unittest.TestCase):
     def _callFUT(self, principals):
         from karl.views.communities import get_community_groups
         return get_community_groups(principals)
@@ -101,7 +101,7 @@ class TestGetCommunityGroups(unittest.TestCase):
         groups = self._callFUT(principals)
         self.assertEqual(groups, [('yo', 'members'), ('yo', 'other_role')])
 
-class TestGetMyCommunities(unittest.TestCase):
+class Test_get_my_communities(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.communities import get_my_communities
         return get_my_communities(context, request)
@@ -216,5 +216,3 @@ class DummyWorkflow:
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
-
-        
