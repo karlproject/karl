@@ -51,7 +51,7 @@ class Test_show_communities_view(unittest.TestCase):
         _checkCookie(response, 'all')
 
 
-class Test_show_all_communities_view(unittest.TestCase):
+class _Show_communities_helper:
     def setUp(self):
         from zope.testing.cleanup import cleanUp
         cleanUp()
@@ -60,21 +60,26 @@ class Test_show_all_communities_view(unittest.TestCase):
         from zope.testing.cleanup import cleanUp
         cleanUp()
 
-    def _callFUT(self, context, request):
-        from karl.views.communities import show_all_communities_view
-        return show_all_communities_view(context, request)
-
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import ILetterManager
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        testing.registerAdapter(DummyCommunityInfoAdapter,
+                                (Interface, Interface),
                                 ICommunityInfo)
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
+
+
+class Test_show_all_communities_view(_Show_communities_helper,
+                                     unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import show_all_communities_view
+        return show_all_communities_view(context, request)
 
     def test_wo_groups(self):
         self._register()
@@ -114,30 +119,12 @@ class Test_show_all_communities_view(unittest.TestCase):
         _checkCookie(request, 'all')
 
 
-class Test_show_active_communities_view(unittest.TestCase):
-    def setUp(self):
-        from zope.testing.cleanup import cleanUp
-        cleanUp()
-
-    def tearDown(self):
-        from zope.testing.cleanup import cleanUp
-        cleanUp()
+class Test_show_active_communities_view(_Show_communities_helper,
+                                        unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import show_active_communities_view
         return show_active_communities_view(context, request)
-
-    def _register(self):
-        from zope.interface import Interface
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import ILetterManager
-        from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
-                                ILetterManager)
 
     def test_excludes_inactive(self):
         from datetime import datetime
@@ -156,6 +143,29 @@ class Test_show_active_communities_view(unittest.TestCase):
         self.assertEqual(communities[0].context, foo)
         self.failUnless(info['actions'])
         _checkCookie(request, 'active')
+
+
+class Test_show_my_communities_view(_Show_communities_helper,
+                                    unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import show_my_communities_view
+        return show_my_communities_view(context, request)
+
+    def test_excludes_nonmember_even_though_permitted(self):
+        self._register()
+        context = testing.DummyModel()
+        context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
+        foo = testing.DummyModel(_is_member=True)
+        bar = testing.DummyModel(_is_member=False)
+        testing.registerModels({'/foo':foo, '/bar': bar})
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        communities = info['communities']
+        self.assertEqual(len(communities), 1)
+        self.assertEqual(communities[0].context, foo)
+        self.failUnless(info['actions'])
+        _checkCookie(request, 'mine')
 
 
 class Test_get_community_groups(unittest.TestCase):
@@ -240,6 +250,11 @@ class DummyAdapter:
         self.context = context
         self.request = request
 
+
+class DummyCommunityInfoAdapter(DummyAdapter):
+    @property
+    def member(self):
+        return self.context._is_member
 
 class DummyLetterManager:
 

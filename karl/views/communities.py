@@ -58,7 +58,11 @@ def _set_cookie_via_request(request, value):
     request.response_headerlist = [header]
 
 
-def _show_communities_view_helper(context, request, test=lambda x: True):
+def _show_communities_view_helper(context,
+                                 request,
+                                 prefix='',
+                                 test=lambda x: True,
+                                ):
     # Grab the data for the two listings, main communities and portlet
     communities_path = model_path(context)
 
@@ -89,27 +93,26 @@ def _show_communities_view_helper(context, request, test=lambda x: True):
     for name, title, urlname in KARL_COMMUNITIES_VIEWS:
         classes.append({'name': name, 'title': title, 'urlname': urlname})
 
+    actions = []
+    if has_permission('create', context, request):
+        actions.append(('Add Community', 'add_community.html'))
+
+    system_name = get_setting(context, 'system_name', 'KARL')
+    page_title = '%s%s Communities' % (prefix, system_name)
+
     return {'communities': communities,
             'batch_info': batch_info,
             'letters': letter_info,
             'subview_classes': classes,
+            'actions': actions,
+            'api': TemplateAPI(context, request, page_title),
            }
 
 
 def show_all_communities_view(context, request):
     _set_cookie_via_request(request, 'all')
 
-    info = _show_communities_view_helper(context, request)
-
-    system_name = get_setting(context, 'system_name', 'KARL')
-    page_title = '%s Communities' % system_name
-    info['api'] = TemplateAPI(context, request, page_title)
-
-    actions = info['actions'] = []
-    if has_permission('create', context, request):
-        actions.append(('Add Community', 'add_community.html'))
-
-    return info
+    return _show_communities_view_helper(context, request)
 
 
 def show_active_communities_view(context, request):
@@ -122,17 +125,18 @@ def show_active_communities_view(context, request):
         return (adapted.context.content_modified is not None and
                 adapted.context.content_modified >= thirty_days_ago)
 
-    info = _show_communities_view_helper(context, request, test=_thirty)
+    return _show_communities_view_helper(context, request,
+                                         prefix='Active ', test=_thirty)
 
-    system_name = get_setting(context, 'system_name', 'KARL')
-    page_title = '%s Communities' % system_name
-    info['api'] = TemplateAPI(context, request, page_title)
 
-    actions = info['actions'] = []
-    if has_permission('create', context, request):
-        actions.append(('Add Community', 'add_community.html'))
+def show_my_communities_view(context, request):
+    _set_cookie_via_request(request, 'mine')
 
-    return info
+    def _mine(adapted):
+        return adapted.member
+
+    return _show_communities_view_helper(context, request,
+                                         prefix='My ', test=_mine)
 
 
 def get_my_communities(communities_folder, request):
