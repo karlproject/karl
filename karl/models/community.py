@@ -74,5 +74,3 @@ class Community(Folder):
 class CommunitiesFolder(Folder):
     implements(ICommunities)
     title = 'Communities'
-    
-    
