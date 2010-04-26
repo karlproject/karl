@@ -159,6 +159,14 @@
   />
 
   <view
+    name="active_communities.html"
+    for="karl.models.interfaces.ICommunities"
+    view=".communities.show_active_communities_view"
+    renderer="templates/communities.pt"
+    permission="view"
+  />
+
+  <view
     name="all_communities.html"
     for="karl.models.interfaces.ICommunities"
     view=".communities.show_all_communities_view"

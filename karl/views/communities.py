@@ -15,23 +15,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import datetime
 import re
-from zope.component import getMultiAdapter
 
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
-
-from karl.views.api import TemplateAPI
-from karl.views.batch import get_catalog_batch_grid
-from karl.utils import get_setting
-
+from zope.component import getMultiAdapter
 
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
+from karl.views.api import TemplateAPI
+from karl.utils import get_setting
+from karl.views.batch import get_catalog_batch_grid
 
 
 # The name of the cookie that makes the communites view sticky.
@@ -96,10 +95,34 @@ def _show_communities_view_helper(context, request, test=lambda x: True):
             'subview_classes': classes,
            }
 
+
 def show_all_communities_view(context, request):
     _set_cookie_via_request(request, 'all')
 
     info = _show_communities_view_helper(context, request)
+
+    system_name = get_setting(context, 'system_name', 'KARL')
+    page_title = '%s Communities' % system_name
+    info['api'] = TemplateAPI(context, request, page_title)
+
+    actions = info['actions'] = []
+    if has_permission('create', context, request):
+        actions.append(('Add Community', 'add_community.html'))
+
+    return info
+
+
+def show_active_communities_view(context, request):
+    _set_cookie_via_request(request, 'active')
+
+    today = datetime.datetime.today()
+    thirty_days_ago = today - datetime.timedelta(30)
+
+    def _thirty(adapted):
+        return (adapted.context.content_modified is not None and
+                adapted.context.content_modified >= thirty_days_ago)
+
+    info = _show_communities_view_helper(context, request, test=_thirty)
 
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s Communities' % system_name

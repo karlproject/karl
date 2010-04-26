@@ -114,6 +114,50 @@ class Test_show_all_communities_view(unittest.TestCase):
         _checkCookie(request, 'all')
 
 
+class Test_show_active_communities_view(unittest.TestCase):
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import show_active_communities_view
+        return show_active_communities_view(context, request)
+
+    def _register(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import ILetterManager
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+                                ICommunityInfo)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        testing.registerAdapter(DummyLetterManager, Interface,
+                                ILetterManager)
+
+    def test_excludes_inactive(self):
+        from datetime import datetime
+        from datetime import timedelta
+        now = datetime.now()
+        self._register()
+        context = testing.DummyModel()
+        context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
+        foo = testing.DummyModel(content_modified=now - timedelta(1))
+        bar = testing.DummyModel(content_modified=now - timedelta(32))
+        testing.registerModels({'/foo':foo, '/bar': bar})
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        communities = info['communities']
+        self.assertEqual(len(communities), 1)
+        self.assertEqual(communities[0].context, foo)
+        self.failUnless(info['actions'])
+        _checkCookie(request, 'active')
+
+
 class Test_get_community_groups(unittest.TestCase):
 
     def _callFUT(self, principals):
