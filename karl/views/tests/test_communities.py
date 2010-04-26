@@ -90,7 +90,6 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.assertEqual(communities[0].context, foo)
         self.failUnless(communities)
         self.failUnless(info['actions'])
-        self.failIf(info['my_communities'])
         _checkCookie(request, 'all')
 
     def test_w_groups(self):
@@ -112,8 +111,6 @@ class Test_show_all_communities_view(unittest.TestCase):
         self.assertEqual(communities[0].context, foo)
         self.failUnless(communities)
         self.failUnless(info['actions'])
-        my_communities = info['my_communities']
-        self.failUnless(my_communities[0].context, yum)
         _checkCookie(request, 'all')
 
 

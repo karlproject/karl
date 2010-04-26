@@ -10,10 +10,6 @@
 
     <h1>Communities</h1>
 
-    <div class="rightcol">
-      <div metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
-    </div>
-
     <div metal:use-macro="api.snippets.macros['letter_box']"/>
 
     <metal:script

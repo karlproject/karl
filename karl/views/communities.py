@@ -88,13 +88,10 @@ def show_all_communities_view(context, request):
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
 
-    my_communities = get_my_communities(context, request)
-
     return {
         'api': api,
         'actions': actions,
         'communities': communities,
-        'my_communities': my_communities,
         'batch_info': batch_info,
         'letters': letter_info,
     }
