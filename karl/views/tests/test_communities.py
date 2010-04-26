@@ -20,6 +20,29 @@ from repoze.bfg import testing
 from karl import testing as karltesting
 
 
+class Test_show_communities_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import show_communities_view
+        return show_communities_view(context, request)
+
+    def _checkResponse(self, response, context, view_name, redirect=False):
+        from webob.exc import HTTPFound
+        from repoze.bfg.url import model_url
+        from karl.views.communities import KARL_COMMUNITIES_VIEW_COOKIE
+        target = model_url(context, request, view_name)
+        self.assertEqual(response.cookies[KARL_COMMUNITIES_VIEW_COOKIE],
+                         target)
+        if redirect:
+            self.failUnless(isinstance(response), HTTPFound)
+            self.assertEqual(response.location, target)
+
+    def test_no_cookie(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self._checkRedirect(response, context, 'all_communities.html', True)
+
 class Test_show_all_communities_view(unittest.TestCase):
     def setUp(self):
         from zope.testing.cleanup import cleanUp
