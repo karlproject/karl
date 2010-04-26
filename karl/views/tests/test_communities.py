@@ -21,9 +21,9 @@ from karl import testing as karltesting
 
 
 def _checkCookie(request_or_response, target):
-    from karl.views.communities import KARL_COMMUNITIES_VIEW_COOKIE
+    from karl.views.communities import _VIEW_COOKIE
     header = ('Set-Cookie',
-              '%s=%s; Path=/' % (KARL_COMMUNITIES_VIEW_COOKIE, target))
+              '%s=%s; Path=/' % (_VIEW_COOKIE, target))
     headerlist = getattr(request_or_response, 'headerlist', None)
     if headerlist is None:
         headerlist = getattr(request_or_response, 'response_headerlist')
@@ -47,8 +47,18 @@ class Test_show_communities_view(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self._checkResponse(response,
-                            model_url(context, request, 'all_communities.html'))
-        _checkCookie(response, 'all')
+                            model_url(context, request, 'my_communities.html'))
+
+    def test_w_cookie(self):
+        from karl.views.communities import _VIEW_COOKIE
+        COOKIES = {_VIEW_COOKIE: 'active'}
+        from repoze.bfg.url import model_url
+        context = testing.DummyModel()
+        request = testing.DummyRequest(cookies=COOKIES)
+        response = self._callFUT(context, request)
+        self._checkResponse(response,
+                            model_url(context, request,
+                                        'active_communities.html'))
 
 
 class _Show_communities_helper:
