@@ -370,36 +370,39 @@ class ShowCommunityViewTests(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-
-    def _callFUT(self, context, request):
-        from karl.views.community import show_community_view
-        self._register()
-        return show_community_view(context, request)
-
-    def test_it(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
-        context = testing.DummyModel(title='thetitle')
-        directlyProvides(context, ICommunity)
-        context.member_names = context.moderator_names = set()
-        foo = testing.DummyModel()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/community.pt')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
-        context.catalog = catalog
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
         testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
                                 IGridEntryInfo)
         testing.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+
+    def _callFUT(self, context, request):
+        from karl.views.community import show_community_view
+        return show_community_view(context, request)
+
+    def _makeCommunity(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        community = testing.DummyModel(title='thetitle')
+        community.member_names = community.moderator_names = set()
+        directlyProvides(community, ICommunity)
+        foo = testing.DummyModel()
+        catalog = karltesting.DummyCatalog({1:'/foo'})
+        testing.registerModels({'/foo':foo})
+        community.catalog = catalog
+        return community
+
+    def test_it(self):
+        self._register()
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer('templates/community.pt')
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 3)
         self.assertEqual(renderer.actions, [
@@ -409,28 +412,11 @@ class ShowCommunityViewTests(unittest.TestCase):
         ])
 
     def test_already_member(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
-        context = testing.DummyModel(title='thetitle')
+        self._register()
+        context = self._makeCommunity()
         context.member_names = set(('userid',))
-        context.moderator_names = set()
-        directlyProvides(context, ICommunity)
-        foo = testing.DummyModel()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/community.pt')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
-        context.catalog = catalog
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         testing.registerDummySecurityPolicy('userid')
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 2)
