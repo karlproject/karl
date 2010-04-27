@@ -44,9 +44,11 @@ from repoze.sendmail.interfaces import IMailDelivery
 from karl.events import ObjectWillBeModifiedEvent
 from karl.events import ObjectModifiedEvent
 
+from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IGridEntryInfo
+from karl.models.interfaces import IProfile
 from karl.models.interfaces import ITagQuery
 
 from repoze.workflow import get_workflow
@@ -398,6 +400,55 @@ def show_community_view(context, request):
             'head_data': convert_to_script(client_json_data),
             'feed_url': feed_url,
            }
+
+def community_recent_items_ajax_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    recent_items = []
+    recent_items_batch = get_recent_items_batch(context, request, 5)
+    for item in recent_items_batch["entries"]:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        recent_items.append(adapted)
+
+    return {'items': recent_items}
+
+def get_members_batch(community, request, size=10):
+    mods = list(community.moderator_names)
+    members = list(community.member_names - community.moderator_names)
+    any = list(community.member_names | community.moderator_names)
+    principals = effective_principals(request)
+    searcher = ICatalogSearch(community)
+    total, docids, resolver = searcher(interfaces=[IProfile],
+                                       limit=size,
+                                       name={'query': ' '.join(any),
+                                             'operator': 'or'},
+                                       allowed={'query': principals,
+                                                'operator': 'or'},
+                                      )
+    mod_entries = []
+    other_entries = []
+
+    for docid in docids:
+        model = resolver(docid)
+        if model is not None:
+            if model.__name__ in mods:
+                mod_entries.append(model)
+            else:
+                other_entries.append(model)
+
+    return (mod_entries + other_entries)[:size]
+                                  
+
+def community_members_ajax_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    members = []
+    members_batch = get_members_batch(context, request, 5)
+    for item in members_batch:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        members.append(adapted)
+
+    return {'items': members}
 
 def join_community_view(context, request):
     """ User sends an email to community moderator(s) asking to join
