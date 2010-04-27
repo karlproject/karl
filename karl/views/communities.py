@@ -55,7 +55,7 @@ _VIEWS = [
      'all_communities.html',
     ),
 ]
-_VIEW_URL_LOOKUP = dict([(x[0], x[2])
+_VIEW_URL_LOOKUP = dict([(x[0], x[3])
                                             for x in _VIEWS])
 
 
