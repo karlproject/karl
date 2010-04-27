@@ -392,38 +392,40 @@ class ShowCommunityViewTests(unittest.TestCase):
         community = testing.DummyModel(title='thetitle')
         community.member_names = community.moderator_names = set()
         directlyProvides(community, ICommunity)
-        foo = testing.DummyModel()
+        foo = testing.DummyModel(__name__='foo')
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerModels({'/foo':foo})
         community.catalog = catalog
         return community
 
-    def test_it(self):
+    def test_not_a_member(self):
+        from repoze.bfg.url import model_url
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/community.pt')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 3)
-        self.assertEqual(renderer.actions, [
-            ('Edit', 'edit.html'),
-            ('Join', 'join.html'),
-            ('Delete', 'delete.html'),
-        ])
+        info = self._callFUT(context, request)
+        actions = info['actions']
+        self.assertEqual(info['actions'],
+                         [('Edit', 'edit.html'),
+                          ('Join', 'join.html'),
+                          ('Delete', 'delete.html'),
+                         ])
+        self.assertEqual(info['feed_url'],
+                         model_url(context, request, "atom.xml"))
+        self.assertEqual(len(info['recent_items']), 1)
+        self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
 
     def test_already_member(self):
         self._register()
         context = self._makeCommunity()
         context.member_names = set(('userid',))
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/community.pt')
         testing.registerDummySecurityPolicy('userid')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 2)
-        self.assertEqual(renderer.actions, [
-            ('Edit', 'edit.html'),
-            ('Delete', 'delete.html'),
-        ])
+        info = self._callFUT(context, request)
+        self.assertEqual(info['actions'],
+                         [('Edit', 'edit.html'),
+                          ('Delete', 'delete.html'),
+                         ])
         
 class RedirectCommunityViewTests(unittest.TestCase):
     def setUp(self):
