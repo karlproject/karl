@@ -382,16 +382,16 @@ class ShowCommunityViewTests(unittest.TestCase):
         from zope.interface import Interface
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import ICommunityInfo
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
         context = testing.DummyModel(title='thetitle')
         directlyProvides(context, ICommunity)
         context.member_names = context.moderator_names = set()
         foo = testing.DummyModel()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/community.pt')
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerModels({'/foo':foo})
         context.catalog = catalog
@@ -412,6 +412,10 @@ class ShowCommunityViewTests(unittest.TestCase):
         from zope.interface import Interface
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import ICommunityInfo
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
         context = testing.DummyModel(title='thetitle')
         context.member_names = set(('userid',))
         context.moderator_names = set()
@@ -419,10 +423,6 @@ class ShowCommunityViewTests(unittest.TestCase):
         foo = testing.DummyModel()
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/community.pt')
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo'})
         testing.registerModels({'/foo':foo})
         context.catalog = catalog
@@ -497,10 +497,7 @@ class JoinCommunityViewTests(unittest.TestCase):
         )
         
     def test_submit_form(self):
-        #from zope.interface import Interface
-        #from karl.models.interfaces import ICommunityInfo
-        #testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                #ICommunityInfo)
+        from repoze.sendmail.interfaces import IMailDelivery
         testing.registerDummyRenderer("templates/join_community.pt")
         
         c = karltesting.DummyCommunity()
@@ -511,7 +508,6 @@ class JoinCommunityViewTests(unittest.TestCase):
         profiles["moderator1"] = karltesting.DummyProfile()
         profiles["moderator2"] = karltesting.DummyProfile()
 
-        from repoze.sendmail.interfaces import IMailDelivery
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery) 
         
@@ -523,7 +519,9 @@ class JoinCommunityViewTests(unittest.TestCase):
         response = self._callFUT(c, request)
 
         self.assertEqual(response.location,
-            "http://example.com/communities/community/?status_message=Your+request+has+been+sent+to+the+moderators.")
+                         "http://example.com/communities/community/"
+                         "?status_message=Your+request+has+been+sent+"
+                         "to+the+moderators.")
         self.assertEqual(len(mailer), 1)
         msg = mailer.pop()
         self.assertEqual(msg.mto, ["moderator1@x.org", 
@@ -657,4 +655,3 @@ class DummyCommunity:
         self.creator = creator
         self.members_group_name = 'members'
         self.moderators_group_name = 'moderators'
-
