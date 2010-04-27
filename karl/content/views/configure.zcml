@@ -7,6 +7,13 @@
     permission="view"
   />
 
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="add.html"
+    view=".blog.redirect_to_add_form"
+    permission="create"
+  />
+
   <formish:form
      controller=".blog.AddBlogEntryFormController"
      name="add_blogentry.html"
@@ -111,6 +118,13 @@
     for="karl.content.interfaces.ICalendar"
     view=".calendar_events.show_view"
     permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="add.html"
+    view=".calendar_events.redirect_to_add_form"
+    permission="create"
   />
 
   <view
@@ -230,6 +244,13 @@
     for="karl.content.interfaces.ICommunityRootFolder"
     view=".files.show_folder_view"
     permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add.html"
+    view=".files.redirect_to_add_form"
+    permission="create"
   />
 
   <formish:form
@@ -648,6 +669,13 @@
     name="index.html"
     view=".wiki.redirect_to_front_page"
     permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="add.html"
+    view=".wiki.redirect_to_add_form"
+    permission="create"
   />
 
   <formish:form

@@ -79,6 +79,11 @@ def redirect_to_front_page(context, request):
     return HTTPFound(location=location)
 
 
+def redirect_to_add_form(context, request):
+    return HTTPFound(
+            location=model_url(context, request, 'add_wikipage.html'))
+
+
 class AddWikiPageFormController(object):
     def __init__(self, context, request):
         self.context = context

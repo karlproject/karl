@@ -156,6 +156,11 @@ def show_folder_view(context, request):
         feed_url=feed_url,
         )
 
+
+def redirect_to_add_form(context, request):
+    return HTTPFound(
+            location=model_url(context, request, 'add_file.html'))
+
 title_field = schemaish.String(
     validator=validator.All(
         validator.Length(max=100),

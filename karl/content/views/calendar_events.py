@@ -333,6 +333,11 @@ def show_view(context, request):
     return HTTPFound(location=model_url(context, request, view_name))
 
 
+def redirect_to_add_form(context, request):
+    return HTTPFound(
+            location=model_url(context, request, 'add_calendarevent.html'))
+
+
 def _get_calendar_categories(context):
     return [ x for x in context.values() if ICalendarCategory.providedBy(x) ]
 

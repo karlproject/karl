@@ -194,6 +194,23 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         self.assertEqual('before', renderer.comments[0]['text'])
         self.assertEqual('sometext', renderer.comments[1]['text'])
 
+
+class Test_redirect_to_add_form(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.content.views.blog import redirect_to_add_form
+        return redirect_to_add_form(context, request)
+
+    def test_it(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                         'http://example.com/add_blogentry.html')
+
+
 class AddBlogEntryFormControllerTests(unittest.TestCase):
     def setUp(self):
         # Register mail utility

@@ -26,6 +26,22 @@ d1 = 'Thursday, October 7, 2010 04:20 PM'
 def dummy(date, flavor):
     return d1
 
+
+class Test_redirect_to_add_form(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.content.views.calendar_events import redirect_to_add_form
+        return redirect_to_add_form(context, request)
+
+    def test_it(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                         'http://example.com/add_calendarevent.html')
+
 class AddCalendarEventFormControllerTests(unittest.TestCase):
     test_states = [{'current': True, 'name': 'foo', 'transitions': True},
                    {'name': 'bar', 'transitions': True}]

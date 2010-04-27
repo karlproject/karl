@@ -97,6 +97,22 @@ class TestShowFolderView(unittest.TestCase):
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
+
+class Test_redirect_to_add_form(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.content.views.files import redirect_to_add_form
+        return redirect_to_add_form(context, request)
+
+    def test_it(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                         'http://example.com/add_file.html')
+
 class TestAddFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()

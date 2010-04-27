@@ -152,6 +152,10 @@ def show_blog_view(context, request):
         security_states=security_states,
         )
 
+def redirect_to_add_form(context, request):
+    return HTTPFound(
+            location=model_url(context, request, 'add_blogentry.html'))
+
 def show_blogentry_view(context, request):
 
     post_url = model_url(context, request, "comments", "add_comment.html")
