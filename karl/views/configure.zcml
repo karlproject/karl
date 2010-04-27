@@ -251,8 +251,9 @@
 
   <view
     for="karl.models.interfaces.ICommunity"
-    view=".community.show_community_view"
     name="view.html"
+    view=".community.show_community_view"
+    renderer="templates/community.pt"
     permission="view"
   />
 

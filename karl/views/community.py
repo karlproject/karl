@@ -366,12 +366,10 @@ def show_community_view(context, request):
 
     # provide client data for rendering current tags in the tagbox
     tagquery = getMultiAdapter((context, request), ITagQuery)
-    client_json_data = dict(
-        tagbox = dict(
-            docid = tagquery.docid,
-            records = tagquery.tagswithcounts,
-            ),
-        )
+    client_json_data = {'tagbox': {'docid': tagquery.docid,
+                                   'records': tagquery.tagswithcounts,
+                                  },
+                       }
 
     # Filter the actions based on permission
     actions = []
@@ -392,15 +390,14 @@ def show_community_view(context, request):
         recent_items.append(adapted)
 
     feed_url = model_url(context, request, "atom.xml")
-    return render_template_to_response(
-        'templates/community.pt',
-        api=api,
-        actions=actions,
-        recent_items=recent_items,
-        batch_info=recent_items_batch,
-        head_data=convert_to_script(client_json_data),
-        feed_url=feed_url,
-    )
+
+    return {'api': api,
+            'actions': actions,
+            'recent_items': recent_items,
+            'batch_info': recent_items_batch,
+            'head_data': convert_to_script(client_json_data),
+            'feed_url': feed_url,
+           }
 
 def join_community_view(context, request):
     """ User sends an email to community moderator(s) asking to join
