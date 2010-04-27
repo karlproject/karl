@@ -10,7 +10,8 @@
 
     <h1>${api.page_title}</h1>
 
-    <div id="community_scope" style="padding-bottom: 0.5em">
+    <div id="community_scope" style="padding-bottom: 0.5em"
+         tal:condition="api.user_is_staff">
      <tal:loop tal:repeat="subview_class subview_classes">
      <a href="${subview_class['urlname']}"
      >${subview_class['title']}</a>
