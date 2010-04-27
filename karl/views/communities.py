@@ -39,9 +39,21 @@ from karl.views.batch import get_catalog_batch_grid
 # as default.
 _VIEW_COOKIE = 'karl.communities_view'
 _VIEWS = [
-    ('mine', 'Mine', 'my_communities.html'),
-    ('active', 'Active', 'active_communities.html'),
-    ('all', 'All', 'all_communities.html'),
+    ('mine',
+     'Mine',
+     'Communities where I am a member',
+     'my_communities.html',
+    ),
+    ('active',
+     'Active',
+     'Communities with activity within the last 30 days',
+     'active_communities.html',
+    ),
+    ('all',
+     'All',
+     'All communities',
+     'all_communities.html',
+    ),
 ]
 _VIEW_URL_LOOKUP = dict([(x[0], x[2])
                                             for x in _VIEWS])
@@ -58,6 +70,7 @@ def show_communities_view(context, request):
 def _set_cookie_via_request(request, value):
     header = ('Set-Cookie', '%s=%s; Path=/' %
                     (_VIEW_COOKIE, value))
+    request.cookies[_VIEW_COOKIE] = value
     request.response_headerlist = [header]
 
 
@@ -93,8 +106,13 @@ def _show_communities_view_helper(context,
 
     view_cookie = request.cookies.get(_VIEW_COOKIE)
     classes = []
-    for name, title, urlname in _VIEWS:
-        classes.append({'name': name, 'title': title, 'urlname': urlname})
+    for name, title, description, urlname in _VIEWS:
+        classes.append({'name': name,
+                        'title': title,
+                        'description': description,
+                        'urlname': urlname,
+                        'current': name == view_cookie,
+                       })
 
     actions = []
     if has_permission('create', context, request):
