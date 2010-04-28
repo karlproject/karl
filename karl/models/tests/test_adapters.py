@@ -303,11 +303,15 @@ class TestLetterManager(unittest.TestCase):
         directlyProvides(context, DummyInterface)
         adapter = self._makeOne(context)
         letters = adapter.get_info(request)
-        self.assertEqual(len(letters), 26)
+        self.assertEqual(len(letters), 27)
         self.assertEqual(letters[0]['name'], 'A')
         self.assertEqual(letters[0]['css_class'], 'notcurrent')
         self.assertEqual(letters[0]['href'], None)
         self.assertEqual(letters[0]['is_current'], False)
+        self.assertEqual(letters[26]['name'], 'Any')
+        self.assertEqual(letters[26]['css_class'], 'current')
+        self.assertEqual(letters[26]['href'], None)
+        self.assertEqual(letters[26]['is_current'], True)
 
     def test_get_info_alpha(self):
         request = testing.DummyRequest()
@@ -317,7 +321,7 @@ class TestLetterManager(unittest.TestCase):
         directlyProvides(context, DummyInterface)
         adapter = self._makeOne(context)
         letters = adapter.get_info(request)
-        self.assertEqual(len(letters), 26)
+        self.assertEqual(len(letters), 27)
         self.assertEqual(letters[0]['name'], 'A')
         self.assertEqual(letters[0]['css_class'], 'notcurrent')
         self.assertEqual(letters[0]['href'],
@@ -327,6 +331,10 @@ class TestLetterManager(unittest.TestCase):
         self.assertEqual(letters[1]['css_class'], 'notcurrent')
         self.assertEqual(letters[1]['href'], None)
         self.assertEqual(letters[1]['is_current'], False)
+        self.assertEqual(letters[26]['name'], 'Any')
+        self.assertEqual(letters[26]['css_class'], 'current')
+        self.assertEqual(letters[26]['href'], None)
+        self.assertEqual(letters[26]['is_current'], True)
 
     def test_titlestartswith(self):
         request = testing.DummyRequest(dict(titlestartswith='A'))
@@ -336,12 +344,16 @@ class TestLetterManager(unittest.TestCase):
         directlyProvides(context, DummyInterface)
         adapter = self._makeOne(context)
         letters = adapter.get_info(request)
-        self.assertEqual(len(letters), 26)
+        self.assertEqual(len(letters), 27)
         self.assertEqual(letters[0]['name'], 'A')
         self.assertEqual(letters[0]['css_class'], 'current')
         self.assertEqual(letters[0]['href'],
                          'http://example.com?titlestartswith=A')
         self.assertEqual(letters[0]['is_current'], True)
+        self.assertEqual(letters[26]['name'], 'Any')
+        self.assertEqual(letters[26]['css_class'], 'notcurrent')
+        self.assertEqual(letters[26]['href'], 'http://example.com')
+        self.assertEqual(letters[26]['is_current'], False)
 
 
 class TestPeopleReportLetterManager(unittest.TestCase):

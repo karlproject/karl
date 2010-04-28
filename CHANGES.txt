@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added an "Any" option at the end of the letterbox to allow clearing
+  any existing filter (LP#/570853).
+
 - On each communities sub-view, add a "quick links" panel on the right
   margin, with tabs showing tool links, recent content, and members.
   The last two are fetched on demand using AJAX.  See
