@@ -188,7 +188,24 @@ def related_communities_ajax_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
 
     related = []
-    #TODO
+    principals = effective_principals(request)
+    searcher = ICatalogSearch(context)
+    search = ' OR '.join(context.title.lower().split())
+    total, docids, resolver = searcher(interfaces=[ICommunity],
+                                       limit=5,
+                                       reverse=True,
+                                       sort_index="modified_date",
+                                       texts=search,
+                                       allowed={'query': principals,
+                                                'operator': 'or'},
+                                      )
+    for docid in docids:
+        model = resolver(docid)
+        if model is not None:
+            if model is not context:
+                adapted = getMultiAdapter((model, request), IGridEntryInfo)
+                related.append(adapted)
+
     return {'items': related}
 
 

@@ -220,14 +220,41 @@ class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
         from karl.views.community import related_communities_ajax_view
         return related_communities_ajax_view(context, request)
 
-    def test_it(self):
-        from karl.models.interfaces import ICommunity
+    def _register(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
+                                IGridEntryInfo)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+
+    def _makeCommunity(self, results=None):
         from zope.interface import directlyProvides
-        context = testing.DummyModel()
-        directlyProvides(context, ICommunity)
+        from karl.models.interfaces import ICommunity
+        if results is None:
+            results = [{}]
+        community = testing.DummyModel(title='Interests Align')
+        catalog = karltesting.DummyCatalog(*results)
+        community.catalog = catalog
+        directlyProvides(community, ICommunity)
+        return community
+
+    def test_it_no_matches(self):
+        from karl.models.interfaces import ICommunity
+        self._register()
+        context = self._makeCommunity()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['items'], []) # TODO
+        self.assertEqual(info['items'], [])
+        self.assertEqual(context.catalog.queries,
+                         [{'interfaces': [ICommunity],
+                           'limit': 5,
+                           'reverse': True,
+                           'sort_index': 'modified_date',
+                           'texts': 'interests OR align',
+                           'allowed': {'query': [], 'operator': 'or'}
+                          }])
 
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
