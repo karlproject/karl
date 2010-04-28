@@ -4,6 +4,16 @@ karl package Changelog
 Unreleased
 ----------
 
+- On each communities sub-view, add a "quick links" panel on the right
+  margin, with tabs showing tool links, recent content, and members.
+  The last two are fetched on demand using AJAX.  See
+  http://dev.karlproject.org/specifications/communitydiscovery.html#step-2-quick-links
+
+- Implemented sub-views for the '/communities/' page:  "Mine" (communities
+  of which I am a member), "Active" (communities having acitivty within
+  the past 30 days), and "All".  Drop the "My communities" portlet.  See
+  http://dev.karlproject.org/specifications/communitydiscovery.html#step-one-dedicated-views
+
 - Add "Community" to list of types in advanced search (LP#571218).
 
 - Add 'fax' field to user profiles (fixes LP#570204).
