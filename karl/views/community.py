@@ -446,6 +446,7 @@ def community_members_ajax_view(context, request):
     members_batch = get_members_batch(context, request, 5)
     for item in members_batch:
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        adapted.moderator = item.__name__ in context.moderator_names
         members.append(adapted)
 
     return {'items': members}

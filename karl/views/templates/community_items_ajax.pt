@@ -1,1 +1,3 @@
-<p tal:repeat="item items"><a href="${item.url}">${item.title[:25]}</a></p>
+<p tal:repeat="item items"><strong tal:omit-tag="not item.moderator">
+  <a href="${item.url}">${item.title[:25]}</a>
+</strong></p>
