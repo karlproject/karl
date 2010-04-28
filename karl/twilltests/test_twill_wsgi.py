@@ -18,8 +18,6 @@
 import os
 import shutil
 import twill
-import karl.twillcommands
-from cStringIO import StringIO
 from repoze.bfg.paster import get_app
 
 def _rm(path):
@@ -50,12 +48,15 @@ class TestKarlTwill:
                           if fname.startswith('Data.fs') or fname in ['blobs']]:
             _rm(os.path.join(fixtures, to_delete))
         os.mkdir(os.path.join(fixtures, 'blobs'))
-        wsgi_app = get_app(os.path.join(test_path, 'fixtures', 'karl.ini'), 'main')
+        wsgi_app = get_app(os.path.join(test_path, 'fixtures', 'karl.ini'),
+                           'main')
 
         def build_app():
             return wsgi_app
 
         twill.add_wsgi_intercept('localhost', 6543, build_app)
+        # XXX How do we suppress the annoying "AT LINE: " output?
+        twill.set_output(open('/dev/null', 'wb'))
         twill.execute_string("extend_with karl.twillcommands")
 
         # mostly the same as karl3.conf without extending with flunc
@@ -65,15 +66,10 @@ class TestKarlTwill:
                              os.path.abspath(os.path.dirname(__file__)) +
                              "/test_twill_wsgi_karl3.conf'")
 
-        # while we're at it, stop twill from running off at the mouth...
-        # Comment out for debugging.
-        # XXX How do we suppress the annoying "AT LINE: " output?
-        #outp = StringIO()
-        #twill.set_output(outp)
-
     def tearDown(self):
         # remove intercept
         twill.remove_wsgi_intercept('localhost', 6543)
+        twill.set_output(None)
 
         test_path =  os.path.abspath(os.path.dirname(__file__))
         fixtures = os.path.join(test_path, 'fixtures')
@@ -102,14 +98,14 @@ class TestKarlTwill:
 
         # copied from twilltests/calendar/calendar-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
-
-                      # run calendar tests
-                      "runfile '${test_path}/calendar/calendar-view.twill'",
-                      "runfile '${test_path}/calendar/create-event.twill'",
-                      "runfile '${test_path}/calendar/calendar-aved.twill'",
-                      "runfile '${test_path}/calendar/calendar-index.twill'"
-                      ]
+            "login 'admin'",
+            
+            # run calendar tests
+            "runfile '${test_path}/calendar/calendar-view.twill'",
+            "runfile '${test_path}/calendar/create-event.twill'",
+            "runfile '${test_path}/calendar/calendar-aved.twill'",
+            "runfile '${test_path}/calendar/calendar-index.twill'"
+            ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -119,18 +115,19 @@ class TestKarlTwill:
 
         # copied from twilltests/community/community-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
-
-                      # Make community
-                      "runfile '${test_path}/community/make_community.twill'",
-
-                      # optional tests which we run to test functionality of new community.
-                      # you can comment out if needed
-                      "runfile '${test_path}/community/blog_initialize.twill'",
-                      "runfile '${test_path}/community/calendar_initialize.twill'",
-                      "runfile '${test_path}/community/files_initialize.twill'",
-                      "runfile '${test_path}/community/wiki_initialize.twill'"
-                      ]
+            "login 'admin'",
+            
+            # Make community
+            "runfile '${test_path}/community/make_community.twill'",
+            
+            # optional tests which we run to test functionality of
+            # new community.
+            # you can comment out if needed
+            "runfile '${test_path}/community/blog_initialize.twill'",
+            "runfile '${test_path}/community/calendar_initialize.twill'",
+            "runfile '${test_path}/community/files_initialize.twill'",
+            "runfile '${test_path}/community/wiki_initialize.twill'"
+            ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -139,14 +136,14 @@ class TestKarlTwill:
 
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
-
-                      # Tests for files suite
-
-                      "runfile '${test_path}/files/files_view.twill'",
-                      "runfile '${test_path}/files/files_aved.twill'",
-                      "runfile '${test_path}/files/files_index.twill'"
-                      ]
+            "login 'admin'",
+            
+            # Tests for files suite
+            
+            "runfile '${test_path}/files/files_view.twill'",
+            "runfile '${test_path}/files/files_aved.twill'",
+            "runfile '${test_path}/files/files_index.twill'"
+            ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -155,21 +152,21 @@ class TestKarlTwill:
 
         # copied from twilltests/profiles/profiles-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
-
-                      # Profile tests
-
-                      # Test to see what profiles we can see
-                      #user_view
-
-                      # Login as admin before add/edit/delete user
-                      "login 'admin'",
-
-                      # Add, edit, and delete user account
-                      "runfile '${test_path}/profiles/user_add.twill'",
-                      #user_edit
-                      "runfile '${test_path}/profiles/user_delete.twill'"
-                      ]
+            "login 'admin'",
+            
+            # Profile tests
+            
+            # Test to see what profiles we can see
+            #user_view
+            
+            # Login as admin before add/edit/delete user
+            "login 'admin'",
+            
+            # Add, edit, and delete user account
+            "runfile '${test_path}/profiles/user_add.twill'",
+            #user_edit
+            "runfile '${test_path}/profiles/user_delete.twill'"
+            ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -178,31 +175,32 @@ class TestKarlTwill:
 
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
+            "login 'admin'",
+            
+            # Search tests
+            
+            # Test searching for a blog entry
+            "runfile '${test_path}/search/search_blog_entry.twill'",
+            
+            # Test searching for a calendar entry
+            "runfile '${test_path}/search/search_calendar_entry.twill'",
+            
+            # Test searching for a community
+            "runfile '${test_path}/search/search_community.twill'",
+            
+            # Test searching for a file
+            "runfile '${test_path}/search/search_file.twill'",
+            
+            # Test searching for a user
+            "runfile '${test_path}/search/search_user.twill'",
+            
+            # Test searching for wiki
+            "runfile '${test_path}/search/search_wiki_entry.twill'",
+            
+            # Check the advanced search page
+            "runfile '${test_path}/search/advanced_search.twill'",
+            ]
 
-                      # Search tests
-
-                      # Test searching for a blog entry
-                      "runfile '${test_path}/search/search_blog_entry.twill'",
-
-                      # Test searching for a calendar entry
-                      "runfile '${test_path}/search/search_calendar_entry.twill'",
-
-                      # Test searching for a community
-                      "runfile '${test_path}/search/search_community.twill'",
-
-                      # Test searching for a file
-                      "runfile '${test_path}/search/search_file.twill'",
-
-                      # Test searching for a user
-                      "runfile '${test_path}/search/search_user.twill'",
-
-                      # Test searching for wiki
-                      "runfile '${test_path}/search/search_wiki_entry.twill'",
-
-                      # Check the advanced search page
-                      "runfile '${test_path}/search/advanced_search.twill'",
-                      ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -211,28 +209,29 @@ class TestKarlTwill:
 
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
+            "login 'admin'",
+            
+            # Tag suite
+            
+            # tag a community
+            "runfile '${test_path}/tagging/tag_community.twill'",
+            
+            # tag a blog entry
+            #"runfile '${test_path}/tagging/tag_blog_entry.twill'",
+            
+            # tag a calendar entry
+            "runfile '${test_path}/tagging/tag_calendar_entry.twill'",
+            
+            # tag a file
+            "runfile '${test_path}/tagging/tag_file.twill'",
+            
+            # tag a user
+            "runfile '${test_path}/tagging/tag_user.twill'",
+            
+            # tag a wiki
+            "runfile '${test_path}/tagging/tag_wiki_entry.twill'",
+            ]
 
-                      # Tag suite
-
-                      # tag a community
-                      "runfile '${test_path}/tagging/tag_community.twill'",
-
-                      # tag a blog entry
-                      #"runfile '${test_path}/tagging/tag_blog_entry.twill'",
-
-                      # tag a calendar entry
-                      "runfile '${test_path}/tagging/tag_calendar_entry.twill'",
-
-                      # tag a file
-                      "runfile '${test_path}/tagging/tag_file.twill'",
-
-                      # tag a user
-                      "runfile '${test_path}/tagging/tag_user.twill'",
-
-                      # tag a wiki
-                      "runfile '${test_path}/tagging/tag_wiki_entry.twill'",
-                      ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
@@ -241,24 +240,24 @@ class TestKarlTwill:
 
         # copied from twilltests/wiki/wiki-tests.tsuite
         mytwilltests = [
-                      "login 'admin'",
+            "login 'admin'",
+            
+            # run wiki tests
+            "runfile '${test_path}/wiki/wiki_view.twill'",
+            "runfile '${test_path}/wiki/wikipage_aved.twill'",
+            "runfile '${test_path}/wiki/wiki_index.twill'"
+            ]
 
-                      # run wiki tests
-                      "runfile '${test_path}/wiki/wiki_view.twill'",
-                      "runfile '${test_path}/wiki/wikipage_aved.twill'",
-                      "runfile '${test_path}/wiki/wiki_index.twill'"
-                      ]
         for comm in mytwilltests:
             twill.execute_string(comm)
 
 
     def test_twill_all(self):
-        ''' test_twill_all is equivalent to "All" tests from twilltests directory'''
+        ''' test_twill_all is equivalent to "All" tests from twilltests
+        directory'''
 
-        # copied from twilltests/all.tsuite
-
-
-        # This suite is to test major functionality for this installation of karl.
+        # This suite is to test major functionality for this installation of
+        # karl.
         #
         # see more options in the README
         print twill.execute_string("go http://localhost:6543")
@@ -283,7 +282,8 @@ class TestKarlTwill:
         self.files_tes()
 
         # run profile tests, then re-login as user vs. admin
-        twill.execute_string("runfile '${test_path}/profiles/user_initialize.twill'")
+        twill.execute_string(
+            "runfile '${test_path}/profiles/user_initialize.twill'")
         self.profiles_tes()
 
         # run search tests
@@ -306,6 +306,7 @@ class TestKarlTwill:
         # See README.txt for more
 
         # Cleanup tests
-        twill.execute_string("runfile '${test_path}/community/delete_testing_community.twill'")
+        twill.execute_string(
+            "runfile '${test_path}/community/delete_testing_community.twill'")
 
         twill.execute_string("logout")
