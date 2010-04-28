@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add "Community" to list of types in advanced search (LP#571218).
+
 - Add 'fax' field to user profiles (fixes LP#570204).
 
 - Don't blow up when managing tags from profile when no tags are

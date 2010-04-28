@@ -215,6 +215,7 @@ class IImageFile(IFile):
 class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """
     taggedValue('name', 'Community')
+    taggedValue('search_option', True)
 
     description = Attribute(u'Description -- plain text summary')
     text = Attribute(u'Text -- includes wiki markup.')
