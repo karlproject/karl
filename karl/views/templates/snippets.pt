@@ -126,8 +126,9 @@
       </span>
     </div>
 
-
     <span metal:define-macro="privacy_badge" class="kprivacy_badge">Private</span>
+
+    <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
 
     <h1 metal:define-macro="page_title" class="kscreentitle">${api.page_title}
         <span tal:condition="api.is_private_in_public_community(api.context)"

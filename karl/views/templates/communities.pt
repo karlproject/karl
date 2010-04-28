@@ -93,6 +93,8 @@
         <a href="${community.url}">${community.title}</a>
         <span tal:condition="not api.has_staff_acl(community.context)"
           metal:use-macro="api.snippets.macros['privacy_badge']"/>
+        <span tal:condition="community.moderator"
+          metal:use-macro="api.snippets.macros['moderator_badge']"/>
       </div>
 
       <p>${community.description}</p>

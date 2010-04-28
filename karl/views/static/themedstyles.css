@@ -212,6 +212,17 @@ a.standalone:hover {
   top: -0.7em;
   text-transform: lowercase;
 }
+.kmoderator_badge {
+  font-size: 11px;
+  color: #00aa00;
+  margin-left: 8px;
+  padding: 0;
+  font-weight: bold;
+  font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
+  position: relative;
+  top: -0.7em;
+  text-transform: lowercase;
+}
 
 /** =CLEAR HACKS
 ----------------------------------------------- */
