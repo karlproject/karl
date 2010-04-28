@@ -169,7 +169,7 @@ def get_members_batch(community, request, size=10):
                 other_entries.append(model)
 
     return (mod_entries + other_entries)[:size]
-                                  
+
 
 def community_members_ajax_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
