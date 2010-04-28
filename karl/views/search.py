@@ -25,7 +25,6 @@ from karl.utils import coarse_datetime_repr
 from karl.utils import get_content_type_name
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
@@ -57,8 +56,7 @@ def advancedsearch_view(context, request):
     this_year = datetime.datetime.now().year
     year_choices = [str(i) for i in range(2007, this_year+1)]
 
-    return render_template_to_response(
-        'templates/advancedsearch.pt',
+    return dict(
         api=api,
         post_url=model_url(context, request, "searchresults.html"),
         type_choices=type_choices,
@@ -217,8 +215,7 @@ def searchresults_view(context, request):
         results = ()
         total = 0
 
-    return render_template_to_response(
-        'templates/searchresults.pt',
+    return dict(
         api=api,
         layout=layout,
         error=error,
@@ -268,9 +265,6 @@ def jquery_livesearch_view(context, request):
         searchterm = searchterm + '*'
 
     records = LivesearchResults()
-    principals = effective_principals(request)
-
-    site_path = model_path(context)
 
     records.set_header('',
         pre = '<div class="header"></div>',

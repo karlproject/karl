@@ -56,6 +56,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".search.advancedsearch_view"
+    renderer="templates/advancedsearch.pt"
     permission="view"
     name="advancedsearch.html"
   />
@@ -63,6 +64,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".search.searchresults_view"
+    renderer="templates/searchresults.pt"
     permission="view"
     name="searchresults.html"
   />
@@ -301,6 +303,7 @@
   <view
     for="karl.models.interfaces.ICommunity"
     name="searchresults.html"
+    renderer="templates/searchresults.pt"
     view=".search.searchresults_view"
     permission="view"
   />

@@ -121,9 +121,8 @@ class SearchResultsViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         testing.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
-        renderer = testing.registerDummyRenderer('templates/searchresults.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.terms, [])
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], [])
 
     def test_bad_kind(self):
         from webob.multidict import MultiDict
@@ -147,10 +146,9 @@ class SearchResultsViewTests(unittest.TestCase):
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        renderer = testing.registerDummyRenderer('templates/searchresults.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.terms, ['yo'])
-        self.assertEqual(len(renderer.results), 1)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
 
     def test_known_kind(self):
         from webob.multidict import MultiDict
@@ -169,10 +167,9 @@ class SearchResultsViewTests(unittest.TestCase):
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        renderer = testing.registerDummyRenderer('templates/searchresults.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.terms, ['yo', 'People'])
-        self.assertEqual(len(renderer.results), 1)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo', 'People'])
+        self.assertEqual(len(result['results']), 1)
 
     def test_community_search(self):
         context = testing.DummyModel()
@@ -188,11 +185,10 @@ class SearchResultsViewTests(unittest.TestCase):
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        renderer = testing.registerDummyRenderer('templates/searchresults.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.community, 'Citizens')
-        self.assertEqual(renderer.terms, ['yo'])
-        self.assertEqual(len(renderer.results), 1)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['community'], 'Citizens')
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
 
     def test_parse_error(self):
         from webob.multidict import MultiDict
@@ -204,11 +200,10 @@ class SearchResultsViewTests(unittest.TestCase):
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(ParseErrorSearch, (Interface),
                                 ICatalogSearch)
-        renderer = testing.registerDummyRenderer('templates/searchresults.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.terms), 0)
-        self.assertEqual(len(renderer.results), 0)
-        self.assertEqual(renderer.error, "Error: 'the' is nonsense")
+        result = self._callFUT(context, request)
+        self.assertEqual(len(result['terms']), 0)
+        self.assertEqual(len(result['results']), 0)
+        self.assertEqual(result['error'], "Error: 'the' is nonsense")
 
 class GetBatchTests(unittest.TestCase):
     def setUp(self):
@@ -380,16 +375,15 @@ class AdvancedSearchViewTests(unittest.TestCase):
 
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/advancedsearch.pt')
         from karl.views.search import advancedsearch_view
         result = advancedsearch_view(context, request)
         self.assertEqual(
-            renderer.post_url, 'http://example.com/searchresults.html')
-        self.assertEqual(renderer.type_choices, [
+            result['post_url'], 'http://example.com/searchresults.html')
+        self.assertEqual(result['type_choices'], [
             ('Comment', 'karl_models_interfaces_IComment'),
             ])
-        self.assertFalse('2006' in renderer.year_choices)
-        self.assertTrue('2007' in renderer.year_choices)
+        self.assertFalse('2006' in result['year_choices'])
+        self.assertTrue('2007' in result['year_choices'])
 
 
 class DummySearch:
