@@ -74,6 +74,115 @@ from karl.security.policy import DELETE_COMMUNITY
 from karl.security.policy import MODERATE
 from karl.security.workflow import get_security_states
 
+def get_recent_items_batch(community, request, size=10):
+    batch = get_catalog_batch_grid(
+        community, request, interfaces=[ICommunityContent],
+        sort_index="modified_date", reverse=True, batch_size=size,
+        path={'query': model_path(community)},
+        allowed={'query': effective_principals(request), 'operator': 'or'},
+    )
+    return batch
+
+def redirect_community_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    default_tool = getattr(context, 'default_tool', None)
+    if not default_tool:
+        default_tool = 'view.html'
+    return HTTPFound(location=model_url(context, request, default_tool))
+
+def show_community_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    user = authenticated_userid(request)
+    page_title = 'View Community ' + context.title
+    api = TemplateAPI(context, request, page_title)
+
+    # provide client data for rendering current tags in the tagbox
+    tagquery = getMultiAdapter((context, request), ITagQuery)
+    client_json_data = {'tagbox': {'docid': tagquery.docid,
+                                   'records': tagquery.tagswithcounts,
+                                  },
+                       }
+
+    # Filter the actions based on permission
+    actions = []
+    if has_permission(MODERATE, context, request):
+        actions.append(('Edit', 'edit.html'))
+
+    # If user has permission to see this view then has permission to join.
+    if not(user in context.member_names or user in context.moderator_names):
+        actions.append(('Join', 'join.html'))
+
+    if has_permission(DELETE_COMMUNITY, context, request):
+        actions.append(('Delete', 'delete.html'))
+
+    recent_items = []
+    recent_items_batch = get_recent_items_batch(context, request)
+    for item in recent_items_batch["entries"]:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        recent_items.append(adapted)
+
+    feed_url = model_url(context, request, "atom.xml")
+
+    return {'api': api,
+            'actions': actions,
+            'recent_items': recent_items,
+            'batch_info': recent_items_batch,
+            'head_data': convert_to_script(client_json_data),
+            'feed_url': feed_url,
+           }
+
+def community_recent_items_ajax_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    recent_items = []
+    recent_items_batch = get_recent_items_batch(context, request, 5)
+    for item in recent_items_batch["entries"]:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        recent_items.append(adapted)
+
+    return {'items': recent_items}
+
+def get_members_batch(community, request, size=10):
+    mods = list(community.moderator_names)
+    members = list(community.member_names - community.moderator_names)
+    any = list(community.member_names | community.moderator_names)
+    principals = effective_principals(request)
+    searcher = ICatalogSearch(community)
+    total, docids, resolver = searcher(interfaces=[IProfile],
+                                       limit=size,
+                                       name={'query': any,
+                                             'operator': 'or'},
+                                       allowed={'query': principals,
+                                                'operator': 'or'},
+                                      )
+    mod_entries = []
+    other_entries = []
+
+    for docid in docids:
+        model = resolver(docid)
+        if model is not None:
+            if model.__name__ in mods:
+                mod_entries.append(model)
+            else:
+                other_entries.append(model)
+
+    return (mod_entries + other_entries)[:size]
+                                  
+
+def community_members_ajax_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    members = []
+    members_batch = get_members_batch(context, request, 5)
+    for item in members_batch:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        adapted.moderator = item.__name__ in context.moderator_names
+        members.append(adapted)
+
+    return {'items': members}
+
 security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
@@ -341,115 +450,6 @@ class EditCommunityFormController(object):
 
     def _get_security_states(self):
         return get_security_states(self.workflow, self.context, self.request)
-
-def get_recent_items_batch(community, request, size=10):
-    batch = get_catalog_batch_grid(
-        community, request, interfaces=[ICommunityContent],
-        sort_index="modified_date", reverse=True, batch_size=size,
-        path={'query': model_path(community)},
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-    )
-    return batch
-
-def redirect_community_view(context, request):
-    assert ICommunity.providedBy(context), str(type(context))
-
-    default_tool = getattr(context, 'default_tool', None)
-    if not default_tool:
-        default_tool = 'view.html'
-    return HTTPFound(location=model_url(context, request, default_tool))
-
-def show_community_view(context, request):
-    assert ICommunity.providedBy(context), str(type(context))
-
-    user = authenticated_userid(request)
-    page_title = 'View Community ' + context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # provide client data for rendering current tags in the tagbox
-    tagquery = getMultiAdapter((context, request), ITagQuery)
-    client_json_data = {'tagbox': {'docid': tagquery.docid,
-                                   'records': tagquery.tagswithcounts,
-                                  },
-                       }
-
-    # Filter the actions based on permission
-    actions = []
-    if has_permission(MODERATE, context, request):
-        actions.append(('Edit', 'edit.html'))
-
-    # If user has permission to see this view then has permission to join.
-    if not(user in context.member_names or user in context.moderator_names):
-        actions.append(('Join', 'join.html'))
-
-    if has_permission(DELETE_COMMUNITY, context, request):
-        actions.append(('Delete', 'delete.html'))
-
-    recent_items = []
-    recent_items_batch = get_recent_items_batch(context, request)
-    for item in recent_items_batch["entries"]:
-        adapted = getMultiAdapter((item, request), IGridEntryInfo)
-        recent_items.append(adapted)
-
-    feed_url = model_url(context, request, "atom.xml")
-
-    return {'api': api,
-            'actions': actions,
-            'recent_items': recent_items,
-            'batch_info': recent_items_batch,
-            'head_data': convert_to_script(client_json_data),
-            'feed_url': feed_url,
-           }
-
-def community_recent_items_ajax_view(context, request):
-    assert ICommunity.providedBy(context), str(type(context))
-
-    recent_items = []
-    recent_items_batch = get_recent_items_batch(context, request, 5)
-    for item in recent_items_batch["entries"]:
-        adapted = getMultiAdapter((item, request), IGridEntryInfo)
-        recent_items.append(adapted)
-
-    return {'items': recent_items}
-
-def get_members_batch(community, request, size=10):
-    mods = list(community.moderator_names)
-    members = list(community.member_names - community.moderator_names)
-    any = list(community.member_names | community.moderator_names)
-    principals = effective_principals(request)
-    searcher = ICatalogSearch(community)
-    total, docids, resolver = searcher(interfaces=[IProfile],
-                                       limit=size,
-                                       name={'query': any,
-                                             'operator': 'or'},
-                                       allowed={'query': principals,
-                                                'operator': 'or'},
-                                      )
-    mod_entries = []
-    other_entries = []
-
-    for docid in docids:
-        model = resolver(docid)
-        if model is not None:
-            if model.__name__ in mods:
-                mod_entries.append(model)
-            else:
-                other_entries.append(model)
-
-    return (mod_entries + other_entries)[:size]
-                                  
-
-def community_members_ajax_view(context, request):
-    assert ICommunity.providedBy(context), str(type(context))
-
-    members = []
-    members_batch = get_members_batch(context, request, 5)
-    for item in members_batch:
-        adapted = getMultiAdapter((item, request), IGridEntryInfo)
-        adapted.moderator = item.__name__ in context.moderator_names
-        members.append(adapted)
-
-    return {'items': members}
 
 def join_community_view(context, request):
     """ User sends an email to community moderator(s) asking to join

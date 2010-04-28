@@ -23,6 +23,192 @@ from repoze.bfg import testing
 
 from karl import testing as karltesting
 
+class ShowCommunityViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _register(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        from karl.models.interfaces import ICommunityInfo
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
+                                IGridEntryInfo)
+        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+                                ICommunityInfo)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+
+    def _callFUT(self, context, request):
+        from karl.views.community import show_community_view
+        return show_community_view(context, request)
+
+    def _makeCommunity(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        community = testing.DummyModel(title='thetitle')
+        community.member_names = community.moderator_names = set()
+        directlyProvides(community, ICommunity)
+        foo = testing.DummyModel(__name__='foo')
+        catalog = karltesting.DummyCatalog({1:'/foo'})
+        testing.registerModels({'/foo':foo})
+        community.catalog = catalog
+        return community
+
+    def test_not_a_member(self):
+        from repoze.bfg.url import model_url
+        self._register()
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['actions'],
+                         [('Edit', 'edit.html'),
+                          ('Join', 'join.html'),
+                          ('Delete', 'delete.html'),
+                         ])
+        self.assertEqual(info['feed_url'],
+                         model_url(context, request, "atom.xml"))
+        self.assertEqual(len(info['recent_items']), 1)
+        self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
+
+    def test_already_member(self):
+        self._register()
+        context = self._makeCommunity()
+        context.member_names = set(('userid',))
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy('userid')
+        info = self._callFUT(context, request)
+        self.assertEqual(info['actions'],
+                         [('Edit', 'edit.html'),
+                          ('Delete', 'delete.html'),
+                         ])
+
+class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _register(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
+                                IGridEntryInfo)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+
+    def _callFUT(self, context, request):
+        from karl.views.community import community_recent_items_ajax_view
+        return community_recent_items_ajax_view(context, request)
+
+    def _makeCommunity(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        community = testing.DummyModel(title='thetitle')
+        directlyProvides(community, ICommunity)
+        foo = testing.DummyModel(__name__='foo')
+        catalog = karltesting.DummyCatalog({1:'/foo'})
+        testing.registerModels({'/foo':foo})
+        community.catalog = catalog
+        return community
+
+    def test_simple(self):
+        self._register()
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(len(info['items']), 1)
+        self.assertEqual(info['items'][0].context.__name__, 'foo')
+
+class CommunityMembersAjaxViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _register(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import IGridEntryInfo
+        from karl.models.adapters import CatalogSearch
+        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
+                                IGridEntryInfo)
+        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+
+    def _callFUT(self, context, request):
+        from karl.views.community import community_members_ajax_view
+        return community_members_ajax_view(context, request)
+
+    def _makeCommunity(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        community = testing.DummyModel(title='thetitle')
+        catalog = karltesting.DummyCatalog({1: '/profiles/phred',
+                                            2: '/profiles/bharney',
+                                            3: '/profiles/wylma',
+                                           })
+        phred = testing.DummyModel(__name__='phred')
+        bharney = testing.DummyModel(__name__='bharney')
+        wylma = testing.DummyModel(__name__='wylma')
+        testing.registerModels({'/profiles/phred':phred,
+                                '/profiles/bharney':bharney,
+                                '/profiles/wylma':wylma,
+                               })
+        community.catalog = catalog
+        community.member_names = set(['phred', 'bharney', 'wylma'])
+        community.moderator_names = set(['bharney'])
+        directlyProvides(community, ICommunity)
+        return community
+
+    def test_simple(self):
+        self._register()
+        context = self._makeCommunity()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(len(info['items']), 3)
+        self.assertEqual(info['items'][0].context.__name__, 'bharney')
+        self.assertEqual(info['items'][1].context.__name__, 'phred')
+        self.assertEqual(info['items'][2].context.__name__, 'wylma')
+        
+class RedirectCommunityViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.community import redirect_community_view
+        return redirect_community_view(context, request)
+    
+    def test_it(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        context.default_tool = 'murg'
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location, 'http://example.com/murg')
+        
+    def test_it_notool(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location, 'http://example.com/view.html')
+
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -359,193 +545,6 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         view.handle_submit(converted)
         self.assertEqual(blog_tool_factory.removed, True)
         self.assertEqual(calendar_tool_factory.added, True)
-
-class ShowCommunityViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _register(self):
-        from zope.interface import Interface
-        from karl.models.interfaces import ITagQuery
-        from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-
-    def _callFUT(self, context, request):
-        from karl.views.community import show_community_view
-        return show_community_view(context, request)
-
-    def _makeCommunity(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
-        community = testing.DummyModel(title='thetitle')
-        community.member_names = community.moderator_names = set()
-        directlyProvides(community, ICommunity)
-        foo = testing.DummyModel(__name__='foo')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
-        community.catalog = catalog
-        return community
-
-    def test_not_a_member(self):
-        from repoze.bfg.url import model_url
-        self._register()
-        context = self._makeCommunity()
-        request = testing.DummyRequest()
-        info = self._callFUT(context, request)
-        actions = info['actions']
-        self.assertEqual(info['actions'],
-                         [('Edit', 'edit.html'),
-                          ('Join', 'join.html'),
-                          ('Delete', 'delete.html'),
-                         ])
-        self.assertEqual(info['feed_url'],
-                         model_url(context, request, "atom.xml"))
-        self.assertEqual(len(info['recent_items']), 1)
-        self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
-
-    def test_already_member(self):
-        self._register()
-        context = self._makeCommunity()
-        context.member_names = set(('userid',))
-        request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('userid')
-        info = self._callFUT(context, request)
-        self.assertEqual(info['actions'],
-                         [('Edit', 'edit.html'),
-                          ('Delete', 'delete.html'),
-                         ])
-
-class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _register(self):
-        from zope.interface import Interface
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-
-    def _callFUT(self, context, request):
-        from karl.views.community import community_recent_items_ajax_view
-        return community_recent_items_ajax_view(context, request)
-
-    def _makeCommunity(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
-        community = testing.DummyModel(title='thetitle')
-        directlyProvides(community, ICommunity)
-        foo = testing.DummyModel(__name__='foo')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
-        community.catalog = catalog
-        return community
-
-    def test_simple(self):
-        self._register()
-        context = self._makeCommunity()
-        request = testing.DummyRequest()
-        info = self._callFUT(context, request)
-        self.assertEqual(len(info['items']), 1)
-        self.assertEqual(info['items'][0].context.__name__, 'foo')
-
-class CommunityMembersAjaxViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _register(self):
-        from zope.interface import Interface
-        from karl.models.interfaces import ICatalogSearch
-        from karl.models.interfaces import IGridEntryInfo
-        from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-
-    def _callFUT(self, context, request):
-        from karl.views.community import community_members_ajax_view
-        return community_members_ajax_view(context, request)
-
-    def _makeCommunity(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import ICommunity
-        community = testing.DummyModel(title='thetitle')
-        catalog = karltesting.DummyCatalog({1: '/profiles/phred',
-                                            2: '/profiles/bharney',
-                                            3: '/profiles/wylma',
-                                           })
-        phred = testing.DummyModel(__name__='phred')
-        bharney = testing.DummyModel(__name__='bharney')
-        wylma = testing.DummyModel(__name__='wylma')
-        testing.registerModels({'/profiles/phred':phred,
-                                '/profiles/bharney':bharney,
-                                '/profiles/wylma':wylma,
-                               })
-        community.catalog = catalog
-        community.member_names = set(['phred', 'bharney', 'wylma'])
-        community.moderator_names = set(['bharney'])
-        directlyProvides(community, ICommunity)
-        return community
-
-    def test_simple(self):
-        self._register()
-        context = self._makeCommunity()
-        request = testing.DummyRequest()
-        info = self._callFUT(context, request)
-        self.assertEqual(len(info['items']), 3)
-        self.assertEqual(info['items'][0].context.__name__, 'bharney')
-        self.assertEqual(info['items'][1].context.__name__, 'phred')
-        self.assertEqual(info['items'][2].context.__name__, 'wylma')
-        
-class RedirectCommunityViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.views.community import redirect_community_view
-        return redirect_community_view(context, request)
-    
-    def test_it(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        context = testing.DummyModel()
-        directlyProvides(context, ICommunity)
-        context.default_tool = 'murg'
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/murg')
-        
-    def test_it_notool(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        context = testing.DummyModel()
-        directlyProvides(context, ICommunity)
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/view.html')
         
 class JoinCommunityViewTests(unittest.TestCase):
     def setUp(self):
