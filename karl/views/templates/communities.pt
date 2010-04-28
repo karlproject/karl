@@ -80,8 +80,9 @@
           <a href="${tab['url']}/add.html"
              title="Add">+</a>
          </tal:if>
-         <tal:if tal:condition="not repeat.tab.end">&nbsp;|&nbsp;</tal:if>
+         &nbsp;|&nbsp;
         </tal:loop>
+        <a href="${community.url}/members">members</a>
        </div>
       </div>
       <script type="text/javascript">
