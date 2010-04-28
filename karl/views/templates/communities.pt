@@ -11,6 +11,9 @@
    .ui-tabs .ui-tabs-hide {
      display: none;
    }
+   .communityEntry {
+        overflow-y: auto;
+   }
    .community-tabs {
         float:right;
         width: 235px;
