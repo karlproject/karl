@@ -25,7 +25,6 @@ from webob import Response
 
 from zope.component import getMultiAdapter
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_model
 from repoze.bfg.security import authenticated_userid
@@ -142,8 +141,7 @@ def jquery_tag_del_view(context, request):
     result = JSONEncoder().encode(status)
     return Response(result, content_type="application/x-json")
 
-def showtag_view(context, request, template='templates/showtag.pt',
-                 community=None, user=None, crumb_title=None, ):
+def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""
 
     page_title = 'Show Tag'
@@ -232,19 +230,17 @@ def showtag_view(context, request, template='templates/showtag.pt',
         args['crumbs'] = '%s / %s / %s' % (
             system_name, crumb_title, context.__name__)
 
-    return render_template_to_response(template, **args)
+    return dict(**args)
 
 def community_showtag_view(context, request):
     """Show a page for a particular community tag."""
     return showtag_view(context, request,
-                        template='templates/community_showtag.pt',
                         community=context.__name__,
                         crumb_title='Communities')
 
 def profile_showtag_view(context, request):
     """Show a page for a particular user tag."""
     return showtag_view(context, request,
-                        template='templates/profile_showtag.pt',
                         user=context.__name__,
                         crumb_title='Profiles')
 
@@ -276,7 +272,6 @@ def _calculateTagWeights(taglist):
     mean = total/count
     var = reduce(lambda x,y: x + math.pow(y-mean, 2), counts, 0)/count
     stddev = math.sqrt(var)
-    tmp = {}
     for t in taglist:
         factor = (t['count'] - mean)
         weight = t['weight'] = norm(factor, stddev)
@@ -296,8 +291,7 @@ def tag_cloud_view(context, request):
     else:
         entries = ()
 
-    return render_template_to_response(
-        'templates/tagcloud.pt',
+    return dict(
         api=api,
         entries=entries,
         )
@@ -317,8 +311,7 @@ def community_tag_cloud_view(context, request):
         entries = ()
 
     system_name = get_setting(context, 'system_name', 'KARL')
-    return render_template_to_response(
-        'templates/community_tagcloud.pt',
+    return dict(
         api=api,
         entries=entries,
         crumbs='%s / Communities / %s' % (system_name, context.__name__),
@@ -336,8 +329,7 @@ def tag_listing_view(context, request):
         entries = [{'name': x[0], 'count': x[1]} for x in tags.getFrequency()]
         entries.sort(key=lambda x: x['name'])
 
-    return render_template_to_response(
-        'templates/taglisting.pt',
+    return dict(
         api=api,
         entries=entries,
         )
@@ -356,8 +348,7 @@ def community_tag_listing_view(context, request):
         entries.sort(key=lambda x: x['name'])
 
     system_name = get_setting(context, 'system_name', 'KARL')
-    return render_template_to_response(
-        'templates/community_taglisting.pt',
+    return dict(
         api=api,
         entries=entries,
         crumbs='%s / Communities / %s' % (system_name, context.__name__),
@@ -379,8 +370,7 @@ def profile_tag_listing_view(context, request):
         entries.sort(key=lambda x: x['name'])
 
     system_name = get_setting(context, 'system_name', 'KARL')
-    return render_template_to_response(
-        'templates/profile_taglisting.pt',
+    return dict(
         api=api,
         entries=entries,
         crumbs='%s / Profiles / %s' % (system_name, context.__name__),
@@ -419,8 +409,7 @@ def tag_users_view(context, request):
     else:
         users = ()
 
-    return render_template_to_response(
-        'templates/tagusers.pt',
+    return dict(
         api=api,
         tag=tag,
         url=model_url(target, request),
@@ -463,8 +452,7 @@ def community_tag_users_view(context, request):
     else:
         users = ()
 
-    return render_template_to_response(
-        'templates/community_tagusers.pt',
+    return dict(
         api=api,
         tag=tag,
         url=model_url(target, request),
@@ -516,8 +504,7 @@ def manage_tags_view(context, request):
         tags = list(tagger.getTags(users=(context.__name__,)))
         tags.sort()
 
-    return render_template_to_response(
-        'templates/profile_tagedit.pt',
+    return dict(
         api=api,
         tags=tags,
         error=error,

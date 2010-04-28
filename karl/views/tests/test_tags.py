@@ -135,13 +135,12 @@ class ShowTagViewTests(unittest.TestCase):
         context.tags = DummyTags()
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, None)
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(len(renderer.related), 0)
+        self.assertEqual(result['tag'], None)
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_tag(self):
         from zope.interface import directlyProvides
@@ -162,13 +161,12 @@ class ShowTagViewTests(unittest.TestCase):
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer('templates/showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/')
@@ -176,9 +174,9 @@ class ShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['type'], 'Blog Entry')
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 2)
-        self.assertEqual(renderer.related[0], 'tag2')
-        self.assertEqual(renderer.related[1], 'tag3')
+        self.assertEqual(len(result['related']), 2)
+        self.assertEqual(result['related'][0], 'tag2')
+        self.assertEqual(result['related'][1], 'tag3')
 
     def test_with_tag_multiple_users(self):
         from zope.interface import directlyProvides
@@ -199,13 +197,12 @@ class ShowTagViewTests(unittest.TestCase):
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer('templates/showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/')
@@ -213,7 +210,7 @@ class ShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['type'], 'Blog Entry')
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 0)
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_jumptag(self):
         # This is when the tagcloud or taglisting "jumps" to a tag
@@ -224,10 +221,8 @@ class ShowTagViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
-        renderer = testing.registerDummyRenderer('templates/showtag.pt')
 
         response = self._callFUT(context, request)
-
         self.assertEqual(response.location, 'http://example.com/showtag/tag2')
 
 
@@ -248,15 +243,13 @@ class CommunityShowTagViewTests(unittest.TestCase):
         root.catalog = DummyCatalog()
         context = root['community'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, None)
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(len(renderer.related), 0)
-        self.assertEqual(renderer.crumbs, 'KARL / Communities / community')
+        self.assertEqual(result['tag'], None)
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(len(result['related']), 0)
+        self.assertEqual(result['crumbs'], 'KARL / Communities / community')
 
     def test_with_tag(self):
         from zope.interface import directlyProvides
@@ -279,14 +272,12 @@ class CommunityShowTagViewTests(unittest.TestCase):
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/community/')
@@ -295,9 +286,9 @@ class CommunityShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/community/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 2)
-        self.assertEqual(renderer.related[0], 'tag2')
-        self.assertEqual(renderer.related[1], 'tag3')
+        self.assertEqual(len(result['related']), 2)
+        self.assertEqual(result['related'][0], 'tag2')
+        self.assertEqual(result['related'][1], 'tag3')
 
     def test_with_tag_multiple_users(self):
         from zope.interface import directlyProvides
@@ -326,14 +317,12 @@ class CommunityShowTagViewTests(unittest.TestCase):
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/community/')
@@ -342,7 +331,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/community/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 0)
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_jumptag(self):
         # This is when the tagcloud or taglisting "jumps" to a tag
@@ -354,8 +343,6 @@ class CommunityShowTagViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_showtag.pt')
 
         response = self._callFUT(context, request)
 
@@ -380,15 +367,13 @@ class ProfileShowTagViewTests(unittest.TestCase):
         profiles = root['profiles'] = testing.DummyModel()
         context = profiles['phred'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, None)
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(len(renderer.related), 0)
-        self.assertEqual(renderer.crumbs, 'KARL / Profiles / phred')
+        self.assertEqual(result['tag'], None)
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(len(result['related']), 0)
+        self.assertEqual(result['crumbs'], 'KARL / Profiles / phred')
 
     def test_with_tag(self):
         from zope.interface import directlyProvides
@@ -412,16 +397,14 @@ class ProfileShowTagViewTests(unittest.TestCase):
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
         self.assertEqual(tags.getItems_called_with,
                         (('tag1',), ('phred',), None))
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/profiles/phred/')
@@ -430,9 +413,9 @@ class ProfileShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/profiles/phred/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 2)
-        self.assertEqual(renderer.related[0], 'tag2')
-        self.assertEqual(renderer.related[1], 'tag3')
+        self.assertEqual(len(result['related']), 2)
+        self.assertEqual(result['related'][0], 'tag2')
+        self.assertEqual(result['related'][1], 'tag3')
 
     def test_with_tag_multiple_users(self):
         from zope.interface import directlyProvides
@@ -462,14 +445,12 @@ class ProfileShowTagViewTests(unittest.TestCase):
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
         request.subpath = [u'tag1']
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_showtag.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, u'tag1')
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(result['tag'], u'tag1')
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['description'], '')
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/profiles/phred/')
@@ -478,7 +459,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/profiles/phred/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(renderer.related), 0)
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_jumptag(self):
         # This is when the tagcloud or taglisting "jumps" to a tag
@@ -491,11 +472,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_showtag.pt')
-
         response = self._callFUT(context, request)
-
         self.assertEqual(response.location,
                          'http://example.com/profiles/phred/showtag/tag2')
 
@@ -514,37 +491,34 @@ class TagCloudViewTests(unittest.TestCase):
     def test_wo_tags_tool(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/tagcloud.pt')
         context.catalog = DummyCatalog()
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_empty(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/tagcloud.pt')
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: []
         context.catalog = DummyCatalog()
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_one_tag(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/tagcloud.pt')
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('foo', 1)]
         context.catalog = DummyCatalog()
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['name'], 'foo')
         self.assertEqual(entry['count'], 1)
         self.assertEqual(entry['weight'], 7)
@@ -553,30 +527,28 @@ class TagCloudViewTests(unittest.TestCase):
     def test_w_tags_sorted_by_name(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/tagcloud.pt')
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
                                     for x in range(10)]
         context.catalog = DummyCatalog()
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.entries[0]['name'], 'tag_000')
-        self.assertEqual(renderer.entries[-1]['name'], 'tag_009')
+        self.assertEqual(result['entries'][0]['name'], 'tag_000')
+        self.assertEqual(result['entries'][-1]['name'], 'tag_009')
 
     def test_w_tags_exceeding_limit(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/tagcloud.pt')
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
                                     for x in range(120)]
         context.catalog = DummyCatalog()
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 100)
-        names = [x['name'] for x in renderer.entries]
+        self.assertEqual(len(result['entries']), 100)
+        names = [x['name'] for x in result['entries']]
         for i in range(20):
             self.failIf('tag_%03d' % i in names)
         for i in range(20, 120):
@@ -601,13 +573,11 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         context.__name__ = 'community'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                        'templates/community_tagcloud.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(renderer.crumbs, 'KARL / Communities / community')
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(result['crumbs'], 'KARL / Communities / community')
 
     def test_w_tags_tool_empty(self):
         context = testing.DummyModel()
@@ -621,12 +591,10 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                        'templates/community_tagcloud.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_one_tag(self):
         context = testing.DummyModel()
@@ -640,13 +608,11 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                        'templates/community_tagcloud.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 1)
-        entry = renderer.entries[0]
+        self.assertEqual(len(result['entries']), 1)
+        entry = result['entries'][0]
         self.assertEqual(entry['name'], 'foo')
         self.assertEqual(entry['count'], 1)
         self.assertEqual(entry['weight'], 7)
@@ -664,13 +630,11 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                        'templates/community_tagcloud.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.entries[0]['name'], 'tag_000')
-        self.assertEqual(renderer.entries[-1]['name'], 'tag_009')
+        self.assertEqual(result['entries'][0]['name'], 'tag_000')
+        self.assertEqual(result['entries'][-1]['name'], 'tag_009')
 
     def test_w_tags_exceeding_limit(self):
         context = testing.DummyModel()
@@ -684,13 +648,11 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                        'templates/community_tagcloud.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 100)
-        names = [x['name'] for x in renderer.entries]
+        self.assertEqual(len(result['entries']), 100)
+        names = [x['name'] for x in result['entries']]
         for i in range(20):
             self.failIf('tag_%03d' % i in names)
         for i in range(20, 120):
@@ -714,11 +676,10 @@ class TagListingViewTests(unittest.TestCase):
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_empty(self):
         context = testing.DummyModel()
@@ -726,11 +687,10 @@ class TagListingViewTests(unittest.TestCase):
         tags.getFrequency = lambda: []
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_nonempty(self):
         TAGS = [('foo', 2), ('bar', 1), ('baz', 3),]
@@ -739,14 +699,13 @@ class TagListingViewTests(unittest.TestCase):
         tags.getFrequency = lambda: TAGS
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), len(TAGS))
-        self.assertEqual(renderer.entries[0], {'name': 'bar', 'count': 1})
-        self.assertEqual(renderer.entries[1], {'name': 'baz', 'count': 3})
-        self.assertEqual(renderer.entries[2], {'name': 'foo', 'count': 2})
+        self.assertEqual(len(result['entries']), len(TAGS))
+        self.assertEqual(result['entries'][0], {'name': 'bar', 'count': 1})
+        self.assertEqual(result['entries'][1], {'name': 'baz', 'count': 3})
+        self.assertEqual(result['entries'][2], {'name': 'foo', 'count': 2})
 
 class CommunityTagListingViewTests(unittest.TestCase):
     def setUp(self):
@@ -764,13 +723,11 @@ class CommunityTagListingViewTests(unittest.TestCase):
         context.__name__ = 'community'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/community_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(renderer.crumbs, 'KARL / Communities / community')
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(result['crumbs'], 'KARL / Communities / community')
 
     def test_w_tags_tool_empty(self):
         context = testing.DummyModel()
@@ -783,12 +740,10 @@ class CommunityTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/community_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_nonempty(self):
         TAGS = [('foo', 3), ('bar', 2), ('baz', 1)]
@@ -802,15 +757,13 @@ class CommunityTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/community_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), len(TAGS))
-        self.assertEqual(renderer.entries[0], {'name': 'bar', 'count': 2})
-        self.assertEqual(renderer.entries[1], {'name': 'baz', 'count': 1})
-        self.assertEqual(renderer.entries[2], {'name': 'foo', 'count': 3})
+        self.assertEqual(len(result['entries']), len(TAGS))
+        self.assertEqual(result['entries'][0], {'name': 'bar', 'count': 2})
+        self.assertEqual(result['entries'][1], {'name': 'baz', 'count': 1})
+        self.assertEqual(result['entries'][2], {'name': 'foo', 'count': 3})
 
 class ProfileTagListingViewTests(unittest.TestCase):
     def setUp(self):
@@ -828,13 +781,11 @@ class ProfileTagListingViewTests(unittest.TestCase):
         context.__name__ = 'phred'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/profile_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
-        self.assertEqual(renderer.crumbs, 'KARL / Profiles / phred')
+        self.assertEqual(len(result['entries']), 0)
+        self.assertEqual(result['crumbs'], 'KARL / Profiles / phred')
 
     def test_w_tags_tool_empty(self):
         context = testing.DummyModel()
@@ -854,12 +805,10 @@ class ProfileTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/profile_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), 0)
+        self.assertEqual(len(result['entries']), 0)
 
     def test_w_tags_tool_nonempty(self):
         TAGS = [('foo', 3), ('bar', 2), ('baz', 1)]
@@ -880,15 +829,13 @@ class ProfileTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                            'templates/profile_taglisting.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.entries), len(TAGS))
-        self.assertEqual(renderer.entries[0], {'name': 'bar', 'count': 2})
-        self.assertEqual(renderer.entries[1], {'name': 'baz', 'count': 1})
-        self.assertEqual(renderer.entries[2], {'name': 'foo', 'count': 3})
+        self.assertEqual(len(result['entries']), len(TAGS))
+        self.assertEqual(result['entries'][0], {'name': 'bar', 'count': 2})
+        self.assertEqual(result['entries'][1], {'name': 'baz', 'count': 1})
+        self.assertEqual(result['entries'][2], {'name': 'foo', 'count': 3})
 
 class TagUsersViewTests(unittest.TestCase):
     def setUp(self):
@@ -926,14 +873,13 @@ class TagUsersViewTests(unittest.TestCase):
         request.params = {'tag': 'tag1', 'docid': '1'}
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
-        renderer = testing.registerDummyRenderer('templates/tagusers.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, 'tag1')
-        self.assertEqual(renderer.url, 'http://example.com/path/to/item/')
-        self.assertEqual(renderer.title, 'Target')
-        self.assertEqual(len(renderer.users), 0)
+        self.assertEqual(result['tag'], 'tag1')
+        self.assertEqual(result['url'], 'http://example.com/path/to/item/')
+        self.assertEqual(result['title'], 'Target')
+        self.assertEqual(len(result['users']), 0)
 
     def test_with_both_params_w_tags_tool(self):
         context = testing.DummyModel()
@@ -951,14 +897,13 @@ class TagUsersViewTests(unittest.TestCase):
         p1.firstname, p1.lastname = 'J. Phred', 'Bloggs'
         request = testing.DummyRequest()
         request.params = {'tag': 'tag1', 'docid': '1'}
-        renderer = testing.registerDummyRenderer('templates/tagusers.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.users), 1)
-        self.assertEqual(renderer.users[0]['login'], 'phred')
-        self.assertEqual(renderer.users[0]['fullname'], 'J. Phred Bloggs')
-        self.assertEqual(renderer.users[0]['also'], ['tag2'])
+        self.assertEqual(len(result['users']), 1)
+        self.assertEqual(result['users'][0]['login'], 'phred')
+        self.assertEqual(result['users'][0]['fullname'], 'J. Phred Bloggs')
+        self.assertEqual(result['users'][0]['also'], ['tag2'])
 
 class CommunityTagUsersViewTests(unittest.TestCase):
     def setUp(self):
@@ -998,15 +943,13 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         testing.registerModels({'/community/target': target})
         request = testing.DummyRequest()
         request.params = {'tag': 'tag1', 'docid': '1'}
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_tagusers.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(renderer.tag, 'tag1')
-        self.assertEqual(renderer.url, 'http://example.com/community/target/')
-        self.assertEqual(renderer.title, 'Target')
-        self.assertEqual(len(renderer.users), 0)
+        self.assertEqual(result['tag'], 'tag1')
+        self.assertEqual(result['url'], 'http://example.com/community/target/')
+        self.assertEqual(result['title'], 'Target')
+        self.assertEqual(len(result['users']), 0)
 
     def test_with_both_params_w_tags_tool(self):
         root = testing.DummyModel()
@@ -1033,15 +976,13 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         p1.firstname, p1.lastname = 'J. Phred', 'Bloggs'
         request = testing.DummyRequest()
         request.params = {'tag': 'tag1', 'docid': '1'}
-        renderer = testing.registerDummyRenderer(
-                                'templates/community_tagusers.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.users), 1)
-        self.assertEqual(renderer.users[0]['login'], 'phred')
-        self.assertEqual(renderer.users[0]['fullname'], 'J. Phred Bloggs')
-        self.assertEqual(renderer.users[0]['also'], ['tag2'])
+        self.assertEqual(len(result['users']), 1)
+        self.assertEqual(result['users'][0]['login'], 'phred')
+        self.assertEqual(result['users'][0]['fullname'], 'J. Phred Bloggs')
+        self.assertEqual(result['users'][0]['also'], ['tag2'])
 
 
 class ManageTagsViewTests(unittest.TestCase):
@@ -1066,14 +1007,12 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_tagedit.pt')
 
-        self._callFUT(context, request)
+        result = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.tags), 2)
-        self.assertEqual(renderer.tags[0], 'tag1')
-        self.assertEqual(renderer.tags[1], 'tag2')
+        self.assertEqual(len(result['tags']), 2)
+        self.assertEqual(result['tags'][0], 'tag1')
+        self.assertEqual(result['tags'][1], 'tag2')
 
     def test_submitted_rename(self):
         context = testing.DummyModel()
@@ -1112,8 +1051,6 @@ class ManageTagsViewTests(unittest.TestCase):
         request.POST['form.rename'] = 'Rename tag'
         request.POST['old_tag'] = 'foo'
         request.POST['new_tag'] = 'bar'
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_tagedit.pt')
 
         self._callFUT(context, request)
 
@@ -1156,8 +1093,6 @@ class ManageTagsViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.POST['form.delete'] = 'Remove tag'
         request.POST['old_tag'] = 'foo'
-        renderer = testing.registerDummyRenderer(
-                                'templates/profile_tagedit.pt')
 
         self._callFUT(context, request)
 

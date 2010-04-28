@@ -74,6 +74,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.showtag_view"
+    renderer="templates/showtag.pt"
     permission="view"
     name="showtag"
   />
@@ -81,6 +82,7 @@
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_showtag_view"
+    renderer="templates/community_showtag.pt"
     permission="view"
     name="showtag"
   />
@@ -88,6 +90,7 @@
   <view
     for="karl.models.interfaces.IProfile"
     view=".tags.profile_showtag_view"
+    renderer="templates/profile_showtag.pt"
     permission="view"
     name="showtag"
   />
@@ -96,6 +99,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_cloud_view"
+    renderer="templates/tagcloud.pt"
     permission="view"
     name="tagcloud.html"
   />
@@ -103,6 +107,7 @@
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_cloud_view"
+    renderer="templates/community_tagcloud.pt"
     permission="view"
     name="tagcloud.html"
   />
@@ -110,6 +115,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_listing_view"
+    renderer="templates/taglisting.pt"
     permission="view"
     name="taglisting.html"
   />
@@ -117,6 +123,7 @@
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_listing_view"
+    renderer="templates/community_taglisting.pt"
     permission="view"
     name="taglisting.html"
   />
@@ -124,6 +131,7 @@
   <view
     for="karl.models.interfaces.IProfile"
     view=".tags.profile_tag_listing_view"
+    renderer="templates/profile_taglisting.pt"
     permission="view"
     name="taglisting.html"
   />
@@ -131,6 +139,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_users_view"
+    renderer="templates/tagusers.pt"
     permission="view"
     name="tagusers.html"
   />
@@ -138,6 +147,7 @@
   <view
     for="karl.models.interfaces.ICommunity"
     view=".tags.community_tag_users_view"
+    renderer="templates/community_tagusers.pt"
     permission="view"
     name="tagusers.html"
   />
@@ -145,6 +155,7 @@
   <view
     for="karl.models.interfaces.IProfile"
     view=".tags.manage_tags_view"
+    renderer="templates/profile_tagedit.pt"
     permission="edit"
     name="manage_tags.html"
   />
