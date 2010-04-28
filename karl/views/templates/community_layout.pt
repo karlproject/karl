@@ -67,7 +67,9 @@
             <h1>${api.community_info.title}
 	      <span
 		 tal:condition="not api.has_staff_acl(api.community_info.context)"
-		 metal:use-macro="api.snippets.macros['privacy_badge']"/></h1>
+		 metal:use-macro="api.snippets.macros['privacy_badge']"/><span
+         tal:condition="api.community_info.moderator"
+         metal:use-macro="api.snippets.macros['moderator_badge']"/></h1>
           </div>
           <div id="cwrapper">
             <div id="cleftcol">
