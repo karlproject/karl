@@ -23,6 +23,36 @@ from repoze.bfg import testing
 
 from karl import testing as karltesting
 
+class RedirectCommunityViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.community import redirect_community_view
+        return redirect_community_view(context, request)
+
+    def test_it(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        context.default_tool = 'murg'
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location, 'http://example.com/murg')
+
+    def test_it_notool(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location, 'http://example.com/view.html')
+
 class ShowCommunityViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -178,36 +208,6 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
         self.assertEqual(info['items'][0].context.__name__, 'bharney')
         self.assertEqual(info['items'][1].context.__name__, 'phred')
         self.assertEqual(info['items'][2].context.__name__, 'wylma')
-        
-class RedirectCommunityViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.views.community import redirect_community_view
-        return redirect_community_view(context, request)
-    
-    def test_it(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        context = testing.DummyModel()
-        directlyProvides(context, ICommunity)
-        context.default_tool = 'murg'
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/murg')
-        
-    def test_it_notool(self):
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        context = testing.DummyModel()
-        directlyProvides(context, ICommunity)
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, 'http://example.com/view.html')
 
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
@@ -339,8 +339,8 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(community.text, 'thetext')
         self.assertEqual(community.default_tool, 'blog')
         self.assertEqual(
-            context.users.added_groups, 
-            [('userid', 'moderators'), ('userid', 'members') ] 
+            context.users.added_groups,
+            [('userid', 'moderators'), ('userid', 'members') ]
         )
         self.assertEqual(dummy_tool_factory.added, True)
         self.assertEqual(len(_tagged), 1)
@@ -545,7 +545,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         view.handle_submit(converted)
         self.assertEqual(blog_tool_factory.removed, True)
         self.assertEqual(calendar_tool_factory.added, True)
-        
+
 class JoinCommunityViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -556,7 +556,7 @@ class JoinCommunityViewTests(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.community import join_community_view
         return join_community_view(context, request)
-    
+
     def test_show_form(self):
         c = karltesting.DummyCommunity()
         site = c.__parent__.__parent__
@@ -569,14 +569,14 @@ class JoinCommunityViewTests(unittest.TestCase):
         self.assertEqual(renderer.profile, profiles["user"])
         self.assertEqual(renderer.community, c)
         self.assertEqual(
-            renderer.post_url, 
+            renderer.post_url,
             "http://example.com/communities/community/join.html"
         )
-        
+
     def test_submit_form(self):
         from repoze.sendmail.interfaces import IMailDelivery
         testing.registerDummyRenderer("templates/join_community.pt")
-        
+
         c = karltesting.DummyCommunity()
         c.moderator_names = set(["moderator1", "moderator2"])
         site = c.__parent__.__parent__
@@ -586,8 +586,8 @@ class JoinCommunityViewTests(unittest.TestCase):
         profiles["moderator2"] = karltesting.DummyProfile()
 
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery) 
-        
+        testing.registerUtility(mailer, IMailDelivery)
+
         testing.registerDummySecurityPolicy("user")
         request = testing.DummyRequest({
             "form.submitted": "1",
@@ -601,10 +601,10 @@ class JoinCommunityViewTests(unittest.TestCase):
                          "to+the+moderators.")
         self.assertEqual(len(mailer), 1)
         msg = mailer.pop()
-        self.assertEqual(msg.mto, ["moderator1@x.org", 
+        self.assertEqual(msg.mto, ["moderator1@x.org",
                                    "moderator2@x.org"])
         self.assertEqual(msg.mfrom, "user@x.org")
-        
+
 class DeleteCommunityViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -683,7 +683,7 @@ class DummyGridEntryAdapter(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        
+
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
@@ -696,7 +696,7 @@ class DummyWorkflow:
 
     def state_info(self, context, request):
         return self._state_info
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,
@@ -706,11 +706,11 @@ class DummyWorkflow:
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
 
-        
+
 class DummyForm:
     def __init__(self):
         self.widgets = {}
-        
+
     def validate(self, request, render, succeed):
         pass
 
@@ -723,7 +723,7 @@ class DummyForm:
 class DummySchema:
     def __init__(self, **kw):
         self.__dict__.update(kw)
-    
+
 class DummyCommunity:
     def __init__(self, title, description, text, creator):
         self.title = title
