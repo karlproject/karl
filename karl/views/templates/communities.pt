@@ -3,6 +3,26 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="api.generic_layout.macros['master']">
 
+<head>
+ <metal:slot metal:fill-slot="extra-headers">
+  <link rel="stylesheet" type="text/css" 
+	    href="${api.static_url}/jquery-ui/1.7/themes/smoothness/ui.all.css" />
+  <style type="text/css">
+   .ui-tabs .ui-tabs-hide {
+     display: none;
+   }
+   .community-tabs {
+        float:right;
+        width: 235px;
+        margin-left: 0.5em;
+        font-size: x-small;
+   }
+  </style>
+  <script src="${api.static_url}/jquery-ui/1.7/ui/ui.tabs.js"></script>
+ </metal:slot>
+</head>
+
+<body>
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
@@ -35,12 +55,42 @@
       </tr>
     </table>
 
-    <div class="communityEntry" tal:repeat="community communities">
+    <div class="communityEntry"
+         tal:repeat="community communities">
+
+      <div id="${community.name}-tabs" class="community-tabs">
+       <ul>
+        <li title="Community tools">
+          <a href="#${community.name}-quicklinks">quicklinks</a>
+        </li>
+        <li title="Content recently updated in the community">
+          <a href="${community.name}/recent_items.html">recent</a>
+        </li>
+        <li title="Community members">
+          <a href="${community.name}/members.html">members</a>
+        </li>
+       </ul>
+       <div id="${community.name}-quicklinks">
+        <tal:loop tal:repeat="tab community.tabs[1:]">
+         <a href="${tab['url']}">${tab['name'].lower()}</a>
+         <tal:if tal:condition="community.member">
+          <a href="${tab['url']}/add.html"
+             title="Add">+</a>
+         </tal:if>
+         <tal:if tal:condition="not repeat.tab.end">&nbsp;|&nbsp;</tal:if>
+        </tal:loop>
+       </div>
+      </div>
+      <script type="text/javascript">
+        $(function(){$("#${community.name}-tabs").tabs();});
+      </script>
+
       <div class="klisting_header">
         <a href="${community.url}">${community.title}</a>
         <span tal:condition="not api.has_staff_acl(community.context)"
           metal:use-macro="api.snippets.macros['privacy_badge']"/>
       </div>
+
       <p>${community.description}</p>
       <div class="documentByLine">
         <span>${community.number_of_members} Member(s)</span>
@@ -60,4 +110,5 @@
 
   </div>
 
+</body>
 </html>
