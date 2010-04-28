@@ -1057,6 +1057,24 @@ class ManageTagsViewTests(unittest.TestCase):
         self.failUnless((1, 'phred', ['bar']) in _updated)
         self.failUnless((2, 'phred', ['bar', 'baz']) in _updated)
 
+    def test_submitted_rename_no_old_tag_in_request(self):
+        # dont blow up when no "old_tags" exists in request.POST
+        # (https://bugs.launchpad.net/karl3/+bug/558743)
+        context = testing.DummyModel()
+        context.__name__ = 'phred'
+        tags = context.tags = DummyTags()
+        def _getTags(items=None, users=None, community=None):
+            return ['tag1', 'tag2']
+        tags.getTags = _getTags
+        request = testing.DummyRequest()
+        request.POST['form.rename'] = 'Rename tag'
+
+        result = self._callFUT(context, request)
+
+        self.assertEqual(len(result['tags']), 2)
+        self.assertEqual(result['tags'][0], 'tag1')
+        self.assertEqual(result['tags'][1], 'tag2')
+
     def test_submitted_delete(self):
         context = testing.DummyModel()
         context.__name__ = 'phred'
@@ -1098,6 +1116,25 @@ class ManageTagsViewTests(unittest.TestCase):
 
         self.failUnless((1, 'phred', 'foo') in _deleted)
         self.failUnless((2, 'phred', 'foo') in _deleted)
+
+    def test_submitted_delete_no_old_tag_in_request(self):
+        # dont blow up when no "old_tags" exists in request.POST
+        # (https://bugs.launchpad.net/karl3/+bug/558743)
+        context = testing.DummyModel()
+        context.__name__ = 'phred'
+        tags = context.tags = DummyTags()
+        def _getTags(items=None, users=None, community=None):
+            return ['tag1', 'tag2']
+        tags.getTags = _getTags
+        request = testing.DummyRequest()
+        request.POST['form.delete'] = 'Delete tag'
+
+        result = self._callFUT(context, request)
+
+        self.assertEqual(len(result['tags']), 2)
+        self.assertEqual(result['tags'][0], 'tag1')
+        self.assertEqual(result['tags'][1], 'tag2')
+        
 
 
 class AjaxViewTests(unittest.TestCase):

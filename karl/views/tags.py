@@ -472,7 +472,7 @@ def manage_tags_view(context, request):
     old = ''
     new = ''
 
-    if 'form.rename' in request.POST:
+    if 'form.rename' in request.POST and 'old_tag' in request.POST:
         old_tag = request.POST['old_tag']
         new_tag = request.POST['new_tag']
         # check that tag contains only valid characters
@@ -493,7 +493,7 @@ def manage_tags_view(context, request):
                 tagger.update(item=docid, user=userid,
                               tags=to_update.get(docid, []))
 
-    if 'form.delete' in request.POST:
+    if 'form.delete' in request.POST and 'old_tag' in request.POST:
         old_tag = request.POST['old_tag']
         for docid in tagger.getItems(tags=[old_tag], users=[userid]):
             tagger.delete(item=docid, user=userid, tag=old_tag)

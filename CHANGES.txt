@@ -6,6 +6,10 @@ Unreleased
 
 - Add 'fax' field to user profiles (fixes LP#570204).
 
+- Don't blow up when managing tags from profile when no tags are
+  present for the profile
+  (https://bugs.launchpad.net/karl3/+bug/558743)
+
 3.28 (2010-04-22)
 -----------------
 
