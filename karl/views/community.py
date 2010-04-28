@@ -183,6 +183,15 @@ def community_members_ajax_view(context, request):
 
     return {'items': members}
 
+
+def related_communities_ajax_view(context, request):
+    assert ICommunity.providedBy(context), str(type(context))
+
+    related = []
+    #TODO
+    return {'items': related}
+
+
 security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))

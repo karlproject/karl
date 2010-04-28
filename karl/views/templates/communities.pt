@@ -16,7 +16,7 @@
    }
    .community-tabs {
         float:right;
-        width: 235px;
+        width: 25em;
         margin-left: 0.5em;
         font-size: x-small;
    }
@@ -71,6 +71,9 @@
         </li>
         <li title="Community members">
           <a href="${community.name}/members.html">members</a>
+        </li>
+        <li title="Related communities">
+          <a href="${community.name}/related.html">related</a>
         </li>
        </ul>
        <div id="${community.name}-quicklinks">

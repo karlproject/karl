@@ -288,6 +288,14 @@
 
   <view
     for="karl.models.interfaces.ICommunity"
+    name="related.html"
+    view=".community.related_communities_ajax_view"
+    renderer="templates/community_items_ajax.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
     view=".atom.community_atom_view"
     name="atom.xml"
     permission="view"

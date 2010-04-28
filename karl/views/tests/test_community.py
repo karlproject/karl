@@ -209,6 +209,26 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
         self.assertEqual(info['items'][1].context.__name__, 'phred')
         self.assertEqual(info['items'][2].context.__name__, 'wylma')
 
+class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.community import related_communities_ajax_view
+        return related_communities_ajax_view(context, request)
+
+    def test_it(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['items'], []) # TODO
+
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
         cleanUp()
