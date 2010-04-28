@@ -33,7 +33,6 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
-from karl.utils import find_peopledirectory
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
 from karl.utils import find_tags
