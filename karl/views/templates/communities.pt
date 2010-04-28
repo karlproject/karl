@@ -64,7 +64,7 @@
       <div id="${community.name}-tabs" class="community-tabs">
        <ul>
         <li title="Community tools">
-          <a href="#${community.name}-quicklinks">quicklinks</a>
+          <a href="#${community.name}-quicklinks">tools</a>
         </li>
         <li title="Content recently updated in the community">
           <a href="${community.name}/recent_items.html">recent</a>
