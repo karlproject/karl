@@ -420,7 +420,7 @@ def get_members_batch(community, request, size=10):
     searcher = ICatalogSearch(community)
     total, docids, resolver = searcher(interfaces=[IProfile],
                                        limit=size,
-                                       name={'query': ' '.join(any),
+                                       name={'query': any,
                                              'operator': 'or'},
                                        allowed={'query': principals,
                                                 'operator': 'or'},
