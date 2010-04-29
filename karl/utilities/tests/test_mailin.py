@@ -158,6 +158,154 @@ class MailinRunnerTests(unittest.TestCase):
         self.assertEqual(handler.handle_args,
                          (message, INFO, text, attachments))
 
+class MailinRunner2Tests(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.utilities.mailin import MailinRunner2
+        return MailinRunner2
+
+    def _makeOne(self, root=None):
+        if root is None:
+            from repoze.bfg import testing
+            root = testing.DummyModel()
+        mailin = self._getTargetClass()(
+            root, 'zodb://test', '/postoffice', 'queue',
+            dummy_queue_factory_factory(self.queue),
+        )
+        return mailin
+
+    def _set_up_queue(self, messages):
+        self.queue = DummyQueue(messages)
+
+        from repoze.bfg.testing import DummyModel
+        from karl.adapters.interfaces import IMailinDispatcher
+        from karl.adapters.interfaces import IMailinHandler
+        from repoze.bfg.testing import registerAdapter
+
+        self.handlers = []
+        def handler_factory(context):
+            handler = DummyHandler(context)
+            self.handlers.append(handler)
+            return handler
+        registerAdapter(handler_factory, DummyModel, IMailinHandler)
+        registerAdapter(DummyDispatcher, DummyModel, IMailinDispatcher)
+
+
+    def test_one_message_reply_no_attachments(self):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import registerModels
+        info = {'community': 'testing',
+                'tool': 'random',
+                'in_reply_to': '7FFFFFFF', # token for docid 0
+                'author': 'phreddy',
+                'subject': 'Feedback'
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        catalog = mailin.root.catalog = DummyCatalog()
+        cf = mailin.root['communities'] = DummyModel()
+        testing = cf['testing'] = DummyModel()
+        tool = testing['random'] = DummyModel()
+        entry = tool['entry'] = DummyModel()
+        comments = entry['comments'] = DummyModel()
+        catalog.document_map._map[0] = '/communities/testing/random/entry'
+        registerModels({'/communities/testing/random/entry': entry})
+
+        mailin()
+
+        self.assertEqual(len(self.handlers), 1)
+        handler = self.handlers[0]
+        self.assertEqual(handler.context, entry)
+        self.assertEqual(handler.handle_args,
+                         (message, info, text, attachments))
+
+    def test_process_message_reply_w_attachment(self):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import registerModels
+        info = {'community': 'testing',
+                'tool': 'random',
+                'in_reply_to': '7FFFFFFF', # token for docid 0
+                'author': 'phreddy',
+                'subject': 'Feedback'
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        catalog = mailin.root.catalog = DummyCatalog()
+        cf = mailin.root['communities'] = DummyModel()
+        testing = cf['testing'] = DummyModel()
+        tool = testing['random'] = DummyModel()
+        entry = tool['entry'] = DummyModel()
+        comments = entry['comments'] = DummyModel()
+        catalog.document_map._map[0] = '/communities/testing/random/entry'
+        registerModels({'/communities/testing/random/entry': entry})
+
+        mailin()
+
+        self.assertEqual(len(self.handlers), 1)
+        handler = self.handlers[0]
+        self.assertEqual(handler.context, entry)
+        self.assertEqual(handler.handle_args,
+                         (message, info, text, attachments))
+
+    def test_bounce_message(self):
+        info = {'community': 'testing',
+                'tool': 'random',
+                'in_reply_to': '7FFFFFFF', # token for docid 0
+                'author': 'phreddy',
+                'subject': 'Feedback',
+                'error': 'Not witty enough',
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        self._makeOne()()
+        self.assertEqual(self.queue.bounced, [(message, 'Not witty enough')])
+
+    def test_quarantine_message(self):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import registerModels
+        info = {'community': 'testing',
+                'tool': 'random',
+                'in_reply_to': '7FFFFFFF', # token for docid 0
+                'author': 'phreddy',
+                'subject': 'Feedback',
+                'exception': 'Not witty enough',
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        catalog = mailin.root.catalog = DummyCatalog()
+        cf = mailin.root['communities'] = DummyModel()
+        testing = cf['testing'] = DummyModel()
+        tool = testing['random'] = DummyModel()
+        entry = tool['entry'] = DummyModel()
+        comments = entry['comments'] = DummyModel()
+        catalog.document_map._map[0] = '/communities/testing/random/entry'
+        registerModels({'/communities/testing/random/entry': entry})
+
+        mailin()
+        self.assertEqual(self.queue.quarantined,
+                         [(message, 'Not witty enough')])
+
 class DummyOptions:
     dry_run = False
     verbosity = 1
@@ -167,9 +315,15 @@ class DummyOptions:
     text_scrubber = None
 
 class DummyHandler:
-    contet = handle_args = None
+    handle_args = None
+
+    def __init__(self, context=None):
+        self.context = context
+
     def handle(self, message, info, text, attachments):
         self.handle_args = (message, info, text, attachments)
+        if 'exception' in info:
+            raise Exception(info['exception'])
 
 class DummyDocumentMap:
     def __init__(self):
@@ -182,67 +336,45 @@ class DummyCatalog:
     def __init__(self):
         self.document_map = DummyDocumentMap()
 
-class DummyMessage:
-    to = None
-    from_ = None
-    subject = None
-    payload = None
-    content_type = None
-    filename = None
-    getpayload_kw = None
-    boundary = None
+class DummyMessage(dict):
+    def __init__(self, info=None, text=None, attachments=None):
+        self.info = info
+        self.text = text
+        self.attachments = attachments
+        self['Message-Id'] = '123456789'
 
-    def _munge(self, name):
-        name = name.lower()
-        if name == 'from':
-            name = 'from_'
-        if '-' in name:
-            name = '_'.join(name.split('-'))
-        return name
+def dummy_queue_factory_factory(queue):
+    def factory(uri, name, path):
+        assert uri == 'zodb://test', uri
+        assert name == 'queue', name
+        assert path == '/postoffice', path
+        return queue
+    return factory
 
-    def get_all(self, name, failobj=None):
-        name = self._munge(name)
-        return getattr(self, name, failobj)
+class DummyQueue(list):
+    def __init__(self, messages):
+        super(DummyQueue, self).__init__(messages)
+        self.bounced = []
+        self.quarantined = []
 
-    def __getitem__(self, key):
-        key = self._munge(key)
-        value = getattr(self, key, self)
-        if value is self:
-            raise KeyError(key)
-        return value
+    def pop_next(self):
+        return self.pop(0)
 
-    def get(self, key, failobj=None):
-        try:
-            return self[key]
-        except KeyError:
-            return failobj
+    def quarantine(self, message, exc_info):
+        self.quarantined.append((message, exc_info[1].message))
 
-    def get_payload(self, i=None, decode=False):
-        if self.getpayload_kw is None:
-            self.getpayload_kw = []
-        self.getpayload_kw.append((i, decode))
-        if i is None:
-            return self.payload
-        return self.payload[i]
+    def bounce(self, message, error):
+        self.bounced.append((message, error))
 
-    def get_filename(self):
-        return self.filename
+class DummyDispatcher(object):
+    def __init__(self, context):
+        self.context = context
 
-    def get_content_type(self):
-        return self.content_type
+    def crackHeaders(self, message):
+        return message.info
 
-    def is_multipart(self):
-        return isinstance(self.payload, tuple)
-
-    def get_boundary(self):
-        return self.boundary
-
-    def walk(self):
-        if self.is_multipart:
-            for part in self.payload:
-                yield part
-        raise StopIteration
-
+    def crackPayload(self, message):
+        return message.text, message.attachments
 
 test_message = """A message for *you*.
 

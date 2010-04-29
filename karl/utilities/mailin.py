@@ -23,6 +23,7 @@ within that folder.
 from __future__ import with_statement
 
 import datetime
+import logging
 import markdown2
 import os
 import re
@@ -39,14 +40,16 @@ from karl.utils import hex_to_docid
 from repoze.bfg.traversal import find_model
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
-
+from repoze.postoffice.queue import open_queue
 
 #BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
 REPLY_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)-(?P<reply>\w+)@')
 TOOL_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)@')
 LOG_FMT = '%s %s %s %s\n'
 
-class MailinRunner:
+log = logging.getLogger('karl.mailin')
+
+class MailinRunner: # pragma NO COVERAGE (deprecated)
 
     def __init__(self, root, maildir_root, options, testing=False):
         self.root = root
@@ -193,3 +196,70 @@ def text_scrubber(text, mimetype=None):
             text = text[:match.start()].strip()
 
     return markdown2.markdown(text)
+
+class MailinRunner2(object):
+    """
+    Compatible with repoze.postoffice.
+    """
+
+    def __init__(self, root, zodb_uri, zodb_path, queue_name,
+                 queue_factory=open_queue):
+        self.root = root
+        self.queue = queue_factory(zodb_uri, queue_name, zodb_path)
+        dispatcher = IMailinDispatcher(self.root)
+        dispatcher.default_tool = 'blog'
+        dispatcher.text_scrubber = text_scrubber
+        self.dispatcher = dispatcher
+
+    def __call__(self):
+        processed = bounced = 0
+        while self.queue:
+            message = self.queue.pop_next()
+            message_id = message.get('Message-Id', 'No message id')
+            log.info("Processing message: %s", message_id)
+            if self.handle_message(message):
+                processed += 1
+            else:
+                bounced += 1
+
+        log.info('Processed %d messages' % processed)
+        log.info('Bounced %d messages' % bounced)
+
+    def handle_message(self, message):
+        # return 'True' if processed, 'False' if bounced.
+        try:
+            message_id = message.get('Message-Id', 'No message id')
+            info = self.dispatcher.crackHeaders(message)
+            error = info.get('error')
+            if error:
+                self.queue.bounce(message, error)
+                log.info('Bounced %s %s %s' % (
+                    message_id, 'error', repr(info)))
+                return False
+            else:
+                text, attachments = self.dispatcher.crackPayload(message)
+                self.process_message(message, info, text, attachments)
+                extra = ['%s:%s' % (x, info.get(x))
+                            for x in ('community', 'in_reply_to', 'tool',
+                                      'author') if info.get(x) is not None]
+                log.info('Processed', message_id, ','.join(extra))
+                return True
+        except:
+            self.queue.quarantine(message, sys.exc_info())
+            error_msg = traceback.format_exc()
+            log.error('Quarantined', message_id, error_msg)
+            return False
+
+    def process_message(self, message, info, text, attachments):
+        community = find_communities(self.root)[info['community']]
+        target = tool = community[info['tool']]
+
+        if info['in_reply_to'] is not None:
+            docid = int(hex_to_docid(info['in_reply_to']))
+            catalog = find_catalog(target)
+            path = catalog.document_map.address_for_docid(docid)
+            item = find_model(self.root, path)
+            target = item
+
+        IMailinHandler(target).handle(message, info, text, attachments)
+
