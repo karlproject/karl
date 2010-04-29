@@ -45,6 +45,10 @@
      </tal:loop>
     </div>
 
+    <div class="rightcol" tal:condition="'demo' not in request.GET">
+      <div metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+    </div>
+
     <div metal:use-macro="api.snippets.macros['letter_box']"/>
 
     <metal:script

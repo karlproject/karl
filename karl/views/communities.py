@@ -123,11 +123,18 @@ def _show_communities_view_helper(context,
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s%s Communities' % (prefix, system_name)
 
+    # XXX:  make this go away
+    if 'demo' not in request.GET:
+        my_communities = get_my_communities(context, request)
+    else:
+        my_communities = ()
+
     return {'communities': communities,
             'batch_info': batch_info,
             'letters': letter_info,
             'subview_classes': classes,
             'actions': actions,
+            'my_communities': my_communities, #XXX
             'api': TemplateAPI(context, request, page_title),
            }
 
