@@ -60,7 +60,9 @@ _VIEW_URL_LOOKUP = dict([(x[0], x[3])
 
 
 def show_communities_view(context, request):
-    which = request.cookies.get(_VIEW_COOKIE, 'mine')
+    # XXX:  make default unconditionally 'mine' once the "new" UI rolls out.
+    default = 'demo' in request.GET and 'mine' or 'all'
+    which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
     target = model_url(context, request, urlname)
     response = HTTPFound(location=target)

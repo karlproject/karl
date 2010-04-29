@@ -41,10 +41,20 @@ class Test_show_communities_view(unittest.TestCase):
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, target)
 
-    def test_no_cookie(self):
+    def test_no_cookie_no_qs(self):
+        # XXX:  collapse this with the next testcase once "new" UI rolls out.
         from repoze.bfg.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self._checkResponse(response,
+                            model_url(context, request, 'all_communities.html'))
+
+    def test_no_cookie_w_qs(self):
+        # XXX:  collapse this with the prior testcase once "new" UI rolls out.
+        from repoze.bfg.url import model_url
+        context = testing.DummyModel()
+        request = testing.DummyRequest(GET={'demo': 1})
         response = self._callFUT(context, request)
         self._checkResponse(response,
                             model_url(context, request, 'my_communities.html'))

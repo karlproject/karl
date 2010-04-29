@@ -34,7 +34,7 @@
     <h1>${api.page_title}</h1>
 
     <div id="community_scope" style="padding-bottom: 0.5em"
-         tal:condition="api.user_is_staff">
+         tal:condition="api.user_is_staff and 'demo' in request.GET">
      <tal:loop tal:repeat="subview_class subview_classes">
      <a href="${subview_class['urlname']}"
         title="${subview_class['description']}"
@@ -61,7 +61,8 @@
     <div class="communityEntry"
          tal:repeat="community communities">
 
-      <div id="${community.name}-tabs" class="community-tabs">
+      <div id="${community.name}-tabs" class="community-tabs"
+           tal:condition="'demo' in request.GET">
        <ul>
         <li title="Community tools">
           <a href="#${community.name}-quicklinks">tools</a>
