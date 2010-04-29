@@ -49,6 +49,7 @@ requires = [
     'repoze.mailin',
     'repoze.mailin.monitor',
     'repoze.monty',
+    'repoze.postoffice',
     'repoze.retry',
     'repoze.sendmail',
     'repoze.session',
