@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.29 (2010-04-30)
+-----------------
 
 - Added an "Any" option at the end of the letterbox to allow clearing
   any existing filter (LP#/570853).
