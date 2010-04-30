@@ -20,6 +20,7 @@
 IMailStore-enabled maildir. The actual maildir must be named 'Maildir'
 within that folder.
 """
+import logging
 from paste.deploy import loadapp
 from repoze.bfg.scripting import get_root
 from repoze.mailin.scripts.draino import Draino
@@ -27,10 +28,13 @@ from karl.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 from karl.scripting import run_daemon
+from karl.utils import get_setting
 from karl.utilities.mailin import MailinRunner
+from karl.utilities.mailin import MailinRunner2
 import optparse
 import os
 import sys
+import transaction
 
 def main(argv=sys.argv, factory=MailinRunner, root=None):
     parser = optparse.OptionParser(
@@ -121,6 +125,81 @@ def main(argv=sys.argv, factory=MailinRunner, root=None):
             draino.run()
         runner = factory(root, maildir_root, options)
         runner()
+        p_jar = getattr(root, '_p_jar', None)
+        if p_jar is not None:
+            # Attempt to fix memory leak
+            p_jar.db().cacheMinimize()
+        closer()
+
+    if options.daemon:
+        run_daemon('mailin', run, options.interval)
+    else:
+        run()
+
+def main2(argv=sys.argv[1:]):
+    """
+    Version which uses repoze.postoffice.
+    """
+    logging.basicConfig()
+
+    parser = optparse.OptionParser(
+        description=__doc__,
+        usage="%prog [options] maildir_root",
+        )
+    parser.add_option('-C', '--config', dest='config',
+        help='Path to configuration file (defaults to $CWD/etc/karl.ini)',
+        metavar='FILE')
+    parser.add_option('--dry-run', '-n', dest='dry_run',
+        action='store_true', default=False,
+        help="Don't actually commit any transaction")
+    parser.add_option('--verbose', '-v', dest='verbose',
+        action='store_true', default=False,
+        help="Output info level logging.")
+    parser.add_option('--daemon', '-D', dest='daemon',
+                      action='store_true', default=False,
+                      help='Run in daemon mode.')
+    parser.add_option('--interval', '-i', dest='interval', type='int',
+                      default=300,
+                      help='Interval, in seconds, between executions when in '
+                           'daemon mode.')
+
+    options, args = parser.parse_args(argv)
+
+    if args:
+        parser.error('Unknown arguments: %s' % ' '.join(args))
+
+    config = options.config
+    if config is None:
+        config = get_default_config()
+    app = loadapp('config:%s' % config, name='karl')
+
+    log_level = logging.WARN
+    if options.verbose:
+        log_level = logging.INFO
+    logging.getLogger('karl.mailin').setLevel(log_level)
+
+    def run():
+        root, closer = get_root(app)
+        set_subsystem('mailin')
+
+        zodb_uri = get_setting(root, 'postoffice.zodb_uri')
+        zodb_path = get_setting(root, 'postoffice.zodb_path', '/postoffice')
+        queue = get_setting(root, 'postoffice.queue')
+
+        if zodb_uri is None:
+            parser.error("postoffice.zodb_uri must be set in config file")
+
+        if queue is None:
+            parser.error("postoffice.queue must be set in config file")
+
+        runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
+        runner()
+
+        if options.dry_run:
+            transaction.abort()
+        else:
+            transaction.commit()
+
         p_jar = getattr(root, '_p_jar', None)
         if p_jar is not None:
             # Attempt to fix memory leak

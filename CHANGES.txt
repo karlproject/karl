@@ -26,6 +26,9 @@ Unreleased
 - Don't blow up when managing tags from profile when no tags are
   present for the profile (LP#558743)
 
+- Created new version of mailin script (mailin2) which uses the experimental
+  repoze.postoffice package for a central mailin depot.
+
 3.28 (2010-04-22)
 -----------------
 

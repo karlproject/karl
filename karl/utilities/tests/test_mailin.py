@@ -184,9 +184,11 @@ class MailinRunner2Tests(unittest.TestCase):
         self.queue = DummyQueue(messages)
 
         from repoze.bfg.testing import DummyModel
+        from repoze.sendmail.interfaces import IMailDelivery
         from karl.adapters.interfaces import IMailinDispatcher
         from karl.adapters.interfaces import IMailinHandler
         from repoze.bfg.testing import registerAdapter
+        from repoze.bfg.testing import registerUtility
 
         self.handlers = []
         def handler_factory(context):
@@ -196,6 +198,8 @@ class MailinRunner2Tests(unittest.TestCase):
         registerAdapter(handler_factory, DummyModel, IMailinHandler)
         registerAdapter(DummyDispatcher, DummyModel, IMailinDispatcher)
 
+        self.mailer = DummyMailer()
+        registerUtility(self.mailer, IMailDelivery)
 
     def test_one_message_reply_no_attachments(self):
         from repoze.bfg.testing import DummyModel
@@ -228,6 +232,7 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(handler.context, entry)
         self.assertEqual(handler.handle_args,
                          (message, info, text, attachments))
+        self.assertEqual(len(self.mailer), 0)
 
     def test_process_message_reply_w_attachment(self):
         from repoze.bfg.testing import DummyModel
@@ -260,6 +265,7 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(handler.context, entry)
         self.assertEqual(handler.handle_args,
                          (message, info, text, attachments))
+        self.assertEqual(len(self.mailer), 0)
 
     def test_bounce_message(self):
         info = {'community': 'testing',
@@ -275,7 +281,9 @@ class MailinRunner2Tests(unittest.TestCase):
         self._set_up_queue([message,])
 
         self._makeOne()()
-        self.assertEqual(self.queue.bounced, [(message, 'Not witty enough')])
+        self.assertEqual(self.queue.bounced, [
+            (message, None, 'Not witty enough')])
+        self.assertEqual(len(self.mailer), 1)
 
     def test_quarantine_message(self):
         from repoze.bfg.testing import DummyModel
@@ -305,6 +313,7 @@ class MailinRunner2Tests(unittest.TestCase):
         mailin()
         self.assertEqual(self.queue.quarantined,
                          [(message, 'Not witty enough')])
+        self.assertEqual(len(self.mailer), 1)
 
 class DummyOptions:
     dry_run = False
@@ -360,11 +369,14 @@ class DummyQueue(list):
     def pop_next(self):
         return self.pop(0)
 
-    def quarantine(self, message, exc_info):
+    def quarantine(self, message, exc_info, send, message_from):
         self.quarantined.append((message, exc_info[1].message))
+        send(message_from, ['foo@example.com'], "You're in quarantine!")
 
-    def bounce(self, message, error):
-        self.bounced.append((message, error))
+    def bounce(self, message, send, from_addr, error):
+        self.bounced.append((message, from_addr, error))
+        send(from_addr, ['foo@example.com'], message)
+
 
 class DummyDispatcher(object):
     def __init__(self, context):
@@ -375,6 +387,10 @@ class DummyDispatcher(object):
 
     def crackPayload(self, message):
         return message.text, message.attachments
+
+class DummyMailer(list):
+    def send(self, from_addr, to_addrs, message):
+        self.append((from_addr, to_addrs, message))
 
 test_message = """A message for *you*.
 
