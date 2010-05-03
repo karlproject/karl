@@ -422,6 +422,104 @@ class TestGetContainerBatch(unittest.TestCase):
         self.assertEqual(
             [o.__name__ for o in batch['entries']], ['c', 'b', 'a'])
 
+class TestGetFileLineBatch(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, fp, context, request, **kw):
+        from karl.views.batch import get_fileline_batch
+        return get_fileline_batch(fp, context, request, **kw)
+
+    def test_no_items(self):
+        container = testing.DummyModel()
+        request = testing.DummyRequest()
+        batch = self._callFUT([], container, request)
+        self.assertEqual(batch['entries'], [])
+        self.assertEqual(batch['batch_start'], 0)
+        self.assertEqual(batch['batch_size'], 20)
+        self.assertEqual(batch['batch_end'], 0)
+        self.assertEqual(batch['total'], 0)
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['batching_required'], False)
+
+    def test_few_items(self):
+        lines = ['a', 'b', 'c']
+        container = testing.DummyModel()
+        request = testing.DummyRequest()
+        batch = self._callFUT(lines, container, request)
+        self.assertEqual(len(batch['entries']), 3)
+        self.assertEqual(batch['entries'], ['a', 'b', 'c'])
+        self.assertEqual(batch['batch_start'], 0)
+        self.assertEqual(batch['batch_size'], 20)
+        self.assertEqual(batch['batch_end'], 3)
+        self.assertEqual(batch['total'], 3)
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['batching_required'], False)
+
+    def test_backwards(self):
+        lines = 'a\nb\nc\n'
+        import StringIO
+        io = StringIO.StringIO(lines)
+        container = testing.DummyModel()
+        request = testing.DummyRequest()
+        batch = self._callFUT(io, container, request, backwards=True)
+        self.assertEqual(len(batch['entries']), 4)
+        self.assertEqual(batch['entries'], ['\n', 'c\n', 'b\n', 'a\n'])
+        self.assertEqual(batch['batch_start'], 0)
+        self.assertEqual(batch['batch_size'], 20)
+        self.assertEqual(batch['batch_end'], 4)
+        self.assertEqual(batch['total'], 4)
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['batching_required'], False)
+
+    def test_many_items(self):
+        container = testing.DummyModel()
+        lines = []
+        for i in range(100):
+            lines.append('line%s' % i)
+        request = testing.DummyRequest({
+            'batch_size': 10,
+            'batch_start': 60,
+            })
+        batch = self._callFUT(lines, container, request)
+        self.assertEqual(len(batch['entries']), 10)
+        self.assertEqual(batch['batch_start'], 60)
+        self.assertEqual(batch['batch_size'], 10)
+        self.assertEqual(batch['batch_end'], 70)
+        self.assertEqual(batch['total'], 100)
+        self.assertEqual(batch['previous_batch'], {
+            'url': 'http://example.com/?batch_size=10&batch_start=50',
+            'name': 'Previous 10 entries (51 - 60)',
+            })
+        self.assertEqual(batch['next_batch'], {
+            'url': 'http://example.com/?batch_size=10&batch_start=70',
+            'name': 'Next 10 entries (71 - 80 of about 100)',
+            })
+        self.assertEqual(batch['batching_required'], True)
+
+    def test_with_line_filter(self):
+        container = testing.DummyModel()
+        lines = ['a', 'b', 'c']
+        request = testing.DummyRequest()
+        def line_filter(line):
+            if line == 'c':
+                return line
+        batch = self._callFUT(lines, container, request,
+                              line_filter=line_filter)
+        self.assertEqual(len(batch['entries']), 1)
+        self.assertEqual(batch['batch_start'], 0)
+        self.assertEqual(batch['batch_size'], 20)
+        self.assertEqual(batch['batch_end'], 1)
+        self.assertEqual(batch['total'], 3)
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['batching_required'], False)
 
 class DummyCreationDateIndex:
     def discriminator(self, obj, default):

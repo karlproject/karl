@@ -18,11 +18,8 @@ class TestAdminView(unittest.TestCase):
         from karl.views.admin import admin_view
         site = DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/admin.pt'
-        )
-        response = admin_view(site, request)
-        self.assertEqual(response.status_int, 200)
+        result = admin_view(site, request)
+        self.failUnless('api' in result)
 
 class TestDeleteContentView(unittest.TestCase):
     def setUp(self):
@@ -65,17 +62,14 @@ class TestDeleteContentView(unittest.TestCase):
 
     def test_render_form(self):
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/delete_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
         ])
 
-        response = self.fut(self.site, request)
-        self.assertEqual(renderer.filtered_content, [])
-        c = renderer.communities
+        result = self.fut(self.site, request)
+        self.assertEqual(result['filtered_content'], [])
+        c = result['communities']
         self.assertEqual(len(c), 2)
         self.assertEqual(c[0]['path'], "/bigendians")
         self.assertEqual(c[0]['title'], "Big Endians")
@@ -83,9 +77,6 @@ class TestDeleteContentView(unittest.TestCase):
         self.assertEqual(c[1]['title'], "Little Endians")
 
     def test_filter_content_no_filter(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/delete_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -100,14 +91,11 @@ class TestDeleteContentView(unittest.TestCase):
                 filter_content=1,
             )
         )
-        response = self.fut(self.site, request)
-        c = renderer.filtered_content
+        result = self.fut(self.site, request)
+        c = result['filtered_content']
         self.assertEqual(len(c), 0)
 
     def test_filter_content_by_title(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/delete_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -123,8 +111,8 @@ class TestDeleteContentView(unittest.TestCase):
                 title_contains="Little",
             )
         )
-        response = self.fut(self.site, request)
-        c = renderer.filtered_content
+        result = self.fut(self.site, request)
+        c = result['filtered_content']
         self.assertEqual(len(c), 1)
         self.assertEqual(c[0]['path'], "/littleendians")
         self.assertEqual(c[0]['url'], "http://example.com/littleendians/")
@@ -136,9 +124,6 @@ class TestDeleteContentView(unittest.TestCase):
         self.failUnless(self.site['littleendians'].deactivated)
 
     def test_filter_content_by_community(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/delete_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -154,7 +139,7 @@ class TestDeleteContentView(unittest.TestCase):
                 community='/bigendians',
             )
         )
-        response = self.fut(self.site, request)
+        self.fut(self.site, request)
         self.assertEqual(len(self.search.calls), 2)
         self.assertEqual(self.search.calls[0]['path'], '/bigendians')
 
@@ -200,7 +185,7 @@ class TestDeleteContentView(unittest.TestCase):
 
     def test_delete_nested_items(self):
         parent = self.site['bigendians']
-        parent['macrobots'] = child = DummyModel()
+        parent['macrobots'] = DummyModel()
 
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
@@ -278,17 +263,14 @@ class TestMoveContentView(unittest.TestCase):
 
     def test_render_form(self):
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/move_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
         ])
 
-        response = self.fut(self.site, request)
-        self.assertEqual(renderer.filtered_content, [])
-        c = renderer.communities
+        result = self.fut(self.site, request)
+        self.assertEqual(result['filtered_content'], [])
+        c = result['communities']
         self.assertEqual(len(c), 2)
         self.assertEqual(c[0]['path'], "/bigendians")
         self.assertEqual(c[0]['title'], "Big Endians")
@@ -296,9 +278,6 @@ class TestMoveContentView(unittest.TestCase):
         self.assertEqual(c[1]['title'], "Little Endians")
 
     def test_filter_content_no_filter(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/move_content.pt'
-        )
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -313,8 +292,8 @@ class TestMoveContentView(unittest.TestCase):
                 filter_content=1,
             )
         )
-        response = self.fut(self.site, request)
-        c = renderer.filtered_content
+        result = self.fut(self.site, request)
+        c = result['filtered_content']
         self.assertEqual(len(c), 0)
 
     def test_move_one_item(self):
@@ -343,9 +322,6 @@ class TestMoveContentView(unittest.TestCase):
         self.failIf('entry2' in dst_blog)
 
     def test_error_no_to_community(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/move_content.pt'
-        )
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict([
@@ -354,9 +330,8 @@ class TestMoveContentView(unittest.TestCase):
             ]),
             view_name='move_content.html',
         )
-        response = self.fut(self.site, request)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(renderer.api.error_message,
+        result = self.fut(self.site, request)
+        self.assertEqual(result['api'].error_message,
                          'Please specify destination community.')
 
     def test_move_two_items(self):
@@ -397,66 +372,51 @@ class TestMoveContentView(unittest.TestCase):
             ]),
             view_name='move_content.html',
         )
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/move_content.pt'
-        )
         del self.site['littleendians']['blog']
-        self.fut(self.site, request)
+        result = self.fut(self.site, request)
         self.assertEqual(
-            renderer.api.error_message,
+            result['api'].error_message,
             'Path does not exist in destination community: /littleendians/blog'
         )
 
 class TestSiteAnnouncementView(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        site = self.site = DummyModel()
+        self.site = DummyModel()
 
     def tearDown(self):
         cleanUp()
 
-    def test_render(self):
+    def call_fut(self, *arg, **kw):
         from karl.views.admin import site_announcement_view
+        return site_announcement_view(*arg, **kw)
+
+    def test_render(self):
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/site_announcement.pt'
-            )
-        response = site_announcement_view(self.site, request)
-        self.assertEqual(response.status_int, 200)
+        result = self.call_fut(self.site, request)
+        self.failUnless('api' in result)
 
     def test_set_announcement(self):
-        from karl.views.admin import site_announcement_view
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/site_announcement.pt'
-            )
         request.params['submit-site-announcement'] = None
         annc = '<p>This is the <i>announcement</i>.</p>'
         request.params['site-announcement-input'] = annc
-        response = site_announcement_view(self.site, request)
+        self.call_fut(self.site, request)
         self.assertEqual(self.site.site_announcement, annc[3:-4])
 
     def test_set_announcement_drop_extra(self):
-        from karl.views.admin import site_announcement_view
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/site_announcement.pt'
-            )
         request.params['submit-site-announcement'] = None
         annc = '<p>This is the <i>announcement</i>.</p><p>This is dropped.</p>'
         request.params['site-announcement-input'] = annc
-        response = site_announcement_view(self.site, request)
+        self.call_fut(self.site, request)
         self.assertEqual(self.site.site_announcement, annc[3:35])
 
     def test_remove_announcement(self):
-        from karl.views.admin import site_announcement_view
         self.site.site_announcement = 'Foo.'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/site_announcement.pt'
-            )
         request.params['remove-site-announcement'] = None
-        response = site_announcement_view(self.site, request)
+        self.call_fut(self.site, request)
         self.failIf(self.site.site_announcement)
 
 
@@ -510,13 +470,9 @@ class TestEmailUsersView(unittest.TestCase):
         request = testing.DummyRequest()
         testing.registerDummySecurityPolicy('barney')
         view = self._make_one(self.site, request)
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/email_users.pt'
-        )
-        response = view()
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(renderer.to_groups, view.to_groups)
-        self.assertEqual(renderer.from_emails, [
+        result = view()
+        self.assertEqual(result['to_groups'], view.to_groups)
+        self.assertEqual(result['from_emails'], [
             ('self', 'Barney Rubble <barney@example.com>'),
             ('admin', 'karl3test Administrator <admin@example.com>'),
         ])
@@ -590,47 +546,60 @@ class TestSyslogView(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
+    def test_no_syslog_path(self):
+        from repoze.bfg.interfaces import ISettings
+        self.settings = settings = karltesting.DummySettings()
+        testing.registerUtility(settings, ISettings)
+        request = testing.DummyRequest()
+        result = self.fut(None, request)
+        batch_info = result['batch_info']
+        entries = batch_info['entries']
+        self.assertEqual(len(entries), 0)
+        self.assertEqual(result['instance'], '_any')
+        
+
     def test_no_filter(self):
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/admin/syslog.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.entries), 4)
-        self.assertEqual(renderer.instance, '_any')
-        self.failUnless(renderer.entries[0].startswith('Dec 26 11:15:23'))
+        result = self.fut(None, request)
+        batch_info = result['batch_info']
+        entries = batch_info['entries']
+        self.assertEqual(len(entries), 4)
+        self.assertEqual(result['instance'], '_any')
+        self.failUnless(entries[0].startswith('Dec 26 11:15:23'))
 
     def test_filter_any(self):
         request = testing.DummyRequest(params={
             'instance': '_any',
         })
-        renderer = testing.registerDummyRenderer('templates/admin/syslog.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.entries), 4)
-        self.assertEqual(renderer.instances, ['org1', 'org2'])
-        self.assertEqual(renderer.instance, '_any')
-        self.failUnless(renderer.entries[0].startswith('Dec 26 11:15:23'))
+        result = self.fut(None, request)
+        self.assertEqual(len(result['batch_info']['entries']), 4)
+        self.assertEqual(result['instances'], ['org1', 'org2'])
+        self.assertEqual(result['instance'], '_any')
+        self.failUnless(
+            result['batch_info']['entries'][0].startswith('Dec 26 11:15:23'))
 
     def test_filter_org1(self):
         request = testing.DummyRequest(params={
             'instance': 'org1',
         })
-        renderer = testing.registerDummyRenderer('templates/admin/syslog.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.entries), 2)
-        self.assertEqual(renderer.instances, ['org1', 'org2'])
-        self.assertEqual(renderer.instance, 'org1')
-        self.failUnless(renderer.entries[0].startswith('Dec 26 11:14:23'))
+        result = self.fut(None, request)
+        self.assertEqual(len(result['batch_info']['entries']), 2)
+        self.assertEqual(result['instances'], ['org1', 'org2'])
+        self.assertEqual(result['instance'], 'org1')
+        self.failUnless(
+            result['batch_info']['entries'][0].startswith('Dec 26 11:14:23'))
 
     def test_single_digit_day_with_leading_space(self):
         self.settings['syslog_view_instances'] = ['org1', 'org2', 'org3']
         request = testing.DummyRequest(params={
             'instance': 'org3',
         })
-        renderer = testing.registerDummyRenderer('templates/admin/syslog.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.entries), 1)
-        self.assertEqual(renderer.instances, ['org1', 'org2', 'org3'])
-        self.assertEqual(renderer.instance, 'org3')
-        self.failUnless(renderer.entries[0].startswith('Feb  2 11:15:23'))
+        result = self.fut(None, request)
+        self.assertEqual(len(result['batch_info']['entries']), 1)
+        self.assertEqual(result['instances'], ['org1', 'org2', 'org3'])
+        self.assertEqual(result['instance'], 'org3')
+        self.failUnless(
+            result['batch_info']['entries'][0].startswith('Feb  2 11:15:23'))
 
 class TestLogsView(unittest.TestCase):
     def setUp(self):
@@ -656,54 +625,46 @@ class TestLogsView(unittest.TestCase):
 
     def test_no_log(self):
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/admin/log.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.logs), 2)
-        self.assertEqual(renderer.log, None)
-        self.assertEqual(len(renderer.lines), 0)
+        result = self.fut(None, request)
+        self.assertEqual(len(result['logs']), 2)
+        self.assertEqual(result['log'], None)
+        self.assertEqual(len(result['lines']), 0)
 
     def test_view_log(self):
         request = testing.DummyRequest(params={
             'log': self.logs[0]
         })
-        renderer = testing.registerDummyRenderer('templates/admin/log.pt')
-        response = self.fut(None, request)
-        self.assertEqual(renderer.logs, self.logs)
-        self.assertEqual(renderer.log, self.logs[0])
-        self.assertEqual(len(renderer.lines), 6)
+        result = self.fut(None, request)
+        self.assertEqual(result['logs'], self.logs)
+        self.assertEqual(result['log'], self.logs[0])
+        self.assertEqual(len(result['lines']), 6)
 
     def test_one_log(self):
         del self.logs[1]
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/admin/log.pt')
-        response = self.fut(None, request)
-        self.assertEqual(len(renderer.logs), 1)
-        self.assertEqual(renderer.log, self.logs[0])
-        self.assertEqual(len(renderer.lines), 6)
+        result = self.fut(None, request)
+        self.assertEqual(len(result['logs']), 1)
+        self.assertEqual(result['log'], self.logs[0])
+        self.assertEqual(len(result['lines']), 6)
 
     def test_protect_arbitrary_files(self):
         request = testing.DummyRequest(params={
             'log': self.logs[0]
         })
         self.logs[0] = 'foo'
-        renderer = testing.registerDummyRenderer('templates/admin/log.pt')
-        response = self.fut(None, request)
-        self.assertEqual(renderer.log, None)
-        self.assertEqual(len(renderer.lines), 0)
+        result = self.fut(None, request)
+        self.assertEqual(result['log'], None)
+        self.assertEqual(len(result['lines']), 0)
 
 class TestUploadUsersView(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
         site = testing.DummyModel()
-        profiles = site['profiles'] = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
         encrypt = lambda x: 'sha:' + x
-        users = site.users = karltesting.DummyUsers(encrypt=encrypt)
+        site.users = karltesting.DummyUsers(encrypt=encrypt)
         self.site = site
-
-        self.renderer = testing.registerDummyRenderer(
-            'templates/admin/upload_users_csv.pt'
-        )
 
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IProfile
@@ -726,20 +687,18 @@ class TestUploadUsersView(unittest.TestCase):
 
     def test_render_form(self):
         request = testing.DummyRequest()
-        response = self._call_fut(self.site, request)
-        self.assertEqual(response.status_int, 200)
-        self.failUnless(hasattr(self.renderer, 'menu'))
-        self.failUnless(hasattr(self.renderer, 'required_fields'))
-        self.failUnless(hasattr(self.renderer, 'allowed_fields'))
+        result = self._call_fut(self.site, request)
+        self.failUnless('menu' in result)
+        self.failUnless('required_fields' in result)
+        self.failUnless('allowed_fields' in result)
 
     def test_submit_ok(self):
         request = testing.DummyRequest({
             'csv': self._file_upload('test_users1.csv'),
         })
-        response = self._call_fut(self.site, request)
-        self.assertEqual(response.status_int, 200)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message, "Created 2 users.")
 
@@ -801,9 +760,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user1","User","One","test@example.com","pass1234"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message, "Created 1 users.")
 
@@ -817,9 +776,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user1","User","One","test@example.com","pass1234","foo"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message,
                          'Malformed CSV: line 2 does not match header.')
         self.assertEqual(api.status_message, None)
@@ -831,9 +790,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user1","User","One","test@example.com"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message,
                          'Malformed CSV: line 2 does not match header.')
         self.assertEqual(api.status_message, None)
@@ -845,9 +804,9 @@ class TestUploadUsersView(unittest.TestCase):
             '"user1","User","One","test@example.com","pass1234","wut"\n'
             ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message,
                          'Unrecognized field: wut')
         self.assertEqual(api.status_message, None)
@@ -859,9 +818,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user1","One","test@example.com","pass1234"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message,
                          'Missing required field: firstname')
         self.assertEqual(api.status_message, None)
@@ -873,9 +832,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user1","User","One","test@example.com"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message,
                          'Must supply either password or sha_password field.')
         self.assertEqual(api.status_message, None)
@@ -889,9 +848,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user2","User","Two","test@example.com","pass1234"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message,
                           'Skipping user: user1: User already exists.\n'
@@ -906,9 +865,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user2","User","Two","test@example.com","pass1234"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message,
                           'Skipping user: user1: User already exists.\n'
@@ -924,9 +883,9 @@ class TestUploadUsersView(unittest.TestCase):
                 '"user2","User","Two","test@example.com","pass1234"\n'
                 ),
         })
-        response = self._call_fut(self.site, request)
+        result = self._call_fut(self.site, request)
 
-        api = self.renderer.api
+        api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message,
                 'Skipping user: user1: User already exists with login: user1\n'
@@ -966,23 +925,17 @@ class TestErrorMonitorView(unittest.TestCase):
         return error_monitor_view(self.site, request)
 
     def test_all_ok(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor.pt'
-        )
-        self.call_fut()
-        self.assertEqual(renderer.subsystems, ["blonde", "red", "head"])
-        self.assertEqual(renderer.states,
+        result = self.call_fut()
+        self.assertEqual(result['subsystems'], ["blonde", "red", "head"])
+        self.assertEqual(result['states'],
                          {"blonde": [], "red": [], "head": []})
-        self.assertEqual(renderer.urls['blonde'],
+        self.assertEqual(result['urls']['blonde'],
             "http://example.com/error_monitor_subsystem.html?subsystem=blonde")
 
     def test_bad_head(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor.pt'
-        )
         self.log_error('head', 'Testing...')
-        self.call_fut()
-        self.assertEqual(renderer.states,
+        result = self.call_fut()
+        self.assertEqual(result['states'],
                          {"blonde": [], "red": [], "head": ['Testing...']})
 
 class TestErrorMonitorSubsystemView(unittest.TestCase):
@@ -1021,36 +974,24 @@ class TestErrorMonitorSubsystemView(unittest.TestCase):
         return error_monitor_subsystem_view(self.site, request)
 
     def test_no_subsystem(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor_subsystem.pt'
-        )
         from repoze.bfg.exceptions import NotFound
         self.assertRaises(NotFound, self.call_fut)
 
     def test_no_errors(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor_subsystem.pt'
-        )
-        self.call_fut('red')
-        self.assertEqual(renderer.entries, [])
+        result = self.call_fut('red')
+        self.assertEqual(result['entries'], [])
 
     def test_bad_head(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor_subsystem.pt'
-        )
         self.log_error('head', u'fo\xf2'.encode('utf-8'))
         self.log_error('head', 'bar')
-        self.call_fut('head')
-        self.assertEqual(renderer.entries, [u'fo\xf2', 'bar'])
+        result = self.call_fut('head')
+        self.assertEqual(result['entries'], [u'fo\xf2', 'bar'])
 
     def test_bad_head_bad_characters(self):
-        renderer = testing.registerDummyRenderer(
-            'templates/admin/error_monitor_subsystem.pt'
-        )
         self.log_error('head', 'fo\x92')
         self.log_error('head', 'bar')
-        self.call_fut('head')
-        self.assertEqual(renderer.entries, [u'fo\x92', 'bar'])
+        result = self.call_fut('head')
+        self.assertEqual(result['entries'], [u'fo\x92', 'bar'])
 
 class TestErrorMonitorStatusView(unittest.TestCase):
     def setUp(self):

@@ -17,7 +17,6 @@
 
 """Catalog results batching functions"""
 
-from zope.component import getAdapter
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.bfg.url import urlencode
@@ -302,3 +301,71 @@ def get_container_batch(container, request, batch_start=0, batch_size=20,
     _add_link_data(info, container, request)
     return info
 
+def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
+                       backwards=False, line_filter=None):
+    if 'batch_start' in request.params:
+        batch_start = int(request.params['batch_start'])
+    if 'batch_size' in request.params:
+        batch_size = int(request.params['batch_size'])
+
+    entries = []
+    last = batch_start + batch_size
+
+    i = 0
+    j = 0
+
+    if backwards:
+        fp = backwards_reader(fp)
+
+    for line in fp:
+        i = i + 1
+        if line_filter:
+            line = line_filter(line)
+            if line is None:
+                continue
+        if j > last:
+            # we have to continue counting in order to show total
+            # line count
+            continue
+        entries.append(line)
+        j = j + 1
+
+    page_entries = entries[batch_start : last]
+
+    info = {
+        'entries': page_entries,
+        'batch_start': batch_start,
+        'batch_size': batch_size,
+        'batch_end': batch_start + len(page_entries),
+        'total': i,
+        }
+    _add_link_data(info, context, request)
+    return info
+
+def backwards_reader(file, BLKSIZE=4096):
+    buf = ""
+    file.seek(-1, 2)
+    lastchar = file.read(1)
+    trailing_newline = (lastchar == "\n")
+
+    while 1:
+        newline_pos = buf.rfind("\n")
+        pos = file.tell()
+        if newline_pos != -1:
+            # Found a newline
+            line = buf[newline_pos+1:]
+            buf = buf[:newline_pos]
+            if pos or newline_pos or trailing_newline:
+                line += "\n"
+            yield line
+        elif pos:
+            # Need to fill buffer
+            toread = min(BLKSIZE, pos)
+            file.seek(-toread, 1)
+            buf = file.read(toread) + buf
+            file.seek(-toread, 1)
+            if pos == toread:
+                buf = "\n" + buf
+        else:
+            # Start-of-file
+            return

@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Batching in syslog view (LP#563745).
 
 3.29 (2010-04-30)
 -----------------

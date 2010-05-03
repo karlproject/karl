@@ -29,8 +29,14 @@
         </form>
 
         <div id="syslog">
-          <div class="entry" tal:condition="not entries">No entries.</div>
-          <div class="entry" tal:repeat="entry entries">${entry}</div>
+          <div class="entry" tal:condition="not batch_info['entries']"
+               >No entries.</div>
+          <div tal:condition="batch_info['batching_required']" 
+               metal:use-macro="api.snippets.macros['batching']"/>
+          <div class="entry" tal:repeat="entry batch_info['entries']"
+               >${entry}</div>
+          <div tal:condition="batch_info['batching_required']" 
+               metal:use-macro="api.snippets.macros['batching']"/>
         </div>
       </div>
     </div>

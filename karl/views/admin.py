@@ -13,7 +13,6 @@ from webob.exc import HTTPFound
 from zope.component import getUtility
 
 from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import find_model
@@ -37,6 +36,7 @@ from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
+from karl.views.batch import get_fileline_batch
 
 class AdminTemplateAPI(TemplateAPI):
 
@@ -53,8 +53,7 @@ def _menu_macro():
     return get_template('templates/admin/menu.pt').macros['menu']
 
 def admin_view(context, request):
-    return render_template_to_response(
-        'templates/admin/admin.pt',
+    return dict(
         api=AdminTemplateAPI(context, request, 'Admin UI'),
         menu=_menu_macro()
     )
@@ -189,11 +188,7 @@ def delete_content_view(context, request):
         filtered_content=filtered_content,
     )
     parms.update(_populate_content_selection_widget(context, request))
-
-    return render_template_to_response(
-        'templates/admin/delete_content.pt',
-        **parms
-    )
+    return parms
 
 class _DstNotFound(Exception):
     pass
@@ -276,11 +271,7 @@ def move_content_view(context, request):
         filtered_content=filtered_content,
     )
     parms.update(_populate_content_selection_widget(context, request))
-
-    return render_template_to_response(
-        'templates/admin/move_content.pt',
-        **parms
-    )
+    return parms
 
 def site_announcement_view(context, request):
     """
@@ -302,9 +293,10 @@ def site_announcement_view(context, request):
         site = find_site(context)
         site.site_announcement = u''
     api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
-    return render_template_to_response(
-        'templates/admin/site_announcement.pt', api=api,
-        menu=_menu_macro())
+    return dict(
+        api=api,
+        menu=_menu_macro()
+        )
 
 
 class EmailUsersView(object):
@@ -368,8 +360,7 @@ class EmailUsersView(object):
                                     query=dict(status_message=status_message))
             return HTTPFound(location=redirect_to)
 
-        return render_template_to_response(
-            'templates/admin/email_users.pt',
+        return dict(
             api=api,
             menu=_menu_macro(),
             to_groups = self.to_groups,
@@ -385,29 +376,33 @@ def syslog_view(context, request):
     else:
         filter_instances = [filter_instance]
 
-    entries = []
-    with codecs.open(syslog_path, encoding='utf-8',
-                     errors='replace') as syslog:
-        for line in syslog:
-            line = _decode(line)
-            try:
-                month, day, time, host, instance, message = line.split(None, 5)
-            except ValueError:
-                # Ignore lines that don't fit the format
-                continue
+    def line_filter(line):
+        try:
+            month, day, time, host, instance, message = line.split(None, 5)
+        except ValueError:
+            # Ignore lines that don't fit the format
+            return None
 
-            if instance not in filter_instances:
-                continue
-            entries.append(line)
-    entries.reverse() # Show more recent entries first
+        if instance not in filter_instances:
+            return None
 
-    return render_template_to_response(
-        'templates/admin/syslog.pt',
+        return line
+
+    if syslog_path:
+        syslog = codecs.open(syslog_path, encoding='utf-8',
+                             errors='replace')
+    else:
+        syslog = StringIO()
+
+    batch_info = get_fileline_batch(syslog, context, request,
+                                    line_filter=line_filter, backwards=True)
+
+    return dict(
         api=AdminTemplateAPI(context, request),
         menu=_menu_macro(),
         instances=instances,
         instance=filter_instance,
-        entries=entries,
+        batch_info=batch_info,
     )
 
 def logs_view(context, request):
@@ -430,8 +425,7 @@ def logs_view(context, request):
     else:
         lines = []
 
-    return render_template_to_response(
-        'templates/admin/log.pt',
+    return dict(
         api=AdminTemplateAPI(context, request),
         menu=_menu_macro(),
         logs=log_paths,
@@ -556,8 +550,8 @@ class UploadUsersView(object):
         api = AdminTemplateAPI(context, request)
         api.error_message = '\n'.join(errors)
         api.status_message = '\n'.join(messages)
-        return render_template_to_response(
-            'templates/admin/upload_users_csv.pt',
+
+        return dict(
             api=api,
             menu=_menu_macro(),
             required_fields=self.required_fields,
@@ -596,8 +590,7 @@ def error_monitor_view(context, request):
             error_monitor_dir, subsystem
         )
 
-    return render_template_to_response(
-        'templates/admin/error_monitor.pt',
+    return dict(
         api=AdminTemplateAPI(context, request),
         menu=_menu_macro(),
         subsystems=subsystems,
@@ -615,8 +608,7 @@ def error_monitor_subsystem_view(context, request):
     entries = _get_error_monitor_state(error_monitor_dir, subsystem)
     back_url = model_url(context, request, 'error_monitor.html')
 
-    return render_template_to_response(
-        'templates/admin/error_monitor_subsystem.pt',
+    return dict(
         api=AdminTemplateAPI(context, request),
         menu=_menu_macro(),
         subsystem=subsystem,
@@ -682,3 +674,4 @@ def mailin_monitor_view(context, request):
     sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
     sub_request = webob.Request(sub_environ)
     return sub_request.get_response(_mailin_monitor_app)
+

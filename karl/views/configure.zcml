@@ -755,6 +755,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.admin_view"
+    renderer="templates/admin/admin.pt"
     permission="administer"
     name="admin.html"
     />
@@ -762,6 +763,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.delete_content_view"
+    renderer="templates/admin/delete_content.pt"
     permission="administer"
     name="delete_content.html"
     />
@@ -769,6 +771,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.move_content_view"
+    renderer="templates/admin/move_content.pt"
     permission="administer"
     name="move_content.html"
     />
@@ -776,6 +779,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.site_announcement_view"
+    renderer="templates/admin/site_announcement.pt"
     permission="administer"
     name="site_announcement.html"
     />
@@ -783,6 +787,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.EmailUsersView"
+    renderer="templates/admin/email_users.pt"
     permission="administer"
     name="email_users.html"
     />
@@ -790,6 +795,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.syslog_view"
+    renderer="templates/admin/syslog.pt"
     permission="administer"
     name="syslog.html"
     />
@@ -797,6 +803,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.logs_view"
+    renderer="templates/admin/log.pt"
     permission="administer"
     name="logs.html"
     />
@@ -804,6 +811,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.UploadUsersView"
+    renderer="templates/admin/upload_users_csv.pt"
     permission="administer"
     name="upload_users_csv.html"
     />
@@ -811,6 +819,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.error_monitor_view"
+    renderer="templates/admin/error_monitor.pt"
     permission="administer"
     name="error_monitor.html"
     />
@@ -818,6 +827,7 @@
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.error_monitor_subsystem_view"
+    renderer="templates/admin/error_monitor_subsystem.pt"
     permission="administer"
     name="error_monitor_subsystem.html"
     />
