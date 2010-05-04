@@ -6,6 +6,8 @@ Unreleased
 
 - Batching in syslog view (LP#563745).
 
+- LP #575276 File view now uses generic layout when outside of a community.
+
 3.29 (2010-04-30)
 -----------------
 

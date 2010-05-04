@@ -79,6 +79,7 @@ from karl.content.views.utils import get_show_sendalert
 
 from karl.security.workflow import get_security_states
 
+from karl.utils import find_community
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
@@ -477,8 +478,12 @@ def show_file_view(context, request):
     previous, next = get_previous_next(context, request)
 
     # Get a layout
+    community = find_community(context)
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+    if community is not None:
+        layout = layout_provider('community')
+    else:
+        layout = layout_provider('generic')
 
     return render_template_to_response(
         'templates/show_file.pt',
