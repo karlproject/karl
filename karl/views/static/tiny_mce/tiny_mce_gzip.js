@@ -611,6 +611,9 @@ tinyMCE.addI18n('en.wicked',{
                 this.info_location = this.element.find('.tiny-imagedrawer-info-location');
                 this.info_author = this.element.find('.tiny-imagedrawer-info-author');
                 this.info_modified = this.element.find('.tiny-imagedrawer-info-modified');
+                this.wrapper_location = this.element.find('.tiny-imagedrawer-info-location-wrapper');
+                this.wrapper_author = this.element.find('.tiny-imagedrawer-info-author-wrapper');
+                this.wrapper_modified = this.element.find('.tiny-imagedrawer-info-modified-wrapper');
                 this.buttonset_save = this.element
                     .find('.karl-buttonset.tiny-imagedrawer-buttonset-save')
                     .karlbuttonset({
@@ -620,6 +623,12 @@ tinyMCE.addI18n('en.wicked',{
                     .karlbuttonset('getButton', 0);
                 this.insert_button_label = this.insert_button
                     .find('a');
+                // Wire up the status boxes in the info panel
+                this.statusbox = this.element.find('.tiny-imagedrawer-statusbox')
+                    .multistatusbox({
+                        //clsItem: 'portalMessage',
+                        hasCloseButton: false
+                    });
                 // Initial value
                 if (this.options.insertButtonLabel) {
                     this.insertButtonLabel(this.options.insertButtonLabel);
@@ -677,8 +686,20 @@ tinyMCE.addI18n('en.wicked',{
 
                 // Setting values, taking care of sensible defaults.
                 this.info_title.text(value.title || 'No selection');
-                this.info_author.text(value.author_name || '');
-                this.info_modified.text(value.last_modified || '');
+                var author_name = value.author_name || '';
+                this.info_author.text(author_name);
+                if (author_name) {
+                    this.wrapper_author.show();
+                } else {
+                    this.wrapper_author.hide();
+                }
+                var last_modified = value.last_modified || '';
+                this.info_modified.text(last_modified);
+                if (last_modified) {
+                    this.wrapper_modified.show();
+                } else {
+                    this.wrapper_modified.hide();
+                }
 
                 // iterate on the location chain and render it
                 this.info_location.html('');
@@ -695,6 +716,21 @@ tinyMCE.addI18n('en.wicked',{
                             .attr('href', this.href)
                         );
                 });
+                if (value.location && value.location.length > 0) {
+                    this.wrapper_location.show();
+                } else {
+                    this.wrapper_location.hide();
+                }
+
+                // update statuses
+                this.statusbox.multistatusbox('clear');
+                if (value.error) {
+                    this.statusbox.multistatusbox('append', value.error,
+                        null, 'ui-state-error ui-corner-all');
+                } else if (value.status) {
+                    this.statusbox.multistatusbox('append', value.status,
+                        null, 'ui-state-highlight ui-corner-all');
+                }
 
                 // handle the insert button enabled state
                 this.insertButtonEnabled(value.image_url);
@@ -718,18 +754,26 @@ tinyMCE.addI18n('en.wicked',{
         $.extend(ImageStripe.prototype, {
 
             init: function(container, column_width, proto_image,
-                title, thumbnail_url) {
+                proto_value) {
                 this.container = container;
                 this.column_width = column_width;
                 this.proto_image = proto_image;
-                this.title = title;
-                this.thumbnail_url = thumbnail_url;
+                this.proto_value = proto_value;
                 this.reset();
             },
 
             reset: function() {
                 this.offset = 0;
                 this.container.empty();
+            },
+
+            // Generates a thumb image.
+            _thumb: function(/*optional*/ value) {
+                return this.proto_image
+                    .clone(true)
+                    .imagedrawerimage({
+                        record: $.extend({}, this.proto_value, value)
+                    });
             },
 
             preload: function(start, end) {
@@ -746,22 +790,9 @@ tinyMCE.addI18n('en.wicked',{
 
                 var i = start;
 
-                // Generates a Loading... image.
-                var loading = function() {
-                    return self.proto_image
-                        .clone(true)
-                        .imagedrawerimage({
-                            record: {
-                                loading: true,
-                                title: self.title,
-                                thumbnail_url: self.thumbnail_url
-                            }
-                        });
-                };
-
                 // Prepend records to the container.
                 while (i < oldstart) {
-                    loading().prependTo(this.container);
+                    this._thumb({loading: true}).prependTo(this.container);
                     i += 1;
                 }
                 // Update the offset
@@ -781,33 +812,25 @@ tinyMCE.addI18n('en.wicked',{
                 // Replace records inside the container.
                 while (i < Math.min(oldend, end)) {
                     // XXX Just update the value, instead? TODO
-                    loading().replaceAll(this.item(i));
+                    this._thumb({loading: true}).replaceAll(this.item(i));
                     i += 1;
                 }
 
                 // Append records to the container.
                 while (i < end) {
-                    loading().appendTo(this.container);
+                    this._thumb({loading: true}).appendTo(this.container);
                     i += 1;
                 }
 
-                // set the length of the container to
-                // always hold all the elements
-                this.container.width(this.items().length 
-                    * (this.column_width + 20) + 100);
-
+                this._setLength();
             },
 
-            insertRecord: function(index, value) {
+            insertRecord: function(index, /*optional*/ value) {
                 // inserts a record at the given position
                 // this pushes all following records to the right.
-                
+
                 // Generates the item.
-                var newItem = self.proto_image
-                    .clone(true)
-                    .imagedrawerimage({
-                        record: value
-                    });
+                var newItem = this._thumb(value);
 
                 if (index - this.offset == this.items().length) {
                     // Allow appending the item right at the
@@ -823,6 +846,17 @@ tinyMCE.addI18n('en.wicked',{
                     newItem.insertBefore(item);
                 }
 
+                this._setLength();
+
+                // Return the newly created object
+                return newItem;
+            },
+
+            _setLength: function() {
+                // set the length of the container to
+                // always hold all the elements
+                this.container.width(this.items().length 
+                    * (this.column_width + 20) + 100);
             },
 
             moveTo: function(start) {
@@ -1005,10 +1039,18 @@ tinyMCE.addI18n('en.wicked',{
                 .bind('change.karlbuttonset', function(event, button_index, value) {
                     // XXX TODO change this also to use sensible identifiers
                     // instead of indexes.
-                    var target = (button_index != 0) ? download_panel : upload_panel;
+                    ////var target = (button_index != 0) ? download_panel : upload_panel;
                     if (value) {
-                        target.show();
-                        if (button_index >= 1 && button_index <= 3) {
+                        ////target.show();
+                       if (button_index == 0) {
+                            // Handle the Upload tab
+                            upload_panel.show();
+                            self.images_panel.hide();
+                            external_panel.hide();
+                            // erase the info in the panel
+                            self.info_panel.imagedrawerinfopanel('record', {});
+                            self.selected_source = button_index;
+                        } else if (button_index >= 1 && button_index <= 3) {
                             // Handle the search result browsers
                             // Did the source change?
                             if (button_index != self.selected_source) {
@@ -1020,18 +1062,20 @@ tinyMCE.addI18n('en.wicked',{
                                 // also need to reset the info panel.
                                 self.info_panel.imagedrawerinfopanel('record', {});
                             }
+                            upload_panel.hide();
                             self.images_panel.show();
                             external_panel.hide();
                         } else if (button_index == 4) {
                             // Handle the External tab
+                            upload_panel.hide();
                             self.images_panel.hide();
                             external_panel.show();
                             // erase the info in the panel
                             self.info_panel.imagedrawerinfopanel('record', {});
                             self.selected_source = button_index;
                         }
-                    } else {
-                        target.hide();
+                    ////} else {
+                    ////    target.hide();
                     }
                 });
             this.selected_source = this.buttonset[0].selectedIndex; 
@@ -1041,19 +1085,18 @@ tinyMCE.addI18n('en.wicked',{
 
             // XXX TODO switch from index to identifier here as well.
 
-            if (this.selected_source != 0) {
-                if (this.selected_source >= 1 && this.selected_source <= 3) {
-                    this.images_panel.show();
-                    external_panel.hide();
-                } else {
-                    this.images_panel.hide();
-                    external_panel.show();
-                }
-                download_panel.show();
-                upload_panel.hide();
-            } else {
-                download_panel.hide();
+            if (this.selected_source == 0) {
                 upload_panel.show();
+                this.images_panel.hide();
+                external_panel.hide();
+            } else if (this.selected_source >= 1 && this.selected_source <= 3) {
+                upload_panel.hide();
+                this.images_panel.show();
+                external_panel.hide();
+            } else {
+                upload_panel.hide();
+                this.images_panel.hide();
+                external_panel.show();
             }
 
             // Wire up the info panel
@@ -1087,28 +1130,74 @@ tinyMCE.addI18n('en.wicked',{
                 .bind('change.karlbuttonset', function(event) {
                     // preload this image.
                     var image_url = urlinput.val();
+                    // XXX TODO eventually, title could be calculated
+                    // XXX from the image_url.
+                    var title = 'External image';
+
                     var img = new Image();
+                    var eventContext = {};
+                    eventContext.thumb = self.external_stripe.insertRecord(0, 
+                        {
+                            loading: true,
+                            title: title,
+                            location: [{
+                                title: image_url,
+                                href: image_url
+                                }]
+                        }
+                    );
+                    // If we are on the external tab: select it,
+                    // otherwise leave the active selection intact.
+                    if (self.buttonset.val() == 'external') {
+                        self._setSelection(eventContext.thumb);
+                    }
+
                     $(img)
                         .attr('src', image_url)
                         .load(function() {
-                            // TODO ...
-                            // update the info panel
-                            self.info_panel.imagedrawerinfopanel('record', {
-                                title: 'External image',
-                                image_url: image_url,
-                                location: [{
-                                    title: image_url,
-                                    href: image_url
-                                    }],
-                                image_width: this.width,
-                                image_height: this.height
-                            });
+                            // update the record with the image sizes we have now
+                            // and also set the thumbnail to show the image
+                            eventContext.thumb.imagedrawerimage('record', $.extend({},
+                                eventContext.thumb.imagedrawerimage('record'), {
+                                    image_width: this.width,
+                                    image_height: this.height,
+                                    image_url: image_url,
+                                    thumbnail_url: image_url
+                            }));
+                            // If there is no selection, and we are still on
+                            // the upload tab: select it,
+                            // otherwise leave the active selection intact.
+                            if (self.buttonset.val() == 'external') {
+                                if (self.selected_item == null) {
+                                    self._setSelection(eventContext.thumb);
+                                } else if (self.selected_item[0] === eventContext.thumb[0]) {
+                                    // This is the selected item. Update the info panel.
+                                    self._updateInfoPanel();
+                                }
+                            }
+ 
                         })
                         .error(function() {
-                            // reset the info panel
-                            self.info_panel.imagedrawerinfopanel('record', {
-                            });
-                            //alert('Error... url is not good');
+                            // Get the existing data record and save the error in it.
+                            eventContext.thumb.imagedrawerimage('record', 
+                                $.extend(eventContext.thumb.imagedrawerimage('record'),
+                                    {
+                                        status: null,
+                                        error: 'Wrong url, or not an image.',
+                                        thumbnail_url: self.url + '/images/error.png'
+                                    }
+                                )
+                            );
+                            // If we are on that tab: select it regardless we have
+                            // a current selection or not.
+                            if (self.buttonset.val() == 'external') {
+                                if (self.selected_item[0] === eventContext.thumb[0]) {
+                                    // We are the selected item. Update the info panel.
+                                    self._updateInfoPanel();
+                                } else {
+                                    self._setSelection(eventContext.thumb);
+                                }
+                            }
                         });
                 });
 
@@ -1126,22 +1215,29 @@ tinyMCE.addI18n('en.wicked',{
                 fileinput.attr('name', 'file');
             }
 
-            // Wire up the Upload / Cancel buttons
+            // Wire up the Upload button
             this.dialog
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-upload')
                 .karlbuttonset({
                     clsContainer: 'tiny-imagedrawer-buttonset-upload'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    if (button_index == 0) { // upload
-                        // Initiate an upload
+                    //if (button_index == 0) { // upload
+                        // Signal the start of this upload
+                        var eventContext = {};
+                        self._uploadStart(eventContext);
+
+                        // Initiate the upload
                         $.ajaxFileUpload({
                             url: ed.getParam('imagedrawer_upload_url'),
                             secureuri: false,
                             fileElementId: self.fileinputid,
+                            extraParams: {
+                                // extra parameters could be passed here with the upload.
+                            },
                             dataType: 'json',
                             success: function(json, status) {
-                                self._uploadSuccess(json);
+                                self._uploadSuccess(json, eventContext);
                             },
                             error: function (json, status, e) {
                                 // Consider using the exception's text,
@@ -1151,12 +1247,10 @@ tinyMCE.addI18n('en.wicked',{
                                 if (e && e.message) {
                                     json = {error: e.message};
                                 }
-                                self._uploadError(json);
+                                self._uploadError(json, eventContext);
                             }
                         });
-                    } else { // Cancel.
-                        self.dialog.dialog('close');
-                    }
+                    //}
                 });
 
 
@@ -1207,25 +1301,108 @@ tinyMCE.addI18n('en.wicked',{
                 .find('ul.tiny-imagedrawer-imagestripe > li')
                 .remove();
 
-            // Create a controller for displaying the image stripe
-            this.image_stripes = this.images_panel.find('ul.tiny-imagedrawer-imagestripe');
-            // XXX
+            // column size is the same in all stripes 
+            this.visible_columns = 4;
+
+            // We have the following stripes to take care of:
+            // - 3 in the download panel
+            // - 1 in the upload panel
+            // - 1 in the external panel
+            
+            // handle the stripes in the download panel
             this.stripes = [];
-            this.image_stripes.each(function(index) {
-                self.stripes.push(new ImageStripe($(this), 95, self.proto_image,
-                    self.editor.getLang('imagedrawer.loading_title'),
-                    self.url + '/images/default_image.png'));
-            });
+            this.images_panel.find('ul.tiny-imagedrawer-imagestripe')
+                .each(function(index) {
+                    self.stripes.push(
+                        new ImageStripe($(this), 95, self.proto_image, {
+                            title: self.editor.getLang('imagedrawer.loading_title'),
+                            thumbnail_url: self.url + '/images/default_image.png'
+                        })
+                    );
+                });
             // A counter to enable rejection of obsolate batches
             this.region_id = 0;
-
-            // Wire the scrollbar
+            // Wire the scrollbar in the download panel
             this.scrollbar = this.images_panel.find('.tiny-imagedrawer-scrollbar')
                 .slider({
                     slide: function(e, ui) {
                         self._moveStripe(ui.value / 100);
                     }
                 });
+
+            // handle the stripe in the upload panel
+            this.upload_stripe = new ImageStripe(
+                upload_panel.find('ul.tiny-imagedrawer-imagestripe').eq(0),
+                95, self.proto_image, {
+                    title: self.editor.getLang('imagedrawer.loading_title'),
+                    thumbnail_url: self.url + '/images/throbber.gif',
+                    status: self.editor.getLang('imagedrawer.uploading_status')
+                }
+            );
+            // Wire the scrollbar in the upload panel
+            this.upload_scrollbar = upload_panel.find('.tiny-imagedrawer-scrollbar')
+                .slider({
+                    slide: function(e, ui) {
+                        var stripe = self.upload_stripe;
+                        var percentage_float = ui.value / 100;
+                        var num_items = stripe.items().length;
+                        // Move the stripe to a percentage position.
+                        var slider_index = percentage_float * 
+                                (num_items - self.visible_columns); 
+                        if (slider_index < 0) {
+                            // Region fits entirely without scrolling.
+                            // Do nothing.
+                            return;
+                        }
+                        ///
+                        stripe.moveTo(slider_index);
+                    }
+                });
+
+            // handle the stripe in the external panel
+            this.external_stripe = new ImageStripe(
+                external_panel.find('ul.tiny-imagedrawer-imagestripe').eq(0),
+                95, self.proto_image, {
+                    title: self.editor.getLang('imagedrawer.loading_title'),
+                    thumbnail_url: self.url + '/images/default_image.png'
+                }
+            );
+            // Wire the scrollbar in the external panel
+            this.external_scrollbar = external_panel.find('.tiny-imagedrawer-scrollbar')
+                .slider({
+                    slide: function(e, ui) {
+                        var stripe = self.external_stripe;
+                        var percentage_float = ui.value / 100;
+                        var num_items = stripe.items().length;
+                        // Move the stripe to a percentage position.
+                        var slider_index = percentage_float * 
+                                (num_items - self.visible_columns); 
+                        if (slider_index < 0) {
+                            // Region fits entirely without scrolling.
+                            // Do nothing.
+                            return;
+                        }
+                        ///
+                        stripe.moveTo(slider_index);
+                    }
+                });
+
+            // Wire up the help panel
+            var help_panel = this.dialog.find('.tiny-imagedrawer-panel-help')
+                .hide();
+            help_panel.find('.karl-buttonset')
+                .karlbuttonset({})
+                .bind('change.karlbuttonset', function(event, button_index, value) {
+                    help_panel.hide('slow');
+                    download_panel.show('slow');
+                });
+            this.dialog.find('.tiny-imagedrawer-button-help')
+                .click(function(event) {
+                    help_panel.show('fold');
+                    download_panel.hide('fold');
+                    event.preventDefault();
+                });
+
 
             // Check that the slider is either jquery ui version 1.8,
             // or that the code is patched with 1.7.
@@ -1258,7 +1435,6 @@ tinyMCE.addI18n('en.wicked',{
             this.region_total = images_info.totalRecords;
             this._resetStripe();
             // Preload the region
-            this.visible_columns = 4;
             this._preloadRegion(this.region_start, this.region_end);
             this._moveStripe(this.scrollbar.slider('value') / 100);
         },
@@ -1312,42 +1488,75 @@ tinyMCE.addI18n('en.wicked',{
             alert(error);
         },
 
-        _uploadStart: function(json) {
-
+        _uploadStart: function(eventContext) {
+            // Insert the image data into the editor
+            eventContext.thumb = this.upload_stripe.insertRecord(0, 
+                {
+                    loading: true,
+                    title: '' + document.getElementById(this.fileinputid).value
+                });
+            // If we are on the upload tab
+            // (most likely the case): select it,
+            // otherwise leave the active selection intact.
+            if (this.buttonset.val() == 'uploadnew') {
+                this._setSelection(eventContext.thumb);
+            }
         },
 
-        _uploadSuccess: function(json) {
+        _uploadSuccess: function(json, eventContext) {
             var self = this;
             var ed = this.editor;
             // use error sent by server, if available
             var error = json && json.error;
             if (error) {
-                this._uploadError(json);
+                this._uploadError(json, eventContext);
                 return;
             }
 
-            // We also received an update: apply it.
-            this._resetStripe();
-            this.region_start = 0;
-            this.region_end = json.images_info.records.length;
-            this._preloadRegion(this.region_start, this.region_end);
-            this._moveStripe(this.scrollbar.slider('value') / 100);
-            this._loadRecords(json.images_info);
-            // Select this record as selection.
-            // XXX ... clear the selection for now!
-            this._setSelection(null);
-            // And now switch to the My Recent tab.
-            this.buttonset.karlbuttonset('getButton', 0).click();
+            // Update the image data that just arrived
+            eventContext.thumb
+                .imagedrawerimage('record', json.upload_image_info);
+            //this._moveStripe(this.scrollbar.slider('value') / 100);
+            //
+            // If there is no selection, and we are still on
+            // the upload tab: select it,
+            // otherwise leave the active selection intact.
+            if (this.buttonset.val() == 'uploadnew') {
+                if (this.selected_item == null) {
+                    this._setSelection(eventContext.thumb);
+                } else if (this.selected_item[0] === eventContext.thumb[0]) {
+                    // This is the selected item. Update the info panel.
+                    this._updateInfoPanel();
+                }
+            }
         },
 
-        _uploadError: function(json) {
+        _uploadError: function(json, eventContext) {
             // use error sent by server, if available
             var error = json && json.error;
             if (! error) {
                 error = 'Server error when fetching drawer_upload_view.html';
             }
-            // XXX XXX XXX do something...
-            alert(error);
+            // Get the existing data record and save the error in it.
+            eventContext.thumb.imagedrawerimage('record', 
+                $.extend(eventContext.thumb.imagedrawerimage('record'),
+                    {
+                        status: null,
+                        error: '' + error,
+                        thumbnail_url: this.url + '/images/error.png'
+                    }
+                )
+            );
+            // If we are on that tab: select it regardless we have
+            // a current selection or not.
+            if (this.buttonset.val() == 'uploadnew') {
+                if (this.selected_item[0] === eventContext.thumb[0]) {
+                    // We are the selected item. Update the info panel.
+                    this._updateInfoPanel();
+                } else {
+                    this._setSelection(eventContext.thumb);
+                }
+            }
         },
 
         _getListItem: function(index) {
@@ -1374,6 +1583,12 @@ tinyMCE.addI18n('en.wicked',{
                 this.selected_item.removeClass('ui-state-default ui-state-active');
             }
 
+            this.selected_item = item;
+            this._updateInfoPanel();
+        },
+
+        _updateInfoPanel: function() {
+            var item = this.selected_item;
             if (item != null) {
                 // select new one
                 // (Use active rather than highlight.)
@@ -1383,9 +1598,6 @@ tinyMCE.addI18n('en.wicked',{
             } else {
                 this.info_panel.imagedrawerinfopanel('record', {});
             }
-
-            this.selected_item = item;
-
         },
 
         _preloadRegion: function(start, end) {
@@ -1705,5 +1917,6 @@ tinyMCE.addI18n('en.wicked',{
 
 tinyMCE.addI18n('en.imagedrawer',{
 image_desc: "Insert/edit image",
-loading_title: 'Loading...'
+loading_title: 'Loading...',
+uploading_status: 'Upload is in progress.'
 });

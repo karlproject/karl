@@ -99,11 +99,9 @@ None of these requests should be cacheable at all.
 
   - The view returns:
         {
-        fileinfo: ...information (name, size) of the succesfully
-                     uploaded file. XXX This should be replaced
-                     by the same record as what images_info returns.
-        images_info: ...an update of the current image listing
-                     (since the client needs to update the thumbnails)
+        upload_image_info: ...information aboutt the succesfully
+                    uploaded file, in the same record format as used
+                    in the data views.
         error: ... explicitely raise an error
         }
 
@@ -348,5 +346,4 @@ def drawer_upload_view(context, request,
     # Update the thumbnails
     return dict(
         upload_image_info=get_image_info(image, request),
-        images_info=batch_images(context, request),
     )

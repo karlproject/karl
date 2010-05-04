@@ -282,7 +282,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
         self.assertEqual(data['upload_image_info'], {'title': 'Foo'})
-        self.assertEqual(data['images_info'], ['foo', 'bar'])
+        self.assert_('images_info' not in data)
 
         image = context['test.jpg']
         self.assertEqual(image.title, 'test.jpg')
@@ -305,7 +305,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
         self.assertEqual(data['upload_image_info'], {'title': 'Foo'})
-        self.assertEqual(data['images_info'], ['foo', 'bar'])
+        self.assert_('images_info' not in data)
 
         image = context['TEMP'].values()[0]
         self.assertEqual(image.title, 'test.jpg')

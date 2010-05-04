@@ -73,8 +73,14 @@
     overflow: hidden;
 }
 
+.tiny-imagedrawer-images {
+    overflow: hidden;
+    padding: 0.5em;
+    margin: -0.5em;
+}
+
 .tiny-imagedrawer-scrollbar {
-    margin: 0 0.5em;
+    margin: 8px 0.5em 0;
 }
 
 ul.tiny-imagedrawer-imagestripe {

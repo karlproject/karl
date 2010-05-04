@@ -1,8 +1,9 @@
 <div>
+
   <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">
     <div class="ui-helper-clearfix tiny-imagedrawer-titlebar">
       <span style="float: left;" class="tiny-imagedrawer-title">Insert Image</span>
-      <a style="float: right;" href="javascript://return false;">help</a>
+      <a style="float: right;" class="tiny-imagedrawer-button-help" href="javascript://return false;">help</a>
     </div>
     <div>
       <span style="float: left; margin-right: 0.5em; margin-top: 1.05em; font-weight: normal;">Source</span>
@@ -26,94 +27,69 @@
     </div>
   </div>
 
-  <div class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-download">
-    <div style="" class="ui-helper-clearfix">
-      <div style="width: 376px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-images">
-        <ul class="tiny-imagedrawer-imagestripe">
-          <!-- The following is used as the prototype image -->
-          <li>
-            <div class="tiny-imagedrawer-image">
-              <div>
-                <img src="http://foo.bar/thumb.jpg"/>
-              </div>
-            </div>
-            <span class="tiny-imagedrawer-imagelabel">
-              An Image
-            </span>
-          </li>
-          <!--  -->
-        </ul>
-        <ul class="tiny-imagedrawer-imagestripe"></ul>
-        <ul class="tiny-imagedrawer-imagestripe"></ul>
-        <div class="tiny-imagedrawer-scrollbar"></div>
-      </div>
+  <div style="height: 388px;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-help">
 
-      <div style="width: 376px; height: 380px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
-        <p>
-          Select the url of the external image to be used in your document!
-        </p>
-        <input type="text" class="tiny-imagedrawer-urlinput" />
-        <br />
-        <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
-          <button class="ui-icon-gear">Check</button>
-        </div>
-
-      </div>
-
-      <div style="width: 306px; height: 380px; float: right;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-info">
-        <span class="tiny-imagedrawer-info-title"></span>
-        <br />
-        <br />
-        <div class="ui-helper-clearfix tiny-imagedrawer-info-columnwrapper">
-          <span class="tiny-imagedrawer-info-label">Location</span>
-          <span class="tiny-imagedrawer-info-location"></span>
-          <br />
-          <span class="tiny-imagedrawer-info-label">Author</span>
-          <span class="tiny-imagedrawer-info-author"></span>
-          <br />
-          <span class="tiny-imagedrawer-info-label">Modified</span>
-          <span class="tiny-imagedrawer-info-modified"></span>
-          <br />
-          <br />
-          <span class="tiny-imagedrawer-info-label">Caption</span>
-          <input type="checkbox" name="blah_0" value="" />
-          <span style="color: red;">yes</span>
-          <br />
-          <span class="tiny-imagedrawer-info-label">Alignment</span>
-          <input id="tiny-imagedrawer-input-align-0" value="left"
-              type="radio" checked="checked" name="tiny-imagedrawer-input-align" />
-          <label for="tiny-imagedrawer-input-align-0">Left</label>
-          <br />
-          <span class="tiny-imagedrawer-info-label"></span>
-          <input id="tiny-imagedrawer-input-align-1" value="right"
-              type="radio" name="tiny-imagedrawer-input-align" />
-          <label for="tiny-imagedrawer-input-align-1">Right</label>
-          <br />
-          <span class="tiny-imagedrawer-info-label"></span>
-          <input id="tiny-imagedrawer-input-align-2" value="center"
-              type="radio" name="tiny-imagedrawer-input-align" />
-          <label style="color: red;" for="tiny-imagedrawer-input-align-2">Center</label>
-          <br />
-          <span class="tiny-imagedrawer-info-label">Size</span>
-          <select name="tiny-imagedrawer-input-dimension">
-            <option value="original">Original (max. 530 x 530)</option>
-            <option value="large">Large (400 x 400)</option>
-            <option value="medium" selected="selected">Medium (250 x 250)</option>
-            <option value="small">Small (100 x 100)</option>
-          </select>
-          <div style="clear: both; height: 0"></div>
-        </div>
-        <div class="karl-buttonset tiny-imagedrawer-buttonset-save" style="">
-          <button class="ui-icon-plusthick" disabled="1">Insert</button>
-          <button class="ui-icon-cancel">Cancel</button>
-        </div>
-        <div style="clear: both; height: 0"></div>
-      </div>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dui tellus,
+      bibendum id tincidunt quis, adipiscing in ipsum. Praesent eu leo nisl.
+      Curabitur accumsan placerat mauris, vulputate tincidunt nunc porttitor
+      suscipit. Suspendisse aliquet velit vitae lectus eleifend non dapibus massa
+      congue. Morbi eu sem nisi. Integer arcu odio, suscipit eu ultricies eget,
+      aliquam eget ligula. Fusce at tortor a ipsum pellentesque ultrices nec nec
+      augue. Suspendisse sodales consectetur elementum. Phasellus a nibh nunc.
+      Vestibulum eget sem at felis varius molestie. Duis rutrum porta aliquam.
+      Suspendisse bibendum dui ut diam aliquet non iaculis ante faucibus.
+      Curabitur sit amet orci nulla! Pellentesque in sagittis ante. Ut porttitor
+      sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur
+      adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora
+      torquent per conubia nostra, per inceptos himenaeos.
+    </p>
+    <p>
+      Aliquam tincidunt lacus id augue eleifend vulputate. Nulla sodales, sem ac
+      fermentum ultrices, nulla arcu viverra justo, nec venenatis lectus purus eu
+      neque. Praesent nec ornare quam. Fusce arcu lectus, porttitor id fermentum
+      quis, ullamcorper et sapien. Pellentesque sagittis, urna id feugiat varius,
+      nulla diam luctus eros; sit amet venenatis sem nisl a enim. Vivamus lacus nisi,
+      faucibus ut interdum et, lacinia a metus. Sed eget ante ipsum, pellentesque
+      blandit mauris. Fusce tincidunt ultricies ante, eget tempus turpis vulputate
+      sed. Cras congue tincidunt elit, at ullamcorper nulla sagittis id. Aenean
+      consequat quam nec ante rhoncus hendrerit. Fusce egestas hendrerit eleifend.
+      Cras id risus vitae enim sodales sodales sed quis elit. Phasellus hendrerit mi
+      leo? Vestibulum rutrum feugiat sem sed volutpat.</p>
+    
+    <div class="karl-buttonset tiny-imagedrawer-buttonset-cancelhelp">
+      <button class="ui-icon-transferthick-e-w">Back</button>
     </div>
   </div>
 
-  <div class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-upload"
-        style="height: 394px;">
+  <div class="ui-helper-clearfix ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-download">
+
+    <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-images">
+      <ul class="tiny-imagedrawer-imagestripe">
+        <!-- The following is used as the prototype image -->
+        <li>
+          <div class="tiny-imagedrawer-image">
+            <div>
+              <img />
+            </div>
+          </div>
+          <span class="tiny-imagedrawer-imagelabel">
+            An Image
+          </span>
+        </li>
+        <!--  -->
+      </ul>
+      <ul class="tiny-imagedrawer-imagestripe"></ul>
+      <ul class="tiny-imagedrawer-imagestripe"></ul>
+      <div class="tiny-imagedrawer-scrollbar"></div>
+    </div>
+
+    <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-upload">
+      <div class="tiny-imagedrawer-images">
+        <ul class="tiny-imagedrawer-imagestripe"></ul>
+        <div class="tiny-imagedrawer-scrollbar"></div>
+      </div>
+      <br />
       <p>
         Select file to upload, then press the Upload button!
         File will be uploaded into the current page.
@@ -122,10 +98,81 @@
       <br />
       <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
         <button class="ui-icon-transferthick-e-w">Upload</button>
-        <button class="ui-icon-cancel">Cancel</button>
       </div>
     </div>
 
-  </div>
+    <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
+      <div class="tiny-imagedrawer-images">
+        <ul class="tiny-imagedrawer-imagestripe"></ul>
+        <div class="tiny-imagedrawer-scrollbar"></div>
+      </div>
+      <br />
+      <p>
+        Select the url of the external image to be used in your document!
+      </p>
+      <input type="text" class="tiny-imagedrawer-urlinput" />
+      <br />
+      <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
+        <button class="ui-icon-gear">Check</button>
+      </div>
+    </div>
 
+    <div style="width: 306px; height: 388px; float: right;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-info">
+      <span class="tiny-imagedrawer-info-title"></span>
+      <br />
+      <br />
+      <div class="tiny-imagedrawer-statusbox"></div>
+      <div class="ui-helper-clearfix tiny-imagedrawer-info-columnwrapper">
+        <div class="tiny-imagedrawer-info-location-wrapper">
+          <span class="tiny-imagedrawer-info-label">Location</span>
+          <span class="tiny-imagedrawer-info-location"></span>
+          <br />
+        </div>
+        <div class="tiny-imagedrawer-info-author-wrapper">
+          <span class="tiny-imagedrawer-info-label">Author</span>
+          <span class="tiny-imagedrawer-info-author"></span>
+          <br />
+        </div>
+        <div class="tiny-imagedrawer-info-modified-wrapper">
+          <span class="tiny-imagedrawer-info-label">Modified</span>
+          <span class="tiny-imagedrawer-info-modified"></span>
+          <br />
+        </div>
+        <br />
+        <span class="tiny-imagedrawer-info-label">Caption</span>
+        <input type="checkbox" name="blah_0" value="" />
+        <span style="color: red;">yes</span>
+        <br />
+        <span class="tiny-imagedrawer-info-label">Alignment</span>
+        <input id="tiny-imagedrawer-input-align-0" value="left"
+            type="radio" checked="checked" name="tiny-imagedrawer-input-align" />
+        <label for="tiny-imagedrawer-input-align-0">Left</label>
+        <br />
+        <span class="tiny-imagedrawer-info-label"></span>
+        <input id="tiny-imagedrawer-input-align-1" value="right"
+            type="radio" name="tiny-imagedrawer-input-align" />
+        <label for="tiny-imagedrawer-input-align-1">Right</label>
+        <br />
+        <span class="tiny-imagedrawer-info-label"></span>
+        <input id="tiny-imagedrawer-input-align-2" value="center"
+            type="radio" name="tiny-imagedrawer-input-align" />
+        <label style="color: red;" for="tiny-imagedrawer-input-align-2">Center</label>
+        <br />
+        <span class="tiny-imagedrawer-info-label">Size</span>
+        <select name="tiny-imagedrawer-input-dimension">
+          <option value="original">Original (max. 530 x 530)</option>
+          <option value="large">Large (400 x 400)</option>
+          <option value="medium" selected="selected">Medium (250 x 250)</option>
+          <option value="small">Small (100 x 100)</option>
+        </select>
+        <div style="clear: both; height: 0"></div>
+      </div>
+      <div class="karl-buttonset tiny-imagedrawer-buttonset-save" style="">
+        <button class="ui-icon-plusthick" disabled="1">Insert</button>
+        <button class="ui-icon-cancel">Cancel</button>
+      </div>
+      <div style="clear: both; height: 0"></div>
+    </div>
+
+  </div>
 </div>

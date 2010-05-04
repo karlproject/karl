@@ -5,6 +5,9 @@
     2009: Balazs Ree <ree@greenfinity.hu>
         * make more useful error when we expect json response, and
           html error arrives, like a 404.
+    2010: Balazs Ree <ree@greenfinity.hu>
+        * allow extra parameters to be passed with the file upload
+
 */
 
 jQuery.extend({
@@ -37,7 +40,7 @@ jQuery.extend({
 
             return io			
     },
-    createUploadForm: function(id, fileElementId)
+    createUploadForm: function(id, fileElementId, /*optional*/ extraParams)
 	{
 		//create form	
 		var formId = 'jUploadForm' + id;
@@ -48,6 +51,13 @@ jQuery.extend({
 		$(oldElement).attr('id', fileId);
 		$(oldElement).before(newElement);
 		$(oldElement).appendTo(form);
+                // Optionally, add some more parameters.
+                extraParams && $.each(extraParams, function(k, v) {
+                    $('<input type="hidden">')
+                        .attr('name', k)
+                        .attr('value', v)
+                        .appendTo(form);
+                });
 		//set attributes
 		$(form).css('position', 'absolute');
 		$(form).css('top', '-1200px');
@@ -60,7 +70,7 @@ jQuery.extend({
         // TODO introduce global settings, allowing the client to modify them for all requests, not only timeout		
         s = jQuery.extend({}, jQuery.ajaxSettings, s);
         var id = new Date().getTime()        
-		var form = jQuery.createUploadForm(id, s.fileElementId);
+		var form = jQuery.createUploadForm(id, s.fileElementId, s.extraParams);
 		var io = jQuery.createUploadIframe(id, s.secureuri);
 		var frameId = 'jUploadFrame' + id;
 		var formId = 'jUploadForm' + id;		
