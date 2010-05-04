@@ -639,12 +639,6 @@
   />
 
   <view
-    for="karl.models.interfaces.IFile"
-    view=".file.serve_file_view"
-    permission="view"
-    />
-
-  <view
     for="karl.models.interfaces.IAttachmentsFolder"
     view=".redirects.redirect_up_view"
     />

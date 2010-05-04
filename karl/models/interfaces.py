@@ -145,7 +145,7 @@ class IProfile(IFolder, IPeople):
     position = Attribute(u"User's position.")
 
     # XXX redundant with categories?
-    organization = Attribute(u"User's organization") 
+    organization = Attribute(u"User's organization")
 
     location = Attribute(u"User's location.")
     country = Attribute(u"User's country.")
@@ -199,18 +199,6 @@ class IProfile(IFolder, IPeople):
 IProfile.ALERT_IMMEDIATELY = 0
 IProfile.ALERT_DIGEST = 1
 IProfile.ALERT_NEVER = 2
-
-class IFile(Interface):
-    """
-    XXX Deprecated.  Can be removed once all Karl instances are evolved to
-        Rev 10.
-    """
-
-class IImageFile(IFile):
-    """
-    XXX Deprecated.  Can be removed once all Karl instances are evolved to
-        Rev 10.
-    """
 
 class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """

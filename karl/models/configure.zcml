@@ -248,11 +248,6 @@
       />
 
   <lemonade:content
-      factory=".image.ImageFile"
-      type=".interfaces.IImageFile"
-      />
-
-  <lemonade:content
       factory=".feedstorage.FeedsContainer"
       type=".interfaces.IFeedsContainer"
       />

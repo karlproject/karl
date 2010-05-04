@@ -8,6 +8,8 @@ Unreleased
 
 - LP #575276 File view now uses generic layout when outside of a community.
 
+- Removed deprecated code that supported old profile pictures.
+
 3.29 (2010-04-30)
 -----------------
 
