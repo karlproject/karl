@@ -80,6 +80,12 @@ TitleAndTextIndexData = makeFlexibleTextIndexData(
                                  ('text', 1, extract_text_from_html),
                                 ])
 
+def _extract_and_cache_file_data(context):
+    data = getattr(context, '_extracted_data', None)
+    if data is None:
+        context._extracted_data = data = _extract_file_data(context)
+    return data
+
 def _extract_file_data(context):
     converter = queryUtility(IConverter, context.mimetype)
     if converter is None:
@@ -126,7 +132,7 @@ def _extract_file_data(context):
 
 FileTextIndexData = makeFlexibleTextIndexData(
                                 [('title', 10, None),
-                                 (_extract_file_data, 1, None),
+                                 (_extract_and_cache_file_data, 1, None),
                                 ])
 
 class CalendarEventCategoryData(object):

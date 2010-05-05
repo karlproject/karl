@@ -10,6 +10,9 @@ Unreleased
 
 - Removed deprecated code that supported old profile pictures.
 
+- LP #571221 Cache results of file text extraction on the model, to make
+  reindexing faster.
+
 3.29 (2010-04-30)
 -----------------
 

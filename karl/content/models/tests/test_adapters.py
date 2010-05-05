@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -239,7 +239,7 @@ class TestFileTextIndexData(unittest.TestCase):
         context.mimetype = 'nonexistent'
         adapter = self._makeOne(context)
         self.assertEqual(adapter(), 'Some Title ' * 9 + 'Some Title')
-        
+
     def test_with_converter(self):
         from karl.utilities.converters.interfaces import IConverter
         converter = DummyConverter('stuff')
@@ -250,6 +250,21 @@ class TestFileTextIndexData(unittest.TestCase):
         context.blobfile = DummyBlobFile()
         adapter = self._makeOne(context)
         self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+
+    def test_cache_with_converter(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('stuff')
+        testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+        self.assertEqual(converter.called, 1)
+        self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+        self.assertEqual(converter.called, 1) # Didn't call converter again
 
 class TestCalendarEventCategoryData(unittest.TestCase):
     def setUp(self):
@@ -276,18 +291,20 @@ class TestCalendarEventCategoryData(unittest.TestCase):
         adapter = self._makeOne(context)
         result = adapter()
         self.assertEqual(result, 'virt')
-    
+
 
 class DummyConverter:
     def __init__(self, data):
         self.data = data
+        self.called = 0
 
     def convert(self, filename, encoding=None, mimetype=None):
+        self.called += 1
         import StringIO
         return StringIO.StringIO(self.data), 'ascii'
 
 class DummyBlobFile:
     def _current_filename(self):
         return None
-    
-    
+
+
