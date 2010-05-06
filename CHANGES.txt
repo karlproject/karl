@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Changed wording of title field on file edit screen to remove mention
+  of nonexistent checkbox (LP#575789).
+
 - Calendar event, blog entry, newsitem, page, reference add behavior
   tweak (LP#576033).
 
