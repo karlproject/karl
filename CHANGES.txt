@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- Calendar event and blog entry add behavior tweak (LP#576033).
+- Calendar event, blog entry, newsitem, page, reference add behavior
+  tweak (LP#576033).
 
 - Batching in syslog view (LP#563745).
 

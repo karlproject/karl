@@ -43,7 +43,6 @@ from karl.utilities.image import thumb_url
 
 from karl.views.api import TemplateAPI
 from karl.views.forms import attr as karlattr
-from karl.views.forms import validators as karlvalidators
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 from karl.views.tags import set_tags
@@ -102,7 +101,7 @@ class AddNewsItemFormController(object):
             validator=validator.All(
                 validator.Length(max=100),
                 validator.Required(),
-                karlvalidators.FolderNameAvailable(self.context)))
+                ))
         fields = [('title', title_field),
                   ('tags', tags_field),
                   ('text', text_field),
@@ -114,7 +113,6 @@ class AddNewsItemFormController(object):
         return fields
 
     def form_widgets(self, fields):
-        default_icon = '%s/images/image.png' % self.api.static_url
         widgets = {'title': formish.Input(empty=''),
                    'tags': karlwidgets.TagsAddWidget(),
                    'text': karlwidgets.RichTextWidget(empty=''),
@@ -251,7 +249,6 @@ class EditNewsItemFormController(AddNewsItemFormController):
 
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
-        default_icon = '%s/images/image.png' % self.api.static_url
         widgets = {'title': formish.Input(empty=''),
                    'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
                    'text': karlwidgets.RichTextWidget(empty=''),

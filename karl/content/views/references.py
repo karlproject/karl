@@ -71,7 +71,7 @@ class AddReferenceFCBase(object):
             validator=validator.All(
                 validator.Length(max=100),
                 validator.Required(),
-                karlvalidators.FolderNameAvailable(self.context)))
+                ))
         fields = [('title', title_field),
                   ('tags', tags_field),
                   ('description', description_field),

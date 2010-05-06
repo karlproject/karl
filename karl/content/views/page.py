@@ -40,7 +40,6 @@ from karl.utils import find_community
 
 from karl.views.api import TemplateAPI
 
-from karl.views.forms import validators as karlvalidators
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 from karl.views.utils import convert_to_script
@@ -82,7 +81,6 @@ class AddPageFormController(object):
             validator=validator.All(
                 validator.Length(max=100),
                 validator.Required(),
-                karlvalidators.FolderNameAvailable(self.context),
                 )
             )
         fields = [('title', title_field),
