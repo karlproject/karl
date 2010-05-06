@@ -1302,6 +1302,15 @@
             if (caption) {
                 klass = (klass ? klass + ' ' : '') + 'tiny-imagedrawer-captioned';
             }
+            // set the align
+            var style;
+            if (align == 'left') {
+                align = 'left';
+            } else if (align == 'right') {
+                align = 'right';
+            } else if (align == 'center') {
+                style = 'display: block; margin-left: auto; margin-right: auto;';
+            }
 
             //
             var args = {
@@ -1310,7 +1319,8 @@
                 width: width,
                 height: height,
                 alt: alt,
-                'class': klass
+                'class': klass,
+                style: style
 
                 // constrain (bool)
                 // vspace

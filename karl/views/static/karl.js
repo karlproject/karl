@@ -2135,6 +2135,9 @@ $(document).ready(function() {
     $('.blogComment').karlquotablecomment({
     });
     
+    // Captioned images
+    $('img.tiny-imagedrawer-captioned').karlcaptionedimage({
+    });
     
     // Enable old style dropdowns
     enableOldStyleDropdowns();

@@ -163,7 +163,7 @@
         <span class="tiny-imagedrawer-info-label"></span>
         <input id="tiny-imagedrawer-input-align-2" value="center"
             type="radio" name="tiny-imagedrawer-input-align" />
-        <label style="color: red;" for="tiny-imagedrawer-input-align-2">Center</label>
+        <label for="tiny-imagedrawer-input-align-2">Center</label>
         <br />
         <span class="tiny-imagedrawer-info-label">Size</span>
         <select name="tiny-imagedrawer-input-dimension">
