@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.30 (2010-05-06)
+-----------------
 
 - Changed wording of title field on file edit screen to remove mention
   of nonexistent checkbox (LP#575789).
