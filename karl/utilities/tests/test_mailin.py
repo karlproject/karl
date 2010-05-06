@@ -311,8 +311,9 @@ class MailinRunner2Tests(unittest.TestCase):
         registerModels({'/communities/testing/random/entry': entry})
 
         mailin()
-        self.assertEqual(self.queue.quarantined,
-                         [(message, 'Not witty enough')])
+        q_message, error = self.queue.quarantined[0]
+        self.assertEqual(q_message, message)
+        self.failUnless('Not witty enough' in error)
         self.assertEqual(len(self.mailer), 1)
 
 class DummyOptions:
@@ -369,8 +370,8 @@ class DummyQueue(list):
     def pop_next(self):
         return self.pop(0)
 
-    def quarantine(self, message, exc_info, send, message_from):
-        self.quarantined.append((message, exc_info[1].message))
+    def quarantine(self, message, error, send, message_from):
+        self.quarantined.append((message, error))
         send(message_from, ['foo@example.com'], "You're in quarantine!")
 
     def bounce(self, message, send, from_addr, error):

@@ -277,5 +277,6 @@ class MailinRunner2(object):
         from_email = get_setting(self.root, 'postoffice.bounce_from_email')
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
-        self.queue.quarantine(message, sys.exc_info(), mailer.send, from_email)
-        return traceback.format_exc()
+        error = traceback.format_exc()
+        self.queue.quarantine(message, error, mailer.send, from_email)
+        return error
