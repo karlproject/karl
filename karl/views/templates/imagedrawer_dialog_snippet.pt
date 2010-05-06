@@ -110,7 +110,7 @@
       <p>
         Select the url of the external image to be used in your document!
       </p>
-      <input type="text" class="tiny-imagedrawer-urlinput" />
+      <input type="text" class="tiny-imagedrawer-input-url" />
       <br />
       <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
         <button class="ui-icon-gear">Check</button>
@@ -140,9 +140,16 @@
         </div>
         <br />
         <span class="tiny-imagedrawer-info-label">Caption</span>
-        <input type="checkbox" name="blah_0" value="" />
-        <span style="color: red;">yes</span>
+        <input type="checkbox" name="tiny-imagedrawer-input-caption" 
+          class="tiny-imagedrawer-input-caption" value="" />
+        <span>yes</span>
         <br />
+        <div class="tiny-imagedrawer-input-captiontext-wrapper">
+          <span class="tiny-imagedrawer-info-label"></span>
+          <input type="text" name="tiny-imagedrawer-input-captiontext"
+            class="tiny-imagedrawer-input-captiontext" value="" />
+          <br />
+        </div>
         <span class="tiny-imagedrawer-info-label">Alignment</span>
         <input id="tiny-imagedrawer-input-align-0" value="left"
             type="radio" checked="checked" name="tiny-imagedrawer-input-align" />

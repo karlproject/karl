@@ -92,14 +92,18 @@
         $.widget('tiny.imagedrawerinfopanel', {
 
             _init: function() {
+                var self = this;
                 // Locate markup
                 this.info_title = this.element.find('.tiny-imagedrawer-info-title');
                 this.info_location = this.element.find('.tiny-imagedrawer-info-location');
                 this.info_author = this.element.find('.tiny-imagedrawer-info-author');
                 this.info_modified = this.element.find('.tiny-imagedrawer-info-modified');
+                this.input_caption = this.element.find('.tiny-imagedrawer-input-caption');
+                this.input_captiontext = this.element.find('.tiny-imagedrawer-input-captiontext');
                 this.wrapper_location = this.element.find('.tiny-imagedrawer-info-location-wrapper');
                 this.wrapper_author = this.element.find('.tiny-imagedrawer-info-author-wrapper');
                 this.wrapper_modified = this.element.find('.tiny-imagedrawer-info-modified-wrapper');
+                this.wrapper_captiontext = this.element.find('.tiny-imagedrawer-input-captiontext-wrapper');
                 this.buttonset_save = this.element
                     .find('.karl-buttonset.tiny-imagedrawer-buttonset-save')
                     .karlbuttonset({
@@ -115,6 +119,21 @@
                         //clsItem: 'portalMessage',
                         hasCloseButton: false
                     });
+                // Wire up the caption selector
+                if (this.input_caption.is(':checked')) {
+                    this.wrapper_captiontext.show();
+                } else {
+                    this.wrapper_captiontext.hide();
+                }
+                this.input_caption.click(function() {
+                    if ($(this).is(':checked')) {
+                        self.wrapper_captiontext
+                            .show('fold')
+                            .focus();
+                    } else {
+                        self.wrapper_captiontext.hide('fold');
+                    }
+                });
                 // Initial value
                 if (this.options.insertButtonLabel) {
                     this.insertButtonLabel(this.options.insertButtonLabel);
@@ -171,7 +190,13 @@
                 this._record = value;
 
                 // Setting values, taking care of sensible defaults.
-                this.info_title.text(value.title || 'No selection');
+                if (value.title) {
+                    this.info_title.text(value.title);
+                    this.input_captiontext.val(value.title);
+                } else {
+                    this.info_title.text('No selection');
+                    this.input_captiontext.val('');
+                }
                 var author_name = value.author_name || '';
                 this.info_author.text(author_name);
                 if (author_name) {
@@ -608,14 +633,14 @@
                 });
 
             // Wire up the external panel
-            var urlinput = external_panel.find('.tiny-imagedrawer-urlinput');
+            var input_url = external_panel.find('.tiny-imagedrawer-input-url');
             external_panel.find('.karl-buttonset.tiny-imagedrawer-buttonset-check')
                 .karlbuttonset({
                     clsContainer: 'tiny-imagedrawer-buttonset-check'
                 })
                 .bind('change.karlbuttonset', function(event) {
                     // preload this image.
-                    var image_url = urlinput.val();
+                    var image_url = input_url.val();
                     // XXX TODO eventually, title could be calculated
                     // XXX from the image_url.
                     var title = 'External image';
@@ -1239,8 +1264,11 @@
             var v;
             var el;
 
+            // XXX TODO these should rather be provided by the info panel
             var dimension = $("select[name=tiny-imagedrawer-input-dimension]").val();
             var align = $("input:radio[name=tiny-imagedrawer-input-align]:checked").val();
+            var caption = $("input:checkbox[name=tiny-imagedrawer-input-caption]:checked").val() != undefined;
+            var captiontext = $("input:text[name=tiny-imagedrawer-input-captiontext]").val();
 
             // In principle, we use the real image size
             // for the insertion,
@@ -1267,17 +1295,27 @@
                 height = max_height;
             }
 
+            var klass = '';
+
+            // Set the caption
+            alt = captiontext;
+            if (caption) {
+                klass = (klass ? klass + ' ' : '') + 'tiny-imagedrawer-captioned';
+            }
+
+            //
             var args = {
                 src: record.image_url,
                 align: align,
                 width: width,
-                height: height
+                height: height,
+                alt: alt,
+                'class': klass
 
                 // constrain (bool)
                 // vspace
                 // hspace
                 // border
-                // alt
                 // title
                 // class
                 // onmousemovecheck (bool)

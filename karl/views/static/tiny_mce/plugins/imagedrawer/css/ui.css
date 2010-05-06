@@ -157,7 +157,7 @@ span.tiny-imagedrawer-imagelabel {
     white-space: nowrap;
 }
 
-input.tiny-imagedrawer-urlinput {
+input.tiny-imagedrawer-input-url {
     width: 350px;
 }
 
@@ -171,3 +171,6 @@ input.tiny-imagedrawer-urlinput {
     margin-left: 0;
 }
 
+input.tiny-imagedrawer-input-captiontext {
+    width: 225px;
+}
