@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Calendar event and blog entry add behavior tweak (LP#576033).
+
 - Batching in syslog view (LP#563745).
 
 - LP #575276 File view now uses generic layout when outside of a community.

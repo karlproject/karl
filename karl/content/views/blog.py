@@ -70,7 +70,6 @@ from karl.views.utils import make_unique_name
 from karl.views.batch import get_container_batch
 
 from karl.views.forms import widgets as karlwidgets
-from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
@@ -306,7 +305,6 @@ class AddBlogEntryFormController(object):
             validator=validator.All(
                 validator.Length(max=100),
                 validator.Required(),
-                karlvalidators.FolderNameAvailable(self.context),
                 )
             )
         fields.append(('title', title_field))
