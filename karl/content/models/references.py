@@ -15,17 +15,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from zope.interface import implements
 from persistent import Persistent
 from persistent.list import PersistentList
-
 from repoze.folder import Folder
+from zope.interface import implements
+
+from karl.content.interfaces import IOrdering
 from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
-from karl.content.interfaces import IOrdering
 
 class Ordering(Persistent):
-    """ Handle an ordered folder """
+    """ Store information about the ordering of items within a folder.
+    """
     implements(IOrdering)
 
     def __init__(self):
@@ -42,6 +43,7 @@ class Ordering(Persistent):
                 # Item is in ordering but not in context, remove from
                 # ordering.
                 self._items.remove(local_name)
+
         for entry_name in entries:
             if entry_name not in self._items:
                 # Item is in folder but not in ordering, append to
@@ -124,6 +126,7 @@ class ReferenceSection(Folder):
         self.creator = unicode(creator)
         self.modified_by = self.creator
         self.ordering = Ordering()
+
 
 class ReferenceManual(Folder):
     implements(IReferenceManual)

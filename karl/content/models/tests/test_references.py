@@ -10,39 +10,98 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
 
-class ReferenceManualTests(unittest.TestCase):
+
+class OrderingTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from karl.content.models.references import ReferenceManual
-        return ReferenceManual
+        from karl.content.models.references import Ordering
+        return Ordering
 
-    def _makeOne(self, title=u'', description=u'', creator=u'admin'):
-        return self._getTargetClass()(title, description, creator)
+    def _makeOne(self):
+        return self._getTargetClass()()
 
-    def test_class_conforms_to_IReferenceManual(self):
+    def test_class_conforms_to_IOrdering(self):
         from zope.interface.verify import verifyClass
-        from karl.content.interfaces import IReferenceManual
-        verifyClass(IReferenceManual, self._getTargetClass())
+        from karl.content.interfaces import IOrdering
+        verifyClass(IOrdering, self._getTargetClass())
 
-    def test_instance_conforms_to_IReferenceManual(self):
+    def test_instance_conforms_to_IOrdering(self):
         from zope.interface.verify import verifyObject
-        from karl.content.interfaces import IReferenceManual
-        verifyObject(IReferenceManual, self._makeOne())
+        from karl.content.interfaces import IOrdering
+        verifyObject(IOrdering, self._makeOne())
 
-    def test_instance_has_valid_construction(self):
-        instance = self._makeOne()
-        self.assertEqual(instance.title, u'')
-        self.assertEqual(instance.description, u'')
-        self.assertEqual(instance.creator, u'admin')
-        self.assertEqual(instance.modified_by, u'admin')
+    def test_empty(self):
+        ordering = self._makeOne()
+        self.assertEqual(ordering.items(), [])
+
+    def test_sync(self):
+        ordering = self._makeOne()
+
+        ordering.sync(['s1', 's2'])
+        self.assertEqual(ordering.items(), [u's1', u's2'])
+
+        ordering.sync(['s2'])
+        self.assertEqual(ordering.items(), [u's2'])
+
+        ordering.sync(['s3', 's2', 's4'])
+        self.assertEqual(ordering.items(), [u's2', u's3', u's4'])
+
+    def test_add_empty(self):
+        ordering = self._makeOne()
+        ordering.add(u's3')
+        self.assertEqual(ordering.items(), [u's3'])
+
+    def test_add_nonempty(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2'])
+        ordering.add(u's3')
+        self.assertEqual(ordering.items(), [u's1', u's2', u's3'])
+
+    def test_remove(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        ordering.remove(u's3')
+        self.assertEqual(ordering.items(), [u's1', u's2', u's4'])
+
+    def test_moveUp_middle(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        ordering.moveUp('s3')
+        self.assertEqual(ordering.items(), [u's1', u's3', u's2', u's4'])
+
+    def test_moveUp_top(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        ordering.moveUp('s1')
+        self.assertEqual(ordering.items(), [u's2', u's3', u's4', u's1'])
+
+    def test_moveDown_middle(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        ordering.moveDown ('s1')
+        self.assertEqual(ordering.items(), [u's2', u's1', u's3', u's4'])
+
+    def test_moveDown_end(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        ordering.moveDown ('s4')
+        self.assertEqual(ordering.items(), [u's4', u's1', u's2', u's3'])
+
+    def test_previous_next(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2', 's3', 's4'])
+        self.assertEqual(ordering.previous_name(u's2'), u's1')
+        self.assertEqual(ordering.previous_name(u's1'), None)
+        self.assertEqual(ordering.next_name(u's3'), u's4')
+        self.assertEqual(ordering.next_name(u's4'), None)
+
 
 class ReferenceSectionTests(unittest.TestCase):
 
@@ -64,116 +123,41 @@ class ReferenceSectionTests(unittest.TestCase):
         verifyObject(IReferenceSection, self._makeOne())
 
     def test_instance_has_valid_construction(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IOrdering
         instance = self._makeOne()
         self.assertEqual(instance.title, u'')
         self.assertEqual(instance.description, u'')
         self.assertEqual(instance.creator, u'admin')
         self.assertEqual(instance.modified_by, u'admin')
-        self.assert_(hasattr(instance, 'ordering'))
-        ordering = instance.ordering
+        verifyObject(IOrdering, instance.ordering)
+
+
+class ReferenceManualTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.content.models.references import ReferenceManual
+        return ReferenceManual
+
+    def _makeOne(self, title=u'', description=u'', creator=u'admin'):
+        return self._getTargetClass()(title, description, creator)
+
+    def test_class_conforms_to_IReferenceManual(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IReferenceManual
+        verifyClass(IReferenceManual, self._getTargetClass())
+
+    def test_instance_conforms_to_IReferenceManual(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IReferenceManual
+        verifyObject(IReferenceManual, self._makeOne())
+
+    def test_instance_has_valid_construction(self):
         from zope.interface.verify import verifyObject
         from karl.content.interfaces import IOrdering
-        verifyObject(IOrdering, ordering)
-        
-    def test_ordering_sync(self):
         instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        ordering = instance.ordering
-
-        ordering.sync(instance.keys())
-        self.assertEqual(ordering.items(), [u's1', u's2'])
-        del instance['s1']
-        ordering.sync(instance.keys())
-        self.assertEqual(ordering.items(), [u's2'])
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering.sync(instance.keys())
-        self.assertEqual(ordering.items(), [u's2', u's3', u's4'])
-
-    def test_ordering_add(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.add(u's3')
-        self.assertEqual(ordering.items(), [u's1', u's2', u's3'])
-
-    def test_ordering_remove(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.remove(u's3')
-        self.assertEqual(ordering.items(), [u's1', u's2', u's4'])
-
-    def test_ordering_moveUp_middle(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.moveUp('s3')
-        self.assertEqual(ordering.items(), [u's1', u's3', u's2', u's4'])
-
-
-    def test_ordering_moveUp_top(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.moveUp('s1')
-        self.assertEqual(ordering.items(), [u's2', u's3', u's4', u's1'])
-
-    def test_ordering_moveDown_middle(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.moveDown ('s1')
-        self.assertEqual(ordering.items(), [u's2', u's1', u's3', u's4'])
-
-    def test_ordering_moveDown_end(self):
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ordering = instance.ordering
-        ordering.sync(instance.keys())
-
-        ordering.moveDown ('s4')
-        self.assertEqual(ordering.items(), [u's4', u's1', u's2', u's3'])
-
-    def test_ordering_previous_next(self):
-
-        instance = self._makeOne()
-        instance['s1'] = testing.DummyModel(title='Section 1')
-        instance['s2'] = testing.DummyModel(title='Section 2')
-        instance['s3'] = testing.DummyModel(title='Section 3')
-        instance['s4'] = testing.DummyModel(title='Section 4')
-        ord = instance.ordering
-        ord.sync(instance.keys())
-
-        self.assertEqual(ord.previous_name(u's2'), u's1')
-        self.assertEqual(ord.previous_name(u's1'), None)
-        self.assertEqual(ord.next_name(u's3'), u's4')
-        self.assertEqual(ord.next_name(u's4'), None)
-
+        self.assertEqual(instance.title, u'')
+        self.assertEqual(instance.description, u'')
+        self.assertEqual(instance.creator, u'admin')
+        self.assertEqual(instance.modified_by, u'admin')
+        verifyObject(IOrdering, instance.ordering)
