@@ -107,6 +107,15 @@ class IReferenceManual(IReferenceSection):
     taggedValue('name', 'Reference Manual')
     description = Attribute(u'Description')
 
+class IReferenceManualHTML(Interface):
+    """ Adapter interface for getting HTML for an item in a reference manual.
+    """
+    def __call__(api):
+        """ Return an appropriate HTML fragment for our context.
+
+        ``api`` may be used to generate URLs in rendered HTML.
+        """
+
 class IWiki(IFolder):
     """A folder containing wiki pages"""
     taggedValue('name', 'Wiki')
