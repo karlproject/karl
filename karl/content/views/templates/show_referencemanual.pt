@@ -24,38 +24,34 @@
     <ol id="references-listing">
 
       <li tal:repeat="section sections">
-	<span class="sortingArrows">
-	  <!-- Arrows for moving *sections* up and down -->
-          <a href="${section['moveUp']}">
-            <img width="9" height="6" border="0" alt="Move up" 
-		 src="${api.static_url}/images/arrowUp.gif" />
-          </a>
-          <a href="${section['moveDown']}">
-            <img width="9" height="6" border="0" alt="Move down" 
-		 src="${api.static_url}/images/arrowDown.gif" />
-          </a>
+
+        <span class="sortingArrows">
+        <!-- Arrows for moving *sections* up and down -->
+            <a href="${section['moveUp']}"
+              ><img width="9" height="6" border="0" alt="Move up" 
+                    src="${api.static_url}/images/arrowUp.gif" /></a>
+            <a href="${section['moveDown']}"
+              ><img width="9" height="6" border="0" alt="Move down" 
+                    src="${api.static_url}/images/arrowDown.gif" /></a>
         </span>
 
-	<a href="${section['href']}" 
-	   class="topLevelItem">${section['title']}</a>
+        <a href="${section['href']}" 
+           class="topLevelItem">${section['title']}</a>
 
-	<ol type="a" tal:condition="section['items']">
+        <ol type="a" tal:condition="section['items']">
           <li class="k3_section_items" tal:repeat="item section['items']">
-	    <!-- Arrows for moving items *in* a section up or down -->
+          <!-- Arrows for moving items *in* a section up or down -->
             <span class="sortingArrows">
-              <a href="${item['moveUp']}">
-                <img width="9" height="6" border="0" alt="Move up" 
-		     src="${api.static_url}/images/arrowUp.gif" />
-              </a>
-              <a href="${item['moveDown']}">
-                <img width="9" height="6" border="0" alt="Move down" 
-		     src="${api.static_url}/images/arrowDown.gif" />
-              </a>
+              <a href="${item['moveUp']}"
+                ><img width="9" height="6" border="0" alt="Move up" 
+                      src="${api.static_url}/images/arrowUp.gif" /></a>
+              <a href="${item['moveDown']}"
+                ><img width="9" height="6" border="0" alt="Move down" 
+                      src="${api.static_url}/images/arrowDown.gif" /></a>
             </span>
             <a href="${item['href']}">${item['title']}</a>
           </li>
-	</ol>
-
+        </ol>
 
       </li>
     </ol>

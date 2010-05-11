@@ -19,9 +19,9 @@
 
     <div class="kcontent">
       <ol type="a">
-	<li tal:repeat="entry entries">
-	  <a href="${entry['href']}">${entry['title']}</a>
-	</li>
+        <li tal:repeat="entry entries">
+          <a href="${entry['href']}">${entry['title']}</a>
+        </li>
       </ol>
     </div>
 
