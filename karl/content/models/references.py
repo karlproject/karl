@@ -79,15 +79,15 @@ class Ordering(Persistent):
 
     def add(self, name):
         # When a new item is added to a folder, put it at the end.
-
-        self._items.append(name)
+        if name not in self._items:
+            self._items.append(name)
 
     def remove(self, name):
         # When an existing item is removed from folder, remove from
         # ordering.  Sure would be nice to use events to do this for
         # us.
-
-        self._items.remove(name)
+        if name in self._items:
+            self._items.remove(name)
 
     def items(self):
         return self._items

@@ -64,11 +64,23 @@ class OrderingTests(unittest.TestCase):
         ordering.add(u's3')
         self.assertEqual(ordering.items(), [u's1', u's2', u's3'])
 
+    def test_add_duplicate(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2'])
+        ordering.add(u's1')
+        self.assertEqual(ordering.items(), [u's1', u's2'])
+
     def test_remove(self):
         ordering = self._makeOne()
         ordering.sync(['s1', 's2', 's3', 's4'])
         ordering.remove(u's3')
         self.assertEqual(ordering.items(), [u's1', u's2', u's4'])
+
+    def test_remove_nonesuch(self):
+        ordering = self._makeOne()
+        ordering.sync(['s1', 's2'])
+        ordering.remove(u's3')
+        self.assertEqual(ordering.items(), [u's1', u's2'])
 
     def test_moveUp_middle(self):
         ordering = self._makeOne()
