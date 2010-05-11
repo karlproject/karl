@@ -28,19 +28,7 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
-
 from repoze.lemonade.content import create_content
-
-from karl.events import ObjectModifiedEvent
-from karl.events import ObjectWillBeModifiedEvent
-
-from karl.views.api import TemplateAPI
-from karl.views.forms import validators as karlvalidators
-from karl.views.forms import widgets as karlwidgets
-from karl.views.tags import set_tags
-from karl.views.utils import convert_to_script
-from karl.views.tags import get_tags_client_data
-from karl.views.utils import make_unique_name
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IPage
@@ -48,7 +36,14 @@ from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.utils import get_previous_next
-
+from karl.events import ObjectModifiedEvent
+from karl.events import ObjectWillBeModifiedEvent
+from karl.views.api import TemplateAPI
+from karl.views.forms import widgets as karlwidgets
+from karl.views.tags import get_tags_client_data
+from karl.views.tags import set_tags
+from karl.views.utils import convert_to_script
+from karl.views.utils import make_unique_name
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 
