@@ -1096,5 +1096,27 @@
     permission="view"
   />
 
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.DescriptionHTML"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.TextHTML"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         repoze.bfg.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.FileHTML"
+    />
+
+
 </configure>
 

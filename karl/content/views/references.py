@@ -17,7 +17,9 @@
 
 from webob.exc import HTTPFound
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.component.event import objectEventNotify
+from zope.interface import implements
 
 from validatish import validator
 import formish
@@ -30,9 +32,8 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
 
-from karl.content.interfaces import ICommunityFile
-from karl.content.interfaces import IPage
 from karl.content.interfaces import IReferenceManual
+from karl.content.interfaces import IReferenceManualHTML
 from karl.content.interfaces import IReferenceSection
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.utils import get_previous_next
@@ -53,47 +54,105 @@ description_field = schemaish.String(
     description="A summary of the reference manual - subject and scope. "
     "Will be displayed on every page of the manual.")
 
+class DescriptionHTML(object):
+    """ Adapter for sections.
+    """
+    implements(IReferenceManualHTML)
 
-def _get_toc(context, here_url):
-    """Get the nested data used by ZPT for showing the refman TOC"""
-    section_up = here_url + '?sectionUp=%s'
-    section_down = here_url + '?sectionDown=%s'
-    item_up = here_url + '?section=%s&itemUp=%s'
-    item_down = here_url + '?section=%s&itemDown=%s'
+    def __init__(self, context, request):
+        self.context = context
+        self.request = context
 
-    # First, be a chicken and sync
-    context.ordering.sync(context.keys())
+    def __call__(self, api):
+        return '<p>%s</p>' % self.context.description
 
-    # Iterate over each section using the ordering for the order of
-    # __name__'s
-    sections = []
-    for section_name in context.ordering.items():
-        # Get the data about this section
-        section = context.get(section_name)
-        section.ordering.sync(section.keys())
-        item = {
-            'name': section_name,
-            'title': section.title,
-            'moveUp': section_up % section_name,
-            'moveDown': section_down % section_name,
-            'href': here_url + section_name,
-            'items': [],
-            }
-        # Now append data about each section's items, again using the
-        # ordering
-        for subitem_name in section.ordering.items():
-            subitem = section.get(subitem_name)
-            item['items'].append({
-                'name': subitem_name,
-                'title': subitem.title,
-                 'href': here_url + section_name + '/' + subitem_name,
-                 'moveUp': item_up % (section_name, subitem_name),
-                 'moveDown': item_down % (section_name, subitem_name),
-                 })
 
-        sections.append(item)
+class TextHTML(object):
+    """ Adapter for pages.
+    """
+    implements(IReferenceManualHTML)
 
-    return sections
+    def __init__(self, context, request):
+        self.context = context
+        self.request = context
+
+    def __call__(self, api):
+        return self.context.text
+
+
+class FileHTML(object):
+    """ Adapter for files.
+    """
+    implements(IReferenceManualHTML)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, api):
+        fileinfo = getMultiAdapter((self.context, self.request), IFileInfo)
+        return render_template('templates/inline_file.pt',
+                               api=api,
+                               fileinfo=fileinfo,
+                              )
+
+
+def getTree(root, request, api, _subpath_prefix='.'):
+    """ Return a recursive structure describing roots descendants.
+
+    - The result is a sequence of mappings, one per direct child of ``root``.
+
+    - Each node in the structure describes one descendant.  Its children,
+      if any, are in its ``items`` value.
+
+    - Leaf nodes with have an empty tuple as their ``items`` value.
+
+    - ``_subpath_prefix`` is not part of the API, but used only
+      to manage building up the subpath recursively.
+    """
+    root.ordering.sync(root.keys())
+    result = []
+    for name in root.ordering.items():
+        child = root[name]
+        ordering = getattr(child, 'ordering', None)
+        subpath = _subpath_prefix + child.__name__
+        if ordering is not None:
+            ordering.sync(child.keys())
+            items = getTree(child, request, api, subpath + '.')
+        else:
+            items = () # tuple signals leaf
+        html_adapter = queryMultiAdapter((child, request), IReferenceManualHTML)
+        html = html_adapter and html_adapter(api) or '<p>Unknown type</p>'
+        item = {'name': name,
+                'title': child.title,
+                'href': model_url(child, request),
+                'html': html,
+                'subpath': subpath,
+                'items': items,
+               }
+        result.append(item)
+    return result
+
+
+def move_subpath(context, subpath, direction):
+    elements = subpath.split('.')
+    container = context
+    assert elements[0] == '' # start at context
+    elements.pop(0)
+    while elements:
+        container.ordering.sync(container.keys())
+        name = elements.pop(0)
+        if elements:
+            container = container[name]
+    if name not in container:
+        raise KeyError(name)
+    if direction == 'up':
+        container.ordering.moveUp(name)
+    elif direction == 'down':
+        container.ordering.moveDown(name)
+    else:
+        raise ValueError('Unknown direction: %' % direction)
+    return 'Moved subpath %s %s' % (subpath, direction)
 
 
 def show_referencemanual_view(context, request):
@@ -101,31 +160,10 @@ def show_referencemanual_view(context, request):
     # Look for moveUp or moveDown in QUERY_STRING, telling us to
     # reorder something
     status_message = None
-    sectionUp = request.params.get('sectionUp', False)
-    if sectionUp:
-        section = context.get(sectionUp)
-        context.ordering.moveUp(sectionUp)
-        status_message = 'Moved section <em>%s</em> up' % section.title
-    else:
-        sectionDown = request.params.get('sectionDown', False)
-        if sectionDown:
-            section = context.get(sectionDown)
-            context.ordering.moveDown(sectionDown)
-            status_message = 'Moved section <em>%s</em> down' % section.title
-        else:
-            itemUp = request.params.get('itemUp', False)
-            if itemUp:
-                section = context.get(request.params.get('section'))
-                section.ordering.moveUp(itemUp)
-                title = section.get(itemUp).title
-                status_message = 'Moved item <em>%s</em> up' % title
-            else:
-                itemDown = request.params.get('itemDown', False)
-                if itemDown:
-                    section = context.get(request.params.get('section'))
-                    section.ordering.moveDown(itemDown)
-                    title = section.get(itemDown).title
-                    status_message = 'Moved item <em>%s</em> down' % title
+    subpath = request.params.get('subpath')
+    if subpath:
+        direction = request.params['direction']
+        status_message = move_subpath(context, subpath, direction)
 
     backto = {
         'href': model_url(context.__parent__, request),
@@ -159,58 +197,10 @@ def show_referencemanual_view(context, request):
         api=api,
         actions=actions,
         head_data=convert_to_script(client_json_data),
-        sections=_get_toc(context, api.here_url),
+        sections=getTree(context, request, api),
         backto=backto,
         layout=layout,
         )
-
-
-def _get_viewall(context, request, api):
-    """Get the nested data used by ZPT for showing the refman TOC"""
-
-    # First, be a chicken and sync
-    context.ordering.sync(context.keys())
-
-    # Iterate over each section using the ordering for the order of
-    # __name__'s
-    sections = []
-    for section_name in context.ordering.items():
-        # Get the data about this section
-        section = context.get(section_name)
-        section.ordering.sync(section.keys())
-        item = {
-            'name': section_name,
-            'title': section.title,
-            'html': '<p>%s</p>' % section.description,
-            'items': [],
-            }
-        # Now append data about each section's items, again using the
-        # ordering
-        for subitem_name in section.ordering.items():
-            subitem = section.get(subitem_name)
-
-            # If this is a page, we generate one chunk of HTML, if
-            # File, a different
-            if IPage.providedBy(subitem):
-                html = subitem.text
-            elif ICommunityFile.providedBy(subitem):
-                fileinfo = getMultiAdapter((subitem, request), IFileInfo)
-                html = render_template(
-                    'templates/inline_file.pt',
-                    api=api,
-                    fileinfo=fileinfo,
-                    )
-            else:
-                html = '<p>Unknown type</p>'
-            item['items'].append({
-                'name': subitem_name,
-                'title': subitem.title,
-                'html': html,
-                 })
-
-        sections.append(item)
-
-    return sections
 
 
 def viewall_referencemanual_view(context, request):
@@ -237,7 +227,7 @@ def viewall_referencemanual_view(context, request):
         api=api,
         actions=[],
         head_data=convert_to_script(client_json_data),
-        sections=_get_viewall(context, request, api),
+        sections=getTree(context, request, api),
         backto=backto,
         layout=layout,
         )
@@ -342,6 +332,10 @@ class AddReferenceFCBase(object):
     def handle_submit(self, converted):
         request = self.request
         context = self.context
+        ordering = getattr(context, 'ordering', None)
+        if ordering is not None:
+            ordering.sync(context.keys())
+
         creator = authenticated_userid(request)
         reference_object = create_content(self.content_iface,
                                           converted['title'],
@@ -350,8 +344,10 @@ class AddReferenceFCBase(object):
                                           )
         name = make_unique_name(context, converted['title'])
         context[name] = reference_object
-        context.ordering.sync(context.keys())
-        context.ordering.add(name)
+
+        if ordering is not None:
+            ordering.add(name)
+
         # save the tags
         set_tags(reference_object, request, converted['tags'])
 

@@ -17,6 +17,7 @@
 
 import unittest
 
+
 class TestBase:
 
     def setUp(self):
@@ -26,6 +27,294 @@ class TestBase:
     def tearDown(self):
         from repoze.bfg.testing import cleanUp
         cleanUp()
+
+
+class DescriptionHTMLTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from karl.content.views.references import DescriptionHTML
+        return DescriptionHTML
+
+    def _makeOne(self, context=None, request=None):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import DummyRequest
+        if context is None:
+            context = DummyModel(description='dummy')
+        if request is None:
+            request = DummyRequest()
+        return self._getTargetClass()(context, request)
+
+    def test_class_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyClass(IReferenceManualHTML, self._getTargetClass())
+
+    def test_instance_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyObject(IReferenceManualHTML, self._makeOne())
+
+    def test___call__(self):
+        adapter = self._makeOne()
+        api = object()
+        self.assertEqual(adapter(api), '<p>dummy</p>')
+
+
+class TextHTMLTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from karl.content.views.references import TextHTML
+        return TextHTML
+
+    def _makeOne(self, context=None, request=None):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import DummyRequest
+        if context is None:
+            context = DummyModel(text='<p>dummy</p>')
+        if request is None:
+            request = DummyRequest()
+        return self._getTargetClass()(context, request)
+
+    def test_class_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyClass(IReferenceManualHTML, self._getTargetClass())
+
+    def test_instance_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyObject(IReferenceManualHTML, self._makeOne())
+
+    def test___call__(self):
+        adapter = self._makeOne()
+        api = object()
+        self.assertEqual(adapter(api), '<p>dummy</p>')
+
+
+class FileHTMLTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from karl.content.views.references import FileHTML
+        return FileHTML
+
+    def _makeOne(self, context=None, request=None):
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import DummyRequest
+        if context is None:
+            context = DummyModel()
+        if request is None:
+            request = DummyRequest()
+        return self._getTargetClass()(context, request)
+
+    def test_class_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyClass(IReferenceManualHTML, self._getTargetClass())
+
+    def test_instance_conforms_to_IReferenceManualHTML(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IReferenceManualHTML
+        verifyObject(IReferenceManualHTML, self._makeOne())
+
+    def test___call__(self):
+        from zope.interface import Interface
+        from repoze.bfg.testing import registerAdapter
+        from repoze.bfg.testing import registerDummyRenderer
+        from karl.content.views.interfaces import IFileInfo
+        fileinfo = object()
+        api = object()
+        def _adapt(context, request):
+            return fileinfo
+        registerAdapter(_adapt, (Interface, Interface), IFileInfo)
+        adapter = self._makeOne()
+        renderer = registerDummyRenderer('templates/inline_file.pt')
+        adapter(api)
+        self.failUnless(renderer.api is api)
+        self.failUnless(renderer.fileinfo is fileinfo)
+
+
+class Test_getTree(TestBase, unittest.TestCase):
+
+    def _callFUT(self, context, request=None, api=None):
+        from repoze.bfg.testing import DummyRequest
+        from karl.content.views.references import getTree
+        if request is None:
+            request = DummyRequest()
+        if api is None:
+            api = object()
+        return getTree(context, request, api)
+
+    def _makeItem(self, ifaces=(), **kw):
+        from zope.interface import directlyProvides
+        from repoze.bfg.testing import DummyModel
+
+        class _DummyOrdering:
+            # The one in karl.testing doesn't have a working sync.
+            def sync(self, entries):
+                self._items = entries
+
+            def items(self):
+                return self._items
+
+        item = DummyModel(ordering=_DummyOrdering(), **kw)
+        directlyProvides(item, ifaces)
+        return item
+
+    def _registerAdapter(self, html, **kw):
+        from zope.interface import Interface
+        from repoze.bfg.testing import registerAdapter
+        from karl.content.interfaces import IReferenceManualHTML
+        def _adapt(context, request):
+            def _html(api):
+                return html % kw
+            return _html
+        registerAdapter(_adapt, (Interface, Interface), IReferenceManualHTML)
+
+    def test_empty(self):
+        root = self._makeItem()
+        items = self._callFUT(root)
+        self.assertEqual(len(items), 0)
+
+    def test_w_child_wo_html_adapter(self):
+        root = self._makeItem()
+        root['aaa'] = self._makeItem(title='AAA', description='My aaa')
+        items = self._callFUT(root)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0], {'name': 'aaa',
+                                    'title': 'AAA',
+                                    'href': 'http://example.com/aaa/',
+                                    'html': '<p>Unknown type</p>',
+                                    'subpath': '.aaa',
+                                    'items': [],
+                                   })
+
+    def test_w_child_w_html_adapter(self):
+        self._registerAdapter('<h1>FOOBAR</h1>')
+        root = self._makeItem()
+        root['aaa'] = self._makeItem(title='AAA', description='My aaa')
+        items = self._callFUT(root)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0], {'name': 'aaa',
+                                    'title': 'AAA',
+                                    'href': 'http://example.com/aaa/',
+                                    'html': '<h1>FOOBAR</h1>',
+                                    'subpath': '.aaa',
+                                    'items': [],
+                                   })
+
+    def test_w_child_leaf(self):
+        root = self._makeItem()
+        class _Leaf:
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+        leaf = root['aaa'] = _Leaf(title='AAA', description='My aaa')
+        leaf.__name__ = 'aaa'
+        items = self._callFUT(root)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0], {'name': 'aaa',
+                                    'title': 'AAA',
+                                    'href': 'http://example.com/aaa/',
+                                    'html': '<p>Unknown type</p>',
+                                    'subpath': '.aaa',
+                                    'items': (),
+                                   })
+
+    def test_w_nested(self):
+        root = self._makeItem()
+        class _Leaf:
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+        child = root['aaa'] = self._makeItem(title='AAA', description='My aaa')
+        grandchild = child['bbb'] = _Leaf(title='BBB', description='My bbb')
+        grandchild.__name__ = 'bbb'
+        items = self._callFUT(root)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0],
+                         {'name': 'aaa',
+                          'title': 'AAA',
+                          'href': 'http://example.com/aaa/',
+                          'html': '<p>Unknown type</p>',
+                          'subpath': '.aaa',
+                          'items': [{'name': 'bbb',
+                                     'title': 'BBB',
+                                     'href': 'http://example.com/aaa/bbb/',
+                                     'html': '<p>Unknown type</p>',
+                                     'subpath': '.aaa.bbb',
+                                     'items': (),
+                                    },
+                          ]
+                         })
+
+
+class Test_move_subpath(unittest.TestCase):
+
+    def _callFUT(self, context, subpath, direction):
+        from karl.content.views.references import move_subpath
+        return move_subpath(context, subpath, direction)
+
+    def _makeItem(self, **kw):
+        from repoze.bfg.testing import DummyModel
+
+        class _DummyOrdering:
+            # The one in karl.testing doesn't have a working sync.
+            _moved_up = _moved_down = None
+            _sync_called = False
+
+            def sync(self, entries):
+                self._items = entries
+                self._sync_called = True
+
+            def items(self):
+                return self._items
+
+            def moveUp(self, name):
+                self._moved_up = name
+
+            def moveDown(self, name):
+                self._moved_down = name
+
+        return DummyModel(ordering=_DummyOrdering(), **kw)
+
+    def test_miss_subpath(self):
+        model = self._makeItem()
+        self.assertRaises(KeyError, self._callFUT, model, '.a', 'up')
+
+    def test_bad_direction(self):
+        model = self._makeItem()
+        model['a'] = self._makeItem()
+        self.assertRaises(ValueError, self._callFUT, model, '.a', 'sideways')
+
+    def test_move_up(self):
+        model = self._makeItem()
+        model['a'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '.a', 'up')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_up, 'a')
+
+    def test_move_up_nested(self):
+        model = self._makeItem()
+        child = model['a'] = self._makeItem()
+        child['b'] = self._makeItem()
+        self._callFUT(model, '.a.b', 'up')
+        self.failUnless(model.ordering._sync_called)
+        self.failUnless(child.ordering._sync_called)
+        self.assertEqual(child.ordering._moved_up, 'b')
+
+    def test_move_down(self):
+        model = self._makeItem()
+        model['a'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '.a', 'down')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_down, 'a')
+
+    def test_move_down_nested(self):
+        model = self._makeItem()
+        child = model['a'] = self._makeItem()
+        child['b'] = self._makeItem()
+        self._callFUT(model, '.a.b', 'down')
+        self.failUnless(model.ordering._sync_called)
+        self.failUnless(child.ordering._sync_called)
+        self.assertEqual(child.ordering._moved_down, 'b')
+
 
 class ShowTestBase(TestBase):
 
@@ -174,6 +463,28 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
+    def test_handle_submit_context_wo_ordering(self):
+        from repoze.bfg.testing import DummyModel
+        from karl.testing import DummyCatalog
+        from karl.testing import DummyTags
+        context = DummyModel(tags = DummyTags(),
+                             catalog = DummyCatalog(),
+                            )
+        converted = {'title': u'Ref Manual Title',
+                     'tags': [u'foo', u'bar'],
+                     'description': u'ref manual description',
+                     }
+        controller = self._makeOne(context=context)
+        self._registerFactory(controller)
+        response = controller.handle_submit(converted)
+
+        self.failUnless(u'ref-manual-title' in context)
+        manual = context[u'ref-manual-title']
+        self.assertEqual(manual.title, u'Ref Manual Title')
+        self.assertEqual(manual.description, u'ref manual description')
+        self.assertEqual(context.tags._called_with[1]['tags'],
+                         [u'foo', u'bar'])
+
     def test_handle_submit(self):
         from repoze.bfg.testing import DummyModel
         from karl.testing import DummyCatalog
@@ -206,7 +517,7 @@ class AddReferenceManualFormControllerTests(unittest.TestCase):
             import AddReferenceManualFormController as klass
         self.assertEqual(klass.page_title, "Add Reference Manual")
         self.assertEqual(klass.content_iface, IReferenceManual)
- 
+
 
 class AddReferenceSectionFormControllerTests(TestBase, unittest.TestCase):
 
