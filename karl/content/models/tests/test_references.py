@@ -142,6 +142,16 @@ class ReferenceManualTests(unittest.TestCase):
     def _makeOne(self, title=u'', description=u'', creator=u'admin'):
         return self._getTargetClass()(title, description, creator)
 
+    def test_class_conforms_to_IReferenceSection(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IReferenceSection
+        verifyClass(IReferenceSection, self._getTargetClass())
+
+    def test_instance_conforms_to_IReferenceSection(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IReferenceSection
+        verifyObject(IReferenceSection, self._makeOne())
+
     def test_class_conforms_to_IReferenceManual(self):
         from zope.interface.verify import verifyClass
         from karl.content.interfaces import IReferenceManual
