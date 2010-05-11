@@ -128,15 +128,5 @@ class ReferenceSection(Folder):
         self.ordering = Ordering()
 
 
-class ReferenceManual(Folder):
+class ReferenceManual(ReferenceSection):
     implements(IReferenceManual)
-    modified_by = None
-
-    def __init__(self, title, description, creator):
-        Folder.__init__(self)
-        self.title = unicode(title)
-        self.description = unicode(description)
-        self.creator = unicode(creator)
-        self.modified_by = self.creator
-        self.ordering = Ordering()
-
