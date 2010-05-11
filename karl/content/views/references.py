@@ -54,69 +54,6 @@ description_field = schemaish.String(
     "Will be displayed on every page of the manual.")
 
 
-class AddReferenceFCBase(object):
-    """Base class for the form controllers for adding a reference
-    manual and a reference section, since they are very similar."""
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def form_fields(self):
-        title_field = schemaish.String(
-            validator=validator.All(
-                validator.Length(max=100),
-                validator.Required(),
-                ))
-        fields = [('title', title_field),
-                  ('tags', tags_field),
-                  ('description', description_field),
-                  ]
-        return fields
-
-    def form_widgets(self, fields):
-        widgets = {'title': formish.Input(empty=''),
-                   'tags': karlwidgets.TagsAddWidget(),
-                   'description': formish.TextArea(rows=5, cols=60, empty=''),
-                   }
-        return widgets
-
-    def __call__(self):
-        context = self.context
-        request = self.request
-        api = TemplateAPI(context, request, self.page_title)
-
-        layout_provider = get_layout_provider(context, request)
-        layout = layout_provider('intranet')
-        return {'api': api, 'layout': layout, 'actions': []}
-
-    def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
-
-    def handle_submit(self, converted):
-        request = self.request
-        context = self.context
-        creator = authenticated_userid(request)
-        reference_object = create_content(self.content_iface,
-                                          converted['title'],
-                                          converted['description'],
-                                          creator,
-                                          )
-        # give the subclasses a handle to the object
-        self._ref_object = reference_object
-        name = make_unique_name(context, converted['title'])
-        context[name] = reference_object
-        # save the tags
-        set_tags(reference_object, request, converted['tags'])
-
-        location = model_url(reference_object, request)
-        return HTTPFound(location=location)
-
-
-class AddReferenceManualFormController(AddReferenceFCBase):
-    page_title = u'Add Reference Manual'
-    content_iface = IReferenceManual
-
-
 def _get_toc(context, here_url):
     """Get the nested data used by ZPT for showing the refman TOC"""
     section_up = here_url + '?sectionUp=%s'
@@ -152,54 +89,6 @@ def _get_toc(context, here_url):
                  'href': here_url + section_name + '/' + subitem_name,
                  'moveUp': item_up % (section_name, subitem_name),
                  'moveDown': item_down % (section_name, subitem_name),
-                 })
-
-        sections.append(item)
-
-    return sections
-
-
-def _get_viewall(context, request, api):
-    """Get the nested data used by ZPT for showing the refman TOC"""
-
-    # First, be a chicken and sync
-    context.ordering.sync(context.keys())
-
-    # Iterate over each section using the ordering for the order of
-    # __name__'s
-    sections = []
-    for section_name in context.ordering.items():
-        # Get the data about this section
-        section = context.get(section_name)
-        section.ordering.sync(section.keys())
-        item = {
-            'name': section_name,
-            'title': section.title,
-            'html': '<p>%s</p>' % section.description,
-            'items': [],
-            }
-        # Now append data about each section's items, again using the
-        # ordering
-        for subitem_name in section.ordering.items():
-            subitem = section.get(subitem_name)
-
-            # If this is a page, we generate one chunk of HTML, if
-            # File, a different
-            if IPage.providedBy(subitem):
-                html = subitem.text
-            elif ICommunityFile.providedBy(subitem):
-                fileinfo = getMultiAdapter((subitem, request), IFileInfo)
-                html = render_template(
-                    'templates/inline_file.pt',
-                    api=api,
-                    fileinfo=fileinfo,
-                    )
-            else:
-                html = '<p>Unknown type</p>'
-            item['items'].append({
-                'name': subitem_name,
-                'title': subitem.title,
-                'html': html,
                  })
 
         sections.append(item)
@@ -276,6 +165,54 @@ def show_referencemanual_view(context, request):
         )
 
 
+def _get_viewall(context, request, api):
+    """Get the nested data used by ZPT for showing the refman TOC"""
+
+    # First, be a chicken and sync
+    context.ordering.sync(context.keys())
+
+    # Iterate over each section using the ordering for the order of
+    # __name__'s
+    sections = []
+    for section_name in context.ordering.items():
+        # Get the data about this section
+        section = context.get(section_name)
+        section.ordering.sync(section.keys())
+        item = {
+            'name': section_name,
+            'title': section.title,
+            'html': '<p>%s</p>' % section.description,
+            'items': [],
+            }
+        # Now append data about each section's items, again using the
+        # ordering
+        for subitem_name in section.ordering.items():
+            subitem = section.get(subitem_name)
+
+            # If this is a page, we generate one chunk of HTML, if
+            # File, a different
+            if IPage.providedBy(subitem):
+                html = subitem.text
+            elif ICommunityFile.providedBy(subitem):
+                fileinfo = getMultiAdapter((subitem, request), IFileInfo)
+                html = render_template(
+                    'templates/inline_file.pt',
+                    api=api,
+                    fileinfo=fileinfo,
+                    )
+            else:
+                html = '<p>Unknown type</p>'
+            item['items'].append({
+                'name': subitem_name,
+                'title': subitem.title,
+                'html': html,
+                 })
+
+        sections.append(item)
+
+    return sections
+
+
 def viewall_referencemanual_view(context, request):
 
     backto = {
@@ -304,6 +241,132 @@ def viewall_referencemanual_view(context, request):
         backto=backto,
         layout=layout,
         )
+
+
+def _get_ordered_listing(context, request):
+
+    # First, be a chicken and sync
+    context.ordering.sync(context.keys())
+
+    # Flatten the list
+    entries = []
+    for name in context.ordering.items():
+        child = context.get(name, False)
+        entries.append({
+                'title': child.title,
+                'href': model_url(child, request),
+                })
+    return entries
+
+def show_referencesection_view(context, request):
+
+    backto = {
+        'href': model_url(context.__parent__, request),
+        'title': context.__parent__.title,
+        }
+
+    actions = []
+    if has_permission('create', context, request):
+        addables = get_folder_addables(context, request)
+        if addables is not None:
+            actions.extend(addables())
+        actions.append(('Edit', 'edit.html'))
+        if has_permission('delete', context, request):
+            actions.append(('Delete', 'delete.html'))
+
+    page_title = context.title
+    api = TemplateAPI(context, request, page_title)
+
+    # Get a layout
+    layout_provider = get_layout_provider(context, request)
+    layout = layout_provider('intranet')
+
+    previous, next = get_previous_next(context, request)
+
+    # provide client data for rendering current tags in the tagbox
+    client_json_data = dict(
+        tagbox = get_tags_client_data(context, request),
+        )
+
+    return render_template_to_response(
+        'templates/show_referencesection.pt',
+        api=api,
+        actions=actions,
+        entries=_get_ordered_listing(context, request),
+        head_data=convert_to_script(client_json_data),
+        backto=backto,
+        previous=previous,
+        next=next,
+        layout=layout,
+        )
+
+
+class AddReferenceFCBase(object):
+    """Base class for the form controllers for adding a reference
+    manual and a reference section, since they are very similar."""
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        title_field = schemaish.String(
+            validator=validator.All(
+                validator.Length(max=100),
+                validator.Required(),
+                ))
+        fields = [('title', title_field),
+                  ('tags', tags_field),
+                  ('description', description_field),
+                  ]
+        return fields
+
+    def form_widgets(self, fields):
+        widgets = {'title': formish.Input(empty=''),
+                   'tags': karlwidgets.TagsAddWidget(),
+                   'description': formish.TextArea(rows=5, cols=60, empty=''),
+                   }
+        return widgets
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request, self.page_title)
+
+        layout_provider = get_layout_provider(context, request)
+        layout = layout_provider('intranet')
+        return {'api': api, 'layout': layout, 'actions': []}
+
+    def handle_cancel(self):
+        return HTTPFound(location=model_url(self.context, self.request))
+
+    def handle_submit(self, converted):
+        request = self.request
+        context = self.context
+        creator = authenticated_userid(request)
+        reference_object = create_content(self.content_iface,
+                                          converted['title'],
+                                          converted['description'],
+                                          creator,
+                                          )
+        name = make_unique_name(context, converted['title'])
+        context[name] = reference_object
+        context.ordering.sync(context.keys())
+        context.ordering.add(name)
+        # save the tags
+        set_tags(reference_object, request, converted['tags'])
+
+        location = model_url(reference_object, request)
+        return HTTPFound(location=location)
+
+
+class AddReferenceManualFormController(AddReferenceFCBase):
+    page_title = u'Add Reference Manual'
+    content_iface = IReferenceManual
+
+
+class AddReferenceSectionFormController(AddReferenceFCBase):
+    page_title = u'Add Reference Section'
+    content_iface = IReferenceSection
 
 
 class EditReferenceFCBase(object):
@@ -373,77 +436,6 @@ class EditReferenceFCBase(object):
 
 class EditReferenceManualFormController(EditReferenceFCBase):
     success_msg = 'Reference%20manual%20edited'
-
-
-class AddReferenceSectionFormController(AddReferenceFCBase):
-    page_title = u'Add Reference Section'
-    content_iface = IReferenceSection
-
-    def handle_submit(self, converted):
-        context = self.context
-        context.ordering.sync(context.keys())
-        response = super(AddReferenceSectionFormController,
-                         self).handle_submit(converted)
-        context.ordering.add(self._ref_object.__name__)
-        return response
-
-
-def _get_ordered_listing(context, request):
-
-    # First, be a chicken and sync
-    context.ordering.sync(context.keys())
-
-    # Flatten the list
-    entries = []
-    for name in context.ordering.items():
-        child = context.get(name, False)
-        entries.append({
-                'title': child.title,
-                'href': model_url(child, request),
-                })
-    return entries
-
-def show_referencesection_view(context, request):
-
-    backto = {
-        'href': model_url(context.__parent__, request),
-        'title': context.__parent__.title,
-        }
-
-    actions = []
-    if has_permission('create', context, request):
-        addables = get_folder_addables(context, request)
-        if addables is not None:
-            actions.extend(addables())
-        actions.append(('Edit', 'edit.html'))
-        if has_permission('delete', context, request):
-            actions.append(('Delete', 'delete.html'))
-
-    page_title = context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    previous, next = get_previous_next(context, request)
-
-    # provide client data for rendering current tags in the tagbox
-    client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
-
-    return render_template_to_response(
-        'templates/show_referencesection.pt',
-        api=api,
-        actions=actions,
-        entries=_get_ordered_listing(context, request),
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous=previous,
-        next=next,
-        layout=layout,
-        )
 
 
 class EditReferenceSectionFormController(EditReferenceFCBase):
