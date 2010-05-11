@@ -97,14 +97,14 @@ class INewsItem(ICommunityContent, IFolder):
     caption = Attribute(u'Caption that appears under photo for this article.')
 
 
-class IReferenceManual(IFolder, ICommunityContent, IPages):
-    """A reference manual in a community"""
-    taggedValue('name', 'Reference Manual')
-    description = Attribute(u'Description')
-
 class IReferenceSection(IFolder, ICommunityContent, IPages):
     """A section of a reference manual in a community"""
     taggedValue('name', 'Reference Section')
+    description = Attribute(u'Description')
+
+class IReferenceManual(IReferenceSection):
+    """A reference manual in a community"""
+    taggedValue('name', 'Reference Manual')
     description = Attribute(u'Description')
 
 class IWiki(IFolder):
