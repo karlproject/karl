@@ -301,8 +301,13 @@ def drawer_upload_view(context, request,
         msg = 'You must select a file before clicking Upload.'
         return dict(error = msg)
 
+    # For file objects, OSI's policy is to store the upload file's
+    # filename as the objectid, instead of basing __name__ on the
+    # title field).
+    filename = basename_of_filepath(fieldstorage.filename)
+
     stream = fieldstorage.file
-    title = fieldstorage.filename
+    title = filename          # just the basename
     image = create_content(ICommunityFile,
                           title=title,
                           stream=stream,
@@ -318,10 +323,6 @@ def drawer_upload_view(context, request,
             msg = 'You do not have permission to upload files here.'
             return dict(error=msg)
 
-        # For file objects, OSI's policy is to store the upload file's
-        # filename as the objectid, instead of basing __name__ on the
-        # title field).
-        filename = basename_of_filepath(fieldstorage.filename)
         image.filename = filename
         name = make_name(target_folder, filename, raise_error=False)
         if not name:
@@ -343,7 +344,7 @@ def drawer_upload_view(context, request,
     if workflow is not None:
         workflow.initialize(image)
 
-    # Update the thumbnails
+    # Return info about the image uploaded
     return dict(
         upload_image_info=get_image_info(image, request),
     )
