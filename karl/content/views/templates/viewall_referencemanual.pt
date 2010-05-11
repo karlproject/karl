@@ -24,27 +24,28 @@
     <ol id="references-listing">
 
       <li tal:repeat="section sections">
-	<strong>${section['title']}</strong>
 
-	<div class="kbody">
-	  <span tal:replace="structure section['html']"/>
+        <strong>${section['title']}</strong>
+
+        <div class="kbody">
+          <span tal:replace="structure section['html']"/>
         </div>
 
-	<ol type="a" tal:condition="section['items']">
+        <ol type="a" tal:condition="section['items']">
 
           <li tal:repeat="item section['items']">
             <strong>${item['title']}</strong>
 
-	    <div class="kbody">
-	      <span tal:replace="structure item['html']"/>
+            <div class="kbody">
+              <span tal:replace="structure item['html']"/>
             </div>
-	    
+
           </li>
 
-	</ol>
-
+        </ol>
 
       </li>
+
     </ol>
 
   </div>
