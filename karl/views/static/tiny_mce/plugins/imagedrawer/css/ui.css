@@ -36,6 +36,10 @@
     top: 15px;
 }
 
+.tiny-imagedrawer-panel-info {
+    overflow: hidden;
+}
+
 /* set back what label overwrites globally */
 .tiny-imagedrawer-panel-info label {
     font-size: 100%;
