@@ -566,9 +566,12 @@ class DefaultFolderAddables(object):
         elif IReferenceManual.providedBy(self.context):
             _addlist = [
                 ('Add Section', 'add_referencesection.html'),
+                ('Add File', 'add_file.html'),
+                ('Add Page', 'add_page.html'),
                 ]
         elif IReferenceSection.providedBy(self.context):
             _addlist = [
+                ('Add Section', 'add_referencesection.html'),
                 ('Add File', 'add_file.html'),
                 ('Add Page', 'add_page.html'),
                 ]

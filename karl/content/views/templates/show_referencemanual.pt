@@ -5,7 +5,10 @@
 
 <body>
 
- <div metal:fill-slot="content">
+ <div metal:fill-slot="content"
+       tal:define="ol_types ['1', 'A', 'i', 'a'] + ['1'] * 1000;
+                   ol_type_index 0;
+                  ">
 
   <div metal:use-macro="api.snippets.macros['status_message']"/>
   <div metal:use-macro="api.snippets.macros['actions_box']"/>
@@ -25,38 +28,36 @@
 
   <ol id="references-listing">
 
-   <li tal:repeat="section sections">
+   <metal:block metal:define-macro="tree">
+   <tal:items tal:repeat="item tree">
+   <li>
 
     <span class="sortingArrows">
-    <!-- Arrows for moving *sections* up and down -->
-     <a href="${api.here_url}?subpath=${section['subpath']}&amp;direction=up"
+     <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=up"
        ><img width="9" height="6" border="0" alt="Move up" 
              src="${api.static_url}/images/arrowUp.gif" /></a>
-     <a href="${api.here_url}?subpath=${section['subpath']}&amp;direction=down"
+     <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=down"
        ><img width="9" height="6" border="0" alt="Move down" 
              src="${api.static_url}/images/arrowDown.gif" /></a>
     </span>
 
-    <a href="${section['href']}" 
-       class="topLevelItem">${section['title']}</a>
+    <a href="${item['href']}" 
+       class="topLevelItem">${item['title']}</a>
 
-    <ol type="a" tal:condition="section['items']">
-     <li class="k3_section_items" tal:repeat="item section['items']">
-     <!-- Arrows for moving items *in* a section up or down -->
-      <span class="sortingArrows">
-       <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=up"
-         ><img width="9" height="6" border="0" alt="Move up" 
-               src="${api.static_url}/images/arrowUp.gif" /></a>
-       <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=downn"
-         ><img width="9" height="6" border="0" alt="Move down" 
-               src="${api.static_url}/images/arrowDown.gif" /></a>
-      </span>
-      <a href="${item['href']}">${item['title']}</a>
-     </li>
+    <tal:setup tal:define="ol_type_index ol_type_index + 1;">
+    <ol type="${ol_types[ol_type_index]}"
+        tal:condition="item['items']"
+        tal:define="tree item['items']">
+      <li metal:use-macro="template.macros['tree']" />
     </ol>
+    </tal:setup>
 
    </li>
+   </tal:items>
+   </metal:block>
   </ol>
+
+  <div metal:use-macro="api.snippets.macros['previous_next']"/>     
 
  </div>
 

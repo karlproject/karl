@@ -191,15 +191,19 @@ def show_referencemanual_view(context, request):
         tagbox = get_tags_client_data(context, request),
         )
 
+    previous, next = get_previous_next(context, request)
+
     api.status_message = status_message
     return render_template_to_response(
         'templates/show_referencemanual.pt',
         api=api,
         actions=actions,
         head_data=convert_to_script(client_json_data),
-        sections=getTree(context, request, api),
+        tree=getTree(context, request, api),
         backto=backto,
         layout=layout,
+        previous=previous,
+        next=next,
         )
 
 
@@ -209,6 +213,15 @@ def viewall_referencemanual_view(context, request):
         'href': model_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
+
+    actions = []
+    if has_permission('create', context, request):
+        addables = get_folder_addables(context, request)
+        if addables is not None:
+            actions.extend(addables())
+        actions.append(('Edit', 'edit.html'))
+        if has_permission('delete', context, request):
+            actions.append(('Delete', 'delete.html'))
 
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
@@ -222,14 +235,18 @@ def viewall_referencemanual_view(context, request):
         tagbox = get_tags_client_data(context, request),
         )
 
+    previous, next = get_previous_next(context, request, 'view_all.html')
+
     return render_template_to_response(
         'templates/viewall_referencemanual.pt',
         api=api,
-        actions=[],
+        actions=actions,
         head_data=convert_to_script(client_json_data),
-        sections=getTree(context, request, api),
+        tree=getTree(context, request, api),
         backto=backto,
         layout=layout,
+        previous=previous,
+        next=next,
         )
 
 

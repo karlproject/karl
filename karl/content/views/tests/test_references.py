@@ -372,6 +372,24 @@ class ShowTestBase(TestBase):
 class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
 
     def _getFUT(self):
+        from karl.content.views.references import viewall_referencemanual_view
+        return viewall_referencemanual_view
+
+    def test_it(self):
+        from repoze.bfg.testing import registerDummyRenderer
+        self._registerTagbox()
+        self._registerAddables()
+        self._registerLayoutProvider()
+
+        # XXX
+        renderer = registerDummyRenderer('templates/viewall_referencemanual.pt')
+        self._callFUT()
+        self.assertEqual(renderer.api.page_title, 'dummytitle')
+        self.assertEqual(renderer.tree, [])
+
+class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
+
+    def _getFUT(self):
         from karl.content.views.references import show_referencemanual_view
         return show_referencemanual_view
 
@@ -385,6 +403,7 @@ class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
         renderer = registerDummyRenderer('templates/show_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
+        self.assertEqual(renderer.tree, [])
 
 
 class ShowReferenceSectionViewTests(ShowTestBase, unittest.TestCase):

@@ -4,7 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Made the "view all" view work for reference sections (LP #575712).
+
+- Allow nesting of sub-sections within reference sections (LP #575712).
+  Also allow adding pages and files at the root of reference manuals, making
+  them behave like reference sections.
 
 3.30 (2010-05-06)
 -----------------

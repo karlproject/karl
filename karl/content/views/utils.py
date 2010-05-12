@@ -73,7 +73,7 @@ def upload_attachments(attachments, folder, creator, request):
                     if has_permission('delete', ob, request):
                         del folder[name]
 
-def get_previous_next(context, request):
+def get_previous_next(context, request, viewname=''):
 
     # Reference Manual sections have inter-item navigation, which
     # means (sigh) that files and pages do as well.
@@ -95,10 +95,10 @@ def get_previous_next(context, request):
 
     if previous:
         previous = {'title': previous.title,
-                    'href': model_url(previous, request)}
+                    'href': model_url(previous, request, viewname)}
     if next:
         next = {'title': next.title,
-                    'href': model_url(next, request)}
+                    'href': model_url(next, request, viewname)}
 
     return previous, next
 

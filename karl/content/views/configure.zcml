@@ -458,19 +458,6 @@
 
   </formish:form>
 
-  <view
-    for="karl.content.interfaces.IReferenceManual"
-    view=".references.show_referencemanual_view"
-    permission="view"
-  />
-
-  <view
-    for="karl.content.interfaces.IReferenceManual"
-    view=".references.viewall_referencemanual_view"
-    name="view_all.html"
-    permission="view"
-  />
-
   <formish:form
      for="karl.content.interfaces.IReferenceManual"
      controller=".references.EditReferenceManualFormController"
@@ -493,7 +480,7 @@
   </formish:form>
 
   <formish:form
-     for="karl.content.interfaces.IReferenceManual"
+     for="karl.content.interfaces.IReferenceSection"
      controller=".references.AddReferenceSectionFormController"
      name="add_referencesection.html"
      permission="create"
@@ -515,7 +502,14 @@
 
   <view
     for="karl.content.interfaces.IReferenceSection"
-    view=".references.show_referencesection_view"
+    view=".references.show_referencemanual_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    view=".references.viewall_referencemanual_view"
+    name="view_all.html"
     permission="view"
   />
 
