@@ -422,8 +422,9 @@ class FilestorePhotoViewTests(unittest.TestCase):
         cleanUp()
 
     def test_edit_profile_filestore_photo_view(self):
-        from karl.views.forms.filestore import get_filestore
         from karl.testing import DummyUpload
+        from karl.views.forms.filestore import get_filestore
+        from karl.views.people import edit_profile_filestore_photo_view
         context = self.context
         request = self.request
         filestore = get_filestore(context, request, 'edit-profile')
@@ -432,14 +433,17 @@ class FilestorePhotoViewTests(unittest.TestCase):
                              mimetype='image/jpeg',
                              data=one_pixel_jpeg)
         filestore.put(key, upload.file, 'cache_tag', [])
-        from karl.views.people import edit_profile_filestore_photo_view
-        response = edit_profile_filestore_photo_view(context, request)
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.body, one_pixel_jpeg)
+        try:
+            response = edit_profile_filestore_photo_view(context, request)
+            self.assertEqual(response.status, '200 OK')
+            self.assertEqual(response.body, one_pixel_jpeg)
+        finally:
+            filestore.clear()
 
     def test_add_user_filestore_photo_view(self):
-        from karl.views.forms.filestore import get_filestore
         from karl.testing import DummyUpload
+        from karl.views.forms.filestore import get_filestore
+        from karl.views.people import add_user_filestore_photo_view
         context = self.context
         request = self.request
         filestore = get_filestore(context, request, 'add-user')
@@ -448,10 +452,12 @@ class FilestorePhotoViewTests(unittest.TestCase):
                              mimetype='image/jpeg',
                              data=one_pixel_jpeg)
         filestore.put(key, upload.file, 'cache_tag', [])
-        from karl.views.people import add_user_filestore_photo_view
-        response = add_user_filestore_photo_view(context, request)
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.body, one_pixel_jpeg)
+        try:
+            response = add_user_filestore_photo_view(context, request)
+            self.assertEqual(response.status, '200 OK')
+            self.assertEqual(response.body, one_pixel_jpeg)
+        finally:
+            filestore.clear()
 
 class ShowProfileTests(unittest.TestCase):
     def setUp(self):
