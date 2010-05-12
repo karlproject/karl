@@ -369,29 +369,12 @@ class ShowTestBase(TestBase):
             request = DummyRequest()
         return self._getFUT()(context, request)
 
-class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
+
+class ReferenceOutlineViewTests(ShowTestBase, unittest.TestCase):
 
     def _getFUT(self):
-        from karl.content.views.references import viewall_referencemanual_view
-        return viewall_referencemanual_view
-
-    def test_it(self):
-        from repoze.bfg.testing import registerDummyRenderer
-        self._registerTagbox()
-        self._registerAddables()
-        self._registerLayoutProvider()
-
-        # XXX
-        renderer = registerDummyRenderer('templates/viewall_referencemanual.pt')
-        self._callFUT()
-        self.assertEqual(renderer.api.page_title, 'dummytitle')
-        self.assertEqual(renderer.tree, [])
-
-class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
-
-    def _getFUT(self):
-        from karl.content.views.references import show_referencemanual_view
-        return show_referencemanual_view
+        from karl.content.views.references import reference_outline_view
+        return reference_outline_view
 
     def test_it(self):
         from repoze.bfg.testing import registerDummyRenderer
@@ -401,6 +384,25 @@ class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
 
         # XXX
         renderer = registerDummyRenderer('templates/show_referencemanual.pt')
+        self._callFUT()
+        self.assertEqual(renderer.api.page_title, 'dummytitle')
+        self.assertEqual(renderer.tree, [])
+
+
+class ReferenceViewallViewTests(ShowTestBase, unittest.TestCase):
+
+    def _getFUT(self):
+        from karl.content.views.references import reference_viewall_view
+        return reference_viewall_view
+
+    def test_it(self):
+        from repoze.bfg.testing import registerDummyRenderer
+        self._registerTagbox()
+        self._registerAddables()
+        self._registerLayoutProvider()
+
+        # XXX
+        renderer = registerDummyRenderer('templates/viewall_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(renderer.tree, [])

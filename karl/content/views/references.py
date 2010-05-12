@@ -155,7 +155,7 @@ def move_subpath(context, subpath, direction):
     return 'Moved subpath %s %s' % (subpath, direction)
 
 
-def show_referencemanual_view(context, request):
+def reference_outline_view(context, request):
 
     # Look for moveUp or moveDown in QUERY_STRING, telling us to
     # reorder something
@@ -207,7 +207,7 @@ def show_referencemanual_view(context, request):
         )
 
 
-def viewall_referencemanual_view(context, request):
+def reference_viewall_view(context, request):
 
     backto = {
         'href': model_url(context.__parent__, request),

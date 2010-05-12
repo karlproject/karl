@@ -502,13 +502,13 @@
 
   <view
     for="karl.content.interfaces.IReferenceSection"
-    view=".references.show_referencemanual_view"
+    view=".references.reference_outline_view"
     permission="view"
   />
 
   <view
     for="karl.content.interfaces.IReferenceSection"
-    view=".references.viewall_referencemanual_view"
+    view=".references.reference_viewall_view"
     name="view_all.html"
     permission="view"
   />
