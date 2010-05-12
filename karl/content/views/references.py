@@ -265,48 +265,6 @@ def _get_ordered_listing(context, request):
                 })
     return entries
 
-def show_referencesection_view(context, request):
-
-    backto = {
-        'href': model_url(context.__parent__, request),
-        'title': context.__parent__.title,
-        }
-
-    actions = []
-    if has_permission('create', context, request):
-        addables = get_folder_addables(context, request)
-        if addables is not None:
-            actions.extend(addables())
-        actions.append(('Edit', 'edit.html'))
-        if has_permission('delete', context, request):
-            actions.append(('Delete', 'delete.html'))
-
-    page_title = context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    previous, next = get_previous_next(context, request)
-
-    # provide client data for rendering current tags in the tagbox
-    client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
-
-    return render_template_to_response(
-        'templates/show_referencesection.pt',
-        api=api,
-        actions=actions,
-        entries=_get_ordered_listing(context, request),
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous=previous,
-        next=next,
-        layout=layout,
-        )
-
 
 class AddReferenceFCBase(object):
     """Base class for the form controllers for adding a reference

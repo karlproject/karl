@@ -406,24 +406,6 @@ class ShowReferenceManualViewTests(ShowTestBase, unittest.TestCase):
         self.assertEqual(renderer.tree, [])
 
 
-class ShowReferenceSectionViewTests(ShowTestBase, unittest.TestCase):
-
-    def _getFUT(self):
-        from karl.content.views.references import show_referencesection_view
-        return show_referencesection_view
-
-    def test_it(self):
-        from repoze.bfg.testing import registerDummyRenderer
-        self._registerAddables()
-        self._registerTagbox()
-        self._registerLayoutProvider()
-
-        # XXX
-        renderer = registerDummyRenderer('templates/show_referencesection.pt')
-        self._callFUT()
-        self.assertEqual(renderer.api.page_title, 'dummytitle')
-
-
 class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
 
     def _getTargetClass(self):
