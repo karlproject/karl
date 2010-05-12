@@ -19,24 +19,23 @@ import re
 
 from lxml.etree import XMLSyntaxError
 from lxml.html import document_fromstring
-
+from repoze.bfg.interfaces import IView
 from repoze.bfg.security import has_permission
-
-from repoze.lemonade.content import create_content
+from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.url import model_url
-
+from repoze.lemonade.content import create_content
+from zope.interface import providedBy
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
-
-from karl.utils import get_setting
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.adapters import DefaultShowSendalert
-
+from karl.utils import get_setting
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import make_unique_name
+
 
 def fetch_attachments(attachments_folder, request):
     return [getMultiAdapter((attachment, request), IFileInfo)
@@ -73,6 +72,16 @@ def upload_attachments(attachments, folder, creator, request):
                     if has_permission('delete', ob, request):
                         del folder[name]
 
+
+def _find_view(context, request, name):
+    # Cribbed from repoze.bfg.view.render_view_to_response
+    provides = map(providedBy, (request, context))
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry()
+    return reg.adapters.lookup(provides, IView, name=name)
+
 def get_previous_next(context, request, viewname=''):
 
     # Reference Manual sections have inter-item navigation, which
@@ -94,11 +103,18 @@ def get_previous_next(context, request, viewname=''):
     next = parent.get(ordering.next_name(current_name))
 
     if previous:
-        previous = {'title': previous.title,
-                    'href': model_url(previous, request, viewname)}
+        if _find_view(previous, request, viewname) is not None:
+            href = model_url(previous, request, viewname)
+        else:
+            href = model_url(previous, request)
+        previous = {'title': previous.title, 'href': href}
+
     if next:
-        next = {'title': next.title,
-                    'href': model_url(next, request, viewname)}
+        if _find_view(next, request, viewname) is not None:
+            href = model_url(next, request, viewname)
+        else:
+            href = model_url(next, request)
+        next = {'title': next.title, 'href': href}
 
     return previous, next
 
