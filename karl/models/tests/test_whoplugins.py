@@ -43,9 +43,3 @@ class TestHTGroupsPlugin(unittest.TestCase):
         identity = {'repoze.who.userid':'a'}
         plugin.add_metadata(environ, identity)
         self.assertEqual(identity['groups'], ['group.one'])
-
-
-    
-    
-    
-    

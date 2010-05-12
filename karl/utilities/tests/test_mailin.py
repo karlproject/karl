@@ -21,7 +21,7 @@ from zope.testing.cleanup import cleanUp
 class MailinRunnerTests(unittest.TestCase):
 
     def setUp(self):
-        self._makeMaildir()
+        self.maildir_root = self._makeMaildir()
         cleanUp()
 
     def tearDown(self):
@@ -29,16 +29,15 @@ class MailinRunnerTests(unittest.TestCase):
         shutil.rmtree(self.maildir_root)
         cleanUp()
 
-    def _makeMaildir(self, root=None):
+    def _makeMaildir(self):
         import os
-        if root is None:
-            import tempfile
-            root = tempfile.mkdtemp()
-        self.maildir_root = root
+        import tempfile
+        root = tempfile.mkdtemp()
         os.mkdir(os.path.join(root, 'Maildir'))
         os.mkdir(os.path.join(root, 'Maildir', 'new'))
         os.mkdir(os.path.join(root, 'Maildir', 'cur'))
         os.mkdir(os.path.join(root, 'Maildir', 'tmp'))
+        return root
 
     def _getTargetClass(self):
         from karl.utilities.mailin import MailinRunner

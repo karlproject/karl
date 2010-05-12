@@ -108,7 +108,8 @@ class ConverterTests(unittest.TestCase):
         self.assertEqual(text, utf8doc)
 
     def testHTMLWithEntities(self):
-        body = u'<html><body> alle V&ouml;gel &Uuml;ber Fl&uuml;gel und T&uuml;mpel</body></html>'
+        body = (u'<html><body> alle V&ouml;gel &Uuml;ber Fl&uuml;gel '
+                u'und T&uuml;mpel</body></html>')
         utf8doc = u'alle Vögel Über Flügel und Tümpel'.encode('utf-8')
         from karl.utilities.converters import html
 
@@ -132,7 +133,8 @@ class ConverterTests(unittest.TestCase):
         self.assertEqual(text, utf8doc)
 
     def testXML(self):
-        body = '<?xml version="1.0" encoding="iso-8859-15" ?><body> alle Vögel Über Flügel und Tümpel</body>'
+        body = ('<?xml version="1.0" encoding="iso-8859-15" ?><body> '
+                'alle Vögel Über Flügel und Tümpel</body>')
         utf8doc = u'alle Vögel Über Flügel und Tümpel'.encode('utf-8')
         from karl.utilities.converters import sgml
         import tempfile
@@ -157,7 +159,8 @@ class ConverterTests(unittest.TestCase):
         C = ooffice.Converter()
         # encoding should be taken from the preamble
         stream, enc = C.convert(fn, 'utf8', 'text/html')
-        expected = u'Viel Vögel sprangen artig in den Tüpel und über Feld und Wüste'
+        expected = (u'Viel Vögel sprangen artig in den Tüpel und über '
+                    u'Feld und Wüste')
         expected_words = [w.strip() for w in expected.encode(enc).split()
                           if w.strip()]
         got_words = [w.strip() for w in stream.read().split() if w.strip()]
@@ -172,7 +175,8 @@ class ConverterTests(unittest.TestCase):
         C = pdf.Converter()
         # encoding should be taken from the preamble
         stream, enc = C.convert(fn, 'utf8', 'text/html')
-        expected = u'Viel Vögel sprangen artig in den Tüpel und über Feld und Wüste'
+        expected = (u'Viel Vögel sprangen artig in den Tüpel und über '
+                    u'Feld und Wüste')
         expected_words = [w.strip() for w in expected.encode(enc).split() if
                           w.strip()]
         got_words = [w.strip() for w in stream.read().split() if w.strip()]

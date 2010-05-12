@@ -37,7 +37,9 @@ class ootextHandler(ContentHandler):
         self._data = tempfile.NamedTemporaryFile()
 
     def getxmlcontent(self, file):
-        doctype = """<!DOCTYPE office:document-content PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "office.dtd">"""
+        doctype = ('<!DOCTYPE office:document-content PUBLIC '
+                   '"-//OpenOffice.org//DTD OfficeDocument 1.0//EN" '
+                   '"office.dtd">')
         xmlstr = zipfile.ZipFile(file).read('content.xml')
         xmlstr = xmlstr.replace(doctype,'')       
         return xmlstr

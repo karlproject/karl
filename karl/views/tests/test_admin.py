@@ -891,7 +891,9 @@ class TestUploadUsersView(unittest.TestCase):
                 'Skipping user: user1: User already exists with login: user1\n'
                 'Created 1 users.')
 
-class TestErrorMonitorView(unittest.TestCase):
+
+class ErrorMonitorBase:
+
     def setUp(self):
         cleanUp()
 
@@ -918,6 +920,9 @@ class TestErrorMonitorView(unittest.TestCase):
 
         import shutil
         shutil.rmtree(self.tmpdir)
+
+
+class TestErrorMonitorView(ErrorMonitorBase, unittest.TestCase):
 
     def call_fut(self):
         from karl.views.admin import error_monitor_view
@@ -938,33 +943,8 @@ class TestErrorMonitorView(unittest.TestCase):
         self.assertEqual(result['states'],
                          {"blonde": [], "red": [], "head": ['Testing...']})
 
-class TestErrorMonitorSubsystemView(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
 
-        import tempfile
-        self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
-
-        self.site = testing.DummyModel()
-
-        from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings(
-            error_monitor_dir=tmpdir,
-            error_monitor_subsystems=["blonde", "red", "head"],
-        )
-        testing.registerUtility(settings, ISettings)
-
-    def log_error(self, subsystem, message):
-        import os
-        with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
-            print >>f, 'ENTRY'
-            print >>f, message
-
-    def tearDown(self):
-        cleanUp()
-
-        import shutil
-        shutil.rmtree(self.tmpdir)
+class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
     def call_fut(self, subsystem=None):
         from karl.views.admin import error_monitor_subsystem_view
@@ -993,33 +973,8 @@ class TestErrorMonitorSubsystemView(unittest.TestCase):
         result = self.call_fut('head')
         self.assertEqual(result['entries'], [u'fo\x92', 'bar'])
 
-class TestErrorMonitorStatusView(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
 
-        import tempfile
-        self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
-
-        self.site = testing.DummyModel()
-
-        from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings(
-            error_monitor_dir=tmpdir,
-            error_monitor_subsystems=["blonde", "red", "head"],
-        )
-        testing.registerUtility(settings, ISettings)
-
-    def log_error(self, subsystem, message):
-        import os
-        with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
-            print >>f, 'ENTRY'
-            print >>f, message
-
-    def tearDown(self):
-        cleanUp()
-
-        import shutil
-        shutil.rmtree(self.tmpdir)
+class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
 
     def call_fut(self):
         from karl.views.admin import error_monitor_status_view
