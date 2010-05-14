@@ -66,6 +66,15 @@ class IOthers(Interface):
 
 # --- end LiveSearch grouping
 
+class IIndexFactory(Interface):
+    """ Register as named utilities to add extra indexes to the catalog.
+    """
+    def __call__():
+        """ Return an index.
+
+        The index will be added to the catalog under the name of the utility.
+        """
+
 class ISite(IFolder):
     """ Karl site """
     taggedValue('name', 'Site')

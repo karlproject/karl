@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added a hook inside ``karl.models.site.Site.update_indexes`` to allow
+  extension or customization packages to extend the set of indexes used
+  in the catalog.
+
 - Made the "view all" view work for reference sections (LP #575712).
 
 - Allow nesting of sub-sections within reference sections (LP #575712).

@@ -20,6 +20,7 @@ import datetime
 from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface.declarations import Declaration
+from zope.component import getUtilitiesFor
 from zope.component import queryAdapter
 from zope.event import notify
 
@@ -45,10 +46,11 @@ from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
-from karl.models.interfaces import ISite
+from karl.models.interfaces import IIndexFactory
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
+from karl.models.interfaces import ISite
 from karl.models.interfaces import ITextIndexData
 from karl.models.interfaces import IVirtualData
 from karl.models.interfaces import IUserAdded
@@ -278,6 +280,16 @@ class Site(Folder):
         self.filestore = PersistentMapping()
 
     def update_indexes(self):
+        """ Ensure that we have indexes matching what the application needs.
+
+        This function is called when the site is first created, and again
+        whenever the ``reindex_catalog`` script is run.
+
+        Extensions can arrange to get their own indexes added by registering
+        named utilities for the
+        :interface:`karl.models.interfaces.IIndexFactory` interface:  each
+        such interface will be called to create a new (or overwritten) index.
+        """
         indexes = {
             'name': CatalogFieldIndex(get_name),
             'title': CatalogFieldIndex(get_title), # used as sort index
@@ -299,6 +311,9 @@ class Site(Folder):
             'member_name': CatalogTextIndex(get_member_name),
             'virtual':CatalogFieldIndex(get_virtual),
             }
+
+        for name, utility in getUtilitiesFor(IIndexFactory):
+            indexes[name] = utility()
 
         catalog = self.catalog
 
