@@ -19,11 +19,8 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from karl.views.api import TemplateAPI
-from karl.utils import get_setting
 
 def login_view(context, request):
-
-    system_name = get_setting(context, 'system_name', 'KARL')
 
     page_title = '' # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
@@ -35,7 +32,7 @@ def login_view(context, request):
     elif came_from.endswith('logout.html'):
         came_from = came_from[:-len('logout.html')]
 
-    api.status_message = status_message=request.params.get('reason', None)
+    api.status_message = request.params.get('reason', None)
     response = render_template_to_response(
         'templates/login.pt',
         api=api,
