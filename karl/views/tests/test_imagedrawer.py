@@ -246,7 +246,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def dummy_batcher(self, context, request):
         return ['foo', 'bar']
 
-    def dummy_make_record(self, context, request):
+    def dummy_make_record(self, context, request, thumb_size=None):
         return dict(title='Foo')
 
     def dummy_check_upload_size(*args):

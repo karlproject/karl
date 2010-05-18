@@ -313,6 +313,62 @@ $(document).ready(function() {
             'Cls applied on item');
     });
 
+    test("Extra cls options on append", function() {
+
+        $('#statusbox').multistatusbox({
+            clsContainer: 'marker-a',
+            clsItem: 'marker-b',
+        });
+
+        $('#statusbox').multistatusbox('append', 'Message1',
+            null, 'marker-c marker-d');
+
+        same(sc(), $([
+            'A message that came with the page',
+            "Message1X"
+            ]), 'Statusbox content does not match');
+
+        ok($('#statusbox.marker-a').length == 1,
+            'Cls applied on container');
+
+        ok($('#statusbox .ui-multistatusbox-item.marker-b').length == 0,
+            'Cls replaced on item');
+        ok($('#statusbox .ui-multistatusbox-item.marker-c').length == 1,
+            'Extra cls applied on item');
+        ok($('#statusbox .ui-multistatusbox-item.marker-d').length == 1,
+            'Second extra cls applied on item');
+
+    });
+
+    test("Extra cls options on clearAndAppend", function() {
+
+        $('#statusbox').multistatusbox({
+            clsContainer: 'marker-a',
+            clsItem: 'marker-b',
+        });
+
+        $('#statusbox').multistatusbox('clearAndAppend', 'Message1',
+            null, 'marker-c marker-d');
+
+        same(sc(), $([
+            'A message that came with the page',
+            "Message1X"
+            ]), 'Statusbox content does not match');
+
+        ok($('#statusbox.marker-a').length == 1,
+            'Cls applied on container');
+
+        ok($('#statusbox .ui-multistatusbox-item.marker-b').length == 0,
+            'Cls replaced on item');
+        ok($('#statusbox .ui-multistatusbox-item.marker-c').length == 1,
+            'Extra cls applied on item');
+        ok($('#statusbox .ui-multistatusbox-item.marker-d').length == 1,
+            'Second extra cls applied on item');
+
+    });
+
+
+
 });
 
 })(jQuery);

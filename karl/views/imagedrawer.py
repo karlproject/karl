@@ -113,6 +113,7 @@ DISPLAY_SIZE = (800, 800)
 
 # Size of thumbnails displayed in image drawer when browsing images.
 THUMB_SIZE = (85, 85)
+LARGE_THUMB_SIZE = (175, 175)
 
 # a somewhat useful decorator
 class jsonview(object):
@@ -148,7 +149,7 @@ def breadcrumbs(doc, request):
 
     return list(visit(doc))
 
-def get_image_info(image, request):
+def get_image_info(image, request, thumb_size=THUMB_SIZE):
     """Return the info about a particular image,
     in the format specified by the client's needs.
 
@@ -174,7 +175,7 @@ def get_image_info(image, request):
         image_width = width,
         image_height = height,
         image_size = image.size,
-        thumbnail_url = thumb_url(image, request, THUMB_SIZE),
+        thumbnail_url = thumb_url(image, request, thumb_size),
         last_modified = image.modified.ctime(),  # XXX Format?
     )
 
@@ -346,5 +347,5 @@ def drawer_upload_view(context, request,
 
     # Return info about the image uploaded
     return dict(
-        upload_image_info=get_image_info(image, request),
+        upload_image_info=get_image_info(image, request, thumb_size=LARGE_THUMB_SIZE),
     )

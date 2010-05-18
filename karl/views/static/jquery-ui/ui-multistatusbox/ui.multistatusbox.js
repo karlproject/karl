@@ -78,9 +78,9 @@ $.widget('ui.multistatusbox', {
     /* Append a message after clearing previous messages.
      * If queueCategory is specified, only the messages added with the
      * same category are cleared. */
-    clearAndAppend: function(message, /*optional*/ queueCategory) {
+    clearAndAppend: function(message, /*optional*/ queueCategory, clsItem) {
         this.clear(queueCategory);
-        this.append(message, queueCategory);
+        this.append(message, queueCategory, clsItem);
     }
 
 

@@ -85,19 +85,30 @@
     </div>
 
     <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-upload">
-      <div class="tiny-imagedrawer-images">
-        <ul class="tiny-imagedrawer-imagestripe"></ul>
-        <div class="tiny-imagedrawer-scrollbar"></div>
+      <div class="tiny-imagedrawer-upload1">
+        <p>
+          Select file to upload, then press the Upload button!
+          File will be uploaded into the current page.
+        </p>
+        <input type="file" class="tiny-imagedrawer-fileinput" />
+        <br />
+        <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
+          <button class="ui-icon-transferthick-e-w">Upload</button>
+        </div>
       </div>
-      <br />
-      <p>
-        Select file to upload, then press the Upload button!
-        File will be uploaded into the current page.
-      </p>
-      <input type="file" class="tiny-imagedrawer-fileinput" />
-      <br />
-      <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
-        <button class="ui-icon-transferthick-e-w">Upload</button>
+      <div class="tiny-imagedrawer-upload2">
+        <p>
+          Insert or Replace the image, after the upload has completed.
+          Press Reset if you wish to upload another image.
+        </p>
+        <ul class="tiny-imagedrawer-imagestripe">
+          <li class="tiny-imagedrawer-image"></li>
+        </ul>
+        <br />
+        <div class="tiny-imagedrawer-statusbox"></div>
+        <div class="karl-buttonset tiny-imagedrawer-buttonset-uploadreset">
+          <button class="ui-icon-transferthick-e-w">Reset</button>
+        </div>
       </div>
     </div>
 

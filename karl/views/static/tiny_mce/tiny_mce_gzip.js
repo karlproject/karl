@@ -517,6 +517,8 @@ tinyMCE.addI18n('en.wicked',{
 
     // unique id needed for the file upload input
     var next_fileinputid = 0;
+    // unique id needed to serialize file uploads
+    var upload_serial = 0;
 
     // Support classes for the image thumbnail handling
     //
@@ -735,10 +737,9 @@ tinyMCE.addI18n('en.wicked',{
                         );
                     }
                     self.info_location.append(
-                        $('<a></a>')
+                        $('<span></span>')
                             // XXX title should be limited (...)
                             .text(this.title)
-                            .attr('href', this.href)
                         );
                 });
                 if (value.location && value.location.length > 0) {
@@ -1072,8 +1073,15 @@ tinyMCE.addI18n('en.wicked',{
                             upload_panel.show();
                             self.images_panel.hide();
                             external_panel.hide();
-                            // erase the info in the panel
-                            self.info_panel.imagedrawerinfopanel('record', {});
+                            // There is only one thumb on the upload panel,
+                            // and that should be selected when switched there.
+                            var value = self.upload_preview_image
+                                .imagedrawerimage('record');
+                            if (value && value.image_url) {
+                                self._setSelection(self.upload_preview_image);
+                            } else {
+                                self._setSelection(null);
+                            }
                             self.selected_source = button_index;
                         } else if (button_index >= 1 && button_index <= 3) {
                             // Handle the search result browsers
@@ -1190,12 +1198,13 @@ tinyMCE.addI18n('en.wicked',{
                                     thumbnail_url: image_url
                             }));
                             // If there is no selection, and we are still on
-                            // the upload tab: select it,
+                            // the external tab: select it,
                             // otherwise leave the active selection intact.
                             if (self.buttonset.val() == 'external') {
                                 if (self.selected_item == null) {
                                     self._setSelection(eventContext.thumb);
-                                } else if (self.selected_item[0] === eventContext.thumb[0]) {
+                                } else if ((self.selected_item && self.selected_item[0]) === 
+                                        eventContext.thumb[0]) {
                                     // This is the selected item. Update the info panel.
                                     self._updateInfoPanel();
                                 }
@@ -1216,7 +1225,8 @@ tinyMCE.addI18n('en.wicked',{
                             // If we are on that tab: select it regardless we have
                             // a current selection or not.
                             if (self.buttonset.val() == 'external') {
-                                if (self.selected_item[0] === eventContext.thumb[0]) {
+                                if ((self.selected_item && self.selected_item[0]) === 
+                                        eventContext.thumb[0]) {
                                     // We are the selected item. Update the info panel.
                                     self._updateInfoPanel();
                                 } else {
@@ -1240,8 +1250,18 @@ tinyMCE.addI18n('en.wicked',{
                 fileinput.attr('name', 'file');
             }
 
+            // Upload panel
+            this.upload_panel_tab1 = upload_panel.find('.tiny-imagedrawer-upload1')
+                .show();
+            this.upload_panel_tab2 = upload_panel.find('.tiny-imagedrawer-upload2')
+                .hide();
+            this.upload_statusbox = upload_panel.find('.tiny-imagedrawer-statusbox')
+                .multistatusbox({
+                    //clsItem: 'portalMessage',
+                    hasCloseButton: false
+                });
             // Wire up the Upload button
-            this.dialog
+            upload_panel
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-upload')
                 .karlbuttonset({
                     clsContainer: 'tiny-imagedrawer-buttonset-upload'
@@ -1250,6 +1270,8 @@ tinyMCE.addI18n('en.wicked',{
                     //if (button_index == 0) { // upload
                         // Signal the start of this upload
                         var eventContext = {};
+                        upload_serial += 1;
+                        eventContext.upload_serial = upload_serial;
                         self._uploadStart(eventContext);
 
                         // Initiate the upload
@@ -1277,7 +1299,22 @@ tinyMCE.addI18n('en.wicked',{
                         });
                     //}
                 });
+            upload_panel
+                .find('.karl-buttonset.tiny-imagedrawer-buttonset-uploadreset')
+                .karlbuttonset({
+                    clsContainer: 'tiny-imagedrawer-buttonset-uploadreset'
+                })
+                .bind('change.karlbuttonset', function(event, button_index, value) {
+                    //if (button_index == 0) { // reset
+                        // 
+                        // We cannot really cancel the upload, so we
+                        // merely reset the ui here for a new upload.
 
+                        self.upload_panel_tab2.hide('fold');
+                        self.upload_panel_tab1.show('fold');
+                    //}
+                });
+                
 
             // Set the Insert/Replace button's text,
             // as well as the title on the top.
@@ -1303,10 +1340,15 @@ tinyMCE.addI18n('en.wicked',{
                     // Doubleclick on the images acts the same as 
                     // pressing the insert button. 
                     //
-                    // Insert the selected one to the editor.
-                    self._insertToEditor(this);
-                    // And close the dialog.
-                    self.dialog.dialog('close');
+                    //
+                    var value = $(this).imagedrawerimage('record');
+                    // Only act if it contains an insertable image!
+                    if (value && value.image_url) {
+                        // Insert the selected one to the editor.
+                        self._insertToEditor(this);
+                        // And close the dialog.
+                        self.dialog.dialog('close');
+                    }
                     // Default clicks should be prevented.
                     event.preventDefault();
                 })
@@ -1355,34 +1397,11 @@ tinyMCE.addI18n('en.wicked',{
                     }
                 });
 
-            // handle the stripe in the upload panel
-            this.upload_stripe = new ImageStripe(
-                upload_panel.find('ul.tiny-imagedrawer-imagestripe').eq(0),
-                95, self.proto_image, {
-                    title: self.editor.getLang('imagedrawer.loading_title'),
-                    thumbnail_url: self.url + '/images/throbber.gif',
-                    status: self.editor.getLang('imagedrawer.uploading_status')
-                }
-            );
-            // Wire the scrollbar in the upload panel
-            this.upload_scrollbar = upload_panel.find('.tiny-imagedrawer-scrollbar')
-                .slider({
-                    slide: function(e, ui) {
-                        var stripe = self.upload_stripe;
-                        var percentage_float = ui.value / 100;
-                        var num_items = stripe.items().length;
-                        // Move the stripe to a percentage position.
-                        var slider_index = percentage_float * 
-                                (num_items - self.visible_columns); 
-                        if (slider_index < 0) {
-                            // Region fits entirely without scrolling.
-                            // Do nothing.
-                            return;
-                        }
-                        ///
-                        stripe.moveTo(slider_index);
-                    }
-                });
+            // handle the image in the upload panel
+            this.upload_preview_image = this.proto_image.clone(true)
+                .imagedrawerimage({});
+            this.upload_preview = upload_panel.find('.tiny-imagedrawer-image')
+                .replaceWith(this.upload_preview_image);
 
             // handle the stripe in the external panel
             this.external_stripe = new ImageStripe(
@@ -1514,18 +1533,17 @@ tinyMCE.addI18n('en.wicked',{
         },
 
         _uploadStart: function(eventContext) {
-            // Insert the image data into the editor
-            eventContext.thumb = this.upload_stripe.insertRecord(0, 
+            // Start the throbber
+            this.upload_preview_image.imagedrawerimage('record', 
                 {
                     loading: true,
-                    title: '' + document.getElementById(this.fileinputid).value
+                    title: '' + document.getElementById(this.fileinputid).value,
+                    thumbnail_url: this.url + '/images/throbber.gif'
                 });
-            // If we are on the upload tab
-            // (most likely the case): select it,
-            // otherwise leave the active selection intact.
-            if (this.buttonset.val() == 'uploadnew') {
-                this._setSelection(eventContext.thumb);
-            }
+            // clear the status box
+            this.upload_statusbox.multistatusbox('clear');
+            this.upload_panel_tab1.hide();
+            this.upload_panel_tab2.show();
         },
 
         _uploadSuccess: function(json, eventContext) {
@@ -1538,18 +1556,21 @@ tinyMCE.addI18n('en.wicked',{
                 return;
             }
 
+            // prevent doing anything if this is not the current upload
+            if (eventContext.upload_serial != upload_serial) {
+                return;
+            }
+
             // Update the image data that just arrived
-            eventContext.thumb
+            this.upload_preview_image
                 .imagedrawerimage('record', json.upload_image_info);
-            //this._moveStripe(this.scrollbar.slider('value') / 100);
             //
-            // If there is no selection, and we are still on
+            // If we are still on
             // the upload tab: select it,
-            // otherwise leave the active selection intact.
             if (this.buttonset.val() == 'uploadnew') {
                 if (this.selected_item == null) {
-                    this._setSelection(eventContext.thumb);
-                } else if (this.selected_item[0] === eventContext.thumb[0]) {
+                    this._setSelection(this.upload_preview_image);
+                } else {
                     // This is the selected item. Update the info panel.
                     this._updateInfoPanel();
                 }
@@ -1557,30 +1578,32 @@ tinyMCE.addI18n('en.wicked',{
         },
 
         _uploadError: function(json, eventContext) {
+
+            // prevent doing anything if this is not the current upload
+            if (eventContext.upload_serial != upload_serial) {
+                return;
+            }
+
             // use error sent by server, if available
             var error = json && json.error;
             if (! error) {
                 error = 'Server error when fetching drawer_upload_view.html';
             }
             // Get the existing data record and save the error in it.
-            eventContext.thumb.imagedrawerimage('record', 
-                $.extend(eventContext.thumb.imagedrawerimage('record'),
+            this.upload_preview_image.imagedrawerimage('record', 
+                $.extend(this.upload_preview_image.imagedrawerimage('record'),
                     {
-                        status: null,
-                        error: '' + error,
                         thumbnail_url: this.url + '/images/error.png'
                     }
                 )
             );
-            // If we are on that tab: select it regardless we have
-            // a current selection or not.
+            // Show the error in the message box
+            this.upload_statusbox.multistatusbox('clearAndAppend', error,
+                        null, 'ui-state-error ui-corner-all');
+            // update selection
             if (this.buttonset.val() == 'uploadnew') {
-                if (this.selected_item[0] === eventContext.thumb[0]) {
-                    // We are the selected item. Update the info panel.
-                    this._updateInfoPanel();
-                } else {
-                    this._setSelection(eventContext.thumb);
-                }
+                // We are the selected item. Update the info panel.
+                this._updateInfoPanel();
             }
         },
 
@@ -1882,6 +1905,8 @@ tinyMCE.addI18n('en.wicked',{
             if (editorImage) {
                 // We are replacing the image.
                 ed.dom.setAttribs(editorImage, args);
+                // Needed.
+                ed.execCommand('mceRepaint');
             } else {
                 // We are inserting a new image.
                 ed.execCommand('mceInsertContent', false, '<img id="__mce_tmp" />', {skip_undo : 1});
@@ -1965,6 +1990,5 @@ tinyMCE.addI18n('en.wicked',{
 
 tinyMCE.addI18n('en.imagedrawer',{
 image_desc: "Insert/edit image",
-loading_title: 'Loading...',
-uploading_status: 'Upload is in progress.'
+loading_title: 'Loading...'
 });
