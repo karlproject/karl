@@ -14,6 +14,9 @@ Unreleased
   Also allow adding pages and files at the root of reference manuals, making
   them behave like reference sections.
 
+- LP #579511 The rtf converter now cleans up pict_dir directories left behind
+  by rtf2xml.
+
 3.30 (2010-05-06)
 -----------------
 

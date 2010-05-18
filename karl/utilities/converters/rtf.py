@@ -10,19 +10,21 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-""" 
+"""
 a simple RTF converter
 
 $Id: rtf.py 1456 2006-02-08 14:10:27Z ajung $
 """
 
-import xml.sax
+import os
+import shutil
 import tempfile
+import xml.sax
 from xml.sax.handler import ContentHandler
 
 from karl.utilities.converters.baseconverter import BaseConverter
@@ -52,6 +54,13 @@ class Converter(BaseConverter):
         handler = RTFtextHandler()
         xmlstr = self.execute('rtf2xml "%s"' % filename).read()
         xml.sax.parseString(xmlstr, handler)
+
+        # rtf2xml quite rudely leaves behind temporary directories which it
+        # appears to be using for unpacking embedded images.
+        pict_dir = filename + "_rtf_pict_dir"
+        if os.path.exists(pict_dir):
+            shutil.rmtree(pict_dir)
+
         return handler.getStream(), 'utf-8'
 
 RTFConverter = Converter()
