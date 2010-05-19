@@ -1023,7 +1023,7 @@
             this.upload_preview_image.imagedrawerimage('record', 
                 {
                     loading: true,
-                    title: '' + 'lalala', //document.getElementById(this.fileinputid).value,
+                    title: '' + document.getElementById(this.fileinputid).value,
                     thumbnail_url: this.url + '/images/throbber.gif'
                 });
             // clear the status box
