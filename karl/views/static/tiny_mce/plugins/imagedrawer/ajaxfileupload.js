@@ -7,6 +7,8 @@
           html error arrives, like a 404.
     2010: Balazs Ree <ree@greenfinity.hu>
         * allow extra parameters to be passed with the file upload
+        * Fix cloning to prevent an issue on IE, that caused
+          all uploads except the first one to fail.
 
 */
 
@@ -48,6 +50,12 @@ jQuery.extend({
 		var form = $('<form  action="" method="POST" name="' + formId + '" id="' + formId + '" enctype="multipart/form-data"></form>');	
 		var oldElement = $('#' + fileElementId);
 		var newElement = $(oldElement).clone();
+                // XXX Setting the name attribute explicitely seems
+                // to be crucial on IE. The result of this bug is that
+                // the first upload succeeds but any further ones
+                // will fail. Not setting the name here seems to
+                // cause the input field missing from the form.
+                newElement.attr('name', oldElement.attr('name'));
 		$(oldElement).attr('id', fileId);
 		$(oldElement).before(newElement);
 		$(oldElement).appendTo(form);
