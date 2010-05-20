@@ -236,7 +236,8 @@ class Test_drawer_upload_view(unittest.TestCase):
 
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICommunityFile
-        registerContentFactory(testing.DummyModel, ICommunityFile)
+        from karl.content.models.files import CommunityFile
+        registerContentFactory(CommunityFile, ICommunityFile)
 
         from zope.interface import Interface
         from repoze.workflow.testing import registerDummyWorkflow
@@ -286,7 +287,7 @@ class Test_drawer_upload_view(unittest.TestCase):
 
         image = context['test.jpg']
         self.assertEqual(image.title, 'test.jpg')
-        self.assertEqual(image.stream.getvalue(), 'TESTDATA')
+        self.assert_(len(image.image().fp.read()) > 0)
         self.assertEqual(image.mimetype, 'image/jpeg')
         self.assertEqual(image.filename, 'test.jpg')
         self.assertEqual(image.creator, 'chris')
@@ -309,7 +310,7 @@ class Test_drawer_upload_view(unittest.TestCase):
 
         image = context['TEMP'].values()[0]
         self.assertEqual(image.title, 'test.jpg')
-        self.assertEqual(image.stream.getvalue(), 'TESTDATA')
+        self.assert_(len(image.image().fp.read()) > 0)
         self.assertEqual(image.mimetype, 'image/jpeg')
         self.assertEqual(image.filename, 'test.jpg')
         self.assertEqual(image.creator, 'chris')
@@ -332,22 +333,77 @@ class Test_drawer_upload_view(unittest.TestCase):
                          u'You must select a file before clicking Upload.')
         self.failUnless(transaction.isDoomed())
 
-    def test_bad_upload(self):
+    def test_missing_input(self):
+        """Input is missing from the posted form"""
         import simplejson
         import transaction
         testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
-                'file': testing.DummyModel(
-                    filename='', file=None, type=None
+                },
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['error'],
+                         u'You must select a file before clicking Upload.')
+        self.failUnless(transaction.isDoomed())
+
+    def test_no_filename(self):
+        import simplejson
+        import transaction
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params = {
+                'file': DummyUpload(
+                    filename = '', 
                 ),
-            }
+            },
         )
         response = self._call_fut(context, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
         self.assertEqual(data['error'], u'The filename must not be empty')
+        self.failUnless(transaction.isDoomed())
+
+    def test_wrong_mimetype(self):
+        import simplejson
+        import transaction
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params = {
+                'file': DummyUpload(
+                    type = 'not/animage',
+                ),
+            },
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['error'],
+            u'File test.jpg is not an image')
+        self.failUnless(transaction.isDoomed())
+
+    def test_wrong_imagedata(self):
+        import simplejson
+        import transaction
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params = {
+                'file': DummyUpload(
+                    IMAGE_DATA = 'NOT_AN_IMAGE',
+                ),
+            },
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['error'],
+            u'File test.jpg is not an image')
         self.failUnless(transaction.isDoomed())
 
     def test_duplicate_filename(self):
@@ -385,14 +441,31 @@ class Test_drawer_upload_view(unittest.TestCase):
                          u'You do not have permission to upload files here.')
         self.failUnless(transaction.isDoomed())
 
+# An 1x1px png (should be jpeg, in fact)
+import binascii
+IMAGE_DATA = binascii.unhexlify(
+            '89504e470d0a1a0a0000000d49484452000000010000000108060000001f' +
+            '15c4890000000467414d410000b18f0bfc610500000006624b474400ff00' +
+            'ff00ffa0bda793000000097048597300000b1200000b1201d2dd7efc0000' +
+            '000976704167000000010000000100c7955fed0000000d4944415408d763' +
+            'd8b861db7d00072402f7f7d926c80000002574455874646174653a637265' +
+            '61746500323031302d30352d31385432303a30343a34322b30323a3030e1' +
+            '1f35f60000002574455874646174653a6d6f6469667900323031302d3035' +
+            '2d31385432303a30343a34322b30323a303090428d4a0000000049454e44' +
+            'ae426082')
+
 class DummyUpload(object):
     filename = 'test.jpg'
     type = 'image/jpeg'
+    IMAGE_DATA = IMAGE_DATA
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
 
     @property
     def file(self):
         from cStringIO import StringIO
-        return StringIO('TESTDATA')
+        return StringIO(self.IMAGE_DATA)
 
 class DummyWorkflow(object):
     def __init__(self):

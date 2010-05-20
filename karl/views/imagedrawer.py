@@ -29,6 +29,7 @@ from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 
 from karl.content.interfaces import ICommunityFile
+from karl.content.interfaces import IImage
 from karl.content.views.files import get_upload_mimetype
 from karl.models.interfaces import ICommunity
 from karl.utilities.image import get_images_batch
@@ -316,6 +317,11 @@ def drawer_upload_view(context, request,
                           filename=fieldstorage.filename,
                           creator=creator,
                           )
+    # Check if it's an image.
+    if not IImage.providedBy(image):
+        msg = 'File %s is not an image' % filename
+        return dict(error=msg)
+
     check_upload_size(context, image, 'file')
 
     if hasattr(context, 'get_attachments'):
