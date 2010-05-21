@@ -493,8 +493,8 @@ def show_file_view(context, request):
         fileinfo=fileinfo,
         head_data=convert_to_script(client_json_data),
         backto=backto,
-        previous=previous,
-        next=next,
+        previous_entry=previous,
+        next_entry=next,
         layout=layout,
         )
 

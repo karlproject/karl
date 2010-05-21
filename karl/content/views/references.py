@@ -202,8 +202,8 @@ def reference_outline_view(context, request):
         tree=getTree(context, request, api),
         backto=backto,
         layout=layout,
-        previous=previous,
-        next=next,
+        previous_entry=previous,
+        next_entry=next,
         )
 
 
@@ -245,8 +245,8 @@ def reference_viewall_view(context, request):
         tree=getTree(context, request, api),
         backto=backto,
         layout=layout,
-        previous=previous,
-        next=next,
+        previous_entry=previous,
+        next_entry=next,
         )
 
 

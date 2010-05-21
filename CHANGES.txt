@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Work around chameleon bug where the new ``next`` builtin in Python 2.6.x
+  was shadowing the value passed from the view, breaking the Twill tests
+  (and the reference manual views) under Python 2.6.x (LP #534599).
 
 3.32 (2010-05-20)
 -----------------
@@ -25,8 +27,8 @@ Unreleased
   Also allow adding pages and files at the root of reference manuals, making
   them behave like reference sections.
 
-- LP #579511 The rtf converter now cleans up pict_dir directories left behind
-  by rtf2xml.
+- The rtf converter now cleans up pict_dir directories left behind
+  by rtf2xml (LP #579511).
 
 3.30 (2010-05-06)
 -----------------
