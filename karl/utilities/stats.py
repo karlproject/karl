@@ -2,13 +2,18 @@ import datetime
 
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
+from karl.models.interfaces import ICatalogSearch
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IWikiPage
 from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunity
 
+from karl.utils import coarse_datetime_repr
+from karl.utils import find_catalog
 from karl.utils import find_communities
+from karl.utils import find_profiles
 from karl.utils import find_tags
+from karl.utils import find_users
 
 from repoze.lemonade.content import get_content_type
 from repoze.lemonade.content import is_content
@@ -79,9 +84,9 @@ def collect_community_stats(context):
                 else:
                     active_users[creator] += 1
 
-            if hasattr(node, '__getitem__') and hasattr(node, 'keys'):
-                for key in node.keys():
-                    count(node[key])
+            if hasattr(node, '__getitem__') and hasattr(node, 'values'):
+                for child in node.values():
+                    count(child)
 
         count(community)
 
@@ -98,5 +103,75 @@ def collect_community_stats(context):
 
         engaged_users = len([v for v in active_users.values() if v >= 2])
         stats['percent_engaged'] = 100.0 * engaged_users / stats['members']
+
+        yield stats
+
+def collect_profile_stats(context):
+    """
+    Returns an iterator where for each user profile a dict is returned with the
+    following keys::
+
+        + first_name
+        + last_name
+        + userid
+        + date_created
+        + is_staff
+        + num_communities
+        + num_communities_moderator
+        + location
+        + department
+        + roles
+        + num_documents
+        + num_tags
+        + documents_this_month
+    """
+    communities = find_communities(context)
+    search = ICatalogSearch(context)
+    profiles = find_profiles(context)
+    users = find_users(context)
+
+    # Collect community membership
+    membership = {}
+    moderatorship = {}
+    for community in communities.values():
+        for name in community.member_names:
+            if name not in membership:
+                membership[name] = 1
+            else:
+                membership[name] += 1
+        for name in community.moderator_names:
+            if name not in moderatorship:
+                moderatorship[name] = 1
+            else:
+                moderatorship[name] += 1
+
+    for profile in profiles.values():
+        info = users.get_by_id(profile.__name__)
+        groups = info['groups']
+        name = profile.__name__
+        stats = dict(
+            first_name=profile.first_name,
+            last_name=profile.last_name,
+            userid=profile.name,
+            date_created=profile.created,
+            location=profile.location,
+            department=profile.department,
+            is_staff='group.KarlStaff' in groups,
+            roles=','.join(groups),
+            num_communities=membership.get(name, 0),
+            num_communities_moderator=moderatorship.get(name, 0),
+        )
+
+        count, docids, resolver = search(creator=name)
+        stats['num_documents'] = count
+
+        begin = coarse_datetime_repr(datetime.datetime.now() - THIRTY_DAYS)
+        count, docids, resolver = search(
+            creator=name, creation_date=(begin, None),
+        )
+        stats['documents_this_month'] = count
+
+        tags = find_tags(context)
+        stats['num_tags'] = len(tags.getTags(users=(name,)))
 
         yield stats

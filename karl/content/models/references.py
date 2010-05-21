@@ -115,8 +115,7 @@ class Ordering(Persistent):
             return self._items[position + 1]
 
 
-class ReferenceSection(Folder):
-    implements(IReferenceSection)
+class _ReferenceSectionBase(Folder):
     modified_by = None
 
     def __init__(self, title, description, creator):
@@ -127,6 +126,8 @@ class ReferenceSection(Folder):
         self.modified_by = self.creator
         self.ordering = Ordering()
 
+class ReferenceSection(_ReferenceSectionBase):
+    implements(IReferenceSection)
 
-class ReferenceManual(ReferenceSection):
+class ReferenceManual(_ReferenceSectionBase):
     implements(IReferenceManual)
