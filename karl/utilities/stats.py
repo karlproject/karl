@@ -152,7 +152,7 @@ def collect_profile_stats(context):
         stats = dict(
             first_name=profile.first_name,
             last_name=profile.last_name,
-            userid=profile.name,
+            userid=name,
             date_created=profile.created,
             location=profile.location,
             department=profile.department,

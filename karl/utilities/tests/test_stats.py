@@ -127,11 +127,175 @@ class TestCommunityStats(unittest.TestCase):
         self.assertEqual(row['community_tags'], 1)
         self.assertAlmostEqual(row['percent_engaged'], 66.666666666)
 
+class TestProfileStats(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        self.registerCatalogSearch()
+
+    def tearDown(self):
+        cleanUp()
+
+    def registerCatalogSearch(self):
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.bfg.testing import registerAdapter
+        from zope.interface import Interface
+        registerAdapter(DummySearchAdapter, (Interface, Interface),
+                        ICatalogSearch)
+        registerAdapter(DummySearchAdapter, (Interface,),
+                        ICatalogSearch)
+
+    def _call_fut(self, context):
+        from karl.utilities.stats import collect_profile_stats as fut
+        return fut(context)
+
+    def _mk_context(self):
+        import datetime
+        from karl.testing import DummyCommunity
+        from karl.testing import DummyModel
+        from karl.testing import DummyProfile
+        from karl.testing import DummyRoot
+        from karl.testing import registerCatalogSearch
+
+        site = DummyRoot()
+        site.users = DummyUsers()
+        site.tags = DummyTags()
+        profiles = site['profiles'] = DummyModel()
+
+        chet = profiles['chet'] = DummyProfile(
+            first_name='Chet',
+            last_name='Baker',
+            created=datetime.datetime(2010, 5, 12, 2, 43),
+            location='bathroom',
+            department='Crooning',
+        )
+
+        chuck = profiles['chuck'] = DummyProfile(
+            first_name='Chuck',
+            last_name='Mangione',
+            created=datetime.datetime(2010, 5, 12, 2, 42),
+            location='kitchen',
+            department='Blowing',
+        )
+
+        communities = site['communities'] = DummyModel()
+        dandies = communities['dandies'] = DummyModel()
+        dandies.member_names = ['chet', 'chuck']
+        dandies.moderator_names = ['chuck']
+
+        loners = communities['loners'] = DummyModel()
+        loners.member_names = ['chet']
+        loners.moderator_names = ['chet']
+
+        lads = communities['lads'] = DummyModel()
+        lads.member_names = ['chet', 'chip', 'charlie']
+        lads.moderator_names = ['chet', 'chip']
+
+        return site
+
+    def test_it(self):
+        import datetime
+        context = self._mk_context()
+        report = list(self._call_fut(context))
+        report.sort(key=lambda x: x['userid'])
+        self.assertEqual(len(report), 2)
+
+        """
+        + first_name
+        + last_name
+        + userid
+        + date_created
+        + is_staff
+        + num_communities
+        + num_communities_moderator
+        + location
+        + department
+        + roles
+        + num_documents
+        + num_tags
+        + documents_this_month
+        """
+        row = report.pop(0)
+        self.assertEqual(row['first_name'], 'Chet')
+        self.assertEqual(row['last_name'], 'Baker')
+        self.assertEqual(row['userid'], 'chet')
+        self.assertEqual(row['date_created'], datetime.datetime(
+            2010, 5, 12, 2, 43
+        ))
+        self.assertEqual(row['is_staff'], False)
+        self.assertEqual(row['num_communities'], 3)
+        self.assertEqual(row['num_communities_moderator'], 2)
+        self.assertEqual(row['location'], 'bathroom')
+        self.assertEqual(row['department'], 'Crooning')
+        self.assertEqual(row['roles'], 'group.Smoove')
+        self.assertEqual(row['num_documents'], 4)
+        self.assertEqual(row['num_tags'], 2)
+        self.assertEqual(row['documents_this_month'], 2)
+
+        row = report.pop(0)
+        self.assertEqual(row['first_name'], 'Chuck')
+        self.assertEqual(row['last_name'], 'Mangione')
+        self.assertEqual(row['userid'], 'chuck')
+        self.assertEqual(row['date_created'], datetime.datetime(
+            2010, 5, 12, 2, 42
+        ))
+        self.assertEqual(row['is_staff'], True)
+        self.assertEqual(row['num_communities'], 1)
+        self.assertEqual(row['num_communities_moderator'], 1)
+        self.assertEqual(row['location'], 'kitchen')
+        self.assertEqual(row['department'], 'Blowing')
+        self.assertEqual(row['roles'], 'group.KarlStaff,group.BrassPlayers')
+        self.assertEqual(row['num_documents'], 56)
+        self.assertEqual(row['num_tags'], 1)
+        self.assertEqual(row['documents_this_month'], 5)
+
 class DummyTags(object):
-    tags = {
+    communities = {
         'big_endians': ['cute', 'clever'],
         'little_endians': ['crooners'],
     }
 
-    def getTags(self, community=None):
-        return self.tags.get(community, [])
+    users = {
+        'chuck': ['bigtime',],
+        'chet': ['ladies', 'man'],
+    }
+
+    def getTags(self, users=None, community=None):
+        if community is not None:
+            return self.communities.get(community, [])
+        elif users is not None:
+            assert len(users) == 1
+            return self.users.get(users[0], [])
+
+class DummySearchAdapter(object):
+    creators = {
+        'chet': (4, 2),
+        'chuck': (56, 5),
+    }
+
+    def __init__(self, context):
+        pass
+
+    def __call__(self, **kw):
+        count = 0
+        if 'creator' in kw:
+            creator = kw['creator']
+            if 'creation_date' in kw:
+                count = self.creators[creator][1]
+            else:
+                count = self.creators[creator][0]
+
+        return count, None, None
+
+class DummyUsers(object):
+    users = {
+        'chuck': {
+            'groups': ['group.KarlStaff', 'group.BrassPlayers'],
+        },
+        'chet': {
+            'groups': ['group.Smoove'],
+        },
+    }
+
+    def get_by_id(self, id):
+        return self.users.get(id)
