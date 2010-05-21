@@ -179,32 +179,35 @@ def main2(argv=sys.argv[1:]):
     logging.getLogger('karl.mailin').setLevel(log_level)
 
     def run():
-        root, closer = get_root(app)
-        set_subsystem('mailin')
+        try:
+            root, closer = get_root(app)
+            set_subsystem('mailin')
 
-        zodb_uri = get_setting(root, 'postoffice.zodb_uri')
-        zodb_path = get_setting(root, 'postoffice.zodb_path', '/postoffice')
-        queue = get_setting(root, 'postoffice.queue')
+            zodb_uri = get_setting(root, 'postoffice.zodb_uri')
+            zodb_path = get_setting(root, 'postoffice.zodb_path', '/postoffice')
+            queue = get_setting(root, 'postoffice.queue')
 
-        if zodb_uri is None:
-            parser.error("postoffice.zodb_uri must be set in config file")
+            if zodb_uri is None:
+                parser.error("postoffice.zodb_uri must be set in config file")
 
-        if queue is None:
-            parser.error("postoffice.queue must be set in config file")
+            if queue is None:
+                parser.error("postoffice.queue must be set in config file")
 
-        runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
-        runner()
+            runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
+            runner()
 
-        if options.dry_run:
-            transaction.abort()
-        else:
-            transaction.commit()
+            if options.dry_run:
+                transaction.abort()
+            else:
+                transaction.commit()
 
-        p_jar = getattr(root, '_p_jar', None)
-        if p_jar is not None:
-            # Attempt to fix memory leak
-            p_jar.db().cacheMinimize()
-        closer()
+            p_jar = getattr(root, '_p_jar', None)
+            if p_jar is not None:
+                # Attempt to fix memory leak
+                p_jar.db().cacheMinimize()
+        finally:
+            closer()
+            runner.close()
 
     if options.daemon:
         run_daemon('mailin', run, options.interval)

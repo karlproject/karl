@@ -225,6 +225,7 @@ class MailinRunner2Tests(unittest.TestCase):
         registerModels({'/communities/testing/random/entry': entry})
 
         mailin()
+        mailin.close()
 
         self.assertEqual(len(self.handlers), 1)
         handler = self.handlers[0]
@@ -357,7 +358,7 @@ def dummy_queue_factory_factory(queue):
         assert uri == 'zodb://test', uri
         assert name == 'queue', name
         assert path == '/postoffice', path
-        return queue
+        return queue, lambda: None
     return factory
 
 class DummyQueue(list):

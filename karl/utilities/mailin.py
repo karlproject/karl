@@ -206,9 +206,9 @@ class MailinRunner2(object):
     """
 
     def __init__(self, root, zodb_uri, zodb_path, queue_name,
-                 queue_factory=open_queue):
+                 factory=open_queue):
         self.root = root
-        self.queue = queue_factory(zodb_uri, queue_name, zodb_path)
+        self.queue, self.closer = factory(zodb_uri, queue_name, zodb_path)
         dispatcher = IMailinDispatcher(self.root)
         dispatcher.default_tool = 'blog'
         dispatcher.text_scrubber = 'karl.utilities.mailin.text_scrubber'
@@ -280,3 +280,6 @@ class MailinRunner2(object):
         error = traceback.format_exc()
         self.queue.quarantine(message, error, mailer.send, from_email)
         return error
+
+    def close(self):
+        self.closer()
