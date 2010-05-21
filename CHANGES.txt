@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.32 (2010-05-20)
+-----------------
 
 - Fixed bug where lemonade could not determine content type of reference
   manuals.
