@@ -577,6 +577,51 @@ class Test_get_security_states(unittest.TestCase):
                 return states
         self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), states)
 
+class Test_available_workflow_states(unittest.TestCase):
+    def _callFUT(self, workflow, context=None, request=None):
+        from karl.security.workflow import available_workflow_states
+        return available_workflow_states(workflow, context, request)
+
+    def test_it_two_states(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        states = [{'transitions':[1], 'current':False},
+                  {'transitions':[2], 'current':False}]
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return states
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), states)
+
+    def test_it_no_transitions(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return [{'transitions':[], 'current':False}]
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+
+    def test_it_single_state_only(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return [{'current':True}]
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
+
+    def test_it_current_state_used_without_transitions(self):
+        class Dummy:
+            pass
+        ob = Dummy()
+        states = [{'current':True},
+                  {'current':False, 'transitions':['123']}]
+        class DummyWorkflow:
+            def state_info(self, context, request):
+                return states
+        self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), states)
+
 class Test_acl_diff(unittest.TestCase):
     def _callFUT(self, ob, acl):
         from karl.security.workflow import acl_diff

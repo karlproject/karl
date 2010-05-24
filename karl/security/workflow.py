@@ -98,6 +98,9 @@ def get_security_states(workflow, context, request):
         return []
     if has_custom_acl(context):
         return []
+    return available_workflow_states(workflow, context, request)
+
+def available_workflow_states(workflow, context, request):
     states = workflow.state_info(context, request)
     newstates = []
     for state in states:
