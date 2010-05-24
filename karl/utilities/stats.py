@@ -21,6 +21,23 @@ from repoze.workflow import get_workflow
 
 THIRTY_DAYS = datetime.timedelta(days=30)
 
+COMMUNITY_COLUMNS = [
+    'community',
+    'id',
+    'security_state',
+    'members',
+    'moderators',
+    'last_activity',
+    'create_date',
+    'wiki_pages',
+    'blog_entries',
+    'comments',
+    'files',
+    'calendar_events',
+    'community_tags',
+    'percent_engaged',
+]
+
 def collect_community_stats(context):
     """
     Returns an iterator of dicts where for each community in the site a dict
@@ -65,6 +82,7 @@ def collect_community_stats(context):
         active_users = {}
 
         def count(node):
+            from repoze.bfg.traversal import model_path
             if IWikiPage.providedBy(node):
                 stats['wiki_pages'] += 1
             elif IBlogEntry.providedBy(node):
@@ -78,15 +96,19 @@ def collect_community_stats(context):
 
             created = getattr(node, 'created', None)
             if created is not None and now - created < THIRTY_DAYS:
-                creator = node.creator
-                if creator not in active_users:
-                    active_users[creator] = 1
-                else:
-                    active_users[creator] += 1
+                creator = getattr(node, 'creator', None)
+                if creator is not None:
+                    if creator not in active_users:
+                        active_users[creator] = 1
+                    else:
+                        active_users[creator] += 1
 
             if hasattr(node, '__getitem__') and hasattr(node, 'values'):
                 for child in node.values():
                     count(child)
+
+            if hasattr(node, '_p_deactivate'):
+                node._p_deactivate()
 
         count(community)
 
@@ -101,10 +123,29 @@ def collect_community_stats(context):
             workflow = get_workflow(ICommunity, 'security', community)
             stats['security_state'] = workflow.state_of(community)
 
-        engaged_users = len([v for v in active_users.values() if v >= 2])
-        stats['percent_engaged'] = 100.0 * engaged_users / stats['members']
+        if stats['members'] != 0:
+            engaged_users = len([v for v in active_users.values() if v >= 2])
+            stats['percent_engaged'] = 100.0 * engaged_users / stats['members']
+        else:
+            stats['percent_engaged'] = 0
 
         yield stats
+
+PROFILE_COLUMNS = [
+    'first_name',
+    'last_name',
+    'userid',
+    'date_created',
+    'is_staff',
+    'num_communities',
+    'num_communities_moderator',
+    'location',
+    'department',
+    'roles',
+    'num_documents',
+    'num_tags',
+    'documents_this_month',
+]
 
 def collect_profile_stats(context):
     """
@@ -147,11 +188,14 @@ def collect_profile_stats(context):
 
     for profile in profiles.values():
         info = users.get_by_id(profile.__name__)
-        groups = info['groups']
+        if info is not None:
+            groups = info['groups']
+        else:
+            groups = []
         name = profile.__name__
         stats = dict(
-            first_name=profile.first_name,
-            last_name=profile.last_name,
+            first_name=profile.firstname,
+            last_name=profile.lastname,
             userid=name,
             date_created=profile.created,
             location=profile.location,

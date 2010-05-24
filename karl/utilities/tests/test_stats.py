@@ -38,6 +38,7 @@ class TestCommunityStats(unittest.TestCase):
         big_endians.created = datetime.datetime(2010, 5, 12, 2, 42)
         big_endians.creator = 'daniela'
         big_endians.content_modified = datetime.datetime(2010, 6, 12, 2, 42)
+        big_endians.__custom_acl__ = True
 
         content = big_endians['wiki1'] = DummyModel()
         content.created = datetime.datetime.now()
@@ -58,6 +59,8 @@ class TestCommunityStats(unittest.TestCase):
         little_endians.content_modified = datetime.datetime(
             2010, 6, 12, 3, 42
         )
+        little_endians._p_deactivate = lambda: None
+        little_endians.state = 'public'
 
         content = little_endians['blog1'] = DummyModel()
         content.created = datetime.datetime.now()
@@ -100,6 +103,7 @@ class TestCommunityStats(unittest.TestCase):
         self.assertEqual(row['create_date'], datetime.datetime(
             2010, 5, 12, 2, 42
         ))
+        self.assertEqual(row['security_state'], 'custom')
         self.assertEqual(row['wiki_pages'], 2)
         self.assertEqual(row['blog_entries'], 0)
         self.assertEqual(row['comments'], 0)
@@ -119,6 +123,7 @@ class TestCommunityStats(unittest.TestCase):
         self.assertEqual(row['create_date'], datetime.datetime(
             2010, 5, 13, 6, 23
         ))
+        self.assertEqual(row['security_state'], 'public')
         self.assertEqual(row['wiki_pages'], 0)
         self.assertEqual(row['blog_entries'], 1)
         self.assertEqual(row['comments'], 1)
@@ -163,19 +168,27 @@ class TestProfileStats(unittest.TestCase):
         profiles = site['profiles'] = DummyModel()
 
         chet = profiles['chet'] = DummyProfile(
-            first_name='Chet',
-            last_name='Baker',
+            firstname='Chet',
+            lastname='Baker',
             created=datetime.datetime(2010, 5, 12, 2, 43),
             location='bathroom',
             department='Crooning',
         )
 
         chuck = profiles['chuck'] = DummyProfile(
-            first_name='Chuck',
-            last_name='Mangione',
+            firstname='Chuck',
+            lastname='Mangione',
             created=datetime.datetime(2010, 5, 12, 2, 42),
             location='kitchen',
             department='Blowing',
+        )
+
+        chuck = profiles['admin'] = DummyProfile(
+            firstname='System',
+            lastname='User',
+            created=datetime.datetime(2010, 5, 12, 2, 42),
+            location='The Machine',
+            department='Big Brother',
         )
 
         communities = site['communities'] = DummyModel()
@@ -198,23 +211,25 @@ class TestProfileStats(unittest.TestCase):
         context = self._mk_context()
         report = list(self._call_fut(context))
         report.sort(key=lambda x: x['userid'])
-        self.assertEqual(len(report), 2)
+        self.assertEqual(len(report), 3)
 
-        """
-        + first_name
-        + last_name
-        + userid
-        + date_created
-        + is_staff
-        + num_communities
-        + num_communities_moderator
-        + location
-        + department
-        + roles
-        + num_documents
-        + num_tags
-        + documents_this_month
-        """
+        row = report.pop(0)
+        self.assertEqual(row['first_name'], 'System')
+        self.assertEqual(row['last_name'], 'User')
+        self.assertEqual(row['userid'], 'admin')
+        self.assertEqual(row['date_created'], datetime.datetime(
+            2010, 5, 12, 2, 42
+        ))
+        self.assertEqual(row['is_staff'], False)
+        self.assertEqual(row['num_communities'], 0)
+        self.assertEqual(row['num_communities_moderator'], 0)
+        self.assertEqual(row['location'], 'The Machine')
+        self.assertEqual(row['department'], 'Big Brother')
+        self.assertEqual(row['roles'], '')
+        self.assertEqual(row['num_documents'], 0)
+        self.assertEqual(row['num_tags'], 0)
+        self.assertEqual(row['documents_this_month'], 0)
+
         row = report.pop(0)
         self.assertEqual(row['first_name'], 'Chet')
         self.assertEqual(row['last_name'], 'Baker')
@@ -271,6 +286,7 @@ class DummySearchAdapter(object):
     creators = {
         'chet': (4, 2),
         'chuck': (56, 5),
+        'admin': (0, 0),
     }
 
     def __init__(self, context):
