@@ -556,7 +556,7 @@ class TestSyslogView(unittest.TestCase):
         entries = batch_info['entries']
         self.assertEqual(len(entries), 0)
         self.assertEqual(result['instance'], '_any')
-        
+
 
     def test_no_filter(self):
         request = testing.DummyRequest()
@@ -655,6 +655,81 @@ class TestLogsView(unittest.TestCase):
         result = self.fut(None, request)
         self.assertEqual(result['log'], None)
         self.assertEqual(len(result['lines']), 0)
+
+class TestStatisticsView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        import os
+        import sys
+        here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
+
+        from repoze.bfg.interfaces import ISettings
+        self.stats_folder = here
+
+        settings = karltesting.DummySettings(
+            statistics_folder=here
+        )
+        testing.registerUtility(settings, ISettings)
+
+        from karl.views.admin import statistics_view
+        self.fut = statistics_view
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_it(self):
+        request = testing.DummyRequest()
+        self.assertEqual(self.fut(None, request)['csv_files'],
+                         ['test_users1.csv'])
+
+class TestStatisticsCSVView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        import os
+        import sys
+        here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
+
+        from repoze.bfg.interfaces import ISettings
+        self.stats_folder = here
+
+        settings = karltesting.DummySettings(
+            statistics_folder=here
+        )
+        testing.registerUtility(settings, ISettings)
+
+        from karl.views.admin import statistics_csv_view
+        self.fut = statistics_csv_view
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_download_csv(self):
+        import os
+        import webob
+        expected = open(os.path.join(self.stats_folder,
+                                     'test_users1.csv')).read()
+        request = webob.Request.blank('/')
+        request.context = None
+        request.matchdict = {'csv_file': 'test_users1.csv'}
+        self.assertEqual(self.fut(request).body, expected)
+
+    def test_not_csv(self):
+        from repoze.bfg.exceptions import NotFound
+        import webob
+        request = webob.Request.blank('/')
+        request.context = None
+        request.matchdict = {'csv_file': 'test_admin.py'}
+        self.assertRaises(NotFound, self.fut, request)
+
+    def test_file_not_found(self):
+        from repoze.bfg.exceptions import NotFound
+        import webob
+        request = webob.Request.blank('/')
+        request.context = None
+        request.matchdict = {'csv_file': 'foo.csv'}
+        self.assertRaises(NotFound, self.fut, request)
 
 class TestUploadUsersView(unittest.TestCase):
     def setUp(self):

@@ -7,6 +7,7 @@ from karl.mail import Message
 import os
 import re
 import transaction
+from paste.fileapp import FileApp
 from webob import Response
 from webob.exc import HTTPFound
 
@@ -432,6 +433,28 @@ def logs_view(context, request):
         log=log,
         lines=lines,
     )
+
+def statistics_view(context, request):
+    statistics_folder = get_setting(context, 'statistics_folder')
+    csv_files = [fn for fn in os.listdir(statistics_folder)
+                 if fn.endswith('.csv')]
+    return dict(
+        api=AdminTemplateAPI(context, request),
+        menu=_menu_macro(),
+        csv_files=csv_files
+    )
+
+def statistics_csv_view(request):
+    statistics_folder = get_setting(request.context, 'statistics_folder')
+    csv_file = request.matchdict.get('csv_file')
+    if not csv_file.endswith('.csv'):
+        raise NotFound()
+
+    path = os.path.join(statistics_folder, csv_file)
+    if not os.path.exists(path):
+        raise NotFound()
+
+    return request.get_response(FileApp(path).get)
 
 class UploadUsersView(object):
     required_fields = [

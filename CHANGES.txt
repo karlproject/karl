@@ -8,6 +8,8 @@ Unreleased
   was shadowing the value passed from the view, breaking the Twill tests
   (and the reference manual views) under Python 2.6.x (LP #534599).
 
+- Add community and profile statistics to admin UI.
+
 3.32 (2010-05-20)
 -----------------
 

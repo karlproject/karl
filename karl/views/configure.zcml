@@ -804,6 +804,21 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.statistics_view"
+    renderer="templates/admin/statistics.pt"
+    permission="administer"
+    name="statistics.html"
+    />
+
+  <route
+    name="statistics.csv"
+    path="/statistics/:csv_file"
+    view="karl.views.admin.statistics_csv_view"
+    permission="administer"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.UploadUsersView"
     renderer="templates/admin/upload_users_csv.pt"
     permission="administer"

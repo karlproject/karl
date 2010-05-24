@@ -55,17 +55,19 @@ def main(argv=sys.argv):
     folder = os.path.abspath(options.output)
 
     # Communities report
-##    path = os.path.join(folder, 'communities.csv')
-##    fd = open(path, 'wb')
-##    out_csv = csv.DictWriter(fd, stats.COMMUNITY_COLUMNS)
-##    for row in stats.collect_community_stats(root):
-##        out_csv.writerow(_unicode(row))
-##    fd.close()
+    path = os.path.join(folder, 'communities.csv')
+    fd = open(path, 'wb')
+    out_csv = csv.DictWriter(fd, stats.COMMUNITY_COLUMNS)
+    out_csv.writerow(dict([(name,name) for name in stats.COMMUNITY_COLUMNS]))
+    for row in stats.collect_community_stats(root):
+        out_csv.writerow(_unicode(row))
+    fd.close()
 
     # Profiles report
     path = os.path.join(folder, 'profiles.csv')
     fd = open(path, 'wb')
     out_csv = csv.DictWriter(fd, stats.PROFILE_COLUMNS)
+    out_csv.writerow(dict([(name,name) for name in stats.PROFILE_COLUMNS]))
     for row in stats.collect_profile_stats(root):
         out_csv.writerow(_unicode(row))
     fd.close()
