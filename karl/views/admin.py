@@ -49,6 +49,13 @@ class AdminTemplateAPI(TemplateAPI):
         self.error_monitoring = not not get_setting(
             context, 'error_monitor_subsystems', None
         )
+        statistics_folder = get_setting(context, 'statistics_folder', None)
+        if statistics_folder is not None:
+            csv_files = [fn for fn in os.listdir(statistics_folder)
+                         if fn.endswith('.csv')]
+            self.statistics_view_enabled = not not csv_files
+        else:
+            self.statistics_view_enabled = False
 
 def _menu_macro():
     return get_template('templates/admin/menu.pt').macros['menu']

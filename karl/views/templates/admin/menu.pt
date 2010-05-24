@@ -55,6 +55,9 @@
         <div class="right-portlet">
           <h3>Logs / Analytics</h3>
           <ul class="menu">
+            <li tal:condition="api.statistics_view_enabled">
+              <a href="${api.app_url}/statistics.html">Statistics</a>
+            </li>
             <li tal:condition="api.syslog_view_enabled">
               <a href="${api.app_url}/syslog.html">Syslog</a>
             </li>
