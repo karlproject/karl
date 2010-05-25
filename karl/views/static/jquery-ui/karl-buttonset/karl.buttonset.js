@@ -88,9 +88,7 @@ $.widget('karl.karlbuttonset', {
             }
             var button_class = clsButton;
             // handle disabled and selected state
-            // XXX XXX skip this as it does not look good with our skin.
-            // XXX XXX This breaks tests!
-            if (false && disabled) {
+            if (disabled) {
                 button_class += ' ui-state-disabled';
             } else {
                 if (selected) {

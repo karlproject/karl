@@ -204,3 +204,11 @@ input.tiny-imagedrawer-input-captiontext {
     width: 225px;
 }
 
+/* disabled buttons in the grey header area
+ * shall have different opacity
+ * (...actualy skin specific)
+ */
+.ui-widget-header .fg-buttonset .ui-state-disabled {
+    opacity: 0.50;
+}
+

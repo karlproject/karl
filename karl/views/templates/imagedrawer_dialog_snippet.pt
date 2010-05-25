@@ -19,6 +19,7 @@
             >This Community</option>
         <option value="allkarl"
             title="Display images from all KARL"
+            disabled="1"
             >All Karl</option>
         <option value="external"
             title="Display images from external websites"
