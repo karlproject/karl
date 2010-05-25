@@ -542,6 +542,8 @@
                 .find('.tiny-imagedrawer-panel-images')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             // source selection buttonset
+            var top_panel = this.dialog.find('.tiny-imagedrawer-panel-top');
+            var source_panel = top_panel.find('.tiny-imagedrawer-sources');
             this.buttonset = this.dialog
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-tabselect');
             this.buttonset
@@ -920,16 +922,23 @@
             // Wire up the help panel
             var help_panel = this.dialog.find('.tiny-imagedrawer-panel-help')
                 .hide();
+            var help_panel_state_shown = false;
             help_panel.find('.karl-buttonset')
                 .karlbuttonset({})
                 .bind('change.karlbuttonset', function(event, button_index, value) {
                     help_panel.hide('slow');
                     download_panel.show('slow');
+                    source_panel.show('slow');
+                    help_panel_state_shown = false;
                 });
             this.dialog.find('.tiny-imagedrawer-button-help')
                 .click(function(event) {
-                    help_panel.show('fold');
-                    download_panel.hide('fold');
+                    if (! help_panel_state_shown) {
+                        help_panel.show('fold');
+                        source_panel.hide();
+                        download_panel.hide();
+                        help_panel_state_shown = true;
+                    }
                     event.preventDefault();
                 });
 

@@ -5,7 +5,7 @@
       <span style="float: left;" class="tiny-imagedrawer-title">Insert Image</span>
       <a style="float: right;" class="tiny-imagedrawer-button-help" href="javascript://return false;">help</a>
     </div>
-    <div>
+    <div class="tiny-imagedrawer-sources">
       <span style="float: left; margin-right: 0.5em; margin-top: 1.05em; font-weight: normal;">Source</span>
       <select class="karl-buttonset compact tiny-imagedrawer-buttonset-tabselect">
         <option value="uploadnew" selected="selected"
@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <div style="height: 388px;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-help">
+  <div style="height: 445px;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-help">
 
     <p>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dui tellus,
