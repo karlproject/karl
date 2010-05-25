@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.33 (2010-05-24)
+-----------------
 
 - Work around chameleon bug where the new ``next`` builtin in Python 2.6.x
   was shadowing the value passed from the view, breaking the Twill tests
