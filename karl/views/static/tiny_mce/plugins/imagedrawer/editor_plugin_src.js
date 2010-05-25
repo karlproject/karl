@@ -941,7 +941,9 @@
                 .hide();
             var help_panel_state_shown = false;
             help_panel.find('.karl-buttonset')
-                .karlbuttonset({})
+                .karlbuttonset({
+                    clsContainer: 'tiny-imagedrawer-buttonset-cancelhelp'
+                })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
                     help_panel.hide('slow');
                     download_panel.show('slow');
