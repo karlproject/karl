@@ -212,3 +212,6 @@ input.tiny-imagedrawer-input-captiontext {
     opacity: 0.50;
 }
 
+.tiny-imagedrawer-input-titletext {
+    width: 325;
+}

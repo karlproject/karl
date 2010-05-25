@@ -1242,7 +1242,8 @@ tinyMCE.addI18n('en.wicked',{
             // Give the file input field a unique id
             this.fileinputid = 'tiny-imagedrawer-fileinputid-' + next_fileinputid;
             next_fileinputid += 1;
-            var fileinput = this.dialog.find('.tiny-imagedrawer-fileinput');
+            var fileinput = upload_panel.find('.tiny-imagedrawer-fileinput');
+            this.textinput = upload_panel.find('.tiny-imagedrawer-input-titletext');
             fileinput.attr('id', this.fileinputid);
             // Name is important as well!
             if (! fileinput.attr('name')) {
@@ -1251,6 +1252,20 @@ tinyMCE.addI18n('en.wicked',{
                 // in the post.)
                 fileinput.attr('name', 'file');
             }
+            this._fileinput_change = function() {
+                // If the file is selected, fill out the title.
+                var value = '' + this.value;
+                // XXX We want only the basename of the file. However
+                // on Windows we get the full path. To make sure
+                // we don't get the full path, we calculate the
+                // basename ourselves.
+                var index = Math.max(value.lastIndexOf('/'), value.lastIndexOf('\\'));
+                if (index != -1) {
+                    value = value.substring(index + 1);
+                }
+                self.textinput.val(value);
+            };
+            fileinput.change(this._fileinput_change);
 
             // Upload panel
             this.upload_panel_tab1 = upload_panel.find('.tiny-imagedrawer-upload1')
@@ -1282,7 +1297,8 @@ tinyMCE.addI18n('en.wicked',{
                             secureuri: false,
                             fileElementId: self.fileinputid,
                             extraParams: {
-                                // extra parameters could be passed here with the upload.
+                                // extra parameters passed with the upload
+                                title: self.textinput.val()
                             },
                             dataType: 'json',
                             success: function(json, status) {
@@ -1299,6 +1315,7 @@ tinyMCE.addI18n('en.wicked',{
                                 self._uploadError(json, eventContext);
                             }
                         });
+
                     //}
                 });
             upload_panel
@@ -1546,7 +1563,7 @@ tinyMCE.addI18n('en.wicked',{
             this.upload_preview_image.imagedrawerimage('record', 
                 {
                     loading: true,
-                    title: '' + document.getElementById(this.fileinputid).value,
+                    title: this.textinput.val(),
                     thumbnail_url: this.url + '/images/throbber.gif'
                 });
             // clear the status box

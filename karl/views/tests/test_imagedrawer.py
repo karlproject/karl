@@ -276,7 +276,31 @@ class Test_drawer_upload_view(unittest.TestCase):
         context = self._make_context()
         request = testing.DummyRequest(
             params={
-                'file': DummyUpload()
+                'file': DummyUpload(),
+                'title': 'Title',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['upload_image_info'], {'title': 'Foo'})
+        self.assert_('images_info' not in data)
+
+        image = context['test.jpg']
+        self.assertEqual(image.title, 'Title')
+        self.assert_(len(image.image().fp.read()) > 0)
+        self.assertEqual(image.mimetype, 'image/jpeg')
+        self.assertEqual(image.filename, 'test.jpg')
+        self.assertEqual(image.creator, 'chris')
+        self.assertEqual(self.workflow.initialized, [image,])
+
+    def test_upload_notitle_ok(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
             }
         )
         response = self._call_fut(context, request)
@@ -299,7 +323,8 @@ class Test_drawer_upload_view(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params={
-                'file': DummyUpload()
+                'file': DummyUpload(),
+                'title': 'Title',
             }
         )
         response = self._call_fut(context, request)
@@ -309,7 +334,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         self.assert_('images_info' not in data)
 
         image = context['TEMP'].values()[0]
-        self.assertEqual(image.title, 'test.jpg')
+        self.assertEqual(image.title, 'Title')
         self.assert_(len(image.image().fp.read()) > 0)
         self.assertEqual(image.mimetype, 'image/jpeg')
         self.assertEqual(image.filename, 'test.jpg')
@@ -324,6 +349,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         request = testing.DummyRequest(
             params={
                 'file': testing.DummyModel(),
+                'title': 'Title',
             }
         )
         response = self._call_fut(context, request)
@@ -341,6 +367,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         context = self._make_context()
         request = testing.DummyRequest(
             params={
+                'title': 'Title',
                 },
         )
         response = self._call_fut(context, request)
@@ -360,6 +387,7 @@ class Test_drawer_upload_view(unittest.TestCase):
                 'file': DummyUpload(
                     filename = '', 
                 ),
+                'title': 'Title',
             },
         )
         response = self._call_fut(context, request)
@@ -378,6 +406,7 @@ class Test_drawer_upload_view(unittest.TestCase):
                 'file': DummyUpload(
                     type = 'not/animage',
                 ),
+                'title': 'Title',
             },
         )
         response = self._call_fut(context, request)
@@ -397,6 +426,7 @@ class Test_drawer_upload_view(unittest.TestCase):
                 'file': DummyUpload(
                     IMAGE_DATA = 'NOT_AN_IMAGE',
                 ),
+                'title': 'Title',
             },
         )
         response = self._call_fut(context, request)
@@ -415,6 +445,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         request = testing.DummyRequest(
             params={
                 'file': DummyUpload(),
+                'title': 'Title',
             }
         )
         response = self._call_fut(context, request)
@@ -432,6 +463,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         request = testing.DummyRequest(
             params={
                 'file': DummyUpload(),
+                'title': 'Title',
             }
         )
         response = self._call_fut(context, request)

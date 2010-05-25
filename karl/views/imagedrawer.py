@@ -309,7 +309,8 @@ def drawer_upload_view(context, request,
     filename = basename_of_filepath(fieldstorage.filename)
 
     stream = fieldstorage.file
-    title = filename          # just the basename
+    # use parameter, as the title (or basename, if missing).
+    title = request.params.get('title', filename)
     image = create_content(ICommunityFile,
                           title=title,
                           stream=stream,

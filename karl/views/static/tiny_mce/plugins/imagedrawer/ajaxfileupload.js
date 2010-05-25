@@ -49,7 +49,7 @@ jQuery.extend({
 		var fileId = 'jUploadFile' + id;
 		var form = $('<form  action="" method="POST" name="' + formId + '" id="' + formId + '" enctype="multipart/form-data"></form>');	
 		var oldElement = $('#' + fileElementId);
-		var newElement = $(oldElement).clone();
+		var newElement = $(oldElement).clone(true);
                 // XXX Setting the name attribute explicitely seems
                 // to be crucial on IE. The result of this bug is that
                 // the first upload succeeds but any further ones

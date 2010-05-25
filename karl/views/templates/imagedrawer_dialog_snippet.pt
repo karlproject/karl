@@ -93,6 +93,11 @@
         </p>
         <input type="file" class="tiny-imagedrawer-fileinput" />
         <br />
+        <br />
+        <span class="tiny-imagedrawer-titletext-label">Title</span>
+        <input type="text" name="tiny-imagedrawer-input-titletext"
+          class="tiny-imagedrawer-input-titletext" value="" />
+        <br />
         <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
           <button class="ui-icon-transferthick-e-w">Upload</button>
         </div>
