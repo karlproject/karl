@@ -1410,7 +1410,9 @@ tinyMCE.addI18n('en.wicked',{
             this.region_id = 0;
             // Wire the scrollbar in the download panel
             this.scrollbar = this.images_panel.find('.tiny-imagedrawer-scrollbar')
-                .slider({
+                .karlslider({
+                    enableClickJump: true,
+                    enableKeyJump: true,
                     slide: function(e, ui) {
                         self._moveStripe(ui.value / 100);
                     }
@@ -1480,7 +1482,7 @@ tinyMCE.addI18n('en.wicked',{
             // or that the code is patched with 1.7.
             // The bug in question would prevent the slider to ever go
             // back to value 0.
-            if ($.ui.version < '1.8' && ! this.scrollbar.data('slider')._uiHash_patched) {
+            if ($.ui.version < '1.8' && ! this.scrollbar.data('karlslider')._uiHash_patched) {
                 throw new Error('jquery-ui version >= 1.8, or patched 1.7 version required.');
             }
             
@@ -1508,7 +1510,12 @@ tinyMCE.addI18n('en.wicked',{
             this._resetStripe();
             // Preload the region
             this._preloadRegion(this.region_start, this.region_end);
-            this._moveStripe(this.scrollbar.slider('value') / 100);
+            this._moveStripe(this.scrollbar.karlslider('value') / 100);
+            // Set the jump increment of the slider.
+            // One jump step should scroll ahead one full page.
+            var jumpStep = Math.floor(100 / (Math.ceil(this.region_total / this.stripes.length)
+                    ) * this.visible_columns); 
+            this.scrollbar.karlslider('option', 'jumpStep', jumpStep);
         },
 
         _dialogError: function(json) {
@@ -1697,7 +1704,7 @@ tinyMCE.addI18n('en.wicked',{
             // reset the selection
             this._setSelection(null);
             // reset the scrollbar
-            this.scrollbar.slider('value', 0);
+            this.scrollbar.karlslider('value', 0);
         },
 
         _moveStripe: function(percentage_float) {
