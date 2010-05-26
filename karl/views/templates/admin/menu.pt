@@ -46,7 +46,7 @@
               </a>
             </li>
             <li>
-              <a href="${api.app_url}/mailin/quarantine">
+              <a href="${api.quarantine_url}">
                 View mailin quarantine
               </a>
             </li>

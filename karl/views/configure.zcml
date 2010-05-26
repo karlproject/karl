@@ -849,6 +849,14 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.postoffice_quarantine_view"
+    renderer="templates/admin/po_quarantine.pt"
+    permission="administer"
+    name="po_quarantine.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.mailin_monitor_view"
     name="mailin"
     />

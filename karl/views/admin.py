@@ -20,6 +20,7 @@ from repoze.bfg.traversal import find_model
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
+from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
 from repoze.workflow import get_workflow
 
@@ -56,6 +57,15 @@ class AdminTemplateAPI(TemplateAPI):
             self.statistics_view_enabled = not not csv_files
         else:
             self.statistics_view_enabled = False
+
+        use_postoffice = not not get_setting(
+            context, 'postoffice.zodb_uri', False)
+        if use_postoffice:
+            self.quarantine_url = ('%s/po_quarantine.html' %
+                                   request.application_url)
+        else:
+            self.quarantine_url = ('%s/mailin/quarantine' %
+                                   request.application_url)
 
 def _menu_macro():
     return get_template('templates/admin/menu.pt').macros['menu']
@@ -705,3 +715,26 @@ def mailin_monitor_view(context, request):
     sub_request = webob.Request(sub_environ)
     return sub_request.get_response(_mailin_monitor_app)
 
+def postoffice_quarantine_view(request):
+    """
+    See messages in postoffice quarantine.
+    """
+    context = request.context
+    zodb_uri = get_setting(context, 'postoffice.zodb_uri')
+    queue_name = get_setting(context, 'postoffice.queue')
+    queue, closer = open_queue(zodb_uri, queue_name)
+    messages = []
+    for message, error in queue.get_quarantined_messages():
+        po_id = message['X-Postoffice-Id']
+        url = '%s/po_quarantine/%s' % (
+            request.application_url, po_id
+        )
+        messages.append(
+            dict(url=url, message_id=message['Message-Id'], error=error)
+        )
+
+    return dict(
+        api=AdminTemplateAPI(context, request),
+        menu=_menu_macro(),
+        messages=messages
+    )
