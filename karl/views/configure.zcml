@@ -855,6 +855,12 @@
     name="po_quarantine.html"
     />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.postoffice_quarantine_status_view"
+    name="po_quarantine_status.txt"
+    />
+
   <route
     name="quarantined_message"
     path="/po_quarantine/:id"

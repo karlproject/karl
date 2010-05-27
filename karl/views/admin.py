@@ -742,12 +742,21 @@ def postoffice_quarantine_view(request):
         messages=messages
     )
 
+def postoffice_quarantine_status_view(request):
+    """
+    Report status of quarantine.  If no messages are in quarantine, status is
+    'OK', otherwise status is 'ERROR'.
+    """
+    queue, closer = _get_postoffice_queue(request.context)
+    if queue.count_quarantined_messages() == 0:
+        return Response('OK')
+    return Response('ERROR')
+
 def postoffice_quarantined_message_view(request):
     """
     View a message in the postoffice quarantine.
     """
-    context = request.context
-    queue, closer = _get_postoffice_queue(context)
+    queue, closer = _get_postoffice_queue(request.context)
     id = request.matchdict.get('id')
     try:
         msg = queue.get_quarantined_message(id)

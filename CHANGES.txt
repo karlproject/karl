@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Duplicated views from old mailin monitor as new views which use postoffice.
+  Admin UI will point to new views if repoze.postoffice is being used,
+  otherwise it will still use the old views.
 
 3.33 (2010-05-24)
 -----------------

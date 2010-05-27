@@ -1107,6 +1107,37 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         self.assertEqual(message['message_id'], 'Message 2')
         self.assertEqual(message['error'], 'Error 2')
 
+class TestPostOfficeQuarantineStatusView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        from karl.views import admin
+        self.queue = DummyPostofficeQueue()
+        admin.open_queue = self.queue
+
+        from repoze.bfg.interfaces import ISettings
+        testing.registerUtility(
+            karltesting.DummySettings(**{
+                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'postoffice.queue': 'queue'}), ISettings
+        )
+
+    def tearDown(self):
+        cleanUp()
+
+    def _call_fut(self, id='0'):
+        from karl.views.admin import postoffice_quarantine_status_view as fut
+        request = testing.DummyRequest()
+        request.context = None
+        return fut(request)
+
+    def test_error(self):
+        self.assertEqual(self._call_fut().body, 'ERROR')
+
+    def test_ok(self):
+        self.queue._msgs = []
+        self.assertEqual(self._call_fut().body, 'OK')
+
 class TestPostofficeQuarantinedMessageView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -1142,21 +1173,29 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
         self.assertRaises(NotFound, self._call_fut, 1)
 
 class DummyPostofficeQueue(object):
+    _msgs = [
+        ({'Message-Id': "Message 1",
+          'X-Postoffice-Id': '0'}, "Error 1"),
+        ({'Message-Id': "Message 2",
+          'X-Postoffice-Id': '1'}, "Error 2"),
+    ]
+
     def __call__(self, uri, queue_name):
         self.uri = uri
         self.queue_name = queue_name
         return self, None
 
     def get_quarantined_messages(self):
-        yield {'Message-Id': "Message 1",
-               'X-Postoffice-Id': '0'}, "Error 1"
-        yield {'Message-Id': "Message 2",
-               'X-Postoffice-Id': '1'}, "Error 2"
+        for msg in self._msgs:
+            yield msg
 
     def get_quarantined_message(self, id):
         if id == '0':
             return DummyMessage('An urgent message for Obi Wan.')
         raise KeyError(id)
+
+    def count_quarantined_messages(self):
+        return len(self._msgs)
 
 class DummyMessage(object):
     def __init__(self, body):
