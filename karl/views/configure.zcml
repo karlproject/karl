@@ -855,6 +855,13 @@
     name="po_quarantine.html"
     />
 
+  <route
+    name="quarantined_message"
+    path="/po_quarantine/:id"
+    view="karl.views.admin.postoffice_quarantined_message_view"
+    permission="administer"
+    />
+
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.mailin_monitor_view"

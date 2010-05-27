@@ -715,14 +715,17 @@ def mailin_monitor_view(context, request):
     sub_request = webob.Request(sub_environ)
     return sub_request.get_response(_mailin_monitor_app)
 
+def _get_postoffice_queue(context):
+    zodb_uri = get_setting(context, 'postoffice.zodb_uri')
+    queue_name = get_setting(context, 'postoffice.queue')
+    return open_queue(zodb_uri, queue_name)
+
 def postoffice_quarantine_view(request):
     """
     See messages in postoffice quarantine.
     """
     context = request.context
-    zodb_uri = get_setting(context, 'postoffice.zodb_uri')
-    queue_name = get_setting(context, 'postoffice.queue')
-    queue, closer = open_queue(zodb_uri, queue_name)
+    queue, closer = _get_postoffice_queue(context)
     messages = []
     for message, error in queue.get_quarantined_messages():
         po_id = message['X-Postoffice-Id']
@@ -738,3 +741,16 @@ def postoffice_quarantine_view(request):
         menu=_menu_macro(),
         messages=messages
     )
+
+def postoffice_quarantined_message_view(request):
+    """
+    View a message in the postoffice quarantine.
+    """
+    context = request.context
+    queue, closer = _get_postoffice_queue(context)
+    id = request.matchdict.get('id')
+    try:
+        msg = queue.get_quarantined_message(id)
+    except KeyError:
+        raise NotFound
+    return Response(body=msg.as_string(), content_type='text/plain')

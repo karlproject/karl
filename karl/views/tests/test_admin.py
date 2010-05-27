@@ -1107,6 +1107,40 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         self.assertEqual(message['message_id'], 'Message 2')
         self.assertEqual(message['error'], 'Error 2')
 
+class TestPostofficeQuarantinedMessageView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        from karl.views import admin
+        self.queue = DummyPostofficeQueue()
+        admin.open_queue = self.queue
+
+        from repoze.bfg.interfaces import ISettings
+        testing.registerUtility(
+            karltesting.DummySettings(**{
+                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'postoffice.queue': 'queue'}), ISettings
+        )
+
+    def tearDown(self):
+        cleanUp()
+
+    def _call_fut(self, id='0'):
+        from karl.views.admin import postoffice_quarantined_message_view as fut
+        request = testing.DummyRequest()
+        request.context = None
+        request.matchdict = {'id': id}
+        return fut(request)
+
+    def test_it(self):
+        self.assertEqual(
+            self._call_fut().body, 'An urgent message for Obi Wan.'
+        )
+
+    def test_notfound(self):
+        from repoze.bfg.exceptions import NotFound
+        self.assertRaises(NotFound, self._call_fut, 1)
+
 class DummyPostofficeQueue(object):
     def __call__(self, uri, queue_name):
         self.uri = uri
@@ -1118,6 +1152,18 @@ class DummyPostofficeQueue(object):
                'X-Postoffice-Id': '0'}, "Error 1"
         yield {'Message-Id': "Message 2",
                'X-Postoffice-Id': '1'}, "Error 2"
+
+    def get_quarantined_message(self, id):
+        if id == '0':
+            return DummyMessage('An urgent message for Obi Wan.')
+        raise KeyError(id)
+
+class DummyMessage(object):
+    def __init__(self, body):
+        self.body = body
+
+    def as_string(self):
+        return self.body
 
 class DummyCatalogSearch(object):
     def __init__(self):
