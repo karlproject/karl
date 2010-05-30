@@ -5,6 +5,8 @@
     <link href="${static_url}/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
     <link href="${static_url}/images/favicon.ico" rel="icon" type="image/vnd.microsoft.icon" />
     <link href="${static_url}/themedstyles.css" rel="stylesheet" type="text/css" />
+    <link href="${static_url}/custom.css" rel="stylesheet" type="text/css" />
+    
   </head>
   <body id="login-wrapper">
     <img src="${static_url}/images/login_gradient.gif" id="login-gradient" />

@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added custom.css link into wsgi_errormsg.pt (LP #587104).
+  
 - Duplicated views from old mailin monitor as new views which use postoffice.
   Admin UI will point to new views if repoze.postoffice is being used,
   otherwise it will still use the old views.
