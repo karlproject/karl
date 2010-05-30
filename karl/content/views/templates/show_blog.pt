@@ -49,7 +49,7 @@
 
     <div style="margin-top:20px;text-align:right">
       <a href="mailto:${api.community_info.name}@${system_email_domain}"><img src="${api.static_url}/images/email.gif" border="0" alt="Subscribe"
-          id="RSSIcon"/></a>
+          id="EmailIcon"/></a>
       <a href="${feed_url}"><img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
           id="RSSIcon"/></a>
     </div>
