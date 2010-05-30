@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- updated maintenance page (LP #587432)
+
 - Changed HTML ID for email icon in blog listing for customizations (LP #582500).
 
 - Added custom.css link into wsgi_errormsg.pt (LP #587104).
