@@ -23,7 +23,7 @@
             >All KARL</option>
         <option value="external"
             title="Display images from external websites"
-            >External</option>
+            >Web</option>
       </select>
     </div>
   </div>
