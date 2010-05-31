@@ -30,12 +30,6 @@ $.widget('karl.karlcaptionedimage', {
             .addClass(this.options.clsWrapper)
             // Set width of the wrapper, to allow easy centering. 
             .width(width);
-        // Copy the css from the original element to the wrapper
-        //$.each(this.element[0].style, function(i, key) {
-        //    self.wrapper.css(key, self.element.css(key));
-        //});
-
-            //
         // convert image alignment to wrapper
         var align = this.element.attr('align');
         if (align == 'left') {
@@ -48,15 +42,21 @@ $.widget('karl.karlcaptionedimage', {
             .text(captiontext)
             .addClass('karl-captionedimage-caption');
         // wrap the image
-        this.element.after(this.wrapper);
+        // centerer plays a role on IE
+        // XXX inlines don't work currently, though:
+        // they become centered.
+        this.centerer = $('<div></div>')
+            .css('text-align', 'center')
+            .append(this.wrapper);
+        this.element.after(this.centerer);
         this.element
             .hide()
-            .appendTo(this.wrapper);
+            .appendTo(this.centerer);
     },
 
     _destroy: function() {
         // unwrap the image
-        this.wrapper.replaceWith(this.element);
+        this.centerer.replaceWith(this.element);
         this.element.show();
     }
 

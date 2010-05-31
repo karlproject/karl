@@ -1361,13 +1361,14 @@
                 klass = (klass ? klass + ' ' : '') + 'tiny-imagedrawer-captioned';
             }
             // set the align
-            var style;
+            var style = '';
             if (align == 'left') {
                 align = 'left';
             } else if (align == 'right') {
                 align = 'right';
             } else if (align == 'center') {
-                style = 'display: block; margin-left: auto; margin-right: auto;';
+                style = 'display: block; margin-left: auto; margin-right: auto; text-align: center;';
+                align = null;
             }
 
             //
