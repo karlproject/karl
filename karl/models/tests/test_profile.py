@@ -60,26 +60,26 @@ class ProfileTests(unittest.TestCase):
         self.failUnless(IFolder.providedBy(o))
         self.failUnless(isinstance(o, Folder))
         self.failUnless(hasattr(o, "data"))
-        
+
     def test_alert_prefs(self):
         from karl.models.interfaces import IProfile
         inst = self._makeOne()
-        self.assertEqual(IProfile.ALERT_IMMEDIATELY, 
+        self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          inst.get_alerts_preference("foo"))
         inst.set_alerts_preference("foo", IProfile.ALERT_DIGEST)
-        self.assertEqual(IProfile.ALERT_DIGEST, 
+        self.assertEqual(IProfile.ALERT_DIGEST,
                          inst.get_alerts_preference("foo"))
         inst.set_alerts_preference("foo", IProfile.ALERT_NEVER)
-        self.assertEqual(IProfile.ALERT_NEVER, 
+        self.assertEqual(IProfile.ALERT_NEVER,
                          inst.get_alerts_preference("foo"))
-        
+
         self.assertRaises(ValueError, inst.set_alerts_preference, "foo", 13)
-        
+
     def test_verify_alert_prefs_persistent(self):
         from persistent.mapping import PersistentMapping
         inst = self._makeOne()
         self.failUnless(isinstance(inst._alert_prefs, PersistentMapping))
-        
+
     def test_pending_alerts(self):
         inst = self._makeOne()
         self.assertEqual(0, len(inst._pending_alerts))
@@ -92,7 +92,7 @@ class ProfileTests(unittest.TestCase):
         from persistent.list import PersistentList
         inst = self._makeOne()
         self.failUnless(isinstance(inst._pending_alerts, PersistentList))
-    
+
 class ProfilesFolderTests(unittest.TestCase):
     def _getTargetClass(self):
         from karl.models.profile import ProfilesFolder
@@ -126,7 +126,7 @@ class ProfilesFolderTests(unittest.TestCase):
         profile = pf['extant'] = DummyModel()
         pf.email_to_name['extant@example.com'] = 'extant'
         self.failUnless(pf.getProfileByEmail('extant@example.com') is profile)
-        
+
     def test_getProfileByEmail_mixedcase(self):
         from repoze.bfg.testing import DummyModel
         pf = self._makeOne()
