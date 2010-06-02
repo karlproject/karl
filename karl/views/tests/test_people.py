@@ -26,18 +26,18 @@ class DummyForm(object):
     pass
 
 profile_data = {
-    'firstname':'firstname',
-    'lastname':'lastname',
-    'email':'email@example.com',
-    'phone':'phone',
-    'extension':'extension',
-    'fax':'fax',
+    'firstname': 'firstname',
+    'lastname': 'lastname',
+    'email': 'email@example.com',
+    'phone': 'phone',
+    'extension': 'extension',
+    'fax': 'fax',
     'department': 'department1',
-    'position':'position',
-    'organization':'organization',
-    'location':'location',
-    'country':'CH',
-    'website':'http://example.com',
+    'position': 'position',
+    'organization': 'organization',
+    'location': 'location',
+    'country': 'CH',
+    'websites': ['http://example.com'],
     'languages': 'englishy',
     'photo': None,
     'biography': 'Interesting Person',
@@ -174,9 +174,9 @@ class TestEditProfileFormController(unittest.TestCase):
         self.assertEqual(self.context['photo'].data, one_pixel_jpeg)
 
         # make sure the www. URLs get prepended
-        converted['website'] = 'www.example.com'
+        converted['websites'] = ['www.example.com']
         controller.handle_submit(converted)
-        self.assertEqual(self.context.website, 'http://www.example.com')
+        self.assertEqual(self.context.websites, ['http://www.example.com'])
 
 class TestAdminEditProfileFormController(unittest.TestCase):
     def setUp(self):
@@ -268,9 +268,9 @@ class TestAdminEditProfileFormController(unittest.TestCase):
                          '?status_message=User%20edited')
 
         # make sure the www. URLs get prepended
-        converted['website'] = 'www.example.com'
+        converted['websites'] = ['www.example.com']
         controller.handle_submit(converted)
-        self.assertEqual(self.context.website, 'http://www.example.com')
+        self.assertEqual(self.context.websites, ['http://www.example.com'])
 
         # try again w/ a login already in use
         context['inuse'] = testing.DummyModel()
@@ -385,10 +385,10 @@ class AddUserFormControllerTests(unittest.TestCase):
 
         # once more, testing URL prepending
         converted['login'] = 'newlogin'
-        converted['website'] = 'www.example.com'
+        converted['websites'] = ['www.example.com']
         response = controller.handle_submit(converted)
         profile = self.context['newlogin']
-        self.assertEqual(profile.website, 'http://www.example.com')
+        self.assertEqual(profile.websites, ['http://www.example.com'])
 
 class GetGroupOptionsTests(unittest.TestCase):
     def setUp(self):

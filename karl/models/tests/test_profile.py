@@ -93,6 +93,32 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne()
         self.failUnless(isinstance(inst._pending_alerts, PersistentList))
 
+    def test_website_websites_new_instance(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.website, '')
+        self.assertEqual(list(inst.websites), [])
+
+    def test_website_not_settable(self):
+        inst = self._makeOne()
+        try:
+            inst.website = 'http://example.com/'
+        except AttributeError:
+            pass
+        else:
+            raise AssertionError('website should not be settable.')
+
+    def test_old_website_gets_included_in_websites(self):
+        inst = self._makeOne()
+        inst.__dict__['website'] = 'http://example.com/'
+        self.assertEqual(list(inst.websites), ['http://example.com/'])
+
+    def test_seting_websites_clears_old_website(self):
+        inst = self._makeOne()
+        inst.__dict__['website'] = 'http://example.com/'
+        inst.websites = ['http://another.example.com/',
+                         'http://yetanother.example.com/']
+        self.failIf('website' in inst.__dict__)
+
 class ProfilesFolderTests(unittest.TestCase):
     def _getTargetClass(self):
         from karl.models.profile import ProfilesFolder

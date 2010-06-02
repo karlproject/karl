@@ -15,12 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import karl.mail
-import formish
-import schemaish
-from schemaish.type import File as SchemaFile
-from validatish import validator
-
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -29,18 +23,23 @@ from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
-from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.sendmail.interfaces import IMailDelivery
+from repoze.workflow import get_workflow
+from schemaish.type import File as SchemaFile
+from validatish import validator
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+import formish
+import schemaish
 
 from karl.consts import countries
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
+from karl.mail import Message
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
@@ -92,7 +91,8 @@ position_field = schemaish.String()
 organization_field = schemaish.String()
 location_field = schemaish.String()
 country_field = schemaish.String()
-website_field = schemaish.String(validator=karlvalidators.WebURL())
+websites_field = schemaish.Sequence(
+                    schemaish.String(validator=karlvalidators.WebURL()))
 languages_field = schemaish.String()
 photo_field = schemaish.File()
 biography_field = schemaish.String()
@@ -114,7 +114,7 @@ class EditProfileFormController(object):
         "organization",
         "location",
         "country",
-        "website",
+        "websites",
         "languages",
         "office",
         "room_no",
@@ -148,7 +148,7 @@ class EditProfileFormController(object):
                   ('organization', organization_field),
                   ('location', location_field),
                   ('country', country_field),
-                  ('website', website_field),
+                  ('websites', websites_field),
                   ('languages', languages_field),
                   ('biography', biography_field),
                   ('photo', photo_field)]
@@ -168,7 +168,9 @@ class EditProfileFormController(object):
                    'organization': formish.Input(empty=''),
                    'location': formish.Input(empty=''),
                    'country': formish.SelectChoice(options=countries),
-                   'website': formish.Input(empty=''),
+                   'websites': formish.TextArea(
+                            rows=3,
+                            converter_options={'delimiter':'\n'}),
                    'languages': formish.Input(empty=''),
                    'photo': karlwidgets.PhotoImageWidget(
                        filestore=self.filestore,
@@ -192,7 +194,7 @@ class EditProfileFormController(object):
                     'organization': context.organization,
                     'location': context.location,
                     'country': context.country,
-                    'website': context.website,
+                    'websites': context.websites,
                     'languages': context.languages,
                     'photo': self.photo,
                     'biography': context.biography,
@@ -218,9 +220,10 @@ class EditProfileFormController(object):
         context = self.context
         request = self.request
         objectEventNotify(ObjectWillBeModifiedEvent(context))
-        # prepend http:// to the website URL if necessary
-        if converted.get('website', '').startswith('www.'):
-            converted['website'] = 'http://%s' % converted['website']
+        websites = converted.setdefault('websites', [])
+        for i, website in enumerate(websites):
+            if website.startswith('www.'):
+                websites[i] = 'http://%s' % website
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -278,7 +281,8 @@ class AdminEditProfileFormController(EditProfileFormController):
         return fields
 
     def form_widgets(self, fields):
-        widgets = super(AdminEditProfileFormController, self).form_widgets(fields)
+        widgets = super(AdminEditProfileFormController, self
+                       ).form_widgets(fields)
         groups_widget = formish.CheckboxMultiChoice(self.group_options)
         widgets.update({'login': formish.Input(empty=''),
                         'groups': groups_widget,
@@ -337,8 +341,10 @@ class AdminEditProfileFormController(EditProfileFormController):
         if converted.get('password', None):
             users.change_password(userid, converted['password'])
         # prepend http:// to the website URL if necessary
-        if converted.get('website', '').startswith('www.'):
-            converted['website'] = 'http://%s' % converted['website']
+        websites = converted.setdefault('websites', [])
+        for i, website in enumerate(websites):
+            if website.startswith('www.'):
+                websites[i] = 'http://%s' % website
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -436,8 +442,11 @@ class AddUserFormController(EditProfileFormController):
         users.add(userid, userid, converted['password'], converted['groups'])
 
         # prepend http:// to the website URL if necessary
-        if converted.get('website', '').startswith('www.'):
-            converted['website'] = 'http://%s' % converted['website']
+        websites = converted.setdefault('websites', [])
+        for i, website in enumerate(websites):
+            if website.startswith('www.'):
+                websites[i] = 'http://%s' % website
+
         kw = {}
         for k, v in converted.items():
             if k in ('login', 'password', 'password_confirm',
@@ -487,6 +496,9 @@ def show_profile_view(context, request):
             profile[name] = unicode(profile_value)
         else:
             profile[name] = None
+
+    # 'websites' is a property, so the loop above misses it
+    profile["websites"] = context.websites
 
     if profile.has_key("languages"):
         profile["languages"] = context.languages
@@ -779,7 +791,7 @@ class ChangePasswordFormController(object):
 
         # send email
         system_name = get_setting(context, 'system_name', 'KARL')
-        mail = karl.mail.Message()
+        mail = Message()
         admin_email = get_setting(context, 'admin_email')
         mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
         mail["To"] = "%s <%s>" % (context.title, context.email)

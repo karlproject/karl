@@ -93,9 +93,12 @@
 
             <span>${profile.languages}</span>
           </p>
-          <p tal:condition="profile.website">
-            <span class="profileLabel">Website:</span>
-            <a href="${profile.website}" target="_blank">${profile.website}</a>
+          <p tal:condition="profile.websites">
+            <span class="profileLabel">Websites:</span>
+            <tal:loop tal:repeat="website profile.websites">
+            <a href="${website}" target="_blank">${website}</a>
+            <br tal:condition="not repeat['website'].end" />
+            </tal:loop>
           </p>
           <p tal:condition="profile.office">
             <span class="profileLabel">Office:</span>

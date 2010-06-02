@@ -33,6 +33,30 @@ class Profile(Folder):
 
     alert_attachments = 'link'
     fax = '' # BBB
+    _websites = ()
+
+    def _get_website(self):
+        old_ws = self.__dict__.get('website')
+        if old_ws is not None:
+            return old_ws
+        return self._websites and self._websites[0] or ''
+
+    website = property(_get_website,)
+
+    def _get_websites(self):
+        if self._websites:
+            return self._websites
+        old_ws = self.__dict__.get('website')
+        if old_ws is not None:
+            return (old_ws,)
+        return ()
+
+    def _set_websites(self, value):
+        self._websites = value # coerce / normalize?
+        if 'website' in self.__dict__:
+            del self.__dict__['website']
+
+    websites = property(_get_websites, _set_websites)
 
     def __init__(self,
                  firstname = '',
@@ -46,7 +70,7 @@ class Profile(Folder):
                  organization = '',
                  location = '',
                  country = '',
-                 website = '',
+                 websites = None,
                  languages = '',
                  office='',
                  room_no='',
@@ -66,7 +90,8 @@ class Profile(Folder):
         self.organization = organization
         self.location = location
         self.country = country
-        self.website = website
+        if websites:
+            self.websites = websites
         self.languages = languages
         self.office = office
         self.room_no = room_no
