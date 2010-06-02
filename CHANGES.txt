@@ -20,6 +20,8 @@ Unreleased
   Admin UI will point to new views if repoze.postoffice is being used,
   otherwise it will still use the old views.
 
+- LP #588303 Added fax to profile view.
+
 3.33 (2010-05-24)
 -----------------
 

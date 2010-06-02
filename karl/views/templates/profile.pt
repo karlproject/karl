@@ -70,7 +70,10 @@
           <p tal:condition="profile.phone">
             <span class="profileLabel">Phone:</span>
             <span>${profile.phone}</span>
-
+          </p>
+          <p tal:condition="profile.fax">
+            <span class="profileLabel">Fax:</span>
+            <span>${profile.fax}</span>
           </p>
           <p tal:condition="profile.room_no">
             <span class="profileLabel">Room:</span>
