@@ -675,6 +675,7 @@
   <formish:form
      controller=".wiki.AddWikiPageFormController"
      name="add_wikipage.html"
+     for="karl.content.interfaces.IWiki"
      permission="create"
      renderer="karl.views.forms:templates/community_formish_form.pt"
      form_id="save">

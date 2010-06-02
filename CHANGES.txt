@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Ensured that wiki pages cannot be added outside of the wiki tool
+  (LP #586458).
+
 - Made profiles support multiple websites (LP #554018).
 
 - updated maintenance page (LP #587432)
