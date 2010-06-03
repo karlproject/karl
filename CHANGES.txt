@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added a ``site_announce`` script to set / clear the site announcement
+  text from the command line (LP #579520).
+
 - Ensured that wiki pages cannot be added outside of the wiki tool
   (LP #586458).
 
