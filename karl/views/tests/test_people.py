@@ -44,6 +44,7 @@ profile_data = {
     }
 
 class DummyProfile(testing.DummyModel):
+    websites = ()
     def __setitem__(self, name, value):
         """Simulate Folder behavior"""
         if self.get(name, None) is not None:
