@@ -134,3 +134,8 @@ body .cal_day .cal_hour_event .cal_event_block  {
 * html button.button img {
   margin-top: 1px;
 }
+
+ol#references-listing li a.topLevelItem {
+  margin-left: 8px;
+} 
+
