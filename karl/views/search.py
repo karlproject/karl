@@ -254,7 +254,12 @@ class LivesearchResults(list):
 
 def jquery_livesearch_view(context, request):
     # Prefix search is with a wildcard at the end
-    searchterm = request.params.get('val', None)
+    try:
+        searchterm = request.params.get('val', None)
+    except UnicodeDecodeError:
+        # Probably windows client didn't set request encoding. Try again.
+        # request.charset = 'ISO-8859-1'
+        searchterm = request.params.get('val', None)
 
     if searchterm is None:
         # The request forgot to send the key we use to do a search, so
