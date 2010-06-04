@@ -28,6 +28,14 @@
           </ul>
         </div>
         <div class="right-portlet">
+          <h3>Offices</h3>
+          <ul class="menu">
+            <li>
+              <a href="/offices/view.html">Update offices</a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-portlet">
           <h3>Announce</h3>
           <ul class="menu">
             <li>
