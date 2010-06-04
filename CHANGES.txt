@@ -32,6 +32,9 @@ Unreleased
 
 - LP #589814 Fixed broken add user form.
 
+- LP #554018 Added special case in cico for website in profile import. (Used by
+  OSI's gsa_sync.)
+
 3.33 (2010-05-24)
 -----------------
 

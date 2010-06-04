@@ -58,7 +58,6 @@ class UserProfileImporter(object):
         "organization",
         "location",
         "country",
-        "website",
         "languages",
         "office",
         "room_no",
@@ -139,6 +138,12 @@ class UserProfileImporter(object):
             attr = tag[len(self.NS_PREFIX):]
             if attr in self._simple_attributes:
                 self._pop_simple_attribute(profile, element, attr)
+
+            elif attr == 'website':
+                value = element.text
+                if value:
+                    value.strip()
+                profile.websites = [value,]
 
             elif attr in ('offices', 'entities', 'departments'):
                 self._pop_category_section(profile, element, attr)
