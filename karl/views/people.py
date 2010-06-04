@@ -500,6 +500,9 @@ def show_profile_view(context, request):
         else:
             profile[name] = None
 
+    if 'fax' not in profile:
+        profile['fax'] = '' # BBB
+
     # 'websites' is a property, so the loop above misses it
     profile["websites"] = context.websites
 
