@@ -18,6 +18,7 @@ show
 
 # Verify user added
 go /profiles/testuser
+status 200
 show
 find Afghanistan
 find testuser@example.com
