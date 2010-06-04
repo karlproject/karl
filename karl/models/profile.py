@@ -44,6 +44,7 @@ class Profile(Folder):
     website = property(_get_website,)
 
     def _get_websites(self):
+        self._p_activate()
         if '_websites' in self.__dict__:
             return self._websites
         old_ws = self.__dict__.get('website')
