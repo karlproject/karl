@@ -341,10 +341,11 @@ class AdminEditProfileFormController(EditProfileFormController):
         if converted.get('password', None):
             users.change_password(userid, converted['password'])
         # prepend http:// to the website URL if necessary
-        websites = converted.setdefault('websites', [])
-        for i, website in enumerate(websites):
-            if website.startswith('www.'):
-                websites[i] = 'http://%s' % website
+        websites = converted.setdefault('websites', None)
+        if websites is not None:
+            for i, website in enumerate(websites):
+                if website.startswith('www.'):
+                    websites[i] = 'http://%s' % website
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
