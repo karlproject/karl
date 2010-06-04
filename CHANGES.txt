@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Updated formatting for wiki body in e-mail alerts (LP #588905)
+
 - Added a ``site_announce`` script to set / clear the site announcement
   text from the command line (LP #579520).
 
