@@ -12,7 +12,7 @@
 
     <h2>${model.title}</h2>
     
-    <p>${model.description}</p>
+    <span tal:replace="structure model.text"/>
 
     <div tal:condition="not digest">----</div>
     <p tal:condition="not digest">
