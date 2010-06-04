@@ -256,6 +256,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(defaults['home_path'], '/home_path')
         self.assertEqual(defaults['login'], 'profile')
         self.assertEqual(defaults['groups'], set(['group.KarlLovers']))
+        self.assertEqual(defaults['websites'], ['http://example.com'])
 
     def test___call__(self):
         self.request.form = DummyForm()
