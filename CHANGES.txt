@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.34 (2010-06-04)
+-----------------
 
 - Updated formatting for wiki body in e-mail alerts (LP #588905)
 
