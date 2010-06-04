@@ -171,12 +171,8 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
             print
             sys.stdout.flush()
         if not self.dry_run:
-            print "About to commit zodb transaction..."
             transaction.commit()
-            print "Committed."
-            print "About to commit sqlite pending.db transaction..."
             self.pending.sql.commit()
-            print "Committed."
 
 REPLY_SEPARATOR = re.compile("--- Reply ABOVE THIS LINE to post a comment ---")
 _OUTLOOK = re.compile(r'[>|\s]*-----\s?Original Message\s?-----')

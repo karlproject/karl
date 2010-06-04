@@ -108,8 +108,6 @@ def main(argv=sys.argv, factory=MailinRunner, root=None):
     #else: unit test
 
     def run(root=root):
-        import time
-        print time.ctime()
         closer = lambda: None # unit test
         if options.run_draino:
             draino_args = ['draino', '-vvv', '-p', '%s/Maildir' % maildir_root,
@@ -132,7 +130,6 @@ def main(argv=sys.argv, factory=MailinRunner, root=None):
             # Attempt to fix memory leak
             p_jar.db().cacheMinimize()
         closer()
-        print "Done."
 
     if options.daemon:
         run_daemon('mailin', run, options.interval)
