@@ -124,6 +124,12 @@ label {
   border: 1px solid #eda379;
 }
 
+.save-attachments a {
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: hand;
+}
+
 /** =FORMISH FORMS
 ----------------------------------------------- */
 
