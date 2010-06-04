@@ -13,65 +13,18 @@
 
     <div metal:use-macro="api.snippets.macros['byline']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
-    <div class="kbody" 
+    <div class="kbody"
 	 tal:condition="api.context.text">
       <span tal:replace="structure api.context.text"/>
     </div>
 
     <div metal:use-macro="api.snippets.macros['show_attachments']"/>
+    <div metal:use-macro="api.snippets.macros['show_comments']"/>
 
-    <tal:block condition="comments">
-      <h2>
-	<a name="comments" id="comments">Comments</a>
-      </h2>
-
-      <div tal:repeat="comment comments">
-       <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
-       <div class="blogComment"> 
-	<div class="commentManagement">
-	  <a href="#" class="quo-paste">quote</a>
-      <tal:ifeditable
-	     tal:condition="comment['edit_url'] is not None">
-	    | <a href="${comment['edit_url']}">edit</a> | 
-	    <a href="${comment['delete_url']}">delete</a>
-      </tal:ifeditable>
-	</div>
-      
-	<span class="portraid">
-          <img width="75" height="100" src="${comment['portrait_url']}" />
-	</span>
-
-	<strong class="kbyline">Posted
-	  by <a href="${comment['author_url']}">${comment['author_name']}</a>
-	  on ${comment['date']}</strong>
-
-	<div class="commentText" tal:content="structure comment['text']" />
-
-        <div class="blogAttachments">
-          <span tal:repeat="attachment comment['attachments']">
-            <img alt="[icon]"
-                 src="${api.static_url}/images/${attachment.mimeinfo.small_icon_name}"
-                 title="${attachment.title}" />
-               <a href="${attachment.url}/dl">${attachment.title}</a>
-               (<a href="${attachment.url}"
-                   title="Click to Tag, Edit or Delete attachment">#</a>)
-            </span>
-        </div>
-
-       </div>
-      </div>
-    </tal:block>
-
-    <form method="post" action="${post_url}" class="k3_genericForm"
-	  enctype="multipart/form-data" name="save">
-
-      <fieldset metal:use-macro="formfields.macros['add_comment-field']"/>
-      <fieldset metal:use-macro="formfields.macros['attachment-field']"/>
-      <fieldset metal:use-macro="formfields.macros['form-submit']"/>
-
-    </form>
+    <a name="addcomment"></a>
+    <span tal:content="structure comment_form()" tal:omit-tag=""/>
 
   </div>
 

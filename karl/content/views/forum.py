@@ -30,6 +30,8 @@ from zope.component.event import objectEventNotify
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
+from repoze.bfg.formish import Form
+from repoze.bfg.formish.zcml import FormAction
 from repoze.bfg.url import model_url
 from repoze.bfg.traversal import model_path
 from repoze.bfg.security import authenticated_userid
@@ -68,6 +70,7 @@ from karl.views.tags import set_tags
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.tags import get_tags_client_data
 
+from karl.content.views.commenting import AddCommentFormController
 from karl.content.views.utils import extract_description
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import upload_attachments
@@ -432,6 +435,29 @@ def show_forum_topic_view(context, request):
     else:
         attachments = ()
 
+    # manually construct formish comment form
+    controller = AddCommentFormController(context['comments'], request)
+    form_schema = schemaish.Structure()
+    form_fields = controller.form_fields()
+    for fieldname, field in form_fields:
+        form_schema.add(fieldname, field)
+    form_action_url = '%sadd_comment.html' % model_url(context['comments'],
+                                                       request)
+    comment_form = Form(form_schema, add_default_action=False, name='save',
+                        action_url=form_action_url)
+    form_defaults = controller.form_defaults()
+    comment_form.defaults = form_defaults
+    request.form_defaults = form_defaults
+
+    form_actions = [FormAction('submit', 'submit'),
+                    FormAction('cancel', 'cancel', validate=False)]
+    for action in form_actions:
+        comment_form.add_action(action.name, action.title)
+
+    widgets = controller.form_widgets(form_fields)
+    for name, widget in widgets.items():
+        comment_form[name].widget = widget
+
     return render_template_to_response(
         'templates/show_forum_topic.pt',
         api=api,
@@ -444,6 +470,7 @@ def show_forum_topic_view(context, request):
         head_data=convert_to_script(client_json_data),
         backto=backto,
         layout=layout,
+        comment_form=comment_form,
         )
 
 

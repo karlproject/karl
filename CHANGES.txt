@@ -20,12 +20,15 @@ Unreleased
   (LP #582500).
 
 - Added custom.css link into wsgi_errormsg.pt (LP #587104).
-  
+
 - Duplicated views from old mailin monitor as new views which use postoffice.
   Admin UI will point to new views if repoze.postoffice is being used,
   otherwise it will still use the old views.
 
 - LP #588303 Added fax to profile view.
+
+- LP #589743 Form topic add comment form was still assuming old formencode
+  system.  It has been updated to be current.
 
 3.33 (2010-05-24)
 -----------------

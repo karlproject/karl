@@ -120,7 +120,7 @@ class TestShowForumView(unittest.TestCase):
 class TestAddForumFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
-        
+
     def tearDown(self):
         testing.cleanUp()
 
@@ -145,7 +145,7 @@ class TestAddForumFormController(unittest.TestCase):
         self.assertEqual(defaults['title'], '')
         self.assertEqual(defaults['description'], '')
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = testing.DummyModel()
@@ -206,7 +206,7 @@ class TestAddForumFormController(unittest.TestCase):
 class TestAddForumTopicFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
-        
+
     def tearDown(self):
         testing.cleanUp()
 
@@ -243,7 +243,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
         self.assertEqual(defaults['text'], '')
         self.assertEqual(defaults['attachments'], [])
         self.assertEqual(defaults['security_state'], workflow.initial_state)
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = self._makeContext()
@@ -278,7 +278,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
         response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_handle_submit(self): 
+    def test_handle_submit(self):
         from karl.testing import DummyUpload
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import IForumTopic
@@ -351,6 +351,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         import datetime
         _NOW = datetime.datetime.now()
         context = testing.DummyModel()
+        context.sessions = DummySessions()
         context.title = 'title'
         context['comments'] = testing.DummyModel()
         comment = testing.DummyModel()
@@ -366,6 +367,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
@@ -391,6 +393,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         import datetime
         _NOW = datetime.datetime.now()
         context = testing.DummyModel(title='title')
+        context.sessions = DummySessions()
         from karl.content.interfaces import IForum
         alsoProvides(context, IForum)
         context['profiles'] = profiles = testing.DummyModel()
@@ -402,6 +405,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['comments']['1'] = comment
         context['attachments'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
@@ -424,6 +428,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         _BEFORE = _NOW - datetime.timedelta(hours=1)
 
         context = testing.DummyModel()
+        context.sessions = DummySessions()
         context.title = 'title'
         context['comments'] = testing.DummyModel()
 
@@ -447,6 +452,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
@@ -466,7 +472,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
 class TestEditForumFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
-        
+
     def tearDown(self):
         testing.cleanUp()
 
@@ -494,7 +500,7 @@ class TestEditForumFormController(unittest.TestCase):
         self.assertEqual(defaults['title'], 'title')
         self.assertEqual(defaults['description'], 'description')
         self.assertEqual(defaults['security_state'], 'public')
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = testing.DummyModel()
@@ -598,7 +604,7 @@ class EditForumTopicFormController(unittest.TestCase):
         self.assertEqual(defaults['text'], 'text')
         self.assertEqual(len(defaults['attachments']),1)
         self.assertEqual(defaults['security_state'], 'public')
-        
+
     def test_form_fields(self):
         self._registerDummyWorkflow()
         context = self._makeContext()
@@ -680,8 +686,8 @@ class EditForumTopicFormController(unittest.TestCase):
         self.assertEqual(context['attachments'].keys(), ['test.txt'])
         self.assertEqual(
             context['attachments']['test.txt'].mimetype, 'text/plain')
-        
-    
+
+
 
 class dictall(dict):
     def getall(self, name):
@@ -718,7 +724,7 @@ class DummyWorkflow:
 
     def state_info(self, context, request):
         return self._state_info
-    
+
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
         self.transitioned.append({'to_state':to_state, 'content':content,
@@ -742,3 +748,8 @@ class DummyFile:
         self.__dict__.update(kw)
         self.size = 0
 
+class DummySessions(dict):
+    def get(self, name, default=None):
+        if name not in self:
+            self[name] = {}
+        return self[name]
