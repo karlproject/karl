@@ -442,10 +442,11 @@ class AddUserFormController(EditProfileFormController):
         users.add(userid, userid, converted['password'], converted['groups'])
 
         # prepend http:// to the website URL if necessary
-        websites = converted.setdefault('websites', [])
-        for i, website in enumerate(websites):
-            if website.startswith('www.'):
-                websites[i] = 'http://%s' % website
+        websites = converted.setdefault('websites', None)
+        if websites is not None:
+            for i, website in enumerate(websites):
+                if website.startswith('www.'):
+                    websites[i] = 'http://%s' % website
 
         kw = {}
         for k, v in converted.items():

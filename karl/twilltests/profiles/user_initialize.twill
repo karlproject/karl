@@ -3,6 +3,7 @@ login "${cur_admin}"
 
 # Add a new user
 go /profiles/add.html
+code 200
 fv save login "testuser"
 fv save password.password "password"
 fv save password.confirm "password"
@@ -14,11 +15,12 @@ fv save email "testuser@example.com"
 fv save biography "User account (Test User) added by Twill test (profiles.user_initialize.twill)"
 formfile save photo.file "${test_path}/profiles/profile.jpg" image/jpeg
 submit
+code 200
 show
 
 # Verify user added
 go /profiles/testuser
-status 200
+code 200
 show
 find Afghanistan
 find testuser@example.com

@@ -30,6 +30,8 @@ Unreleased
 - LP #589743 Form topic add comment form was still assuming old formencode
   system.  It has been updated to be current.
 
+- LP #589814 Fixed broken add user form.
+
 3.33 (2010-05-24)
 -----------------
 
