@@ -44,7 +44,7 @@ class Profile(Folder):
     website = property(_get_website,)
 
     def _get_websites(self):
-        if self._websites:
+        if '_websites' in self.__dict__:
             return self._websites
         old_ws = self.__dict__.get('website')
         if old_ws is not None:
@@ -90,7 +90,7 @@ class Profile(Folder):
         self.organization = organization
         self.location = location
         self.country = country
-        if websites:
+        if websites is not None:
             self.websites = websites
         self.languages = languages
         self.office = office

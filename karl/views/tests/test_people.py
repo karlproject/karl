@@ -148,25 +148,24 @@ class TestEditProfileFormController(unittest.TestCase):
         response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
-    def test_handle_submit(self):
-        controller = self._makeOne(self.context, self.request)
-        converted = {}
-        # first set up the simple fields to submit
-        for fieldname, value in profile_data.items():
-            if fieldname == 'photo':
-                continue
-            converted[fieldname] = value
-        # then set up with the photo
+    def test_handle_submit_normal_defaults(self):
         from karl.content.interfaces import ICommunityFile
         from karl.testing import DummyUpload
         from repoze.lemonade.interfaces import IContentFactory
         testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
                                 IContentFactory)
-        converted['photo'] = DummyUpload(filename='test.jpg',
+        controller = self._makeOne(self.context, self.request)
+        converted = {'photo': DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
-                                         data=one_pixel_jpeg)
-        # finally submit
+                                         data=one_pixel_jpeg)}
+        # first set up the simple fields to submit
+        for fieldname, value in profile_data.items():
+            if fieldname == 'photo':
+                continue
+            converted[fieldname] = value
+
         controller.handle_submit(converted)
+
         for fieldname, value in profile_data.items():
             if fieldname == 'photo':
                 continue
@@ -174,10 +173,33 @@ class TestEditProfileFormController(unittest.TestCase):
         self.failUnless('photo' in self.context)
         self.assertEqual(self.context['photo'].data, one_pixel_jpeg)
 
+    def test_handle_submit_w_websites_no_scheme(self):
+        controller = self._makeOne(self.context, self.request)
         # make sure the www. URLs get prepended
-        converted['websites'] = ['www.example.com']
+        converted = {'websites': ['www.example.com'],
+                     'photo': None,
+                    }
         controller.handle_submit(converted)
         self.assertEqual(self.context.websites, ['http://www.example.com'])
+        self.failIf('photo' in self.context)
+
+    def test_handle_submit_w_websites_None(self):
+        controller = self._makeOne(self.context, self.request)
+        # Apparently, the formish / schemaish stuff has a bug which can give
+        # us None for a sequence field.
+        converted = {'websites': None}
+        # first set up the simple fields to submit
+        for fieldname, value in profile_data.items():
+            if fieldname in ('websites', 'photo'):
+                continue
+            converted[fieldname] = value
+        controller.handle_submit(converted)
+        self.assertEqual(self.context.websites, [])
+        for fieldname, value in profile_data.items():
+            if fieldname in ('websites', 'photo'):
+                continue
+            self.assertEqual(getattr(self.context, fieldname), value)
+
 
 class TestAdminEditProfileFormController(unittest.TestCase):
     def setUp(self):
@@ -246,7 +268,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.get('include_blurb'), False)
         self.assertEqual(response.get('admin_edit'), True)
 
-    def test_handle_submit(self):
+    def test_handle_submit_normal(self):
         from repoze.who.plugins.zodb.users import get_sha_password
         controller = self._makeOne(self.context, self.request)
         converted = {}
@@ -268,22 +290,58 @@ class TestAdminEditProfileFormController(unittest.TestCase):
                          'http://example.com/profile/'
                          '?status_message=User%20edited')
 
+    def test_handle_submit_w_websites_no_scheme(self):
         # make sure the www. URLs get prepended
+        controller = self._makeOne(self.context, self.request)
+        converted = {}
+        converted['home_path'] = '/home_path'
+        converted['login'] = 'newlogin'
+        converted['password'] = 'secret'
+        converted['groups'] = ['group.KarlAdmin']
         converted['websites'] = ['www.example.com']
         controller.handle_submit(converted)
         self.assertEqual(self.context.websites, ['http://www.example.com'])
 
-        # try again w/ a login already in use
-        context['inuse'] = testing.DummyModel()
-        converted['login'] = 'inuse'
+    def test_handle_submit_existing_loign(self):
+        # try w/ a login already in use
         from repoze.bfg.formish import ValidationError
+        controller = self._makeOne(self.context, self.request)
+        converted = {}
+        converted['home_path'] = '/home_path'
+        converted['login'] = 'inuse'
+        converted['password'] = 'secret'
+        converted['groups'] = ['group.KarlAdmin']
+        converted['websites'] = ['www.example.com']
+        context = self.context
+        context['inuse'] = testing.DummyModel()
         self.assertRaises(ValidationError, controller.handle_submit,
                           converted)
 
-        # try again w/ special login value that will trigger ValueError
+    def test_handle_submit_w_login_raising_ValidationError(self):
+        from repoze.bfg.formish import ValidationError
+        controller = self._makeOne(self.context, self.request)
+        converted = {}
+        converted['home_path'] = '/home_path'
         converted['login'] = 'raise_value_error'
+        converted['password'] = 'secret'
+        converted['groups'] = ['group.KarlAdmin']
+        converted['websites'] = ['www.example.com']
+        # try again w/ special login value that will trigger ValueError
         self.assertRaises(ValidationError, controller.handle_submit,
                           converted)
+
+    def test_handle_submit_w_websites_None(self):
+        # Apparently, the formish / schemaish stuff has a bug which can give
+        # us None for a sequence field.
+        controller = self._makeOne(self.context, self.request)
+        converted = {}
+        converted['home_path'] = '/home_path'
+        converted['login'] = 'newlogin'
+        converted['password'] = 'secret'
+        converted['groups'] = ['group.KarlAdmin']
+        converted['websites'] = None
+        controller.handle_submit(converted)
+        self.assertEqual(self.context.websites, [])
 
 class AddUserFormControllerTests(unittest.TestCase):
     def setUp(self):
@@ -338,35 +396,36 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(response.get('include_blurb'), False)
 
     def test_handle_submit(self):
+        from repoze.lemonade.interfaces import IContentFactory
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.content.interfaces import ICommunityFile
+        from karl.models.interfaces import IProfile
+        from karl.models.profile import Profile
+        from karl.testing import DummyUpload
+        # register defaults
+        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
+                                IContentFactory)
+        workflow = registerDummyWorkflow('security')
+        registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
         # first set up the easier fields
         converted = {'login': 'login',
                      'password': 'password',
                      'groups': ['group.KarlLovers'],
-                     'home_path': '/home_path'}
+                     'home_path': '/home_path',
+                    }
         for fieldname, value in profile_data.items():
             if fieldname == 'photo':
                 continue
             converted[fieldname] = value
         # then set up the photo
-        from karl.content.interfaces import ICommunityFile
-        from karl.testing import DummyUpload
-        from repoze.lemonade.interfaces import IContentFactory
-        from repoze.lemonade.testing import registerContentFactory
-        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
-                                IContentFactory)
         converted['photo'] = DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
                                          data=one_pixel_jpeg)
-        # next the workflow
-        from repoze.workflow.testing import registerDummyWorkflow
-        workflow = registerDummyWorkflow('security')
-        # and the profile content factory
-        from karl.models.profile import Profile
-        from karl.models.interfaces import IProfile
-        registerContentFactory(Profile, IProfile)
         # finally submit our constructed form
         response = controller.handle_submit(converted)
+
         self.assertEqual('http://example.com/profile/login/', response.location)
         user = self.users.get_by_id('login')
         self.failIf(user is None)
@@ -377,19 +436,75 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.failUnless('photo' in profile)
         self.assertEqual(profile['photo'].data, one_pixel_jpeg)
 
-        # try again and make sure it fails
-        converted['firstname'] = 'different'
+    def test_handle_submit_duplicate_id(self):
         from repoze.bfg.formish import ValidationError
+        # try again and make sure it fails
+        controller = self._makeOne(self.context, self.request)
+        self.context['existing'] = testing.DummyModel(firstname='firstname')
+        converted = {'login': 'existing',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'firstname': 'different',
+                    }
         self.assertRaises(ValidationError, controller.handle_submit, converted)
-        profile = self.context['login']
+        profile = self.context['existing']
         self.failIf(profile.firstname != 'firstname')
 
+    def test_handle_submit_w_websites_no_scheme(self):
         # once more, testing URL prepending
-        converted['login'] = 'newlogin'
-        converted['websites'] = ['www.example.com']
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.models.interfaces import IProfile
+        from karl.models.profile import Profile
+        # register defaults
+        workflow = registerDummyWorkflow('security')
+        registerContentFactory(Profile, IProfile)
+        controller = self._makeOne(self.context, self.request)
+        # first set up the easier fields
+        converted = {'login': 'login',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'photo': None,
+                     'websites': ['www.example.com'],
+                    }
+        for fieldname, value in profile_data.items():
+            if fieldname in ('websites', 'photo'):
+                continue
+            converted[fieldname] = value
+        # then set up the photo
         response = controller.handle_submit(converted)
-        profile = self.context['newlogin']
+        profile = self.context['login']
         self.assertEqual(profile.websites, ['http://www.example.com'])
+
+    def test_handle_submit_w_websites_None(self):
+        # Apparently, the formish / schemaish stuff has a bug which can give
+        # us None for a sequence field.
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.models.interfaces import IProfile
+        from karl.models.profile import Profile
+        # register defaults
+        workflow = registerDummyWorkflow('security')
+        registerContentFactory(Profile, IProfile)
+        controller = self._makeOne(self.context, self.request)
+        # first set up the easier fields
+        converted = {'login': 'login',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'photo': None,
+                     'websites': None,
+                    }
+        for fieldname, value in profile_data.items():
+            if fieldname in ('websites', 'photo'):
+                continue
+            converted[fieldname] = value
+        # then set up the photo
+        response = controller.handle_submit(converted)
+        profile = self.context['login']
+        self.assertEqual(profile.websites, [])
 
 class GetGroupOptionsTests(unittest.TestCase):
     def setUp(self):
@@ -879,7 +994,8 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertEqual(IProfile.ALERT_DIGEST,
                          self.profile.get_alerts_preference("community2"))
         self.assertEqual(
-            "http://example.com/profiles/a/?status_message=Community+preferences+updated.",
+            "http://example.com/profiles/a/"
+            "?status_message=Community+preferences+updated.",
             response.location)
 
     def test_leave_community(self):
@@ -896,7 +1012,8 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertEqual( [("a", "community1_members")],
                           self.users.removed_groups)
         self.assertEqual(
-            "http://example.com/profiles/a/?status_message=Community+preferences+updated.",
+            "http://example.com/profiles/a/"
+            "?status_message=Community+preferences+updated.",
             response.location)
 
     def test_leave_community_sole_moderator(self):
@@ -1011,7 +1128,7 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/profiles/profile/')
 
-    def test_handle_submit(self):
+    def test_handle_submit_normal(self):
         # first create the fake user
         users = self.site.users
         users.add('profile', 'profile', 'oldoldold', [])
@@ -1035,7 +1152,8 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         new_enc = get_sha_password('newnewnew')
         self.assertEqual(users.get_by_id('profile')['password'], new_enc)
         self.assertEqual(response.location,
-            'http://example.com/profiles/profile/?status_message=Password%20changed')
+            'http://example.com/profiles/profile/'
+            '?status_message=Password%20changed')
 
         self.assertEqual(len(mailer), 1)
         msg = mailer.pop()

@@ -98,6 +98,11 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(inst.website, '')
         self.assertEqual(list(inst.websites), [])
 
+    def test_websites_as_empty_list(self):
+        inst = self._makeOne(websites=[])
+        self.assertEqual(inst.website, '')
+        self.assertEqual(inst.websites, [])
+
     def test_website_not_settable(self):
         inst = self._makeOne()
         try:

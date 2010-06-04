@@ -220,10 +220,7 @@ class EditProfileFormController(object):
         context = self.context
         request = self.request
         objectEventNotify(ObjectWillBeModifiedEvent(context))
-        websites = converted.setdefault('websites', [])
-        for i, website in enumerate(websites):
-            if website.startswith('www.'):
-                websites[i] = 'http://%s' % website
+        _normalize_websites(converted)
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -287,7 +284,11 @@ class AdminEditProfileFormController(EditProfileFormController):
         widgets.update({'login': formish.Input(empty=''),
                         'groups': groups_widget,
                         'home_path': formish.Input(empty=''),
-                        'password': karlwidgets.KarlCheckedPassword()})
+                        'password': karlwidgets.KarlCheckedPassword(),
+                        'websites': formish.TextArea(
+                            rows=3,
+                            converter_options={'delimiter':'\n'}),
+                       })
         return widgets
 
     def form_defaults(self):
@@ -340,12 +341,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         # Edit password
         if converted.get('password', None):
             users.change_password(userid, converted['password'])
-        # prepend http:// to the website URL if necessary
-        websites = converted.setdefault('websites', None)
-        if websites is not None:
-            for i, website in enumerate(websites):
-                if website.startswith('www.'):
-                    websites[i] = 'http://%s' % website
+        _normalize_websites(converted)
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -442,13 +438,7 @@ class AddUserFormController(EditProfileFormController):
             raise ValidationError(login=msg)
         users.add(userid, userid, converted['password'], converted['groups'])
 
-        # prepend http:// to the website URL if necessary
-        websites = converted.setdefault('websites', None)
-        if websites is not None:
-            for i, website in enumerate(websites):
-                if website.startswith('www.'):
-                    websites[i] = 'http://%s' % website
-
+        _normalize_websites(converted)
         kw = {}
         for k, v in converted.items():
             if k in ('login', 'password', 'password_confirm',
@@ -468,6 +458,17 @@ class AddUserFormController(EditProfileFormController):
             raise ValidationError(**e.error_dict)
         location = model_url(profile, request)
         return HTTPFound(location=location)
+
+
+def _normalize_websites(converted):
+    websites = converted.setdefault('websites', [])
+    if websites is None:
+        # Work around formish / schemaish passing None
+        websites = converted['websites'] = []
+    # prepend http:// to the website URL if necessary
+    for i, website in enumerate(websites):
+        if website.startswith('www.'):
+            websites[i] = 'http://%s' % website
 
 def get_profile_actions(profile, request):
     actions = []
