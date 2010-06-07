@@ -22,7 +22,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         self.assertEqual(delivery.__class__, FakeMailDelivery)
 
     def test_with_settings_and_suppress_mail(self):
-        from repoze.bfg.interfaces import ISettings 
+        from repoze.bfg.interfaces import ISettings
         from karl.utilities.mailer import FakeMailDelivery
         settings = DummySettings()
         testing.registerUtility(settings, ISettings)
@@ -32,7 +32,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
 
     def test_mail_queue_path_unspecified(self):
         import sys
-        from repoze.bfg.interfaces import ISettings 
+        from repoze.bfg.interfaces import ISettings
         settings = DummySettings()
         testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
@@ -131,6 +131,19 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(
             ["b@example.com", "C@EXAMPLE.COM"], sender.calls[0]["toaddrs"])
+
+    def test_address_normalization(self):
+        from karl.utilities.mailer import WhiteListMailDelivery
+        sender = DummyMailDelivery()
+        self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
+
+        delivery = WhiteListMailDelivery(sender)
+        delivery.send("a", ["Fred <b@example.com>",
+                            "Bill <C@EXAMPLE.COM>"], "message")
+        self.assertEqual(1, len(sender.calls))
+        self.assertEqual(
+            ["Fred <b@example.com>", "Bill <C@EXAMPLE.COM>"],
+            sender.calls[0]["toaddrs"])
 
 class DummyMailDelivery(object):
     def __init__(self):

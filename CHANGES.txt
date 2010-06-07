@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fixed bug in whitelist--address matching is now normalized to be indifferent
+  to the inclusion or exclusion of a name part with an email address.  (IE,
+  'Fred Flintstone <test@example.com>' == 'test@example.com')
 
 3.34 (2010-06-04)
 -----------------

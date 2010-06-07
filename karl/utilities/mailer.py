@@ -69,7 +69,7 @@ class WhiteListMailDelivery(object):
         if white_list_fn:
             with open(white_list_fn) as f:
                 self.white_list = set(
-                    unicode(line.strip()).lower() for line in f.readlines())
+                    self._normalize(line) for line in f.readlines())
         else:
             self.white_list = None
 
@@ -82,10 +82,15 @@ class WhiteListMailDelivery(object):
     def send(self, fromaddr, toaddrs, message):
         if self.white_list is not None:
             toaddrs = [addr for addr in toaddrs
-                if addr.lower() in self.white_list]
+                if self._normalize(addr) in self.white_list]
         if toaddrs:
             self.md.send(fromaddr, toaddrs, message)
 
+    @staticmethod
+    def _normalize(addr):
+        if '<' in addr:
+            addr = addr[addr.index('<') + 1:addr.rindex('>')]
+        return unicode(addr.strip()).lower()
 
 # Make an instance available as registerable component
 # (If for some reason we find config data isn't set yet or we think it might
