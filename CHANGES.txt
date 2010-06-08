@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.35 (2010-06-08)
+-----------------
 
 - Members views were not updated to use the new websites field after multiple
   websites change from 3.34, which caused an unexpected parameter error when
