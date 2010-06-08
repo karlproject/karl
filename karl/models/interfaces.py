@@ -158,7 +158,7 @@ class IProfile(IFolder, IPeople):
 
     location = Attribute(u"User's location.")
     country = Attribute(u"User's country.")
-    website = Attribute(u"User's website url.")
+    websites = Attribute(u"User's websites urls.")
     languages = Attribute(u"User's spoken languages.")
 
     # XXX redundant with categories?

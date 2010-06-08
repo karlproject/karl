@@ -573,7 +573,8 @@ class AcceptInvitationFormController(object):
             ('location', schemaish.String()),
             ('department', schemaish.String()),
             ('position', schemaish.String()),
-            ('website', schemaish.String(validator=validator.URL())),
+            ('websites', schemaish.Sequence(
+                schemaish.String(validator=validator.URL()))),
             ('languages', schemaish.String()),
             ('biography', schemaish.String()),
             ('photo', schemaish.File()),
@@ -607,6 +608,9 @@ class AcceptInvitationFormController(object):
                 terms_text, 'the %s Terms and Conditions' % system_name),
             'accept_privacy_policy': karlwidgets.AcceptFieldWidget(
                 privacy_text, 'the %s Privacy Policy' % system_name),
+            'websites': formish.TextArea(
+                rows=3,
+                converter_options={'delimiter':'\n'}),
             }
 
     def handle_cancel(self):
@@ -648,7 +652,7 @@ class AcceptInvitationFormController(object):
             organization=converted['organization'],
             location=converted['location'],
             country=converted['country'],
-            website=converted['website'],
+            websites=converted['websites'],
             languages=converted['languages']
             )
         profiles[username] = profile

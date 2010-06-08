@@ -264,7 +264,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                      'phone':'phone', 'extension':'extension',
                      'department':'department', 'position':'position',
                      'organization':'organization', 'location':'location',
-                     'country':'country', 'website':'website',
+                     'country':'country', 'websites':['website'],
                      'languages':'languages',
                      }
         response = controller.handle_submit(converted)
