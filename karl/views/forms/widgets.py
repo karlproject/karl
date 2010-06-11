@@ -218,6 +218,9 @@ class FileUpload2(Widget):
                 return None
             self.from_filestore = True
             headers = dict(headers)
+            if headers.get('Filename', None) is None:
+                # user pressed remove on edit view and submitted with no file
+                return None
             return SchemaFile(f, headers['Filename'], headers['Content-Type'])
 
 class PhotoImageWidget(FileUpload2):
