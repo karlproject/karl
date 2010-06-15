@@ -110,8 +110,10 @@ def show_folder_view(context, request):
     if not (ICommunityRootFolder.providedBy(context) or
         IIntranetRootFolder.providedBy(context)):
         # Root folders for the tools aren't editable or deletable
-        if has_permission('create', context, request):
+        if has_permission('edit', context, request):
             actions.append(('Edit', 'edit.html'))
+
+        if has_permission('delete', context.__parent__, request):
             actions.append(('Delete', 'delete.html'))
 
         in_intranets = find_interface(context, IIntranets) is not None

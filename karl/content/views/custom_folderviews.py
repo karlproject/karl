@@ -236,8 +236,14 @@ class CustomFolderView(object):
             addables = get_folder_addables(context, request)
             if addables is not None:
                 actions.extend(addables())
+
+        if has_permission('edit', context, request):
             actions.append(('Edit', 'edit.html'))
+
+        if has_permission('delete', context.__parent__, request):
             actions.append(('Delete', 'delete.html'))
+
+        if has_permission('administer', context, request):
             # admins see an Advanced action that puts markers on a folder.
             actions.append(('Advanced', 'advanced.html'))
 
