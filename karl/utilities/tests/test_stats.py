@@ -6,8 +6,15 @@ class TestCommunityStats(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
+        from karl.utilities import stats
+        self._save_datetime = stats.datetime
+        stats.datetime = DummyDateTime()
+
     def tearDown(self):
         cleanUp()
+
+        from karl.utilities import stats
+        stats.datetime = self._save_datetime
 
     def _call_fut(self, context):
         from karl.utilities.stats import collect_community_stats as fut
@@ -41,7 +48,7 @@ class TestCommunityStats(unittest.TestCase):
         big_endians.__custom_acl__ = True
 
         content = big_endians['wiki1'] = DummyModel()
-        content.created = datetime.datetime.now()
+        content.created = datetime.datetime(2010, 5, 12, 3, 42)
         content.creator = 'daniela'
         directlyProvides(content, IWikiPage)
 
@@ -315,3 +322,17 @@ class DummyUsers(object):
 
     def get_by_id(self, id):
         return self.users.get(id)
+
+import datetime
+class DummyDateTime(object):
+    _now = datetime.datetime(2010, 6, 7, 8, 9)
+
+    @property
+    def datetime(self):
+        return self
+
+    def __call__(self, *args):
+        return datetime.datetime(*args)
+
+    def now(self):
+        return self._now
