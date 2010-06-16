@@ -7,6 +7,10 @@ Unreleased
 - Fixed UI bug where actions in folder views did not correspond to user's
   permissions.  (LP #594180)
 
+- Added evolve script to remove some broken objects that seem to be left over
+  from the migration of profile photos to image drawer.  These were blocking
+  reindexing of profiles.  (LP #594131)
+
 3.35 (2010-06-08)
 -----------------
 
