@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fixed UI bug where actions in folder views did not correspond to user's
+  permissions.  (LP #594180)
 
 3.35 (2010-06-08)
 -----------------
