@@ -238,7 +238,6 @@ def get_email(object, default):
 
 def get_allowed_to_view(object, default):
     principals = principals_allowed_by_permission(object, 'view')
-    print principals
     return principals
 
 def get_lastfirst(object, default):

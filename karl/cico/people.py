@@ -100,6 +100,17 @@ class UserProfileImporter(object):
         profile.created_by = profile.modified_by = username
         profile.created = profile.modified = datetime.datetime.now()
 
+        # Profile was indexed before workflow was initialized, so there is a
+        # a bogus value for the 'allowed' index.  Unfortunately, we can't just
+        # add the profile to the profiles folder (which triggers indexing)
+        # after the workflow is initialized, because the workflow
+        # initialization code for profiles requires that the profile already
+        # be in the content tree since a call to 'find_users' is made.  The
+        # work around is to just remove the profile and add it back again to
+        # trigger reindexing.
+        del profiles[username]
+        profiles[username] = profile
+
     def update(self, profile):
         objectEventNotify(ObjectWillBeModifiedEvent(profile))
 

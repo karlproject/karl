@@ -11,6 +11,12 @@ Unreleased
   from the migration of profile photos to image drawer.  These were blocking
   reindexing of profiles.  (LP #594131)
 
+- Fixed bug where profiles add via cico (OSI, using gsa_sync) were indexed with
+  a bogus value for the 'allowed' index. Updated evolve script to reindex the
+  people directory.  (LP #594131)
+
+- Added stub for console script, reindex_peopledir.
+
 3.35 (2010-06-08)
 -----------------
 
