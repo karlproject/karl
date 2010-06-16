@@ -261,8 +261,7 @@ class CustomFolderView(object):
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
 
-        return render_template_to_response(
-            'templates/custom_folder.pt',
+        return dict(
             api=api,
             actions=actions,
             head_data=convert_to_script(client_json_data),
@@ -317,9 +316,6 @@ class NetworkEventsView(CustomFolderView):
                                    self.year, self.month, self._past_events)
         return batch
 
-def network_events_view(context, request):
-    return NetworkEventsView(context, request)()
-
 class NetworkNewsView(CustomFolderView):
     itype = INewsItem
     sort_index = "publication_date"
@@ -331,6 +327,3 @@ class NetworkNewsView(CustomFolderView):
         batch = get_catalog_news(self.context, self.request, self.searchterm,
                                  self.year, self.month)
         return batch
-
-def network_news_view(context, request):
-    return NetworkNewsView(context, request)()

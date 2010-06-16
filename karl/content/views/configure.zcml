@@ -1081,14 +1081,16 @@
 
   <view
     for="karl.content.views.interfaces.INetworkNewsMarker"
-    view=".custom_folderviews.network_news_view"
+    view=".custom_folderviews.NetworkNewsView"
     permission="view"
+    renderer="templates/custom_folder.pt"
   />
 
   <view
     for="karl.content.views.interfaces.INetworkEventsMarker"
-    view=".custom_folderviews.network_events_view"
+    view=".custom_folderviews.NetworkEventsView"
     permission="view"
+    renderer="templates/custom_folder.pt"
   />
 
   <adapter

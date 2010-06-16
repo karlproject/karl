@@ -22,7 +22,6 @@ from zope.testing.cleanup import cleanUp
 
 from repoze.bfg.testing import DummyModel
 from repoze.bfg.testing import DummyRequest
-from repoze.bfg.testing import registerDummyRenderer
 from repoze.bfg.testing import registerAdapter
 from repoze.bfg.testing import registerUtility
 
@@ -37,8 +36,6 @@ class TestShowNetworkEventsView(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
-        self.template_fn = 'templates/custom_folder.pt'
-
         self.parent = DummyModel(title='dummyparent')
         self.context = DummyModel(title='dummytitle', text='dummytext')
         self.context['attachments'] = DummyModel()
@@ -52,8 +49,8 @@ class TestShowNetworkEventsView(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.custom_folderviews import network_events_view
-        return network_events_view(context, request)
+        from karl.content.views.custom_folderviews import NetworkEventsView
+        return NetworkEventsView(context, request)()
 
     def _registerAddables(self):
         from karl.views.interfaces import IFolderAddables
@@ -83,17 +80,25 @@ class TestShowNetworkEventsView(unittest.TestCase):
                              (Interface, Interface),
                              ILayoutProvider)
 
-    def _registerSecurityPolicy(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
-        registerDummySecurityPolicy("userid")
+    def _registerSecurityPolicy(self, permissions):
+        if permissions is None:
+            from repoze.bfg.testing import registerDummySecurityPolicy
+            registerDummySecurityPolicy("userid")
+        else:
+            from repoze.bfg.interfaces import IAuthenticationPolicy
+            from repoze.bfg.interfaces import IAuthorizationPolicy
+            from repoze.bfg.testing import registerUtility
+            policy = DummySecurityPolicy("userid", permissions=permissions)
+            registerUtility(policy, IAuthenticationPolicy)
+            registerUtility(policy, IAuthorizationPolicy)
 
-    def _register(self):
+    def _register(self, permissions=None):
         self._registerAddables()
         self._registerKarlDates()
         self._registerCatalogSearch()
         self._registerTagbox()
         self._registerLayoutProvider()
-        self._registerSecurityPolicy()
+        self._registerSecurityPolicy(permissions)
 
     def test_first_request(self):
         self._register()
@@ -101,19 +106,18 @@ class TestShowNetworkEventsView(unittest.TestCase):
         context = self.context
         request = DummyRequest()
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 5)
-        self.assertEqual(renderer.backto,
+        self.assertEqual(len(response['actions']), 5)
+        self.assertEqual(response['backto'],
                          {'href': 'http://example.com/',
                           'title': 'Home'})
-        self.assertEqual(renderer.entries, [])
-        self.assertEqual(renderer.fb_years[:3], ['2007', '2008', '2009'])
-        self.assertEqual(len(renderer.fb_months), 12)
-        self.assertEqual(renderer.searchterm, None)
-        self.assertEqual(renderer.selected_year, None)
-        self.assertEqual(renderer.selected_month, None)
-        self.assertEqual(renderer.past_events_url,
+        self.assertEqual(response['entries'], [])
+        self.assertEqual(response['fb_years'][:3], ['2007', '2008', '2009'])
+        self.assertEqual(len(response['fb_months']), 12)
+        self.assertEqual(response['searchterm'], None)
+        self.assertEqual(response['selected_year'], None)
+        self.assertEqual(response['selected_month'], None)
+        self.assertEqual(response['past_events_url'],
                          "http://example.com/child/?past_events=True")
 
     def test_with_searchterm(self):
@@ -122,12 +126,11 @@ class TestShowNetworkEventsView(unittest.TestCase):
         context = self.context
         request = DummyRequest({'searchterm':'someword'})
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.searchterm, 'someword')
-        self.assertEqual(renderer.selected_year, None)
-        self.assertEqual(renderer.selected_month, None)
+        self.assertEqual(response['searchterm'], 'someword')
+        self.assertEqual(response['selected_year'], None)
+        self.assertEqual(response['selected_month'], None)
 
     def test_with_unparseable_searchterm(self):
         self._register()
@@ -135,12 +138,11 @@ class TestShowNetworkEventsView(unittest.TestCase):
         context = self.context
         request = DummyRequest({'searchterm':'the'})
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.searchterm, 'the')
-        self.assertEqual(renderer.selected_year, None)
-        self.assertEqual(renderer.selected_month, None)
+        self.assertEqual(response['searchterm'], 'the')
+        self.assertEqual(response['selected_year'], None)
+        self.assertEqual(response['selected_month'], None)
 
     def test_with_year_and_month(self):
         self._register()
@@ -151,12 +153,11 @@ class TestShowNetworkEventsView(unittest.TestCase):
                 'month':'3',
                 })
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.searchterm, None)
-        self.assertEqual(renderer.selected_year, '2007')
-        self.assertEqual(renderer.selected_month, '3')
+        self.assertEqual(response['searchterm'], None)
+        self.assertEqual(response['selected_year'], '2007')
+        self.assertEqual(response['selected_month'], '3')
 
     def test_past_events(self):
         self._register()
@@ -166,12 +167,11 @@ class TestShowNetworkEventsView(unittest.TestCase):
             'past_events': 'True',
         })
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.future_events_url,
+        self.assertEqual(response['future_events_url'],
                          "http://example.com/child/?past_events=False")
-        self.assertEqual(renderer.past_events_url, None)
+        self.assertEqual(response['past_events_url'], None)
 
     def test_future_events(self):
         self._register()
@@ -181,12 +181,42 @@ class TestShowNetworkEventsView(unittest.TestCase):
             'past_events': 'False',
         })
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.past_events_url,
+        self.assertEqual(response['past_events_url'],
                          "http://example.com/child/?past_events=True")
-        self.assertEqual(renderer.future_events_url, None)
+        self.assertEqual(response['future_events_url'], None)
+
+    def test_read_only(self):
+        self._register({self.context: ('view',),})
+        request = DummyRequest()
+        response = self._callFUT(self.context, request)
+        self.assertEqual(response['actions'], [])
+
+    def test_editable(self):
+        self._register({self.context: ('view', 'edit'),})
+        request = DummyRequest()
+        response = self._callFUT(self.context, request)
+        self.assertEqual(response['actions'], [('Edit', 'edit.html')])
+
+    def test_deletable(self):
+        self._register({self.context.__parent__: ('view', 'delete'),})
+        request = DummyRequest()
+        response = self._callFUT(self.context, request)
+        self.assertEqual(response['actions'], [('Delete', 'delete.html')])
+
+    def test_delete_is_for_children_not_container(self):
+        self._register({self.context: ('view', 'delete'),})
+        request = DummyRequest()
+        response = self._callFUT(self.context, request)
+        self.assertEqual(response['actions'], [])
+
+    def test_creatable(self):
+        self._register({self.context: ('view', 'create'),})
+        request = DummyRequest()
+        response = self._callFUT(self.context, request)
+        self.assertEqual(response['actions'], [
+            ('Add Folder', 'add_folder.html'), ('Add File', 'add_file.html')])
 
 class TestShowNetworkNewsView(unittest.TestCase):
     def setUp(self):
@@ -207,8 +237,8 @@ class TestShowNetworkNewsView(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.custom_folderviews import network_news_view
-        return network_news_view(context, request)
+        from karl.content.views.custom_folderviews import NetworkNewsView
+        return NetworkNewsView(context, request)()
 
     def _registerAddables(self):
         from karl.views.interfaces import IFolderAddables
@@ -256,19 +286,18 @@ class TestShowNetworkNewsView(unittest.TestCase):
         context = self.context
         request = DummyRequest()
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 5)
-        self.assertEqual(renderer.backto,
+        self.assertEqual(len(response['actions']), 5)
+        self.assertEqual(response['backto'],
                          {'href': 'http://example.com/',
                           'title': 'Home'})
-        self.assertEqual(renderer.entries, [])
-        self.assertEqual(renderer.fb_years[:3], ['2007', '2008', '2009'])
-        self.assertEqual(len(renderer.fb_months), 12)
-        self.assertEqual(renderer.searchterm, None)
-        self.assertEqual(renderer.selected_year, None)
-        self.assertEqual(renderer.selected_month, None)
-        self.assertEqual(renderer.past_events_url, None)
+        self.assertEqual(response['entries'], [])
+        self.assertEqual(response['fb_years'][:3], ['2007', '2008', '2009'])
+        self.assertEqual(len(response['fb_months']), 12)
+        self.assertEqual(response['searchterm'], None)
+        self.assertEqual(response['selected_year'], None)
+        self.assertEqual(response['selected_month'], None)
+        self.assertEqual(response['past_events_url'], None)
 
     def test_with_searchterm(self):
         self._register()
@@ -276,12 +305,11 @@ class TestShowNetworkNewsView(unittest.TestCase):
         context = self.context
         request = DummyRequest({'searchterm':'someword'})
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.searchterm, 'someword')
-        self.assertEqual(renderer.selected_year, None)
-        self.assertEqual(renderer.selected_month, None)
+        self.assertEqual(response['searchterm'], 'someword')
+        self.assertEqual(response['selected_year'], None)
+        self.assertEqual(response['selected_month'], None)
 
     def test_with_year_and_month(self):
         self._register()
@@ -292,7 +320,42 @@ class TestShowNetworkNewsView(unittest.TestCase):
                 'month':'3',
                 })
 
-        renderer = registerDummyRenderer(self.template_fn)
         response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.searchterm, None)
+        self.assertEqual(response['searchterm'], None)
+
+from repoze.bfg.security import Authenticated
+from repoze.bfg.security import Everyone
+
+class DummySecurityPolicy:
+    """ A standin for both an IAuthentication and IAuthorization policy """
+    def __init__(self, userid=None, groupids=(), permissions=None):
+        self.userid = userid
+        self.groupids = groupids
+        self.permissions = permissions or {}
+
+    def authenticated_userid(self, request):
+        return self.userid
+
+    def effective_principals(self, request):
+        effective_principals = [Everyone]
+        if self.userid:
+            effective_principals.append(Authenticated)
+            effective_principals.append(self.userid)
+            effective_principals.extend(self.groupids)
+        return effective_principals
+
+    def remember(self, request, principal, **kw):
+        return []
+
+    def forget(self, request):
+        return []
+
+    def permits(self, context, principals, permission):
+        if context in self.permissions:
+            permissions = self.permissions[context]
+            return permission in permissions
+        return False
+
+    def principals_allowed_by_permission(self, context, permission):
+        return self.effective_principals(None)
