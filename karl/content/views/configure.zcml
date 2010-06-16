@@ -244,6 +244,7 @@
     for="karl.content.interfaces.ICommunityRootFolder"
     view=".files.show_folder_view"
     permission="view"
+    renderer="templates/show_folder.pt"
   />
 
   <view
@@ -344,6 +345,7 @@
     for="karl.content.interfaces.ICommunityFolder"
     view=".files.show_folder_view"
     permission="view"
+    renderer="templates/show_folder.pt"
   />
 
   <view

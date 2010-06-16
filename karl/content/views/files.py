@@ -149,8 +149,7 @@ def show_folder_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return render_template_to_response(
-        'templates/show_folder.pt',
+    return dict(
         api=api,
         actions=actions,
         head_data=convert_to_script(client_json_data),

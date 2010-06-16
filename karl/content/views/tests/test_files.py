@@ -40,7 +40,7 @@ class TestShowFolderView(unittest.TestCase):
         from karl.content.views.files import show_folder_view
         return show_folder_view(context, request)
 
-    def _register(self):
+    def _register(self, permissions=None):
         from karl.content.views.interfaces import IFileInfo
         testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                 IFileInfo)
@@ -52,6 +52,14 @@ class TestShowFolderView(unittest.TestCase):
         from karl.views.interfaces import IFolderAddables
         testing.registerAdapter(DummyFolderAddables, (Interface, Interface),
                                 IFolderAddables)
+
+        if permissions is not None:
+            from repoze.bfg.interfaces import IAuthenticationPolicy
+            from repoze.bfg.interfaces import IAuthorizationPolicy
+            from repoze.bfg.testing import registerUtility
+            policy = DummySecurityPolicy("userid", permissions=permissions)
+            registerUtility(policy, IAuthenticationPolicy)
+            registerUtility(policy, IAuthorizationPolicy)
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
@@ -71,9 +79,8 @@ class TestShowFolderView(unittest.TestCase):
         folder['child'] = context
         request = testing.DummyRequest()
         directlyProvides(context, ICommunity)
-        renderer  = testing.registerDummyRenderer('templates/show_folder.pt')
-        self._callFUT(context, request)
-        actions = renderer.actions
+        response = self._callFUT(context, request)
+        actions = response['actions']
         self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
@@ -90,13 +97,61 @@ class TestShowFolderView(unittest.TestCase):
         context.catalog = {'modified_date': DummyModifiedDateIndex()}
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
-        renderer  = testing.registerDummyRenderer('templates/show_folder.pt')
-        self._callFUT(context, request)
-        actions = renderer.actions
+        response = self._callFUT(context, request)
+        actions = response['actions']
         self.assertEqual(len(actions), 2)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
+    def test_read_only(self):
+        root = testing.DummyModel(title='root')
+        root['context'] = context = testing.DummyModel(title='thetitle')
+        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        self._register({context: ('view',),})
+        self._registerLayoutProvider()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [])
+
+    def test_editable(self):
+        root = testing.DummyModel(title='root')
+        root['context'] = context = testing.DummyModel(title='thetitle')
+        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        self._register({context: ('view', 'edit'),})
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [('Edit', 'edit.html')])
+
+    def test_deletable(self):
+        root = testing.DummyModel(title='root')
+        root['context'] = context = testing.DummyModel(title='thetitle')
+        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        self._register({context.__parent__: ('view', 'delete'),})
+        self._registerLayoutProvider()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [('Delete', 'delete.html')])
+
+    def test_delete_is_for_children_not_container(self):
+        root = testing.DummyModel(title='root')
+        root['context'] = context = testing.DummyModel(title='thetitle')
+        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        self._register({context: ('view', 'delete'),})
+        self._registerLayoutProvider()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [])
+
+    def test_creatable(self):
+        root = testing.DummyModel(title='root')
+        root['context'] = context = testing.DummyModel(title='thetitle')
+        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        self._register({context: ('view', 'create'),})
+        self._registerLayoutProvider()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [
+            ('Add Folder', 'add_folder.html'), ('Add File', 'add_file.html')])
 
 class Test_redirect_to_add_form(unittest.TestCase):
 
@@ -1293,3 +1348,38 @@ class DummyShowSendalert(object):
         pass
     show_sendalert = True
 
+from repoze.bfg.security import Authenticated
+from repoze.bfg.security import Everyone
+
+class DummySecurityPolicy:
+    """ A standin for both an IAuthentication and IAuthorization policy """
+    def __init__(self, userid=None, groupids=(), permissions=None):
+        self.userid = userid
+        self.groupids = groupids
+        self.permissions = permissions or {}
+
+    def authenticated_userid(self, request):
+        return self.userid
+
+    def effective_principals(self, request):
+        effective_principals = [Everyone]
+        if self.userid:
+            effective_principals.append(Authenticated)
+            effective_principals.append(self.userid)
+            effective_principals.extend(self.groupids)
+        return effective_principals
+
+    def remember(self, request, principal, **kw):
+        return []
+
+    def forget(self, request):
+        return []
+
+    def permits(self, context, principals, permission):
+        if context in self.permissions:
+            permissions = self.permissions[context]
+            return permission in permissions
+        return False
+
+    def principals_allowed_by_permission(self, context, permission):
+        return self.effective_principals(None)
