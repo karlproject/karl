@@ -247,7 +247,7 @@ class AdminEditProfileFormController(EditProfileFormController):
     logic that the admin form requires.
     """
     simple_field_names = EditProfileFormController.simple_field_names
-    simple_field_names += ['home_path']
+    simple_field_names = simple_field_names + ['home_path']
 
     def __init__(self, context, request):
         super(AdminEditProfileFormController, self).__init__(context, request)
@@ -375,7 +375,7 @@ class AddUserFormController(EditProfileFormController):
     they both inherit from the same base.
     """
     simple_field_names = EditProfileFormController.simple_field_names
-    simple_field_names += ['home_path']
+    simple_field_names = simple_field_names + ['home_path']
 
     def __init__(self, context, request):
         self.context = context

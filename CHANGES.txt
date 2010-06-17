@@ -17,6 +17,9 @@ Unreleased
 
 - Added stub for console script, reindex_peopledir.
 
+- Fixed bug where 'home_path' was being clobbered by edit profile form.
+  (LP #594127)
+
 3.35 (2010-06-08)
 -----------------
 

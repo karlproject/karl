@@ -200,6 +200,19 @@ class TestEditProfileFormController(unittest.TestCase):
                 continue
             self.assertEqual(getattr(self.context, fieldname), value)
 
+    def test_handle_submit_dont_clobber_home_path(self):
+        # LP #594127, bad class inheritance code caused
+        # EditFormController.simple_field_names to be contaminated with field
+        # names from subclasses, which was causing 'home_path' to get
+        # overwritten even though it isn't shown on the form.
+        controller = self._makeOne(self.context, self.request)
+        # first set up the simple fields to submit
+        converted = {}
+        for fieldname, value in profile_data.items():
+            converted[fieldname] = value
+        self.context.home_path = 'foo/bar'
+        controller.handle_submit(converted)
+        self.assertEqual(self.context.home_path, 'foo/bar')
 
 class TestAdminEditProfileFormController(unittest.TestCase):
     def setUp(self):
