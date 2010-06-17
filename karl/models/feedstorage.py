@@ -51,6 +51,10 @@ class Feed(Persistent):
         self.entries = PersistentList()
 
     def update(self, parser):
+        new_entries = [FeedEntry(e) for e in parser.entries]
+        if not new_entries:
+            return
+
         for field in self._feed_fields:
             value = parser.feed.get(field)
             if getattr(self, field, _marker) != value:
@@ -64,8 +68,7 @@ class Feed(Persistent):
         if self.feed_modified != modified:
             self.feed_modified = modified
 
-        new_entries = [FeedEntry(e) for e in parser.entries]
-        if new_entries and new_entries != list(self.entries):
+        if new_entries != list(self.entries):
             self.entries[:] = new_entries
 
 
