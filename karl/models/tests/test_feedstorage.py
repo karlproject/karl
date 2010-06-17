@@ -106,3 +106,21 @@ class FeedStorageTests(unittest.TestCase):
         self.assertEqual(feed1.entries, feed2.entries)
         self.assertFalse(feed1.entries[0] != feed2.entries[0])
         self.assertFalse(feed1.entries[1] != feed2.entries[1])
+
+    def test_empty_upstream_feed(self):
+        from karl.models.feedstorage import Feed
+        import feedparser
+        import os
+        filename = os.path.join(
+            os.path.dirname(__file__), 'feeds', 'test1.xml')
+
+        parser = feedparser.parse(filename)
+        feed = Feed("example")
+        feed.update(parser)
+        self.assertEqual(len(feed.entries), 3)
+
+        filename = os.path.join(
+            os.path.dirname(__file__), 'feeds', 'test0.xml')
+        parser = feedparser.parse(filename)
+        feed.update(parser)
+        self.assertEqual(len(feed.entries), 3)

@@ -20,6 +20,9 @@ Unreleased
 - Fixed bug where 'home_path' was being clobbered by edit profile form.
   (LP #594127)
 
+- Updated the rss feed update code to only update a feed if the upstream feed
+  contains entries.  (LP #594352)
+
 3.35 (2010-06-08)
 -----------------
 

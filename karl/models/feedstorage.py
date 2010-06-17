@@ -65,7 +65,7 @@ class Feed(Persistent):
             self.feed_modified = modified
 
         new_entries = [FeedEntry(e) for e in parser.entries]
-        if new_entries != list(self.entries):
+        if new_entries and new_entries != list(self.entries):
             self.entries[:] = new_entries
 
 
