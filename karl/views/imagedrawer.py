@@ -18,12 +18,13 @@
 from simplejson import JSONEncoder
 import transaction
 import urlparse
+import os
 from webob import Response
 
-from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import model_path
+from repoze.bfg.traversal import traverse
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
@@ -188,6 +189,18 @@ def batch_images(context, request,
                  get_image_info=get_image_info, # unittest
                  get_images_batch=get_images_batch): # unittest
 
+    include_image_url = request.params.get('include_image_url', None)
+    # include_image_url is a special case.
+    include_info = None
+    if include_image_url is not None:
+        # Note, we must use the path only, as IE submits the full domain
+        # and without the next line IE would fail.
+        path = urlparse.urlparse(include_image_url)[2]
+        include_context = traverse(context, path)['context']
+        if IImage.providedBy(include_context):
+            # We have a good image to include.
+            include_info = get_image_info(include_context, request)
+
     # Find query parameters based on the 'source' param,
     # which signifies the selection index of the source button
     # in the imagedrawer dialog.
@@ -211,13 +224,26 @@ def batch_images(context, request,
     # apply their default. This allows us to enforce
     # a MINIMAL_BATCH size.
     batch_start = int(request.params.get('start', '0'))
-    batch_size = max(int(request.params.get('limit', '0')), MINIMAL_BATCH)
+    batch_size = int(request.params.get('limit', '0'))
     # there is a minimal batch size to enforce, if the client
     # does not ask for one
     # Just pass the values to lower levels where sensible
     # defaults will be applied.
     sort_index = request.params.get('sort_on', None)
     reverse = request.params.get('reverse', None)
+
+    # XXX include_image will now be inserted in the first
+    # position, as extra image.
+    insert_extra = False
+    if include_info is not None:
+        if batch_start == 0:
+            batch_size -= 1
+            insert_extra = True
+        else:
+            batch_start -= 1
+
+    # Enforce the minimal batch size
+    batch_size = max(batch_size, MINIMAL_BATCH)
 
     search_params = dict(
         creator=creator,
@@ -238,12 +264,22 @@ def batch_images(context, request,
 
     records = [get_image_info(image, request)
                for image in batch_info['entries']]
+    start = batch_info['batch_start']
+    totalRecords = batch_info['total']
+
+    # add the fake included image
+    if include_info is not None:
+        totalRecords += 1
+        if insert_extra:
+            records.insert(0, include_info)
+        else:
+            start += 1
 
     return dict(
-        records=records,
-        start=batch_info['batch_start'],
-        totalRecords=batch_info['total'],
-    )
+        records = records,
+        start = start,
+        totalRecords = totalRecords,
+        )
 
 @jsonview()
 def drawer_dialog_view(context, request,
@@ -259,14 +295,27 @@ def drawer_dialog_view(context, request,
 
         error: ... explicitely raise an error
     """
-    # Render the dialog template
-    dialog_snippet = render_template('templates/imagedrawer_dialog_snippet.pt',
+    # Read the dialog snippet
+    # It is located where the tinymce plugin is.
+    here = os.path.abspath(os.path.dirname(__file__))
+    dialog_snippet = file(os.path.join(here,
+            'static', 'tiny_mce', 'plugins', 'imagedrawer',
+            'imagedrawer_dialog_snippet.html',
+        )).read()
+
+    d = dict(
+        dialog_snippet = dialog_snippet,
         )
 
-    return dict(
-        dialog_snippet=dialog_snippet,
-        ##images_info=batch_images(context, request),
-    )
+    # Download sources will need a batch result
+    # to be included in the response.
+    source = request.params.get('source', None)
+    assert source in ('upload', 'myrecent', 'thiscommunity',
+                    'allkarl', 'external', None)
+    if source in ('myrecent', 'thiscommunity', 'allkarl'):
+        d['images_info'] = batch_images(context, request)
+
+    return d
 
 @jsonview()
 def drawer_data_view(context, request,

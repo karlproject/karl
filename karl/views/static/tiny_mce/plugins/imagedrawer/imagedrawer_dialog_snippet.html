@@ -17,10 +17,6 @@
         <option value="thiscommunity"
             title="Display images from this community"
             >This Community</option>
-        <option value="allkarl"
-            title="Display images from all KARL"
-            disabled="1"
-            >All KARL</option>
         <option value="external"
             title="Display images from external websites"
             >Web</option>
@@ -86,52 +82,55 @@
     </div>
 
     <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-upload">
-      <div class="tiny-imagedrawer-upload1">
-        <p>
-          Select file to upload, then press the Upload button!
-          File will be uploaded into the current page.
-        </p>
-        <input type="file" class="tiny-imagedrawer-fileinput" />
-        <br />
-        <br />
-        <span class="tiny-imagedrawer-titletext-label">Title</span>
-        <input type="text" name="tiny-imagedrawer-input-titletext"
-          class="tiny-imagedrawer-input-titletext" value="" />
-        <br />
-        <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
-          <button class="ui-icon-transferthick-e-w">Upload</button>
+      <p>
+        Select file to upload, then press the Upload button!
+        File will be uploaded into the current page.
+      </p>
+      <div class="ui-helper-clearfix tiny-imagedrawer-upload-columnwrapper">
+        <div class="tiny-imagedrawer-upload-file-wrapper">
+          <span class="tiny-imagedrawer-upload-label">File</span>
+          <input type="file" class="tiny-imagedrawer-fileinput" />
+          <br />
+        </div>
+        <div class="tiny-imagedrawer-upload-titletext-wrapper">
+          <span class="tiny-imagedrawer-upload-label">Title</span>
+          <input type="text" name="tiny-imagedrawer-input-titletext"
+            class="tiny-imagedrawer-input-titletext" value="" />
+          <br />
         </div>
       </div>
-      <div class="tiny-imagedrawer-upload2">
-        <p>
-          Insert or Replace the image, after the upload has completed.
-          Press Reset if you wish to upload another image.
-        </p>
-        <ul class="tiny-imagedrawer-imagestripe">
-          <li class="tiny-imagedrawer-image"></li>
-        </ul>
-        <br />
-        <div class="tiny-imagedrawer-statusbox"></div>
-        <div class="karl-buttonset tiny-imagedrawer-buttonset-uploadreset">
-          <button class="ui-icon-transferthick-e-w">Reset</button>
-        </div>
+      <div class="karl-buttonset tiny-imagedrawer-buttonset-upload">
+        <button class="ui-icon-transferthick-e-w">Upload</button>
+        <button class="ui-icon-cancel" disabled="1">Reset</button>
       </div>
+      <div class="tiny-imagedrawer-statusbox"></div>
+      <ul class="tiny-imagedrawer-imagestripe">
+        <li class="tiny-imagedrawer-image"></li>
+      </ul>
     </div>
 
     <div style="width: 376px; height: 388px; float: left;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-external">
-      <div class="tiny-imagedrawer-images">
-        <ul class="tiny-imagedrawer-imagestripe"></ul>
-        <div class="tiny-imagedrawer-scrollbar"></div>
-      </div>
-      <br />
       <p>
-        Select the url of the external image to be used in your document!
+        Select the URL of the external image to be used in your document.
       </p>
-      <input type="text" class="tiny-imagedrawer-input-url" />
-      <br />
-      <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
-        <button class="ui-icon-gear">Check</button>
+      <div class="ui-helper-clearfix tiny-imagedrawer-external-columnwrapper">
+        <div class="tiny-imagedrawer-external-url-wrapper">
+          <span class="tiny-imagedrawer-external-label">URL</span>
+          <input type="text" name="tiny-imagedrawer-input-url"
+            class="tiny-imagedrawer-input-url" value=""/>
+          <br />
+        </div>
       </div>
+      <div class="karl-buttonset tiny-imagedrawer-buttonset-check">
+        <button class="ui-icon-gear">Preview</button>
+      </div>
+      <div class="tiny-imagedrawer-external-previewtitle">Image Preview</div>
+      <br />
+      <span class="tiny-imagedrawer-external-previewtext">None Selected</span>
+      <div class="tiny-imagedrawer-statusbox"></div>
+      <ul class="tiny-imagedrawer-imagestripe">
+        <li class="tiny-imagedrawer-image"></li>
+      </ul>
     </div>
 
     <div style="width: 306px; height: 388px; float: right;" class="ui-widget-content ui-corner-all tiny-imagedrawer-panel tiny-imagedrawer-panel-info">
@@ -156,6 +155,7 @@
           <br />
         </div>
         <br />
+        <!-- XXX Captions temporarily disabled. --><div style="display: none;">
         <span class="tiny-imagedrawer-info-label">Caption</span>
         <input type="checkbox" name="tiny-imagedrawer-input-caption" 
           class="tiny-imagedrawer-input-caption" value="" />
@@ -167,20 +167,21 @@
             class="tiny-imagedrawer-input-captiontext" value="" />
           <br />
         </div>
+        <!-- --></div>
         <span class="tiny-imagedrawer-info-label">Alignment</span>
-        <input id="tiny-imagedrawer-input-align-0" value="left"
+        <input value="left" id="tiny-imagedrawer-input-align-left"
             type="radio" checked="checked" name="tiny-imagedrawer-input-align" />
-        <label for="tiny-imagedrawer-input-align-0">Left</label>
+        <label for="tiny-imagedrawer-input-align-left">Left</label>
         <br />
         <span class="tiny-imagedrawer-info-label"></span>
-        <input id="tiny-imagedrawer-input-align-1" value="right"
+        <input value="right" id="tiny-imagedrawer-input-align-right"
             type="radio" name="tiny-imagedrawer-input-align" />
-        <label for="tiny-imagedrawer-input-align-1">Right</label>
+        <label for="tiny-imagedrawer-input-align-right">Right</label>
         <br />
         <span class="tiny-imagedrawer-info-label"></span>
-        <input id="tiny-imagedrawer-input-align-2" value="center"
+        <input value="center" id="tiny-imagedrawer-input-align-center"
             type="radio" name="tiny-imagedrawer-input-align" />
-        <label for="tiny-imagedrawer-input-align-2">Center</label>
+        <label for="tiny-imagedrawer-input-align-center">Center</label>
         <br />
         <span class="tiny-imagedrawer-info-label">Size</span>
         <select name="tiny-imagedrawer-input-dimension">

@@ -67,13 +67,16 @@
     padding-left: 75px;
 }
 
-.tiny-imagedrawer-buttonset-upload,
-.tiny-imagedrawer-buttonset-uploadreset,
 .tiny-imagedrawer-buttonset-cancelhelp {
     margin-left: 0;
     margin-top: 1.5em;
 }
 
+.tiny-imagedrawer-buttonset-upload {
+    margin-left: 0;
+    margin-top: 1.5em;
+    float: none !important;
+}
 /* Image listing */
 .tiny-imagedrawer-panel-images {
     overflow: hidden;
@@ -186,14 +189,34 @@ span.tiny-imagedrawer-imagelabel {
 }
 
 
+.tiny-imagedrawer-panel-external ul.tiny-imagedrawer-imagestripe {
+    height: 212px; /* must match height of the li */
+}
+.tiny-imagedrawer-panel-external ul.tiny-imagedrawer-imagestripe li {
+    width: 183px; /* 4px + 175px + 4px */
+    height: 210px; /* must match height of the ul */
+}
+.tiny-imagedrawer-panel-external div.tiny-imagedrawer-image {
+    width: 183px; /* 4px + 175px + 4px */
+    height: 183px; /* 4px + 175px + 4px */
+}
+.tiny-imagedrawer-panel-external div.tiny-imagedrawer-image img {
+    max-height: 175px;
+    max-width: 175px;
+}
+.tiny-imagedrawer-panel-external span.tiny-imagedrawer-imagelabel {
+    max-width: 175px;
+}
+
 
 input.tiny-imagedrawer-input-url {
-    width: 350px;
+    width: 300px;
 }
 
 .tiny-imagedrawer-buttonset-check {
     margin-top: 1em;
-    margin-left: 0;
+    margin-left: 8px;
+    float: none !important;
 }
 
 .tiny-imagedrawer-buttonset-save {
@@ -213,6 +236,38 @@ input.tiny-imagedrawer-input-captiontext {
     opacity: 0.50;
 }
 
-.tiny-imagedrawer-input-titletext {
-    width: 325;
+.tiny-imagedrawer-upload-titletext-wrapper {
+    margin-top: 0.25em;
 }
+.tiny-imagedrawer-input-titletext {
+    width: 300px;
+}
+
+.tiny-imagedrawer-upload-label {
+    margin-left: -42px;
+    float: left;
+}
+
+.tiny-imagedrawer-upload-columnwrapper {
+    padding-left: 50px;
+}
+
+.tiny-imagedrawer-external-label {
+    margin-left: -42px;
+    float: left;
+}
+
+.tiny-imagedrawer-external-columnwrapper {
+    padding-left: 50px;
+}
+
+.tiny-imagedrawer-external-previewtitle {
+    font-size: 1.4em;
+    margin-bottom: 0.25em;
+}
+
+.tiny-imagedrawer-external-previewtext {
+    font-style: italic;
+    margin-left: 8px;
+}
+

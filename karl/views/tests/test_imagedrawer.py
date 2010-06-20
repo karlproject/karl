@@ -192,43 +192,303 @@ class Test_drawer_dialog_view(unittest.TestCase):
 
     def test_it(self):
         import simplejson
-        renderer = testing.registerDummyRenderer(
-            'templates/imagedrawer_dialog_snippet.pt'
-        )
-        renderer.string_response = 'template body'
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._call_fut(context, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data['dialog_snippet'], 'template body')
+        self.assertEqual(data['dialog_snippet'][:123],
+            u'<div>\n\n  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">\n'
+        )
         # the default source has no image
-        # and this is the only way to launch the dialog right now.
-        ###self.assertEqual(data['images_info'], ['foo', 'bar'])
         self.assert_('images_info' not in data)
+
+    def test_download_tabs(self):
+        import simplejson
+        context = testing.DummyModel()
+        request = testing.DummyRequest(
+            params={
+                'source': 'myrecent',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['dialog_snippet'][:123],
+            u'<div>\n\n  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">\n'
+        )
+        # download tabs have images_info included
+        self.assertEqual(data['images_info'], ['foo', 'bar'])
+
+        request = testing.DummyRequest(
+            params={
+                'source': 'thiscommunity',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['dialog_snippet'][:123],
+            u'<div>\n\n  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">\n'
+        )
+        # download tabs have images_info included
+        self.assertEqual(data['images_info'], ['foo', 'bar'])
+
+        request = testing.DummyRequest(
+            params={
+                'source': 'allkarl',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['dialog_snippet'][:123],
+            u'<div>\n\n  <div class="ui-widget-header ui-corner-all ui-helper-clearfix tiny-imagedrawer-panel tiny-imagedrawer-panel-top">\n'
+        )
+        # download tabs have images_info included
+        self.assertEqual(data['images_info'], ['foo', 'bar'])
 
 class Test_drawer_data_view(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
+        batch = [
+            testing.DummyModel(title='foo'),
+            testing.DummyModel(title='bar'),
+        ]
+
+        class DummyGetImagesBatch(object):
+            def __call__(self, context, request, **search_params):
+                self.called = (context, request, search_params)
+                return dict(
+                    entries = batch,
+                    batch_start = search_params['batch_start'],
+                    batch_size = search_params['batch_size'],
+                    total = 5)
+        self.dummy_get_images_batch = DummyGetImagesBatch()
+
+        def dummy_get_images_info(image, request):
+            return image.title
+        self.dummy_get_images_info = dummy_get_images_info
+
+        from karl.views.imagedrawer import batch_images
+        def wrapped_batch_images(*arg, **kw):
+            kw['get_image_info'] = self.dummy_get_images_info
+            kw['get_images_batch'] = self.dummy_get_images_batch
+            return batch_images(*arg, **kw)
+
+        self.dummy_batch_images = wrapped_batch_images
+
+
     def tearDown(self):
         cleanUp()
 
-    def dummy_batcher(self, context, request):
-        return ['foo', 'bar']
-
     def _call_fut(self, context, request):
         from karl.views.imagedrawer import drawer_data_view
-        return drawer_data_view(context, request, self.dummy_batcher)
+        return drawer_data_view(context, request, self.dummy_batch_images)
 
     def test_it(self):
         import simplejson
         context = testing.DummyModel()
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(
+            params={
+                'source': 'myrecent',
+            }
+        )
         response = self._call_fut(context, request)
         self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
         data = simplejson.loads(response.body)
-        self.assertEqual(data['images_info'], ['foo', 'bar'])
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 5,
+            'start': 0,
+            'records': ['foo', 'bar'],
+            })
+
+        # ask a batch from the 1st (or nth) image
+        request = testing.DummyRequest(
+            params={
+                'source': 'myrecent',
+                'start': '1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 1,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 5,
+            'start': 1,
+            'records': ['foo', 'bar'], # no problem... just bad faking
+            })
+
+    def test_including_replace_image(self):
+        ## if we are replacing, the passed-in image url
+        ## is added as a fake 1th element.
+        import simplejson
+        from karl.content.interfaces import IImage
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        image = context['boo.jpg'] = testing.DummyModel()
+        image.title = 'Boo'
+        directlyProvides(image, IImage)
+
+        request = testing.DummyRequest(
+            params={
+                'include_image_url': '/boo.jpg',
+                'source': 'myrecent',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 6,
+            'start': 0,
+            'records': ['Boo', 'foo', 'bar'],
+            })
+
+        # if we don't ask for the 0th index: it's not
+        # added, but the sizes and indexes are aligned.
+        request = testing.DummyRequest(
+            params={
+                'include_image_url': '/boo.jpg',
+                'source': 'myrecent',
+                'start': '1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 6,
+            'start': 1,
+            'records': ['foo', 'bar'],
+            })
+
+    def test_including_replace_image_urlview(self):
+        import simplejson
+        from karl.content.interfaces import IImage
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        image = context['boo.jpg'] = testing.DummyModel()
+        image.title = 'Boo'
+        directlyProvides(image, IImage)
+
+        # It is expected for the url path to continue beyond
+        # the context object. (thumbnail, or a specific view)
+        request = testing.DummyRequest(
+            params={
+                'include_image_url': '/boo.jpg/what/ever',
+                'source': 'myrecent',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 6,
+            'start': 0,
+            'records': ['Boo', 'foo', 'bar'],
+            })
+
+    def test_including_replace_image_fulldomain(self):
+        import simplejson
+        from karl.content.interfaces import IImage
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        image = context['boo.jpg'] = testing.DummyModel()
+        image.title = 'Boo'
+        directlyProvides(image, IImage)
+
+        # It must also work, when the image url is
+        # a full domain. This happens on IE.
+        # XXX The server should _not_ check the domain
+        # at all, simply use the path.
+
+        # XXX For a reason unknown, this test passes even
+        # if the traverse the full domain instead of just the
+        # path... while, the same thing fails in "real life" on IE.
+        # So, this test probably does not test what it should...
+        request = testing.DummyRequest(
+            params={
+                'include_image_url': 'http://lcd.tv:9876/boo.jpg/thumb',
+                'source': 'myrecent',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 6,
+            'start': 0,
+            'records': ['Boo', 'foo', 'bar'],
+            })
+
+    def test_including_replace_image_fail(self):
+        import simplejson
+        context = testing.DummyModel()
+        request = testing.DummyRequest(
+            params={
+                'include_image_url': '/badimage',
+                'source': 'myrecent',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(self.dummy_get_images_batch.called,
+            (context, request, {
+                'community': None,
+                'batch_start': 0,
+                'batch_size': 12,
+                'creator': None
+                }))
+        data = simplejson.loads(response.body)
+        self.assertEqual(data['images_info'], {
+            'totalRecords': 5,
+            'start': 0,
+            'records': ['foo', 'bar'],
+            })
 
 class Test_drawer_upload_view(unittest.TestCase):
     def setUp(self):

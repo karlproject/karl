@@ -519,6 +519,8 @@ tinyMCE.addI18n('en.wicked',{
     var next_fileinputid = 0;
     // unique id needed to serialize file uploads
     var upload_serial = 0;
+    // unique id needed to serialize file uploads
+    var external_check_serial = 0;
 
     // Support classes for the image thumbnail handling
     //
@@ -614,8 +616,14 @@ tinyMCE.addI18n('en.wicked',{
                 this.info_location = this.element.find('.tiny-imagedrawer-info-location');
                 this.info_author = this.element.find('.tiny-imagedrawer-info-author');
                 this.info_modified = this.element.find('.tiny-imagedrawer-info-modified');
-                this.input_caption = this.element.find('.tiny-imagedrawer-input-caption');
-                this.input_captiontext = this.element.find('.tiny-imagedrawer-input-captiontext');
+                this.input_caption = this.element.find('input:checkbox[name=tiny-imagedrawer-input-caption]');
+                this.input_captiontext = this.element.find('input:text[name=tiny-imagedrawer-input-captiontext]');
+                this.input_align = {};
+                this.element.find('input:radio[name=tiny-imagedrawer-input-align]')
+                    .each(function(index, value) {
+                        self.input_align[$(value).attr('value')] = value;
+                    });
+                this.input_dimension = this.element.find('select[name=tiny-imagedrawer-input-dimension]');
                 this.wrapper_location = this.element.find('.tiny-imagedrawer-info-location-wrapper');
                 this.wrapper_author = this.element.find('.tiny-imagedrawer-info-author-wrapper');
                 this.wrapper_modified = this.element.find('.tiny-imagedrawer-info-modified-wrapper');
@@ -763,12 +771,51 @@ tinyMCE.addI18n('en.wicked',{
 
                 // XXX this will work in jquery.ui >= 1.8
                 return this;
+            },
+
+            insertOptions: function(/*optional*/ value) {
+                var self = this;
+
+                if (typeof value == 'undefined') {
+                    // Geting value from the inputs.
+                    return {
+                        caption: this.input_caption.is(':checked'),
+                        captiontext: this.input_captiontext.val(),
+                        align: this.element.find('input:radio[name=tiny-imagedrawer-input-align]:checked').val(),
+                        dimension: this.input_dimension.val()
+                    };
+                }
+
+                // Setting values, taking care of sensible defaults.
+                if (value) {
+                    if (value.caption != undefined) {
+                        this.input_caption[0].checked = value.caption;
+                        if (value.caption) {
+                            this.wrapper_captiontext.show();
+                        } else {
+                            this.wrapper_captiontext.hide();
+                        }
+                    }
+                    if (value.captiontext != undefined) {
+                        this.input_captiontext.val(value.captiontext);
+                    }
+                    if (value.align != undefined) {
+                        this.input_align[value.align].checked = true;
+                    }
+                    if (value.dimension != undefined) {
+                        this.input_dimension.val(value.dimension);
+                    }
+                }
+
+                // XXX this will work in jquery.ui >= 1.8
+                return this;
             }
+
 
         });
 
         $.extend($.tiny.imagedrawerinfopanel, {
-                getter: "record",
+                getter: "record insertOptions",
                 defaults: {
                     record: null,
                     insertButtonLabel: null
@@ -923,7 +970,9 @@ tinyMCE.addI18n('en.wicked',{
     };
 
 
-    tinymce.create('tinymce.plugins.ImageDrawerPlugin', {
+    // allow this to fail if tinymce is not present
+    window.tinymce || register_widgets();
+    window.tinymce && tinymce.create('tinymce.plugins.ImageDrawerPlugin', {
 
         // Mandatory parameters:
         //      imagedrawer_dialog_url
@@ -952,14 +1001,47 @@ tinyMCE.addI18n('en.wicked',{
                 if (ed.dom.getAttrib(ed.selection.getNode(), 'class').indexOf('mceItem') != -1)
                     return;
                 
+                // Let's see what image the user wants us to replace
+                var img = self._getEditorImageSelection();
+                if (img) {
+                    img = $(img);
+
+                    // Fetch the data from the image
+                    self.editor_image_data = self._getEditorImageData(img);
+
+                    // Analyze the source.
+                    var re_domain = /^https?:\/\/([^\/\?]*)[\/\?]?/;
+                    var a_1 = re_domain.exec(window.location.href);
+                    var a_domain = a_1 && a_1[1];
+                    var b_1 = re_domain.exec(img.attr('src')); // null if relative
+                    var b_domain = b_1 && b_1[1];
+                    self.editor_image_data.external = b_1 && a_domain != b_domain;
+
+                } else {
+                    // Not replacing (...will insert)
+                    self.editor_image_data = null;
+                }
+
+
                 // Do we need a dialog?
                 if (! self.dialog) {
+                    var data = {};
+                    if (self.editor_image_data && ! self.editor_image_data.external) { 
+                        // If this is our internal image, we start
+                        // on the My Recent tab. The server will
+                        // incorporate the image to be replaced
+                        // in the thumbnail result list.
+                        data = {
+                            source: 'myrecent',
+                            include_image_url: self.editor_image_data.image_url
+                        };
+                    }
                     // Make a request to the server to fetch the dialog snippet
                     // as well as the initial batch of the image list
                     $.ajax({
                             type: 'GET',
                             url: ed.getParam('imagedrawer_dialog_url'),
-                            data: '',
+                            data: data,
                             success: function(json) {self._dialogSuccess(json);},
                             error: function(json) {self._dialogError(json);},
                             dataType: 'json'
@@ -967,10 +1049,46 @@ tinyMCE.addI18n('en.wicked',{
 
                         // XXX show loading status here?
                 } else {
+                    self._restore_formstate();  // XXX XXX
+                    // XXX...
+                    var button_value = $(self.buttonset).data('karlbuttonset')
+                        .element.children().eq(self.selected_source).attr('value');
+
                     // Set the Insert/Replace button's text.
                     self._updateInsertReplaceState();
+                    // Set the source in case we are replacing.
+                    if (self.editor_image_data) {
+                        // We are replacing. Source is either My Recent or Web.
+                        if (self.editor_image_data.external) {
+                            self.buttonset
+                                .karlbuttonset('getButton', 3)   // Web
+                                .click();
+                            self.input_url.val(self.editor_image_data.image_url);
+                            self._externalDoCheck({
+                                image_url: self.editor_image_data.image_url
+                            });
+                        } else {
+                            if (self.selected_source != 1) {
+                                self.buttonset
+                                    .karlbuttonset('getButton', 1)   // My Recent
+                                    .click();
+                            } else if (button_value == 'myrecent' ||
+                                       button_value == 'thiscommunity' ) {
+                                // need to force the re-fetch
+                                self._requestRecords(0, 12, true);   // XXX XXX
+                            }
+                        } 
+                    } else {
+                        if (button_value == 'myrecent' ||
+                                button_value == 'thiscommunity' ) {
+                            // need to force the re-fetch
+                            self._requestRecords(0, 12, true);   // XXX XXX
+                        }
+                    }
                     // We have it, so (re-)open it.
+                    self._save_formstate();     // XXX XXX
                     self.dialog.dialog('open');
+                    self._restore_formstate();  // XXX XXX
                 }
 
             });
@@ -991,6 +1109,22 @@ tinyMCE.addI18n('en.wicked',{
                 //}
             });
 
+        },
+
+        // Hack to work around:
+        //   http://sikanrong.com/blog/radio_button_javascript_bug__internet_explorer
+        // Every time we open / close the dialog, the snippet will be
+        // moved in the dom. Which causes IE to forget the selection of
+        // the radio buttons, and revert to their value at creation.
+        _save_formstate: function() {
+            this._formstate = {
+                insertOptions: this.info_panel.imagedrawerinfopanel('insertOptions')
+            };
+        },
+        //
+        _restore_formstate: function() {
+            this.info_panel.imagedrawerinfopanel('insertOptions',
+                    this._formstate.insertOptions);
         },
 
         _dialogSuccess: function(json) {
@@ -1048,9 +1182,9 @@ tinyMCE.addI18n('en.wicked',{
             // each tab panel gets selected by a button
             // from the source selection buttonset
             var download_panel = this.dialog.find('.tiny-imagedrawer-panel-download');
-            var upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload')
+            this.upload_panel = this.dialog.find('.tiny-imagedrawer-panel-upload')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
-            var external_panel = download_panel.find('.tiny-imagedrawer-panel-external')
+            this.external_panel = download_panel.find('.tiny-imagedrawer-panel-external')
                 .tiny_fixIEPanelSize($.tiny.PANEL_WD, $.tiny.PANEL_HD); // fix the box model if needed
             this.images_panel = this.dialog
                 .find('.tiny-imagedrawer-panel-images')
@@ -1065,16 +1199,16 @@ tinyMCE.addI18n('en.wicked',{
                     clsContainer: 'tiny-imagedrawer-buttonset-tabselect'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    // XXX TODO change this also to use sensible identifiers
-                    // instead of indexes.
-                    ////var target = (button_index != 0) ? download_panel : upload_panel;
                     if (value) {
-                        ////target.show();
-                       if (button_index == 0) {
+                        // XXX...
+                        var button_value = $(this).data('karlbuttonset')
+                            .element.children().eq(button_index).attr('value');
+
+                        if (button_value == 'uploadnew') {
                             // Handle the Upload tab
-                            upload_panel.show();
+                            self.upload_panel.show();
                             self.images_panel.hide();
-                            external_panel.hide();
+                            self.external_panel.hide();
                             // There is only one thumb on the upload panel,
                             // and that should be selected when switched there.
                             var value = self.upload_preview_image
@@ -1085,7 +1219,8 @@ tinyMCE.addI18n('en.wicked',{
                                 self._setSelection(null);
                             }
                             self.selected_source = button_index;
-                        } else if (button_index >= 1 && button_index <= 3) {
+                        } else if (button_value == 'myrecent' ||
+                                   button_value == 'thiscommunity') {
                             // Handle the search result browsers
                             // Did the source change?
                             if (button_index != self.selected_source) {
@@ -1097,42 +1232,27 @@ tinyMCE.addI18n('en.wicked',{
                                 // also need to reset the info panel.
                                 self.info_panel.imagedrawerinfopanel('record', {});
                             }
-                            upload_panel.hide();
+                            self.upload_panel.hide();
                             self.images_panel.show();
-                            external_panel.hide();
-                        } else if (button_index == 4) {
+                            self.external_panel.hide();
+                        } else if (button_value == 'external') {
                             // Handle the External tab
-                            upload_panel.hide();
+                            self.upload_panel.hide();
                             self.images_panel.hide();
-                            external_panel.show();
-                            // erase the info in the panel
-                            self.info_panel.imagedrawerinfopanel('record', {});
+                            self.external_panel.show();
+                            // There is only one thumb on the external panel,
+                            // and that should be selected when switched there.
+                            var value = self.external_preview_image
+                                .imagedrawerimage('record');
+                            if (value && value.image_url) {
+                                self._setSelection(self.external_preview_image);
+                            } else {
+                                self._setSelection(null);
+                            }
                             self.selected_source = button_index;
                         }
-                    ////} else {
-                    ////    target.hide();
                     }
                 });
-            this.selected_source = this.buttonset[0].selectedIndex; 
-            // panels are shown based on initial selection
-            // (Note: we use the index, not the option values,
-            // which are irrelevant for the working of this code.)
-
-            // XXX TODO switch from index to identifier here as well.
-
-            if (this.selected_source == 0) {
-                upload_panel.show();
-                this.images_panel.hide();
-                external_panel.hide();
-            } else if (this.selected_source >= 1 && this.selected_source <= 3) {
-                upload_panel.hide();
-                this.images_panel.show();
-                external_panel.hide();
-            } else {
-                upload_panel.hide();
-                this.images_panel.hide();
-                external_panel.show();
-            }
 
             // Wire up the info panel
             this.info_panel = this.dialog.find('.tiny-imagedrawer-panel-info')
@@ -1150,100 +1270,22 @@ tinyMCE.addI18n('en.wicked',{
                         // Insert the selected one to the editor.
                         self._insertToEditor();
                         // Done. Close.
+                        self._save_formstate();     // XXX XXX
                         self.dialog.dialog('close');
+                        self._restore_formstate();  // XXX XXX
                     } else { // Cancel.
+                        self._save_formstate();     // XXX XXX
                         self.dialog.dialog('close');
+                        self._restore_formstate();  // XXX XXX
                     }
-                });
-
-            // Wire up the external panel
-            var input_url = external_panel.find('.tiny-imagedrawer-input-url');
-            external_panel.find('.karl-buttonset.tiny-imagedrawer-buttonset-check')
-                .karlbuttonset({
-                    clsContainer: 'tiny-imagedrawer-buttonset-check'
-                })
-                .bind('change.karlbuttonset', function(event) {
-                    // preload this image.
-                    var image_url = input_url.val();
-                    // XXX TODO eventually, title could be calculated
-                    // XXX from the image_url.
-                    var title = 'External image';
-
-                    var img = new Image();
-                    var eventContext = {};
-                    eventContext.thumb = self.external_stripe.insertRecord(0, 
-                        {
-                            loading: true,
-                            title: title,
-                            location: [{
-                                title: image_url,
-                                href: image_url
-                                }]
-                        }
-                    );
-                    // If we are on the external tab: select it,
-                    // otherwise leave the active selection intact.
-                    if (self.buttonset.val() == 'external') {
-                        self._setSelection(eventContext.thumb);
-                    }
-
-                    $(img)
-                        .attr('src', image_url)
-                        .load(function() {
-                            // update the record with the image sizes we have now
-                            // and also set the thumbnail to show the image
-                            eventContext.thumb.imagedrawerimage('record', $.extend({},
-                                eventContext.thumb.imagedrawerimage('record'), {
-                                    image_width: this.width,
-                                    image_height: this.height,
-                                    image_url: image_url,
-                                    thumbnail_url: image_url
-                            }));
-                            // If there is no selection, and we are still on
-                            // the external tab: select it,
-                            // otherwise leave the active selection intact.
-                            if (self.buttonset.val() == 'external') {
-                                if (self.selected_item == null) {
-                                    self._setSelection(eventContext.thumb);
-                                } else if ((self.selected_item && self.selected_item[0]) === 
-                                        eventContext.thumb[0]) {
-                                    // This is the selected item. Update the info panel.
-                                    self._updateInfoPanel();
-                                }
-                            }
- 
-                        })
-                        .error(function() {
-                            // Get the existing data record and save the error in it.
-                            eventContext.thumb.imagedrawerimage('record', 
-                                $.extend(eventContext.thumb.imagedrawerimage('record'),
-                                    {
-                                        status: null,
-                                        error: 'Wrong url, or not an image.',
-                                        thumbnail_url: self.url + '/images/error.png'
-                                    }
-                                )
-                            );
-                            // If we are on that tab: select it regardless we have
-                            // a current selection or not.
-                            if (self.buttonset.val() == 'external') {
-                                if ((self.selected_item && self.selected_item[0]) === 
-                                        eventContext.thumb[0]) {
-                                    // We are the selected item. Update the info panel.
-                                    self._updateInfoPanel();
-                                } else {
-                                    self._setSelection(eventContext.thumb);
-                                }
-                            }
-                        });
                 });
 
 
             // Give the file input field a unique id
             this.fileinputid = 'tiny-imagedrawer-fileinputid-' + next_fileinputid;
             next_fileinputid += 1;
-            var fileinput = upload_panel.find('.tiny-imagedrawer-fileinput');
-            this.textinput = upload_panel.find('.tiny-imagedrawer-input-titletext');
+            var fileinput = this.upload_panel.find('.tiny-imagedrawer-fileinput');
+            this.textinput = this.upload_panel.find('.tiny-imagedrawer-input-titletext');
             fileinput.attr('id', this.fileinputid);
             // Name is important as well!
             if (! fileinput.attr('name')) {
@@ -1264,32 +1306,39 @@ tinyMCE.addI18n('en.wicked',{
                     value = value.substring(index + 1);
                 }
                 self.textinput.val(value);
+                // reset the buttonset state
+                // so, upload becomes clickable.
+                self._uploadReset();
+                self.buttonset_upload
+                    .karlbuttonset('getButton', 0).removeClass('ui-state-disabled');
+                self.buttonset_upload
+                    .karlbuttonset('getButton', 1).addClass('ui-state-disabled');
             };
             fileinput.change(this._fileinput_change);
 
             // Upload panel
-            this.upload_panel_tab1 = upload_panel.find('.tiny-imagedrawer-upload1')
-                .show();
-            this.upload_panel_tab2 = upload_panel.find('.tiny-imagedrawer-upload2')
-                .hide();
-            this.upload_statusbox = upload_panel.find('.tiny-imagedrawer-statusbox')
+            this.upload_statusbox = this.upload_panel.find('.tiny-imagedrawer-statusbox')
                 .multistatusbox({
                     //clsItem: 'portalMessage',
                     hasCloseButton: false
                 });
             // Wire up the Upload button
-            upload_panel
+            this.buttonset_upload = this.upload_panel
                 .find('.karl-buttonset.tiny-imagedrawer-buttonset-upload')
                 .karlbuttonset({
                     clsContainer: 'tiny-imagedrawer-buttonset-upload'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    //if (button_index == 0) { // upload
+                    var buttonset = $(this);
+                    if (button_index == 0) { // upload
                         // Signal the start of this upload
                         var eventContext = {};
                         upload_serial += 1;
                         eventContext.upload_serial = upload_serial;
                         self._uploadStart(eventContext);
+                        // enable the reset button
+                        buttonset.karlbuttonset('getButton', 0).addClass('ui-state-disabled');
+                        buttonset.karlbuttonset('getButton', 1).removeClass('ui-state-disabled');
 
                         // Initiate the upload
                         $.ajaxFileUpload({
@@ -1316,30 +1365,41 @@ tinyMCE.addI18n('en.wicked',{
                             }
                         });
 
-                    //}
+                    } else { // Reset in-progress upload
+                        // by increasing the serial
+                        // we ignore the current upload's result
+                        upload_serial += 1;
+                        // Ignore what is going on
+                        self._uploadReset();
+                        // reset the buttonset state
+                        buttonset.karlbuttonset('getButton', 0).removeClass('ui-state-disabled');
+                        buttonset.karlbuttonset('getButton', 1).addClass('ui-state-disabled');
+                    }
                 });
-            upload_panel
-                .find('.karl-buttonset.tiny-imagedrawer-buttonset-uploadreset')
+
+
+            // Web (was: external) panel
+            this.input_url = this.external_panel.find('.tiny-imagedrawer-input-url');
+            this.label_previewtext = this.external_panel.find('.tiny-imagedrawer-external-previewtext');
+            this.external_statusbox = this.external_panel.find('.tiny-imagedrawer-statusbox')
+                .multistatusbox({
+                    //clsItem: 'portalMessage',
+                    hasCloseButton: false
+                });
+            // Wire up the Check button
+            this.buttonset_check = this.external_panel
+                .find('.karl-buttonset.tiny-imagedrawer-buttonset-check')
                 .karlbuttonset({
-                    clsContainer: 'tiny-imagedrawer-buttonset-uploadreset'
+                    clsContainer: 'tiny-imagedrawer-buttonset-check'
                 })
                 .bind('change.karlbuttonset', function(event, button_index, value) {
-                    //if (button_index == 0) { // reset
-                        // 
-                        // We cannot really cancel the upload, so we
-                        // merely reset the ui here for a new upload.
-
-                        self.upload_panel_tab2.hide('fold');
-                        self.upload_panel_tab1.show('fold');
-                    //}
+                    var buttonset = $(this);
+                    //if (button_index == 0) { // check                    
+                        self._externalDoCheck({
+                            image_url: self.input_url.val()
+                        });
+                    // }
                 });
-                
-
-            // Set the Insert/Replace button's text,
-            // as well as the title on the top.
-            this.title_tag = this.dialog
-                .find('.tiny-imagedrawer-title');
-            self._updateInsertReplaceState();
 
             // Wire the image list
             // 
@@ -1366,7 +1426,9 @@ tinyMCE.addI18n('en.wicked',{
                         // Insert the selected one to the editor.
                         self._insertToEditor(this);
                         // And close the dialog.
+                        self._save_formstate();     // XXX XXX
                         self.dialog.dialog('close');
+                        self._restore_formstate();  // XXX XXX
                     }
                     // Default clicks should be prevented.
                     event.preventDefault();
@@ -1421,36 +1483,18 @@ tinyMCE.addI18n('en.wicked',{
             // handle the image in the upload panel
             this.upload_preview_image = this.proto_image.clone(true)
                 .imagedrawerimage({});
-            this.upload_preview = upload_panel.find('.tiny-imagedrawer-image')
+            this.upload_panel.find('.tiny-imagedrawer-image')
                 .replaceWith(this.upload_preview_image);
+            // reset the upload state
+            this._uploadReset();
 
-            // handle the stripe in the external panel
-            this.external_stripe = new ImageStripe(
-                external_panel.find('ul.tiny-imagedrawer-imagestripe').eq(0),
-                95, self.proto_image, {
-                    title: self.editor.getLang('imagedrawer.loading_title'),
-                    thumbnail_url: self.url + '/images/default_image.png'
-                }
-            );
-            // Wire the scrollbar in the external panel
-            this.external_scrollbar = external_panel.find('.tiny-imagedrawer-scrollbar')
-                .slider({
-                    slide: function(e, ui) {
-                        var stripe = self.external_stripe;
-                        var percentage_float = ui.value / 100;
-                        var num_items = stripe.items().length;
-                        // Move the stripe to a percentage position.
-                        var slider_index = percentage_float * 
-                                (num_items - self.visible_columns); 
-                        if (slider_index < 0) {
-                            // Region fits entirely without scrolling.
-                            // Do nothing.
-                            return;
-                        }
-                        ///
-                        stripe.moveTo(slider_index);
-                    }
-                });
+            // handle the image in the external panel
+            this.external_preview_image = this.proto_image.clone(true)
+                .imagedrawerimage({});
+            this.external_panel.find('.tiny-imagedrawer-image')
+                .replaceWith(this.external_preview_image);
+            // reset the external check state
+            this._externalReset();
 
             // Wire up the help panel
             var help_panel = this.dialog.find('.tiny-imagedrawer-panel-help')
@@ -1485,7 +1529,13 @@ tinyMCE.addI18n('en.wicked',{
             if ($.ui.version < '1.8' && ! this.scrollbar.data('karlslider')._uiHash_patched) {
                 throw new Error('jquery-ui version >= 1.8, or patched 1.7 version required.');
             }
-            
+
+            // Set the Insert/Replace button's text,
+            // as well as the title on the top.
+            this.title_tag = this.dialog
+                .find('.tiny-imagedrawer-title');
+            self._updateInsertReplaceState();
+
             //
             // Render the first batch of images
             //
@@ -1497,8 +1547,66 @@ tinyMCE.addI18n('en.wicked',{
             // force initial selection to null 
             self._setSelection(null);
 
+
+            // Initial source tab switch
+            if (this.editor_image_data) {
+                // We are replacing. Source is either My Recent or Web.
+                if (this.editor_image_data.external) {
+                    this.buttonset
+                        .karlbuttonset('getButton', 3)   // Web
+                        .click();
+                    this.input_url.val(this.editor_image_data.image_url);
+                    this._externalDoCheck({
+                        image_url: this.editor_image_data.image_url
+                    });
+                } else {
+                    this.selected_source = 1;    // My Recent
+                    // this will change the tabbing but importantly
+                    // _not_ re-fetch the data set
+                    this.buttonset
+                        .karlbuttonset('getButton', 1)   // My Recent
+                        .click();
+                    // We select the
+                    // first element. XXX Note in a refined implementation,
+                    // the server should not append the replaced image as
+                    // a first fake, but return the (source tab / ) batch
+                    // that contains the image, so the client could just
+                    // select it whichever index it has.
+                    this._setSelection(this._getListItem(0));
+                    // prevent selection for another time
+                    this.editor_image_data._selected_once = true;
+                }
+            } else {
+                // We are inserting (not replacing).
+                // panels are shown based on initial selection
+                this.selected_source = this.buttonset[0].selectedIndex; 
+                // (Note: we use the index, not the option values,
+                // which are irrelevant for the working of this code.)
+            }
+
+            // XXX...
+            var button_value = this.buttonset.data('karlbuttonset')
+                .element.children().eq(this.selected_source).attr('value');
+
+            if (button_value == 'uploadnew') {
+                this.upload_panel.show();
+                this.images_panel.hide();
+                this.external_panel.hide();
+            } else if (button_value == 'myrecent' ||
+                       button_value == 'thiscommunity') {
+                this.upload_panel.hide();
+                this.images_panel.show();
+                this.external_panel.hide();
+            } else if (button_value == 'external') {
+                this.upload_panel.hide();
+                this.images_panel.hide();
+                this.external_panel.show();
+            }
+
             // Finally, open the dialog.
+            this._save_formstate();     // XXX XXX
             this.dialog.dialog('open');
+            this._restore_formstate();  // XXX XXX
         },
             
         // Initialize images for the given search criteria.
@@ -1531,7 +1639,6 @@ tinyMCE.addI18n('en.wicked',{
         _dataSuccess: function(json, region_id, initial) {
 
             var self = this;
-            var ed = this.editor;
             // use error sent by server, if available
             var error = json && json.error;
             if (error) {
@@ -1555,6 +1662,23 @@ tinyMCE.addI18n('en.wicked',{
 
             // load the records 
             this._loadRecords(json.images_info);
+
+            // If we are in the initial batch: we select the
+            // first element. XXX Note in a refined implementation,
+            // the server should not append the replaced image as
+            // a first fake, but return the (source tab / ) batch
+            // that contains the image, so the client could just
+            // select it whichever index it has.
+            if (initial && this.editor_image_data
+                    && ! this.editor_image_data.external
+                    && ! this.editor_image_data._selected_once) {
+                // XXX ... maybe, assert that we loaded record 0?
+                // Select the first element
+                this._setSelection(this._getListItem(0));
+                // prevent selection for another time
+                this.editor_image_data._selected_once = true;
+            }
+
         },
 
         _dataError: function(json) {
@@ -1569,7 +1693,10 @@ tinyMCE.addI18n('en.wicked',{
 
         _uploadStart: function(eventContext) {
             // Start the throbber
-            this.upload_preview_image.imagedrawerimage('record', 
+            this.upload_preview_image
+                .parent().show();
+            this.upload_preview_image
+                .imagedrawerimage('record', 
                 {
                     loading: true,
                     title: this.textinput.val(),
@@ -1577,13 +1704,26 @@ tinyMCE.addI18n('en.wicked',{
                 });
             // clear the status box
             this.upload_statusbox.multistatusbox('clear');
-            this.upload_panel_tab1.hide();
-            this.upload_panel_tab2.show();
+        },
+
+        _uploadReset: function() {
+            // hide the image
+            this.upload_preview_image
+                .parent().hide();
+            this.upload_preview_image
+                .imagedrawerimage('record', 
+                {
+                    loading: true,
+                    thumbnail_url: this.url + '/images/throbber.gif'
+                });
+            // clear the status box
+            this.upload_statusbox.multistatusbox('clear');
+            // clear the selection
+            this._setSelection(null);
         },
 
         _uploadSuccess: function(json, eventContext) {
             var self = this;
-            var ed = this.editor;
             // use error sent by server, if available
             var error = json && json.error;
             if (error) {
@@ -1624,11 +1764,16 @@ tinyMCE.addI18n('en.wicked',{
             if (! error) {
                 error = 'Server error when fetching drawer_upload_view.html';
             }
+            // hide the image, and
             // Get the existing data record and save the error in it.
-            this.upload_preview_image.imagedrawerimage('record', 
+            this.upload_preview_image
+                .parent().hide();
+            this.upload_preview_image
+                .imagedrawerimage('record', 
                 $.extend(this.upload_preview_image.imagedrawerimage('record'),
                     {
-                        thumbnail_url: this.url + '/images/error.png'
+                        //thumbnail_url: this.url + '/images/error.png'
+                        thumbnail_url: this.url + '/images/throbber.gif'
                     }
                 )
             );
@@ -1637,6 +1782,137 @@ tinyMCE.addI18n('en.wicked',{
                         null, 'ui-state-error ui-corner-all');
             // update selection
             if (this.buttonset.val() == 'uploadnew') {
+                // We are the selected item. Update the info panel.
+                this._updateInfoPanel();
+            }
+        },
+
+        _externalDoCheck: function(eventContext) {
+            var self = this;
+
+            external_check_serial += 1;
+            eventContext.external_check_serial = external_check_serial;
+            this._externalStart(eventContext);
+
+            // Initiate the check
+            var img = new Image();
+
+            $(img)
+                .attr('src', eventContext.image_url)
+                .load(function() {
+                    self._externalSuccess(this, eventContext);
+                })
+                .error(function() {
+                    self._externalError(this, eventContext);
+                });
+        },
+
+        _externalStart: function(eventContext) {
+            var image_url = eventContext.image_url;
+            // XXX TODO eventually, title could be calculated
+            // XXX from the image_url.
+            var title = 'External image';
+
+            // Start the throbber
+            this.external_preview_image
+                .parent().show();
+            this.external_preview_image
+                .imagedrawerimage('record', {
+                    loading: true,
+                    title: title,
+                    thumbnail_url: this.url + '/images/throbber.gif',
+                    location: [{
+                        title: image_url,
+                        href: image_url
+                        }]
+                });
+
+            // clear the status box
+            this.external_statusbox.multistatusbox('clear');
+            // hide the "none selected" label
+            this.label_previewtext.hide(); 
+        },
+
+        _externalReset: function() {
+            // hide the image
+            this.external_preview_image
+                .parent().hide();
+            this.external_preview_image
+                .imagedrawerimage('record', 
+                {
+                    loading: true,
+                    thumbnail_url: this.url + '/images/throbber.gif'
+                });
+            // clear the status box
+            this.external_statusbox.multistatusbox('clear');
+            // clear the selection
+            this._setSelection(null);
+            // show the "none selected" label
+            this.label_previewtext.show(); 
+        },
+
+        _externalSuccess: function(img, eventContext) {
+            var self = this;
+
+            // prevent doing anything if this is not the current upload
+            if (eventContext.external_check_serial != external_check_serial) {
+                return;
+            }
+
+            // update the record with the image sizes we have now
+            // and also set the thumbnail to show the image
+            this.external_preview_image.imagedrawerimage('record', $.extend({},
+                this.external_preview_image.imagedrawerimage('record'), {
+                    image_width: img.width,
+                    image_height: img.height,
+                    image_url: eventContext.image_url,
+                    thumbnail_url: eventContext.image_url
+            }));
+
+            // clear the status box
+            this.external_statusbox.multistatusbox('clear');
+            // hide the "none selected" label
+            this.label_previewtext.hide(); 
+            // If we are still on
+            // the external tab: select it,
+            if (this.buttonset.val() == 'external') {
+                if (this.selected_item == null) {
+                    this._setSelection(this.external_preview_image);
+                } else {
+                    // This is the selected item. Update the info panel.
+                    this._updateInfoPanel();
+                }
+            }
+        },
+
+        _externalError: function(img, eventContext) {
+            // prevent doing anything if this is not the current check
+            if (eventContext.external_check_serial != external_check_serial) {
+                return;
+            }
+
+            var error = 'Wrong url, or not an image.';
+
+            // hide the image, and
+            // Get the existing data record and save the error in it.
+            this.external_preview_image
+                .parent().hide();
+            this.external_preview_image
+                .imagedrawerimage('record', 
+                $.extend(this.upload_preview_image.imagedrawerimage('record'),
+                    {
+                        //thumbnail_url: this.url + '/images/error.png'
+                        thumbnail_url: this.url + '/images/throbber.gif'
+                    }
+                )
+            );
+            // Show the error in the message box
+            this.external_statusbox.multistatusbox('clearAndAppend', error,
+                        null, 'ui-state-error ui-corner-all');
+            // show the "none selected" label
+            this.label_previewtext.show(); 
+            // update selection
+            if (this.buttonset.val() == 'external') {
                 // We are the selected item. Update the info panel.
                 this._updateInfoPanel();
             }
@@ -1789,19 +2065,31 @@ tinyMCE.addI18n('en.wicked',{
         },
 
         _requestRecords: function(start, limit, /*optional*/ initial) {
+            // XXX There are two invariants that this method
+            // fetches from the dom:
+            // - the source parameter (fetched from the buttonset)
+            // - the url of the replaced (internal) image
             var self = this;
             // load the required data
             var region_id = this.region_id;
+            var data = {
+                start: start, 
+                limit: limit,
+                sort_on: 'creation_date',
+                reverse: '1',
+                source: this.buttonset.val()
+            };
+            // if replacing, we pass the image_url of the image
+            // that we want to include into the result set
+            // Simple implementation on server side may present
+            // this image as first in the My Recent tab.
+            if (this.editor_image_data && ! this.editor_image_data.external) {
+                data.include_image_url = this.editor_image_data.image_url;
+            }
             $.ajax({
                 type: 'GET',
                 url: this.editor.getParam('imagedrawer_data_url'),
-                data: {
-                    start: start, 
-                    limit: limit,
-                    sort_on: 'creation_date',
-                    reverse: '1',
-                    source: this.buttonset.val()
-                },
+                data: data,
                 success: function(json) { self._dataSuccess(json, region_id, initial); },
                 error: function(json) { self._dataError(json); },
                 dataType: 'json'
@@ -1836,11 +2124,8 @@ tinyMCE.addI18n('en.wicked',{
             var v;
             var el;
 
-            // XXX TODO these should rather be provided by the info panel
-            var dimension = $("select[name=tiny-imagedrawer-input-dimension]").val();
-            var align = $("input:radio[name=tiny-imagedrawer-input-align]:checked").val();
-            var caption = $("input:checkbox[name=tiny-imagedrawer-input-caption]:checked").val() != undefined;
-            var captiontext = $("input:text[name=tiny-imagedrawer-input-captiontext]").val();
+            // get the insertion options from the info panel
+            var insertOptions = this.info_panel.imagedrawerinfopanel('insertOptions');
 
             // In principle, we use the real image size
             // for the insertion,
@@ -1855,7 +2140,7 @@ tinyMCE.addI18n('en.wicked',{
                 large: {max_width: 400, max_height: 400},
                 medium: {max_width: 250, max_height: 250},
                 small: {max_width: 100, max_height: 100}
-            }[dimension];
+            }[insertOptions.dimension];
             var max_width = dim.max_width;
             var max_height = dim.max_height;
             if (width > max_width) {
@@ -1870,17 +2155,18 @@ tinyMCE.addI18n('en.wicked',{
             var klass = '';
 
             // Set the caption
-            alt = captiontext;
-            if (caption) {
+            alt = insertOptions.captiontext;
+            if (insertOptions.caption) {
                 klass = (klass ? klass + ' ' : '') + 'tiny-imagedrawer-captioned';
             }
             // set the align
             var style = '';
-            if (align == 'left') {
+            var align;
+            if (insertOptions.align == 'left') {
                 align = 'left';
-            } else if (align == 'right') {
+            } else if (insertOptions.align == 'right') {
                 align = 'right';
-            } else if (align == 'center') {
+            } else if (insertOptions.align == 'center') {
                 style = 'display: block; margin-left: auto; margin-right: auto; text-align: center;';
                 align = null;
             }
@@ -1954,7 +2240,8 @@ tinyMCE.addI18n('en.wicked',{
 
         },
 
-        // Either return the selected image in the editor, or null, in case we are replacing.
+        // Either return the selected image in the editor,
+        // or null, in case we are inserting.
         _getEditorImageSelection: function() {
 
             var ed = this.editor;
@@ -1991,12 +2278,52 @@ tinyMCE.addI18n('en.wicked',{
             }
         },
 
+        _getEditorImageData: function(img) {
+            img = $(img);
+            // Figure properties of the image
+            var w = img.attr('width');
+            var h = img.attr('height');
+            var d = {
+                insert_width:   w, //img.attr('width'),
+                insert_height:  h, //img.attr('height'),
+                caption:        img.hasClass('tiny-imagedrawer-captioned'),
+                captiontext:    img.attr('alt'),
+                image_url:      img.attr('src'),
+                dimension: 'original'
+            };
+            $.each([['small', 100], ['medium', 250], ['large', 400]],
+                function(index, value) {
+                    if (w <= value[1] && h <= value[1]) {
+                        d.dimension = value[0];
+                        return false;   // break
+                    }
+                }
+            );
+            if (img.css('float') == 'left') {
+                d.align = 'left';
+            } else if (img.css('float') == 'right') {
+                d.align = 'right';
+            } else if (img.css('margin-left') == 'auto' && 
+                       img.css('margin-right') == 'auto') {
+                d.align = 'center';
+            } else {
+                // no hint on align.
+                d.align = null;
+            }
+            return d;
+        },
+
         _updateInsertReplaceState: function() {
+            var self = this;
             var title;
             var button_label;
-            if (this._getEditorImageSelection()) {
+            var d = this.editor_image_data;
+
+            if (d) {
                 title = 'Replace Image';
                 button_label = 'Replace';
+                // Set the insertion options in the info panel
+                this.info_panel.imagedrawerinfopanel('insertOptions', d);
             } else {
                 title = 'Insert Image';
                 button_label = 'Insert';
@@ -2005,6 +2332,7 @@ tinyMCE.addI18n('en.wicked',{
             this.info_panel.imagedrawerinfopanel('insertButtonLabel', button_label);
             // update the main title on the top
             this.title_tag.text(title);
+
         },
 
         getInfo : function() {
@@ -2019,8 +2347,11 @@ tinyMCE.addI18n('en.wicked',{
     });
 
     // Register plugin
-    tinymce.PluginManager.add('imagedrawer', tinymce.plugins.ImageDrawerPlugin);
-    tinymce.PluginManager.requireLangPack('imagedrawer');
+    // allow this to fail if tinymce is not present
+    if (window.tinymce) {
+        tinymce.PluginManager.add('imagedrawer', tinymce.plugins.ImageDrawerPlugin);
+        tinymce.PluginManager.requireLangPack('imagedrawer');
+    }
 
 })();
 
