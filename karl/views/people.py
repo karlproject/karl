@@ -62,6 +62,8 @@ from karl.views.utils import photo_from_filestore_view
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
+from karl.views.communities import get_preferred_communities
+from karl.views.communities import get_my_communities
 
 PROFILE_THUMB_SIZE = (75, 100)
 
@@ -559,6 +561,15 @@ def show_profile_view(context, request):
     communities = communities.values()
     communities.sort(key=lambda x:x["title"])
 
+    preferred_communities = []
+    my_communities = None
+    name = context.__name__
+    # is this the current user's profile?
+    if authenticated_userid(request) == name:
+        preferred_communities = get_preferred_communities(communities_folder,
+                                                          request)
+        my_communities = get_my_communities(communities_folder, request)
+
     tagger = find_tags(context)
     if tagger is None:
         tags = ()
@@ -594,6 +605,8 @@ def show_profile_view(context, request):
         photo=photo,
         head_data=convert_to_script(client_json_data),
         communities=communities,
+        my_communities=my_communities,
+        preferred_communities=preferred_communities,
         tags=tags,
         recent_items=recent_items,
         )

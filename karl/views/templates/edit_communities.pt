@@ -1,0 +1,21 @@
+<form id="preferred_form">
+  <dt>Set Preferred Communities</dt>
+  <p class="set_preferred_ui">Please mark the checkboxes for the communities that youwish to show up in this list from now on and then press 'Update'.</p>
+  <p class="set_preferred_ui">To go back to the full community listing, press 'Clear Preferred'.</p>
+  <p class="set_preferred_ui"><b>Note:</b> Keep in mind that any communities added after you check this list will NOT show up here until expressly selected.</p>
+  <dd tal:repeat="my_community my_communities">
+    <input type="checkbox" name="preferred" id="preferred"
+           value="${my_community.title}"
+           checked="${preferred is not None and my_community.title in preferred}"
+           class="set_preferred_ui" />
+    <strong tal:omit-tag="not my_community.moderator">
+      <span>${my_community.title}</span>
+    </strong>
+  </dd>
+  <input type="button" class="set_preferred_ui" name="update" value="Update"
+  onclick="var preferred=new Array();$('input:checkbox:checked').each(function() {preferred.push($(this).val())});$('#my-communities-list').load('/jquery_set_preferred.html', {preferred: preferred})" />
+  <input type="button" class="set_preferred_ui" name="clear" value="Clear Preferred"
+         onclick="$('#my-communities-list').load('/jquery_clear_preferred.html')" />
+  <input type="button" class="set_preferred_ui" name="cancel" value="Cancel"
+         onclick="$('#my-communities-list').load('/jquery_list_preferred.html')" />
+</form>

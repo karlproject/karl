@@ -20,6 +20,7 @@ import re
 
 from repoze.bfg.security import has_permission
 from repoze.bfg.security import effective_principals
+from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
@@ -30,6 +31,8 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 from karl.views.api import TemplateAPI
 from karl.utils import get_setting
+from karl.utils import find_profiles
+from karl.utils import find_communities
 from karl.views.batch import get_catalog_batch_grid
 
 
@@ -129,13 +132,17 @@ def _show_communities_view_helper(context,
     else:
         my_communities = ()
 
+    preferred_communities = get_preferred_communities(context, request)
+
     return {'communities': communities,
             'batch_info': batch_info,
             'letters': letter_info,
             'subview_classes': classes,
             'actions': actions,
             'my_communities': my_communities, #XXX
+            'preferred_communities': preferred_communities,
             'api': TemplateAPI(context, request, page_title),
+            'profile': None,
            }
 
 
@@ -169,7 +176,7 @@ def show_my_communities_view(context, request):
                                          prefix='My ', test=_mine)
 
 
-def get_my_communities(communities_folder, request):
+def get_my_communities(communities_folder, request, ignore_preferred=False):
     # sorted by title
     principals = effective_principals(request)
     communities = {}
@@ -186,10 +193,15 @@ def get_my_communities(communities_folder, request):
     communities = communities.values()
     communities.sort()
     communities = [ x[1] for x in communities ]
+    preferred = get_preferred_communities(communities_folder, request)
     my_communities = []
     for community in communities:
         adapted = getMultiAdapter((community, request), ICommunityInfo)
-        my_communities.append(adapted)
+        if not ignore_preferred and preferred is not None \
+            and adapted.title in preferred:
+            my_communities.append(adapted)
+        if preferred is None or ignore_preferred:
+            my_communities.append(adapted)
     return my_communities
 
 
@@ -206,4 +218,70 @@ def get_community_groups(principals):
             name, role = match.groups()
             groups.append((name, role))
     return groups
+
+def set_preferred_communities(context, request, communities):
+    profiles = find_profiles(context)
+    userid = authenticated_userid(request)
+    profile = profiles[userid]
+    profile.preferred_communities = communities
+
+def get_preferred_communities(context, request):
+    profiles = find_profiles(context)
+    userid = authenticated_userid(request)
+    profile = profiles[userid]
+    # old profiles will not have this attribute, so to be safe use getattr
+    preferred_communities = getattr(profile, 'preferred_communities', None)
+    return preferred_communities
+
+def jquery_set_preferred_view(context, request):
+    communities_folder = find_communities(context)
+    communities = request.params.getall('preferred')
+    set_preferred_communities(communities_folder, request, communities)
+    updated_communities = get_my_communities(communities_folder, request)
+    return { 'my_communities': updated_communities,
+             'preferred': communities,
+             'show_all': False,
+             'profile': None,
+             'status_message': 'Set preferred communities.'}
+
+def jquery_clear_preferred_view(context, request):
+    communities_folder = find_communities(context)
+    set_preferred_communities(communities_folder, request, None)
+    updated_communities = get_my_communities(communities_folder, request)
+    return { 'my_communities': updated_communities,
+             'preferred': None,
+             'show_all': False,
+             'profile': None,
+             'status_message': 'Cleared preferred communities.'}
+
+def jquery_list_preferred_view(context, request):
+    communities_folder = find_communities(context)
+    communities = get_my_communities(communities_folder, request)
+    preferred = get_preferred_communities(communities_folder, request)
+    return { 'my_communities': communities,
+             'preferred': preferred,
+             'show_all': False,
+             'profile': None,
+             'status_message': None}
+
+def jquery_edit_preferred_view(context, request):
+    communities_folder = find_communities(context)
+    communities = get_my_communities(communities_folder,
+                                     request,
+                                     ignore_preferred=True)
+    preferred = get_preferred_communities(communities_folder, request)
+    return { 'my_communities': communities,
+             'preferred': preferred }
+
+def jquery_list_my_communities_view(context, request):
+    communities_folder = find_communities(context)
+    communities = get_my_communities(communities_folder,
+                                     request,
+                                     ignore_preferred=True)
+    preferred = get_preferred_communities(communities_folder, request)
+    return { 'my_communities': communities,
+             'preferred': preferred,
+             'show_all': True,
+             'profile': None,
+             'status_message': None}
 

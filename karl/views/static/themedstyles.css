@@ -2937,3 +2937,34 @@ ul.menu li {
     padding-left: 5px;
     display: inline;
 }
+
+/* Styles for set preferred portlet */
+
+.set_preferred_ui {
+    font-size: 90%;
+    margin-left: 3px;
+}
+
+.set_preferred_normal {
+    margin-left: 8px;
+    font-size: 90%;
+}
+
+#preferred_form {
+    background-color: #e0e0e0;
+    font-size: 90%;
+    padding: 4px;
+    margin: 4px;
+    border: 1px solid black;
+}
+
+#preferred_form span {
+    font-size: 90%;
+    padding: 0px;
+    margin: 0px 0px 3px 0px;
+}
+
+#preferred-message {
+    width: 130px;
+    margin: 10px;
+}

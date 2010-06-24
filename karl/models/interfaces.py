@@ -175,6 +175,9 @@ class IProfile(IFolder, IPeople):
         u"Example: {'departments': ['finance']}. "
         u"Typical keys: 'entities', 'offices', 'departments', 'other'")
 
+    preferred_communities = Attribute(u"List of preferred communities. May "
+                          u" be None.")
+
     password_reset_key = Attribute(
         u"Key for confirming password reset.  "
         u"Not for display or editing.")

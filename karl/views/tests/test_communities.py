@@ -104,6 +104,8 @@ class Test_show_all_communities_view(_Show_communities_helper,
     def test_wo_groups(self):
         self._register()
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles[None] = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         foo = testing.DummyModel()
         testing.registerModels({'/foo':foo})
@@ -122,6 +124,8 @@ class Test_show_all_communities_view(_Show_communities_helper,
         testing.registerDummySecurityPolicy('admin',
                                             ['group.community:yum:bar'])
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles['admin'] = testing.DummyModel()
         yum = testing.DummyModel()
         context['yum'] = yum
         yum.title = 'Yum!'
@@ -152,6 +156,8 @@ class Test_show_active_communities_view(_Show_communities_helper,
         now = datetime.now()
         self._register()
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles[None] = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
         foo = testing.DummyModel(content_modified=now - timedelta(1))
         bar = testing.DummyModel(content_modified=now - timedelta(32))
@@ -175,6 +181,8 @@ class Test_show_my_communities_view(_Show_communities_helper,
     def test_excludes_nonmember_even_though_permitted(self):
         self._register()
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles[None] = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
         foo = testing.DummyModel(_is_member=True)
         bar = testing.DummyModel(_is_member=False)
@@ -214,6 +222,8 @@ class Test_get_my_communities(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles['foo'] = testing.DummyModel()
         yo = testing.DummyModel()
         yo.title = 'Yo'
         yi = testing.DummyModel()
@@ -241,6 +251,8 @@ class Test_get_my_communities(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ICommunityInfo
         context = testing.DummyModel()
+        profiles = context['profiles'] = testing.DummyModel()
+        profiles['foo'] = testing.DummyModel()
         yo = testing.DummyModel()
         yo.title = 'Yo'
         yi = testing.DummyModel()

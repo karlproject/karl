@@ -620,6 +620,9 @@ class ShowProfileTests(unittest.TestCase):
         context.__name__ = 'userid'
         context.users = DummyUsers()
         context.users.add("userid", "userlogin", "password", [])
+        context['communities'] = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 3)
         self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
@@ -722,6 +725,9 @@ class ShowProfileTests(unittest.TestCase):
         context = DummyProfile()
         context.title = "Eddie"
         context.__name__ = "eddie"
+        context['communities'] = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['eddie'] = DummyProfile()
         users = context.users = DummyUsers()
         users.add("eddie", "eddie", "password", [])
         tags = context.tags = testing.DummyModel()
@@ -766,6 +772,9 @@ class ShowProfileTests(unittest.TestCase):
         context = DummyProfile()
         context.title = "Eddie"
         context.__name__ = "eddie"
+        context['communities'] = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['eddie'] = DummyProfile()
         users = context.users = DummyUsers()
         users.add("eddie", "eddie", "password", [])
         tags = context.tags = testing.DummyModel()

@@ -195,6 +195,46 @@
     permission="view"
   />
 
+  <view
+    name="jquery_set_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_set_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_clear_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_clear_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_list_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_list_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_edit_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_edit_preferred_view"
+    renderer="templates/edit_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_list_my_communities.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_list_my_communities_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
   <formish:form
      controller=".community.AddCommunityFormController"
      name="add_community.html"

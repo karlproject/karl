@@ -1,0 +1,26 @@
+<dt>${profile and profile.firstname+"'s" or "My"} Communities</dt>
+<div tal:condition="status_message is not None" id="preferred-message" class="portalMessage">${status_message}</div>
+<dd tal:repeat="my_community my_communities">
+  <strong tal:omit-tag="not my_community.moderator">
+    <a href="${my_community.url}">${my_community.title}</a>
+  </strong>
+</dd>
+<p>
+  <a class="set_preferred_normal" tal:condition="preferred is None and not show_all"
+     title="Personalize the list of communities that appear on this list"
+     onclick="$('#my-communities-list').load('/jquery_edit_preferred.html'); return false"
+     href="#">Set preferred</a>
+  <a class="set_preferred_normal" tal:condition="preferred is not None"
+     title="Edit your personalized list of communities"
+     onclick="$('#my-communities-list').load('/jquery_edit_preferred.html'); return false"
+     href="#">Edit preferred</a>
+  <a class="set_preferred_normal" tal:condition="preferred is not None and not show_all"
+     title="Show all of your communities now"
+     onclick="$('#my-communities-list').load('/jquery_list_my_communities.html'); return false"
+     href="#">Show all</a>
+  <a class="set_preferred_normal" tal:condition="preferred is not None and show_all"
+     title="Show the list of preferred communities"
+     onclick="$('#my-communities-list').load('/jquery_list_preferred.html'); return false"
+     href="#">Show preferred</a>
+</p>
+

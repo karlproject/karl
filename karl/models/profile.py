@@ -78,6 +78,7 @@ class Profile(Folder):
                  biography='',
                  data=None,
                  home_path=None,
+                 preferred_communities = None,
                 ):
         super(Profile, self).__init__(data)
         self.firstname = firstname
@@ -103,6 +104,7 @@ class Profile(Folder):
         self.categories = PersistentMapping()
         self.password_reset_key = None
         self.password_reset_time = None
+        self.preferred_communities = preferred_communities
 
     @property
     def creator(self):
