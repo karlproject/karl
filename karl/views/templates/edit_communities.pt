@@ -12,10 +12,9 @@
       <span>${my_community.title}</span>
     </strong>
   </dd>
-  <input type="button" class="set_preferred_ui" name="update" value="Update"
-  onclick="var preferred=new Array();$('input:checkbox:checked').each(function() {preferred.push($(this).val())});$('#my-communities-list').load('/jquery_set_preferred.html', {preferred: preferred})" />
-  <input type="button" class="set_preferred_ui" name="clear" value="Clear Preferred"
-         onclick="$('#my-communities-list').load('/jquery_clear_preferred.html')" />
-  <input type="button" class="set_preferred_ui" name="cancel" value="Cancel"
-         onclick="$('#my-communities-list').load('/jquery_list_preferred.html')" />
+  <div class="preferred-buttons">
+    <a onclick="var preferred=new Array();$('input:checkbox:checked').each(function() {preferred.push($(this).val())});$('#my-communities-list').load('/jquery_set_preferred.html', {preferred: preferred});return false">Update</a>
+    <a onclick="$('#my-communities-list').load('/jquery_clear_preferred.html');return false">Clear Preferred</a>
+    <a onclick="$('#my-communities-list').load('/jquery_list_preferred.html');return false">Cancel</a>
+  </div>
 </form>
