@@ -1,4 +1,4 @@
-<dt>${profile and profile.firstname+"'s" or "My"} Communities</dt>
+<dt>My Communities</dt>
 <div tal:condition="status_message is not None" id="preferred-message" class="portalMessage">${status_message}</div>
 <dd tal:repeat="my_community my_communities">
   <strong tal:omit-tag="not my_community.moderator">

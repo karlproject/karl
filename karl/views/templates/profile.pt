@@ -15,7 +15,8 @@
     <div class="rightcol">
 
       <dl class="tag_page_side" id="popular-tags-portlet">
-        <dt>${profile.firstname}'s Tags</dt>
+        <dt tal:condition="my_communities is None">${profile.firstname}'s Tags</dt>
+        <dt tal:condition="my_communities is not None">My Tags</dt>
         <dd tal:condition="not tags">
           <strong>No tags</strong>
         </dd>
