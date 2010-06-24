@@ -194,6 +194,9 @@ def get_my_communities(communities_folder, request, ignore_preferred=False):
     communities.sort()
     communities = [ x[1] for x in communities ]
     preferred = get_preferred_communities(communities_folder, request)
+    # if preferred list is empty show all instead of nothing
+    if preferred == []:
+        ignore_preferred = True
     my_communities = []
     for community in communities:
         adapted = getMultiAdapter((community, request), ICommunityInfo)
