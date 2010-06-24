@@ -79,6 +79,22 @@
                 this.label.text(shortened_title);
                 this.image.attr('src', value.thumbnail_url); 
 
+                // Setting width and height is important for
+                // external images, where there is no thumbnail
+                // and the fullsize image is used. On IE, the
+                // following stanza is needed to get such thumbnails
+                // "behave", ie. scale properly
+                if (value.thumbnail_width) {
+                    this.image.attr('width', value.thumbnail_width); 
+                } else {
+                    this.image.removeAttr('width');
+                }
+                if (value.thumbnail_height) {
+                    this.image.attr('height', value.thumbnail_height); 
+                } else {
+                    this.image.removeAttr('height');
+                }
+
                 // XXX this will work in jquery.ui >= 1.8
                 return this;
             }
@@ -1284,13 +1300,20 @@
             var img = new Image();
 
             $(img)
-                .attr('src', eventContext.image_url)
                 .load(function() {
                     self._externalSuccess(this, eventContext);
                 })
                 .error(function() {
                     self._externalError(this, eventContext);
-                });
+                })
+                // XXX It is _very_ important to have this _after_
+                // setting the load handler, to satisfy IE. 
+                // Explanation: If the image
+                // is cached, IE will _never_ execute the onload
+                // handler if the src is set preceding the handler
+                // setup. This is pretty unexpected, concerning
+                // that javascript should execute single-threaded.
+                .attr('src', eventContext.image_url);
         },
 
         _externalStart: function(eventContext) {
@@ -1345,6 +1368,32 @@
                 return;
             }
 
+            // We will not actually use a thumbnail image, because
+            // for external images, this is not available. We will
+            // use the original size image. This works everywhere
+            // but on IE. For the sole purpose of making this
+            // work on IE, we must calculate and explicitely set
+            // the size of the thumbnails.
+            var thumbnail_width = undefined;
+            var thumbnail_height = undefined;
+
+            // We _could_ have it everywhere, but apart from IE
+            // it makes no point, and it makes the image appearing
+            // ugly (size set, before the image actually gets loaded)
+            if ($.browser.msie) {
+                var clipping_size = 175;   // 175px: must match the css
+                if (img.width > clipping_size || img.height > clipping_size) {
+                    var ratio = img.width / img.height;
+                    if (ratio > 1) {
+                        thumbnail_width = clipping_size;
+                        thumbnail_height = Math.floor(clipping_size / ratio);
+                    } else {
+                        thumbnail_width = Math.floor(clipping_size * ratio);
+                        thumbnail_height = clipping_size;
+                    }
+                }
+            }
+
             // update the record with the image sizes we have now
             // and also set the thumbnail to show the image
             this.external_preview_image.imagedrawerimage('record', $.extend({},
@@ -1352,7 +1401,9 @@
                     image_width: img.width,
                     image_height: img.height,
                     image_url: eventContext.image_url,
-                    thumbnail_url: eventContext.image_url
+                    thumbnail_url: eventContext.image_url,
+                    thumbnail_width: thumbnail_width,
+                    thumbnail_height: thumbnail_height
             }));
 
             // clear the status box
