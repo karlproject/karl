@@ -206,15 +206,15 @@
            </strong>
          </dd>
          <p>
-           <a class="set_preferred_normal" tal:condition="preferred_communities is None"
+           <a class="set_preferred_normal" tal:condition="False and preferred_communities is None"
                title="Personalize the list of communities that appear on this list"
                onclick="$('#my-communities-list').load('/jquery_edit_preferred.html'); return false"
                href="#">Set preferred</a>
-           <a class="set_preferred_normal" tal:condition="preferred_communities is not None"
+           <a class="set_preferred_normal" tal:condition="False and preferred_communities is not None"
                title="Edit your personalized list of communities"
                onclick="$('#my-communities-list').load('/jquery_edit_preferred.html'); return false"
                href="#">Edit preferred</a>
-           <a class="set_preferred_normal" tal:condition="preferred_communities is not None"
+           <a class="set_preferred_normal" tal:condition="False and preferred_communities is not None"
                title="Show all of your communities now"
                onclick="$('#my-communities-list').load('/jquery_list_my_communities.html'); return false"
                href="#">Show all</a>
