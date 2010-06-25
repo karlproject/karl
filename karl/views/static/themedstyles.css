@@ -1620,10 +1620,14 @@ span.sortingArrows a img {
 	border: 1px solid #ccc;
 	margin: 0 0 1em;
 	padding: 0 0 1em;
+        overflow: auto;
 }
 .tag_page_side a {
 	color: #639332;
 	text-decoration: none;
+        float: left;
+        padding-left: 3px;
+        clear: right;
 }
 #tagview-column .tag_page_side {
 	width: 176px;
@@ -2945,6 +2949,10 @@ ul.menu li {
     margin-left: 1px;
 }
 
+.set_preferred_ui dd {
+    padding: 0px;
+}
+
 .set_preferred_normal {
     margin-left: 8px;
     font-size: 90%;
@@ -2972,8 +2980,14 @@ ul.menu li {
     height: 60px;
 }
 
+.edit-preferred {
+    padding: 0;
+    margin 0;
+}
+
 .preferred-buttons a, .preferred-buttons a:visited {
     cursor: hand;
+    padding-left: 0px;
     margin: 2px;
     width: 79px;
     height: 20px;
