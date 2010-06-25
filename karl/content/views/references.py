@@ -139,11 +139,18 @@ def move_subpath(context, subpath, direction):
     container = context
     assert elements[0] == '' # start at context
     elements.pop(0)
+    filename = None
     while elements:
         container.ordering.sync(container.keys())
         name = elements.pop(0)
         if elements:
-            container = container[name]
+            try:
+                container = container[name]
+            except KeyError:
+                # only a file, which has a dotted extension, could fail here
+                filename = name
+    if filename is not None:
+        name = filename + '.' + name
     if name not in container:
         raise KeyError(name)
     if direction == 'up':
