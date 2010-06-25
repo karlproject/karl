@@ -211,6 +211,347 @@ class Test_get_community_groups(unittest.TestCase):
         groups = self._callFUT(principals)
         self.assertEqual(groups, [('yo', 'members'), ('yo', 'other_role')])
 
+class Test_jquery_set_preferred_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import jquery_set_preferred_view
+        return jquery_set_preferred_view(context, request)
+
+    def test_jquery_set_preferred_view(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = None
+        request = testing.DummyRequest()
+        request.params = RequestParamsWithGetall()
+        request.params['preferred'] = ['Yi']
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['my_communities'][0].context, yi)
+
+class Test_jquery_clear_preferred_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import jquery_clear_preferred_view
+        return jquery_clear_preferred_view(context, request)
+
+    def test_jquery_clear_preferred_view(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = ['Yi']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], None)
+        self.assertEqual(len(result['my_communities']), 2)
+
+class Test_jquery_list_preferred_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import jquery_list_preferred_view
+        return jquery_list_preferred_view(context, request)
+
+    def test_jquery_list_preferred_view(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = ['Yi']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], ['Yi'])
+        self.assertEqual(len(result['my_communities']), 1)
+
+    def test_jquery_list_preferred_view_with_none(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = None
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], None)
+        self.assertEqual(len(result['my_communities']), 2)
+
+    def test_jquery_list_preferred_view_with_empty(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = []
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], [])
+        self.assertEqual(len(result['my_communities']), 2)
+
+class Test_jquery_edit_preferred_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import jquery_edit_preferred_view
+        return jquery_edit_preferred_view(context, request)
+
+    def test_jquery_edit_preferred_view(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = ['Yi']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], ['Yi'])
+        self.assertEqual(len(result['my_communities']), 2)
+
+class Test_jquery_list_my_communities_view(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import jquery_list_my_communities_view
+        return jquery_list_my_communities_view(context, request)
+
+    def test_jquery_list_my_communities_view(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        communities = context['communities'] = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        communities['yo'] = yo
+        communities['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = ['Yi']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['preferred'], ['Yi'])
+        self.assertEqual(result['show_all'], True)
+        self.assertEqual(len(result['my_communities']), 2)
+
+class Test_get_preferred_communities(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.communities import get_preferred_communities
+        return get_preferred_communities(context, request)
+
+    def test_get_preferred_communities(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        context['yo'] = yo
+        context['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = ['yo']
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0], 'yo')
+
+    def test_get_preferred_communities_old_profile(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        context['yo'] = yo
+        context['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+                                ICommunityInfo)
+        result = self._callFUT(context, request)
+        self.assertEqual(result, None)
+
+class Test_set_preferred_communities(unittest.TestCase):
+
+    def _callFUT(self, context, request, communities):
+        from karl.views.communities import set_preferred_communities
+        set_preferred_communities(context, request, communities)
+
+    def test_set_preferred_communities(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICommunityInfo
+        from karl.views.communities import get_preferred_communities
+        context = testing.DummyModel()
+        yo = testing.DummyModel()
+        yo.title = 'Yo'
+        yi = testing.DummyModel()
+        yi.title = 'Yi'
+        context['yo'] = yo
+        context['yi'] = yi
+        profiles = context['profiles'] = testing.DummyModel()
+        foo = profiles['foo'] = testing.DummyModel()
+        foo.preferred_communities = None
+        request = testing.DummyRequest()
+        testing.registerDummySecurityPolicy(
+            'foo',
+            groupids=[
+            'group.community:yo:members',
+            'group.community:yo:moderators',
+            'group.community:yi:moderators',
+            'group.community:yang:moderators'
+            ]
+            )
+        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+                                ICommunityInfo)
+        communities = ['yi']
+        self._callFUT(context, request, communities)
+        result = get_preferred_communities(context, request)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0], 'yi')
 
 class Test_get_my_communities(unittest.TestCase):
 
@@ -283,6 +624,14 @@ class DummyAdapter:
         self.request = request
 
 
+class DummyAdapterWithTitle:
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.title = context.title
+
+
 class DummyCommunityInfoAdapter(DummyAdapter):
     @property
     def member(self):
@@ -318,6 +667,11 @@ class DummySecurityWorkflow:
     def execute(self, request, transition_id):
         self.context.transition_id = transition_id
 
+
+class RequestParamsWithGetall(dict):
+
+    def getall(self, key):
+        return self[key]
 
 class DummyToolAddables(DummyAdapter):
 
