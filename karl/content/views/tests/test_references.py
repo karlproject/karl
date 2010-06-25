@@ -289,6 +289,14 @@ class Test_move_subpath(unittest.TestCase):
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_up, 'a')
 
+    def test_move_up_file_with_extension(self):
+        model = self._makeItem()
+        model['a.doc'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '.a.doc', 'up')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_up, 'a.doc')
+
     def test_move_up_nested(self):
         model = self._makeItem()
         child = model['a'] = self._makeItem()
@@ -305,6 +313,14 @@ class Test_move_subpath(unittest.TestCase):
         self._callFUT(model, '.a', 'down')
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_down, 'a')
+
+    def test_move_down_file_with_extension(self):
+        model = self._makeItem()
+        model['a.doc'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '.a.doc', 'down')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_down, 'a.doc')
 
     def test_move_down_nested(self):
         model = self._makeItem()
