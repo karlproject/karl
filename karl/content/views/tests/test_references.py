@@ -181,7 +181,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'title': 'AAA',
                                     'href': 'http://example.com/aaa/',
                                     'html': '<p>Unknown type</p>',
-                                    'subpath': '.aaa',
+                                    'subpath': '|aaa',
                                     'items': [],
                                    })
 
@@ -195,7 +195,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'title': 'AAA',
                                     'href': 'http://example.com/aaa/',
                                     'html': '<h1>FOOBAR</h1>',
-                                    'subpath': '.aaa',
+                                    'subpath': '|aaa',
                                     'items': [],
                                    })
 
@@ -212,7 +212,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'title': 'AAA',
                                     'href': 'http://example.com/aaa/',
                                     'html': '<p>Unknown type</p>',
-                                    'subpath': '.aaa',
+                                    'subpath': '|aaa',
                                     'items': (),
                                    })
 
@@ -231,12 +231,12 @@ class Test_getTree(TestBase, unittest.TestCase):
                           'title': 'AAA',
                           'href': 'http://example.com/aaa/',
                           'html': '<p>Unknown type</p>',
-                          'subpath': '.aaa',
+                          'subpath': '|aaa',
                           'items': [{'name': 'bbb',
                                      'title': 'BBB',
                                      'href': 'http://example.com/aaa/bbb/',
                                      'html': '<p>Unknown type</p>',
-                                     'subpath': '.aaa.bbb',
+                                     'subpath': '|aaa|bbb',
                                      'items': (),
                                     },
                           ]
@@ -274,18 +274,18 @@ class Test_move_subpath(unittest.TestCase):
 
     def test_miss_subpath(self):
         model = self._makeItem()
-        self.assertRaises(KeyError, self._callFUT, model, '.a', 'up')
+        self.assertRaises(KeyError, self._callFUT, model, '|a', 'up')
 
     def test_bad_direction(self):
         model = self._makeItem()
         model['a'] = self._makeItem()
-        self.assertRaises(ValueError, self._callFUT, model, '.a', 'sideways')
+        self.assertRaises(ValueError, self._callFUT, model, '|a', 'sideways')
 
     def test_move_up(self):
         model = self._makeItem()
         model['a'] = self._makeItem()
         model['b'] = self._makeItem()
-        self._callFUT(model, '.a', 'up')
+        self._callFUT(model, '|a', 'up')
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_up, 'a')
 
@@ -293,15 +293,23 @@ class Test_move_subpath(unittest.TestCase):
         model = self._makeItem()
         model['a.doc'] = self._makeItem()
         model['b'] = self._makeItem()
-        self._callFUT(model, '.a.doc', 'up')
+        self._callFUT(model, '|a.doc', 'up')
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_up, 'a.doc')
+
+    def test_move_up_file_with_many_dots(self):
+        model = self._makeItem()
+        model['a.file.with.dots'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '|a.file.with.dots', 'up')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_up, 'a.file.with.dots')
 
     def test_move_up_nested(self):
         model = self._makeItem()
         child = model['a'] = self._makeItem()
         child['b'] = self._makeItem()
-        self._callFUT(model, '.a.b', 'up')
+        self._callFUT(model, '|a|b', 'up')
         self.failUnless(model.ordering._sync_called)
         self.failUnless(child.ordering._sync_called)
         self.assertEqual(child.ordering._moved_up, 'b')
@@ -310,7 +318,7 @@ class Test_move_subpath(unittest.TestCase):
         model = self._makeItem()
         model['a'] = self._makeItem()
         model['b'] = self._makeItem()
-        self._callFUT(model, '.a', 'down')
+        self._callFUT(model, '|a', 'down')
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_down, 'a')
 
@@ -318,15 +326,23 @@ class Test_move_subpath(unittest.TestCase):
         model = self._makeItem()
         model['a.doc'] = self._makeItem()
         model['b'] = self._makeItem()
-        self._callFUT(model, '.a.doc', 'down')
+        self._callFUT(model, '|a.doc', 'down')
         self.failUnless(model.ordering._sync_called)
         self.assertEqual(model.ordering._moved_down, 'a.doc')
+
+    def test_move_down_file_with_many_dots(self):
+        model = self._makeItem()
+        model['a.file.with.dots'] = self._makeItem()
+        model['b'] = self._makeItem()
+        self._callFUT(model, '|a.file.with.dots', 'down')
+        self.failUnless(model.ordering._sync_called)
+        self.assertEqual(model.ordering._moved_down, 'a.file.with.dots')
 
     def test_move_down_nested(self):
         model = self._makeItem()
         child = model['a'] = self._makeItem()
         child['b'] = self._makeItem()
-        self._callFUT(model, '.a.b', 'down')
+        self._callFUT(model, '|a|b', 'down')
         self.failUnless(model.ordering._sync_called)
         self.failUnless(child.ordering._sync_called)
         self.assertEqual(child.ordering._moved_down, 'b')

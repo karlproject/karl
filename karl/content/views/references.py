@@ -97,7 +97,7 @@ class FileHTML(object):
                               )
 
 
-def getTree(root, request, api, _subpath_prefix='.'):
+def getTree(root, request, api, _subpath_prefix='|'):
     """ Return a recursive structure describing roots descendants.
 
     - The result is a sequence of mappings, one per direct child of ``root``.
@@ -118,7 +118,7 @@ def getTree(root, request, api, _subpath_prefix='.'):
         subpath = _subpath_prefix + child.__name__
         if ordering is not None:
             ordering.sync(child.keys())
-            items = getTree(child, request, api, subpath + '.')
+            items = getTree(child, request, api, subpath + '|')
         else:
             items = () # tuple signals leaf
         html_adapter = queryMultiAdapter((child, request), IReferenceManualHTML)
@@ -135,7 +135,7 @@ def getTree(root, request, api, _subpath_prefix='.'):
 
 
 def move_subpath(context, subpath, direction):
-    elements = subpath.split('.')
+    elements = subpath.split('|')
     container = context
     assert elements[0] == '' # start at context
     elements.pop(0)
@@ -144,13 +144,7 @@ def move_subpath(context, subpath, direction):
         container.ordering.sync(container.keys())
         name = elements.pop(0)
         if elements:
-            try:
-                container = container[name]
-            except KeyError:
-                # only a file, which has a dotted extension, could fail here
-                filename = name
-    if filename is not None:
-        name = filename + '.' + name
+            container = container[name]
     if name not in container:
         raise KeyError(name)
     if direction == 'up':
