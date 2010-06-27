@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.36 (2010-06-27)
+-----------------
 
 - Fixed UI bug where actions in folder views did not correspond to user's
   permissions.  (LP #594180)
