@@ -1620,14 +1620,10 @@ span.sortingArrows a img {
 	border: 1px solid #ccc;
 	margin: 0 0 1em;
 	padding: 0 0 1em;
-        overflow: hidden;
 }
 .tag_page_side a {
 	color: #639332;
 	text-decoration: none;
-        float: left;
-        padding-left: 3px;
-        clear: right;
 }
 #tagview-column .tag_page_side {
 	width: 176px;
@@ -1640,8 +1636,6 @@ span.sortingArrows a img {
 .tag_page_side dd {
 	padding: 5px 7px;
 	margin: 0px;
-        clear: left;
-        width: 174px;
 }
 #popular-tags-portlet {
 	margin-top: 2em;
@@ -2942,95 +2936,4 @@ ul.menu li {
 .peopledir-hcard .vcard .country-name {
     padding-left: 5px;
     display: inline;
-}
-
-/* Styles for set preferred portlet */
-
-.set_preferred_ui {
-    font-size: 90%;
-    margin-left: 1px;
-}
-
-.set_preferred_ui dd {
-    padding: 0px;
-}
-
-.set_preferred_normal {
-    margin-left: 8px;
-    font-size: 90%;
-}
-
-#preferred_form {
-    background-color: #e0e0e0;
-    font-size: 90%;
-    margin: 1px;
-}
-
-#preferred_form span {
-    font-size: 90%;
-    padding: 0px;
-    margin: 0px 0px 3px 0px;
-}
-
-#preferred-message {
-    width: 130px;
-    margin: 10px;
-}
-
-.preferred-buttons {
-    display: block;
-    height: 60px;
-}
-
-.edit-preferred {
-    padding: 0;
-    margin 0;
-}
-
-.preferred-buttons a, .preferred-buttons a:visited {
-    cursor: hand;
-    padding-left: 0px;
-    margin: 2px;
-    width: 79px;
-    height: 20px;
-    float: left;
-    line-height: 20px;
-    background: url("images/cal_buttons_new_event.png") 0 0 no-repeat;
-    font-weight: bold;
-    font-family: Arial, Verdana, sans-serif;
-    font-size: 10px;
-    text-decoration: none;
-    text-align: center;
-    color: #fff;
-    z-index: 1000;
-}
-
-.preferred-buttons a:hover {
-  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat;
-  text-decoration: none;
-}
-
-.preferred-buttons a:active {
-  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat;
-}
-
-
-#my-communities-portlet {
-    width: 188px;
-    border: 1px solid #ccc;
-    margin: 0 0 2em;
-}
-#my-communities-portlet h3 {
-    padding:1em 7px;
-    font-size:1.3em;
-    font-weight:bold;
-}
-
-.my-communities-item {
-    display: block;
-    color:#639332;
-    padding: 3px;
-    padding-left: 5px;
-    padding-right: 5px;
-    text-decoration: none;
 }

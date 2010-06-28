@@ -197,7 +197,7 @@
     </metal:actions_box>
 
     <div metal:define-macro="my_communities_portlet" 
-      id="my-communities-portlet">
+      id="my-communities-portlet" class="tag_page_side">
         <h3>My Communities</h3>
 	<div tal:repeat="my_community my_communities">
 	  <strong tal:omit-tag="not my_community.moderator">

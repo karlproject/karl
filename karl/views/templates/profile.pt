@@ -29,17 +29,14 @@
          >All ${profile.firstname}'s tags</a>
         </dd>
       </dl>
-      <div tal:condition="False and my_communities is not None"
-           metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
-
-      <div id="my-communities-portlet">
-        <h3 tal:condition="True or my_communities is None">My Communities</h3>
+      <div id="my-communities-portlet" class="tag_page_side">
+        <h3 tal:condition="my_communities is not None">My Communities</h3>
 	<h3 tal:condition="my_communities is
 	None">${profile.firstname}'s Communities</h3>
-	<div tal:repeat="my_community my_communities">
-	  <strong tal:omit-tag="not my_community.moderator">
-	    <a class="my-communities-item" href="${my_community.url}">
-	      ${my_community.title}
+	<div tal:repeat="community communities">
+	  <strong tal:omit-tag="not community.moderator">
+	    <a class="my-communities-item" href="${community.url}">
+	      ${community.title}
 	    </a>
 	  </strong>
 	</div>
