@@ -198,7 +198,7 @@
 
     <dl metal:define-macro="my_communities_portlet" class="tag_page_side"
       id="my-communities-portlet">
-      <div id="my-communities-list">
+      <p id="my-communities-list">
         <dt>My Communities</dt>
         <dd tal:repeat="my_community my_communities">
            <strong tal:omit-tag="not my_community.moderator">
@@ -219,7 +219,7 @@
                onclick="$('#my-communities-list').load('/jquery_list_my_communities.html'); return false"
                href="#">Show all</a>
          </p>
-      </div>
+      </p>
     </dl>
 
     <metal:table metal:define-macro="folder_grid">

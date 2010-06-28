@@ -1620,7 +1620,7 @@ span.sortingArrows a img {
 	border: 1px solid #ccc;
 	margin: 0 0 1em;
 	padding: 0 0 1em;
-        overflow: auto;
+        overflow: hidden;
 }
 .tag_page_side a {
 	color: #639332;
@@ -1640,6 +1640,8 @@ span.sortingArrows a img {
 .tag_page_side dd {
 	padding: 5px 7px;
 	margin: 0px;
+        clear: left;
+        width: 174px;
 }
 #popular-tags-portlet {
 	margin-top: 2em;
