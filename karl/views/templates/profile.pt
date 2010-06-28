@@ -15,8 +15,7 @@
     <div class="rightcol">
 
       <dl class="tag_page_side" id="popular-tags-portlet">
-        <dt tal:condition="my_communities is None">${profile.firstname}'s Tags</dt>
-        <dt tal:condition="my_communities is not None">My Tags</dt>
+        <dt>${profile.firstname}'s Tags</dt>
         <dd tal:condition="not tags">
           <strong>No tags</strong>
         </dd>
@@ -29,24 +28,8 @@
          >All ${profile.firstname}'s tags</a>
         </dd>
       </dl>
-      <div id="my-communities-portlet" class="tag_page_side">
-        <h3 tal:condition="my_communities is not None">My Communities</h3>
-	<h3 tal:condition="my_communities is
-	None">${profile.firstname}'s Communities</h3>
-	<div tal:repeat="community communities">
-	  <strong tal:omit-tag="not community.moderator">
-	    <a class="my-communities-item" href="${community.url}">
-	      ${community.title}
-	    </a>
-	  </strong>
-	</div>
-      </div>
-
-
-        <dl style="display:none" class="tag_page_side" id="communities-portlet"
-           tal:condition="True or my_communities is None">
-        <dt tal:condition="my_communities is None">${profile.firstname}'s Communities</dt>
-        <dt tal:condition="my_communities is not None">My Communities</dt>
+      <dl class="tag_page_side" id="communities-portlet">
+        <dt>${profile.firstname}'s Communities</dt>
 
         <dd tal:condition="not communities">
           <strong>No communities</strong>

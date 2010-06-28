@@ -196,17 +196,15 @@
       </script>
     </metal:actions_box>
 
-    <div metal:define-macro="my_communities_portlet" 
-      id="my-communities-portlet" class="tag_page_side">
-        <h3>My Communities</h3>
-	<div tal:repeat="my_community my_communities">
-	  <strong tal:omit-tag="not my_community.moderator">
-	    <a class="my-communities-item" href="${my_community.url}">
-	      ${my_community.title}
-	    </a>
-	  </strong>
-	</div>
-    </div>
+    <dl metal:define-macro="my_communities_portlet" class="tag_page_side"
+      id="my-communities-portlet">
+      <dt>My Communities</dt>
+      <dd tal:repeat="my_community my_communities">
+        <strong tal:omit-tag="not my_community.moderator">
+          <a href="${my_community.url}">${my_community.title}</a>
+        </strong>
+      </dd>
+    </dl>
 
     <metal:table metal:define-macro="folder_grid">
       <div id="filegrid"></div>
