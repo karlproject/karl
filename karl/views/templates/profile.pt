@@ -29,11 +29,11 @@
          >All ${profile.firstname}'s tags</a>
         </dd>
       </dl>
-      <div tal:condition="False and my_communities is not None"
-           metal:use-macro="api.snippets.macros['my_communities_portlet']" />
-        <dl class="tag_page_side" id="communities-portlet"
-           tal:condition="True or my_communities is None">
-        <dt tal:condition="my_communities is None">${profile.firstname}'s Communities</dt>
+      <div tal:condition="my_communities is not None"
+           metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+        <dl tal:condition="my_communities is None"
+            class="tag_page_side" id="communities-portlet">
+        <dt tal:condition="my_communities is None">${profile.firstname}'s Tags</dt>
         <dt tal:condition="my_communities is not None">My Communities</dt>
 
         <dd tal:condition="not communities">
