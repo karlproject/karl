@@ -3013,3 +3013,24 @@ ul.menu li {
 .preferred-buttons a:active {
   background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat;
 }
+
+
+#my-communities-portlet {
+    width: 188px;
+    border: 1px solid #ccc;
+    margin: 0 0 2em;
+}
+#my-communities-portlet h3 {
+    padding:1em 7px;
+    font-size:1.3em;
+    font-weight:bold;
+}
+
+.my-communities-item {
+    display: block;
+    color:#639332;
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-decoration: none;
+}
