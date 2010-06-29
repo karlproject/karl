@@ -282,7 +282,24 @@ class MailinRunner2Tests(unittest.TestCase):
 
         self._makeOne()()
         self.assertEqual(self.queue.bounced, [
-            (message, None, 'Not witty enough')])
+            (message, None, 'Not witty enough', None)])
+        self.assertEqual(len(self.mailer), 1)
+
+    def test_bounce_message_throttled(self):
+        message = DummyMessage(None, 'Message body.', ())
+        message['X-Postoffice-Rejected'] = 'Throttled'
+        message['From'] = 'Clarence'
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        mailin()
+
+        self.assertEqual(len(self.queue.bounced), 1)
+        bounced = self.queue.bounced[0]
+        self.assertEqual(bounced[0], message)
+        self.assertEqual(bounced[1], None)
+        self.assertEqual(bounced[2], None)
+        self.assertEqual(bounced[3]['To'], 'Clarence')
         self.assertEqual(len(self.mailer), 1)
 
     def test_quarantine_message(self):
@@ -374,8 +391,9 @@ class DummyQueue(list):
         self.quarantined.append((message, error))
         send(message_from, ['foo@example.com'], "You're in quarantine!")
 
-    def bounce(self, message, send, from_addr, error):
-        self.bounced.append((message, from_addr, error))
+    def bounce(self, message, send, from_addr, error=None,
+               bounce_message=None):
+        self.bounced.append((message, from_addr, error, bounce_message))
         send(from_addr, ['foo@example.com'], message)
 
 

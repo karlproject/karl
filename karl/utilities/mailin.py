@@ -34,10 +34,12 @@ import transaction
 
 from karl.adapters.interfaces import IMailinDispatcher
 from karl.adapters.interfaces import IMailinHandler
+from karl.mail import Message
 from karl.utils import find_catalog
 from karl.utils import find_communities
 from karl.utils import get_setting
 from karl.utils import hex_to_docid
+from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.traversal import find_model
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
@@ -233,9 +235,15 @@ class MailinRunner2(object):
         try:
             message_id = message.get('Message-Id', 'No message id')
             info = self.dispatcher.crackHeaders(message)
-            error = info.get('error')
+            error = message.get('X-Postoffice-Rejected')
+            if not error:
+                error = info.get('error')
             if error:
-                self.bounce_message(message, error)
+                # Special case throttle errors
+                if error == 'Throttled':
+                    self.bounce_message_throttled(message)
+                else:
+                    self.bounce_message(message, error)
                 log.info('Bounced %s %s %s' % (
                     message_id, error, repr(info)))
                 return False
@@ -271,6 +279,27 @@ class MailinRunner2(object):
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
         self.queue.bounce(message, mailer.send, from_email, error)
+
+    def bounce_message_throttled(self, message):
+        mailer = getUtility(IMailDelivery)
+        from_email = get_setting(self.root, 'postoffice.bounce_from_email')
+        if from_email is None:
+            from_email = get_setting(self.root, 'admin_email')
+
+        bounce_message = Message()
+        bounce_message['From'] = from_email
+        bounce_message['To'] = message['From']
+        bounce_message['Subject'] = 'Your submission to Karl has bounced.'
+        bounce_message.set_type('text/html')
+        bounce_message.set_payload(render_template(
+            'templates/bounce_email_throttled.pt',
+            subject=message.get('Subject'),
+        ), 'utf-8')
+
+        self.queue.bounce(
+            message, mailer.send, from_email,
+            bounce_message=bounce_message
+        )
 
     def quarantine_message(self, message):
         mailer = getUtility(IMailDelivery)
