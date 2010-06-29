@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- hid the overflow on the main content area, so that when wide items are
+  entered, the entire content area won't fall beneath the left menu in IE.
+  (LP #576042)
 
 3.36 (2010-06-27)
 -----------------

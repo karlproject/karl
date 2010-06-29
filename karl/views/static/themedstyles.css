@@ -519,6 +519,7 @@ a.chparent:hover {
   padding:10px;
   margin: 0 15px 15px;
   position:relative;
+  overflow:hidden;
 }
 #right {
  	float: right;
