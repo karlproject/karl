@@ -294,6 +294,8 @@ class MailinRunner2(object):
         bounce_message.set_payload(render_template(
             'templates/bounce_email_throttled.pt',
             subject=message.get('Subject'),
+            system_name=get_setting(self.root, 'system_name', 'KARL'),
+            admin_email=get_setting(self.root, 'admin_email'),
         ), 'utf-8')
 
         self.queue.bounce(
