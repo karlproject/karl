@@ -15,7 +15,8 @@
     <div class="rightcol">
 
       <dl class="tag_page_side" id="popular-tags-portlet">
-        <dt>${profile.firstname}'s Tags</dt>
+        <dt tal:condition="my_communities is None">${profile.firstname}'s Tags</dt>
+        <dt tal:condition="my_communities is not None">My Tags</dt>
         <dd tal:condition="not tags">
           <strong>No tags</strong>
         </dd>
@@ -28,19 +29,25 @@
          >All ${profile.firstname}'s tags</a>
         </dd>
       </dl>
-      <dl class="tag_page_side" id="communities-portlet">
-        <dt>${profile.firstname}'s Communities</dt>
-
-        <dd tal:condition="not communities">
-          <strong>No communities</strong>
-        </dd>
-
-        <dd tal:repeat="c communities">
-          <strong tal:omit-tag="not c.moderator">
-            <a href="${c.url}">${c.title}</a>
+      <div tal:condition="my_communities is not None"
+           metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+      <div metal:define-macro="my_communities_portlet" class="generic-portlet"
+           tal:condition="my_communities is None" id="my-communities-portlet">
+        <h3>${profile.firstname}'s Communities</h3>
+        <div class="portlet-item" tal:condition="communities"
+             tal:repeat="community communities">
+          <strong tal:omit-tag="not community.moderator">
+            <a href="${community.url}">
+              ${community.title}
+            </a>
           </strong>
-        </dd>
-      </dl>
+        </div>
+        <div class="portlet-item" tal:condition="not communities">
+          <strong>No Communities</strong>
+        </div>
+    </div>
+
+
     </div>
     <div class="profile_page_body">
       <span class="portraid">
