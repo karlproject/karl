@@ -14,21 +14,21 @@
 
     <div class="rightcol">
 
-      <dl class="tag_page_side" id="popular-tags-portlet">
-        <dt tal:condition="my_communities is None">${profile.firstname}'s Tags</dt>
-        <dt tal:condition="my_communities is not None">My Tags</dt>
-        <dd tal:condition="not tags">
+      <div class="generic-portlet" id="popular-tags-portlet">
+        <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
+        <h3 tal:condition="my_communities is not None">My Tags</h3>
+        <div class="portlet-item" tal:condition="not tags">
           <strong>No tags</strong>
-        </dd>
-        <dd tal:repeat="tag tags">
+        </div>
+        <div class="portlet-item" tal:repeat="tag tags">
          ${tag.count}&nbsp;
          <a href="${api.here_url}showtag/${tag.name}">${tag.name}</a>
-        </dd>
-        <dd>
+        </div>
+        <div class="portlet-item">
          <a href="${api.here_url}taglisting.html"
          >All ${profile.firstname}'s tags</a>
-        </dd>
-      </dl>
+        </div>
+      </div>
       <div tal:condition="my_communities is not None"
            metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
       <div metal:define-macro="my_communities_portlet" class="generic-portlet"

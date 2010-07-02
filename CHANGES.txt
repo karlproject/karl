@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- portlet styles - cleaned up CSS for status message,
+  applied new styles to profile tags portlet (LP #599522)
+
 - general cleaning up of themedstyles.css for legibility
  * conformed way the code is laid out
  * fixed small errors

@@ -277,7 +277,7 @@ a.standalone:hover {
   font-size: 1px;
 }
 
-/** =ERROR MESSAGES
+/** =ERROR/STATUS MESSAGES
 ----------------------------------------------- */
 .portalMessage,
 .portalErrorMessage,
@@ -296,12 +296,16 @@ a.standalone:hover {
   font-size: 1em;
   text-align: left;
   -moz-border-radius: 5px;
-  -webkit-borderradius: 5px;
+  -webkit-border-radius: 5px;
 }
 #inner .portalMessage {
   padding: 0.5em 10px 0.5em 30px;
   width: 438px;
   margin: 0;
+}
+.generic-portlet .portalMessage {
+  margin: 1em;
+  width: 130px;
 }
 /* also make tag statusbox look nice */
 #tag-inputbox .statusbox-item {
@@ -2998,25 +3002,4 @@ ul.menu li {
 .portlet-item a {
     color: #639332;
     text-decoration: none;
-}
-
-.portlet-message {
-  background: #fffad8 url('images/message_info_icon.gif') 7px 50% no-repeat;
-  border: 1px solid #f1e186;
-  color: #333;
-  font-weight: normal;
-  font-size: 1.1em;
-  margin: 1em;
-  padding: 6px 10px 6px 30px;
-  vertical-align: middle;
-  width: 130px;
-  font-size: 1em;
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-topright: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
 }
