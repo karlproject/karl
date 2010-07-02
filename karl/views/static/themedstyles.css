@@ -23,13 +23,14 @@ h1, h2, h3 {
 h1 {
   font-size: 1.8em;
   font-weight: normal;
-  font-family:Georgia,Palatino,Times New Roman;
+  font-family: Georgia,Palatino,"Times New Roman";
 }
 h2 {
   font-size: 1.3em;
 }
 h3 {
-  font-size: 1.2em; letter-spacing: 0;
+  font-size: 1.2em;
+  letter-spacing: 0;
 }
 h3 div {
   color: #333333;
@@ -48,13 +49,13 @@ table {
   font-size: 1em;
 }
 pre {
-  background-color:#F0F2F4;
-  border:1px solid #CECECE;
-  color:black;
-  font-size:125%;
-  overflow:auto;
+  background-color: #F0F2F4;
+  border: 1px solid #CECECE;
+  color: black;
+  font-size: 125%;
+  overflow: auto;
   width: 95%;
-  padding:10px;
+  padding: 10px;
   padding-bottom: 20px
 }
 
@@ -158,7 +159,7 @@ input#save-state {
 /** =SHARED
 ----------------------------------------------- */
 .content {
-	width: 952px;
+  width: 952px;
   margin: 0 auto;
   padding: 0;
 }
@@ -187,7 +188,7 @@ input#save-state {
 }
 .context {
   background: #639332;
-  color: White !important;
+  color: white !important;
   font-size: 1em;
   padding: 0.2em 0.6em;
   border: 1px solid #CECECE;
@@ -241,10 +242,19 @@ a.standalone:hover {
   display: block;
   clear: both;
 }
-.clearafter, .kscreentitle {display: inline-block;}
+.clearafter,
+.kscreentitle {
+    display: inline-block;
+}
 /* Holly Hack targets IE Win only \*/
-* html .clearafter, * html .kscreentitle {height: 1%;}
-.clearafter, .kscreentitle {display: block;}
+* html .clearafter,
+* html .kscreentitle {
+    height: 1%;
+}
+.clearafter,
+.kscreentitle {
+    display: block;
+}
 /* End Holly Hack */
 
 /* clear after the title without the need to put clearafter
@@ -402,7 +412,7 @@ span.pointer {
   cursor: pointer;
 }
 ul.menubar a:visited {
-  color: White;
+  color: white;
 }
 ul.menubar a:hover {
   text-decoration: none;
@@ -410,7 +420,7 @@ ul.menubar a:hover {
   color: #2B3F17;
 }
 ul.menubar a:active {
-  color: White;
+  color: white;
 }
 ul.menubar li.noborder a:hover { /* XXX ? */
   background-image: none;
@@ -515,10 +525,10 @@ a.chparent:hover {
 }
 #center {
   background-color: #FFF;
-  border:1px solid #CECECE;
-  padding:10px;
+  border: 1px solid #CECECE;
+  padding: 10px;
   margin: 0 15px 15px;
-  position:relative;
+  position: relative;
 }
 #right {
  	float: right;
@@ -539,8 +549,8 @@ a.chparent:hover {
 /** =HEADER
 ----------------------------------------------- */
 #header-user-menu {
-	font-size: 0.9em;
-	text-transform: uppercase;
+  font-size: 0.9em;
+  text-transform: uppercase;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   text-align: right;
@@ -558,8 +568,8 @@ ul.horListing li {
 }
 .horListing a,
 .horListing a:visited {
-	color: #639332;
-	text-decoration: none;
+  color: #639332;
+  text-decoration: none;
   padding: 0 0.5em;
 }
 .horListing li.noborder a {
@@ -614,13 +624,13 @@ ul#header-menu img {
   float: right;
   vertical-align: top;
   margin: 10px 20px 0 0;
-  padding: 0 0 0 0 !important;
+  padding: 0 !important;
   text-align: right;
   width: 483px;
 }
 #searchbox form {
-  margin: 0 0 0 0;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 input#livesearch-input {
   float: right;
@@ -633,7 +643,7 @@ input#livesearch-input {
   font-size: large;
   vertical-align: top;
   float: left;
-  padding: 0 0 0 0 !important;
+  padding: 0 !important;
 }
 #livesearch-button {
   float: right;
@@ -642,14 +652,14 @@ input#livesearch-input {
   background: transparent url('images/btn-go.gif') top left no-repeat;
 }
 #searchbox .advancedSearch {
-	display: block;
+  display: block;
   font-size: 1.2em;
   line-height: 1em;
 }
 #searchbox span a,
 #searchbox span a:visited {
   font-size: 0.8em;
-	color: #63707C;
+  color: #63707C;
   padding: 0;
   margin: 0;
   text-decoration: none;
@@ -670,12 +680,14 @@ input#livesearch-input {
   margin: 0px;
   padding: 0px;
 }
-#footer .osi-logo img {border: none;}
+#footer .osi-logo img {
+  border: none;
+}
 #footer .extra {
   float: right;
   font-size: 0.9em;
 }
-#footer .extra a{
+#footer .extra a {
   color: #639332;
 }
 
@@ -702,7 +714,7 @@ input#livesearch-input {
   margin-bottom: 0.2em;
   font-weight: bold;
   letter-spacing: 0px;
-  font-family: Georgia,Palatino,Times New Roman;
+  font-family: Georgia,Palatino,"Times New Roman";
   text-transform: uppercase;
 }
 #left .menu ul li {
@@ -720,7 +732,7 @@ input#livesearch-input {
 }
 #left .submenu a {
   background-image: url('images/arrow.gif');
-  background-position:right;
+  background-position: right;
   background-repeat: no-repeat;
 }
 #left a:hover {
@@ -741,7 +753,7 @@ input#livesearch-input {
 	padding: 10px;
 	font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
 	margin-bottom: 10px;
-        overflow: auto;
+    overflow: auto;
 }
 #right div p {
 	margin: 7px 0;
@@ -761,12 +773,12 @@ input#livesearch-input {
 	display: block;
 	overflow: hidden;
 	border-top: 1px solid #cccccc;
-	margin-top:1.5em;
+	margin-top: 1.5em;
 }
 #center .sections h3 {
   font-weight: normal;
   letter-spacing: 0px;
-  font-family: Georgia,Palatino,Times New Roman;
+  font-family: Georgia,Palatino,"Times New Roman";
   color: #639332;
   font-size: 1.6em;
 }
@@ -829,7 +841,7 @@ ul#peopledir-tabs li a {
   text-transform: uppercase;
 }
 ul#peopledir-tabs li a:hover {
-  background-color: White;
+  background-color: white;
   text-decoration: none;
 }
 ul#peopledir-tabs li.selected a {
@@ -915,12 +927,12 @@ ul#peopledir-tabs li.selected a {
   background-color: #CEDFEF !important;
 }
 .community_view .cheader {
-	clear: both;
-	margin-bottom: 25px;
+  clear: both;
+  margin-bottom: 25px;
   position: relative;
 }
 .community_view .cheader h1 {
-	font-weight: normal;
+  font-weight: normal;
   margin-top: 0;
 }
 .community_view .cheader form {
@@ -929,8 +941,8 @@ ul#peopledir-tabs li.selected a {
   text-align: right;
 }
 .community_view .cheader form input {
-	margin-right: 2px;
-	font-size: 11px;
+  margin-right: 2px;
+  font-size: 11px;
   display: inline;
 }
 .community_view .cheader form .inp {
@@ -940,8 +952,8 @@ ul#peopledir-tabs li.selected a {
 /** =COMMUNITY TABS (OVERVIEW, BLOG, WIKI)
 ----------------------------------------------- */
 .community_view #cwrapper {
-	clear: both;
-	margin-top: 10px;
+  clear: both;
+  margin-top: 10px;
   background-color: #CEDFEF;
 }
 .community_view #cleftcol {
@@ -950,7 +962,7 @@ ul#peopledir-tabs li.selected a {
 }
 .community_view #cleftcol .ccontent {
 	border: 1px solid #CECECE;
-  border-top: none;
+    border-top: none;
 	padding: 20px 10px 10px 10px;
 	display: block;
 	background-color: white;
@@ -975,10 +987,10 @@ ul#peopledir-tabs li.selected a {
   background: #e6e6f2;
   text-decoration: none;
   font-size: 0.9em;
-	text-transform: uppercase;
+  text-transform: uppercase;
 }
 .community_view #cleftcol #cheader ul li a:hover {
-  background-color: White;
+  background-color: white;
 }
 .community_view #cleftcol #cheader ul li.curr a {
   background: white;
@@ -1000,14 +1012,14 @@ ul#peopledir-tabs li.selected a {
 ----------------------------------------------- */
 .community_view #crightcol {
   margin: 0px 0px 0px 700px;
-	padding: 1.5em 0 0 0;
-	color: #000;
-	font-size: 0.9em;
+  padding: 1.5em 0 0 0;
+  color: #000;
+  font-size: 0.9em;
 }
 .community_view #crightcol .right-portlet {
   margin-bottom: 20px;
   padding-bottom: 20px;
-	border-bottom: 1px dashed #CECECE;
+  border-bottom: 1px dashed #CECECE;
 }
 .community_view #crightcol #activepeople {
   border-bottom: none;
@@ -1089,9 +1101,13 @@ ul.nav li.iehover ul a:hover {
   margin: 0;
   vertical-align: top;
 }
-.portlet-table td.type {text-align: center;}
-.portlet-table td.date {text-align: right;}
-.portlet-table .num{
+.portlet-table td.type {
+    text-align: center;
+}
+.portlet-table td.date {
+    text-align: right;
+}
+.portlet-table .num {
 	width: 10%;
 	padding-right: 10px;
 	text-align: right;
@@ -1137,7 +1153,7 @@ div#offices-wrapper p {
   border: none;
 }
 .wicked_unresolved {
-  color:Red;
+  color: red;
 }
 
 /** edit page (form) view **/
@@ -1168,21 +1184,13 @@ div.error {
 }
 
 #mce_editor_0_addwickedlink,
-#mce_editor_0_delwickedlink {
-  display: none;
-}
+#mce_editor_0_delwickedlink,
 #mce_editor_1_addwickedlink,
-#mce_editor_1_delwickedlink {
-  display: none;
-}
+#mce_editor_1_delwickedlink,
 #mce_editor_2_addwickedlink,
-#mce_editor_2_delwickedlink {
-  display: none;
-}
+#mce_editor_2_delwickedlink,
 #mce_editor_3_addwickedlink,
-#mce_editor_3_delwickedlink {
-  display: none;
-}
+#mce_editor_3_delwickedlink,
 #mce_editor_4_addwickedlink,
 #mce_editor_4_delwickedlink {
   display: none;
@@ -1197,11 +1205,11 @@ div.error {
 }
 .newsitemImage {
   float: right;
-  margin:0 0 1em 1em;
+  margin: 0 0 1em 1em;
 }
 .imageCaption {
-  margin-top:0.5em;
-  width:200px;
+  margin-top: 0.5em;
+  width: 200px;
 }
 .kbyline {
   color: #999999;
@@ -1251,9 +1259,9 @@ div.error {
 /** =BATCH MECHANISM
 ----------------------------------------------- */
 .kpagination_frame {
-  background-color:#F0F2F4;
+  background-color: #F0F2F4;
   border: 1px solid #cecece;
-  color:black;
+  color: black;
   padding: 0.2em 1em;
   margin-top: 1em;
   margin-bottom: 1em;
@@ -1265,7 +1273,7 @@ div.error {
   margin-bottom: 20px;
 }
 .kutility_menu a {
-  color: Black;
+  color: black;
 }
 h2.eventsListing {
   text-align: center;
@@ -1301,7 +1309,7 @@ table#calendar td.this-day {
 }
 table#calendar td.other-month,
 table#calendar td.this-month {
-  background: White;
+  background: white;
 }
 table#calendar span.middot {
   font-weight: bold;
@@ -1311,8 +1319,8 @@ table#calendar span.middot {
   line-height: 0.6em;
 }
 .calendar_day_of_week_header {
-  text-align:center;
-  background-color:#e5e8ed;
+  text-align: center;
+  background-color: #e5e8ed;
 }
 .calendar_day_of_week_header td {
   padding: 4px 0 4px 0;
@@ -1320,13 +1328,13 @@ table#calendar span.middot {
   border-width: 1px 0 1px 1px;
 }
 .calendar_day_header {
-  text-align:right;
-  background-color:#E8EEF7;
-  display:block;
+  text-align: right;
+  background-color: #E8EEF7;
+  display: block;
 }
 .other-month .calendar_day_header {
-  text-align:right;
-  background-color:#E8EEF7;
+  text-align: right;
+  background-color: #E8EEF7;
   color: #D9D9D9;
 }
 .calendar_day_entry {
@@ -1409,7 +1417,7 @@ div.search_utility_bar {
   width: 118px;
 }
 .profileNoWrap {
-  white-space:nowrap;
+  white-space: nowrap;
 }
 .rightcol {
 	float: right;
@@ -1496,7 +1504,7 @@ body#login-wrapper h1.kscreentitle span {
   width: 129px;
 }
 .loginLeftPadding {
-  padding-left:8em;
+  padding-left: 8em;
 }
 span.loginLabelWrapper {
   width: 83px;
@@ -1537,49 +1545,49 @@ table.messageBoard th.boardCaption .kpagination_frame a {
 /** =REFERENCE MANUAL
 ----------------------------------------------- */
 ol#references-listing {
-  padding:0;
-  margin:0;
-  width:655px;
-  list-style-position:inside;
-  font-size:1em;
+  padding: 0;
+  margin: 0;
+  width: 655px;
+  list-style-position: inside;
+  font-size: 1em;
 }
 ol#references-listing li {
   line-height: normal;
-  list-style-position:inside;
+  list-style-position: inside;
   border-bottom: 1px solid #CECECE;
   padding: 0.3em 0 0 0.5em;
-  margin:0;
-  clear:right;
+  margin: 0;
+  clear: right;
 }
 ol#references-listing li a {
-  text-decoration:none;
+  text-decoration: none;
 }
 ol#references-listing li a.topLevelItem {
-  font-weight:bold;
-  text-transform:uppercase;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 ol#references-listing li ol {
-  margin:0.3em 0 0;
+  margin: 0.3em 0 0;
   padding: 0 0 0 2em;
 }
 * html ol#references-listing li ol {
-  padding-left:1.5em;
+  padding-left: 1.5em;
 }
 ol#references-listing li ol li {
-  padding-bottom:0.3em;
-  border-bottom:none;
-  border-top:1px solid #CECECE;
+  padding-bottom: 0.3em;
+  border-bottom: none;
+  border-top: 1px solid #CECECE;
 }
 
 span.sortingArrows {
-  display:block;
-  width:25px;
-  height:8px;
-  padding:0;
-  float:right;
+  display: block;
+  width: 25px;
+  height: 8px;
+  padding: 0;
+  float: right;
 }
 span.sortingArrows a {
-  text-decoration:none;
+  text-decoration: none;
 }
 span.sortingArrows a img {
   border:none;
@@ -1683,7 +1691,7 @@ h2.tagsHeaderSpace {
 }
 .tagweight7 {
   font-size: 220%;
-  color:green;
+  color: green;
 }
 
 /* who applied the tag "name" to ... */
@@ -1806,11 +1814,15 @@ table#staffprofile-content td a:hover {
 ----------------------------------------------- */
 
 /* Hide certain form fields when staff edits a profile */
-.k3_staff_role #save-firstname--field, .k3_staff_role #save-lastname--field,
+.k3_staff_role #save-firstname--field,
+.k3_staff_role #save-lastname--field,
 .k3_staff_role #save-phone--field,
-.k3_staff_role #save-extension--field, .k3_staff_role #save-department--field,
-.k3_staff_role #save-organization--field, .k3_staff_role #save-position--field,
-.k3_staff_role #save-location--field, .k3_staff_role #save-country--field {
+.k3_staff_role #save-extension--field,
+.k3_staff_role #save-department--field,
+.k3_staff_role #save-organization--field,
+.k3_staff_role #save-position--field,
+.k3_staff_role #save-location--field,
+.k3_staff_role #save-country--field {
   /* Changed to display: block to facilitate testing, temporarily. */
   display: none;
 }
@@ -1838,7 +1850,7 @@ div.moderator {
 /** =CALENDAR
 ----------------------------------------------- */
 .cal_header a img {
-  border: 0;
+  border: none;
 }
 .cal_header {
   background-color: #edf1f3;
@@ -1886,7 +1898,7 @@ div.moderator {
   color: #333;
 }
 .cal_choose .color {
-  border: 0;
+  border: none;
 }
 
 .cal_actions {
@@ -2135,7 +2147,7 @@ table.cal_scroll {
   padding: 3px;
 }
 .cal .all_day .create img {
-  border: 0;
+  border: none;
 }
 .cal td .add {
   visibility: hidden;
@@ -2204,14 +2216,8 @@ table.cal_scroll {
 
 /* events */
 .cal_event_pos_full a {
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-topright: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 .cal_event_pos_left a {
   -moz-border-radius-topleft: 5px;
@@ -2257,14 +2263,8 @@ body .cal_event_pos_right .cal_event_block {
   border-left-width: 0;
 }
 body .cal_hour_event .cal_event_block {
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-topright: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
   z-index: 1;
 }
 body .cal_hour_event .cal_event_block .time {
@@ -2285,7 +2285,7 @@ body .cal_hour_event .cal_event_block .time {
   padding: 3px;
 }
 .cal_hour_event .create img {
-  border: 0;
+  border: none;
 }
 .cal td.hov,
 .cal div.hov {
@@ -2380,7 +2380,7 @@ body .cal_hour_event .cal_event_block .time {
   padding: 0 3px;
   text-decoration: none;
   overflow: hidden;
-  border: 0;
+  border: none;
 }
 .at_time a {
   background-color: transparent;
@@ -2399,7 +2399,7 @@ body .cal_hour_event .cal_event_block .time {
 
 .cal_month .label img {
   visibility: hidden;
-  border: 0;
+  border: none;
 }
 .cal_month .hov .label img {
   visibility: visible;
@@ -2560,7 +2560,7 @@ body .cal_hour_event .cal_event_block .time {
   font-size: 110%;
   background-color: transparent;
   font-weight: bold;
-  border: 0;
+  border: none;
   text-decoration: none;
 }
 .cal_event_category {
@@ -2667,8 +2667,10 @@ input.category_title, input.layer_title {
 select.category_paths {
   width: 500px;
 }
-.cal_add input,  .cal_add select,
-.cal_edit input, .cal_edit select {
+.cal_add input,
+.cal_add select,
+.cal_edit input,
+.cal_edit select {
   margin-top: 2px;
 }
 .cal_choose_color {
@@ -2688,10 +2690,11 @@ select.category_paths {
 .cal_choose_color li input {
   margin: 0 0 3px 0;
   padding: 0;
-  border: 0;
+  border: none;
   background: none;
 }
-.cal_add, .cal_edit,
+.cal_add,
+.cal_edit,
 #setup_add_layer,
 #setup_add_cal {
     margin-bottom: 35px;
@@ -2753,7 +2756,7 @@ select.category_paths {
 .button {
   float: left;
   margin: 0;
-  border: 0;
+  border: none;
   padding: 0 14px 0 0;
   font-family: Arial, Verdana, sans-serif;
   font-size: 12px;

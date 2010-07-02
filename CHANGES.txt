@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- general cleaning up of themedstyles.css for legibility
+ * conformed way the code is laid out
+ * fixed small errors
+
 - Styled the site announcement to look like a status message. (LP #600765)
 
 - Updated mailin code to respect X-Postoffice-Rejected headers coming from
