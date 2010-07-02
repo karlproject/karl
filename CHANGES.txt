@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Styled the site announcement to look like a status message. (LP #600765)
+
 - Updated mailin code to respect X-Postoffice-Rejected headers coming from
   repoze.postoffice and special cased the bounce message when a message is
   rejected to due to vacation loop detection throttling. (LP #597835)
