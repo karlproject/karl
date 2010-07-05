@@ -236,6 +236,27 @@ class TagsTests(unittest.TestCase):
         objects = engine.getTagObjects(community='nonesuch')
         self.assertEqual(len(objects), 0)
 
+    def test_getCloud_w_items_as_int(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        cloud = dict(engine.getCloud(items=13))
+        self.assertEqual(len(cloud), 2)
+        self.assertEqual(cloud['foo'], 1)
+        self.assertEqual(cloud['bar'], 1)
+
+    def test_getCloud_w_users_as_string(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        cloud = dict(engine.getCloud(users='bharney'))
+        self.assertEqual(len(cloud), 1)
+        self.assertEqual(cloud['foo'], 1)
+
     def test_getCloud_no_community(self):
         self._registerCommunityFinder()
         engine = self._makeOne()
