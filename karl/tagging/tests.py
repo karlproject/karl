@@ -450,6 +450,39 @@ class TagsTests(unittest.TestCase):
         related = engine.getRelatedItems(15, user='bharney')
         self.assertEqual(len(related), 0)
 
+    def test_getRelatedUsers_wo_community(self):
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        related = engine.getRelatedUsers(user='phred')
+        self.assertEqual(len(related), 2)
+        self.assertEqual(related[0], ('wylma', 1))
+        self.assertEqual(related[1], ('bharney', 1))
+
+    def test_getRelatedUsers_w_valid_community(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        related = engine.getRelatedUsers(user='phred', community='community')
+        self.assertEqual(len(related), 2)
+        self.assertEqual(related[0], ('wylma', 1))
+        self.assertEqual(related[1], ('bharney', 1))
+
+    def test_getRelatedUsers_w_invalid_community(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        related = engine.getRelatedUsers(user='phred', community='nonesuch')
+        self.assertEqual(len(related), 0)
+
     def test_update_one(self):
         TAGS = ('bedrock', 'dinosaur')
         engine = self._makeOne()
