@@ -108,6 +108,17 @@ class TagTests(unittest.TestCase):
         self.failUnless(tag1 in target)
         self.failUnless(tag2 in target)
 
+    def test___repr___wo_community(self):
+        tag = self._makeOne()
+        self.assertEqual(repr(tag),
+                         "<Tag u'test' for 13 by u'phred', community None>")
+
+    def test___repr___w_community(self):
+        tag = self._makeOne(community='community')
+        self.assertEqual(repr(tag),
+                         "<Tag u'test' for 13 by u'phred', "
+                         "community u'community'>")
+
 
 class TagsTests(unittest.TestCase):
 
