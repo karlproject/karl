@@ -719,6 +719,12 @@ class TagsTests(unittest.TestCase):
 
 class TagCommunityFinderTests(unittest.TestCase):
 
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from karl.tagging import TagCommunityFinder
         return TagCommunityFinder
