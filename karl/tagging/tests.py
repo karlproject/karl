@@ -483,6 +483,67 @@ class TagsTests(unittest.TestCase):
         related = engine.getRelatedUsers(user='phred', community='nonesuch')
         self.assertEqual(len(related), 0)
 
+    def test_getFrequency_defaults(self):
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        freq = engine.getFrequency()
+        self.assertEqual(len(freq), 4)
+        self.failUnless(('foo', 1) in freq)
+        self.failUnless(('bar', 4) in freq)
+        self.failUnless(('baz', 1) in freq)
+        self.failUnless(('qux', 1) in freq)
+
+    def test_getFrequency_w_tags(self):
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        freq = engine.getFrequency(tags=['bar', 'foo', 'nonesuch'])
+        self.assertEqual(len(freq), 3)
+        self.failUnless(('foo', 1) in freq)
+        self.failUnless(('bar', 4) in freq)
+        self.failUnless(('nonesuch', 0) in freq)
+
+    def test_getFrequency_w_user(self):
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        freq = engine.getFrequency(user='phred')
+        self.assertEqual(len(freq), 3)
+        self.failUnless(('foo', 1) in freq)
+        self.failUnless(('bar', 2) in freq)
+        self.failUnless(('baz', 1) in freq)
+
+    def test_getFrequency_w_valid_community(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        freq = engine.getFrequency(community='community')
+        self.assertEqual(len(freq), 4)
+        self.failUnless(('foo', 1) in freq)
+        self.failUnless(('bar', 4) in freq)
+        self.failUnless(('baz', 1) in freq)
+        self.failUnless(('qux', 1) in freq)
+
+    def test_getFrequency_w_invalid_community(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'wylma', ('bar',))
+        engine.update(14, 'bharney', ('qux', 'bar'))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        freq = engine.getFrequency(community='nonesuch')
+        self.assertEqual(len(freq), 0)
+
     def test_update_one(self):
         TAGS = ('bedrock', 'dinosaur')
         engine = self._makeOne()
