@@ -948,7 +948,6 @@ class TestUploadUsersView(unittest.TestCase):
                           'Skipping user: user1: User already exists.\n'
                           'Created 1 users.')
 
-
     def test_skip_existing_user_by_login(self):
         self.site.users.add('foo', 'user1', 'password', set())
         request = testing.DummyRequest({
@@ -965,6 +964,23 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message,
                 'Skipping user: user1: User already exists with login: user1\n'
                 'Created 1 users.')
+
+    def test_user_with_groups(self):
+        # See https://bugs.launchpad.net/karl3/+bug/598246
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","User","One","test@example.com","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        profile = self.site['profiles']['user1']
+        # Groups are not attributes of the profile
+        self.failIf('groups' in profile.__dict__)
 
 
 class ErrorMonitorBase:

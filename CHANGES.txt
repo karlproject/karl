@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- upload users view:  don't pass 'groups' to profile factory (LP #598246).
+
 - portlet styles - cleaned up CSS for status message,
   applied new styles to profile tags portlet (LP #599522)
 

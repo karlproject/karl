@@ -565,10 +565,8 @@ class UploadUsersView(object):
                             "login: %s" % (username, login)
                         )
                     else:
-                        if 'groups' in row:
-                            groups = set(row['groups'].split())
-                        else:
-                            groups = set()
+                        groups = row.pop('groups', '')
+                        groups = set(groups.split())
                         if 'sha_password' in fieldnames:
                             users.add(username, login, row.pop('sha_password'),
                                       groups, encrypted=True)
