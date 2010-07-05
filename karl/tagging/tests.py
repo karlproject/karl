@@ -938,15 +938,64 @@ class TagIndexTests(unittest.TestCase):
         from repoze.catalog.interfaces import ICatalogIndex
         verifyObject(ICatalogIndex, self._makeOne())
 
-    def test_apply_or(self):
+    def test_index_doc(self):
         index = self._makeOne()
-        res = index.apply(dict(query=['a', 'b'], operator='or'))
+        before = index.__dict__.copy()
+        site_before = index.site.__dict__.copy()
+        index.index_doc(1, object())
+        self.assertEqual(index.__dict__, before)
+        self.assertEqual(index.site.__dict__, site_before)
+
+    def test_unindex_doc(self):
+        index = self._makeOne()
+        before = index.__dict__.copy()
+        site_before = index.site.__dict__.copy()
+        index.unindex_doc(1)
+        self.assertEqual(index.__dict__, before)
+        self.assertEqual(index.site.__dict__, site_before)
+
+    def test_reindex_doc(self):
+        index = self._makeOne()
+        before = index.__dict__.copy()
+        site_before = index.site.__dict__.copy()
+        index.reindex_doc(1, object())
+        self.assertEqual(index.__dict__, before)
+        self.assertEqual(index.site.__dict__, site_before)
+
+    def test_clear(self):
+        index = self._makeOne()
+        before = index.__dict__.copy()
+        site_before = index.site.__dict__.copy()
+        index.clear()
+        self.assertEqual(index.__dict__, before)
+        self.assertEqual(index.site.__dict__, site_before)
+
+    def test_apply_intersect_wo_docids(self):
+        index = self._makeOne()
+        res = index.apply_intersect({'query': ['a', 'b'], 'operator':'or'},
+                                    docids=None)
         self.assertEquals(set(res), set([1, 2, 3]))
+
+    def test_apply_intersect_w_docids(self):
+        index = self._makeOne()
+        res = index.apply_intersect({'query': ['a', 'b'], 'operator':'or'},
+                                    docids=index.family.IF.Set([1, 2]))
+        self.assertEquals(set(res), set([1, 2]))
+
+    def test_apply_bare_query(self):
+        index = self._makeOne()
+        res = index.apply(['a', 'b'])
+        self.assertEquals(set(res), set([2]))
 
     def test_apply_default(self):
         index = self._makeOne()
         res = index.apply(dict(query=['a', 'b']))
         self.assertEquals(set(res), set([2]))
+
+    def test_apply_or(self):
+        index = self._makeOne()
+        res = index.apply(dict(query=['a', 'b'], operator='or'))
+        self.assertEquals(set(res), set([1, 2, 3]))
 
     def test_apply_and(self):
         index = self._makeOne()
