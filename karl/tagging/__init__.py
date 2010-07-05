@@ -225,12 +225,14 @@ class Tags(Persistent):
         else:
             users = None
         if tags is None:
-            tags = self.getTags(users=users, community=community)
-        result = {}
-        for tag in tags:
-            objects = self.getTagObjects(tags=[tag], users=users,
-                                         community=community, )
-            result[tag] = len(objects)
+            result = {}
+        else:
+            result = dict((x, 0) for x in tags)
+        for tag_id in self._getTagIds(users=users,
+                                      tags=tags,
+                                      community=community):
+            tag_obj = self._tagid_to_obj[tag_id]
+            result[tag_obj.name] = result.setdefault(tag_obj.name, 0) + 1
         return sorted(result.items(), key=lambda x: x[1])
 
     def update(self, item, user, tags):

@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- tagging engine:  optimized 'getFrequency' (LP #597838).
+
 - upload users view:  don't pass 'groups' to profile factory (LP #598246).
 
 - portlet styles - cleaned up CSS for status message,
