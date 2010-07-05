@@ -16,9 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from zope.interface import Interface
-from zope.schema import Datetime
 from zope.schema import Int
-from zope.schema import Set
 from zope.schema import TextLine
 
 class ITag(Interface):
