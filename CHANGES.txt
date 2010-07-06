@@ -4,12 +4,16 @@ karl package Changelog
 Unreleased
 ----------
 
-- further cleaning up of portlet styles to make them all the same
-  * set up related tags portlet and its .rightcol space to be styled like the other portlets in the site.
-  * removed now unused CSS code.
-  * gave .rightcol a left margin to put space between the portlet and text
-  * reduced space above and below portlet title
-  (LP #599522)
+- further cleaning up of portlet styles to make them all the same (LP #599522)
+
+  - set up related tags portlet and its .rightcol space to be styled like the
+    other portlets in the site.
+
+  - removed now unused CSS code.
+
+  - gave .rightcol a left margin to put space between the portlet and text
+
+  - reduced space above and below portlet title
 
 - cico people import:  fixed the fix for singular 'website' element
   transform (LP #601205).
@@ -22,8 +26,10 @@ Unreleased
   applied new styles to profile tags portlet (LP #599522)
 
 - general cleaning up of themedstyles.css for legibility
- * conformed way the code is laid out
- * fixed small errors
+
+  - conformed way the code is laid out
+
+  - fixed small errors
 
 - Styled the site announcement to look like a status message. (LP #600765)
 
@@ -62,7 +68,7 @@ Unreleased
 
 - Members views were not updated to use the new websites field after multiple
   websites change from 3.34, which caused an unexpected parameter error when
-  creating a new profile after invitation. Fixed and updated tests. (LP #591267).
+  creating a new profile after invitation. Fixed and updated tests. (LP #591267)
 
 - Fixed bug in whitelist--address matching is now normalized to be indifferent
   to the inclusion or exclusion of a name part with an email address.  (IE,
