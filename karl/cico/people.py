@@ -152,9 +152,9 @@ class UserProfileImporter(object):
 
             elif attr == 'website':
                 value = element.text
-                if value:
-                    value.strip()
-                profile.websites = [value,]
+                if value is None:
+                    value = ''
+                profile.websites = value.strip().split()
 
             elif attr in ('offices', 'entities', 'departments'):
                 self._pop_category_section(profile, element, attr)

@@ -77,7 +77,55 @@ class UserProfileImporterTests(unittest.TestCase):
         self.assertEqual(profile.organization, 'Open Society Institute')
         self.assertEqual(profile.location, 'Port-au-Prince')
         self.assertEqual(profile.country, 'HT')
-        self.assertEqual(profile.websites, ['http://karl.example.com/profile',])
+        self.assertEqual(profile.websites, ['http://karl.example.com/profile'])
+        self.assertEqual(profile.languages, 'Italian, English, Esperanto')
+        self.assertEqual(profile.office, 'Fondation Connaissance et Liberte')
+        self.assertEqual(profile.room_no, '1234')
+        self.assertEqual(profile.biography,
+                         'Was born, grew up, is still alive.')
+        self.assertEqual(profile.home_path, 'offices/national-foundation')
+        self.assertEqual(profile.categories['entities'], [
+            'open-society-institute',
+            'hardees',
+            ])
+        self.assertEqual(profile.categories['offices'], [
+            'fondation-connaissance-et-liberte',
+            'hand-creme',
+            ])
+        self.assertEqual(profile.categories['departments'], [
+            'information-retrieval',
+            'paper-chase',
+            ])
+
+        self.assertEqual(self.root.users.get_by_id('crossi'), {
+            'id': 'crossi',
+            'login': 'crossi',
+            'password': 'password',
+            'groups': set(['group.KarlStaff', 'group.AnotherGroup',
+                           'group.community.FugaziFanClub']),
+            })
+
+    def test_update_empty_profile(self):
+        profile = testing.DummyModel()
+        self.profiles['crossi'] = profile
+        self.root.users.add('crossi', 'crossi', 'crossi',
+                          set(['group.KarlStaff', 'group.KarlKitchenStaff',
+                               'group.community.FugaziFanClub']))
+        adapter = self._make_one('test_profile-empty_website.xml')
+        adapter.update(profile)
+
+        self.assertEqual(profile.firstname, 'User')
+        self.assertEqual(profile.lastname, 'Two')
+        self.assertEqual(profile.email, 'user2@example.com')
+        self.assertEqual(profile.phone, '212-555-1212')
+        self.assertEqual(profile.extension, '123')
+        self.assertEqual(profile.department, 'Human Resources')
+        self.assertEqual(profile.position,
+                         'Responsable Bibliotheque Monique Calixte')
+        self.assertEqual(profile.organization, 'Open Society Institute')
+        self.assertEqual(profile.location, 'Port-au-Prince')
+        self.assertEqual(profile.country, 'HT')
+        self.assertEqual(profile.websites, [])
         self.assertEqual(profile.languages, 'Italian, English, Esperanto')
         self.assertEqual(profile.office, 'Fondation Connaissance et Liberte')
         self.assertEqual(profile.room_no, '1234')
@@ -127,7 +175,7 @@ class UserProfileImporterTests(unittest.TestCase):
         self.assertEqual(profile.organization, 'Open Society Institute')
         self.assertEqual(profile.location, 'Port-au-Prince')
         self.assertEqual(profile.country, 'HT')
-        self.assertEqual(profile.websites, ['http://karl.example.com/profile',])
+        self.assertEqual(profile.websites, ['http://karl.example.com/profile'])
         self.assertEqual(profile.languages, 'Italian, English, Esperanto')
         self.assertEqual(profile.office, 'Fondation Connaissance et Liberte')
         self.assertEqual(profile.room_no, '1234')

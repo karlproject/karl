@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- cico people import:  fixed the fix for singular 'website' element
+  transform (LP #601205).
+
 - tagging engine:  optimized 'getFrequency' (LP #597838).
 
 - upload users view:  don't pass 'groups' to profile factory (LP #598246).
