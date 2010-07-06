@@ -598,13 +598,14 @@
      </tal:block>
      <tal:block tal:condition="tag is not None">
 
-      <div id="tagview-column" class="rightcol">
-       <dl class="tag_page_side" id="relatedtags-portlet" style="width: 176px; overflow:hidden">
-        <dt> Related Tags </dt>
-        <dd tal:repeat="rel related|()">
+      <div class="rightcol">
+       <div class="generic-portlet" id="relatedtags-portlet">
+        <h3>Related Tags</h3>
+        <div class="portlet-item"
+             tal:repeat="rel related|()">
           <a href="${api.view_url}/${rel}">${rel}</a>
-        </dd>
-       </dl>
+        </div>
+       </div>
       </div>
 
       <h2 class="tagsHeaderSpace">

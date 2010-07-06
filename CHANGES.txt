@@ -4,6 +4,13 @@ karl package Changelog
 Unreleased
 ----------
 
+- further cleaning up of portlet styles to make them all the same
+  * set up related tags portlet and its .rightcol space to be styled like the other portlets in the site.
+  * removed now unused CSS code.
+  * gave .rightcol a left margin to put space between the portlet and text
+  * reduced space above and below portlet title
+  (LP #599522)
+
 - cico people import:  fixed the fix for singular 'website' element
   transform (LP #601205).
 

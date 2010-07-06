@@ -1418,6 +1418,7 @@ div.search_utility_bar {
 .rightcol {
 	float: right;
 	width: 190px;
+	margin-left: 10px;
 }
 a.rightFloatLink {
   float: right;
@@ -1615,32 +1616,6 @@ span.sortingArrows a img {
   position: relative;
   float: left;
 }
-#tagview-column {
-	width: 178px !important;
-}
-.tag_page_side {
-	width: 188px;
-	background-color:#fff;
-	border: 1px solid #ccc;
-	margin: 0 0 1em;
-	padding: 0 0 1em;
-}
-.tag_page_side a {
-	color: #639332;
-	text-decoration: none;
-}
-#tagview-column .tag_page_side {
-	width: 176px;
-}
-.tag_page_side dt {
-	font-weight: bold;
-	padding: 1em 7px;
-	font-size: 1.3em;
-}
-.tag_page_side dd {
-	padding: 5px 7px;
-	margin: 0px;
-}
 #popular-tags-portlet {
 	margin-top: 2em;
 }
@@ -1648,16 +1623,6 @@ span.sortingArrows a img {
 	margin: 0;
 	width: 100%;
 	margin-bottom: 1em;
-}
-#relatedtags-portlet {
-	background:#fbf5e7;
-	border: 1px solid #e7e0da;
-}
-#relatedtags-portlet dt {
-	font-size: 1em;
-	background: #f6ecd1;
-	border-bottom: 1px solid #e7e0da;
-	padding: 1px 7px 2px;
 }
 
 /* tag cloud */
@@ -2939,6 +2904,7 @@ ul.menu li {
 
 .portlet-buttons {
     margin: 5px;
+    padding: 0 3px;
 }
 
 .portlet-buttons a, .portlet-buttons a:visited {
@@ -2977,6 +2943,7 @@ ul.menu li {
     margin: 1px;
 }
 
+/* Generic Portlet Styles */
 .generic-portlet {
     width: 188px;
     background-color:#fff;
@@ -2988,15 +2955,14 @@ ul.menu li {
 
 .generic-portlet h3 {
     text-align: center;
-    padding: 1em 7px;
+    padding: 10px;
     font-size: 1.3em;
     font-weight: bold;
+    margin: 0;
 }
 
 .portlet-item, .portlet-help {
-    padding: 4px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 4px 10px;
 }
 
 .portlet-item a {
