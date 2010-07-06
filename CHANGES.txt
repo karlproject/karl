@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.37 (2010-07-06)
+-----------------
 
 - further cleaning up of portlet styles to make them all the same (LP #599522)
 
