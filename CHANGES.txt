@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fix handling  of 'website' in admin CSV user upload. (LP #602473)
+
 
 3.37 (2010-07-06)
 -----------------

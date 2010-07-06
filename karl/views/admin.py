@@ -553,6 +553,9 @@ class UploadUsersView(object):
 
                     username = row.pop('username')
                     login = row.pop('login', username)
+                    website = row.pop('website', None)
+                    if website is not None:
+                        row['websites'] = website.strip().split()
                     if (users.get_by_id(username) is not None or
                         username in profiles):
                         messages.append(
