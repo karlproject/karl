@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #566594: Help text for imagedrawer.
+
 - slightly reduce margin on #right to prevent layout from
   breaking when font size is changed (LP #602837)
 
