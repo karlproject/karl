@@ -1038,6 +1038,8 @@ tinyMCE.addI18n('en.wicked',{
                     self.editor_image_data = null;
                 }
 
+                // XXX Workaround IE selection handle problem
+                self._save_editor_selection(img);
 
                 // Do we need a dialog?
                 if (! self.dialog) {
@@ -1141,6 +1143,37 @@ tinyMCE.addI18n('en.wicked',{
         _restore_formstate: function() {
             this.info_panel.imagedrawerinfopanel('insertOptions',
                     this._formstate.insertOptions);
+        },
+
+
+        // Hack to work around:
+        // on IE (including IE7, and IE8) the resize handles
+        // of the image selected in the editor are displayed
+        // in front of the dialog. To work around this, the
+        // selection is removed while the dialog is active.
+        _save_editor_selection: function(img) {
+            // only active on IE, in case a single image is selected.
+            if (img && $.browser.msie) {
+                this._saved_editor_selection = $(img)[0];
+                var ed = this.editor;
+                ed.selection.collapse();
+                // Needed.
+                ed.execCommand('mceRepaint');
+            } else {
+                this._saved_editor_selection = null;
+            }
+        },
+        _get_editor_selection: function() {
+            // We don't really restore the selection.
+            // Instead, use the saved image at insertion time.
+            var result;
+            if (this._saved_editor_selection) {
+                result = this._saved_editor_selection;
+                this._saved_editor_selection = null;
+            } else {
+                result = _getEditorImageSelection();
+            }
+            return result;
         },
 
         _dialogSuccess: function(json) {
@@ -2274,7 +2307,8 @@ tinyMCE.addI18n('en.wicked',{
             }
 
             // Insert / Replace image.
-            var editorImage = this._getEditorImageSelection();
+            var editorImage = this._get_editor_selection();
+
             if (editorImage) {
                 // We are replacing the image.
                 ed.dom.setAttribs(editorImage, args);
