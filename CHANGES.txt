@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- slightly reduce margin on #right to prevent layout from
+  breaking when font size is changed (LP #602837)
+
 - Fix handling  of 'website' in admin CSV user upload. (LP #602473)
 
 - tempfolder:  suppress sending events on add / remove, and therefore
