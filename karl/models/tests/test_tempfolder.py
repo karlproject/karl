@@ -60,3 +60,18 @@ class TestTempFolder(unittest.TestCase):
         obj.cleanup()
         self.failUnless('one' in obj)
         self.failIf('two' in obj)
+
+    def test___setitem___emits_no_events(self):
+        events = testing.registerEventListener()
+        del events[:]
+        obj = self._make_one()
+        obj['foo'] = testing.DummyModel()
+        self.failIf(events)
+
+    def test___delitem___emits_no_events(self):
+        obj = self._make_one()
+        obj['foo'] = testing.DummyModel()
+        events = testing.registerEventListener()
+        del events[:]
+        del obj['foo']
+        self.failIf(events)

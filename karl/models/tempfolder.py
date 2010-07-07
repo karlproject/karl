@@ -35,3 +35,12 @@ class TempFolder(Folder):
             if now - doc.modified > self.LIFESPAN:
                 del self[name]
 
+    def add(self, name, other, send_events=False):
+        """ Override to suppress sending events by default.
+        """
+        super(TempFolder, self).add(name, other, send_events)
+
+    def remove(self, name, send_events=True):
+        """ Override to suppress sending events by default.
+        """
+        super(TempFolder, self).remove(name, send_events)

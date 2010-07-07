@@ -6,6 +6,9 @@ Unreleased
 
 - Fix handling  of 'website' in admin CSV user upload. (LP #602473)
 
+- tempfolder:  suppress sending events on add / remove, and therefore
+  any catalog activity for objects in the temporary location. (LP #592697)
+
 
 3.37 (2010-07-06)
 -----------------
