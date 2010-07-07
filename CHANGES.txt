@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #601109: Remove code and template for sending email after changing
+  password.
+
 - LP #566594: Help text for imagedrawer.
 
 - slightly reduce margin on #right to prevent layout from

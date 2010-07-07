@@ -808,31 +808,6 @@ class ChangePasswordFormController(object):
 
         users.change_password(userid, converted['password'])
 
-        # send email
-        system_name = get_setting(context, 'system_name', 'KARL')
-        mail = Message()
-        admin_email = get_setting(context, 'admin_email')
-        mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
-        mail["To"] = "%s <%s>" % (context.title, context.email)
-        mail["Subject"] = "%s Password Change Notification" % system_name
-        system_name = get_setting(context, 'system_name', 'KARL')
-        body = render_template(
-            "templates/email_change_password.pt",
-            login=user['login'],
-            password=converted['password'],
-            system_name=system_name,
-            )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        mail.set_payload(body, "UTF-8")
-        mail.set_type("text/html")
-
-        recipients = [context.email]
-        mailer = getUtility(IMailDelivery)
-        mailer.send(admin_email, recipients, mail)
-
         path = model_url(context, self.request)
         msg = '?status_message=Password%20changed'
         return HTTPFound(location=path+msg)

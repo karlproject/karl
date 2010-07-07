@@ -1162,11 +1162,6 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         converted = {'old_password': 'oldoldold',
                      'password': 'newnewnew',
                      }
-        # register fake mailer
-        from repoze.sendmail.interfaces import IMailDelivery
-        from karl.testing import DummyMailer
-        mailer = DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
 
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_submit(converted)
@@ -1177,11 +1172,6 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/profiles/profile/'
             '?status_message=Password%20changed')
-
-        self.assertEqual(len(mailer), 1)
-        msg = mailer.pop()
-        self.assertEqual(msg.mto, ['profile@example.com'])
-        self.assertEqual(msg.mfrom, "admin@example.com")
 
 
 class TestDeleteProfileView(unittest.TestCase):
