@@ -258,7 +258,7 @@ def jquery_livesearch_view(context, request):
         searchterm = request.params.get('val', None)
     except UnicodeDecodeError:
         # Probably windows client didn't set request encoding. Try again.
-        # request.charset = 'ISO-8859-1'
+        request.charset = 'ISO-8859-1'
         searchterm = request.params.get('val', None)
 
     if searchterm is None:
