@@ -57,7 +57,7 @@
       <div id="main">
       <span tal:replace="structure body"/>
       </div>
-      <div id="footer" tal:content="structure api.render_footer()" />
+      <tal:footer content="structure api.render_footer()" />
     </div>
   </body>
 </html>

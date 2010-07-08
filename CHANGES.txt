@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- removed extra div#footer, so there are not multiple ids (LP #602889)
+
 - LP #602888: Change titles on some People reports.
 
 - LP #601109: Remove code and template for sending email after changing

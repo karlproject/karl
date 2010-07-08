@@ -59,8 +59,7 @@
           <div metal:define-slot="content"> Content goes here. </div>
         </div>
       </div>
-      <div id="footer" tal:content="structure api.render_footer()">
-      </div>
+      <tal:footer content="structure api.render_footer()" />
 
     </div>
   </body>
