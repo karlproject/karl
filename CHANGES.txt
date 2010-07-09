@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.38 (2010-07-09)
+-----------------
 
 - removed extra div#footer, so there are not multiple ids (LP #602889)
 
