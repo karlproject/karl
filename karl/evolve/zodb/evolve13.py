@@ -12,14 +12,15 @@ def evolve(root):
     for docid, path in docmap.docid_to_address.items():
         if isinstance(path, unicode):
             print "Converting unicode path in document map:"
-            print "\t%s" % path
+            print "\t%s" % path.encode('UTF-8')
             del docmap.address_to_docid[path]
             path = path.encode('UTF-8')
             docmap.address_to_docid[path] = docid
             docmap.docid_to_address[docid] = path
 
+    # We have a few broken objects again.  Why?
+    remove_broken_objects(root, sys.stdout)
+
     # Prune catalog
     prune_catalog(root, sys.stdout)
 
-    # We have a few broken objects again.  Why?
-    remove_broken_objects(root, sys.stdout)
