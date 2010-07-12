@@ -163,8 +163,6 @@ def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
             continue
         output and output('reindexing %s' % path)
         try:
-            if isinstance(path, unicode):
-                path = path.encode("utf-8")
             model = find_model(context, path)
         except KeyError:
             output and output('error: %s not found' % path)
