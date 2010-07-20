@@ -657,7 +657,7 @@
                 result = this._saved_editor_selection;
                 this._saved_editor_selection = null;
             } else {
-                result = _getEditorImageSelection();
+                result = this._getEditorImageSelection();
             }
             return result;
         },
