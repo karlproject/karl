@@ -2086,8 +2086,8 @@ $(document).ready(function() {
     // Initialize tinymce live forms
     createLiveForms();
 
-    var app_url = $("#karl-app-url")[0].content;
-    var here_url = $("#karl-here-url")[0].content;
+    var app_url = $("#karl-app-url").eq(0).attr('content');
+    var here_url = $("#karl-here-url").eq(0).attr('content');
 
     $("#livesearch-input").karllivesearch({
         ajax: app_url + "/jquery_livesearch",
