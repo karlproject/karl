@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Fixed bug in mailin2 script that caused ZEO connections to be left open if
+  there was a configuration error.
 
 3.38 (2010-07-09)
 -----------------
