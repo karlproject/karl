@@ -179,21 +179,21 @@ def main2(argv=sys.argv[1:]):
     logging.getLogger('karl.mailin').setLevel(log_level)
 
     def run():
+        root, closer = get_root(app)
+        set_subsystem('mailin')
+
+        zodb_uri = get_setting(root, 'postoffice.zodb_uri')
+        zodb_path = get_setting(root, 'postoffice.zodb_path', '/postoffice')
+        queue = get_setting(root, 'postoffice.queue')
+
+        if zodb_uri is None:
+            parser.error("postoffice.zodb_uri must be set in config file")
+
+        if queue is None:
+            parser.error("postoffice.queue must be set in config file")
+
+        runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
         try:
-            root, closer = get_root(app)
-            set_subsystem('mailin')
-
-            zodb_uri = get_setting(root, 'postoffice.zodb_uri')
-            zodb_path = get_setting(root, 'postoffice.zodb_path', '/postoffice')
-            queue = get_setting(root, 'postoffice.queue')
-
-            if zodb_uri is None:
-                parser.error("postoffice.zodb_uri must be set in config file")
-
-            if queue is None:
-                parser.error("postoffice.queue must be set in config file")
-
-            runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
             runner()
 
             if options.dry_run:
