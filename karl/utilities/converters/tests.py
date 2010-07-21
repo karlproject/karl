@@ -132,6 +132,30 @@ class ConverterTests(unittest.TestCase):
         self.assertEqual(enc, 'utf-8')
         self.assertEqual(text, utf8doc)
 
+    def testHTMLWithNumericEntities(self):
+        body = (u'<html><body>Non&#160;breaking&#160;space.</body></html>')
+        utf8doc = u'Non breaking space.'.encode('utf-8')
+        from karl.utilities.converters import html
+
+        import tempfile
+        C = html.Converter()
+
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('iso-8859-15'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'iso-8859-15', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('utf-8'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'utf8', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
     def testXML(self):
         body = ('<?xml version="1.0" encoding="iso-8859-15" ?><body> '
                 'alle Vögel Über Flügel und Tümpel</body>')
