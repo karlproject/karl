@@ -442,11 +442,11 @@ test("Disables work with noselection", function() {
     // sequence of events
     same(res, [
         [0, true],
-        [1, true],
+        [1, true]
     ], 'event sequence wrapper');
     same(res2, [
         [0, true],
-        [1, true],
+        [1, true]
     ], 'event sequence original element');
 
     $('#template4').karlbuttonset('destroy');
@@ -515,13 +515,13 @@ test("Disables work in selects", function() {
         [1, false],
         [0, true],
         [0, false],
-        [1, true],
+        [1, true]
     ], 'event sequence wrapper');
     same(res2, [
         [1, false],
         [0, true],
         [0, false],
-        [1, true],
+        [1, true]
     ], 'event sequence original element');
 
     $('#template5').karlbuttonset('destroy');
@@ -577,11 +577,11 @@ test("Disables works with the change event", function() {
 
     same(res, [
         [1, false],
-        [2, true],
+        [2, true]
     ], 'triggering ok after re-enabling');
     same(res2, [
         [1, false],
-        [2, true],
+        [2, true]
     ], 'triggering ok after re-enabling');
 
     $('#template5').karlbuttonset('destroy');

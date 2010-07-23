@@ -563,7 +563,11 @@ tinyMCE.addI18n('en.wicked',{
         // actually, register the widgets.
         $.widget('tiny.imagedrawerimage', {
 
-            _init: function() {
+            options: {
+                record: null
+            },
+
+            _create: function() {
                 // Locate markup
                 this.image = this.element.find('.tiny-imagedrawer-image img');
                 this.label = this.element.find('.tiny-imagedrawer-imagelabel');
@@ -615,17 +619,14 @@ tinyMCE.addI18n('en.wicked',{
 
         });
 
-        $.extend($.tiny.imagedrawerimage, {
-                getter: "record",
-                defaults: {
-                    record: null
-                }
-        });
-
-
         $.widget('tiny.imagedrawerinfopanel', {
 
-            _init: function() {
+            options: {
+                record: null,
+                insertButtonLabel: null
+            },
+
+            _create: function() {
                 var self = this;
                 // Locate markup
                 this.info_title = this.element.find('.tiny-imagedrawer-info-title');
@@ -829,16 +830,6 @@ tinyMCE.addI18n('en.wicked',{
 
 
         });
-
-        $.extend($.tiny.imagedrawerinfopanel, {
-                getter: "record insertOptions",
-                defaults: {
-                    record: null,
-                    insertButtonLabel: null
-                }
-        });
-
-
 
         $.extend(ImageStripe.prototype, {
 

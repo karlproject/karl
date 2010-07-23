@@ -17,13 +17,6 @@
 
 """ Concatenate the css resources  
 
-This is at the moment only used for creating a concatenated
-theme css for the jquery.ui theme.
-The jquery ui builder process would also be usable to
-create this css.
-
-This script only needs to be used if some component is added
-to jquery.ui in addition to the one we currently use.
 """
 
 import sys
@@ -45,23 +38,7 @@ def main(argv=sys.argv):
         raise RuntimeError, 'cssconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
 
-    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.7')
-    theme_dir = os.path.join(ui_dir, 'themes', 'base')
-
-    theme_css = os.path.join(theme_dir, 'jquery-ui-1.7.2.karl.css')
-    f = file(theme_css, 'w')
-    for fname in itertools.chain(
-            filesindir(theme_dir, 'ui.core.css'),
-            # selected components come here
-            filesindir(theme_dir, 'ui.datepicker.css'),
-            filesindir(theme_dir, 'ui.dialog.css'),
-            filesindir(theme_dir, 'ui.slider.css'),
-            #
-            filesindir(theme_dir, 'ui.theme.css'),
-            ):
-        f.write(file(fname).read())
-    f.close()
-    print "Successfully produced resource", theme_css
+    print "Success, nothing to do right now."
 
 if __name__ == '__main__':
     main()

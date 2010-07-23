@@ -444,6 +444,115 @@ test("cannot jump out with keys", function() {
 
 });
 
+test("setting jumpStep option works", function() {
+
+    var el = $('#slider1');
+
+    el.karlslider({
+        enableClickJump: true,
+        enableKeyJump: true,
+        jumpStep: 5
+    });
+    
+    var handle = el.find('.ui-slider-handle');
+
+    equals(el.karlslider('value'), 0, 'at the left');
+
+    var p = inside(el, 0.75, 0.50);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 5, 'at first increment');
+
+    el.karlslider('option', 'jumpStep', 10);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 15, 'jumpStep in effect');
+
+    el.karlslider('destroy');
+
+    // But, if keyjumps are not enabled:
+    //
+    var el = $('#slider2');
+
+    el.karlslider({
+        enableClickJump: true,
+        enableKeyJump: false,    //
+        jumpStep: 5
+    });
+    
+    var handle = el.find('.ui-slider-handle');
+
+    equals(el.karlslider('value'), 0, 'at the left');
+
+    var p = inside(el, 0.75, 0.50);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 1, 'at first increment');
+
+    el.karlslider('option', 'jumpStep', 10);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 2, 'jumpStep not in effect');
+
+    el.karlslider('destroy');
+
+});
+
+test("setting step option works", function() {
+
+    var el = $('#slider1');
+
+    el.karlslider({
+        enableClickJump: true,
+        enableKeyJump: true,
+        jumpStep: 10
+    });
+    
+    var handle = el.find('.ui-slider-handle');
+
+    equals(el.karlslider('value'), 0, 'at the left');
+
+    var p = inside(el, 0.75, 0.50);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 10, 'at first increment');
+
+    el.karlslider('option', 'step', 10);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 20, 'step not in effect');
+
+    el.karlslider('destroy');
+
+    // But, if keyjumps are not enabled:
+    //
+    var el = $('#slider2');
+
+    el.karlslider({
+        enableClickJump: true,
+        enableKeyJump: false,    //
+        jumpStep: 10 
+    });
+    
+    var handle = el.find('.ui-slider-handle');
+
+    equals(el.karlslider('value'), 0, 'at the left');
+
+    var p = inside(el, 0.75, 0.50);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 1, 'at first increment');
+
+    el.karlslider('option', 'step', 5);
+
+    handle.simulate("keydown", {keyCode: $.ui.keyCode.RIGHT});
+    equals(el.karlslider('value'), 6, 'step in effect');
+
+    el.karlslider('destroy');
+
+});
+
+
 
 })(jQuery);
 

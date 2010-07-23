@@ -5,7 +5,7 @@
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
     <script type="text/javascript" 
-        src="${api.static_url}/jquery-ui/1.7/ui/ui.sortable.js">//</script>
+        src="${api.static_url}/jquery-ui/1.8.2/development-bundle/ui/jquery.ui.sortable.js">//</script>
     <script type="text/javascript" 
         src="${api.static_url}/formish.js">//</script>
     <script type="text/javascript">

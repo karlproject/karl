@@ -84,9 +84,29 @@
   }
 
 $.widget('ui.autobox3', {
-  //$.fn.autobox=function(opt)
 
-    _init: function() {
+    options: {
+        timeout: 500,
+        template: function(str) {
+            return "<li>" + this.options.insertText(str) + "</li>";
+        },
+        insertText: function(str) {
+            return str;
+        },
+        match: function(typed) {
+            return this.match(new RegExp(typed));
+        },
+        wrapper: '<ul class="autobox-list"></ul>',
+        resizable: {},
+        selectHoverable: '> li',
+        // if specified, a query starts at minimum this many characters
+        minQueryLength: 0,
+        minQueryNotice: null,
+        // maximum width of the search container
+        maxSearchContainerWidth: 400
+    },
+
+    _create: function() {
 
         var t = this;
         var opt = this.options;
@@ -230,11 +250,7 @@ $.widget('ui.autobox3', {
         this.off();
         if (!list.length) return false;
         
-        var container = list.wrapAll(opt.wrapper).parents(":last").children();
-        // IE seems to wrap the wrapper in a random div wrapper so
-        // drill down to the node in opt.wrapper.
-        var wrapper_tagName = $(opt.wrapper)[0].tagName;
-        for(; container[0].tagName !== wrapper_tagName; container=container.children(':first')) {}
+        var container = list.wrapAll(opt.wrapper).parents(":last");
 
         var offset = this.input.offset();
         this.container = container
@@ -450,29 +466,6 @@ $.widget('ui.autobox3', {
     }
 
 });   // END widget ui.autobox3
-
-$.extend($.ui.autobox3, {
-    defaults: {
-        timeout: 500,
-        template: function(str) {
-            return "<li>" + this.options.insertText(str) + "</li>";
-        },
-        insertText: function(str) {
-            return str;
-        },
-        match: function(typed) {
-            return this.match(new RegExp(typed));
-        },
-        wrapper: '<ul class="autobox-list"></ul>',
-        resizable: {},
-        selectHoverable: '> li',
-        // if specified, a query starts at minimum this many characters
-        minQueryLength: 0,
-        minQueryNotice: null,
-        // maximum width of the search container
-        maxSearchContainerWidth: 400
-    }
-});
 
 
 })(jQuery);

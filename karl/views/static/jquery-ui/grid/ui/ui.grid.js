@@ -2,6 +2,21 @@
 
 $.widget('ui.grid', {
 
+	options: {
+		width: 500,
+		height: 300,
+
+		limit: false,
+		pagination: true,
+		allocateRows: true, //Only used for infinite scrolling
+		chunk: 20, //Only used for infinite scrolling
+
+		footer: true,
+		toolbar: false,
+
+		multipleSelection: true
+	},
+
 	_generateToolbar: function() {
 		this.toolbar = $('<tr class="ui-grid-toolbar"><td>Toolbar</td></tr>').appendTo(this.grid);
 		this.toolbar = $('td', this.toolbar);
@@ -69,7 +84,7 @@ $.widget('ui.grid', {
 
 	},
 
-	_init: function() {
+	_create: function() {
 
 		var self = this;
 		this.offset = 0;
@@ -374,7 +389,14 @@ $.widget('ui.grid', {
 
 $.widget('ui.gridResizable', $.extend({}, $.ui.mouse, {
 
-	_init: function() {
+	options: {
+		handle: false,
+		cancel: ":input",
+		delay: 0,
+		distance: 1
+	},
+
+	_create: function() {
 		this.table = this.element.parent().parent().parent();
 		this.gridTable = this.element.parents('.ui-grid').find('div.ui-grid-content > table');
 		this._mouseInit();
@@ -419,19 +441,17 @@ $.widget('ui.gridResizable', $.extend({}, $.ui.mouse, {
 
 }));
 
-$.extend($.ui.gridResizable, {
-	defaults: {
+
+$.widget('ui.gridSortable', $.extend({}, $.ui.mouse, {
+
+	options: {
 		handle: false,
 		cancel: ":input",
 		delay: 0,
 		distance: 1
-	}
-});
+	},
 
-
-$.widget('ui.gridSortable', $.extend({}, $.ui.mouse, {
-
-	_init: function() {
+	_create: function() {
 		this._mouseInit();
 	},
 
@@ -500,32 +520,5 @@ $.widget('ui.gridSortable', $.extend({}, $.ui.mouse, {
 	}
 
 }));
-
-$.extend($.ui.gridSortable, {
-	defaults: {
-		handle: false,
-		cancel: ":input",
-		delay: 0,
-		distance: 1
-	}
-});
-
-
-$.extend($.ui.grid, {
-	defaults: {
-		width: 500,
-		height: 300,
-
-		limit: false,
-		pagination: true,
-		allocateRows: true, //Only used for infinite scrolling
-		chunk: 20, //Only used for infinite scrolling
-
-		footer: true,
-		toolbar: false,
-
-		multipleSelection: true
-	}
-});
 
 })(jQuery);

@@ -5,7 +5,11 @@
  * only */
 $.widget('karl.karlbuttonset', {
 
-    _init: function() {
+    options: {
+        clsContainer: null
+    },
+
+    _create: function() {
         var self = this;
         
         // fetch parameters from original markup
@@ -153,6 +157,7 @@ $.widget('karl.karlbuttonset', {
             this.element.insertAfter(this.wrapper);
             this.wrapper.remove();
         }
+        $.Widget.prototype.destroy.call(this);
     },
 
     // Gets the button control with the given index
@@ -198,14 +203,6 @@ $.widget('karl.karlbuttonset', {
     }
 
 });
-
-$.extend($.karl.karlbuttonset, {
-    getter: 'getButton',
-    defaults: {
-        clsContainer: null
-    }
-});
-
 
 })(jQuery);
 

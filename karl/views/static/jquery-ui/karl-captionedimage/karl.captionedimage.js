@@ -6,7 +6,11 @@
  */
 $.widget('karl.karlcaptionedimage', {
 
-    _init: function() {
+    options: {
+        clsWrapper: 'karl-captionedimage-wrapper'
+    },
+
+    _create: function() {
         var self = this;
         this.wrapper = $('<div></div>');
         this.proxy = $('<img>').appendTo(this.wrapper);
@@ -58,14 +62,9 @@ $.widget('karl.karlcaptionedimage', {
         // unwrap the image
         this.centerer.replaceWith(this.element);
         this.element.show();
+        $.Widget.prototype.destroy.call( this );
     }
 
-});
-
-$.extend($.karl.karlcaptionedimage, {
-    defaults: {
-        clsWrapper: 'karl-captionedimage-wrapper'
-    }
 });
 
 

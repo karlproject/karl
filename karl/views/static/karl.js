@@ -150,8 +150,13 @@ var enableOldStyleDropdowns = function () {
 // Custom jquery extensions
 
 $.widget('ui.karlstatusbox', {
-    
-    _init: function() {
+ 
+    options: {
+        clsItem: 'statusbox-item',
+        hasCloseButton: true
+    },
+   
+    _create: function() {
         // initialize the queue
         this.queue = [];
     },
@@ -231,15 +236,13 @@ $.widget('ui.karlstatusbox', {
 
 });
 
-$.extend($.ui.karlstatusbox, {
-    defaults: {
-        clsItem: 'statusbox-item',
-        hasCloseButton: true
-    }
-});
-
-
 $.widget('ui.karllivesearch', $.extend({}, $.ui.autobox3.prototype, {
+
+    options: $.extend({}, $.ui.autobox3.prototype.options, {
+        selectHoverable: '.result .item, .showall .item',
+        // start search from 3rd input character only
+        minQueryLength: 3
+    }),
 
     activate: function() {
         if (this.active && this.active[0] && $.data(this.active[0], "originalObject")) {
@@ -281,14 +284,6 @@ $.widget('ui.karllivesearch', $.extend({}, $.ui.autobox3.prototype, {
                     
 }));
 
-$.extend($.ui.karllivesearch, {
-    defaults: $.extend({}, $.ui.autobox3.defaults, {
-        selectHoverable: '.result .item, .showall .item',
-        // start search from 3rd input character only
-        minQueryLength: 3
-    })
-});
-
 
 Karl.makeSnippets = function(snippetmap) {
     // compile templates
@@ -316,7 +311,59 @@ Karl.getJSON = function getJSON(url, data, callback, error) {
     });
 };
 
+var _snip_pre =     '<span>' + 
+                    '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
+                    '<span class="count">&nbsp;(' +
+                    '<a class="tagusers-link"  href="<%= tagusers_url %>"><%= count %></a>)</span>';
+var _snip_input =   '<input type="hidden" name="<%= _name %>" value="<%= tag %>" />';
+var _snip_post =    '</span>' +
+                    '</li>';
+
+
 $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
+
+    options: $.extend({}, $.ui.autobox3.prototype.options, {
+        //
+        // Livesearch results with better highlighting
+        //
+        match: function(typed) {
+            this.typed = typed;
+            this.pre_match = this.text;
+            this.match = this.post_match = '';
+            if (!this.ajax && !typed || typed.length == 0) { return true; }
+            var match_at = this.text.search(new RegExp("\\b" + typed, "i"));
+            if (match_at != -1) {
+                this.pre_match = this.text.slice(0,match_at);
+                this.match = this.text.slice(match_at,match_at + typed.length);
+                this.post_match = this.text.slice(match_at + typed.length);
+                return true;
+            }
+            return false;
+        },
+        insertText: function(obj) {
+            return obj.tag;
+        },
+        templateText: "<li><%= pre_match %><span class='matching' ><%= match %></span><%= post_match %></li>",
+        //
+        // Snippets for more flexible client side rendering
+        //
+        snippets: Karl.makeSnippets({
+            '': 
+                '<li id="<%= _wid %>" class="bit-box">' +
+                _snip_pre +
+                '<a href="#" class="closebutton"></a>' +
+                _snip_input +
+                _snip_post,
+            nondeleteable: 
+                '<li id="<%= _wid %>" class="bit-box nondeleteable">' +
+                _snip_pre + 
+                _snip_post
+        }),
+        // The only items addable are the one from the search result.
+        strictAdd: false,
+        selectFirst: false,
+        validateRegexp: null
+    }),
 
     _addBox: function (record, /*optional*/ initializing) {
         var self = this;
@@ -595,69 +642,14 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
 
 }));
 
-var _snip_pre =     '<span>' + 
-                    '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
-                    '<span class="count">&nbsp;(' +
-                    '<a class="tagusers-link"  href="<%= tagusers_url %>"><%= count %></a>)</span>';
-var _snip_input =   '<input type="hidden" name="<%= _name %>" value="<%= tag %>" />';
-var _snip_post =    '</span>' +
-                    '</li>';
-
-$.extend($.ui.karltagbox, {
-    defaults: $.extend({}, $.ui.autobox3.defaults, {
-        //
-        // Livesearch results with better highlighting
-        //
-        match: function(typed) {
-            this.typed = typed;
-            this.pre_match = this.text;
-            this.match = this.post_match = '';
-            if (!this.ajax && !typed || typed.length == 0) { return true; }
-            var match_at = this.text.search(new RegExp("\\b" + typed, "i"));
-            if (match_at != -1) {
-                this.pre_match = this.text.slice(0,match_at);
-                this.match = this.text.slice(match_at,match_at + typed.length);
-                this.post_match = this.text.slice(match_at + typed.length);
-                return true;
-            }
-            return false;
-        },
-        insertText: function(obj) {
-            return obj.tag;
-        },
-        templateText: "<li><%= pre_match %><span class='matching' ><%= match %></span><%= post_match %></li>",
-        //
-        // Snippets for more flexible client side rendering
-        //
-        snippets: Karl.makeSnippets({
-            '': 
-                '<li id="<%= _wid %>" class="bit-box">' +
-                _snip_pre +
-                '<a href="#" class="closebutton"></a>' +
-                _snip_input +
-                _snip_post,
-            nondeleteable: 
-                '<li id="<%= _wid %>" class="bit-box nondeleteable">' +
-                _snip_pre + 
-                _snip_post
-        }),
-        // The only items addable are the one from the search result.
-        strictAdd: false,
-        selectFirst: false,
-        validateRegexp: null
-    })
-});
-
 
 /*
  * A variant of the tagbox, used for members.
  * It only allows entering the items from the search result set.
  */
 $.widget('ui.karlmemberbox', $.extend({}, $.ui.karltagbox.prototype, {
-}));
 
-$.extend($.ui.karlmemberbox, {
-    defaults: $.extend({}, $.ui.karltagbox.defaults, {
+    options: $.extend({}, $.ui.karltagbox.prototype.options, {
         strictAdd: true,
         selectFirst: true,
         getBoxFromSelection: function() {
@@ -686,10 +678,33 @@ $.extend($.ui.karlmemberbox, {
 
     })
 
-});
+}));
 
 
 $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
+
+    options: $.extend({}, $.ui.grid.prototype.options, {
+        width: 500,
+        height: 300,
+
+        limit: false,
+        pagination: true,
+        allocateRows: true, //Only used for infinite scrolling
+        chunk: 20, //Only used for infinite scrolling
+
+        footer: true,
+        toolbar: false,
+
+        multipleSelection: true,
+
+        evenRowClass: 'even',
+        oddRowClass: 'odd',
+
+        sortColumn: '',
+        sortDirection: '',
+
+        initialState: null
+    }),
 
     _generateColumns: function() {
 
@@ -1111,38 +1126,14 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 }));
 
 
-$.extend($.ui.karlgrid, {
-    defaults: {
-        width: 500,
-        height: 300,
-
-        limit: false,
-        pagination: true,
-        allocateRows: true, //Only used for infinite scrolling
-        chunk: 20, //Only used for infinite scrolling
-
-        footer: true,
-        toolbar: false,
-
-        multipleSelection: true,
-
-        evenRowClass: 'even',
-        oddRowClass: 'odd',
-
-        sortColumn: '',
-        sortDirection: '',
-
-        initialState: null
-    }
-});
-
-
-
 $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
 
-    _init: function() {
-        $.ui.dialog.prototype._init.call(this);
-    },
+    options: $.extend({}, $.ui.dialog.prototype.options, {
+        autoOpen: false,
+        modal: true,
+        bgiframe: true,    // XXX bgiFrame is currently needed for modal
+        hide: 'fold'
+    }),
 
     /* Need to replicate this, because we do not want
      * to scroll down to the first tabbable element when
@@ -1199,19 +1190,16 @@ $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
 
 }));
 
-$.extend($.ui.karldialog, {
-    defaults: $.extend({}, $.ui.dialog.defaults, {
-        autoOpen: false,
-        modal: true,
-        bgiframe: true,    // XXX bgiFrame is currently needed for modal
-        hide: 'fold'
-    })
-});
-
 
 $.widget('ui.karlmultiupload', {
 
-    _init: function() {
+    options: {
+        selectorStub: '.muf-stub',
+        selectorCloseButton: '.muf-closebutton',
+        selectorAddButton: '.muf-addbutton'
+    },
+
+    _create: function() {
         var self = this;
         this.stub = this.element.find(this.options.selectorStub);
         // Set up the stub
@@ -1250,18 +1238,16 @@ $.widget('ui.karlmultiupload', {
 
 });
 
-$.extend($.ui.karlmultiupload, {
-    defaults: {
-        selectorStub: '.muf-stub',
-        selectorCloseButton: '.muf-closebutton',
-        selectorAddButton: '.muf-addbutton'
-    }
-});
-
 
 $.widget('ui.karlsingleupload', {
 
-    _init: function() {
+    options: {
+        selectorStub: '.sif-stub',
+        selectorNoChange: '.sif-nochange',
+        selectorUpload: '.sif-upload'
+    },
+
+    _create: function() {
         var self = this;
         this.stub = this.element.find(this.options.selectorStub);
         // Set up the stub
@@ -1303,14 +1289,6 @@ $.widget('ui.karlsingleupload', {
 
 });
 
-$.extend($.ui.karlsingleupload, {
-    defaults: {
-        selectorStub: '.sif-stub',
-        selectorNoChange: '.sif-nochange',
-        selectorUpload: '.sif-upload'
-    }
-});
-
 
 /**
  * Quotable comments
@@ -1323,7 +1301,15 @@ $.extend($.ui.karlsingleupload, {
  */
 $.widget('ui.karlquotablecomment', {
 
-    _init: function() {
+    options: {
+        selectorText: '.commentText',
+        selectorPasteButton: '.quo-paste',
+        wrapperPre: '<div class="quotedreplytext">',
+        // An empty paragraph must be added after the quote.
+        wrapperPost: '</div><div><p></p></div>'
+    },
+
+    _create: function() {
         var self = this;
         this.text = this.element.find(this.options.selectorText);
         // Set up the paste button
@@ -1350,16 +1336,6 @@ $.widget('ui.karlquotablecomment', {
 
 });
 
-$.extend($.ui.karlquotablecomment, {
-    defaults: {
-        selectorText: '.commentText',
-        selectorPasteButton: '.quo-paste',
-        wrapperPre: '<div class="quotedreplytext">',
-        // An empty paragraph must be added after the quote.
-        wrapperPost: '</div><div><p></p></div>'
-    }
-});
-
 
 /**
  * Date time picker field
@@ -1371,7 +1347,10 @@ $.extend($.ui.karlquotablecomment, {
  */
 $.widget('ui.karldatetimepicker', {
 
-    _init: function() {
+    options: {
+    },
+
+    _create: function() {
         var self = this;
         if (! jQuery.nodeName(this.element[0], 'input')) {
             throw new Error('ui.karldatetimepicker can only be bound to <input> nodes.');
@@ -1524,12 +1503,6 @@ $.widget('ui.karldatetimepicker', {
 
 });
 
-$.ui.karldatetimepicker.getter = "getAsDate";
-$.extend($.ui.karldatetimepicker, {
-    defaults: {
-    }
-});
-
 
 /**
  * Dropdown menu
@@ -1561,7 +1534,10 @@ $.extend($.ui.karldatetimepicker, {
 
 $.widget('ui.karldropdown', {
 
-    _init: function() {
+    options: {
+    },
+
+    _create: function() {
         var self = this;
         this._locate();
 
@@ -1702,10 +1678,6 @@ $.widget('ui.karldropdown', {
 
 });
 
-$.extend($.ui.karldropdown, {
-    defaults: {
-    }
-});
 
 // preload active/hover state images
 function initButtons() {

@@ -3,8 +3,14 @@
 
 
 $.widget('ui.multistatusbox', {
-    
-    _init: function() {
+ 
+    options: {
+        clsContainer: 'ui-widget',
+        clsItem: 'ui-state-highlight ui-corner-all',
+        hasCloseButton: true
+    },
+   
+    _create: function() {
         // initialize the queue
         this.queue = [];
         // add container class to container
@@ -90,15 +96,6 @@ $.widget('ui.multistatusbox', {
 
 
 });
-
-$.extend($.ui.multistatusbox, {
-    defaults: {
-        clsContainer: 'ui-widget',
-        clsItem: 'ui-state-highlight ui-corner-all',
-        hasCloseButton: true
-    }
-});
-
 
 })(jQuery);
 
