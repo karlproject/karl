@@ -68,8 +68,8 @@ var loadTinyMCE = function loadTinyMCE() {
         var plugins = 'paste,embedmedia,spellchecker';
         if (widget_data.enable_wiki_plugin) {
             plugins += ',wicked';
-        }
-        if (widget_data.enable_experimental_imagedrawer_plugin) {
+            // Imagedrawer is default enabled on wiki pages.
+            // Disabled everywhere else. XXX TODO
             plugins += ',imagedrawer';
         }
      

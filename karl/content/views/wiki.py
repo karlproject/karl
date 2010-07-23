@@ -144,8 +144,6 @@ class AddWikiPageFormController(object):
         head_data = convert_to_script(dict(
             text = dict(
                 enable_wiki_plugin = True,
-                enable_experimental_imagedrawer_plugin = \
-                    'enable_imagedrawer' in self.request.params,
                 ),
             ))
         return {'api':api, 'actions':(), 'head_data':head_data}
@@ -290,8 +288,6 @@ class EditWikiPageFormController(object):
         head_data = convert_to_script(dict(
             text = dict(
                 enable_wiki_plugin = True,
-                enable_experimental_imagedrawer_plugin = \
-                    'enable_imagedrawer' in self.request.params,
                 ),
             ))
         return {'api':api,
