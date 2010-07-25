@@ -197,7 +197,7 @@ class MonthViewPresenter(BasePresenter):
 
     @property
     def template_filename(self):
-        return 'templates/calendar_month.pt'
+        return 'karl.content.views:templates/calendar_month.pt'
 
 
 class DayOnMonthView(object):   

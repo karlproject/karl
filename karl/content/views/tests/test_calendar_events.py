@@ -22,6 +22,8 @@ from repoze.bfg.formish import ValidationError
 from repoze.bfg.testing import cleanUp
 from karl.content.interfaces import ICalendarEvent
 
+from karl.testing import registerLayoutProvider
+
 d1 = 'Thursday, October 7, 2010 04:20 PM'
 def dummy(date, flavor):
     return d1
@@ -74,6 +76,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         for profile in self.profiles.values():
             profile["alerts"] = testing.DummyModel()
         testing.registerDummySecurityPolicy('a')
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -255,7 +258,10 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
                      'attachments': [attachment1, attachment2],
                      'sendalert': True,
                      }
-        response = controller.handle_submit(converted)
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/email_calendar_event_alert.pt')
+
+        controller.handle_submit(converted)
         self.failUnless('event-title' in context)
         event = context['event-title']
         # check basic attribute values
@@ -307,7 +313,9 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
                      'attachments': [attachment1, attachment2],
                      'sendalert': True,
                      }
-        response = controller.handle_submit(converted)
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/email_calendar_event_alert.pt')
+        controller.handle_submit(converted)
         self.failUnless('event-title' in context)
         event = context['event-title']
         # check basic attribute values
@@ -963,6 +971,7 @@ END:VCALENDAR
 class CalendarLayersViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -1240,7 +1249,9 @@ class CalendarSetupViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        testing.registerDummyRenderer(
+            'karl.views:templates/formfields.pt')
+        self._callFUT(context, request)
 
         from repoze.bfg.url import model_url
         self.assertEqual(model_url(context, request),
@@ -1251,7 +1262,9 @@ class CalendarSetupViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        testing.registerDummyRenderer(
+            'karl.views:templates/formfields.pt')
+        self._callFUT(context, request)
 
         from repoze.bfg.url import model_url
         self.assertEqual(model_url(context, request, 'categories.html'),
@@ -1262,7 +1275,9 @@ class CalendarSetupViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        testing.registerDummyRenderer(
+            'karl.views:templates/formfields.pt')
+        self._callFUT(context, request)
 
         from repoze.bfg.url import model_url
         self.assertEqual(model_url(context, request, 'layers.html'),
@@ -1357,8 +1372,10 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_day.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_day.pt')
         self._registerSecurityWorkflow()
 
         from karl.content.views.calendar_events import show_day_view
@@ -1377,8 +1394,10 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_week.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_week.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
         self._registerSecurityWorkflow()
 
         from karl.content.views.calendar_events import show_week_view
@@ -1397,8 +1416,10 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_month.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_month.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
         self._registerSecurityWorkflow()
 
         from karl.content.views.calendar_events import show_month_view
@@ -1417,8 +1438,10 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        renderer = testing.registerDummyRenderer(
-            'templates/calendar_list.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_list.pt')
         self._registerSecurityWorkflow()
 
         from karl.content.views.calendar_events import show_list_view

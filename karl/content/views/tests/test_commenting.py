@@ -30,8 +30,8 @@ from karl.content.interfaces import IBlogEntry
 from karl.models.interfaces import IComment
 
 from karl.testing import DummyFile
-from karl.testing import DummyLayoutProvider
 from karl.testing import DummySessions
+from karl.testing import registerLayoutProvider
 
 class AddCommentFormControllerTests(unittest.TestCase):
     def setUp(self):
@@ -155,6 +155,8 @@ class AddCommentFormControllerTests(unittest.TestCase):
                      'attachments': [],
                      'sendalert': True,
                      'security_state': 'public'}
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/email_blog_comment_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location, location)
         self.failUnless(u'99' in context)
@@ -195,6 +197,7 @@ class EditCommentFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -287,6 +290,7 @@ class EditCommentFormControllerTests(unittest.TestCase):
 class ShowCommentViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -295,15 +299,7 @@ class ShowCommentViewTests(unittest.TestCase):
         from karl.content.views.commenting import show_comment_view
         return show_comment_view(context, request)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
-
     def test_it(self):
-        self._registerLayoutProvider()
-
         context = testing.DummyModel(title='the title')
 
         request = testing.DummyRequest()

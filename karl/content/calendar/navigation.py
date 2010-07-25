@@ -55,7 +55,7 @@ class Navigation(object):
                       '%s_down.png'   % self._presenter.name)
     
     def _init_template(self):
-        path = '../views/templates/calendar_navigation.pt'
+        path = 'karl.content.views:templates/calendar_navigation.pt'
         self._template = get_template(path)
 
     @property

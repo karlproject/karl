@@ -17,8 +17,10 @@
 
 import unittest
 import datetime
-import time
 import calendar
+
+from repoze.bfg import testing
+
 from karl.content.calendar.presenters.month import MonthViewPresenter
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
@@ -28,6 +30,12 @@ from karl.content.calendar.tests.presenters.test_base import DummyDayWithEvents
 class MonthSkeletonTests(unittest.TestCase):
     def setUp(self):
         calendar.setfirstweekday(calendar.SUNDAY)
+        testing.setUp()
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_assigns_year_and_month_properties(self):
         skeleton = self._makeOne(2009, 8)
@@ -94,6 +102,14 @@ class MonthSkeletonTests(unittest.TestCase):
 class BubblePainterTests(unittest.TestCase):
 
     # _find_contiguous_slot_across_days
+
+    def setUp(self):
+        testing.setUp()
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+
+    def tearDown(self):
+        testing.tearDown()
     
     def test__find_contiguous_slot_across_days_gets_first_available(self):
         presenter = self._makePresenter()

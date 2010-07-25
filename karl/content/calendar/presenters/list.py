@@ -101,7 +101,7 @@ class ListViewPresenter(BasePresenter):
 
     @property
     def template_filename(self):
-        return 'templates/calendar_list.pt'
+        return 'karl.content.views:templates/calendar_list.pt'
 
 
 class Event(object):

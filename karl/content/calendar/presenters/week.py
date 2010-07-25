@@ -242,7 +242,7 @@ class WeekViewPresenter(BasePresenter):
     
     @property
     def template_filename(self):
-        return 'templates/calendar_week.pt'
+        return 'karl.content.views:templates/calendar_week.pt'
 
 
 class DayOnWeekView(object):

@@ -29,9 +29,9 @@ from repoze.bfg.testing import registerAdapter
 from repoze.lemonade.testing import registerContentFactory
 
 from karl.testing import DummyCatalog
-from karl.testing import DummyLayoutProvider
 from karl.testing import DummySessions
 from karl.testing import DummyTagQuery
+from karl.testing import registerLayoutProvider
 
 from karl.content.interfaces import IPage
 
@@ -44,6 +44,7 @@ class TestAddPageFormController(unittest.TestCase):
         sessions = DummySessions()
         context = testing.DummyModel(sessions=sessions)
         self.context = context
+        registerLayoutProvider()
 
     def tearDown(self):
         testing.cleanUp()
@@ -161,6 +162,7 @@ class TestEditPageFormController(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -258,6 +260,7 @@ class ShowPageViewTests(unittest.TestCase):
         self.context['attachments'] = DummyModel()
         self.parent['child'] = self.context
         self.parent.catalog = DummyCatalog()
+        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -271,14 +274,8 @@ class ShowPageViewTests(unittest.TestCase):
         registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider, 
-                             (Interface, Interface),
-                             ILayoutProvider)
-
     def test_it(self):
-        self._registerLayoutProvider()
+        registerLayoutProvider()
         self._registerTagbox()
 
         context = self.context

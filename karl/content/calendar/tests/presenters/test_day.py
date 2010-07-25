@@ -16,10 +16,12 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import sys
 import datetime
 import time
 import calendar
+
+from repoze.bfg import testing
+
 from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 
@@ -27,6 +29,12 @@ from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 class DayViewPresenterTests(unittest.TestCase):
     def setUp(self):
         calendar.setfirstweekday(calendar.SUNDAY)
+        testing.setUp()
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_title_is_day_name_with_numeric_month_and_day(self):
         focus_at = datetime.datetime(2009, 8, 1) 

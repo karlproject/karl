@@ -69,6 +69,7 @@ class BlogAtomFeedTests(unittest.TestCase):
         from karl.views.atom import GenericAtomEntry
         testing.registerAdapter(GenericAtomEntry, (IBlogEntry, Interface),
                                 IAtomEntry)
+        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_blog_entries(self, count=1,
                                    creator="chris",
@@ -190,6 +191,7 @@ class CalendarAtomFeedTests(unittest.TestCase):
         from karl.content.views.atom import CalendarEventAtomEntry
         testing.registerAdapter(CalendarEventAtomEntry, (Interface, Interface),
                                 IAtomEntry)
+        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_calendar_events(self, count=1,
                                       creator="chris",
@@ -319,6 +321,7 @@ class WikiAtomFeedTests(unittest.TestCase):
         from karl.views.atom import GenericAtomEntry
         testing.registerAdapter(GenericAtomEntry, (Interface, Interface),
                                 IAtomEntry)
+        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_wiki_pages(self, count=1,
                                    creator="chris",
@@ -439,6 +442,7 @@ class CommunityFilesAtomFeedTests(unittest.TestCase):
         from karl.content.views.atom import CommunityFileAtomEntry
         testing.registerAdapter(CommunityFileAtomEntry, (Interface, Interface),
                                 IAtomEntry)
+        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_files(self, count=1,
                             creator="chris",

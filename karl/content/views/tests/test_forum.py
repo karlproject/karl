@@ -25,8 +25,8 @@ from repoze.bfg.testing import cleanUp
 from repoze.bfg import testing
 
 from karl.testing import DummyCatalog
-from karl.testing import DummyLayoutProvider
 from karl.testing import DummyProfile
+from karl.testing import registerLayoutProvider
 
 class TestShowForumsView(unittest.TestCase):
     def setUp(self):
@@ -91,15 +91,9 @@ class TestShowForumView(unittest.TestCase):
         from karl.utilities.interfaces import IKarlDates
         testing.registerUtility(dummy, IKarlDates)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        testing.registerAdapter(DummyLayoutProvider,
-                                (Interface, Interface),
-                                ILayoutProvider)
-
     def test_it(self):
         self._register()
-        self._registerLayoutProvider()
+        registerLayoutProvider()
         from karl.models.interfaces import ICatalogSearch
         from karl.content.interfaces import IForumsFolder
         testing.registerAdapter(DummySearchAdapter, (Interface),
@@ -206,6 +200,7 @@ class TestAddForumFormController(unittest.TestCase):
 class TestAddForumTopicFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         testing.cleanUp()
@@ -321,6 +316,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
 class ShowForumTopicViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -339,15 +335,9 @@ class ShowForumTopicViewTests(unittest.TestCase):
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        testing.registerAdapter(DummyLayoutProvider,
-                                (Interface, Interface),
-                                ILayoutProvider)
-
     def test_no_security_policy(self):
         self._register()
-        self._registerLayoutProvider()
+        registerLayoutProvider()
         import datetime
         _NOW = datetime.datetime.now()
         context = testing.DummyModel()
@@ -389,7 +379,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
 
     def test_with_security_policy(self):
         self._register()
-        self._registerLayoutProvider()
+        registerLayoutProvider()
         import datetime
         _NOW = datetime.datetime.now()
         context = testing.DummyModel(title='title')
@@ -422,7 +412,7 @@ class ShowForumTopicViewTests(unittest.TestCase):
 
     def test_comment_ordering(self):
         self._register()
-        self._registerLayoutProvider()
+        registerLayoutProvider()
         import datetime
         _NOW = datetime.datetime.now()
         _BEFORE = _NOW - datetime.timedelta(hours=1)
@@ -561,6 +551,7 @@ class TestEditForumFormController(unittest.TestCase):
 class EditForumTopicFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         testing.tearDown()

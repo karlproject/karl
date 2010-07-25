@@ -235,7 +235,7 @@ class DayViewPresenter(BasePresenter):
 
     @property
     def template_filename(self):
-        return 'templates/calendar_day.pt'
+        return 'karl.content.views:templates/calendar_day.pt'
 
 
 class TimeSlot(object):

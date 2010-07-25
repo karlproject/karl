@@ -362,6 +362,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         registerContentFactory(DummyFile, ICommunityFile)
         request = self._makeRequest()
         controller = self._makeOne(context, request)
+        testing.registerDummyRenderer(
+            'templates/email_blog_entry_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
                          'http://example.com/communities/community/blog/foo/')
@@ -378,10 +380,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.failUnless(context['foo']['attachments']['test1.txt'])
         self.failUnless(context['foo']['attachments']['test2.txt'])
 
-        from base64 import decodestring
         body = self.mailer[0].msg.get_payload(decode=True)
-        self.failUnless("%s/test1.txt" % attachments_url in body)
-        self.failUnless("%s/test2.txt" % attachments_url in body)
+        self.assertEqual(body, '')
 
         attachment1 = context['foo']['attachments']['test1.txt']
         self.assertEqual(attachment1.filename, "test1.txt")

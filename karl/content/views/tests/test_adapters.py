@@ -143,7 +143,8 @@ class TestBylineInfo(unittest.TestCase):
 
 class TestBlogEntryAlert(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
@@ -270,8 +271,11 @@ class TestBlogCommentAlert(unittest.TestCase):
         directlyProvides(blogentry, IBlogEntry)
         self.blogentry = blogentry
 
-        blogentry["comments"] = comments = testing.DummyModel()
+        blogentry["comments"] = testing.DummyModel()
         self.comment = self._add_comment(blogentry)
+
+    def tearDown(self):
+        cleanUp()
 
     def _add_comment(self, blogentry,
                      name="comment",
@@ -286,9 +290,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         comment.creator = creator
         comment.created = len(comments)
         return comment
-
-    def tearDown(self):
-        cleanUp()
 
     def _getTargetClass(self):
         from karl.content.views.adapters import BlogCommentAlert
@@ -373,7 +374,8 @@ class TestBlogCommentAlert(unittest.TestCase):
 
 class TestCalendarEventAlert(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICalendarEvent
@@ -468,7 +470,8 @@ class TestCalendarEventAlert(unittest.TestCase):
 
 class TestCommunityFileAlert(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICommunityFile

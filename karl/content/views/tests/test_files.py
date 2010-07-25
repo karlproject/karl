@@ -21,17 +21,17 @@ from zope.interface import Interface
 from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
-from repoze.bfg.testing import registerAdapter
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyFolderCustomizer
 from karl.testing import DummyFolderAddables
-from karl.testing import DummyLayoutProvider
 from karl.testing import DummyTagQuery
+from karl.testing import registerLayoutProvider
 
 class TestShowFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -61,15 +61,8 @@ class TestShowFolderView(unittest.TestCase):
             registerUtility(policy, IAuthenticationPolicy)
             registerUtility(policy, IAuthorizationPolicy)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
-
     def test_notcommunityrootfolder(self):
         self._register()
-        self._registerLayoutProvider()
 
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -89,7 +82,6 @@ class TestShowFolderView(unittest.TestCase):
 
     def test_communityrootfolder(self):
         self._register()
-        self._registerLayoutProvider()
 
         from karl.content.interfaces import ICommunityRootFolder
         from zope.interface import directlyProvides
@@ -108,7 +100,6 @@ class TestShowFolderView(unittest.TestCase):
         root['context'] = context = testing.DummyModel(title='thetitle')
         root.catalog = {'modified_date': DummyModifiedDateIndex()}
         self._register({context: ('view',),})
-        self._registerLayoutProvider()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
@@ -127,7 +118,6 @@ class TestShowFolderView(unittest.TestCase):
         root['context'] = context = testing.DummyModel(title='thetitle')
         root.catalog = {'modified_date': DummyModifiedDateIndex()}
         self._register({context.__parent__: ('view', 'delete'),})
-        self._registerLayoutProvider()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Delete', 'delete.html')])
@@ -137,7 +127,6 @@ class TestShowFolderView(unittest.TestCase):
         root['context'] = context = testing.DummyModel(title='thetitle')
         root.catalog = {'modified_date': DummyModifiedDateIndex()}
         self._register({context: ('view', 'delete'),})
-        self._registerLayoutProvider()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
@@ -147,7 +136,6 @@ class TestShowFolderView(unittest.TestCase):
         root['context'] = context = testing.DummyModel(title='thetitle')
         root.catalog = {'modified_date': DummyModifiedDateIndex()}
         self._register({context: ('view', 'create'),})
-        self._registerLayoutProvider()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
@@ -171,6 +159,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
 class TestAddFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         testing.tearDown()
@@ -296,6 +285,7 @@ class TestDeleteFolderView(unittest.TestCase):
 class TestAddFileFormController(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -337,12 +327,6 @@ class TestAddFileFormController(unittest.TestCase):
              {'transitions':['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
-
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        registerAdapter(DummyLayoutProvider,
-                        (Interface, Interface),
-                        ILayoutProvider)
 
     def _makeRequest(self):
         request = testing.DummyRequest()
@@ -417,7 +401,6 @@ class TestAddFileFormController(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         self._register()
-        self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
@@ -442,7 +425,6 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.bfg.formish import ValidationError
         self._register()
-        self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
@@ -475,7 +457,6 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.bfg.formish import ValidationError
         self._register()
-        self._registerLayoutProvider()
 
         testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
@@ -538,6 +519,8 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
         controller = self._makeOne(context, request)
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/email_community_file_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/filename/')
         self.assertEqual(context['filename'].title, u'a title')
@@ -550,7 +533,6 @@ class TestAddFileFormController(unittest.TestCase):
 
     def test_submitted_toobig(self):
         self._register()
-        self._registerLayoutProvider()
 
         from repoze.bfg.formish import ValidationError
 
@@ -579,6 +561,7 @@ class TestAddFileFormController(unittest.TestCase):
 class TestShowFileView(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -587,14 +570,7 @@ class TestShowFileView(unittest.TestCase):
         from karl.content.views.files import show_file_view
         return show_file_view(context, request)
 
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        registerAdapter(DummyLayoutProvider,
-                        (Interface, Interface),
-                        ILayoutProvider)
-
     def test_it(self):
-        self._registerLayoutProvider()
 
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
@@ -697,6 +673,7 @@ class TestThumbnailView(unittest.TestCase):
 class TestEditFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         testing.tearDown()
@@ -798,6 +775,7 @@ class TestEditFolderFormController(unittest.TestCase):
 class TestEditFileFormController(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        registerLayoutProvider()
 
     def tearDown(self):
         cleanUp()
@@ -1023,17 +1001,11 @@ class TestEditFileFormController(unittest.TestCase):
 class TestAdvancedFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
-
-        self._registerLayoutProvider()
+        registerLayoutProvider()
+        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
-
-    def _registerLayoutProvider(self):
-        from karl.views.interfaces import ILayoutProvider
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
 
     def _callFUT(self, context, request):
         from karl.content.views.files import advanced_folder_view
