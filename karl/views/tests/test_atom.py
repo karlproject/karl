@@ -17,7 +17,6 @@
 
 import datetime
 from zope.interface import directlyProvides
-from zope.testing.cleanup import cleanUp
 
 import unittest
 from repoze.bfg import testing
@@ -27,10 +26,10 @@ from karl.views.tests.test_community import DummyTagQuery
 
 class CommunityAtomViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _register(self):
         from zope.interface import Interface
@@ -58,7 +57,8 @@ class CommunityAtomViewTests(unittest.TestCase):
         foo = testing.DummyModel()
         foo.modified = datetime.datetime(2009, 9, 2, 10, 28, 0)
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/atom.pt')
+        testing.registerDummyRenderer(
+            'karl.views:templates/atomfeed.pt')
         from karl.models.interfaces import ICatalogSearch
         from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo'})

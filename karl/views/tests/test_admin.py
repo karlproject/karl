@@ -15,6 +15,7 @@ class TestAdminView(unittest.TestCase):
         cleanUp()
 
     def test_it(self):
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
         from karl.views.admin import admin_view
         site = DummyModel()
         request = testing.DummyRequest()
@@ -56,6 +57,9 @@ class TestDeleteContentView(unittest.TestCase):
 
         from karl.views.admin import delete_content_view
         self.fut = delete_content_view
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        testing.registerDummyRenderer(
+            'karl.views:templates/admin/content_select.pt')
 
     def tearDown(self):
         cleanUp()
@@ -257,7 +261,9 @@ class TestMoveContentView(unittest.TestCase):
 
         from karl.views.admin import move_content_view
         self.fut = move_content_view
-
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        testing.registerDummyRenderer(
+            'karl.views:templates/admin/content_select.pt')
     def tearDown(self):
         cleanUp()
 
@@ -383,6 +389,7 @@ class TestSiteAnnouncementView(unittest.TestCase):
     def setUp(self):
         cleanUp()
         self.site = DummyModel()
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -458,6 +465,7 @@ class TestEmailUsersView(unittest.TestCase):
         karltesting.registerAdapter(dummy_search_factory, Interface,
                                     ICatalogSearch)
         search.add_result([fred, barney])
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -542,6 +550,7 @@ class TestSyslogView(unittest.TestCase):
 
         from karl.views.admin import syslog_view
         self.fut = syslog_view
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -619,6 +628,7 @@ class TestLogsView(unittest.TestCase):
 
         from karl.views.admin import logs_view
         self.fut = logs_view
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -674,6 +684,7 @@ class TestStatisticsView(unittest.TestCase):
 
         from karl.views.admin import statistics_view
         self.fut = statistics_view
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -747,6 +758,7 @@ class TestUploadUsersView(unittest.TestCase):
 
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()
@@ -999,6 +1011,8 @@ class ErrorMonitorBase:
             error_monitor_subsystems=["blonde", "red", "head"],
         )
         testing.registerUtility(settings, ISettings)
+        testing.registerDummyRenderer(
+            'karl.views:templates/admin/menu.pt')
 
     def log_error(self, subsystem, message):
         import os
@@ -1099,6 +1113,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
+        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
         cleanUp()

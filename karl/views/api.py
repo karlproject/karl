@@ -38,7 +38,6 @@ from repoze.bfg.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
 from karl.consts import countries
-from karl.utils import find_catalog
 from karl.utils import find_intranet
 from karl.utils import find_intranets
 from karl.utils import find_site
@@ -69,13 +68,13 @@ class TemplateAPI(object):
     _intranets_info = None
     _current_intranet = None
     _home_url = None
+    _snippets = None
+    _start_time = int(time.time())
     countries = countries
 
     def __init__(self, context, request, page_title=None):
         self.context = context
         self.request = request
-        self.snippets = get_template('templates/snippets.pt')
-        self.snippets.doctype = xhtml
         self.userid = authenticated_userid(request)
         self.app_url = app_url = request.application_url
         self.profile_url = app_url + '/profiles/%s' % self.userid
@@ -103,6 +102,13 @@ class TemplateAPI(object):
         if hasattr(request, 'form') and getattr(request.form, 'errors', False):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
+
+    @property
+    def snippets(self):
+        if self._snippets is None:
+            self._snippets = get_template('templates/snippets.pt')
+            self._snippets.doctype = xhtml
+        return self._snippets
 
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') == 'public'
@@ -153,7 +159,6 @@ class TemplateAPI(object):
     def recent_items(self):
         if self._recent_items is None:
             community = find_interface(self.context, ICommunity)
-            catalog = find_catalog(self.context)
             if community is not None:
                 community_path = model_path(community)
                 search = getAdapter(self.context, ICatalogSearch)
@@ -175,25 +180,25 @@ class TemplateAPI(object):
 
         return self._recent_items
 
-    community_layout_fn = 'templates/community_layout.pt'
+    community_layout_fn = 'karl.views:templates/community_layout.pt'
     @property
     def community_layout(self):
         macro_template = get_template(self.community_layout_fn)
         return macro_template
 
-    anonymous_layout_fn = 'templates/anonymous_layout.pt'
+    anonymous_layout_fn = 'karl.views:templates/anonymous_layout.pt'
     @property
     def anonymous_layout(self):
         macro_template = get_template(self.anonymous_layout_fn)
         return macro_template
 
-    generic_layout_fn = 'templates/generic_layout.pt'
+    generic_layout_fn = 'karl.views:templates/generic_layout.pt'
     @property
     def generic_layout(self):
         macro_template = get_template(self.generic_layout_fn)
         return macro_template
 
-    formfields_fn = 'templates/formfields.pt'
+    formfields_fn = 'karl.views:templates/formfields.pt'
     @property
     def formfields(self):
         macro_template = get_template(self.formfields_fn)

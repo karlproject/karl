@@ -130,6 +130,7 @@ class TestEditProfileFormController(unittest.TestCase):
 
     def test___call__(self):
         self.request.form = DummyForm()
+        karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
         response = controller()
         self.failUnless('api' in response)
@@ -274,6 +275,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
     def test___call__(self):
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
+        karltesting.registerLayoutProvider()
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Edit title')
@@ -403,6 +405,9 @@ class AddUserFormControllerTests(unittest.TestCase):
     def test___call__(self):
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
+        karltesting.registerLayoutProvider()
+        testing.registerDummyRenderer(
+            'karl.views:forms/templates/snippets.pt')
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title , 'Add User')
@@ -959,7 +964,9 @@ class ManageCommunitiesTests(unittest.TestCase):
 
     def test_show_form(self):
         renderer = testing.registerDummyRenderer(
-            'templates/manage_communities.pt')
+            'karl.views:templates/manage_communities.pt')
+        testing.registerDummyRenderer(
+            'karl.views:templates/formfields.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
         self.profile.set_alerts_preference("community2", 1)
@@ -1137,6 +1144,9 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         controller = self._makeOne(self.context, self.request)
+        karltesting.registerLayoutProvider()
+        testing.registerDummyRenderer(
+            'karl.views:forms/templates/snippets.pt')
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Change Password')

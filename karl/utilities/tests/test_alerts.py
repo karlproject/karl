@@ -141,6 +141,8 @@ class TestAlerts(unittest.TestCase):
         self.assertEqual(2, len(profiles["a"]._pending_alerts))
         self.assertEqual(1, len(profiles["b"]._pending_alerts))
 
+        testing.registerDummyRenderer('karl.utilities:email_digest.pt')
+
         tool.send_digests(site)
 
         self.assertEqual(2, len(mailer))

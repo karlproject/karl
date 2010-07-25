@@ -16,12 +16,18 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.interface import Interface
 
 from repoze.bfg import testing
 
 
 class TestDeleteResourceView(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+        testing.registerDummyRenderer(
+            'karl.views:templates/community_layout.pt')
+
+    def tearDown(self):
+        testing.cleanUp()
 
     def _callFUT(self, context, request, num_children=0):
         from karl.views.resource import delete_resource_view
@@ -34,7 +40,7 @@ class TestDeleteResourceView(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'Context'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        testing.registerDummyRenderer(
             'templates/delete_resource.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '200 OK')

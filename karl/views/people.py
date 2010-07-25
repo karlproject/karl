@@ -713,7 +713,7 @@ def manage_communities_view(context, request):
         communities.sort(key=lambda x: x["title"])
 
     return render_template_to_response(
-        'templates/manage_communities.pt',
+        'karl.views:templates/manage_communities.pt',
         api=api,
         communities=communities,
         post_url=request.url,

@@ -612,6 +612,8 @@ class JoinCommunityViewTests(unittest.TestCase):
         renderer = testing.registerDummyRenderer("templates/join_community.pt")
         testing.registerDummySecurityPolicy("user")
         request = testing.DummyRequest()
+        testing.registerDummyRenderer(
+            'karl.views:templates/formfields.pt')
         self._callFUT(c, request)
         self.assertEqual(renderer.profile, profiles["user"])
         self.assertEqual(renderer.community, c)
@@ -640,6 +642,8 @@ class JoinCommunityViewTests(unittest.TestCase):
             "form.submitted": "1",
             "message": "Message text.",
         })
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_join_community.pt')
         response = self._callFUT(c, request)
 
         self.assertEqual(response.location,

@@ -23,6 +23,9 @@ class TestBase:
     def setUp(self):
         from repoze.bfg.testing import cleanUp
         cleanUp()
+        from repoze.bfg import testing
+        testing.registerTemplateRenderer(
+            'karl.content.views:templates/generic_layout.pt')
 
     def tearDown(self):
         from repoze.bfg.testing import cleanUp

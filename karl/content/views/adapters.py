@@ -791,19 +791,15 @@ class DefaultLayoutProvider(object):
 
     @property
     def community_layout(self):
-        package_dir = package_path(site)
-        template_fn = join(package_dir, 'templates', 'community_layout.pt')
-        return get_template(template_fn)
+        return get_template('karl.views:templates/community_layout.pt')
 
     @property
     def generic_layout(self):
-        package_dir = package_path(site)
-        template_fn = join(package_dir, 'templates', 'generic_layout.pt')
-        return get_template(template_fn)
+        return get_template('karl.views:templates/generic_layout.pt')
 
     @property
     def intranet_layout(self):
-        layout = get_template('templates/intranet_layout.pt')
+        layout = get_template('karl.content.views:templates/generic_layout.pt')
         intranet = find_interface(self.context, IIntranet)
         if intranet:
             layout.navigation = intranet.navigation

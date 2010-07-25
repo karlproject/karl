@@ -195,6 +195,7 @@ class Test_edit_acl_view(unittest.TestCase):
         request.POST['form.move_up'] = '^'
         request.POST['index'] = 1
 
+        testing.registerDummyRenderer('karl.views:templates/edit_acl.pt')
         self._callFUT(context, request)
 
         self.assertEqual(context.__acl__, acl[1:2] + acl[0:1] + acl[2:])

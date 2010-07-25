@@ -17,7 +17,6 @@
 """Tests of karl.views.peopledirectory"""
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 from repoze.bfg import testing
 
@@ -25,10 +24,10 @@ from repoze.bfg import testing
 class PeopleDirectoryViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import peopledirectory_view
@@ -130,10 +129,10 @@ class RenderReportGroupTests(unittest.TestCase):
 class SectionViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import section_view
@@ -187,10 +186,10 @@ class SectionViewTests(unittest.TestCase):
 class ReportViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import report_view
@@ -254,10 +253,10 @@ class ReportViewTests(unittest.TestCase):
 class JqueryGridViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import jquery_grid_view
@@ -354,10 +353,10 @@ class ProfilePhotoRowsTests(unittest.TestCase):
 class PictureViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import picture_view
@@ -486,10 +485,10 @@ class GetReportQueryTests(unittest.TestCase):
 class GetGridDataTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, **kw):
         from karl.views.peopledirectory import get_grid_data
@@ -576,10 +575,10 @@ class GetGridDataTests(unittest.TestCase):
 class GetReportDescriptionsTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, report):
         from karl.views.peopledirectory import get_report_descriptions
@@ -607,10 +606,10 @@ class GetReportDescriptionsTests(unittest.TestCase):
 class TextDumpTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, report, request):
         from karl.views.peopledirectory import text_dump
@@ -652,10 +651,10 @@ class TextDumpTests(unittest.TestCase):
 class CSVViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import csv_view
@@ -701,10 +700,10 @@ class CSVViewTests(unittest.TestCase):
 class PrintViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, response):
         from karl.views.peopledirectory import print_view
@@ -737,6 +736,11 @@ class AddUserViewTests(unittest.TestCase):
             'http://example.com/profiles/add.html')
 
 class TestOpenSearchViews(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _callFUT(self, context, request):
         from karl.views.peopledirectory import opensearch_view
@@ -749,7 +753,7 @@ class TestOpenSearchViews(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/opensearch.xml'
         )
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.report, context)
         self.assertEqual(renderer.url, 'http://example.com/')
 

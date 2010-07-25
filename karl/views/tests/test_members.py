@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 from repoze.bfg import testing
 from karl import testing as karltesting
@@ -24,10 +23,10 @@ from karl import testing as karltesting
 class ShowMembersViewTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.members import show_members_view
@@ -74,10 +73,10 @@ class ShowMembersViewTests(unittest.TestCase):
 
 class AddExistingUserFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         from karl.views.members import AddExistingUserFormController
@@ -125,6 +124,8 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         mailer = karltesting.DummyMailer()
         testing.registerUtility(mailer, IMailDelivery)
         controller = self._makeOne(context, request)
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_add_existing.pt')
         response = controller()
         self.assertEqual(context.users.added_groups, [('admin','members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
@@ -147,6 +148,8 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         testing.registerUtility(mailer, IMailDelivery)
         controller = self._makeOne(context, request)
         converted = {'users': (u'admin',), 'text':'some_text'}
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(context.users.added_groups, [('admin','members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
@@ -155,10 +158,10 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
 
 class AcceptInvitationFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeContext(self):
         context = testing.DummyModel(sessions=DummySessions())
@@ -267,6 +270,8 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                      'country':'country', 'websites':['website'],
                      'languages':'languages',
                      }
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_accept_invitation.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
                          'http://example.com/?status_message=Welcome%21')
@@ -281,10 +286,10 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
 
 class InviteNewUsersFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.views.members import InviteNewUsersFormController
@@ -363,6 +368,8 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             'text': u'some text',
             }
 
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_invite_new.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
           'http://example.com/manage.html?status_message=One+user+invited.++'
@@ -392,6 +399,8 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             'email_addresses': [u'd@x.org'],
             'text': u'some text',
             }
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
           'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'
@@ -430,10 +439,10 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
 
 class ManageMembersFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.views.members import ManageMembersFormController
@@ -615,6 +624,8 @@ class ManageMembersFormControllerTests(unittest.TestCase):
                          'Removed+moderator+buz')
 
     def test_handle_submit_resend(self):
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_invite_new.pt')
         context = self._makeCommunity()
         context.title = 'community'
         context.description = 'description'
@@ -652,10 +663,10 @@ class ManageMembersFormControllerTests(unittest.TestCase):
 
 class TestJqueryMemberSearchView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.members import jquery_member_search_view

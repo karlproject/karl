@@ -17,15 +17,14 @@
 
 import unittest
 from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
 from karl import testing as karltesting
 
 class TemplateAPITests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.views.api import TemplateAPI
@@ -92,7 +91,8 @@ class TemplateAPITests(unittest.TestCase):
         self.assertEqual(api.status_message, 'abc')
 
     def test_generic_layout(self):
-        renderer = testing.registerDummyRenderer('templates/generic_layout.pt')
+        renderer = testing.registerDummyRenderer(
+            'karl.views:templates/generic_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
@@ -101,7 +101,7 @@ class TemplateAPITests(unittest.TestCase):
 
     def test_anonymous_layout(self):
         renderer = testing.registerDummyRenderer(
-            'templates/anonymous_layout.pt')
+            'karl.views:templates/anonymous_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
@@ -110,7 +110,7 @@ class TemplateAPITests(unittest.TestCase):
 
     def test_community_layout(self):
         renderer = testing.registerDummyRenderer(
-            'templates/community_layout.pt')
+            'karl.views:templates/community_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
@@ -167,7 +167,10 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.failUnless('likely to be overridden' in api.render_footer())
+        renderer = testing.registerDummyRenderer(
+            'templates/footer.pt')
+        api.render_footer()
+        renderer.assert_(api=api)
 
     def test_render_footer_w_direct_adapter(self):
         from zope.interface import Interface

@@ -340,7 +340,7 @@ class DummyFolderCustomizer(DummyAdapter):
     markers = []
 
 class DummyLayoutProvider(DummyAdapter):
-    template_fn = 'templates/community_layout.fn'
+    template_fn = 'karl.views:templates/community_layout.fn'
 
     def __call__(self, default):
         renderer = registerDummyRenderer(self.template_fn)
@@ -400,9 +400,9 @@ class DummySessions(dict):
 
 def registerLayoutProvider():
     from karl.views.interfaces import ILayoutProvider
-    ad = registerAdapter(DummyLayoutProvider,
-                         (Interface, Interface),
-                         ILayoutProvider)
+    registerAdapter(DummyLayoutProvider,
+                    (Interface, Interface),
+                    ILayoutProvider)
 
 def registerTagbox():
     from karl.models.interfaces import ITagQuery

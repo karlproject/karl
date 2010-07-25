@@ -34,6 +34,7 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
+        testing.registerDummyRenderer('karl.views:forms/templates/snippets.pt')
 
     def tearDown(self):
         testing.cleanUp()
@@ -160,6 +161,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
+        testing.registerDummyRenderer('karl.views:forms/templates/snippets.pt')
 
     def tearDown(self):
         testing.cleanUp()
@@ -223,8 +225,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, u'Reset Password')
         self.failUnless('blurb_macro' in response)
-        from chameleon.core.template import Macro
-        self.failUnless(response['blurb_macro'].__class__ is Macro)
+        self.failUnless(response['blurb_macro'])
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)

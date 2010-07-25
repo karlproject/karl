@@ -34,6 +34,12 @@ class Test_redirect_up_view(unittest.TestCase):
 
 
 class Test_redirect_favicon_view(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
     def _callFUT(self, context, request):
         from karl.views.redirects import redirect_favicon
         return redirect_favicon(context, request)

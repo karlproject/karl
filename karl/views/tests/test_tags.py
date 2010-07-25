@@ -17,17 +17,16 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 from karl import testing as karltesting
 
 class AddTagsTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, values):
         from karl.views.tags import add_tags
@@ -89,10 +88,10 @@ class AddTagsTests(unittest.TestCase):
 class SetTagsTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, values):
         from karl.views.tags import set_tags
@@ -121,10 +120,10 @@ class SetTagsTests(unittest.TestCase):
 
 class ShowTagViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import showtag_view
@@ -228,10 +227,10 @@ class ShowTagViewTests(unittest.TestCase):
 
 class CommunityShowTagViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import community_showtag_view
@@ -351,10 +350,10 @@ class CommunityShowTagViewTests(unittest.TestCase):
 
 class ProfileShowTagViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import profile_showtag_view
@@ -479,10 +478,10 @@ class ProfileShowTagViewTests(unittest.TestCase):
 
 class TagCloudViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import tag_cloud_view
@@ -559,10 +558,10 @@ class TagCloudViewTests(unittest.TestCase):
 
 class CommunityTagCloudViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import community_tag_cloud_view
@@ -663,10 +662,10 @@ class CommunityTagCloudViewTests(unittest.TestCase):
 
 class TagListingViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import tag_listing_view
@@ -709,10 +708,10 @@ class TagListingViewTests(unittest.TestCase):
 
 class CommunityTagListingViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import community_tag_listing_view
@@ -767,10 +766,10 @@ class CommunityTagListingViewTests(unittest.TestCase):
 
 class ProfileTagListingViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import profile_tag_listing_view
@@ -839,10 +838,10 @@ class ProfileTagListingViewTests(unittest.TestCase):
 
 class TagUsersViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import tag_users_view
@@ -907,10 +906,10 @@ class TagUsersViewTests(unittest.TestCase):
 
 class CommunityTagUsersViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import community_tag_users_view
@@ -987,10 +986,10 @@ class CommunityTagUsersViewTests(unittest.TestCase):
 
 class ManageTagsViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import manage_tags_view
@@ -1139,13 +1138,13 @@ class ManageTagsViewTests(unittest.TestCase):
 
 class AjaxViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self.context = context = testing.DummyModel()
         context.tags = DummyTags()
         context.catalog = DummyCatalog()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callAdd(self, context, request):
         from karl.views.tags import jquery_tag_add_view
@@ -1209,10 +1208,10 @@ class AjaxViewTests(unittest.TestCase):
 
 class TestJQueryTagSearchView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.tags import jquery_tag_search_view

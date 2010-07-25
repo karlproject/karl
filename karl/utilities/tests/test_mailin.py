@@ -16,18 +16,18 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
+from repoze.bfg import testing
 
 class MailinRunnerTests(unittest.TestCase):
 
     def setUp(self):
         self.maildir_root = self._makeMaildir()
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
         import shutil
         shutil.rmtree(self.maildir_root)
-        cleanUp()
+        testing.cleanUp()
 
     def _makeMaildir(self):
         import os
@@ -160,10 +160,10 @@ class MailinRunnerTests(unittest.TestCase):
 class MailinRunner2Tests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.utilities.mailin import MailinRunner2
@@ -286,6 +286,8 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.mailer), 1)
 
     def test_bounce_message_throttled(self):
+        testing.registerDummyRenderer(
+            'karl.utilities:templates/bounce_email_throttled.pt')
         message = DummyMessage(None, 'Message body.', ())
         message['X-Postoffice-Rejected'] = 'Throttled'
         message['From'] = 'Clarence'

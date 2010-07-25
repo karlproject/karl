@@ -21,7 +21,7 @@ from repoze.bfg import testing
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import taggedValue
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 class JQueryLivesearchViewTests(unittest.TestCase):
     def setUp(self):
@@ -106,6 +106,9 @@ class JQueryLivesearchViewTests(unittest.TestCase):
 class SearchResultsViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        testing.registerDummyRenderer('karl.views:templates/generic_layout.pt')
+        testing.registerDummyRenderer(
+            'karl.views:templates/community_layout.pt')
 
     def tearDown(self):
         cleanUp()
