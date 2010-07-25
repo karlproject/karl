@@ -17,7 +17,6 @@
 
 import unittest
 from zope.interface import directlyProvides
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.threadlocal import get_current_registry
@@ -25,7 +24,7 @@ from karl.testing import DummySessions
 
 class ResetRequestFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         from karl.testing import registerSettings
         registerSettings()
         from karl.models.interfaces import ISite
@@ -37,7 +36,7 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         self.request = request
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         from karl.views.resetpassword import ResetRequestFormController
@@ -92,7 +91,8 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         # register dummy renderer for email template
         reg = get_current_registry()
         config = Configurator(reg)
-        renderer = config.testing_add_template('templates/email_reset_password.pt')
+        renderer = config.testing_add_template(
+            'templates/email_reset_password.pt')
 
         # test w/ staff user
         controller = self._makeOne(context, request)
@@ -124,8 +124,6 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         self.assertEqual(msg.mto[0], 'me@example.com')
         self.assertEqual(dict(msg.msg._headers)['Subject'],
                          'karl3test Password Reset Request')
-        url = ('http://example.com/reset_confirm.html?key=%s' %
-               profile.password_reset_key)
         renderer.assert_(login='me', system_name='karl3test')
         self.failUnless(hasattr(renderer, 'reset_url'))
         self.failUnless(renderer.reset_url.startswith(
@@ -134,10 +132,10 @@ class ResetRequestFormControllerTests(unittest.TestCase):
 
 class ResetSentViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.resetpassword import reset_sent_view
@@ -154,7 +152,7 @@ class ResetSentViewTests(unittest.TestCase):
 
 class ResetConfirmFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         from karl.models.interfaces import ISite
         site = testing.DummyModel(sessions=DummySessions())
         directlyProvides(site, ISite)
@@ -164,7 +162,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.request = request
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         from karl.views.resetpassword import ResetConfirmFormController
