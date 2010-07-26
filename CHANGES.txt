@@ -13,6 +13,8 @@ Unreleased
 
 - Fixed bug in entity conversion where numeric entities were not converted.
 
+- Removed a redundant copy of the text_scrubber code used by mailin.
+
 3.38 (2010-07-09)
 -----------------
 
