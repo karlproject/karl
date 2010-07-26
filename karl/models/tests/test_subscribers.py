@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -34,7 +34,7 @@ class TestPostorder(unittest.TestCase):
     def test_None_node(self):
         result = list(self._callFUT(None))
         self.assertEqual(result, [None])
-        
+
     def test_IFolder_node_no_children(self):
         from repoze.folder.interfaces import IFolder
         from zope.interface import directlyProvides
@@ -447,7 +447,7 @@ class ProfileAddedTests(unittest.TestCase):
                          'phreddy')
         self.assertEqual(parent.email_to_name['Phreddy2@Example.com'],
                          'phreddy')
-        
+
 class ProfileRemovedTests(unittest.TestCase):
 
     def setUp(self):
@@ -655,6 +655,26 @@ class QueryLoggerTests(unittest.TestCase):
         finally:
             shutil.rmtree(d)
 
+    def test_log_everything(self):
+        import os
+        import shutil
+        import tempfile
+        d = tempfile.mkdtemp()
+        try:
+            logger = self._makeOne()
+            logger.configure(DummySettings(d, log_all=True))
+            self.assertEquals(logger._configured, True)
+            self.assertEquals(logger.log_dir, d)
+            logger(DummyQueryEvent())
+            names = sorted(os.listdir(d))
+            self.assertEquals(names, ['0000500.log', 'everything.log'])
+            timed_path = os.path.join(d, names[0])
+            self.assert_(os.path.getsize(timed_path) > 0)
+            all_path = os.path.join(d, names[1])
+            self.assert_(os.path.getsize(all_path) > 0)
+        finally:
+            shutil.rmtree(d)
+
 class DummyTags:
     _delete_called_with = None
 
@@ -670,6 +690,7 @@ class DummyQueryEvent:
     result = (1, [99])
 
 class DummySettings:
-    def __init__(self, log_dir, min_duration=0):
+    def __init__(self, log_dir, min_duration=0, log_all=False):
         self.query_log_dir = log_dir
         self.query_log_min_duration = min_duration
+        self.query_log_all = log_all

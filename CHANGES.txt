@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added support for logging each query, to compare performance across
+  different configurations. Keyed on the `query_log_all` parameter, defaulting
+  to False. Entries will be added to `log/query/everything.log`.
+
 - Fixed bug in mailin2 script that caused ZEO connections to be left open if
   there was a configuration error.
 

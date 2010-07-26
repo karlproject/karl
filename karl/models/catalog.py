@@ -20,6 +20,7 @@ from karl.utils import find_site
 
 from BTrees.Length import Length
 
+
 class CachingCatalog(Catalog):
     implements(ICatalog)
 

@@ -230,14 +230,17 @@ def update_peopledirectory_indexes(event):
 class QueryLogger(object):
     """Event listener that logs ICatalogQueryEvents to a directory.
 
-    Divides the log files by the magnitude of the query duration,
-    making it easy to find expensive queries.
+    Performs 2 tasks:
+    1. Divides the log files by the magnitude of the query duration,
+       making it easy to find expensive queries.
+    2. Log all queries to a single file for comparison across systems
     """
 
     def __init__(self):
         self._configured = False
         self.log_dir = None
         self.min_duration = None
+        self.log_all = None
 
     def configure(self, settings):
         self.log_dir = getattr(settings, 'query_log_dir', None)
@@ -246,6 +249,8 @@ class QueryLogger(object):
                 os.makedirs(self.log_dir)
         self.min_duration = float(
             getattr(settings, 'query_log_min_duration', 0.0))
+        self.log_all = bool(
+            getattr(settings, 'query_log_all', False))
         self._configured = True
 
     def __call__(self, event):
@@ -255,20 +260,27 @@ class QueryLogger(object):
                 self.configure(settings)
         if not self.log_dir:
             return
-        duration = event.duration
-        if duration < self.min_duration:
-            return
         t = datetime.now().isoformat()
+        duration = event.duration
         query = '  ' + pformat(event.query).replace('\n', '\n  ')
+        if self.log_all:
+            self._log(t, duration, event.result[0], query)
+        if duration >= self.min_duration:
+            self._log_by_magnitude(t, duration, event.result[0], query)
+
+    def _log(self, ts, duration, num_results, query, fname='everything.log'):
         msg = '%s %8.3f %6d\n%s\n' % (
-            t, duration, event.result[0], query)
-        magnitude = math.ceil(math.log(duration, 2))
-        fn = '%07d.log' % int(1000 * 2**magnitude)
-        path = os.path.join(self.log_dir, fn)
+            ts, duration, num_results, query)
+        path = os.path.join(self.log_dir, fname)
         f = open(path, 'a')
         try:
             f.write(msg)
         finally:
             f.close()
+
+    def _log_by_magnitude(self, ts, duration, num_results, query):
+        magnitude = math.ceil(math.log(duration, 2))
+        fn = '%07d.log' % int(1000 * 2**magnitude)
+        self._log(ts, duration, num_results, query, fname=fn)
 
 log_query = QueryLogger()
