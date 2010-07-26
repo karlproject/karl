@@ -95,9 +95,6 @@
     <!-- Css resource composition -->
     <metal:resources define-macro="css_resources">
       <link rel="stylesheet" type="text/css" media="print" href="${api.static_url}/print.css"/>
-      <!--[if IE]> <style type="text/css" media="all">@import
-                          url(${api.static_url}/karl_ie.css);</style>
-                      <![endif]-->
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/1.8.2/css/smoothness/jquery-ui-1.8.2.custom.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/autobox2/jquery.ui.autobox.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/ui-multistatusbox/ui.multistatusbox.css" type="text/css"/>
@@ -106,7 +103,13 @@
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/ui.custom.css" type="text/css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/custom.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
-    </metal:resources>
+      <!--[if IE]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie.css);</style>
+      <![endif]-->
+      <!--[if IE 8]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie8.css);</style>
+      <![endif]-->
+   </metal:resources>
 
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <span tal:repeat="letter letters">
@@ -159,19 +162,20 @@
 
     <metal:actions_box define-macro="actions_box">
       <ul class="menubar">
-            <tal:block repeat="action api.actions_to_menu(actions)">
-          <li class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
-            <a href="${api.here_url}${action[1]}"
-              class="${action[2] and 'karldropdown-heading' or ''}">${action[0]}</a>
-            <tal:submenu condition="action[2]">
-              <ul class="karldropdown-menu">
-                <li tal:repeat="subaction action[2]">
-                  <a href="${api.here_url}${subaction[1]}">${subaction[0]}</a>
-                </li>
-              </ul>
-            </tal:submenu>
-          </li>
-            </tal:block>
+          <tal:block repeat="action api.actions_to_menu(actions)">
+              <li tal:attributes="id string:menubar-${repeat.action.number()}"
+                  class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
+                <a href="${api.here_url}${action[1]}"
+                  class="${action[2] and 'karldropdown-heading' or ''}"><span>${action[0]}</span></a>
+                <tal:submenu condition="action[2]">
+                  <ul class="karldropdown-menu">
+                    <li tal:repeat="subaction action[2]">
+                      <a href="${api.here_url}${subaction[1]}">${subaction[0]}</a>
+                    </li>
+                  </ul>
+                </tal:submenu>
+              </li>
+          </tal:block>
       </ul>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
@@ -196,19 +200,22 @@
         </div>
         <div class="portlet-buttons">
           <a tal:condition="preferred_communities is None"
+             class="primary_button"
              title="Personalize the list of communities that appear on this list"
              href="/jquery_edit_preferred.html">
-             Set preferred
+             <span>Set preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
+             class="primary_button"
              title="Edit your personalized list of communities"
              href="/jquery_edit_preferred.html">
-             Edit preferred
+             <span>Edit preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
+             class="primary_button"
              title="Show all of your communities now"
              href="/jquery_list_my_communities.html">
-             Show all
+             <span>Show all</span>
           </a>
         </div>
       </div>
@@ -298,7 +305,7 @@
         <fieldset>
           <input id="livesearch-input" name="body"
                  type="text" autocomplete="off"/>
-          <a id="livesearch-button" href="javascript: document.ff.submit()"></a>
+          <a id="livesearch-button" class="primary_button" href="javascript: document.ff.submit()">Go</a>
         </fieldset>
       </form>
       <span class="advancedSearch">
@@ -698,6 +705,19 @@
            tal:content="structure api.site_announcement">
       </div>
     </metal:announcement>
+    
+    <ul id="header-menu" metal:define-macro="header-menu">
+        <li id="header-communities">
+          <a href="${api.app_url}/communities">Communities</a>
+        </li>
+        <li id="header-people">
+          <a href="${api.people_url}">People</a>
+        </li>
+        <li id="header-tags" tal:condition="api.user_is_staff">
+          <a href="${api.app_url}/tagcloud.html">Tags</a>
+        </li>
+    </ul>
+    
 
   </body>
 </html>

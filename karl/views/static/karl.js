@@ -593,7 +593,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // add a button after the input
         // also wrap it to avoid breaking
         this.input.wrap('<span></span>');
-        $('<button class="standalone addtag-button" type="button">Add</button>')
+        $('<button class="button primary_button inline addtag-button" type="button"><span>Add</span></button>')
             .bind('click', function(e) {
                 // We generate the record first...
                 // (null result means we need not add it)
@@ -1679,19 +1679,6 @@ $.widget('ui.karldropdown', {
 });
 
 
-// preload active/hover state images
-function initButtons() {
-  var active  = new Image(), hover  = new Image(),
-      pActive = new Image(), pHover = new Image();
-
-  // find static link
-  var url = $('link[rel="icon"]').attr("href").replace("favicon.ico", "");
-  active.src  = url + 'button_active.png';
-  hover.src   = url + 'button_hover.png';
-  pActive.src = url + 'button_primary_active.png';
-  pHover.src  = url + 'button_primary_hover.png';
-}
-
 /* auto create anon ids (used by calendar) */
 jQuery.fn.identify = function() {
     var i = 0;
@@ -2116,7 +2103,6 @@ $(document).ready(function() {
     
     // initialize button
     if ($('.button').length > 0) { 
-      initButtons(); 
       $("#form-submit").click(function() { 
         $("#form-cancel").attr("disabled", "disabled"); 
       });
@@ -2143,6 +2129,16 @@ $(document).ready(function() {
     if ($('#setup_add_cal').length > 0) {
       initCalendarSetup();
     }
+    
+    // portlet item hover effect
+    $(".generic-portlet .portlet-item").hover(
+        function() {
+            $(this).css("background-color","#f0f2f4");
+        },
+        function() {
+            $(this).css("background-color","transparent");
+        }
+    );
 }); // END document ready handler
 
 // For debugging and development.
@@ -2185,4 +2181,3 @@ jQuery.fn.extend({
 });
 
 })();                   // END CLOSURE Karl
-

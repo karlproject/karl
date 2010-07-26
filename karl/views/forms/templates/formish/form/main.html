@@ -14,7 +14,7 @@
     </div>
     <p tal:condition="form.error" class="error">${unicode(form.error)}</p>
     <span tal:replace="structure form.fields()"/>
-    <div class="buttons clearafter">
+    <div class="buttons clearafter formsubmit">
       <tal:block repeat="action form._actions">
         <tal:block condition="repeat['action'].start">
           <button name="${action.name or ''}"

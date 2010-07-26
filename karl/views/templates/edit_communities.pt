@@ -24,17 +24,20 @@
     </strong>
   </div>
   <div class="portlet-buttons">
-    <a title="Set the personalized list of communities"
+    <a class="primary_button"
+       title="Set the personalized list of communities"
        href="/jquery_set_preferred.html">
-       Update
+       <span>Update</span>
     </a>
-    <a title="Reset portlet to show all communities"
+    <a class="primary_button"
+       title="Reset portlet to show all communities"
        href="/jquery_clear_preferred.html">
-       Clear preferred
+       <span>Clear preferred</span>
     </a>
-    <a title="Cancel and return to list of communities"
+    <a class="primary_button"
+       title="Cancel and return to list of communities"
        href="/jquery_list_preferred.html">
-       Cancel
+       <span>Cancel</span>
     </a>
   </div>
   <script language="javascript" type="text/javascript">

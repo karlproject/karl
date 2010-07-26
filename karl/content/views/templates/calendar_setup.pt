@@ -38,8 +38,8 @@
       </table>
 
       <!-- Add a new category button -->
-      <div class="add_button" id="setup_add_cal">
-        <a href="#">Add Category</a>
+      <div class="add_button clearafter" id="setup_add_cal">
+        <a class="primary_button" href="#"><span>Add Category</span></a>
       </div>
 
       <!-- Add a new category form -->
@@ -132,8 +132,8 @@
       </table>
 
       <!-- Add a new layer button -->  
-      <div class="add_button" id="setup_add_layer">
-        <a href="#">Add Layer</a>
+      <div class="add_button clearafter" id="setup_add_layer">
+        <a class="primary_button" href="#"><span>Add Layer</span></a>
       </div>
 
       <!-- Add a new layer form -->  

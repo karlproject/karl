@@ -30,11 +30,15 @@
               ${api.site_announcement}
             </textarea>
           </fieldset>
-          <br/>
-          <input type="submit" name="submit-site-announcement"
-                 value="Set Site Announcement"/>
-          <input type="submit" name="remove-site-announcement"
-                 value="Remove Site Announcement"/>
+          <br />
+          <div class="buttons">
+              <button name="submit-site-announcement" type="submit" class="button primary_button">
+                  <span>Set Site Announcement</span>
+              </button>
+              <button name="remove-site-announcement" type="submit" class="button normal_button">
+                  <span>Remove Site Announcement</span>
+              </button>
+          </div>
         </form>
 
       </div>

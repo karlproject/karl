@@ -118,24 +118,235 @@ body .cal_day .cal_hour_event .cal_event_block  {
   width: 603px !important;
 }
 
-/** =BUTTONS
------------------------------------------------ */
-* html button.button { 
-  position: relative;
-  top: -2px;
-  width: auto; 
-  overflow: visible; 
-}
-* html button.button span { 
-  position: relative;
-  top: 1px;
-  margin-top: 1px; 
-}
-* html button.button img {
-  margin-top: 1px;
-}
-
 ol#references-listing li a.topLevelItem {
   margin-left: 8px;
 } 
+
+/** =ROUNDED CORNERS / BUTTONS (other browsers use all CSS)
+----------------------------------------------- */
+
+/* tags - people - communities */
+ul#header-menu li {
+    background: transparent url(images/corners.png) no-repeat right -5px;
+    padding-right: 18px;
+    top: -1px;
+}
+ul#header-menu li a {
+    background: transparent url(images/corners.png) no-repeat left -5px;
+    border: none;
+    line-height: 20px;
+    padding: 5px 9px 3px 27px;
+}
+
+/* general button styles */
+button {
+    overflow: visible; 
+}
+button span {
+    height: 20px !important;
+    line-height: 20px !important;
+    margin-bottom: -1px;
+}
+.primary_button,
+.primary_button:visited,
+ul.menubar #menubar-1.menubar-lastitem a {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    border: none !important;
+    padding: 0px 5px 0 0;
+    float: left;
+    display: block;
+}
+.primary_button span,
+ul.menubar #menubar-1.menubar-lastitem span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    line-height: 20px;
+    height: 20px;
+    padding: 1px 5px 1px 10px;
+    white-space: nowrap;
+    z-index: 2;
+}
+.primary_button:hover,
+ul.menubar #menubar-1.menubar-lastitem a:hover {
+    background: transparent url(images/corners.png) no-repeat right -47px;
+}
+.primary_button:hover span,
+ul.menubar #menubar-1.menubar-lastitem a:hover span {
+    background: #ffffff url(images/corners.png) no-repeat left -47px;
+}
+.primary_button:active,
+ul.menubar #menubar-1.menubar-lastitem a:active {
+    background: transparent url(images/corners.png) no-repeat right -68px;
+    outline: 0;
+}
+.primary_button:active span,
+ul.menubar #menubar-1.menubar-lastitem a:active span {
+    background: #ffffff url(images/corners.png) no-repeat left -68px;
+}
+
+.normal_button,
+.normal_button:hover,
+.normal_button:active {
+    background: transparent url(images/corners.png) no-repeat right -91px !important;
+    border: none !important;
+    padding: 0px 5px 0 0;
+    float: left;
+    display: inline-block;
+}
+.normal_button span,
+.normal_button:hover span,
+.normal_button:active span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    line-height: 20px;
+    height: 20px;
+    padding: 1px 5px 1px 10px;
+    white-space: nowrap;
+}
+
+/* calendar buttons */
+.cal_buttons .menubar a,
+.cal_buttons .menubar a:hover,
+.cal_buttons .menubar a:active {
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+    border: none;
+    color: #3A74A9;
+    font-weight: normal;
+    line-height: 19px;
+    height: 19px;
+    padding-bottom: 2px;
+}
+.cal_buttons .menubar.day-view a.day,
+.cal_buttons .menubar.week-view a.week,
+.cal_buttons .menubar.month-view a.month,
+.cal_buttons .menubar.list-view a.list {
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+    color: #000000 !important;
+}
+.cal_buttons .menubar .firstItem a,
+.cal_buttons .menubar .firstItem a:hover,
+.cal_buttons .menubar .firstItem a:active,
+.cal_buttons .menubar .firstItem a.disabled {
+    background: transparent url(images/corners.png) no-repeat left -91px;
+    border: none;
+}
+.cal_buttons .menubar .lastItem a,
+.cal_buttons .menubar .lastItem a:hover,
+.cal_buttons .menubar .lastItem a:active,
+.cal_buttons .menubar .lastItem a.disabled {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none;
+}
+.cal_buttons .menubar li {
+    border-right: 1px solid #bcc2c7;
+}
+.cal_buttons .menubar .lastItem,
+.cal_buttons .menubar .todayButton {
+    border-right: none;
+}
+.cal_buttons .menubar .todayButton a,
+.cal_buttons .menubar .todayButton a:hover,
+.cal_buttons .menubar .todayButton a:active,
+.cal_buttons .menubar .todayButton a.disabled,
+.cal_buttons .menubar .todayButton a.disabled:hover,
+.cal_buttons .menubar .todayButton a.disabled:active {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none;
+    padding: 0px 5px 0 0;
+}
+.cal_buttons .menubar .todayButton a span {
+    background: #EDF1F3 url(images/corners.png) no-repeat left -91px;
+    border: none;
+    line-height: 20px;
+    height: 20px;
+    padding: 1px 5px 1px 10px;
+}
+.cal_buttons .menubar a.disabled,
+.cal_buttons .menubar a.disabled:hover,
+.cal_buttons .menubar a.disabled:active {
+    color: #B4B4B4;
+    cursor: default;
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+}
+
+.cal_buttons .previous span,
+.cal_buttons .next span {
+    border: none;
+    font-size: 11px;
+    line-height: 19px;
+    height: 19px;
+    top: 0;
+    font-weight: bold;
+}
+
+/* sign in button */
+#login-wrapper .primary_button {
+    line-height: 16px !important;
+    height: 22px !important;
+    padding: 3px 5px 4px 0;
+}
+#login-wrapper .primary_button span {
+    line-height: 16px !important;
+    height: 16px !important;
+    padding: 4px 10px 4px 15px;
+}
+#login-wrapper .buttons {
+    _height: 24px;
+    _overflow: hidden;
+}
+
+/* edit - manage - delete - etc*/
+ul.menubar li a {
+    background: transparent url(images/corners.png) no-repeat -10px -25px;
+    line-height: 20px;
+    height: 20px;
+    border: none !important;
+}
+ul.menubar li a:hover {
+    background: transparent url(images/corners.png) no-repeat -10px -47px;
+}
+ul.menubar li a:active {
+    background: transparent url(images/corners.png) no-repeat -10px -69px;
+}
+ul.menubar #menubar-1 a {
+    background: transparent url(images/corners.png) no-repeat left -25px;
+}
+ul.menubar #menubar-1 a:hover {
+    background: transparent url(images/corners.png) no-repeat left -47px;
+}
+ul.menubar #menubar-1 a:active {
+    background: transparent url(images/corners.png) no-repeat left -69px;
+}
+ul.menubar .menubar-lastitem a {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+}
+ul.menubar .menubar-lastitem a:hover {
+    background: transparent url(images/corners.png) no-repeat right -47px;
+}
+ul.menubar .menubar-lastitem a:active {
+    background: transparent url(images/corners.png) no-repeat right -69px;
+}
+
+/* search button */
+#livesearch-button.primary_button {
+    background: transparent url(images/corners.png) no-repeat left -113px;
+    width: 28px;
+    height: 24px;
+    line-height: 26px;
+}
+
+/* add tag button */
+.addtag-button {
+    position: relative;
+}
+    
+/* specific button color bg */
+.cheader button.normal_button span {
+    background-color: #cedfef;
+}
+#login-wrapper .primary_button span {
+    background-color: #e4e9ec;
+}
+.cal_new_event .primary_button span {
+    background-color: #edf1f3;
+}
+
 

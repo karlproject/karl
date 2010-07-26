@@ -128,7 +128,7 @@ label {
 .save-attachments a {
   font-weight: bold;
   text-decoration: underline;
-  cursor: hand;
+  cursor: pointer;
 }
 
 /** =FORMISH FORMS
@@ -159,7 +159,7 @@ input#save-state {
 /** =SHARED
 ----------------------------------------------- */
 .content {
-  width: 952px;
+  width: 950px;
   margin: 0 auto;
   padding: 0;
 }
@@ -203,6 +203,14 @@ input#save-state {
 a.context:hover,
 a.standalone:hover {
 	text-decoration: none;
+}
+button.inline {
+    float: none !important;
+    display: inline !important;
+    margin: 0 4px;
+}
+button.inline span {
+    width: auto !important;
 }
 .kscreentitle {
   margin-bottom: 0.3em;
@@ -304,8 +312,8 @@ a.standalone:hover {
   margin: 0;
 }
 .generic-portlet .portalMessage {
-  margin: 1em;
-  width: 130px;
+  margin: 1em 0;
+  width: 118px;
 }
 /* also make tag statusbox look nice */
 #tag-inputbox .statusbox-item {
@@ -385,48 +393,55 @@ ul.menubar li {
   display: inline-block;
   float: left;
   height: 18px;
-  /* no min-width here, broken in ie6 */
   position: relative;
   padding: 0;
   margin: 0;
   list-style: none;
   text-align: center;
-  color: #fff;
-  background: #639332 url('images/toolbar-separator-1x18.png') top right no-repeat scroll;
-}
-ul.menubar a,
-ul.menubar span {
-  text-decoration: none;
-  line-height: 1.6em;
-  margin: 0px;
-  padding: 0 11px;
-}
-ul.menubar a {
   color: #ffffff;
+  border-right: 1px solid #ffffff;
 }
-ul.menubar a span {
-  padding: 0;
+ul.menubar li a {
+    color: #ffffff;
+    background: #639332;
+    border-top: 1px solid #355217;
+    border-bottom: 1px solid #355217;
+    text-decoration: none;
+    line-height: 16px;
+    height: 16px;
+    margin: 0px;
+    padding: 1px 10px;
+    outline: 0;
+    font-size: 11px;
 }
+ul.menubar li a:hover {
+    background: #6b9e37;
+    text-decoration: none;
+}
+ul.menubar li a:active {
+    background: #557e2c;
+}
+ul.menubar #menubar-1 a {
+    border-left: 1px solid #355217;
+    border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+}
+ul.menubar .menubar-lastitem a {
+    border-right: 1px solid #355217;
+    border-radius: 0 5px 5px 0;
+    -moz-border-radius: 0 5px 5px 0;
+}
+/* when there is only one button */
+ul.menubar #menubar-1.menubar-lastitem a {
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+/* dropdowns */
 span.pointer {
   cursor: pointer;
 }
-ul.menubar a:visited {
-  color: white;
-}
-ul.menubar a:hover {
-  text-decoration: none;
-  background: transparent;
-  color: #2B3F17;
-}
-ul.menubar a:active {
-  color: white;
-}
-ul.menubar li.noborder a:hover { /* XXX ? */
-  background-image: none;
-}
-ul.menubar li.menubar-lastitem {
-  /* make menubar button visual separator disappear on the last item. */
-  background-image: none;
+ul.menubar a span {
+  padding: 0;
 }
 ul.karldropdown-menu {
   position: absolute;
@@ -448,6 +463,8 @@ ul.menubar ul.karldropdown-menu li {
 ul.menubar ul.karldropdown-menu li a {
   display: block;
   padding: 0;
+  border: none !important;
+  background: transparent none !important;
 }
 ul.menubar div.karldropdown-indicator {
   display: block;
@@ -502,14 +519,18 @@ a.chparent:hover {
   z-index: 100; /* to get the livesearch results *above* the content in IE */
   margin: 0px auto;
   text-align: right;
-  background: #f0f2f4 url('images/content_bg.gif') top left repeat-y;
+  background: #f0f2f4;
+  border-right: 1px solid #cecece;
+  border-left: 1px solid #cecece;
 }
 #main {
   width: 952px;
   margin: 0px auto;
   text-align: left;
+  border-right: 1px solid #cecece;
+  border-left: 1px solid #cecece;
   border-bottom: 1px solid #CECECE;
-  background: #f0f2f4 url('images/content_bg.gif') top left repeat-y;
+  background: #f0f2f4;
   padding-bottom: 3.5em;
   padding-top: 15px;
 }
@@ -572,7 +593,7 @@ ul.horListing li {
   padding-right: 0;
 }
 #header-top {
-  background: #fff url("images/gradient-top.gif") top left repeat-x;
+  background: #fff url("images/gradient-top.png") top left repeat-x;
   height: 55px;
 }
 #logo {
@@ -595,23 +616,32 @@ ul.horListing li {
 	position: relative;
 }
 ul#header-menu {
-  padding: 0 20px 0 0;
-  margin: 0;
-  list-style: none;
-  float: right;
-  width: 932px;
-  background: #f0f2f4 url('images/content_bg.gif') top left repeat-y;
+    padding: 0 20px 0 0;
+    margin: -1px 0 0;
+    list-style: none none;
+    float: right;
+    width: 915px;
 }
 ul#header-menu li {
-  padding: 0;
-  margin: 0;
-  float: right;
-  position: relative;
-  top: -1px;
-  list-style: none;
+    padding: 0;
+    margin: 0 0 0 5px;
+    float: right;
+    position: relative;
 }
-ul#header-menu img {
-  border: none;
+ul#header-menu li a {
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 10px;
+    line-height: 14px;
+    padding: 2px 27px;
+    color: #507988;
+    outline: 0;
+    background-color: #CFD5DA;
+    border-width: 0 1px 1px;
+    border-color: #bcc2c7;
+    border-style: solid;
+    border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
 }
 
 /** =SEARCHBOX
@@ -622,7 +652,7 @@ ul#header-menu img {
   margin: 10px 20px 0 0;
   padding: 0 !important;
   text-align: right;
-  width: 483px;
+  width: 486px;
 }
 #searchbox form {
   margin: 0;
@@ -643,9 +673,12 @@ input#livesearch-input {
 }
 #livesearch-button {
   float: right;
-  width: 28px;
-  height: 26px;
-  background: transparent url('images/btn-go.gif') top left no-repeat;
+  width: 26px;
+  height: 24px;
+  line-height: 24px;
+  text-transform: uppercase;
+  padding: 0;
+  margin: 0;
 }
 #searchbox .advancedSearch {
   display: block;
@@ -912,9 +945,10 @@ ul#peopledir-tabs li.selected a {
 	margin-bottom:2em;
 	font-size: 1.3em;
 }
-.deleteMessage a {
-	font-size: 0.8em;
-	text-decoration: none;
+.deleteMessage .primary_button,
+.deleteMessage .normal_button {
+    float: none !important;
+    display: inline-block;
 }
 
 /** =COMMUNITY HEADER (H1, SEARCH)
@@ -940,6 +974,8 @@ ul#peopledir-tabs li.selected a {
   margin-right: 2px;
   font-size: 11px;
   display: inline;
+  height: 19px;
+  vertical-align: baseline;
 }
 .community_view .cheader form .inp {
 	width: 15em;
@@ -1415,11 +1451,6 @@ div.search_utility_bar {
 .profileNoWrap {
   white-space: nowrap;
 }
-.rightcol {
-	float: right;
-	width: 190px;
-	margin-left: 10px;
-}
 a.rightFloatLink {
   float: right;
   text-decoration: none;
@@ -1615,9 +1646,6 @@ span.sortingArrows a img {
   margin-right: 5px;
   position: relative;
   float: left;
-}
-#popular-tags-portlet {
-	margin-top: 2em;
 }
 #popular-tags-portlet table.portlet-table {
 	margin: 0;
@@ -1899,6 +1927,84 @@ div.moderator {
 }
 .cal_buttons .cal_scope {
   float: right;
+}
+
+.cal_buttons .menubar a {
+    background-color: #F6F7F6;
+    border-top: 1px solid #bcc2c7;
+    border-bottom: 1px solid #bcc2c7;
+    color: #3A74A9;
+    font-weight: normal;
+    line-height: 18px;
+    padding-bottom: 2px;
+}
+.cal_buttons .menubar a:hover {
+    background-color: #FBFCFB;
+    color: #3A74A9;
+}
+.cal_buttons .menubar a:active {
+    background-color: #ebeced;
+    color: #3A74A9;
+}
+.cal_buttons .menubar.day-view a.day,
+.cal_buttons .menubar.week-view a.week,
+.cal_buttons .menubar.month-view a.month,
+.cal_buttons .menubar.list-view a.list {
+    background-color: #ebeced;
+    color: #000000;
+}
+.cal_buttons .menubar .firstItem a {
+    border-left: 1px solid #bcc2c7;
+    border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+}
+.cal_buttons .menubar .lastItem a {
+    border-right: 1px solid #bcc2c7;
+    border-radius: 0 5px 5px 0;
+    -moz-border-radius: 0 5px 5px 0;
+}
+.cal_buttons .menubar li {
+    border-right: 1px solid #bcc2c7;
+}
+.cal_buttons .menubar .lastItem,
+.cal_buttons .menubar .todayButton {
+    border-right: none;
+}
+.cal_buttons .menubar .todayButton a {
+    border: 1px solid #bcc2c7;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    margin-right: 5px;
+}
+.cal_buttons .menubar a.disabled,
+.cal_buttons .menubar a.disabled:hover,
+.cal_buttons .menubar a.disabled:active {
+    color: #B4B4B4;
+    cursor: default;
+    background-color: #F6F7F6;
+}
+.cal_buttons .previous span,
+.cal_buttons .next span {
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid transparent;
+    display: inline-block;
+    font-size:0;
+    height: 0;
+    position: relative;
+    top: 3px;
+    line-height: 14px;
+}
+.cal_buttons .previous span {
+    border-right: 9px solid #3A74A9;
+}
+.cal_buttons .next span {
+    border-left: 9px solid #3A74A9;
+}
+.cal_buttons .disabled .previous span {
+    border-right: 9px solid #B4B4B4;
+}
+.cal_buttons .disabled .next span {
+    border-left: 9px solid #B4B4B4;
 }
 
 
@@ -2544,27 +2650,6 @@ body .cal_hour_event .cal_event_block .time {
   margin: 0 2px;
   color: #999;
 }
-.cal_new_event a,
-.cal_new_event a:visited {
-  float: left;
-  width: 79px;
-  height: 20px;
-  line-height: 20px;
-  background: url("images/cal_buttons_new_event.png") 0 0 no-repeat;
-  font-weight: bold;
-  font-family: Arial, Verdana, sans-serif;
-  font-size: 11px;
-  text-decoration: none;
-  text-align: center;
-  color: #fff;
-}
-.cal_new_event a:hover {
-  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat;
-  text-decoration: none;
-}
-.cal_new_event a:active {
-  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat;
-}
 
 
 /** =CALENDAR SETUP
@@ -2661,16 +2746,6 @@ select.category_paths {
     margin-bottom: 35px;
 }
 
-#setup_add_layer a,
-#setup_add_cal a {
-  background-color: #639332;
-  padding: 1px 11px;
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
-  font-weight: bold;
-}
-
 /** =CALENDAR TOOLTIP
 ----------------------------------------------- */
 .tooltip {
@@ -2709,47 +2784,9 @@ select.category_paths {
 }
 
 
-/** =BUTTONS
+/** =BUTTONS see karl_ie.css for IE styles
 ----------------------------------------------- */
-.buttons .button {
-  margin-right: 7px;
-}
-.button {
-  float: left;
-  margin: 0;
-  border: none;
-  padding: 0 14px 0 0;
-  font-family: Arial, Verdana, sans-serif;
-  font-size: 12px;
-  color: #333;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  outline: none;
-}
-.button span {
-  position: relative;
-  display: block;
-  white-space: nowrap;
-  padding: 0 0 0 14px;
-}
-button:focus::-moz-focus-inner {
-  border-color: transparent !important;
-}
-button::-moz-focus-inner {
-  border: none;
-  padding: 0;
-}
 
-a.button:link,
-a.button:visited {
-  color: #333;
-}
-a.button:link span,
-a.button:visited span {
-  float: left;
-  display: inline;
-}
 
 /* primary */
 button.primary,
@@ -2774,71 +2811,58 @@ a.disabled img {
   opacity: 0.5;
 }
 
-/* primary button */
-button.primary_button,
-a.primary_button:link,
-a.primary_button:visited {
-  font-weight: bold;
-  color: #fff;
-  text-decoration: none;
+/* general styles */
+button,
+.normal_button,
+.primary_button {
+    cursor: pointer;
+    padding: 1px 10px;
+    margin: 2px;
+    height: 16px;
+    line-height: 16px;
+    float: left;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 11px;
+    text-decoration: none;
+    text-align: center;
+    text-transform: capitalize;
+}
+button {
+    line-height: 20px !important;
+    height: 20px !important;
 }
 .primary_button,
-.disabled.primary_button:hover {
-  background: url("images/button_primary_normal.png") right no-repeat;
-}
-.primary_button span,
-.disabled.primary_button:hover span {
-  height: 15px;
-  line-height: 15px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background: url("images/button_primary_normal.png") left no-repeat;
+.primary_button:visited {
+    background: #639332;
+    border: 1px solid #355217;
+    font-weight: bold;
+    color: #fff;
 }
 .primary_button:hover {
-  background: url("images/button_primary_hover.png") right no-repeat;
-}
-.primary_button:hover span {
-  background: url("images/button_primary_hover.png") left no-repeat;
+    background: #6b9e37;
+    text-decoration: none;
 }
 .primary_button:active {
-  background: url("images/button_primary_active.png") right no-repeat;
-  -ms-background-position-y: 1px; /* ie8 hack */
+    background: #557e2c;
+    outline: none;
 }
-.primary_button:active span {
-  background: url("images/button_primary_active.png") left no-repeat;
-}
-
-/* normal button */
 .normal_button,
+.normal_button:visited,
 .disabled.normal_button:hover {
-  background: url("images/button_normal.png") right no-repeat;
-}
-.normal_button span,
-.disabled.normal_button:hover span {
-  height: 15px;
-  line-height: 15px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background: url("images/button_normal.png") left no-repeat;
+  background: #ebeced;
+  border: 1px solid #b4b4b4;
+  color: #333333;
+  font-weight: normal;
 }
 .normal_button:hover {
-  background: url("images/button_hover.png") right no-repeat;
-}
-.normal_button:hover span {
-  background: url("images/button_hover.png") left no-repeat;
+  background: #f1f2f4;
+  text-decoration: none;
 }
 .normal_button:active {
-  background: url("images/button_active.png") right no-repeat;
-  -ms-background-position-y: 1px; /* ie8 hack */
-}
-.normal_button:active span {
-  background: url("images/button_active.png") left no-repeat;
-}
-
-#peopledir-opensearch-add {
-    text-align: right;
-    padding-right: 10px;
-    margin-top: 10px;
+  background: #e1e1e2;
+  outline: 0;
 }
 
 /* Admin UI Styles */
@@ -2872,6 +2896,12 @@ ul.menu li {
   padding-left: 0;
 }
 
+#peopledir-opensearch-add {
+    text-align: right;
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
 /* Support for the layout from karl.peopledir's "hcard" idea  */
 
 .peopledir-hcard .vcard .hcard-main {
@@ -2903,34 +2933,7 @@ ul.menu li {
 }
 
 .portlet-buttons {
-    margin: 5px;
-    padding: 0 3px;
-}
-
-.portlet-buttons a, .portlet-buttons a:visited {
-    cursor: hand;
-    padding-left: 0px;
-    margin: 2px;
-    width: 79px;
-    height: 20px;
-    float: left;
-    line-height: 20px;
-    background: url("images/cal_buttons_new_event.png") 0 0 no-repeat;
-    font-weight: bold;
-    font-family: Arial, Verdana, sans-serif;
-    font-size: 10px;
-    text-decoration: none;
-    text-align: center;
-    color: #fff;
-}
-
-.portlet-buttons a:hover {
-  background: url("images/cal_buttons_new_event.png") 0 -20px no-repeat;
-  text-decoration: none;
-}
-
-.portlet-buttons a:active {
-  background: url("images/cal_buttons_new_event.png") 0 -40px no-repeat;
+    margin: 5px 0;
 }
 
 #preferred_form {
@@ -2944,25 +2947,42 @@ ul.menu li {
 }
 
 /* Generic Portlet Styles */
+.rightcol {
+    float: right;
+    width: 181px;
+    margin-left: 10px;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    background-color: #f0f2f4;
+    padding: 1em 1em 0;
+}
 .generic-portlet {
-    width: 188px;
-    background-color:#fff;
-    border: 1px solid #ccc;
+    width: 159px;
+    *width: 185px;
+    background-color: #fff;
     margin: 0 0 1em;
-    padding: 0 0 1em;
+    padding: 0 10px 14px;
     overflow: hidden;
 }
 
 .generic-portlet h3 {
     text-align: center;
-    padding: 10px;
+    padding: 9px 0;
     font-size: 1.3em;
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 7px 0;
+    border-bottom: 1px dashed #cccccc;
 }
 
-.portlet-item, .portlet-help {
-    padding: 4px 10px;
+.portlet-item {
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+}
+
+.portlet-help {
+    padding: 4px 0;
 }
 
 .portlet-item a {

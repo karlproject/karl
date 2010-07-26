@@ -11,8 +11,10 @@
       item in this folder.</p>
       <p tal:condition="num_children > 1" style="color: red">Warning: There are ${num_children} 
       items in this folder.</p>
-      <p><a href="?confirm=1" class="context">ok</a>&#160;<a href="${api.here_url}"
-          class="standalone">cancel</a></p>
+      <p>
+          <a href="?confirm=1" class="primary_button"><span>ok</span></a>
+          <a href="${api.here_url}" class="normal_button"><span>cancel</span></a>
+      </p>
     </div>
 
   </div>
