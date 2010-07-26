@@ -15,6 +15,9 @@ Unreleased
 
 - Removed a redundant copy of the text_scrubber code used by mailin.
 
+- Add some preprocessing to the mailin text scrubber to find URLs and mark
+  them up as links using markdown syntax.  (LP #545420)
+
 3.38 (2010-07-09)
 -----------------
 

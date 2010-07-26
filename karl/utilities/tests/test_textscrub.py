@@ -58,6 +58,13 @@ KARL wrote:
 > A quote of some sort.
 """
 
+test_message_w_url_w_underscores = """This message contains a url:
+
+http://example.com/fi_fai_fo_fum.mp3
+
+I hope it comes out ok!
+"""
+
 class TestMailinTextScrubber(unittest.TestCase):
     def test_bad_mimetype(self):
         from karl.utilities.textscrub import text_scrubber
@@ -65,16 +72,24 @@ class TestMailinTextScrubber(unittest.TestCase):
 
     def test_no_mimetype(self, text=test_message):
         from karl.utilities.textscrub import text_scrubber
-        from karl.utilities.textscrub import REPLY_SEPARATOR
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
         self.assertEqual(expected, text_scrubber(text))
 
     def test_good_mimetype(self):
         from karl.utilities.textscrub import text_scrubber
-        from karl.utilities.textscrub import REPLY_SEPARATOR
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
         self.assertEqual(expected, text_scrubber(test_message,
                                                  mimetype="text/plain"))
+
+    def test_message_w_url_w_underscores(self):
+        from karl.utilities.textscrub import text_scrubber
+        expected = (u'<p>This message contains a url:</p>\n\n'
+                    u'<p><a href="http://example.com/fi_fai_fo_fum.mp3">'
+                    u'http://example.com/fi_fai_fo_fum.mp3</a></p>\n\n'
+                    u'<p>I hope it comes out ok!</p>\n')
+        self.assertEqual(
+            expected, text_scrubber(test_message_w_url_w_underscores)
+        )
 
     def test_gmail(self):
         self.test_no_mimetype(test_message_gmail)
@@ -87,3 +102,4 @@ class TestMailinTextScrubber(unittest.TestCase):
 
     def test_thunderbird(self):
         self.test_no_mimetype(test_message_thunderbird)
+
