@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- edited the admin right side portlets to match new portlet styles (LP #610493)
+
 - Added support for logging each query, to compare performance across
   different configurations. Keyed on the `query_log_all` parameter, defaulting
   to False. Entries will be added to `log/query/everything.log`.
