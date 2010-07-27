@@ -93,4 +93,7 @@ def mime_info(mime_type):
             'viewable': False,
         }
 
+        if mime_type.startswith('image/'):
+            info['viewable'] = True
+
     return info

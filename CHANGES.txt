@@ -26,6 +26,11 @@ Unreleased
   with 'www.'.  Also added an evolve script to normalize the websites field for
   existing profiles.  (LP #605203)
 
+- Convert non-standard mimetypes sent by Internet Explorer for jpeg and png
+  image files to their more standard equivalents.  (LP #608473)
+
+- Made all unknown image/* types viewable in default mime info.  (LP #608473)
+
 3.38 (2010-07-09)
 -----------------
 

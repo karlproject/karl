@@ -804,7 +804,14 @@ def get_upload_mimetype(fieldstorage):
     filename = fieldstorage.filename
     return get_mimetype(res, filename)
 
+# Table mapping mime types sent by IE to standard types
+ie_types = {
+    "image/x-png": "image/png",
+    "image/pjpeg": "image/jpeg",
+}
+
 def get_mimetype(res, filename):
+    res = ie_types.get(res, res)
     if res in (
             'application/x-download',
             'application/x-application',

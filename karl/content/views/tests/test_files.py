@@ -1241,6 +1241,20 @@ class TestGetUploadMimetype(unittest.TestCase):
         mimetype = self._callFUT(fieldstorage)
         self.assertEqual(mimetype, "application/x-download")
 
+    def test_fix_bad_ie_jpeg_mimetype(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = 'image/pjpeg'
+        fieldstorage.filename = 'file.jpg'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "image/jpeg")
+
+    def test_fix_bad_ie_png_mimetype(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = 'image/x-png'
+        fieldstorage.filename = 'file.png'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "image/png")
+
 from zope.interface import implements
 
 class DummyBlobFile:
