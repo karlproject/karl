@@ -3,6 +3,7 @@ from karl.utilities.broken import remove_broken_objects
 from karl.utils import find_catalog
 
 import sys
+import urllib
 
 def evolve(root):
     # Probably a fossil left over from Karl2 to Karl3 migration.  Some
@@ -14,7 +15,7 @@ def evolve(root):
             print "Converting unicode path in document map:"
             print "\t%s" % path.encode('UTF-8')
             del docmap.address_to_docid[path]
-            path = path.encode('UTF-8')
+            path = urllib.quote(path.encode('UTF-8'))
             docmap.address_to_docid[path] = docid
             docmap.docid_to_address[docid] = path
 
