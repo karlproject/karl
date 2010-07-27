@@ -18,6 +18,12 @@ Unreleased
 - Add some preprocessing to the mailin text scrubber to find URLs and mark
   them up as links using markdown syntax.  (LP #545420)
 
+- Reproduced the websites normalization performed when editing a profile via
+  the UI in the cico XML import, so that profile websites data downloaded from
+  GSA will also be normalized by prepending 'http://' to websites which begin
+  with 'www.'.  Also added an evolve script to normalize the websites field for
+  existing profiles.  (LP #605203)
+
 3.38 (2010-07-09)
 -----------------
 

@@ -154,7 +154,11 @@ class UserProfileImporter(object):
                 value = element.text
                 if value is None:
                     value = ''
-                profile.websites = value.strip().split()
+                websites = value.strip().split()
+                for i in xrange(len(websites)):
+                    if websites[i].startswith('www.'):
+                        websites[i] = 'http://' + websites[i]
+                profile.websites = tuple(websites)
 
             elif attr in ('offices', 'entities', 'departments'):
                 self._pop_category_section(profile, element, attr)
