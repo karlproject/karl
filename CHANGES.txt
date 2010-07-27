@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- fixed add tag button on edit screen for IE8 (LP #610549)
+
 - edited the admin right side portlets to match new portlet styles (LP #610493)
 
 - Added support for logging each query, to compare performance across
