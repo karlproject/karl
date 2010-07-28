@@ -230,6 +230,12 @@ def get_creator(object, default):
         return default
     return creator
 
+def get_modified_by(object, default):
+    userid = getattr(object, 'modified_by', None)
+    if userid is None:
+        return default
+    return userid
+
 def get_email(object, default):
     email = getattr(object, 'email', None)
     if email is None:
@@ -306,6 +312,7 @@ class Site(Folder):
             'publication_date': CatalogFieldIndex(get_publication_date),
             'mimetype': CatalogFieldIndex(get_mimetype),
             'creator': CatalogFieldIndex(get_creator),
+            'modified_by': CatalogFieldIndex(get_modified_by),
             'email': CatalogFieldIndex(get_email),
             'tags': TagIndex(self),
             'lastfirst': CatalogFieldIndex(get_lastfirst),
