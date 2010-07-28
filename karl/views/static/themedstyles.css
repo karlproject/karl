@@ -1727,6 +1727,9 @@ ul.tagUsersList li {
   width: 75px;
   margin-right: 30px;
 }
+.profile_page_body .portraid img {
+    margin-right: 0;
+}
 .profileDetails {
  	margin-bottom: 1em;
 	float: left;

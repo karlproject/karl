@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- removed unnecessary margin from profile image, so the middle content
+  doesn't get pushed down (LP #610666)
+
 - fixed add tag button on edit screen for IE8 (LP #610549)
 
 - edited the admin right side portlets to match new portlet styles (LP #610493)
