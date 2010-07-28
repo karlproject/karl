@@ -10,7 +10,7 @@ def evolve(root):
     # addresses are in the catalog document_map as unicode objects, when they
     # should be UTF-8 encoded strings.
     docmap = find_catalog(root).document_map
-    for docid, path in docmap.docid_to_address.items():
+    for docid, path in list(docmap.docid_to_address.items()):
         if isinstance(path, unicode):
             print "Converting unicode path in document map:"
             print "\t%s" % path.encode('UTF-8')

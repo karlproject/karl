@@ -29,15 +29,21 @@ def remove_broken_objects(root, out=None):
     from the db before their classes were removed from the code.  Somehow or
     another, though, we've wound up with obsolete objects outliving
     """
+    to_remove = []
     for obj, path, container in _traverse(root):
         if isinstance(obj, Broken):
             if out is not None:
                 print >>out, 'Removing broken object:', '/'.join(path)
                 name = path[-1]
-                data = dict(container.data.items())
-                del data[name]
-                container.data = OOBTree(data)
-                container._num_objects = Length(len(data))
+                # avoid mutating tree while traversing it
+                to_remove.append((container, name))
+
+    # Delayed removal
+    for container, name in to_remove:
+        data = dict(container.data.items())
+        del data[name]
+        container.data = OOBTree(data)
+        container._num_objects = Length(len(data))
 
 def prune_catalog(root, out=None):
     """
@@ -46,7 +52,7 @@ def prune_catalog(root, out=None):
     the catalog of dead records.
     """
     catalog = find_catalog(root)
-    for path, docid in catalog.document_map.address_to_docid.items():
+    for path, docid in list(catalog.document_map.address_to_docid.items()):
         try:
             model = find_model(root, path)
         except KeyError:
