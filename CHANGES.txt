@@ -38,6 +38,8 @@ Unreleased
 
 - Added a utility and console script for renaming users. (LP #606339)
 
+- Removed link to __error_log__ from admin ui.  (LP #581949)
+
 3.38 (2010-07-09)
 -----------------
 

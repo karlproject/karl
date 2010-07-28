@@ -50,16 +50,17 @@
               </a>
           </div>
         </div>
-        <div class="generic-portlet">
+        <div class="generic-portlet"
+             tal:condition="api.statistics_view_enabled or
+                            api.syslog_view_enabled or
+                            api.error_monitoring or
+                            api.has_logs">
           <h3>Logs / Analytics</h3>
           <div class="portlet-item" tal:condition="api.statistics_view_enabled">
             <a href="${api.app_url}/statistics.html">Statistics</a>
           </div>
           <div class="portlet-item" tal:condition="api.syslog_view_enabled">
             <a href="${api.app_url}/syslog.html">Syslog</a>
-          </div>
-          <div class="portlet-item">
-            <a href="${api.app_url}/__error_log__">Error Log</a>
           </div>
           <div class="portlet-item" tal:condition="api.error_monitoring">
             <a href="${api.app_url}/error_monitor.html">Error Monitor</a>
