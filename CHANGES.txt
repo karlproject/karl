@@ -36,6 +36,8 @@ Unreleased
 
 - Made all unknown image/* types viewable in default mime info.  (LP #608473)
 
+- Added a utility and console script for renaming users. (LP #606339)
+
 3.38 (2010-07-09)
 -----------------
 
