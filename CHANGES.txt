@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- reduced width on login username input for IE6, so it doesn't
+  fall to the next line.  Set margin on surrounding field as
+  !important, because elements were jumping after focus was moved
+  away (LP #611017)
+
 - removed unnecessary margin from profile image, so the middle content
   doesn't get pushed down (LP #610666)
 

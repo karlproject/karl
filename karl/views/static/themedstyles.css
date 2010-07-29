@@ -1501,7 +1501,7 @@ img#login-gradient {
   padding: 28px 110px 40px;
 }
 #inner .field {
-  margin: 1em 0 1.5em;
+  margin: 1em 0 1.5em !important;
 }
 
 body#login-wrapper #inner h2 {
