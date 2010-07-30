@@ -205,6 +205,11 @@ def main2(argv=sys.argv[1:]):
             if p_jar is not None:
                 # Attempt to fix memory leak
                 p_jar.db().cacheMinimize()
+
+        except:
+            transaction.abort()
+            raise
+
         finally:
             closer()
             runner.close()
