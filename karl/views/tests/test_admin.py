@@ -1006,10 +1006,11 @@ class ErrorMonitorBase:
         self.site = testing.DummyModel()
 
         from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings(
-            error_monitor_dir=tmpdir,
-            error_monitor_subsystems=["blonde", "red", "head"],
-        )
+        settings = karltesting.DummySettings(**{
+            'error_monitor_dir': tmpdir,
+            'error_monitor_subsystems': ["blonde", "red", "head"],
+            'postoffice.zodb_uri': 'zeo://localhost:9002',
+            'postoffice.queue': 'queue'})
         testing.registerUtility(settings, ISettings)
         testing.registerDummyRenderer(
             'karl.views:templates/admin/menu.pt')
@@ -1080,6 +1081,12 @@ class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
 
 class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
+    def setUp(self):
+        super(TestErrorMonitorStatusView, self).setUp()
+
+        from karl.views import admin
+        self.queue = DummyPostofficeQueue()
+        admin.open_queue = self.queue
 
     def call_fut(self):
         from karl.views.admin import error_monitor_status_view
@@ -1087,17 +1094,29 @@ class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
         return error_monitor_status_view(self.site, request)
 
     def test_all_ok(self):
+        self.queue._msgs = []
         body = self.call_fut().body
         self.assertEqual(body, "blonde: OK\n"
                                "red: OK\n"
-                               "head: OK\n")
+                               "head: OK\n"
+                               "postoffice quarantine: OK\n")
 
     def test_bad_head(self):
+        self.queue._msgs = []
         self.log_error('head', 'foo')
         body = self.call_fut().body
         self.assertEqual(body, "blonde: OK\n"
                                "red: OK\n"
-                               "head: ERROR\n")
+                               "head: ERROR\n"
+                               "postoffice quarantine: OK\n")
+
+    def test_bad_postoffice_queue(self):
+        body = self.call_fut().body
+        self.assertEqual(body, "blonde: OK\n"
+                               "red: OK\n"
+                               "head: OK\n"
+                               "postoffice quarantine: ERROR\n")
+
 
 class TestPostofficeQuarantineView(unittest.TestCase):
     def setUp(self):

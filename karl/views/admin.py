@@ -672,6 +672,13 @@ def error_monitor_status_view(context, request):
         else:
             print >>buf, '%s: OK' % subsystem
 
+    # Tack on mailin quarantine status while we're at it
+    queue, closer = _get_postoffice_queue(request.context)
+    if queue.count_quarantined_messages() == 0:
+        print >>buf, 'postoffice quarantine: OK'
+    else:
+        print >>buf, 'postoffice quarantine: ERROR'
+
     return Response(buf.getvalue(), content_type='text/plain')
 
 _mailin_monitor_app = None

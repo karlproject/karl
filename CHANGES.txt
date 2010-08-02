@@ -9,6 +9,9 @@ Unreleased
 
 - IE8 button display fixes (LP #610549)
 
+- Merged status views for error monitor and postoffice quarantine, for easier
+  monitoring by SFUP.
+
 3.39 (2010-07-29)
 
 -----------------
