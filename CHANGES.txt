@@ -4,8 +4,14 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed a bug in mailin where we were trying to decode headers twice, once in
+  repoze.postoffice, and then once again in our processor.
+
 - IE8 button display fixes (LP #610549)
 
+3.39 (2010-07-29)
+
+-----------------
 - reduced width on login username input for IE6, so it doesn't
   fall to the next line.  Set margin on surrounding field as
   !important, because elements were jumping after focus was moved

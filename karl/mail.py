@@ -83,6 +83,10 @@ def decode_header(value):
     if value is None:
         return None
 
+    if isinstance(value, unicode):
+        # already decoded, apparently
+        return value
+
     parts = []
     for part, encoding in stdlib_decode_header(value):
         if encoding is not None:

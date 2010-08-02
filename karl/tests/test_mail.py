@@ -67,3 +67,9 @@ class TestMIMEMultipPart(TestMessage):
         from karl.mail import MIMEMultipart as target
         return target
 
+class Test_decode_header(unittest.TestCase):
+    def test_already_decoded(self):
+        from karl.mail import decode_header as fut
+        s = u"Non c'\xe9 realt\xe0, c'\xe8 solo superpollo!"
+        self.assertEqual(fut(s), s)
+
