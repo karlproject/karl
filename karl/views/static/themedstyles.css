@@ -947,8 +947,12 @@ ul#peopledir-tabs li.selected a {
 }
 .deleteMessage .primary_button,
 .deleteMessage .normal_button {
-    float: none !important;
-    display: inline-block;
+    float: left;
+    display: block;
+}
+
+.deleteMessage .primary_button {
+    margin-left: 280px;
 }
 
 /** =COMMUNITY HEADER (H1, SEARCH)

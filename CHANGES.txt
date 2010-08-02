@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- IE8 button display fixes (LP #610549)
+
 - reduced width on login username input for IE6, so it doesn't
   fall to the next line.  Set margin on surrounding field as
   !important, because elements were jumping after focus was moved
