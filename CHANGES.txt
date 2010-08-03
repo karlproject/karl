@@ -2,6 +2,11 @@ karl package Changelog
 ======================
 
 Unreleased
+-----------
+
+
+3.40 (2010-08-03)
+
 ----------
 
 - Fixed a bug in mailin where we were trying to decode headers twice, once in
