@@ -799,7 +799,7 @@ class DefaultLayoutProvider(object):
 
     @property
     def intranet_layout(self):
-        layout = get_template('karl.content.views:templates/generic_layout.pt')
+        layout = get_template('karl.content.views:templates/intranet_layout.pt')
         intranet = find_interface(self.context, IIntranet)
         if intranet:
             layout.navigation = intranet.navigation
