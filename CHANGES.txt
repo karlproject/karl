@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 -----------
 
+- Fixed missing asterisk typo in ProfileEditFormController.handle_submit.
+  (LP #612503)
 
 3.40 (2010-08-03)
 

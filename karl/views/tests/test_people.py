@@ -174,6 +174,25 @@ class TestEditProfileFormController(unittest.TestCase):
         self.failUnless('photo' in self.context)
         self.assertEqual(self.context['photo'].data, one_pixel_jpeg)
 
+    def test_handle_submit_bad_upload(self):
+        from karl.content.interfaces import ICommunityFile
+        from karl.testing import DummyUpload
+        from repoze.lemonade.interfaces import IContentFactory
+        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
+                                IContentFactory)
+        controller = self._makeOne(self.context, self.request)
+        converted = {'photo': DummyUpload(filename='test.jpg',
+                                         mimetype='x-application/not a jpeg',
+                                         data='not a jpeg')}
+        # first set up the simple fields to submit
+        for fieldname, value in profile_data.items():
+            if fieldname == 'photo':
+                continue
+            converted[fieldname] = value
+
+        from repoze.bfg.formish import ValidationError
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
     def test_handle_submit_w_websites_no_scheme(self):
         controller = self._makeOne(self.context, self.request)
         # make sure the www. URLs get prepended
@@ -1233,8 +1252,6 @@ class TestDeleteProfileView(unittest.TestCase):
         self.assertEqual(users.removed_users, ['userid'])
 
 class DummyImageFile(object):
-    is_image = True
-
     def __init__(self, title=None, stream=None, mimetype=None, filename=None,
                  creator=None):
         self.title = title
@@ -1244,9 +1261,9 @@ class DummyImageFile(object):
         else:
             self.data = one_pixel_jpeg
         self.size = len(self.data)
-        self.mimetype = mimetype
         self.filename= filename
         self.creator = creator
+        self.is_image = mimetype != 'x-application/not a jpeg'
 
 one_pixel_jpeg = [
 0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01,

@@ -230,7 +230,7 @@ class EditProfileFormController(object):
         try:
             handle_photo_upload(context, converted)
         except Invalid, e:
-            raise ValidationError(*e.error_dict)
+            raise ValidationError(**e.error_dict)
         self.filestore.clear()
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
