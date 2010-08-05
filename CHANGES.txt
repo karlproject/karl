@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added a community index to the tagging enginge in order to speed up the
+  community tags portlet when first loaded. On local machine loading of
+  community tags portlet with OSI database went from 40s to 3ms.
 
 3.41 (2010-08-04)
 -----------

@@ -278,6 +278,14 @@ class Tags(Persistent):
                 self._name_to_tagids[tagObj.name] = IOBTree.IOSet((id,))
             else:
                 ids.insert(id)
+
+            ids = self._community_to_tagids.get(tagObj.community)
+            if ids is None:
+                self._community_to_tagids[tagObj.community] = \
+                    IOBTree.IOSet((id,))
+            else:
+                ids.insert(id)
+
         del_tag_ids = old_tag_ids.difference(add_tag_ids)
         self._delTags(del_tag_ids)
 
@@ -349,10 +357,12 @@ class Tags(Persistent):
     def _reset(self):
         # Map tagid to tag object
         self._tagid_to_obj = IOBTree.IOBTree()
+
         # Indexes
         self._user_to_tagids = OOBTree.OOBTree()
         self._item_to_tagids = IOBTree.IOBTree()
         self._name_to_tagids = OOBTree.OOBTree()
+        self._community_to_tagids = OOBTree.OOBTree()
 
     def _generateId(self):
         """Generate an id which is not yet taken.
@@ -376,16 +386,22 @@ class Tags(Persistent):
         return uid
 
     def _getTagIds(self, items=None, users=None, tags=None, community=None):
-        if items is None and users is None and tags is None:
+        if (items is None and users is None and
+            tags is None and community is None):
             # get them all
             result = set()
             for v in self._item_to_tagids.values():
                 result.update(v)
         else:
+            if community is not None:
+                communities = [community]
+            else:
+                communities = None
             result = None
             for seq, bt in ((items, self._item_to_tagids),
                             (users, self._user_to_tagids),
-                            (tags, self._name_to_tagids)):
+                            (tags, self._name_to_tagids),
+                            (communities, self._community_to_tagids)):
                 res = set()
                 if seq is not None:
                     for item in seq:
@@ -394,10 +410,7 @@ class Tags(Persistent):
                         result = result.intersection(res)
                     else:
                         result = res
-        if community is None:
-            return result
-        return set([x for x in result
-                        if self._tagid_to_obj[x].community == community])
+        return result
 
     def _delTags(self, del_tag_ids):
         """deletes tags in iterable"""
@@ -414,6 +427,11 @@ class Tags(Persistent):
             self._name_to_tagids[tagObj.name].remove(id)
             if not len(self._name_to_tagids[tagObj.name]):
                 del self._name_to_tagids[tagObj.name]
+
+            self._community_to_tagids[tagObj.community].remove(id)
+            if not len(self._community_to_tagids[tagObj.community]):
+                del self._community_to_tagids[tagObj.community]
+
             del self._tagid_to_obj[id]
 
 

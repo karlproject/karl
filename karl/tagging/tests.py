@@ -757,6 +757,19 @@ class TagsTests(unittest.TestCase):
         self.failUnless(13 in engine.getItems())
         self.failUnless(42 in engine.getItems())
 
+    def test_delete_all(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        self._populate(engine)
+
+        count = engine.delete(item=42)
+        count += engine.delete(item=13)
+
+        self.assertEqual(count, 5)
+
+        self.failIf(42 in engine.getItems())
+        self.failIf(13 in engine.getItems())
+
     def test_delete_nonesuch(self):
         engine = self._makeOne()
         self._populate(engine)
@@ -917,7 +930,7 @@ class TagCommunityFinderTests(unittest.TestCase):
 
 
 class TagIndexTests(unittest.TestCase):
-    
+
     def _getTargetClass(self):
         from karl.tagging.index import TagIndex
         return TagIndex
