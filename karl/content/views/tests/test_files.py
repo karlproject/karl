@@ -451,6 +451,29 @@ class TestAddFileFormController(unittest.TestCase):
         # attempt a duplicate upload
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
+    def test_handle_submit_filename_with_only_symbols_and_smartquote(self):
+        from repoze.bfg.formish import ValidationError
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
+        self._register()
+
+        testing.registerDummySecurityPolicy('userid')
+        context = self._makeContext()
+        context.catalog = DummyCatalog()
+        from schemaish.type import File as SchemaFile
+        fs = SchemaFile(None, None, u'??\u2019')
+        request = self._makeRequest()
+        converted = {
+            'file': fs,
+            'title': 'a title',
+            'sendalert': '0',
+            'security_state': 'private',
+            'tags':[],
+            }
+        registerContentFactory(DummyCommunityFile, ICommunityFile)
+        controller = self._makeOne(context, request)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+
     def test_handle_submit_full_path_filename(self):
         from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile

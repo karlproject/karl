@@ -8,6 +8,10 @@ Unreleased
   community tags portlet when first loaded. On local machine loading of
   community tags portlet with OSI database went from 40s to 3ms.
 
+- Wrote an evolve script to find content that is created or modified by a user
+  no longer in the system and move that content over to a 'former user'
+  profile.  The 'former user' profile is created if and only if it is needed.
+
 3.41 (2010-08-04)
 -----------
 
@@ -26,7 +30,7 @@ Unreleased
 - Merged status views for error monitor and postoffice quarantine, for easier
   monitoring by SFUP.
 
-- Fixed bug in default layout provider: wrong template being called for 
+- Fixed bug in default layout provider: wrong template being called for
   intranet layout. (LP #612576)
 
 3.39 (2010-07-29)
