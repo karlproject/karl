@@ -12,6 +12,10 @@ Unreleased
   no longer in the system and move that content over to a 'former user'
   profile.  The 'former user' profile is created if and only if it is needed.
 
+- Improved search performance by not using the catalog cache for very large
+  result sets, as the overhead in marshalling the result set in order to cache
+  it is much greater than the overhead of running the search.  (LP #6120123)
+
 3.41 (2010-08-04)
 -----------
 

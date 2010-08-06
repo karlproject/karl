@@ -20,6 +20,7 @@ from karl.utils import find_site
 
 from BTrees.Length import Length
 
+LARGE_RESULT_SET = 500
 
 class CachingCatalog(Catalog):
     implements(ICatalog)
@@ -90,6 +91,16 @@ class CachingCatalog(Catalog):
 
         if cache.get(key) is None:
             num, docids = self._search(*arg, **kw)
+
+            # We don't cache large result sets because the time it takes to
+            # unroll the result set turns out to be far more time than it
+            # takes to run the search.  In a particular instance using OSI's
+            # catalog a search that took 0.015s but returned nearly N results
+            # took over 50s to unroll the result set for caching, significantly
+            # slowing search performance.
+            if num > LARGE_RESULT_SET:
+                return num, docids
+
             # we need to unroll here; a btree-based structure may have
             # a reference to its connection
             docids = list(docids)
