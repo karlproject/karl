@@ -94,10 +94,10 @@ class CachingCatalog(Catalog):
 
             # We don't cache large result sets because the time it takes to
             # unroll the result set turns out to be far more time than it
-            # takes to run the search.  In a particular instance using OSI's
-            # catalog a search that took 0.015s but returned nearly N results
-            # took over 50s to unroll the result set for caching, significantly
-            # slowing search performance.
+            # takes to run the search. In a particular instance using OSI's
+            # catalog a search that took 0.015s but returned nearly 35,295
+            # results took over 50s to unroll the result set for caching,
+            # significantly slowing search performance.
             if num > LARGE_RESULT_SET:
                 return num, docids
 
