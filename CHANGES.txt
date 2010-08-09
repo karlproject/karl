@@ -16,6 +16,9 @@ Unreleased
   result sets, as the overhead in marshalling the result set in order to cache
   it is much greater than the overhead of running the search.  (LP #6120123)
 
+- Added postoffice quarantine to error monitor admin ui for parallelism with
+  the status view for monitoring.  (LP #613579)
+
 3.41 (2010-08-04)
 -----------
 
