@@ -631,6 +631,20 @@ def error_monitor_view(context, request):
             error_monitor_dir, subsystem
         )
 
+    # Tack on mailin quarantine status while we're at it
+    use_postoffice = not not get_setting(
+        context, 'postoffice.zodb_uri', False)
+    if  use_postoffice:
+        name = 'postoffice quarantine'
+        urls[name] = '%s/po_quarantine.html' % request.application_url
+        queue, closer = _get_postoffice_queue(request.context)
+        if queue.count_quarantined_messages() > 0:
+            states[name] = ['Messages in quarantine.']
+        else:
+            states[name] = []
+        subsystems = list(subsystems)
+        subsystems.append(name)
+
     return dict(
         api=AdminTemplateAPI(context, request),
         menu=_menu_macro(),
@@ -673,11 +687,14 @@ def error_monitor_status_view(context, request):
             print >>buf, '%s: OK' % subsystem
 
     # Tack on mailin quarantine status while we're at it
-    queue, closer = _get_postoffice_queue(request.context)
-    if queue.count_quarantined_messages() == 0:
-        print >>buf, 'postoffice quarantine: OK'
-    else:
-        print >>buf, 'postoffice quarantine: ERROR'
+    use_postoffice = not not get_setting(
+        context, 'postoffice.zodb_uri', False)
+    if  use_postoffice:
+        queue, closer = _get_postoffice_queue(request.context)
+        if queue.count_quarantined_messages() == 0:
+            print >>buf, 'postoffice quarantine: OK'
+        else:
+            print >>buf, 'postoffice quarantine: ERROR'
 
     return Response(buf.getvalue(), content_type='text/plain')
 

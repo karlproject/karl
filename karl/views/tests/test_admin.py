@@ -1015,6 +1015,10 @@ class ErrorMonitorBase:
         testing.registerDummyRenderer(
             'karl.views:templates/admin/menu.pt')
 
+        from karl.views import admin
+        self.queue = DummyPostofficeQueue()
+        admin.open_queue = self.queue
+
     def log_error(self, subsystem, message):
         import os
         with open(os.path.join(self.tmpdir, subsystem), 'ab') as f:
@@ -1036,19 +1040,33 @@ class TestErrorMonitorView(ErrorMonitorBase, unittest.TestCase):
         return error_monitor_view(self.site, request)
 
     def test_all_ok(self):
+        self.queue._msgs = []
         result = self.call_fut()
-        self.assertEqual(result['subsystems'], ["blonde", "red", "head"])
+        self.assertEqual(result['subsystems'],
+                         ["blonde", "red", "head", "postoffice quarantine"])
         self.assertEqual(result['states'],
-                         {"blonde": [], "red": [], "head": []})
+                         {"blonde": [], "red": [], "head": [],
+                          "postoffice quarantine": []})
         self.assertEqual(result['urls']['blonde'],
             "http://example.com/error_monitor_subsystem.html?subsystem=blonde")
+        self.assertEqual(result['urls']['postoffice quarantine'],
+            "http://example.com/po_quarantine.html")
 
     def test_bad_head(self):
+        self.queue._msgs = []
         self.log_error('head', 'Testing...')
         result = self.call_fut()
         self.assertEqual(result['states'],
-                         {"blonde": [], "red": [], "head": ['Testing...']})
+                         {"blonde": [], "red": [], "head": ['Testing...'],
+                          "postoffice quarantine": []})
 
+
+    def test_messages_in_quarantine(self):
+        result = self.call_fut()
+        self.assertEqual(result['subsystems'],
+                         ["blonde", "red", "head", "postoffice quarantine"])
+        state = result['states']['postoffice quarantine']
+        self.failUnless(not not state, state)
 
 class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
@@ -1081,12 +1099,6 @@ class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
 
 class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
-    def setUp(self):
-        super(TestErrorMonitorStatusView, self).setUp()
-
-        from karl.views import admin
-        self.queue = DummyPostofficeQueue()
-        admin.open_queue = self.queue
 
     def call_fut(self):
         from karl.views.admin import error_monitor_status_view
