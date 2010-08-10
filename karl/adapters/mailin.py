@@ -232,6 +232,12 @@ class MailinDispatcher(object):
             filename = part.get_filename()
             mimetype = part.get_content_type()
             data = part.get_payload(decode=1)
+            if not data:
+                # Parts with no payload are containers, for example, the
+                # message part of a forwarded message, which in turn contains
+                # text parts and possibly its own attachments.
+                continue
+
             if mimetype.startswith('text/'):
                 charset = part.get_content_charset() or 'utf-8'
                 try:
