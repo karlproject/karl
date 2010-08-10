@@ -13,7 +13,7 @@ def evolve(context):
     tag_objects = tags._tagid_to_obj.items()
     n_tags = len(tag_objects)
     for count, (id, tag) in enumerate(tag_objects):
-        print "Updating %d/%d" % (count, n_tags), tag.name
+        print "Updating %d/%d" % (count, n_tags), tag.name.encode('utf8')
         ids = index.get(tag.community)
         if ids is None:
             index[tag.community] = IOBTree.IOSet((id,))
