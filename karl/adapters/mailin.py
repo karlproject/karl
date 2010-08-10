@@ -225,8 +225,7 @@ class MailinDispatcher(object):
     def crackPayload(self, message):
         """ See IMailinDispatcher.
         """
-        text = None
-        text_mimetype = None
+        texts = []
         attachments = []
 
         for part in message.walk():
@@ -248,15 +247,17 @@ class MailinDispatcher(object):
 
             if filename is not None:
                 attachments.append((filename, mimetype, data))
-            elif text is None and mimetype.startswith('text/plain'):
-                text = data
+            elif mimetype.startswith('text/plain'):
+                texts.append(data)
                 text_mimetype = mimetype
 
-        if text is not None and self.text_scrubber is not None:
-            scrubber = getUtility(IMailinTextScrubber, self.text_scrubber)
-            text = scrubber(text, text_mimetype)
+        if texts:
+            text = '\n\n'.join(texts)
+            if self.text_scrubber is not None:
+                scrubber = getUtility(IMailinTextScrubber, self.text_scrubber)
+                text = scrubber(text, 'text/plain')
 
-        if text is None:
+        else:
             text = ("Message body not found.  Incoming email message must "
                     "contain a plain text representation.  HTML-only email "
                     "is not supported.")

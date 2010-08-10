@@ -521,6 +521,43 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][0], 'cnlybnq')
         self.assertEqual(_called_with[0][1], 'text/plain')
 
+    def test_crackPayload_w_multiple_text(self):
+        from repoze.bfg.testing import registerUtility
+        from karl.utilities.interfaces import IMailinTextScrubber
+        _called_with = []
+        def _fooScrubber(text, text_mimetype=None):
+            _called_with.append((text, text_mimetype))
+            return text.upper()
+        registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
+        mailin = self._makeOne()
+        mailin.text_scrubber = 'foo'
+        message = DummyMessage()
+        filepart = DummyMessage()
+        filepart.filename = 'file1.bin'
+        filepart.payload = '0123456789ABCDEF'
+        filepart.content_type = 'application/octet-stream'
+        textpart = DummyMessage()
+        textpart.payload = 'payload'
+        textpart.charset = 'rot13'
+        textpart.content_type = 'text/plain'
+        textpart2 = DummyMessage()
+        textpart2.payload = 'howdy folks.\n'
+        textpart2.charset = 'ascii'
+        textpart2.content_type = 'text/plain'
+        message.payload = (textpart, filepart, textpart2)
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'CNLYBNQ\n\nHOWDY FOLKS.\n')
+        self.assertEqual(len(attachments), 1)
+        filename, mimetype, data = attachments[0]
+        self.assertEqual(filename, 'file1.bin')
+        self.assertEqual(mimetype, 'application/octet-stream')
+        self.assertEqual(data, '0123456789ABCDEF')
+        self.assertEqual(len(_called_with), 1)
+        self.assertEqual(_called_with[0][0], 'cnlybnq\n\nhowdy folks.\n')
+        self.assertEqual(_called_with[0][1], 'text/plain')
+
     def test_crackPayload_bad_encoding(self):
         mailin = self._makeOne()
         message = DummyMessage()

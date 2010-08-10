@@ -19,6 +19,10 @@ Unreleased
 - Added postoffice quarantine to error monitor admin ui for parallelism with
   the status view for monitoring.  (LP #613579)
 
+- Mailin now concatenates all 'text/plain' message parts when constructing the
+  document body.  Previously only the first 'text/plain' message part was used.
+  This is per discussion with OSI about including forwarded messages in mailin.
+
 3.41 (2010-08-04)
 -----------
 
