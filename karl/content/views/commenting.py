@@ -50,6 +50,7 @@ from karl.models.interfaces import IComment
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForumTopic
 from karl.content.views.utils import extract_description
+from karl.content.views.utils import get_show_sendalert
 from karl.content.views.utils import upload_attachments
 from karl.content.views.interfaces import IBylineInfo
 from karl.views.forms.filestore import get_filestore
@@ -124,15 +125,19 @@ class AddCommentFormController(object):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'comment')
+        self.show_sendalert = get_show_sendalert(context, request)
 
     def form_defaults(self):
-        return {'sendalert': True}
+        if self.show_sendalert:
+            return {'sendalert': True}
+        return {}
 
     def form_fields(self):
         fields = [('add_comment', add_comment_field),
                   ('attachments', attachments_field),
-                  ('sendalert', sendalert_field),
                   ]
+        if self.show_sendalert:
+            fields.append(('sendalert', sendalert_field))
         return fields
 
     def form_widgets(self, fields):
@@ -141,8 +146,9 @@ class AddCommentFormController(object):
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
-            'sendalert': karlwidgets.SendAlertCheckbox(),
             }
+        if self.show_sendalert:
+            widgets['sendalert'] = karlwidgets.SendAlertCheckbox()
         return widgets
 
     def __call__(self):
@@ -180,7 +186,7 @@ class AddCommentFormController(object):
         relocate_temp_images(comment, request)
 
         blogentry = find_interface(context, IBlogEntry)
-        if converted['sendalert']:
+        if converted.get('sendalert'):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(comment, request)
 

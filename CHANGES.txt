@@ -23,6 +23,9 @@ Unreleased
   document body.  Previously only the first 'text/plain' message part was used.
   This is per discussion with OSI about including forwarded messages in mailin.
 
+- Updated the 'add comment' form to respect the IShowSendalert adapter.
+  (LP #602889)
+
 3.41 (2010-08-04)
 -----------
 

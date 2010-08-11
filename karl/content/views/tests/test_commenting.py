@@ -52,6 +52,16 @@ class AddCommentFormControllerTests(unittest.TestCase):
                                 (IComment, IProfile, IRequest),
                                 IAlert)
 
+        # Register IShowSendAlert adapter
+        self.show_sendalert = True
+        from karl.content.views.interfaces import IShowSendalert
+        class DummyShowSendalert(object):
+            def __init__(myself, context, request):
+                myself.show_sendalert = self.show_sendalert
+
+        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                IShowSendalert)
+
         # Create dummy site skel
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
@@ -91,12 +101,26 @@ class AddCommentFormControllerTests(unittest.TestCase):
         defaults = controller.form_defaults()
         self.failUnless('sendalert' in defaults and defaults['sendalert'])
 
+    def test_form_defaults_wo_sendalert(self):
+        self.show_sendalert = False
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults, {})
+
     def test_form_fields(self):
         controller = self._makeOne(self.context, self.request)
         fields = dict(controller.form_fields())
         self.failUnless('add_comment' in fields)
         self.failUnless('attachments' in fields)
         self.failUnless('sendalert' in fields)
+
+    def test_form_fields_wo_sendalert(self):
+        self.show_sendalert = False
+        controller = self._makeOne(self.context, self.request)
+        fields = dict(controller.form_fields())
+        self.failUnless('add_comment' in fields)
+        self.failUnless('attachments' in fields)
+        self.failIf('sendalert' in fields)
 
     def test_form_widgets(self):
         controller = self._makeOne(self.context, self.request)
@@ -105,6 +129,15 @@ class AddCommentFormControllerTests(unittest.TestCase):
         self.failUnless('attachments' in widgets)
         self.failUnless('attachments.*' in widgets)
         self.failUnless('sendalert' in widgets)
+
+    def test_form_widgets_wo_sendalert(self):
+        self.show_sendalert = False
+        controller = self._makeOne(self.context, self.request)
+        widgets = controller.form_widgets({})
+        self.failUnless('add_comment' in widgets)
+        self.failUnless('attachments' in widgets)
+        self.failUnless('attachments.*' in widgets)
+        self.failIf('sendalert' in widgets)
 
     def test___call__(self):
         controller = self._makeOne(self.context, self.request)
