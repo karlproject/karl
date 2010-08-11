@@ -24,7 +24,6 @@ from zope.interface import alsoProvides
 from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
-from repoze.bfg.testing import registerAdapter
 
 from karl.content.interfaces import IBlogEntry
 from karl.models.interfaces import IComment

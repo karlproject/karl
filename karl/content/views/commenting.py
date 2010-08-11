@@ -25,7 +25,6 @@ from zope.component import getMultiAdapter
 from zope.component import queryUtility
 
 from schemaish.type import File as SchemaFile
-import formish
 import schemaish
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
