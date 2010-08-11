@@ -45,7 +45,6 @@ You are nice.
   Sent: Tuesday, March 24, 2009 5:00 PM
   Subject: [Staff 8 Test] Email Alert Test
 
-
   A quote of some sort.
   """
 
@@ -70,16 +69,17 @@ class TestMailinTextScrubber(unittest.TestCase):
         from karl.utilities.textscrub import text_scrubber
         self.assertRaises(Exception, text_scrubber, "TEXT", "text/html")
 
-    def test_no_mimetype(self, text=test_message):
+    def test_no_mimetype(self, text=test_message, is_reply=True):
         from karl.utilities.textscrub import text_scrubber
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
-        self.assertEqual(expected, text_scrubber(text))
+        self.assertEqual(expected, text_scrubber(text, is_reply=True))
 
-    def test_good_mimetype(self):
+    def test_good_mimetype_reply(self):
         from karl.utilities.textscrub import text_scrubber
         expected = u'<p>A message for <em>you</em>.</p>\n\n<p>You are nice.</p>\n'
         self.assertEqual(expected, text_scrubber(test_message,
-                                                 mimetype="text/plain"))
+                                                 mimetype="text/plain",
+                                                 is_reply=True))
 
     def test_message_w_url_w_underscores(self):
         from karl.utilities.textscrub import text_scrubber
@@ -91,15 +91,31 @@ class TestMailinTextScrubber(unittest.TestCase):
             expected, text_scrubber(test_message_w_url_w_underscores)
         )
 
-    def test_gmail(self):
+    def test_gmail_reply(self):
         self.test_no_mimetype(test_message_gmail)
 
-    def test_outlook(self):
+    def test_outlook_reply(self):
         self.test_no_mimetype(test_message_outlook)
 
-    def test_outlook_express(self):
+    def test_outlook_express_reply(self):
         self.test_no_mimetype(test_message_outlook_express)
 
-    def test_thunderbird(self):
+    def test_outlook_express_not_reply(self):
+        from karl.utilities.textscrub import text_scrubber
+        expected = (
+            u'<p>A message for <em>you</em>.</p>\n\n'
+            u'<p>You are nice.</p>\n\n'
+            u'<p>----- Original Message -----\n'
+            u'  From: KARL\n'
+            u'  To: Test User\n'
+            u'  Sent: Tuesday, March 24, 2009 5:00 PM\n'
+            u'  Subject: [Staff 8 Test] Email Alert Test</p>\n\n'
+            u'<p>A quote of some sort.</p>\n'
+        )
+        self.assertEqual(
+            expected, text_scrubber(test_message_outlook_express)
+        )
+
+    def test_thunderbird_reply(self):
         self.test_no_mimetype(test_message_thunderbird)
 

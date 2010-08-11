@@ -261,7 +261,8 @@ class MailinDispatcher(object):
             text = '\n\n'.join(texts)
             if self.text_scrubber is not None:
                 scrubber = getUtility(IMailinTextScrubber, self.text_scrubber)
-                text = scrubber(text, 'text/plain')
+                is_reply = not not message.get('In-Reply-To')
+                text = scrubber(text, 'text/plain', is_reply)
 
         else:
             text = ("Message body not found.  Incoming email message must "

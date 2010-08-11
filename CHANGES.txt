@@ -23,6 +23,19 @@ Unreleased
   document body.  Previously only the first 'text/plain' message part was used.
   This is per discussion with OSI about including forwarded messages in mailin.
 
+- The text scrubber used for mailin now takes a new argument, 'is_reply',
+  indicating whether the message is a reply to another email.  This is checked
+  by looking for the presence of the 'In-Reply-To' header in the message.  If
+  the message is not a reply, the text_scrubber now omits the processing
+  where it attempts to separate the new message body from the quoted message
+  being replied to.  This processing was causing messages being forwarded to
+  Karl communities to be stripped of content, since for some email clients
+  (Outlook Express) the separator for replied to messages and inline forwarded
+  messages is the same.  Since a forwarded message shouldn't have the
+  'In-Reply-To' header set, this allows forwarded messages to be properly added
+  to Karl, while still doing the proper thing when users make comments by
+  replying to alert emails.  Based on discussion with OSI.
+
 - Updated the 'add comment' form to respect the IShowSendalert adapter.
   (LP #602889)
 

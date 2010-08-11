@@ -22,15 +22,16 @@ def url_to_markdown_link(match):
     title = url.replace('_', '\_')
     return '[%s](%s)' % (title, url)
 
-def text_scrubber(text, mimetype=None):
+def text_scrubber(text, mimetype=None, is_reply=False):
     # We're assuming plain text
     if mimetype is not None and mimetype != "text/plain":
         raise Exception("Unsupported mime type: %s" % mimetype)
 
-    for pattern in cutoffs:
-        match = pattern.search(text)
-        if match:
-            text = text[:match.start()].strip()
+    if is_reply:
+        for pattern in cutoffs:
+            match = pattern.search(text)
+            if match:
+                text = text[:match.start()].strip()
 
     text = url_re.sub(url_to_markdown_link, text)
     return markdown2.markdown(text)

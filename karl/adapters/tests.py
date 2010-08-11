@@ -403,8 +403,8 @@ class MailinDispatcherTests(unittest.TestCase):
         from repoze.bfg.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
-        def _fooScrubber(text, text_mimetype=None):
-            _called_with.append((text, text_mimetype))
+        def _fooScrubber(text, text_mimetype=None, is_reply=False):
+            _called_with.append((text, text_mimetype, is_reply))
             return text.upper()
         registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
         mailin = self._makeOne()
@@ -420,6 +420,31 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(len(_called_with), 1)
         self.assertEqual(_called_with[0][0], 'payload')
         self.assertEqual(_called_with[0][1], 'text/plain')
+        self.assertEqual(_called_with[0][2], False)
+
+    def test_crackPayload_single_with_scrubber_is_reply(self):
+        from repoze.bfg.testing import registerUtility
+        from karl.utilities.interfaces import IMailinTextScrubber
+        _called_with = []
+        def _fooScrubber(text, text_mimetype=None, is_reply=False):
+            _called_with.append((text, text_mimetype, is_reply))
+            return text.upper()
+        registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
+        mailin = self._makeOne()
+        mailin.text_scrubber = 'foo'
+        message = DummyMessage()
+        message.payload = 'payload'
+        message.content_type = 'text/plain'
+        setattr(message, 'in-reply-to', 'foo')
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'PAYLOAD')
+        self.assertEqual(len(attachments), 0)
+        self.assertEqual(len(_called_with), 1)
+        self.assertEqual(_called_with[0][0], 'payload')
+        self.assertEqual(_called_with[0][1], 'text/plain')
+        self.assertEqual(_called_with[0][2], True)
 
     def test_crackPayload_single_encoded(self):
         mailin = self._makeOne()
@@ -492,8 +517,8 @@ class MailinDispatcherTests(unittest.TestCase):
         from repoze.bfg.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
-        def _fooScrubber(text, text_mimetype=None):
-            _called_with.append((text, text_mimetype))
+        def _fooScrubber(text, text_mimetype=None, is_reply=False):
+            _called_with.append((text, text_mimetype, is_reply))
             return text.upper()
         registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
         mailin = self._makeOne()
@@ -520,13 +545,14 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(len(_called_with), 1)
         self.assertEqual(_called_with[0][0], 'cnlybnq')
         self.assertEqual(_called_with[0][1], 'text/plain')
+        self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_w_multiple_text(self):
         from repoze.bfg.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
-        def _fooScrubber(text, text_mimetype=None):
-            _called_with.append((text, text_mimetype))
+        def _fooScrubber(text, text_mimetype=None, is_reply=False):
+            _called_with.append((text, text_mimetype, is_reply))
             return text.upper()
         registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
         mailin = self._makeOne()
@@ -557,13 +583,14 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(len(_called_with), 1)
         self.assertEqual(_called_with[0][0], 'cnlybnq\n\nhowdy folks.\n')
         self.assertEqual(_called_with[0][1], 'text/plain')
+        self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_w_forwarded_message(self):
         from repoze.bfg.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
-        def _fooScrubber(text, text_mimetype=None):
-            _called_with.append((text, text_mimetype))
+        def _fooScrubber(text, text_mimetype=None, is_reply=False):
+            _called_with.append((text, text_mimetype, is_reply))
             return text.upper()
         registerUtility(_fooScrubber, IMailinTextScrubber, 'foo')
         mailin = self._makeOne()
@@ -598,6 +625,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(len(_called_with), 1)
         self.assertEqual(_called_with[0][0], 'cnlybnq\n\nhowdy folks.\n')
         self.assertEqual(_called_with[0][1], 'text/plain')
+        self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_bad_encoding(self):
         mailin = self._makeOne()

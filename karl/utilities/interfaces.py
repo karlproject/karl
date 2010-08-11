@@ -32,11 +32,14 @@ class IMimeInfo(Interface):
 class IMailinTextScrubber(Interface):
     """ Utility for cleaning text of mail-in content.
     """
-    def __call__(text, mimetype=None):
+    def __call__(text, mimetype=None, is_reply=False):
         """ Return scrubbed version of 'text'.
 
         o 'mimetype', if passed, will be the MIME type of the part from
           which 'text' was extracted.
+
+        o If 'is_reply' is True, extra processing may be done to attempt to
+          separate the reply from the replied to message.
         """
 
 class IKarlDates(Interface):
