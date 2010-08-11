@@ -22,6 +22,7 @@ from datetime import datetime
 
 from repoze.bfg.testing import cleanUp
 
+
 class TestFileInfo(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -98,6 +99,7 @@ class TestFileInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.size, "32.9 MB")
 
+
 class TestBylineInfo(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -141,7 +143,9 @@ class TestBylineInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date, context.posted_date)
 
+
 class TestBlogEntryAlert(unittest.TestCase):
+
     def setUp(self):
         config = cleanUp()
         config.setup_registry() # this is not a unit test
@@ -196,8 +200,10 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
 
     def test_community_name_has_commas(self):
         self.community.title = 'Dummy, Community'
@@ -210,9 +216,10 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Community <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
-
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Community <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
 
     def test_digest(self):
         request = testing.DummyRequest()
@@ -225,8 +232,10 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual( alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
 
     def test_digest_malformed_text(self):
         self.blogentry.text = malformed_text
@@ -240,8 +249,11 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
+
 
 class TestBlogCommentAlert(unittest.TestCase):
     def setUp(self):
@@ -315,8 +327,10 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
 
         messages, n = renderer.history
         self.assertEqual(n, 1)
@@ -337,8 +351,10 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
         self.assertEqual(renderer.history, ([], 0))
 
     def test_long_history(self):
@@ -358,8 +374,10 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(u"Dummy Communit\xe0 <community+blog-7FFFFFFF@karl3.example.com>",
-                         alert.message["reply-to"])
+        self.assertEqual(alert.message["reply-to"],
+                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
+                          "@karl3.example.com>"
+                        )
 
         messages, n = renderer.history
         self.assertEqual(n, 7)
@@ -371,6 +389,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(messages[4], comments[3])
         self.assertEqual(messages[5], comments[4])
         self.assertEqual(messages[6], comments[5])
+
 
 class TestCalendarEventAlert(unittest.TestCase):
     def setUp(self):
@@ -467,7 +486,6 @@ class TestCalendarEventAlert(unittest.TestCase):
                          u'title | karl3test <alerts@karl3.example.com>')
 
 
-
 class TestCommunityFileAlert(unittest.TestCase):
     def setUp(self):
         config = cleanUp()
@@ -531,6 +549,7 @@ class TestCommunityFileAlert(unittest.TestCase):
         self.assertEqual(alert.message["from"],
                          u'title | karl3test <alerts@karl3.example.com>')
 
+
 class TestForumPortlet(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -581,6 +600,7 @@ class TestForumPortlet(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assert_(adapter.asHTML.startswith('<div'))
 
+
 class TestDefaultShowSendalert(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -613,12 +633,14 @@ class TestDefaultShowSendalert(unittest.TestCase):
         intranet['foo'] = context = testing.DummyModel()
         self.failIf(self._call_fut(context, None))
 
+
 class DummySearchAdapter:
     def __init__(self, context):
         self.context = context
 
     def __call__(self, **kw):
         return 0, [], None
+
 
 class DummyContext(testing.DummyModel):
     creator=u'dummy'
