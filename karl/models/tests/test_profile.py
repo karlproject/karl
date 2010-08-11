@@ -18,6 +18,15 @@
 import unittest
 
 class ProfileTests(unittest.TestCase):
+
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
     def _getTargetClass(self):
         from karl.models.profile import Profile
         return Profile
@@ -125,6 +134,15 @@ class ProfileTests(unittest.TestCase):
         self.failIf('website' in inst.__dict__)
 
 class ProfilesFolderTests(unittest.TestCase):
+
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
     def _getTargetClass(self):
         from karl.models.profile import ProfilesFolder
         return ProfilesFolder
