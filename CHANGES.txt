@@ -42,6 +42,12 @@ Unreleased
 - Updated the 'add comment' form to respect the IShowSendalert adapter.
   (LP #602889)
 
+- Converted retry functionality used when running console scripts as daemons to
+  be time based rather than number of iterations based.  By default, now, if
+  a daemon script gets ConflictErrors, it will retry once a minute for 30
+  minutes.  If unable to fulfill its duties for 30 minutes, it will raise an
+  exception which will trigger all of the usual alarm bells. (LP #614368)
+
 3.41 (2010-08-04)
 -----------
 

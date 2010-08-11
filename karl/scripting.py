@@ -52,30 +52,42 @@ def open_root(config, name='karl'):
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
 
-def run_daemon(name, func, interval=300, tries=3, retryable=None):
+def run_daemon(name, func, interval=300,
+               retry_period=30*60, retry_interval=60, retryable=None,
+               proceed=None):
     logger = get_logger()
 
     if retryable is None:
         retryable = (ConflictError,)
 
-    while True:
-        tried = 0
+    if proceed == None:
+        def proceed():
+            return True
+
+    while proceed():
+        start_trying = time.time()
+        tries = 0
         logger.info("Running %s", name)
         while True:
             try:
+                tries += 1
                 func()
                 logger.info("Finished %s", name)
                 break
             except retryable:
-                tried += 1
-                if tried == tries:
-                    logger.error("Error after %s tries" % tries, exc_info=True)
+                if time.time() - start_trying > retry_period:
+                    logger.error("Retried for %d seconds, count = %d",
+                                 retry_period, tries,
+                                 exc_info=True)
                     break
-                logger.info("Retrying, count = %s" % tried, exc_info=True)
+                logger.info("Retrying in %d seconds, count = %d",
+                            retry_interval, tries,
+                            exc_info=True)
+                time.sleep(retry_interval)
             except:
                 logger.error("Error in daemon process", exc_info=True)
                 break
-        if _debug_object_refs:
+        if _debug_object_refs: #pragma no cover
             _count_object_refs()
         sys.stderr.flush()
         sys.stdout.flush()
