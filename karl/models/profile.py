@@ -177,6 +177,11 @@ def profile_textindexdata(profile):
         ):
         v = getattr(profile, attr, None)
         if v:
+            if isinstance(v, str):
+                try:
+                    v = v.decode('UTF8')
+                except UnicodeDecodeError:
+                    v = v.decode('latin1')
             text.append(unicode(v))
     text = '\n'.join(text)
     return lambda: text

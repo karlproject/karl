@@ -182,3 +182,63 @@ class ProfilesFolderTests(unittest.TestCase):
         profile = pf['extant'] = DummyModel()
         pf.email_to_name['eXtant@example.com'] = 'extant'
         self.failUnless(pf.getProfileByEmail('Extant@example.com') is profile)
+
+
+class Test_profile_textindexdata(unittest.TestCase):
+
+    def _callFUT(self, profile):
+        from karl.models.profile import profile_textindexdata
+        return profile_textindexdata(profile)
+
+    def test_no_attrs(self):
+        callable = self._callFUT(object())
+        self.assertEqual(callable(), '')
+
+    def test_w_all_attrs(self):
+        from repoze.bfg.testing import DummyModel
+        ATTR_NAMES = [
+            '__name__',
+            'firstname',
+            'lastname',
+            'email',
+            'phone',
+            'extension',
+            'department',
+            'position',
+            'organization',
+            'location',
+            'country',
+            'website',
+            'languages',
+            'office',
+            'room_no',
+            'biography',
+        ]
+        ATTR_VALUES = [x.upper() for x in ATTR_NAMES]
+        mapping = dict(zip(ATTR_NAMES, ATTR_VALUES))
+        profile = DummyModel(**mapping)
+        callable = self._callFUT(profile)
+        self.assertEqual(callable(), '\n'.join(ATTR_VALUES))
+
+    def test_w_extra_attrs(self):
+        from repoze.bfg.testing import DummyModel
+        profile = DummyModel(firstname='Phred',
+                             lastname='Phlyntstone',
+                             town='Bedrock',
+                            )
+        callable = self._callFUT(profile)
+        self.assertEqual(callable(), 'Phred\nPhlyntstone')
+
+    def test_w_UTF8_attrs(self):
+        from repoze.bfg.testing import DummyModel
+        FIRSTNAME = u'Phr\xE9d'
+        profile = DummyModel(firstname=FIRSTNAME.encode('UTF8'))
+        callable = self._callFUT(profile)
+        self.assertEqual(callable(), FIRSTNAME)
+
+    def test_w_latin1_attrs(self):
+        from repoze.bfg.testing import DummyModel
+        FIRSTNAME = u'Phr\xE9d'
+        profile = DummyModel(firstname=FIRSTNAME.encode('latin1'))
+        callable = self._callFUT(profile)
+        self.assertEqual(callable(), FIRSTNAME)

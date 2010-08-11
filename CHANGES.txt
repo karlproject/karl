@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed text indexing of profiles with attributes encoded as UTF8 or latin1
+  (LP #614398).
+
 - Added a community index to the tagging enginge in order to speed up the
   community tags portlet when first loaded. On local machine loading of
   community tags portlet with OSI database went from 40s to 3ms.
