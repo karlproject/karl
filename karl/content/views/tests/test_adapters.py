@@ -133,8 +133,8 @@ class TestBylineInfo(unittest.TestCase):
                          'http://example.com/profiles/dummy/')
 
     def test_posted_date(self):
-        context = DummyContext()
         from karl.utilities.interfaces import IKarlDates
+        context = DummyContext()
         d1 = 'Wednesday, January 28, 2009 08:32 AM'
         def dummy(date, flavor):
             return d1
@@ -147,11 +147,11 @@ class TestBylineInfo(unittest.TestCase):
 class TestBlogEntryAlert(unittest.TestCase):
 
     def setUp(self):
-        config = cleanUp()
-        config.setup_registry() # this is not a unit test
-
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
+
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         karltesting.registerSettings()
 
@@ -191,6 +191,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
+        from karl.mail import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         self.assertEqual("community@karl3.example.com",
@@ -198,7 +199,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -206,6 +206,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_community_name_has_commas(self):
+        from karl.mail import Message
         self.community.title = 'Dummy, Community'
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
@@ -214,7 +215,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Community <community+blog-7FFFFFFF"
@@ -222,6 +222,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_digest(self):
+        from karl.mail import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         alert.digest = True
@@ -230,7 +231,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual( alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -238,6 +238,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_digest_malformed_text(self):
+        from karl.mail import Message
         self.blogentry.text = malformed_text
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
@@ -247,7 +248,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -256,12 +256,12 @@ class TestBlogEntryAlert(unittest.TestCase):
 
 
 class TestBlogCommentAlert(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
 
+    def setUp(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
 
+        cleanUp()
         karltesting.registerSettings()
 
         # Create dummy site skel
@@ -316,6 +316,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
+        from karl.mail import Message
         renderer = testing.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
@@ -325,7 +326,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -337,6 +337,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(messages[0], self.blogentry)
 
     def test_digest(self):
+        from karl.mail import Message
         renderer = testing.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         renderer.string_response = "<body>Dummy message body.</body>"
@@ -349,7 +350,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -358,6 +358,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(renderer.history, ([], 0))
 
     def test_long_history(self):
+        from karl.mail import Message
         comments = []
         for i in xrange(6):
             comments.append(
@@ -372,7 +373,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
@@ -392,12 +392,13 @@ class TestBlogCommentAlert(unittest.TestCase):
 
 
 class TestCalendarEventAlert(unittest.TestCase):
-    def setUp(self):
-        config = cleanUp()
-        config.setup_registry() # this is not a unit test
 
+    def setUp(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICalendarEvent
+
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         karltesting.registerSettings()
         karltesting.registerKarlDates()
@@ -446,6 +447,8 @@ class TestCalendarEventAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
+        from karl.mail import Message
+
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
         self.assertEqual("alerts@karl3.example.com",
@@ -453,7 +456,6 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')
@@ -468,6 +470,8 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(alert.attendees, 'alice; bob')
 
     def test_digest(self):
+        from karl.mail import Message
+
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
         alert.digest = True
@@ -476,7 +480,6 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')
@@ -487,12 +490,13 @@ class TestCalendarEventAlert(unittest.TestCase):
 
 
 class TestCommunityFileAlert(unittest.TestCase):
-    def setUp(self):
-        config = cleanUp()
-        config.setup_registry() # this is not a unit test
 
+    def setUp(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICommunityFile
+
+        config = cleanUp()
+        config.setup_registry() # this is not a unit test
 
         karltesting.registerSettings()
 
@@ -532,6 +536,7 @@ class TestCommunityFileAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
+        from karl.mail import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.f, self.profile, request)
         alert.digest = True
@@ -540,7 +545,6 @@ class TestCommunityFileAlert(unittest.TestCase):
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
-        from karl.mail import Message
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
                          u'Dummy Communit\xe0 <member@x.org>')
