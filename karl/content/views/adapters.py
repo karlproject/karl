@@ -246,7 +246,11 @@ class BlogAlert(Alert):
     def __init__(self, context, profile, request):
         super(BlogAlert, self).__init__(context, profile, request)
         self._community = find_community(context)
-        self._blogentry = find_interface(context, IBlogEntry)
+        blogentry = find_interface(context, IBlogEntry)
+        if blogentry is None:
+            # Comments can also be made against forum topics
+            blogentry = find_interface(context, IForumTopic)
+        self._blogentry = blogentry
 
     @property
     def mfrom(self):

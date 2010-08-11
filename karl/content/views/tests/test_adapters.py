@@ -315,6 +315,24 @@ class TestBlogCommentAlert(unittest.TestCase):
         from karl.utilities.interfaces import IAlert
         verifyClass(IAlert, self._getTargetClass())
 
+    def test_ctor_with_forum_comment(self):
+        # LP #615370:  comment alerts need to work against forum topics, too.
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IForumTopic
+        topic = testing.DummyModel(text="This is a test")
+        community = self.blogentry.__parent__.__parent__
+        community["forum"] = testing.DummyModel()
+        community["forum"]["topic"] = topic
+        topic["attachments"] = testing.DummyModel()
+        topic["comments"] = testing.DummyModel()
+        topic.title = "Forum Post"
+        topic.docid = 0
+        directlyProvides(topic, IForumTopic)
+        comment = self._add_comment(topic)
+        request = testing.DummyRequest()
+        alert = self._makeOne(comment, self.profile, request)
+        self.failUnless(alert._blogentry is topic)
+
     def test_alert(self):
         from karl.mail import Message
         renderer = testing.registerDummyRenderer(
