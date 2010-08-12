@@ -576,7 +576,15 @@ class UploadUsersView(object):
                         else:
                             users.add(username, login, row.pop('password'),
                                       groups)
-                        profile = create_content(IProfile, **row)
+                        decoded = {}
+                        for k, v in row.items():
+                            if isinstance(v, str):
+                                try:
+                                    v = v.decode('utf8')
+                                except UnicodeDecodeError:
+                                    v = v.decode('latin1')
+                            decoded[k] = v
+                        profile = create_content(IProfile, **decoded)
                         profiles[username] = profile
                         workflow = get_workflow(IProfile, 'security', profile)
                         if workflow is not None:

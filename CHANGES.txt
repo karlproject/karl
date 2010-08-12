@@ -7,6 +7,9 @@ Unreleased
 - Ensured that comment alerts work for comments made agaisnt forum posts
   (LP #614370).
 
+- Ensured that CSV profile import decodes attributes encoded as UTF8 or latin1
+  (LP #614398).
+
 - Fixed text indexing of profiles with attributes encoded as UTF8 or latin1
   (LP #614398).
 

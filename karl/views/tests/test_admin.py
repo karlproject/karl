@@ -994,6 +994,42 @@ class TestUploadUsersView(unittest.TestCase):
         # Groups are not attributes of the profile
         self.failIf('groups' in profile.__dict__)
 
+    def test_user_with_utf8_attrs(self):
+        # See https://bugs.launchpad.net/karl3/+bug/614398
+        FIRSTNAME = u'Phr\xE9d'
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","%s","","test@example.com","pass1234","KarlStaff"'
+                        % FIRSTNAME.encode('utf8'),
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        profile = self.site['profiles']['user1']
+        self.assertEqual(profile.firstname, FIRSTNAME)
+
+    def test_user_with_latin1_attrs(self):
+        # See https://bugs.launchpad.net/karl3/+bug/614398
+        FIRSTNAME = u'Phr\xE9d'
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","%s","","test@example.com","pass1234","KarlStaff"'
+                        % FIRSTNAME.encode('latin1'),
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        profile = self.site['profiles']['user1']
+        self.assertEqual(profile.firstname, FIRSTNAME)
+
 
 class ErrorMonitorBase:
 
