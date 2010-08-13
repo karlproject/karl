@@ -502,6 +502,12 @@ a.chparent:hover {
   float: left;
   margin-left: 15px;
 }
+.ie-announcement {
+    float: left;
+    margin-left: 15px;
+    border-color: #ff0000;
+    background-color: #F2C3C2;
+}
 
 /** =LAYOUT STRUCTURE
 ----------------------------------------------- */

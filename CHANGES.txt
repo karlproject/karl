@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Put in deprecation notice for IE6 (yay!)
+  (LP #616869)
+
 - Ensured that comment alerts work for comments made agaisnt forum posts
   (LP #614370).
 
