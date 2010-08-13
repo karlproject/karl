@@ -240,7 +240,7 @@ def jquery_set_preferred_view(context, request):
     request.response_headerlist = [('Cache-Control',
         'max-age=0, no-cache, no-store, private, must-revalidate')]
     communities_folder = find_communities(context)
-    communities = request.params.getall('preferred')
+    communities = request.params.getall('preferred[]')
     set_preferred_communities(communities_folder, request, communities)
     updated_communities = get_my_communities(communities_folder, request)
     return { 'my_communities': updated_communities,
