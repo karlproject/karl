@@ -233,7 +233,7 @@ class Test_jquery_set_preferred_view(unittest.TestCase):
         foo.preferred_communities = None
         request = testing.DummyRequest()
         request.params = RequestParamsWithGetall()
-        request.params['preferred'] = ['Yi']
+        request.params['preferred[]'] = ['Yi']
         testing.registerDummySecurityPolicy(
             'foo',
             groupids=[
