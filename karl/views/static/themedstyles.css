@@ -658,7 +658,7 @@ ul#header-menu li a {
   margin: 10px 20px 0 0;
   padding: 0 !important;
   text-align: right;
-  width: 486px;
+  width: 505px;
 }
 #searchbox form {
   margin: 0;
@@ -679,10 +679,9 @@ input#livesearch-input {
 }
 #livesearch-button {
   float: right;
-  width: 26px;
+  width: 47px;
   height: 24px;
   line-height: 24px;
-  text-transform: uppercase;
   padding: 0;
   margin: 0;
 }

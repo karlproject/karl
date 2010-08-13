@@ -328,7 +328,7 @@ ul.menubar .menubar-lastitem a:active {
 /* search button */
 #livesearch-button.primary_button {
     background: transparent url(images/corners.png) no-repeat left -113px;
-    width: 28px;
+    width: 47px;
     height: 24px;
     line-height: 26px;
 }

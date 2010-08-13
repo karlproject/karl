@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Changes searches so there is no label, changed buttons to say
+  'search' instead of 'go'
+  (LP #616868)
+
 - Put in deprecation notice for IE6 (yay!)
   (LP #616869)
 

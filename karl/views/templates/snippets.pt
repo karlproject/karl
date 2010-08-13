@@ -305,7 +305,7 @@
         <fieldset>
           <input id="livesearch-input" name="body"
                  type="text" autocomplete="off"/>
-          <a id="livesearch-button" class="primary_button" href="javascript: document.ff.submit()">Go</a>
+          <a id="livesearch-button" class="primary_button" href="javascript: document.ff.submit()">Search</a>
         </fieldset>
       </form>
       <span class="advancedSearch">
@@ -663,9 +663,8 @@
           <form method="get" action="${api.view_url}">
             <fieldset>
               <div class="field">
-                <label for="body">Search</label>
                 <input type="text" name="body" value="" />
-                <input type="submit" value="Go" />
+                <input type="submit" value="Search" />
               </div>
             </fieldset>
           </form>
