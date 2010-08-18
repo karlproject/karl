@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from zope.component import getMultiAdapter
+from zope.component import ComponentLookupError
 
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -58,6 +59,7 @@ def retail_view(context, request):
 
 def _get_portlet_html(context, request, portlet_ids):
     missing = '<div class="sections"><p>Missing portlet at %s</p></div>'
+    notaportlet = '<div class="sections"><p>%s is not a portlet</p></div>'
     html = ''
     for portlet_id in portlet_ids:
         try:
@@ -65,7 +67,11 @@ def _get_portlet_html(context, request, portlet_ids):
         except KeyError:
             html += missing % portlet_id
             continue
-        portlet_info = getMultiAdapter((model, request), IIntranetPortlet)
+        try:
+            portlet_info = getMultiAdapter((model, request), IIntranetPortlet)
+        except ComponentLookupError:
+            html += notaportlet % portlet_id
+            continue
         html += portlet_info.asHTML
 
     return html
