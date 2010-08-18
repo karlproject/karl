@@ -856,6 +856,20 @@ class TestUploadUsersView(unittest.TestCase):
         users = self.site.users
         self.assertEqual(users.get_by_id('user1')['password'], 'pass1234')
 
+    def test_null_byte_in_row(self):
+        request = testing.DummyRequest({
+            'csv': DummyUpload(
+                '"username","firstname","lastname","email","sha_password"\n'
+                '"user1","User","One","test@example.com\x00","pass1234","foo"\n'
+                ),
+        })
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message,
+                         'Malformed CSV: line contains NULL byte')
+        self.assertEqual(api.status_message, None)
+
     def test_row_too_long(self):
         request = testing.DummyRequest({
             'csv': DummyUpload(

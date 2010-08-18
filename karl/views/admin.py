@@ -3,6 +3,7 @@ from __future__ import with_statement
 import codecs
 from cStringIO import StringIO
 import csv
+from _csv import Error
 from karl.mail import Message
 import os
 import re
@@ -516,27 +517,31 @@ class UploadUsersView(object):
         field = request.params.get('csv', None)
         if hasattr(field, 'file'):
             reader = csv.DictReader(field.file)
-            rows = list(reader)
+            try:
+                rows = list(reader)
+            except Error, e:
+                errors.append("Malformed CSV: %s" % e[0])
 
             # Make sure we have required fields
-            fieldnames = rows[0].keys()
-            if None in fieldnames:
-                errors.append("Malformed CSV: line 2 does not match header.")
-            else:
-                for required_field in self.required_fields:
-                    if required_field not in fieldnames:
-                        errors.append("Missing required field: %s" %
-                                      required_field)
-                if (not ('password' in fieldnames or
-                    'sha_password' in fieldnames)):
-                    errors.append('Must supply either password or '
-                                  'sha_password field.')
+            if not errors:
+                fieldnames = rows[0].keys()
+                if None in fieldnames:
+                    errors.append("Malformed CSV: line 2 does not match header.")
+                else:
+                    for required_field in self.required_fields:
+                        if required_field not in fieldnames:
+                            errors.append("Missing required field: %s" %
+                                          required_field)
+                    if (not ('password' in fieldnames or
+                        'sha_password' in fieldnames)):
+                        errors.append('Must supply either password or '
+                                      'sha_password field.')
 
-                # Restrict to allowed fields
-                allowed_fields = self.allowed_fields
-                for fieldname in fieldnames:
-                    if fieldname not in allowed_fields:
-                        errors.append("Unrecognized field: %s" % fieldname)
+                    # Restrict to allowed fields
+                    allowed_fields = self.allowed_fields
+                    for fieldname in fieldnames:
+                        if fieldname not in allowed_fields:
+                            errors.append("Unrecognized field: %s" % fieldname)
 
             # Add users
             if not errors:
