@@ -255,6 +255,9 @@ class EditWikiPageFormController(object):
                 karlvalidators.FolderNameAvailable(
                     self.context.__parent__,
                     exceptions=(self.context.title,)),
+                karlvalidators.WikiTitleAvailable(
+                    self.context.__parent__,
+                    exceptions=(self.context.title,)),
                 )
             )
         fields.append(('title', title_field))

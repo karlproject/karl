@@ -25,6 +25,19 @@ class FolderNameAvailable(Validator):
         except ValueError, why:
             raise Invalid(why[0])
     
+class WikiTitleAvailable(Validator):
+    def __init__(self, container, exceptions=()):
+        self.container = container
+        self.exceptions = exceptions
+
+    def __call__(self, v):
+        if v in self.exceptions:
+            return
+        title = v.lower()
+        for page in self.container.values():
+            if page.title.lower() == title:
+                raise Invalid('Title "%s" is already in use on this wiki' % v)
+    
 class NotOneOf(Validator):
     """ Checks whether value is not one of a supplied list of values"""
     def __init__(self, set_of_values):

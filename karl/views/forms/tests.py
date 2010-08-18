@@ -41,6 +41,26 @@ class TestUserProfileLookupWidget(unittest.TestCase):
         result = widget.from_request_data(field, ['a', '', 'b'])
         self.assertEqual(result, ['a', 'b'])
 
+class TestWikiTitleAvailableValidator(unittest.TestCase):
+    def _makeOne(self, container, exceptions=()):
+        from karl.views.forms.validators import WikiTitleAvailable
+        return WikiTitleAvailable(container, exceptions)
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        container = testing.DummyModel()
+        container['foo'] = testing.DummyModel()
+        container['foo'].title = 'A title'
+        validator = self._makeOne(container)
+        self.assertRaises(Invalid, validator, 'A Title')
+
+    def test_exception_success(self):
+        container = testing.DummyModel()
+        container['foo'] = testing.DummyModel()
+        container['foo'].title = 'A title'
+        validator = self._makeOne(container, exceptions=('A title',))
+        self.assertEqual(validator('A title'), None)
+
 class TestFolderNameAvailableValidator(unittest.TestCase):
     def _makeOne(self, container, exceptions=()):
         from karl.views.forms.validators import FolderNameAvailable
