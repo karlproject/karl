@@ -1,8 +1,11 @@
 karl package Changelog
 ======================
+Unreleased 
+-------------
 
-Unreleased
-----------
+
+3.43 (2010-08-19)
+-----------------
 
 - Changes searches so there is no label, changed buttons to say
   'search' instead of 'go'
