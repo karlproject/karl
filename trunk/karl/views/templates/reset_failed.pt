@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <p>Unable to reset your password.  Try these troubleshooting tips:</p>
+    <ul>
+        <li>
+            Verify you pasted the complete password reset URL from the email.
+        </li>
+        <li>
+            If several days have passed since you initiated the request
+            to reset your password, you should
+            <a href="${api.app_url}/reset_request.html">try again</a>.
+        </li>
+        <li>
+            Verify you entered the correct user name.
+        </li>
+        <li>
+            Email your <a
+            href="mailto:${api.settings.admin_email}">Site Administrator</a>
+            for additional help.
+        </li>
+    </ul>
+    <p><a href="${api.app_url}/login.html">Return to the login page</a></p>
+
+  </div>
+</html>

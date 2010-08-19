@@ -1,0 +1,8 @@
+# Add forum as admin and then re-login as user
+login_admin
+forum_add
+login_user
+
+# Add forum topic
+forumtopic_add
+

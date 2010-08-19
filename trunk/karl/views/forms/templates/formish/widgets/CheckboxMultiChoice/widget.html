@@ -1,0 +1,10 @@
+<tal:block repeat="pair enumerate(field.widget.options)">
+  <input tal:attributes="checked field.widget.checked(pair[1],field) or None"
+         id="${field.cssname}-${pair[0]}" 
+         name="${field.name}"
+         type="checkbox" 
+         value="${pair[1][0]}"
+         />
+  <label for="${field.cssname}-${pair[0]}">${pair[1][1]}</label>
+  <br />
+</tal:block>

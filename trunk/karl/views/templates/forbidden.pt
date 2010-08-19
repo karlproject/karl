@@ -1,0 +1,13 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    The set of credentials you possess does not allow you to view this
+    resource.  If you'd like to log in as a different user, please
+    visit the <a href="${login_form_url}">login form</a>.  Otherwise,
+    you may visit the <a href="${homepage_url}">home page</a>.
+  </div>
+
+</div>

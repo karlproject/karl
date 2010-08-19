@@ -1,0 +1,9 @@
+# Check NYC's office to see if they have network events
+go /offices/nyc
+find "MORE Network Events"
+follow "MORE Network Events"
+
+# Network-event folder
+url /offices/files/network-events/
+find "Network Events"
+find "Show Past Events"

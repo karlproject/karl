@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <p tal:condition="not digest">
+      --- Reply ABOVE THIS LINE to post a comment ---
+    </p>
+
+    <p>
+      A new <a href="${blogentry_href}">blog entry</a> has been posted by
+      ${creator.title} in the 
+      <a href="${community_href}">${community.title}</a> community.
+      <div>
+    ---------------------------------------------------------------
+      </div>
+    </p>
+
+    <h2>${blogentry.title}</h2>
+    
+    <!-- XXX Can "structure" be used with Genshi syntax? -->
+    <span tal:replace="structure blogentry.text"/>
+
+    <p tal:condition="attachments">
+      <div><b>Attachments</b></div>
+      <div tal:repeat="filename attachments">
+        <a href="${attachment_hrefs[filename]}">
+          ${filename}
+        </a>
+      </div>
+    </p>
+    <div tal:condition="not digest">----</div>
+    <p tal:condition="not digest">
+      REPLIES TO THIS MESSAGE WILL BE SENT TO THE COMMUNITY<br/>
+      To view this community, visit: ${community_href}<br/>
+      To stop these alerts, visit: ${manage_preferences_href}<br/>
+    </p>
+  </body>
+</html>

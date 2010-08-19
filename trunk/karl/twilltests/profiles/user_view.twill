@@ -1,0 +1,22 @@
+# Login as staff1, make sure you can see your profile as well as
+# staff2 and affiliate1
+
+login staff1
+go /profiles/staff1
+find "Staff One"
+go /profiles/staff2
+find "Staff Two"
+go /profiles/affiliate1
+find "Affiliate One"
+
+# Login as affiliate3, go to your profile.  We use affiliate9 because
+# other Twill scripts use affiliate1 and leave behind communities
+# where they are members.
+
+login affiliate3
+go /profiles/affiliate3
+find "Affiliate Three"
+
+# But you shouldn't be able to see staff1
+go /profiles/staff1
+find "Forbidden"

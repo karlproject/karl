@@ -1,0 +1,11 @@
+# This is the cleanup routines for the "all" suite
+# To run just the cleanup suite, use the -C flag
+# flunc -C all
+#
+# or to run the "all" suite without running cleanup 
+# use the -X flag
+# flunc -X all
+# See README.txt for more
+
+# Cleanup tests
+community.delete_testing_community

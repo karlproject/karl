@@ -1,0 +1,6 @@
+# Verify wiki exist
+go /communities/${community_name}/wiki
+url /communities/${community_name}/wiki/front_page
+find "Edit"
+find "${community_name} Community Wiki Page"
+

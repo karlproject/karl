@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">Content Added Recently
+        by <a href="${api.here_url}">${api.context.title}</a></h1>
+
+    <div class="recentItemsWrapper">
+      <table class="content-listing">
+        <thead>
+          <tr>
+            <th class="cldate">Created</th>
+            <th class="cltitle">Title</th>
+            <th class="cltype">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="ri in recent_items">
+            <td class="cldate">${ri.created}</td>
+            <td class="cltitle">
+              <a href="${ri.url}">${ri.title}</a>
+            </td>
+            <td class="cltype">${ri.type}</td>
+          </tr>
+        </tbody>
+        <tfoot tal:condition="batch_info.batching_required">
+          <tr>
+            <th colspan="4" class="boardCaption" style="padding:0">
+              <div metal:use-macro="api.snippets.macros['batching']"/>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+
+</html>

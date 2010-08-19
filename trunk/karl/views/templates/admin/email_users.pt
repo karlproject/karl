@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Email Users</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="email_users">
+          <b>From</b><br/>
+          <select name="from_email">
+            <option tal:repeat="from_email from_emails"
+                    value="${from_email[0]}">${from_email[1]}</option>
+          </select><br/>
+          <br/>
+          <b>To</b><br/>
+          <select name="to_group">
+            <option tal:repeat="to_group to_groups"
+                    value="${to_group[0]}">${to_group[1]}</option>
+          </select><br/>
+          <br/>
+          <b>Subject</b><br/>
+          <input name="subject"/><br/>
+          <br/>
+          <metal:input use-macro="api.formfields.macros['text-field']"/>
+          <br/>
+          <input type="submit" name="send_email" value="Send Email"/>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</html>

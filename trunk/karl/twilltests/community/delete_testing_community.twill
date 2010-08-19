@@ -1,0 +1,4 @@
+# Delete the current community 
+# used after testing during cleanup phase
+login "${cur_admin}"
+remove_community "$community_name"

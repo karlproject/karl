@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Karl JavaScript QUnit Tests</title>
+
+  <!-- tinymce -->
+  <script type="text/javascript" src="../tiny_mce/tiny_mce_src.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/langs/en.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/themes/advanced/editor_template_src.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/themes/advanced/langs/en.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/plugins/paste/editor_plugin_src.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/plugins/wicked/editor_plugin_src.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/plugins/wicked/langs/en.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/plugins/spellchecker/editor_plugin_src.js">//</script>
+  <script type="text/javascript" src="../tiny_mce/plugins/embedmedia/editor_plugin_src.js">//</script>
+
+  <!-- jquery -->
+  <script type="text/javascript" src="../packed/jquery-1.3.2.js"></script>
+
+  <!-- jquery ui -->
+  <script type="text/javascript" src="../jquery-ui/bgiframe_2.1.1/jquery.bgiframe.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/ui.core.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/grid/ui/ui.grid.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/grid/ui/ui.gridmodel.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/autobox2/jquery.templating.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/autobox2/jquery.ui.autobox.ext.js">//</script>
+                  
+  <script type="text/javascript" src="../jquery-ui/autobox2/jquery.ui.autobox.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/effects.core.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/effects.pulsate.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/effects.fold.js">//</script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/ui.datepicker.js"></script>
+  <script type="text/javascript" src="../jquery-ui/1.7/ui/ui.dialog.js"></script>
+
+  <!-- karl -->
+  <script type="text/javascript" src="../DD_roundies.js"></script>
+  <script type="text/javascript" src="../karl.js"></script>
+
+
+  <!-- test suite libs -->
+  <link   type="text/css"       href="../qunit/testsuite.css" rel="stylesheet" media="screen" />
+	<script type="text/javascript" src="../qunit/testsuite.js"></script>
+	<script type="text/javascript" src="../qunit/testrunner.js"></script>
+	<script type="text/javascript" src="../qunit/jquery.simulate.js"></script>
+
+  <!-- karl unit tests  -->
+  <!--<script type="text/javascript" src="statusbox.js"></script>
+  <script type="text/javascript" src="dropdown.js"></script>
+	<script type="text/javascript" src="singleupload.js"></script>
+	<script type="text/javascript" src="multiupload.js"></script>-->
+
+	<script type="text/javascript" src="datetimepicker.js"></script>
+
+  <!-->
+  <script type="text/javascript" src="livesearch.js"></script>
+	<script type="text/javascript" src="tagbox.js"></script>
+	<script type="text/javascript" src="memberbox.js"></script>
+	<script type="text/javascript" src="grid.js"></script>
+	<script type="text/javascript" src="dialog.js"></script>
+	<script type="text/javascript" src="quotablecomment.js"></script>
+  -->
+</head>
+
+<body>
+
+
+  <div id="main">
+  
+    <!-- karl.js dependencies -->
+    <div id="karl-app-url"></div>
+    <div id="karl-here-url"></div>
+  
+    <!-- statusbox.js -->
+    <div class="statusbox"></div>
+    
+    <!-- singleupload.js -->
+    <div class="sif-widget">
+      <input id="file_nochange" class="sif-nochange noborder" type="radio"
+            checked="checked" value="nochange" name="file-dummyoption"/>
+      <label for="file_nochange">Keep existing file</label>
+      <br />
+      <input id="file_upload" class="sif-upload noborder" type="radio"
+            value="" name="file-dummyoption"/>
+      <label for="file_upload">Replace with new file:</label>
+      <br />
+      <div class="sif-stub"><input type="file" value="true" name="file"/></div>
+    </div>
+    
+    <!-- multiupload.js -->
+    <div class="muf-widget">
+      <div class="muf-stub">
+        <input type="file" value="true" name="attachment"/>
+        <a href="#" class="muf-closebutton">Remove</a>
+      </div>
+      <a href="#" class="muf-addbutton">Attach another file</a>
+    </div>
+
+    <!-- datetimepicker -->
+    <label class="required">Start Date</label>
+    <input name="startDate" id="startDate" value="1/31/2009 18:00"/>
+
+    <!-- blogcomment.js -->
+    <!-- <div class="blogComment">
+      <a class="quo-paste" href="#">quote</a>        
+      <div class="commentText"><p>here is a comment</p></div>
+    </div>
+    <textarea id="add_comment" name="add_comment" rows="1" cols="40" class="mceEditor karlrichtextfield"></textarea> -->
+    
+    <!-- dropdown.js -->
+    <li class="karldropdown">
+      <a class="karldropdown-heading" href="#">Add</a>
+      <ul class="karldropdown-menu">
+        <li><a href="#">Folder</a></li>
+        <li><a href="#">Forum</a></li>
+        <li><a href="#">File</a></li>
+      </ul>
+    </li>
+  </div>
+
+</body>
+</html>

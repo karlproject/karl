@@ -1,0 +1,22 @@
+.formsubmit button span {
+    position: relative;
+    top: -1px;
+}
+
+.addtag-button {
+    position: static;
+}
+
+#tags--field .addtag-button,
+#save-tags--field .addtag-button {
+    background: #ffffff url(images/corners.png) no-repeat right -25px;
+    line-height: 22px !important;
+    height: 22px !important;
+}
+
+#tags--field .addtag-button span,
+#save-tags--field .addtag-button span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    line-height: 21px !important;
+    height: 21px !important;
+}

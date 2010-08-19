@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+    <p>You have been added to the
+    ${system_name} <a href="${community_href}">${community_name}</a>
+    community.
+      <div>
+    ...............................................................
+      </div>
+    </p>
+    <p>
+      <h4>Community Description:</h4> 
+      <div>${community_description}</div>
+    </p>
+    <p tal:condition="personal_message is not None">
+     <h4>Personal Message:</h4>
+     <div tal:content="structure personal_message"/>
+    </p>
+    <p>
+      <div>--</div>
+      <div>PLEASE DO NOT REPLY TO THIS EMAIL.</div>
+      <div>To view this community,
+      visit: <a href="${community_href}">${community_href}</a></div>
+    </p>
+  </body>
+</html>

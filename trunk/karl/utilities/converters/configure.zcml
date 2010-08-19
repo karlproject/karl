@@ -1,0 +1,225 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".html.HTMLConverter"
+      name="text/html"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".doc.DocConverter"
+      name="application/msword"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".doc.DocConverter"
+      name="application/ms-word"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".doc.DocConverter"
+      name="application/vnd.ms-word"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".plaintext.PlainTextConverter"
+      name="text/plain"
+      />
+
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.calc"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.calc.template"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.draw"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.draw.template"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.impress"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.impress.template"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.math"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.writer"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.writer.global"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.sun.xml.writer.template"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.chart"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.database"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.formula"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.graphics"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.graphics-template otg"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.image"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.presentation"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.presentation-template otp"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.spreadsheet"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.spreadsheet-template ots"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.text"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.text-master"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.text-template ott"
+     />
+  <utility
+     provides=".interfaces.IConverter"
+     component=".ooffice.OOfficeConverter"
+     name="application/vnd.oasis.opendocument.text-web"
+     />
+
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".pdf.PDFConverter"
+      name="application/pdf"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".ppt.PPTConverter"
+      name="application/mspowerpoint"
+      />
+  <utility
+      provides=".interfaces.IConverter"
+      component=".ppt.PPTConverter"
+      name="application/ms-powerpoint"
+      />
+  <utility
+      provides=".interfaces.IConverter"
+      component=".ppt.PPTConverter"
+      name="application/vnd.ms-powerpoint"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".ps.PSConverter"
+      name="application/postscript"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".sgml.SGMLConverter"
+      name="text/sgml"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".sgml.SGMLConverter"
+      name="text/xml"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".xls.XLSConverter"
+      name="application/mxexcel"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".xls.XLSConverter"
+      name="application/ms-excel"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".xls.XLSConverter"
+      name="application/vnd.ms-excel"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".rtf.RTFConverter"
+      name="application/rtf"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".rtf.RTFConverter"
+      name="text/rtf"
+      />
+
+</configure>

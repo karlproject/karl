@@ -1,0 +1,35 @@
+<div id="${field.cssname}">
+
+  <input type="checkbox" class="noborder" id="${field.cssname}-id"
+         tal:attributes="checked field.widget.checked(field) and True or False"
+	 value="True" name="${field.name}"/>
+  <label style="font-weight: normal;" for="${field.cssname}-id">
+    I accept <a class="dialogLink" href="#">${field.widget.description}</a>
+  </label>
+  <div title="Terms and Conditions" class="dialogContent"
+       tal:content="structure field.widget.text" />
+
+  <script language="javascript" type="text/javascript">
+    $(document).ready(function() {
+    // create the dialog from the embedded content
+    var dialog = $('#${field.cssname} .dialogContent')
+    .karldialog({
+        width: 666,
+        height: 450,
+        dialogClass: 'karlTermsDialog',
+        buttons: {
+            "Ok": function() {
+            $(this).karldialog('close');
+        }
+    }
+    });
+    // bind the click to open the dialog
+    $('#${field.cssname} .dialogLink')
+        .click(function(e) {
+            dialog.karldialog('open');
+            e.preventDefault();
+         });
+    });
+  </script>
+
+</div>

@@ -1,0 +1,54 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.generic_layout.macros['master']">
+
+<div metal:fill-slot="content">
+
+<form method="post" id="tag-manage">
+
+<h1 class="kscreentitle">${api.page_title}</h1>
+
+<h4 class="abouthead">Rename tags</h4>
+
+<p class="aboutsmall">
+ This is where you can rename tags that you have used before. Renaming
+ tags will change every item that is tagged with the old tag to the new tag.
+</p>
+
+<div tal:condition="error" class="portalMessage">${error}</div>
+
+<fieldset>
+ <label for="old_tag">Old tag</label>
+ <select name="old_tag">
+   <option tal:repeat="tag tags"
+                value="${tag}" selected="${tag == old}">${tag}</option>
+ </select>
+
+ <label for="new_tag">New tag</label>
+ <input type="text" size="35" name="new_tag" value="${new}"/>
+
+ <input type="submit" name="form.rename" value="Rename tags" />
+</fieldset>
+
+<h4 class="abouthead">Delete tags</h4>
+
+<p class="aboutsmall">
+  Deleting a tag will remove that tag from any item that uses it. It
+  will not delete the item.
+</p>
+
+<fieldset>
+ <label for="todelete">Tag to be deleted</label>
+ <select name="todelete">
+  <option tal:repeat="to_delete tags"
+          value="${to_delete}">${to_delete}</option>
+ </select>
+
+ <input type="submit" name="form.delete" value="delete tag" />
+</fieldset>
+</form>
+
+</div>
+
+</div>

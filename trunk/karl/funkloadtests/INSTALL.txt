@@ -1,0 +1,43 @@
+To use funkload tests, you need to have funkload installed.
+But after install, there is a problem with one of its dependencies, webunit.
+
+Webunit does not correctly check the domain when you are running against a website that uses a port as part of its address.
+
+So, we fixed this. 
+I included the cookie.py which replaces cookie.py that is installed with funkload & webunit. 
+
+Here is the long explanation of the problem and fix:
+So funkload can login to karl website with 
+
+self.setBasicAuth("admin","admin")
+
+once the initial "cookie" problem is fixed.
+
+The cookie error we initially get is: 
+Error: COOKIE ERROR: Cookie domain ".localhost:6543" doesn't match request host "localhost"
+
+I've installed funkload in my own directory (not in svn) to test
+I identified the error in cookie.py which is located in my test directory's:
+lib/python2.5/site-packages/webunit-1.3.8-py2.5.egg/webunit/
+
+In cookie.py's decodeCookies method, (near line 70) the orginal said:
+
+if not server.endswith(domain):
+                raise Error, 'Cookie domain "%s" doesn\'t match '\
+                    'request host "%s"'%(domain, server)
+
+I wanted to test a locally run server for the developers which is running on a 6543 port so the cookie always failed. 
+
+I changed that part of method to:
+            port = 6543
+...
+
+            full_serveraddress = '%s:%s' % (server, port)
+            if not (domain.endswith(server) or domain.endswith(full_serveraddress)):
+            #if not server.endswith(domain):
+                raise Error, 'Cookie domain "%s" doesn\'t match '\
+                    'request host "%s"'%(domain, server)
+
+and now I don't get cookie error and I can use the basicauth to login to karl and "do stuff." 
+
+I e-mailed an FYI to webunit and funkload creators, but aren't expecting any response.

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>Intranet_add</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Intranet_add</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/offices/forums/?status_message=Deleted+selenium_test1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=INTRANETS</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Add Intranet</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>title</td>
+	<td>Pensacola</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>address</td>
+	<td>aa bbb ccc ave</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>city</td>
+	<td>Pensacola</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>state</td>
+	<td>Fl</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>country</td>
+	<td>USA</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>zipcode</td>
+	<td>32514</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>telephone</td>
+	<td>xxxyy1234</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>form-submit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Intranet added</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

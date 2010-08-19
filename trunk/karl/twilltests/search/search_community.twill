@@ -1,0 +1,24 @@
+# Search for a community
+
+# Make a random word to insert in the community
+set_random_word search_comm
+
+# create community
+# Makes a community using function in twillcommands
+make_community ${search_comm}
+
+# Verify community
+go /communities/${search_comm}
+code 200
+find ${search_comm}
+
+# Search for community
+catalog_find ${search_comm} ${search_comm}
+
+# Remove event
+go /communities/${search_comm}/delete.html?confirm=1
+go /communities/${search_comm}/
+code 404
+
+# Verify search doesn't find it now that it's been deleted
+catalog_notfind "${search_comm}" "/communities/${search_comm}"

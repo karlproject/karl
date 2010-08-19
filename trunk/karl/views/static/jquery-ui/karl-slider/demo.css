@@ -1,0 +1,11 @@
+
+body {
+    font-family: sans-serif;
+    margin: 2em;
+    color: black;
+    background-color: white;
+}
+
+.text {
+    background-color: yellow;
+}

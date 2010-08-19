@@ -1,0 +1,42 @@
+login admin
+## Viewed through the Office Layout, not the Community Layout.
+go /offices/forums/baloney
+notfind "SEARCH COMMUNITY"
+notfind "ACTIVE USERS"
+## Provide a link that gets back to the List Forums screen
+find "Back to Forums"
+follow "Back to Forums"
+#url /offices/forums/all_forums.html
+## All KarlStaff can see this view and sees an action saying “Add Forum Topic”
+login staff1
+go /offices/forums/baloney
+find "Add Forum Topic"
+login affiliate
+go /offices/forums/baloney
+title "Forbidden"
+find "The set of credentials you possess does not allow you to view this"
+notfind "Add Forum Topic"
+login admin
+go /offices/forums/baloney
+## Show the title of the forum in the page heading area
+title "Bologna"
+#xpath "count(//ul[@class='kscreentitle', @text='Bologna'])" 1
+## A paginated listing with pagination boxes at the top and bottom
+#xpath "count(//ul[@class='kpaginationtotals'])" 2
+## 20 items per page, no security filtering
+## 4 columns
+ ## Topic shows the title of the topic as a hyperlink to the show the topic
+set_random_word forumtitle
+go /offices/forums/baloney/add_forum_topic.html
+fv save title ${forumtitle}
+submit
+go /offices/forums/baloney
+find ${forumtitle}
+follow ${forumtitle}
+title ${forumtitle}
+#xpath "count(//ul[@class='kscreentitle', text='${forumtitle}'])" 1
+ ## Posted By shows the name of the creator
+go /offices/forums/baloney
+#xpath "count(//table[@class='messageBoard', @td2='Staff One']" 1
+ ## Date shows a longform version of the creation date
+ ## Comments shows the count of comments to the topic

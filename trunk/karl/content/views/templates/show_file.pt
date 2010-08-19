@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <div metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+
+    <div class="kbody">
+
+      <div metal:use-macro="api.snippets.macros['download_file']"/>
+
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['previous_next']"/>
+
+  </div>
+
+</html>

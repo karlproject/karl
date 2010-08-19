@@ -1,0 +1,14 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     class="sections">
+
+    <h3>${feed.title}</h3>
+
+    <p tal:repeat="entry feed.entries">
+        <a href="${entry.link}" tal:content="entry.title"></a>
+    </p>
+
+	<p class="more"><a href="${feed.link}">MORE ${feed.title}</a></p>
+
+</div>

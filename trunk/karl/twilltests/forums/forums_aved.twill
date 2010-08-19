@@ -1,0 +1,84 @@
+# Add/view/edit/delete for forums
+# Add, edit forum topic
+# Add comment on forum topic
+
+# Make a random word to insert in the forum title
+set_random_word test_forum
+
+# Add a forum and ensure the random word appears
+go /communities/${community_name}/forums/add_forum.html
+notfind "Delete"
+fv save title ${test_forum}
+fv save description "This is a forum created by Twill test (forums.forums_aved) to verify a new forum could be added."
+submit
+url "/communities/${community_name}/forums/${test_forum}/"
+
+# Confirm
+find ${test_forum}
+find "Add Forum Topic"
+find "Edit"
+find "Delete"
+
+# Edit Forum
+set_random_word titlechange
+follow "Edit"
+notfind "Delete"
+fv save title "${titlechange}"
+submit
+find ${titlechange}
+
+catalog_find ${titlechange} /communities/${community_name}/forums/
+
+# Add forum topic
+set_random_word ftopic
+go /communities/${community_name}/forums/${test_forum}
+code 200
+follow "Add Forum Topic"
+url /communities/${community_name}/forums/${test_forum}/add_forum_topic.html
+find "Add Forum Topic"
+find "Title"
+find "Text"
+fv save title "${ftopic}"
+fv save text "This forum topic (${ftopic}) was created by Twill tests (forums.forums_aved)"
+submit
+
+# View forum topic
+url /communities/${community_name}/forums/${test_forum}/${ftopic}
+title "${ftopic}"
+find "Edit"
+find "Delete"
+
+# Add comment
+fv save add_comment "This is a comment made by a Twill tests (forums.forms_aved) to comment on this topic entry."
+submit
+
+
+# Edit forum topic
+go /communities/${community_name}/forums/${test_forum}/${ftopic}
+url /communities/${community_name}/forums/${test_forum}/${ftopic}
+title "${ftopic}"
+find "Edit"
+follow "Edit"
+url /communities/${community_name}/forums/${test_forum}/${ftopic}/edit.html
+find "Edit ${ftopic}"
+find "Title"
+find "Tags"
+find "Text"
+fv save text "This forum topic was edited by Twill tests (forums.forums_aved.twill)"
+submit
+url /communities/${community_name}/forums/${test_forum}/${ftopic}
+find "Edit"
+find "Delete"
+
+
+
+# Now delete forum
+# tip: if you don't delete file, you might get error on re-running test
+# each location needs unique filenames of files uploaded
+go /communities/${community_name}/forums/${test_forum}
+follow "Delete"
+follow "ok"
+go /communities/${community_name}/forums/${test_forum}
+code 404
+
+catalog_notfind ${titlechange} /communities/${community_name}/forums/

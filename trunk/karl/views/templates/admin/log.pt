@@ -1,0 +1,45 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="rightcol">
+      <div metal:use-macro="menu"/>
+    </div>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: View Log</h1>
+
+      <div class="koverview_body">
+        <form method="GET" name="log_files"
+              tal:condition="len(logs) > 1">
+          <b>Choose a log file to view</b><br/>
+          <select name="log">
+            <option value="_none">-------</option>
+            <option tal:repeat="path logs"
+                    tal:attributes="selected log == path;
+                                    value path">${path}</option>
+          </select>
+          <input type="submit" value="View log file."/>
+          <br/><br/>
+        </form>
+
+        <div id="log-wrapper" tal:condition="log">
+          <div><b>${log}</b></div>
+          <br/>
+          <div id="log">
+            <div class="line" tal:condition="not lines">Empty log.</div>
+            <div class="line" tal:repeat="line lines">${line}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</html>

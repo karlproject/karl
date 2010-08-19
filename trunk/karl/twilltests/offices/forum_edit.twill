@@ -1,0 +1,8 @@
+# Delete forum
+go /offices/forums/${forum_name}
+find "${forum_name}"
+url /offices/forums/${forum_name}
+follow "Edit"
+fv save description "Description changed by Twill test (offices.forum_edit)"
+submit
+url /offices/forums/${forum_name}
