@@ -135,9 +135,37 @@ class TestCommunityStats(unittest.TestCase):
         self.assertEqual(row['blog_entries'], 1)
         self.assertEqual(row['comments'], 1)
         self.assertEqual(row['files'], 1)
-        self.assertEqual(row['calendar_events'], 0)
+        self.assertEqual(row['calendar_events'], 1)
         self.assertEqual(row['community_tags'], 1)
         self.assertAlmostEqual(row['percent_engaged'], 66.666666666)
+
+    def test_community_with_no_members(self):
+        import datetime
+        site = self._mk_dummy_site()
+        site['communities']['big_endians'].member_names = set()
+        site['communities']['big_endians'].moderator_names = set()
+        report = list(self._call_fut(site))
+        report.sort(key=lambda x: x['id'])
+        self.assertEqual(len(report), 2)
+        row = report.pop(0)
+        self.assertEqual(row['community'], 'Big Endians')
+        self.assertEqual(row['id'], 'big_endians')
+        self.assertEqual(row['members'], 0)
+        self.assertEqual(row['moderators'], 0)
+        self.assertEqual(row['last_activity'], datetime.datetime(
+            2010, 6, 12, 2, 42
+        ))
+        self.assertEqual(row['create_date'], datetime.datetime(
+            2010, 5, 12, 2, 42
+        ))
+        self.assertEqual(row['security_state'], 'custom')
+        self.assertEqual(row['wiki_pages'], 2)
+        self.assertEqual(row['blog_entries'], 0)
+        self.assertEqual(row['comments'], 0)
+        self.assertEqual(row['files'], 0)
+        self.assertEqual(row['calendar_events'], 0)
+        self.assertEqual(row['community_tags'], 2)
+        self.assertAlmostEqual(row['percent_engaged'], 0.0)
 
 class TestProfileStats(unittest.TestCase):
     def setUp(self):
@@ -271,6 +299,112 @@ class TestProfileStats(unittest.TestCase):
         self.assertEqual(row['num_tags'], 1)
         self.assertEqual(row['documents_this_month'], 5)
 
+class TestUserActivityReport(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        self._mk_site()
+
+    def tearDown(self):
+        cleanUp()
+
+    def registerCatalogSearch(self, search_adapter):
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.bfg.testing import registerAdapter
+        from zope.interface import Interface
+        registerAdapter(search_adapter, (Interface,), ICatalogSearch)
+
+    def _mk_site(self):
+        from karl.models.interfaces import ICommunity
+        from karl.testing import DummyCommunity
+        from karl.testing import DummyModel
+        from karl.testing import DummyRoot
+        from zope.interface import directlyProvides
+
+        search_results = {
+            'daniela': [],
+            'stough': [],
+            'fred': [],
+        }
+
+        self.site = site = DummyRoot()
+        communities = site['communities'] = DummyModel()
+
+        profiles = site['profiles'] = DummyModel()
+        profiles['daniela'] = DummyModel()
+        profiles['stough'] = DummyModel()
+        profiles['fred'] = DummyModel()
+
+        big_endians = communities['big_endians'] = DummyCommunity()
+        self.big_endians = big_endians
+        directlyProvides(big_endians, ICommunity)
+
+        content = big_endians['wiki1'] = DummyModel()
+        content.created = datetime.datetime(2010, 5, 12, 3, 42)
+        search_results['daniela'].append(content)
+
+        content = big_endians['wiki2'] = DummyModel()
+        content.created = datetime.datetime(1975, 7, 7, 7, 23)
+        search_results['fred'].append(content)
+
+        little_endians = communities['little_endians'] = DummyCommunity()
+        self.little_endians = little_endians
+        directlyProvides(little_endians, ICommunity)
+
+        content = little_endians['blog1'] = DummyModel()
+        content.created = datetime.datetime(2010, 5, 12, 3, 43)
+        search_results['stough'].append(content)
+
+        content['comment1'] = DummyModel()
+        content = content['comment1']
+        content.created = datetime.datetime(2010, 5, 12, 3, 44)
+        search_results['stough'].append(content)
+
+        content['comment2'] = DummyModel()
+        content = content['comment2']
+        content.created = datetime.datetime(2010, 5, 12, 3, 45)
+        search_results['daniela'].append(content)
+
+        self.registerCatalogSearch(DummySearchAdapterFactory(search_results))
+
+    def _call_fut(self, context, ids=None):
+        from karl.utilities.stats import user_activity_report as fut
+        return fut(context, ids)
+
+    def test_it(self):
+        from datetime import datetime
+        results = list(self._call_fut(self.site))
+        self.assertEqual(len(results), 4)
+        self.assertEqual(
+            results[0],
+            ('daniela', self.big_endians, datetime(2010, 5, 12, 3, 42))
+        )
+        self.assertEqual(
+            results[1],
+            ('daniela', self.little_endians, datetime(2010, 5, 12, 3, 45))
+        )
+        self.assertEqual(
+            results[2],
+            ('fred', self.big_endians, datetime(1975, 7, 7, 7, 23))
+        )
+        self.assertEqual(
+            results[3],
+            ('stough', self.little_endians, datetime(2010, 5, 12, 3, 44))
+        )
+
+    def test_it_with_ids(self):
+        from datetime import datetime
+        results = list(self._call_fut(self.site, ('stough', 'fred')))
+        self.assertEqual(len(results), 2)
+        self.assertEqual(
+            results[0],
+            ('fred', self.big_endians, datetime(1975, 7, 7, 7, 23))
+        )
+        self.assertEqual(
+            results[1],
+            ('stough', self.little_endians, datetime(2010, 5, 12, 3, 44))
+        )
+
 class DummyTags(object):
     communities = {
         'big_endians': ['cute', 'clever'],
@@ -309,6 +443,21 @@ class DummySearchAdapter(object):
                 count = self.creators[creator][0]
 
         return count, None, None
+
+def DummySearchAdapterFactory(results):
+    """
+    Results is a mapping of creator to list of documents.
+    """
+    class DummySearchAdapter2(object):
+        def __init__(self, context):
+            pass
+
+        def __call__(self, **kw):
+            creator = kw['creator']
+            content = results[creator]
+            return len(content), content, lambda x: x
+
+    return DummySearchAdapter2
 
 class DummyUsers(object):
     users = {

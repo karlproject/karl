@@ -191,6 +191,13 @@ class DummyMailer(list):
     def send(self, mfrom, mto, msg):
         self.append(self.DummyMessage(mfrom, mto, msg))
 
+def registerDummyMailer():
+    from repoze.bfg.testing import registerUtility
+    from repoze.sendmail.interfaces import IMailDelivery
+    mailer = DummyMailer()
+    registerUtility(mailer, IMailDelivery)
+    return mailer
+
 class DummyFile:
     def __init__(self, **kw):
         self.__dict__.update(kw)
@@ -289,6 +296,9 @@ class DummyUsers:
         if userid in self._by_id:
             return group in self._by_id[userid]['groups']
         return False
+
+    def users_in_group(self, group):
+        return [id for id in self._by_id if group in self._by_id[id]['groups']]
 
 class DummyUpload(object):
     """Simulates an HTTP upload.  Suitable for assigning as the value to

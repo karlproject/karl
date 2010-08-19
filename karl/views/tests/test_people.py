@@ -1203,25 +1203,32 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
             '?status_message=Password%20changed')
 
 
-class TestDeleteProfileView(unittest.TestCase):
+class TestDeactivateProfileView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.views.people import delete_profile_view
-        return delete_profile_view(context, request)
+        from karl.views.people import deactivate_profile_view
+        return deactivate_profile_view(context, request)
 
     def test_noconfirm(self):
         context = DummyProfile(firstname='Mori', lastname='Turi')
         context.title = 'Context'
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer(
-            'templates/delete_profile.pt')
+            'templates/deactivate_profile.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '200 OK')
 
     def test_confirm_not_deleting_own_profile(self):
         from karl.testing import DummyUsers
+        from repoze.workflow.testing import registerDummyWorkflow
         parent = testing.DummyModel()
         users = parent.users = DummyUsers()
+        workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
         testing.registerDummySecurityPolicy('admin')
@@ -1232,14 +1239,19 @@ class TestDeleteProfileView(unittest.TestCase):
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location,
                          'http://example.com/?status_message='
-                         'Deleted+profile%3A+userid')
-        self.failIf('userid' in parent)
+                         'Deactivated+user+account%3A+userid')
         self.assertEqual(users.removed_users, ['userid'])
+        self.assertEqual(workflow.transitioned, [{
+            'to_state': 'inactive', 'content': context,
+            'request': request, 'guards': (),
+            'context': None, 'skip_same': True}])
 
     def test_confirm_deleting_own_profile(self):
         from karl.testing import DummyUsers
+        from repoze.workflow.testing import registerDummyWorkflow
         parent = testing.DummyModel()
         users = parent.users = DummyUsers()
+        workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
         testing.registerDummySecurityPolicy('userid')
@@ -1248,8 +1260,11 @@ class TestDeleteProfileView(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '401 Unauthorized')
-        self.failIf('userid' in parent)
         self.assertEqual(users.removed_users, ['userid'])
+        self.assertEqual(workflow.transitioned, [{
+            'to_state': 'inactive', 'content': context,
+            'request': request, 'guards': (),
+            'context': None, 'skip_same': True}])
 
 class DummyImageFile(object):
     def __init__(self, title=None, stream=None, mimetype=None, filename=None,

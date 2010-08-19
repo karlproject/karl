@@ -124,10 +124,10 @@ class Test_content_to_private(unittest.TestCase):
         self.assertEqual(ob.__acl__[3], NO_INHERIT)
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_to_profile(unittest.TestCase):
+class Test_to_profile_active(unittest.TestCase):
     def _callFUT(self, ob, transition):
-        from karl.workflow import to_profile
-        return to_profile(ob, transition)
+        from karl.workflow import to_profile_active
+        return to_profile_active(ob, transition)
 
     def test_it(self):
         from zope.interface import directlyProvides
@@ -139,8 +139,9 @@ class Test_to_profile(unittest.TestCase):
         from karl.security.policy import NO_INHERIT
         ob = testing.DummyModel()
         ob.__acl__ = []
-        index = DummyIndex()
-        ob.catalog = {'path': index}
+        ob.catalog = DummyCatalog()
+        ob['people'] = people = testing.DummyModel()
+        people.catalog = DummyCatalog()
         ob.creator = 'creator'
         ob.users = DummyUsers(**{'creator':
                                  {'groups':['group.community:foo:members']}})
@@ -148,18 +149,53 @@ class Test_to_profile(unittest.TestCase):
         directlyProvides(ob, ICommunity)
         self._callFUT(ob, None)
         self.assertEqual(ob.__acl__[0],
-                         (Allow, 'creator', MEMBER_PERMS))
+                         (Allow, 'creator', MEMBER_PERMS + ('view_only',)))
         self.assertEqual(ob.__acl__[1],
-                         (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS))
+                         (Allow, 'group.KarlUserAdmin',
+                          ADMINISTRATOR_PERMS + ('view_only',)))
         self.assertEqual(ob.__acl__[2],
-                         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
+                         (Allow, 'group.KarlAdmin',
+                          ADMINISTRATOR_PERMS + ('view_only',)))
         self.assertEqual(ob.__acl__[3],
-                         (Allow, 'group.KarlStaff', GUEST_PERMS))
+                         (Allow, 'group.KarlStaff',
+                          GUEST_PERMS + ('view_only',)))
         self.assertEqual(ob.__acl__[4],
-                         (Allow, 'group.community:foo:members', GUEST_PERMS))
-        self.assertEqual(ob.__acl__[5], NO_INHERIT)
-        self.assertEqual(index.indexed, {1234: ob})
+                         (Allow, 'group.community:foo:members',
+                          GUEST_PERMS + ('view_only',)))
+        self.assertEqual(ob.__acl__[5],
+                         (Allow, 'system.Authenticated', ('view_only',)))
+        self.assertEqual(ob.__acl__[6], NO_INHERIT)
+        self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
+        self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
+        self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
 
+class Test_to_profile_inactive(unittest.TestCase):
+    def _callFUT(self, ob, transition):
+        from karl.workflow import to_profile_inactive
+        return to_profile_inactive(ob, transition)
+
+    def test_it(self):
+        from zope.interface import directlyProvides
+        from repoze.bfg.security import Allow
+        from karl.models.interfaces import ICommunity
+        from karl.security.policy import NO_INHERIT
+        ob = testing.DummyModel()
+        ob.__acl__ = []
+        ob.catalog = DummyCatalog()
+        ob['people'] = people = testing.DummyModel()
+        people.catalog = DummyCatalog()
+        ob.creator = 'creator'
+        ob.users = DummyUsers(**{'creator':
+                                 {'groups':['group.community:foo:members']}})
+        ob.docid = 1234
+        directlyProvides(ob, ICommunity)
+        self._callFUT(ob, None)
+        self.assertEqual(ob.__acl__[0],
+                         (Allow, 'system.Authenticated', ('view_only',)))
+        self.assertEqual(ob.__acl__[1], NO_INHERIT)
+        self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
+        self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
+        self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
 
 class Test_comment_to_inherits(unittest.TestCase):
     def _callFUT(self, ob, transition):
@@ -555,9 +591,18 @@ class Test_reset_profile(unittest.TestCase):
 class DummyContent:
     pass
 
-class DummyCatalog:
+class DummyCatalog(dict):
+    def __init__(self):
+        super(DummyCatalog, self).__init__()
+        self['path'] = DummyIndex()
+        self['allowed'] = DummyIndex()
+        self.document_map = self
+
     def reindex_doc(self, docid, obj): # pragma: no cover
         assert 0, "don't go here"
+
+    def docid_for_address(self, path):
+        return 12345
 
 class DummyIndex:
     def __init__(self):

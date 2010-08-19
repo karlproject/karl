@@ -5,12 +5,12 @@ login "${cur_admin}"
 # Delete user
 go /profiles/tempuser
 find "Test User"
-go /profiles/tempuser/delete.html
-find "Do you really want to delete <strong> Test User"
+go /profiles/tempuser/deactivate.html
+find "Do you really want to deactivate\s+<strong> Test User"
 find "ok"
 follow "ok"
 go /profiles/tempuser
-code 404
+code 200
 
 
 # logging back in as current user

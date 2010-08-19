@@ -479,8 +479,6 @@ def get_profile_actions(profile, request):
         actions.append(('Edit', 'admin_edit_profile.html'))
     elif same_user:
         actions.append(('Edit', 'edit_profile.html'))
-    #if has_permission('delete', profile, request) and not same_user:
-    #    actions.append(('Delete', 'delete.html'))
     if same_user:
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
@@ -813,28 +811,30 @@ class ChangePasswordFormController(object):
         return HTTPFound(location=path+msg)
 
 
-def delete_profile_view(context, request):
+def deactivate_profile_view(context, request):
+    name = context.__name__
+    myself = authenticated_userid(request) == context.__name__
 
     confirm = request.params.get('confirm')
     if confirm:
-        parent = context.__parent__
-        name = context.__name__
         find_users(context).remove(name)
-        del parent[name]
-
-        if authenticated_userid(request) == name:
+        workflow = get_workflow(IProfile, 'security', context)
+        workflow.transition_to_state(context, request, 'inactive')
+        if myself:
             return logout_view(context, request, reason='User removed')
-        query = {'status_message': 'Deleted profile: %s' % name}
+        query = {'status_message': 'Deactivated user account: %s' % name}
+        parent = context.__parent__
         location = model_url(parent, request, query=query)
 
         return HTTPFound(location=location)
 
-    page_title = 'Delete Profile for %s %s' % (context.firstname,
-                                               context.lastname)
+    page_title = 'Deactivate user account for %s %s' % (context.firstname,
+                                                        context.lastname)
     api = TemplateAPI(context, request, page_title)
 
     # Get a layout
     return render_template_to_response(
-        'templates/delete_profile.pt',
+        'templates/deactivate_profile.pt',
         api=api,
+        myself=myself,
         )

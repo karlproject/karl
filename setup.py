@@ -121,6 +121,7 @@ setup(name='karl',
       reset_security_workflows = karl.scripts.reset_security_workflows:main
       use_pgtextindex = karl.scripts.use_pgtextindex:main
       site_announce = karl.scripts.site_announce:main
+      user_activity_report = karl.scripts.user_activity_report:main
       """
       )
 

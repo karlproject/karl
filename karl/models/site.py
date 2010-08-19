@@ -244,6 +244,11 @@ def get_email(object, default):
 
 def get_allowed_to_view(object, default):
     principals = principals_allowed_by_permission(object, 'view')
+    if not principals:
+        # An empty value tells the catalog to match anything, whereas when
+        # there are no principals with permission to view we want for there
+        # to be no matches.
+        principals = ['NO ONE no way NO HOW',]
     return principals
 
 def get_lastfirst(object, default):

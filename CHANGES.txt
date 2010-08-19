@@ -61,6 +61,16 @@ Unreleased
   minutes.  If unable to fulfill its duties for 30 minutes, it will raise an
   exception which will trigger all of the usual alarm bells. (LP #614368)
 
+- Replaced the notion of deleting users with the notion of deactivating users.
+  Deactivated users are effectively deleted except that their profiles may
+  still be viewed by clicking a link on content which the deactivated user
+  had authored.  LP #599805
+
+- Fixed bug (found by random code review) in community stats report where
+  calendar events were not counted.
+
+- Created user activity report.  LP #599804
+
 3.41 (2010-08-04)
 -----------
 

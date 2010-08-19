@@ -133,14 +133,24 @@
             name="profile"
             description="Workflow for profiles"
             content_types="karl.models.interfaces.IProfile"
-            initial_state="profile"
+            initial_state="active"
             state_attr="security_state"
             >
 
-      <state name="profile" title="Profile"
-             callback="karl.workflow.to_profile">
+      <state name="active" title="Active"
+             callback="karl.workflow.to_profile_active">
           <alias name="inherits"/> <!-- b/c -->
       </state>
+
+      <state name="inactive" title="Inactive"
+             callback="karl.workflow.to_profile_inactive"/>
+
+      <transition name="active_to_inactive"
+                  to_state="inactive"
+                  from_state="active"/>
+      <transition name="inactive_to_active"
+                  to_state="active"
+                  from_state="inactive"/>
 
   </workflow>
 

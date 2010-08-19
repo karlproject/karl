@@ -10,6 +10,7 @@ from karl.models.interfaces import ICommunity
 
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
+from karl.utils import find_community
 from karl.utils import find_communities
 from karl.utils import find_profiles
 from karl.utils import find_tags
@@ -91,7 +92,7 @@ def collect_community_stats(context):
                 stats['comments'] += 1
             elif ICommunityFile.providedBy(node):
                 stats['files'] += 1
-            elif ICommunityFile.providedBy(node):
+            elif ICalendarEvent.providedBy(node):
                 stats['calendar_events'] += 1
 
             created = getattr(node, 'created', None)
@@ -219,3 +220,43 @@ def collect_profile_stats(context):
         stats['num_tags'] = len(tags.getTags(users=(name,)))
 
         yield stats
+
+def user_activity_report(context, ids=None):
+    """
+    Returns a generator which iterates over user profiles yielding rows where
+    each row is a tuple of (username, community, last_activity) where
+    `last_activity` is the most recent activity for that user in that
+    community.  If ids is not specified, report will be generated for all user
+    profiles.  Otherwise, the report will only be generated for the given
+    profiles.
+    """
+    if ids is None:
+        profiles = find_profiles(context)
+        ids = sorted(profiles.keys())
+    else:
+        ids = sorted(ids)
+
+    search = ICatalogSearch(context)
+    for id in ids:
+        # communities[community_name] = (community, last_activity_date)
+        communities = {}
+        count, docids, resolver = search(creator=id)
+        for docid in docids:
+            doc = resolver(docid)
+            created = getattr(doc, 'created', None)
+            community = find_community(doc)
+            if community is None:
+                continue
+
+            name = community.__name__
+            if name not in communities:
+                communities[name] = (community, created)
+                continue
+
+            last_activity = communities[name][1]
+            if created > last_activity:
+                communities[name] = (community, created)
+
+        for name in sorted(communities.keys()):
+            community, last_activity = communities[name]
+            yield id, community, last_activity

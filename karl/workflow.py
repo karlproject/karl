@@ -20,6 +20,7 @@ from karl.security.workflow import reset_security_workflow
 
 from karl.utils import find_catalog
 from karl.utils import find_community
+from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_users
 from karl.utils import find_profiles
 from karl.views.communities import get_community_groups
@@ -47,6 +48,17 @@ def _reindex(ob):
         for node in postorder(ob):
             if hasattr(node, 'docid'):
                 allowed_index.reindex_doc(node.docid, node)
+
+def _reindex_peopledir(profile):
+    catalog = find_peopledirectory_catalog(profile)
+
+    # The docid stored as an attribute on the profile is the docid for the main
+    # site catalog.  The peopledir catalog has a different set of docids, so it
+    # is necessary to consult the document map.
+    path = model_path(profile)
+    docid = catalog.document_map.docid_for_address(path)
+    allowed_index = catalog.get('allowed')
+    allowed_index.reindex_doc(docid, profile)
 
 def ts(*args):
     return '\t'.join([unicode(x) for x in args])
@@ -228,27 +240,46 @@ def forum_topic_to_inherits(ob, info):
 #   Special workflow for profiles
 #------------------------------------------------------------------------------
 
-def to_profile(ob, info):
+def to_profile_active(ob, info):
     acl  = [
-        (Allow, ob.creator, MEMBER_PERMS),
+        (Allow, ob.creator, MEMBER_PERMS + ('view_only',)),
     ]
-    acl.append((Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS))
-    acl.append((Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
-    acl.append((Allow, 'group.KarlStaff', GUEST_PERMS))
+    acl.append((Allow, 'group.KarlUserAdmin',
+                ADMINISTRATOR_PERMS + ('view_only',)))
+    acl.append((Allow, 'group.KarlAdmin',
+                ADMINISTRATOR_PERMS + ('view_only',)))
+    acl.append((Allow, 'group.KarlStaff',
+                GUEST_PERMS + ('view_only',)))
     users = find_users(ob)
     user = users.get_by_id(ob.creator)
     if user is not None:
         groups = user['groups']
         for group, role in get_community_groups(groups):
             c_group = 'group.community:%s:%s' % (group, role)
-            acl.append((Allow, c_group, GUEST_PERMS))
+            acl.append((Allow, c_group, GUEST_PERMS + ('view_only',)))
+    acl.append((Allow, 'system.Authenticated', ('view_only',)))
     acl.append(NO_INHERIT)
     msg = None
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('to-profile', model_path(ob), added, removed)
+        msg = ts('to-active', model_path(ob), added, removed)
     _reindex(ob)
+    _reindex_peopledir(ob)
+    return msg
+
+def to_profile_inactive(ob, info):
+    acl  = [
+        (Allow, 'system.Authenticated', ('view_only',)),
+        NO_INHERIT,
+    ]
+    msg = None
+    added, removed = acl_diff(ob, acl)
+    if added or removed:
+        ob.__acl__ = acl
+        msg = ts('to-inactive', model_path(ob), added, removed)
+    _reindex(ob)
+    _reindex_peopledir(ob)
     return msg
 
 #------------------------------------------------------------------------------

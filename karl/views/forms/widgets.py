@@ -1,5 +1,6 @@
 import os
 from simplejson import JSONEncoder
+import formish
 from formish.widgets import Widget
 from formish.widgets import Grid
 from formish.widgets import Input
@@ -273,3 +274,6 @@ class PhotoImageWidget(FileUpload2):
 
 class DateTime(Widget):
     template = 'field.DateTime'
+
+class VerticalRadioChoice(formish.RadioChoice):
+    template = 'field.VerticalRadioChoice'
