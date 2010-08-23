@@ -2154,6 +2154,22 @@ Karl.themeroller = function() {
     }
 };
 
+
+//
+// A console.log replacement that works on all browsers
+// If the browser does not have a console, it's silent
+//
+// usage: Karl.log('This happened.');
+// or:    Karl.log('Variables:', var1, var2, var3);
+//
+Karl.log = function() {
+    if (window.console && console.log) {
+        // log for FireBug or WebKit console
+        console.log(Array.prototype.slice.call(arguments));
+    }
+};
+
+
 // Make debugging more fun by providing outerHtml.
 // Credit for this code: http://ivorycity.com/blog/2009/08/18/3/
 jQuery.fn.extend({
