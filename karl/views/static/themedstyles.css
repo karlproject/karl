@@ -1647,10 +1647,8 @@ span.sortingArrows a img {
   margin: 1em 0 1em;
 }
 .label-tags {
-  border: 1px solid #CECECE;
   font-size: 1em;
-  background: #F0F2F4;
-  padding: 0.2em 0.6em;
+  padding-top: 4px;
   color: #333 !important;
   margin-right: 5px;
   position: relative;
@@ -1660,6 +1658,18 @@ span.sortingArrows a img {
 	margin: 0;
 	width: 100%;
 	margin-bottom: 1em;
+}
+#tag-inputbox input,
+#tags--field input {
+    height: 19px;
+    margin-top: 2px;
+}
+button.addtag-button {
+    height: 19px !important;
+    margin-top: 2px;
+}
+#tags--field button.addtag-button {
+    margin-top: 2px;
 }
 
 /* tag cloud */

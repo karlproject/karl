@@ -4,9 +4,14 @@
 }
 
 .addtag-button {
-    position: static;
+    position: relative;
 }
-
+#tag-inputbox input {
+    margin-top: 1px !important;
+}
+#tags--field input {
+    margin-top: 0px !important;
+}
 #tags--field .addtag-button,
 #save-tags--field .addtag-button {
     background: #ffffff url(images/corners.png) no-repeat right -25px;

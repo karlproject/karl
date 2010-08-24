@@ -336,8 +336,12 @@ ul.menubar .menubar-lastitem a:active {
 /* add tag button */
 .addtag-button {
     position: relative;
+    margin-top: -1px !important;
 }
-    
+#tag-inputbox ul.autobox-hldr,
+#tags--field ul.autobox-hldr {
+    overflow: visible;
+}
 /* specific button color bg */
 .cheader button.normal_button span {
     background-color: #cedfef;
