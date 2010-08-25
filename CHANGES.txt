@@ -3,6 +3,9 @@ karl package Changelog
 Unreleased 
 -------------
 
+- Updated styles on Community Files page
+  (LP #622883)
+
 - Tags: set label to not look like a button, made tags, input
   and button same height and/or centered vertically
   (LP #622689)

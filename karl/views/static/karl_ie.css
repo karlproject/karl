@@ -100,6 +100,11 @@ span.sortingArrows {
     margin-top: -1px !important;
 }
 
+/* file page */
+#filegrid .ui-grid-pagination .ui-icon {
+    left: 2px;
+}
+
 /** =CALENDAR
 ----------------------------------------------- */
 body .cal th .cal_time_label {

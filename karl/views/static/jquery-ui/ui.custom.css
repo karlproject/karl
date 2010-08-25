@@ -16,7 +16,9 @@
     line-height: 1.8em;
     height: 1.8em;
 }
-
+#filegrid .ui-grid-footer {
+    background: #ffffff none;
+}
 .ui-grid-footer-text {
     display: inline-block;
     vertical-align: top;
@@ -24,7 +26,10 @@
     padding: 2px;
     margin: 2px;
 }
-
+#filegrid .ui-grid-footer-text {
+    font-weight: normal;
+    color: #999999;
+}
 .ui-grid-pagination {
     display: inline-block;
     vertical-align: top;
@@ -34,7 +39,9 @@
     padding: 2px;
     margin: 2px 2px 4px 2px;
 }
-
+#filegrid .ui-grid-pagination {
+    height: 20px;
+}
 .ui-grid-pagination a,
 .ui-grid-pagination a:hover,
 .ui-grid-pagination span {
@@ -47,8 +54,45 @@
     padding: 0 0.2em;
     text-decoration: none;
 }
+#filegrid .ui-grid-pagination a,
+#filegrid .ui-grid-pagination a:hover,
+#filegrid .ui-grid-pagination span {
+    margin: 0;
+    padding: 0 10px;
+    line-height: 19px;
+    background: #F6F7F6 none;
+    border-top: 1px solid #bcc2c7;
+    border-bottom: 1px solid #bcc2c7;
+    color: #3A74A9;
+}
 .ui-grid-pagination span {
     cursor: default;
+}
+#filegrid .ui-grid-pagination .ui-state-default {
+    background: #F6F7F6 none;
+    color: #3A74A9;
+    border-color: #bcc2c7;
+}
+#filegrid .ui-grid-pagination .ui-state-active {
+    background: #ebeced none;
+    color: #000000;
+    border-color: #bcc2c7;
+}
+#filegrid .ui-grid-pagination .ui-state-disabled {
+    background: #F6F7F6 none !important;
+    border-color: #bcc2c7;
+    opacity: 1;
+}
+#filegrid .ui-grid-pagination .ui-state-disabled div {
+    opacity: .35;
+}
+#filegrid .ui-grid-pagination .ui-grid-pagination-icon:first-child {
+    border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+}
+#filegrid .ui-grid-pagination .ui-grid-pagination-icon:last-child {
+    border-radius: 0 5px 5px 0;
+    -moz-border-radius: 0 5px 5px 0;
 }
 .ui-grid-pagination a.ui-grid-pagination-icon,
 .ui-grid-pagination a.ui-grid-pagination-icon:hover,
@@ -62,6 +106,16 @@
     top: 50%;
     left: 0;
 }
+#filegrid .ui-grid-pagination .ui-icon {
+    left: 5px;
+    background-image: url("/static/images/ui-icons_3a74a9_256x240.png");
+}
+#filegrid .ui-icon-circle-arrow-w {
+    background-position: -96px -49px;
+}
+#filegrid .ui-icon-circle-arrow-e {
+    background-position: -32px -49px;
+}
 .ui-grid-pagination a.ui-state-hover .ui-icon {
     margin-top: -9px;
 }
@@ -70,6 +124,11 @@
 .ui-grid-pagination span.ui-grid-pagination-icon {
     padding: 0;
     width: 16px;
+}
+#filegrid .ui-grid-pagination a.ui-grid-pagination-icon,
+#filegrid .ui-grid-pagination a.ui-grid-pagination-icon:hover,
+#filegrid .ui-grid-pagination span.ui-grid-pagination-icon {
+    width: 7px;
 }
 /* IE: Need to set the width 2px wider then the icon width (16px) */
 /* Holly Hack targets IE Win only \*/
@@ -108,14 +167,22 @@
     border-top: 0;
     border-left: 0;
     border-right: 0;
-    //XXpadding-top: 1px;
+    padding-top: 1px;
     padding-left: 2px;
     padding-right: 2px;
 }
-
+#filegrid .ui-grid-column,
+#filegrid .ui-grid-row-hover .ui-grid-column,
+#filegrid .ui-grid-row-selected .ui-grid-column {
+    border-bottom: 1px solid #E7E8E9;
+    padding: 2px;
+}
 /* alternate row coloring */
 .ui-grid-row.even .ui-grid-column {
     background: #fbf9ee url(/static/jquery-ui/grid/themes/base/images/fbf9ee_40x100_textures_02_glass_55.png) 0 50% repeat-x;
+}
+#filegrid .ui-grid-row.even .ui-grid-column {
+    background: #f0f2f4;
 }
 /* override selections on top of alternate colors,
  * and this time also apply correct absolute url. */
@@ -133,6 +200,13 @@
 .ui-grid-column-header {
     cursor: pointer;
 }
+#filegrid .ui-grid-column-header {
+    background: url(/static/images/grid_header.png) repeat-x left bottom;
+    border-top: 1px solid #E7E8E9;
+    border-right: 1px solid #e3e3e3;
+    border-bottom: none;
+    border-left: none;
+}
 
 /*.ui-grid-column-header div {*/
 .ui-grid-column-header a {
@@ -146,12 +220,25 @@
     margin-top: -8px;
     top: 50%;
     right: 8px;
-
+}
+#filegrid .ui-grid-column-header .ui-grid-visual-sorting-indicator {
+    background-image: url("/static/images/ui-icons_3a74a9_256x240.png");
+}
+#filegrid .ui-icon-carat-1-n {
+    background-position: 1px -49px;
+}
+#filegrid .ui-icon-carat-1-s {
+    background-position: -64px -49px;
 }
 .ui-grid-column-header .ui-grid-column-header-text {
     padding-right: 19px;   /* 16px + 3px */
 }
-
+#filegrid .ui-grid-column-header .ui-grid-column-header-text {
+    text-transform: uppercase;
+    color: #999999;
+    font-size: 10px;
+    padding-right: 6px;
+}
 
 /* autobox2 customization */
 
