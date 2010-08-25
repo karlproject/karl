@@ -3,7 +3,7 @@ karl package Changelog
 Unreleased 
 -------------
 
-- Updated styles on Community Files page
+- Updated styles on Community Files page, new file icons
   (LP #622883)
 
 - Tags: set label to not look like a button, made tags, input
