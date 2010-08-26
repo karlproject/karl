@@ -701,7 +701,7 @@
     <metal:announcement define-macro="site-announcement">
       <!--[if IE 6]>
       <div class="ie-announcement portalMessage">
-          KARL is detecting that your web browser in out of date. Using an out of date browser will
+          KARL is detecting that your web browser is out of date. Using an out of date browser will
           cause some KARL features to not work properly.
           <a href="http://www.microsoft.com/windows/internet-explorer">Please click here to
           download a newer version of your browser</a>.
