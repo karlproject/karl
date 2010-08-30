@@ -918,6 +918,8 @@ ul#peopledir-tabs li.selected a {
 }
 #peopledir-actions ul {
   margin: 0px;
+  float: right;
+  padding: 0;
 }
 #peopledir-actions li {
   float: left;

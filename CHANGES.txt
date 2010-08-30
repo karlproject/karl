@@ -3,6 +3,9 @@ karl package Changelog
 Unreleased 
 -------------
 
+- Fixed icons on people list page when FF zooms out
+  (LP #624761)
+
 - Updated styles on Community Files page, new file icons
   (LP #622883)
 
