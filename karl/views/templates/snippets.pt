@@ -283,7 +283,6 @@
           href="${api.here_url}dl/${api.context.filename}?save=True">Click here
           to download the file</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a style="padding-left: 0.2em;"
-          tal:condition="fileinfo.mimeinfo.viewable"
           href="${api.here_url}dl/${api.context.filename}">Click here to view
           the file</a>
       </div>
@@ -707,13 +706,13 @@
           download a newer version of your browser</a>.
       </div>
       <![endif]-->
-      
+
       <div class="site-announcement portalMessage" id="site-announcement"
            tal:condition="api.site_announcement"
            tal:content="structure api.site_announcement">
       </div>
     </metal:announcement>
-    
+
     <ul id="header-menu" metal:define-macro="header-menu">
         <li id="header-communities">
           <a href="${api.app_url}/communities">Communities</a>
@@ -725,7 +724,7 @@
           <a href="${api.app_url}/tagcloud.html">Tags</a>
         </li>
     </ul>
-    
+
 
   </body>
 </html>
