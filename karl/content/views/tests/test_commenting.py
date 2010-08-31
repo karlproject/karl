@@ -365,6 +365,14 @@ class RedirectCommentsTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
 
+    def test_redirect_with_status_message(self):
+        context = testing.DummyModel()
+        context.title = 'The comment'
+        request = testing.DummyRequest({'status_message':'The status'})
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+                         'http://example.com/?status_message=The status')
+
 class DummyCommentsFolder(testing.DummyModel):
 
     @property

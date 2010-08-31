@@ -68,7 +68,12 @@ def redirect_comments_view(context, request):
         msg = '?status_message=' + status_message
     else:
         msg = ''
-    return HTTPFound(location=url+msg)
+    # avoid Unicode errors on webob.multidict or webob.descriptors.
+    # only way to keep both happy from our end, since the redirect
+    # complicates things
+    location = url+msg
+    location = location.encode('utf-8')
+    return HTTPFound(location=location)
 
 def show_comment_view(context, request):
 
