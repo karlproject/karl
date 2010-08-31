@@ -175,11 +175,6 @@ class AddIntranetFormController(object):
         # members_group_name
         community.__name__ = name
 
-        # This subcommunity (intranet) gets added directly in the
-        # parent, not in a tool subfolder.  E.g. store it in /osi.
-        intranets_parent = find_community(context)
-        intranets_parent[name] = community
-
         for toolinfo in get_listitems(IToolFactory):
             if toolinfo['name'] in ('forums', 'files'):
                 toolinfo['component'].add(community, request)
@@ -197,6 +192,11 @@ class AddIntranetFormController(object):
 
         for group_name in moderators_group_name, members_group_name:
             users.add_group(userid, group_name)
+
+        # This subcommunity (intranet) gets added directly in the
+        # parent, not in a tool subfolder.  E.g. store it in /osi.
+        intranets_parent = find_community(context)
+        intranets_parent[name] = community
 
         # Adding a community should take you to the Add Existing
         # User screen, so the moderator can include some users.
