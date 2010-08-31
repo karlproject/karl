@@ -747,7 +747,7 @@ class TestUploadUsersView(unittest.TestCase):
         cleanUp()
 
         site = testing.DummyModel()
-        site['profiles'] = testing.DummyModel()
+        site['profiles'] = DummyProfiles()
         encrypt = lambda x: 'sha:' + x
         site.users = karltesting.DummyUsers(encrypt=encrypt)
         self.site = site
@@ -855,6 +855,20 @@ class TestUploadUsersView(unittest.TestCase):
 
         users = self.site.users
         self.assertEqual(users.get_by_id('user1')['password'], 'pass1234')
+
+    def test_empty_username(self):
+        request = testing.DummyRequest({
+            'csv': DummyUpload(
+                '"username","firstname","lastname","email","sha_password"\n'
+                '"","User","One","test@example.com","pass1234"\n'
+                ),
+        })
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message,
+                "Malformed CSV: line 2 has an empty username.")
+        self.assertEqual(api.status_message, None)
 
     def test_null_byte_in_row(self):
         request = testing.DummyRequest({
@@ -1283,6 +1297,13 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
     def test_notfound(self):
         from repoze.bfg.exceptions import NotFound
         self.assertRaises(NotFound, self._call_fut, 1)
+
+class DummyProfiles(testing.DummyModel):
+
+    def __setitem__(self, name, other):
+        if not name:
+            raise TypeError("Name must not be empty")
+        return testing.DummyModel.__setitem__(self, name, other)
 
 class DummyPostofficeQueue(object):
     _msgs = [

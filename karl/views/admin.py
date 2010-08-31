@@ -557,6 +557,12 @@ class UploadUsersView(object):
                         break
 
                     username = row.pop('username')
+                    # repoze.folder needs a non-empty name for the profile
+                    if not username:
+                        errors.append(
+                            "Malformed CSV: line %d has an empty username." %
+                            (i+2))
+                        break
                     login = row.pop('login', username)
                     website = row.pop('website', None)
                     if website is not None:
