@@ -516,7 +516,7 @@ class TestGetFileLineBatch(unittest.TestCase):
         self.assertEqual(batch['batch_start'], 0)
         self.assertEqual(batch['batch_size'], 20)
         self.assertEqual(batch['batch_end'], 1)
-        self.assertEqual(batch['total'], 3)
+        self.assertEqual(batch['total'], 1)
         self.assertEqual(batch['previous_batch'], None)
         self.assertEqual(batch['next_batch'], None)
         self.assertEqual(batch['batching_required'], False)
