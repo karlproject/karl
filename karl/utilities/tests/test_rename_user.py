@@ -45,9 +45,6 @@ class Test_rename_user(unittest.TestCase):
         from karl.utilities.rename_user import rename_user as fut
         return fut(self.root, old_name, new_name, merge, out)
 
-    def test_old_user_does_not_exist(self):
-        self.assertRaises(ValueError, self.call_fut, 'chris', 'rodrigo')
-
     def test_old_profile_does_not_exist(self):
         self.root.users.add('chris', 'chris', 'password', set())
         self.assertRaises(ValueError, self.call_fut, 'chris', 'rodrigo')
@@ -96,6 +93,20 @@ class Test_rename_user(unittest.TestCase):
         self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])
         self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])
 
+    def test_rename_old_user_does_not_exist(self):
+        users = self.root.users
+        profiles = self.root['profiles']
+        profiles['chris'] = karltesting.DummyProfile()
+
+        self.call_fut('chris', 'rodrigo', out=DummyOutputStream())
+        self.failIf('chris' in profiles)
+        self.failUnless('rodrigo' in profiles)
+        self.assertEqual(users.get_by_id('rodrigo'), None)
+
+        catalog = self.root.catalog
+        self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])
+        self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])
+
     def test_merge_user(self):
         users = self.root.users
         profiles = self.root['profiles']
@@ -110,6 +121,19 @@ class Test_rename_user(unittest.TestCase):
         self.assertEqual(users.removed_users, ['chris'])
         self.assertEqual(users.added_groups,
                          [('rodrigo', 'group1'), ('rodrigo', 'group2')])
+        catalog = self.root.catalog
+        self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])
+        self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])
+
+    def test_merge_old_user_does_not_exist(self):
+        users = self.root.users
+        profiles = self.root['profiles']
+        profiles['chris'] = karltesting.DummyProfile()
+        profiles['rodrigo'] = karltesting.DummyProfile()
+
+        self.call_fut('chris', 'rodrigo', True, DummyOutputStream())
+        self.failIf('chris' in profiles)
+        self.failUnless('rodrigo' in profiles)
         catalog = self.root.catalog
         self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])
         self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])

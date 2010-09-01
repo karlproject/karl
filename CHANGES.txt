@@ -19,6 +19,8 @@ Unreleased
   uploaded previously with newline and tab characters in the filename.
   LP #616511
 
+- Rename user script can now rename or merge profiles which don't have logins.
+
 3.43 (2010-08-19)
 -----------------
 
