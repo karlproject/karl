@@ -1,6 +1,6 @@
 karl package Changelog
 ======================
-Unreleased 
+Unreleased
 -------------
 
 - Fixed icons on people list page when FF zooms out
@@ -12,6 +12,9 @@ Unreleased
 - Tags: set label to not look like a button, made tags, input
   and button same height and/or centered vertically
   (LP #622689)
+
+- Tabs and newline characters in uploaded filenames are now converted to
+  spaces. LP #616511
 
 3.43 (2010-08-19)
 -----------------

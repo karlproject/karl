@@ -374,7 +374,7 @@ class TestFileUpload2(unittest.TestCase):
         field = DummyField()
         result = widget.pre_parse_incoming_request_data(field, None)
         self.assertEqual(result, {})
-        
+
     def test_pre_parse_incoming_request_data_remove(self):
         filestore = DummyFileStore()
         widget = self._makeOne(filestore)
@@ -394,6 +394,21 @@ class TestFileUpload2(unittest.TestCase):
         self.assertEqual(result['name'], ['bar.txt'])
         self.assertEqual(result['mimetype'], ['type'])
 
+    def test_pre_parse_incoming_request_data_with_file_tabs_and_newlines(self):
+        filestore = DummyFileStore()
+        widget = self._makeOne(filestore)
+        field = DummyField()
+        storage = DummyFieldStorage()
+        storage.filename = '/home/chris/get\nout\tof town.txt'
+        data = {'file':[storage]}
+        result = widget.pre_parse_incoming_request_data(field, data)
+        self.assertEqual(result['name'], ['get out of town.txt'])
+        self.assertEqual(result['mimetype'], ['type'])
+        self.assertEqual(
+            filestore['get out of town.txt'],
+            ('file', 'get out of town.txt',
+             [('Content-Type', 'type'), ('Filename', 'get out of town.txt')])
+        )
     def test_to_request_data_with_schemafile(self):
         from schemaish.type import File as SchemaFile
         field = DummyField()
@@ -404,7 +419,7 @@ class TestFileUpload2(unittest.TestCase):
         self.assertEqual(result['name'], ['2'])
         self.assertEqual(result['default'], ['2'])
         self.assertEqual(result['mimetype'], ['3'])
-        
+
     def test_to_request_data_with_none_schemafile(self):
         field = DummyField()
         f = None
@@ -421,7 +436,7 @@ class TestFileUpload2(unittest.TestCase):
         widget = self._makeOne(filestore)
         result = widget.urlfactory(data)
         self.assertEqual(result, '/filehandler/b/d')
-        
+
     def test_urlfactory_with_no_data(self):
         filestore = DummyFileStore()
         widget = self._makeOne(filestore, image_thumbnail_default='1')
@@ -490,23 +505,23 @@ class DummyAttr:
 class DummyField:
     def __init__(self):
         self.attr = DummyAttr()
-        
+
 class DummyBlob:
     def open(self, mode):
         return True
-    
+
 class DummyFileStore(dict):
     def put(self, key, value, name, headers=()):
         self[key] = (value, name, headers)
-        
+
 class DummyFieldStorage(object):
     filename = 'c:\\fuz\\foo\\bar.txt'
     file = 'file'
     type = 'type'
-    
+
 class DummySessions(dict):
     def get(self, name, default=None):
         if not name in self:
             self[name] = {}
         return self[name]
-    
+

@@ -184,13 +184,14 @@ class FileUpload2(Widget):
             return data
 
         fieldstorage = data.get('file', [''])[0]
-        if getattr(fieldstorage,'file',None):
+        if getattr(fieldstorage, 'file', None):
             filename = fieldstorage.filename
             filename = filename.replace('\\', '/')
             key = os.path.split(filename)[-1]
+            key = key.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
             self.filestore.put(key, fieldstorage.file, key,
                                [('Content-Type', fieldstorage.type),
-                                ('Filename', fieldstorage.filename)])
+                                ('Filename', key)])
             data['name'] = [key]
             data['mimetype'] = [fieldstorage.type]
         return data
