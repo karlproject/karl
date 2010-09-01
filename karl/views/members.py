@@ -38,6 +38,7 @@ from simplejson import JSONEncoder
 from webob.exc import HTTPFound
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
+from zope.index.text.parsetree import ParseError
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.chameleon_zpt import get_template
@@ -871,14 +872,17 @@ def jquery_member_search_view(context, request):
         limit=20,
         )
     searcher = ICatalogSearch(context)
-    total, docids, resolver = searcher(**query)
-    profiles = filter(None, map(resolver, docids))
-    records = [dict(
-                id = profile.__name__,
-                text = profile.firstname + ' ' + profile.lastname,
-                )
-            for profile in profiles
-            if profile.__name__ not in community_member_names ]
+    try:
+        total, docids, resolver = searcher(**query)
+        profiles = filter(None, map(resolver, docids))
+        records = [dict(
+                    id = profile.__name__,
+                    text = profile.firstname + ' ' + profile.lastname,
+                    )
+                for profile in profiles
+                if profile.__name__ not in community_member_names ]
+    except ParseError:
+        records = []
     result = JSONEncoder().encode(records)
     return Response(result, content_type="application/x-json")
 
