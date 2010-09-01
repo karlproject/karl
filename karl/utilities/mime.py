@@ -40,6 +40,24 @@ _LOOKUP = {
         'title': 'PowerPoint',
         'viewable': False,
         },
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': {
+        'small_icon_name': 'ppt_small.gif',
+        'large_icon_name': 'ppt_big.gif',
+        'title': 'PowerPoint',
+        'viewable': False,
+        },
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
+        'small_icon_name': 'xls_small.gif',
+        'large_icon_name': 'xls_big.gif',
+        'title': 'Excel',
+        'viewable': False,
+        },
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
+        'small_icon_name': 'doc_small.gif',
+        'large_icon_name': 'doc_big.gif',
+        'title': 'Word',
+        'viewable': False,
+        },
     'audio/mpeg': {
         'small_icon_name': 'mp3_small.gif',
         'large_icon_name': 'mp3_big.gif',
