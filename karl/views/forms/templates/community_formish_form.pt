@@ -12,6 +12,7 @@
       //<![CDATA[
       $(document).ready(function() {
         formish();
+        $('.inputs>:checked').click(function(e){if (this.checked==false) {alert("WARNING: By turning off this tool, you will permanently lose all existing content");}})
       });
       //]]>
     </script>
