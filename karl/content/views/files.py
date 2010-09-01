@@ -511,6 +511,7 @@ def download_file_view(context, request):
         fname = context.filename
         if isinstance(fname, unicode):
             fname = fname.encode('utf-8')
+        fname = fname.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
         headers.append(
             ('Content-Disposition', 'attachment; filename=%s' % fname)
         )

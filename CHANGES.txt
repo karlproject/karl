@@ -14,7 +14,10 @@ Unreleased
   (LP #622689)
 
 - Tabs and newline characters in uploaded filenames are now converted to
-  spaces. LP #616511
+  spaces. Same is also done in the download_file_view when setting the
+  filename in the Content-Disposition header, in case there are files
+  uploaded previously with newline and tab characters in the filename.
+  LP #616511
 
 3.43 (2010-08-19)
 -----------------
