@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-#
+# 
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -38,10 +38,6 @@ class TimeitFilter(object):
 
         # Generate the response.  If text/html, print elapsed
         resp = req.get_response(self.app)
-        for name, value in resp.headerlist:
-            if '\n' in value or '\t' in value:
-                raise Exception("STFU!!!")
-
         if resp.content_type == "text/html":
             elapsed = str(1 / (time.time() - start))[0:5]
             first_result = resp.body
@@ -58,4 +54,5 @@ def main(app, global_conf, **local_conf):
     """Middleware to inject elapsed time into a web page"""
 
     return TimeitFilter(app)
+
 
