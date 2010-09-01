@@ -260,7 +260,7 @@ class TestKarlTwill:
         # karl.
         #
         # see more options in the README
-        print twill.execute_string("go http://localhost:6543")
+        twill.execute_string("go http://localhost:6543")
         twill.execute_string("login 'admin'")
         # check for login accounts
         twill.execute_string("runfile '${test_path}/profiles/user_karl3.twill'")
