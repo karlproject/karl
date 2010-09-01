@@ -80,9 +80,14 @@ following::
    Generated script '/Users/chrism/projects/karl3/bin/flunc'.
    buildout: Generated interpreter '/Users/chrism/projects/karl3/bin/python-flunc'.
 
-The buildout process creates a symlink named ``etc`` that initially points
-to the ``etc-develop`` directory. If you are building for production
-rather than development, redirect the link.  For example::
+Finally, make a symlink to the correct configuration area.  The
+various buildouts associated with KARL have a number of pre-setup
+configurations.  For development::
+
+  ln -sfn etc-develop etc
+
+If you are building for production rather than development, redirect
+the link.  For example::
 
     ln -sfn etc-deploy etc
 

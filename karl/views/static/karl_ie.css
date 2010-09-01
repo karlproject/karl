@@ -1,6 +1,9 @@
 .visual-portal-wrapper {
     width: 1003px;
 }
+img { 
+    -ms-interpolation-mode:bicubic;
+}
 .community_view #crightcol,
 * html .community_view #cleftcol .ccontent,
 * html #center,
@@ -127,6 +130,33 @@ ol#references-listing li a.topLevelItem {
   margin-left: 8px;
 } 
 
+/* feeds */
+.feedOptions {
+    width: 380px;
+}
+
+.feeditem .posttime {
+    background: transparent url(images/corners.png) no-repeat left -148px;
+    border: none;
+}
+.feeditem .added {
+	background: transparent url(images/corners.png) no-repeat -300px -139px;
+    border: none;
+}
+.feeditem .edited {
+	background: transparent url(images/corners.png) no-repeat -400px -139px;
+    border: none;
+}
+.feeditem .tagged {
+	background: transparent url(images/corners.png) no-repeat -100px -139px;
+    border: none;
+}
+.feeditem .left,
+.feeditem .joined {
+	background: transparent url(images/corners.png) no-repeat -200px -139px;
+    border: none;
+}
+
 /** =ROUNDED CORNERS / BUTTONS (other browsers use all CSS)
 ----------------------------------------------- */
 
@@ -145,30 +175,39 @@ ul#header-menu li a {
 
 /* general button styles */
 button {
-    overflow: visible; 
+    overflow: visible;
+    height: 22px;
 }
 button span {
-    height: 20px !important;
-    line-height: 20px !important;
+    height: 22px !important;
+    line-height: 22px !important;
     margin-bottom: -1px;
 }
 .primary_button,
 .primary_button:visited,
-ul.menubar #menubar-1.menubar-lastitem a {
+ul.menubar #menubar-1.menubar-lastitem a,
+#poll-indicator.on,
+#poll-indicator.polling {
     background: transparent url(images/corners.png) no-repeat right -25px;
     border: none !important;
     padding: 0px 5px 0 0;
     float: left;
     display: block;
+    height: 22px !important;
 }
 .primary_button span,
-ul.menubar #menubar-1.menubar-lastitem span {
+ul.menubar #menubar-1.menubar-lastitem span,
+#poll-indicator.on span,
+#poll-indicator.polling span {
     background: #ffffff url(images/corners.png) no-repeat left -25px;
-    line-height: 20px;
+    line-height: 22px;
     height: 20px;
-    padding: 1px 5px 1px 10px;
+    padding: 4px 5px 4px 10px;
     white-space: nowrap;
     z-index: 2;
+}
+ul.menubar #menubar-1.menubar-lastitem span {
+    padding-top: 5px;
 }
 .primary_button:hover,
 ul.menubar #menubar-1.menubar-lastitem a:hover {
@@ -190,34 +229,52 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 
 .normal_button,
 .normal_button:hover,
-.normal_button:active {
-    background: transparent url(images/corners.png) no-repeat right -91px !important;
+.normal_button:active,
+#poll-indicator.off,
+#poll-indicator.error {
+    background: transparent url(images/corners.png) no-repeat right -91px;
     border: none !important;
-    padding: 0px 5px 0 0;
+    padding: 0px 5px 0px 0;
     float: left;
-    display: inline-block;
+    display: block;
+    height: 22px !important;
 }
 .normal_button span,
 .normal_button:hover span,
-.normal_button:active span {
+.normal_button:active span,
+#poll-indicator.off span,
+#poll-indicator.error span {
     background: #ffffff url(images/corners.png) no-repeat left -91px;
-    line-height: 20px;
+    line-height: 22px;
     height: 20px;
-    padding: 1px 5px 1px 10px;
+    padding: 4px 5px 4px 10px;
     white-space: nowrap;
 }
 
-/* calendar buttons */
+#poll-indicator.on span,
+#poll-indicator.polling span,
+#poll-indicator.off span,
+#poll-indicator.error span {
+    line-height: 22px;
+    height: 22px;
+}
+
+/* calendar buttons, feed filters */
 .cal_buttons .menubar a,
 .cal_buttons .menubar a:hover,
-.cal_buttons .menubar a:active {
+.cal_buttons .menubar a:active,
+#feed-filters ul a,
+#feed-filters ul a:hover,
+#feed-filters ul a:active {
     background: transparent url(images/corners.png) no-repeat -10px -91px;
     border: none;
     color: #3A74A9;
     font-weight: normal;
-    line-height: 19px;
-    height: 19px;
-    padding-bottom: 2px;
+    line-height: 23px;
+    height: 20px;
+    padding: 4px 10px 5px;
+    position: relative;
+    top: -2px;
 }
 .cal_buttons .menubar.day-view a.day,
 .cal_buttons .menubar.week-view a.week,
@@ -226,25 +283,36 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: transparent url(images/corners.png) no-repeat -10px -91px;
     color: #000000 !important;
 }
+#feed-filters ul .current a {
+    color: #000000 !important;
+}
 .cal_buttons .menubar .firstItem a,
 .cal_buttons .menubar .firstItem a:hover,
 .cal_buttons .menubar .firstItem a:active,
-.cal_buttons .menubar .firstItem a.disabled {
-    background: transparent url(images/corners.png) no-repeat left -91px;
+.cal_buttons .menubar .firstItem a.disabled,
+#feed-filters ul .firstItem a,
+#feed-filters ul .firstItem a:hover,
+#feed-filters ul .firstItem a:active {
+    background: transparent url(images/corners.png) no-repeat left -91px !important;
     border: none;
 }
 .cal_buttons .menubar .lastItem a,
 .cal_buttons .menubar .lastItem a:hover,
 .cal_buttons .menubar .lastItem a:active,
-.cal_buttons .menubar .lastItem a.disabled {
+.cal_buttons .menubar .lastItem a.disabled,
+#feed-filters ul .lastItem a,
+#feed-filters ul .lastItem a:hover,
+#feed-filters ul .lastItem a:active {
     background: transparent url(images/corners.png) no-repeat right -91px;
     border: none;
 }
-.cal_buttons .menubar li {
+.cal_buttons .menubar li,
+#feed-filters ul li {
     border-right: 1px solid #bcc2c7;
 }
 .cal_buttons .menubar .lastItem,
-.cal_buttons .menubar .todayButton {
+.cal_buttons .menubar .todayButton,
+#feed-filters ul .lastItem {
     border-right: none;
 }
 .cal_buttons .menubar .todayButton a,
@@ -261,8 +329,8 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: #EDF1F3 url(images/corners.png) no-repeat left -91px;
     border: none;
     line-height: 20px;
-    height: 20px;
-    padding: 1px 5px 1px 10px;
+    height: 22px;
+    padding: 4px 5px 5px 10px;
 }
 .cal_buttons .menubar a.disabled,
 .cal_buttons .menubar a.disabled:hover,
@@ -276,9 +344,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 .cal_buttons .next span {
     border: none;
     font-size: 11px;
-    line-height: 19px;
-    height: 19px;
-    top: 0;
+    top: -9px;
     font-weight: bold;
 }
 
@@ -301,9 +367,10 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 /* edit - manage - delete - etc*/
 ul.menubar li a {
     background: transparent url(images/corners.png) no-repeat -10px -25px;
-    line-height: 20px;
-    height: 20px;
+    line-height: 24px;
+    height: 24px;
     border: none !important;
+    padding: 4px 10px 5px;
 }
 ul.menubar li a:hover {
     background: transparent url(images/corners.png) no-repeat -10px -47px;
@@ -334,19 +401,34 @@ ul.menubar .menubar-lastitem a:active {
 #livesearch-button.primary_button {
     background: transparent url(images/corners.png) no-repeat left -113px;
     width: 47px;
-    height: 24px;
+    height: 26px !important;
     line-height: 26px;
 }
 
 /* add tag button */
-.addtag-button {
-    position: relative;
-    margin-top: -1px !important;
+button.addtag-button,
+button.addtag-button:hover {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    height: 22px !important;
+    padding-top: 1px;
+    margin-top: 0px !important;
 }
 #tag-inputbox ul.autobox-hldr,
 #tags--field ul.autobox-hldr {
     overflow: visible;
 }
+button.addtag-button span,
+button.addtag-button:hover span {
+    background: #ffffff url(images/corners.png) no-repeat left -21px;
+    position: relative;
+    top: 2px;
+    padding: 7px 5px 5px 10px;
+    white-space: nowrap;
+    line-height: 21px;
+    height: 21px;
+    z-index: 2;
+}
+    
 /* specific button color bg */
 .cheader button.normal_button span {
     background-color: #cedfef;
@@ -357,5 +439,7 @@ ul.menubar .menubar-lastitem a:active {
 .cal_new_event .primary_button span {
     background-color: #edf1f3;
 }
-
+#poll-indicator span {
+    background-color: #e6e6f2 !important;
+}
 

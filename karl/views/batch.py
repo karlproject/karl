@@ -61,6 +61,7 @@ def get_catalog_batch(context, request, **kw):
             model = resolver(docid)
             if model is None:
                 i -= 1
+                total -= 1
                 continue
             batch.append(model)
     else:

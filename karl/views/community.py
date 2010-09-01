@@ -450,6 +450,7 @@ class EditCommunityFormController(object):
         context.title = converted['title']
         context.description = converted['description']
         context.text = converted['text']
+        context.modified_by = authenticated_userid(request)
         # NB: this is an edit form, so tags are added immediately via
         # AJAX; we needn't deal with setting them in the form post
         tools_present = [None]

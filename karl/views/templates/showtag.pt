@@ -3,9 +3,19 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal" 
      metal:use-macro="api.generic_layout.macros['master']">
 
+  <div metal:fill-slot="portlets">
+      <div class="generic-portlet" id="relatedtags-portlet">
+        <h3>Related Tags</h3>
+        <div class="portlet-item"
+             tal:repeat="rel related|()">
+          <a href="${api.view_url}/${rel}">${rel}</a>
+        </div>
+      </div>
+  </div>
+  
   <div metal:fill-slot="content">
 
-   <div metal:use-macro="api.snippets.macros['showtag']"/>
+  <div metal:use-macro="api.snippets.macros['showtag']"/>
 
   </div>
 </div>

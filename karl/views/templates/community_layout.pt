@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
@@ -11,7 +12,7 @@
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
 
-  <body>
+  <body class="community-layout">
     <div class="visual-portal-wrapper">
       <div id="header" class="shadow">
 
@@ -39,6 +40,8 @@
         <div class="visualClear"></div>
       </div>
       <div id="main">
+        <div class="rightcol" tal:content="structure api.render_sidebar()">
+        </div>
         <div id="center" class="clearafter community_view">
           <div class="cheader">
             <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
@@ -74,11 +77,10 @@
                 <div metal:define-slot="content"/>
               </div>
             </div>
-            <div id="crightcol" tal:content="structure api.render_sidebar()">
-            </div>
             <div class="visualClear"></div>
           </div>
-        </div>
+        </div>  
+        <div class="visualClear"></div>
       </div>
       <tal:footer content="structure api.render_footer()" />
     </div>

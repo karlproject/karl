@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+      <title>tinymce spellchecker plugin tests</title>
+
+      <!-- Load jQuery -->
+      <script src="http://www.google.com/jsapi"
+	      type="text/javascript"></script>
+      <script type="text/javascript">
+          google.load("jquery", "1.4.2");
+      </script>
+
+      <!-- Test suite -->
+      <script type="text/javascript" src="http://github.com/jquery/qunit/raw/master/qunit/qunit.js">//</script>
+      <link rel="stylesheet" href="http://github.com/jquery/qunit/raw/master/qunit/qunit.css" />
+      <script type="text/javascript" src="http://soc.googlecode.com/hg/app/json.min/json2.js">//</script>
+      <script type="text/javascript" src="http://greenfinity.hu/pub/js.moremocks/trunk/mocktimeouts_pre.js">//</script>
+      <script type="text/javascript" src="http://greenfinity.hu/pub/js.moremocks/trunk/mocktimeouts.js">//</script>
+      <script type="text/javascript" src="http://github.com/eduardolundgren/jquery-simulate/raw/master/jquery.simulate.js">//</script>
+      <!-- Implement a head-less server -->
+      <script type="text/javascript" src="http://soc.googlecode.com/hg/app/json.min/json2.js">//</script>
+      <script src="http://github.com/philikon/MockHttpRequest/raw/master/lib/mock.js" type="text/javascript">//</script>
+      <script type="text/javascript" src="http://greenfinity.hu/pub/js.moremocks/trunk/moremockhttp.js"></script>
+
+      <!-- The widget plugin JS and CSS -->
+      <script src="../../../tiny_mce_src.js" type="text/javascript">//</script>
+      <script src="../../../jquery.tinysafe.js" type="text/javascript">//</script>
+      <!-- static js loading  -->
+      <script src="../../../themes/advanced/editor_template_src.js" type="text/javascript"></script>
+      <script src="../editor_plugin_src.js" type="text/javascript"></script>
+
+      <!-- Page specific JS and CSS -->
+      <link rel="stylesheet" href="demo.css" type="text/css" />
+      <script src="test.js" type="text/javascript"></script>
+
+
+  </head>
+
+  <body>
+    <h1 id="qunit-header">tinymce spellchecker plugin tests</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>  
+
+    <div id="main">
+
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dui tellus,
+        bibendum id tincidunt quis, adipiscing in ipsum. Praesent eu leo nisl.
+        Curabitur accumsan placerat mauris, vulputate tincidunt nunc porttitor
+        suscipit. Suspendisse aliquet velit vitae lectus eleifend non dapibus massa
+        congue. Morbi eu sem nisi. Integer arcu odio, suscipit eu ultricies eget,
+        aliquam eget ligula. Fusce at tortor a ipsum pellentesque ultrices nec nec
+        augue.
+      </p>
+
+      <textarea name="text" rows="1" cols="40" class="mceEditor">Pellentesque in sagittis ante. Ut porttitor
+sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur
+adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora
+torquent per conubia nostra, per inceptos himenaeos.
+      </textarea>
+
+      <p>
+        Suspendisse sodales consectetur elementum. Phasellus a nibh nunc.
+        Vestibulum eget sem at felis varius molestie. Duis rutrum porta aliquam.
+        Suspendisse bibendum dui ut diam aliquet non iaculis ante faucibus.
+        Curabitur sit amet orci nulla!
+      </p>
+
+    </div>
+
+  </body>
+</html>

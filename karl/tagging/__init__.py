@@ -21,21 +21,52 @@ from BTrees import IOBTree
 from BTrees import OOBTree
 from persistent import Persistent
 from zope.component import queryAdapter
+from zope.event import notify
 from zope.interface import implements
 from repoze.bfg.traversal import find_model
 
 from karl.utils import find_catalog
 from karl.utils import find_community
 from karl.tagging.interfaces import ITag
+from karl.tagging.interfaces import ITagAddedEvent
 from karl.tagging.interfaces import ITagCommunityFinder
 from karl.tagging.interfaces import ITaggingEngine
 from karl.tagging.interfaces import ITaggingStatistics
+from karl.tagging.interfaces import ITagRemovedEvent
+
+
+class _TagEventBase(Persistent):
+
+    def __init__(self, tag):
+        self._tag = tag
+
+    item = property(lambda x: x._tag.item,)
+    name = property(lambda x: x._tag.name,)
+    user = property(lambda x: x._tag.user,)
+    community = property(lambda x: x._tag.community,)
+
+    def __cmp__(self, other):
+        return cmp(self._tag, other._tag)
+
+    def __hash__(self):
+        return hash(self._tag)
+
+    def __repr__(self):
+        return '<%s %r >' %(self.__class__.__name__, self._tag)
+
+class TagAddedEvent(_TagEventBase):
+    implements(ITagAddedEvent)
+
+
+class TagRemovedEvent(_TagEventBase):
+    implements(ITagRemovedEvent)
 
 
 class Tag(Persistent):
     """ Simple implementation of a tag.
     """
     implements(ITag)
+    _id = None
 
     def __init__(self, item, user, name, community=None):
         self.item = item
@@ -48,6 +79,9 @@ class Tag(Persistent):
         if community and not isinstance(community, unicode):
             community = unicode(community, 'utf-8')
         self.community = community
+
+    def _clone(self):
+        return self.__class__(self.item, self.user, self.name, self.community)
 
     def __cmp__(self, other):
         return cmp((self.item, self.user, self.name, self.community),
@@ -66,6 +100,7 @@ class Tag(Persistent):
             self.item,
             self.user,
             self.community)
+
 
 class Tags(Persistent):
     implements(ITaggingEngine, ITaggingStatistics)
@@ -240,27 +275,22 @@ class Tags(Persistent):
         """
         c_finder = queryAdapter(self, ITagCommunityFinder)
         community = c_finder and c_finder(item) or None
+
         tags_item = set(self._item_to_tagids.get(item, ()))
         tags_user = set(self._user_to_tagids.get(user, ()))
-        tags_tags = set()
-        for t in tags:
-            tags_tags.update(self._name_to_tagids.get(t, ()))
-        old_tag_ids = tags_item.intersection(tags_user)
-        # any tags of the same user/item that are not in tags
-        old_tag_ids = old_tag_ids.difference(tags_tags)
+        tags_user_item = tags_item.intersection(tags_user)
 
-        old_tags = set([self._tagid_to_obj[id]
-                        for id in old_tag_ids])
+        old_tags = set([self._tagid_to_obj[id] for id in tags_user_item])
 
         new_tags = set([Tag(item, user, tagName, community)
                             for tagName in tags])
 
         add_tags = new_tags.difference(old_tags)
+        remove_tags = old_tags.difference(new_tags)
 
-        add_tag_ids = []
         for tagObj in add_tags:
             id = self._add(tagObj)
-            add_tag_ids.append(id)
+
             ids = self._user_to_tagids.get(user)
             if ids is None:
                 self._user_to_tagids[user] = IOBTree.IOSet((id,))
@@ -286,7 +316,9 @@ class Tags(Persistent):
             else:
                 ids.insert(id)
 
-        del_tag_ids = old_tag_ids.difference(add_tag_ids)
+            notify(TagAddedEvent(tagObj))
+
+        del_tag_ids = [x._id for x in remove_tags]
         self._delTags(del_tag_ids)
 
     def delete(self, item=None, user=None, tag=None):
@@ -320,7 +352,9 @@ class Tags(Persistent):
         tagIds = set(self._name_to_tagids.get(old, ()))
         for tagId in tagIds:
             tagObj = self._tagid_to_obj[tagId]
+            notify(TagRemovedEvent(tagObj._clone()))
             tagObj.name = new
+            notify(TagAddedEvent(tagObj))
         newTagIds = IOBTree.IOSet(self._name_to_tagids.get(new, ()))
         newTagIds.update(tagIds)
         self._name_to_tagids[new] = newTagIds
@@ -333,13 +367,18 @@ class Tags(Persistent):
         """
         old_ids = self._user_to_tagids[olduser]
         if newuser in self._user_to_tagids:
+            # XXX This potentially leaves dupes in the tree.
             self._user_to_tagids[newuser].update(old_ids)
         else:
             self._user_to_tagids[newuser] = old_ids
         del self._user_to_tagids[olduser]
         for tagid in old_ids:
             tagobj = self._tagid_to_obj[tagid]
+            notify(TagRemovedEvent(tagobj._clone()))
             tagobj.user = unicode(newuser)
+            # XXX Ideally, we would filter events for already-existing
+            #     identical tags by the new user.
+            notify(TagAddedEvent(tagobj))
 
     def normalize(self, normalizer=None):
         """ See ITaggingEngine.
@@ -383,6 +422,7 @@ class Tags(Persistent):
     def _add(self, tagObj):
         uid = self._generateId()
         self._tagid_to_obj[uid] = tagObj
+        tagObj._id = uid
         return uid
 
     def _getTagIds(self, items=None, users=None, tags=None, community=None):
@@ -433,6 +473,7 @@ class Tags(Persistent):
                 del self._community_to_tagids[tagObj.community]
 
             del self._tagid_to_obj[id]
+            notify(TagRemovedEvent(tagObj))
 
 
 class TagCommunityFinder(object):

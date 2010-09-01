@@ -222,6 +222,35 @@ class TemplateAPITests(unittest.TestCase):
         api = self._makeOne(context, request)
         self.assertEqual(api.logo_url, api.static_url + '/mylogo.png')
 
+    def test_kaltura_info_empty(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        api = self._makeOne(context, request)
+        self.assertEqual(api.kaltura_info, {'enabled': False})
+
+    def test_kaltura_info(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        from repoze.bfg.interfaces import ISettings
+        settings = karltesting.DummySettings()
+        settings.kaltura_enabled = 'true'
+        settings.kaltura_service_url = 'http://sandbox.kaltura.com/api'
+        settings.kaltura_partner_id = '123456'
+        settings.kaltura_sub_partner_id = '12345600'
+        settings.kaltura_admin_secret = '123456789abcdef123456789abcdef12'
+        settings.kaltura_user_secret = '0123456789abcdef123456789abcdef1'
+        testing.registerUtility(settings, ISettings)
+        api = self._makeOne(context, request)
+        self.assertEqual(api.kaltura_info, dict(
+            enabled = True,
+            service_url = 'http://sandbox.kaltura.com/api',
+            partner_id = '123456',
+            sub_partner_id = '12345600',
+            admin_secret = '123456789abcdef123456789abcdef12',
+            user_secret = '0123456789abcdef123456789abcdef1',
+            ))
+
+
 class DummyTagQuery:
     def __init__(self, context, request):
         self.tagusers = ['a']

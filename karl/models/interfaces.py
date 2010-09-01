@@ -493,3 +493,52 @@ class IPeopleReport(Interface):
 class IPeopleDirectorySchemaChanged(Interface):
     """Notification that the schema of the people directory has changed"""
     peopledir = Attribute('The IPeopleDirectory object')
+
+class ISiteEvents(Interface):
+    """ Site-level 'tool' for tracking user event stream.
+
+    Events are pushed as mappings.
+    """
+    def __iter__():
+        """ Yield (generation, index, mapping) in most-recent first order.
+        """
+
+    def newer(latest_gen, latest_index, principals=None, created_by=None):
+        """ Yield items newer than (`latest_gen`, `latest_index`).
+        
+        Implemented as a method on the layer to work around lack of generator
+        expressions in Python 2.5.x.
+
+        If 'principals' is passed, yield only items where mapping['allowed']
+        contains one or more of the named principals.
+
+        If 'created_by' is passed and is not None, yield only items where
+        mapping['userid'] or mapping['content_creator'] is equal to its value.
+        Communities are not ever yielded in this case.
+        """
+
+    def older(earliest_gen, earliest_index, principals=None, created_by=None):
+        """ Yield items older than (`earliest_gen`, `earliest_index`).
+        
+        Implemented as a method on the layer to work around lack of generator
+        expressions in Python 2.5.x.
+
+        If 'principals' is passed, yield only items where mapping['allowed']
+        contains one or more of the named principals.
+
+        If 'created_by' is passed and is not None, yield only items where
+        mapping['userid'] or mapping['content_creator'] is equal to its value.
+        Communities are not ever yielded in this case.
+        """
+
+    def checked(principals, created_by):
+        """ Yield (generation, index, mapping) in most-recent first order.
+
+        Yield only items where mapping['allowed'] contains one or more of
+        the named principals and (if 'created_by' is not None and item content
+        is not a community) was created by the named userid.
+        """
+
+    def push(**kw):
+        """ Append an mapping to the stack.
+        """

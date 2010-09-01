@@ -891,6 +891,34 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
 
 
+class ProfileThumbnailTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.people import profile_thumbnail
+        return profile_thumbnail(context, request)
+
+    def test_wo_photo(self):
+        context = testing.DummyModel()
+        rsp = self._callFUT(context, testing.DummyRequest())
+        self.failUnless(rsp.location.startswith('http://example.com/static/'))
+        self.failUnless(rsp.location.endswith('/images/defaultUser.gif'))
+
+    def test_w_photo(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IImage
+        context = testing.DummyModel()
+        photo = context['photo'] = testing.DummyModel()
+        directlyProvides(photo, IImage)
+        response = self._callFUT(context, testing.DummyRequest())
+        self.assertEqual(response.location,
+                         'http://example.com/photo/thumb/75x100.jpg')
+
+
 class RecentContentTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

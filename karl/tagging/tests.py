@@ -21,6 +21,61 @@ from repoze.bfg import testing
 
 _marker = object()
 
+
+class TagAddedTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.tagging import TagAddedEvent
+        return TagAddedEvent
+
+    def _makeOne(self, item=13, user='phred', name='test', community=_marker):
+        klass = self._getTargetClass()
+        if community is _marker:
+            tag = testing.DummyModel(item=item, user=user, name=name,
+                                     community=None)
+        else:
+            tag = testing.DummyModel(item=item, user=user, name=name,
+                                     community=community)
+        return klass(tag)
+
+    def test_class_conforms_to_ITagAddedEvent(self):
+        from zope.interface.verify import verifyClass
+        from karl.tagging.interfaces import ITagAddedEvent
+        verifyClass(ITagAddedEvent, self._getTargetClass())
+
+    def test_object_conforms_to_ITagAddedEvent(self):
+        from zope.interface.verify import verifyObject
+        from karl.tagging.interfaces import ITagAddedEvent
+        verifyObject(ITagAddedEvent, self._makeOne())
+
+
+class TagRemovedTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.tagging import TagRemovedEvent
+        return TagRemovedEvent
+
+    def _makeOne(self, item=13, user='phred', name='test', community=_marker):
+        klass = self._getTargetClass()
+        if community is _marker:
+            tag = testing.DummyModel(item=item, user=user, name=name,
+                                     community=None)
+        else:
+            tag = testing.DummyModel(item=item, user=user, name=name,
+                                     community=community)
+        return klass(tag)
+
+    def test_class_conforms_to_ITagRemovedEvent(self):
+        from zope.interface.verify import verifyClass
+        from karl.tagging.interfaces import ITagRemovedEvent
+        verifyClass(ITagRemovedEvent, self._getTargetClass())
+
+    def test_object_conforms_to_ITagRemovedEvent(self):
+        from zope.interface.verify import verifyObject
+        from karl.tagging.interfaces import ITagRemovedEvent
+        verifyObject(ITagRemovedEvent, self._makeOne())
+
+
 class TagTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -146,6 +201,12 @@ class TagsTests(unittest.TestCase):
                 return name
             return _callable
         testing.registerAdapter(_factory, Interface, ITagCommunityFinder)
+
+    def _registerEventsListener(self):
+        from repoze.bfg.testing import registerEventListener
+        events = registerEventListener()
+        del events[:]
+        return events
 
     def test_class_conforms_to_ITaggingEngine(self):
         from zope.interface.verify import verifyClass
@@ -545,10 +606,19 @@ class TagsTests(unittest.TestCase):
         self.assertEqual(len(freq), 0)
 
     def test_update_one(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
         TAGS = ('bedrock', 'dinosaur')
+        events = self._registerEventsListener()
         engine = self._makeOne()
 
         engine.update(13, 'phred', TAGS)
+
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0],
+                         TagAddedEvent(Tag(13, 'phred', TAGS[0], None)))
+        self.assertEqual(events[1],
+                         TagAddedEvent(Tag(13, 'phred', TAGS[1], None)))
 
         self.assertEqual(engine.tagCount, len(TAGS))
         self.assertEqual(engine.itemCount, 1)
@@ -592,13 +662,21 @@ class TagsTests(unittest.TestCase):
             self.assertEqual(engine.getFrequency((tag,))[0][1], 1)
 
     def test_update_one_with_community(self):
-        self._registerCommunityFinder()
-
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
         TAGS = ('bedrock', 'dinosaur')
+        self._registerCommunityFinder()
+        events = self._registerEventsListener()
+
         engine = self._makeOne()
 
         engine.update(13, 'phred', TAGS)
 
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0],
+                         TagAddedEvent(Tag(13, 'phred', TAGS[0], 'community')))
+        self.assertEqual(events[1],
+                         TagAddedEvent(Tag(13, 'phred', TAGS[1], 'community')))
         self.assertEqual(engine.tagCount, len(TAGS))
         self.assertEqual(engine.itemCount, 1)
         self.assertEqual(engine.userCount, 1)
@@ -642,21 +720,53 @@ class TagsTests(unittest.TestCase):
             self.assertEqual(engine.getFrequency((tag,))[0][0], tag)
             self.assertEqual(engine.getFrequency((tag,))[0][1], 1)
 
-    def test_update_dupe_leaves_old_values_updates_timestamp(self):
+    def test_update_dupe_plus_remove(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
 
         engine.update(13, 'phred', ('bedrock', 'dinosaur'))
+        events = self._registerEventsListener()
+
         engine.update(13, 'phred', ('bedrock',))
+
+        # No event for the duplicated tag.
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0],
+                         TagRemovedEvent(Tag(13, 'phred', 'dinosaur')))
 
         tagObjs = list(engine.getTagObjects())
         self.assertEqual(len(tagObjs), 1)
-        self.assertEqual(tagObjs[0].user, 'phred')
-        self.assertEqual(tagObjs[0].item, 13)
-        self.assertEqual(tagObjs[0].name, 'bedrock')
+        tuples = [(x.user, x.item, x.name) for x in tagObjs]
+        self.failUnless(('phred', 13, 'bedrock') in tuples)
+        self.failIf(('phred', 13, 'dinosaur') in tuples)
+
+    def test_update_dupe_plus_add(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        engine = self._makeOne()
+
+        engine.update(13, 'phred', ('bedrock',))
+        events = self._registerEventsListener()
+
+        engine.update(13, 'phred', ('bedrock', 'dinosaur'))
+
+        # No event for the duplicated tag.
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0],
+                         TagAddedEvent(Tag(13, 'phred', 'dinosaur')))
+
+        tagObjs = list(engine.getTagObjects())
+        self.assertEqual(len(tagObjs), 2)
+        tuples = [(x.user, x.item, x.name) for x in tagObjs]
+        self.failUnless(('phred', 13, 'bedrock') in tuples)
+        self.failUnless(('phred', 13, 'dinosaur') in tuples)
 
     def test_delete_all_criteria_None_raises_ValueError(self):
+        events = self._registerEventsListener()
         engine = self._makeOne()
         self.assertRaises(ValueError, engine.delete, None, None, None)
+        self.assertEqual(len(events), 0)
 
     def _populate(self, engine):
         engine.update(13, 'phred', ('bedrock', 'dinosaur'))
@@ -664,12 +774,21 @@ class TagsTests(unittest.TestCase):
         engine.update(13, 'bharney', ('bedrock',))
 
     def test_delete_w_item(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(item=42)
 
         self.assertEqual(count, 2)
+
+        self.assertEqual(len(events), 2)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
 
         self.failIf(42 in engine.getItems())
         self.failUnless(13 in engine.getItems())
@@ -683,10 +802,21 @@ class TagsTests(unittest.TestCase):
         self.assertEqual(len(tagObjs), 3)
 
     def test_delete_w_user(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(user='bharney')
+
+        self.assertEqual(len(events), 3)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
 
         self.failIf('bharney' in engine.getUsers())
         self.failUnless('phred' in engine.getUsers())
@@ -700,12 +830,23 @@ class TagsTests(unittest.TestCase):
         self.assertEqual(len(tagObjs), 2)
 
     def test_delete_w_tag(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(tag='bedrock')
 
         self.assertEqual(count, 3)
+
+        self.assertEqual(len(events), 3)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'bedrock'))
+                            in events)
 
         self.failIf('bedrock' in engine.getTags())
         self.failUnless('dinosaur' in engine.getTags())
@@ -722,12 +863,21 @@ class TagsTests(unittest.TestCase):
         self.failUnless('neighbor' in tags)
 
     def test_delete_w_item_and_user(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(item=42, user='bharney')
 
         self.assertEqual(count, 2)
+
+        self.assertEqual(len(events), 2)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
 
         self.failUnless('bedrock' in engine.getTags())
         self.failUnless('dinosaur' in engine.getTags())
@@ -740,12 +890,19 @@ class TagsTests(unittest.TestCase):
         self.failIf(42 in engine.getItems())
 
     def test_delete_w_item_and_user_and_tag(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(item=42, user='bharney', tag='bedrock')
 
         self.assertEqual(count, 1)
+
+        self.assertEqual(len(events), 1)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
 
         self.failUnless('bedrock' in engine.getTags())
         self.failUnless('dinosaur' in engine.getTags())
@@ -773,57 +930,150 @@ class TagsTests(unittest.TestCase):
     def test_delete_nonesuch(self):
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.delete(item=57)
 
         self.assertEqual(count, 0)
+        self.assertEqual(len(events), 0)
 
     def test_rename_same(self):
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
         self.assertEqual(engine.rename('bedrock', 'bedrock'), 0)
+        self.assertEqual(len(events), 0)
 
     def test_rename_nonesuch(self):
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
         self.assertEqual(engine.rename('nonesuch', 'bedrock'), 0)
+        self.assertEqual(len(events), 0)
 
     def test_rename_actual(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.rename('bedrock', 'Bedrock')
         self.assertEqual(count, 3)
+
+        self.assertEqual(len(events), 6)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'bharney', 'Bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'bharney', 'Bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'Bedrock'))
+                            in events)
 
         self.failIf('bedrock' in engine.getTags())
         self.failUnless('Bedrock' in engine.getTags())
 
     def test_reassign_to_new_user(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
+
         engine.reassign('bharney', 'phony')
+
+        self.assertEqual(len(events), 6)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'phony', 'neighbor'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'phony', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phony', 'bedrock'))
+                            in events)
+
         self.assertTrue('neighbor' in engine.getTags())
         self.assertTrue('phred' in engine.getUsers())
         self.assertTrue('phony' in engine.getUsers())
         self.assertFalse('bharney' in engine.getUsers())
 
     def test_reassign_to_existing_user(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
+
         engine.reassign('bharney', 'phred')
+
+        self.assertEqual(len(events), 6)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'phred', 'neighbor'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'phred', 'bedrock'))
+                            in events)
+        # Note that we emit an event, even though phred already had this
+        # tag, because the implementation would get too gnarly if we tried
+        # to filter it out.
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'bedrock'))
+                            in events)
+
         self.assertTrue('neighbor' in engine.getTags())
         self.assertTrue('phred' in engine.getUsers())
         self.assertFalse('phony' in engine.getUsers())
         self.assertFalse('bharney' in engine.getUsers())
 
     def test_normalize_default(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         engine.update(13, 'phred', ('BEDROCK', 'DINOSAUR'))
         engine.update(42, 'bharney', ('BEDROCK', 'NEIGHBOR'))
         engine.update(13, 'bharney', ('BEDROCK',))
+        events = self._registerEventsListener()
 
         count = engine.normalize()
         self.assertEqual(count, 5)
+
+        self.assertEqual(len(events), 10)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'BEDROCK'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'DINOSAUR'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'dinosaur'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'BEDROCK'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'NEIGHBOR'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'BEDROCK'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
 
         self.failUnless('bedrock' in engine.getTags())
         self.failIf('BEDROCK' in engine.getTags())
@@ -833,11 +1083,37 @@ class TagsTests(unittest.TestCase):
         self.failIf('DINOSAUR' in engine.getTags())
 
     def test_normalize_callable(self):
+        from karl.tagging import Tag
+        from karl.tagging import TagAddedEvent
+        from karl.tagging import TagRemovedEvent
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
 
         count = engine.normalize(lambda x: '-'.join(x))
         self.assertEqual(count, 5)
+
+        self.assertEqual(len(events), 10)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'b-e-d-r-o-c-k'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'phred', 'dinosaur'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'phred', 'd-i-n-o-s-a-u-r'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'bharney', 'b-e-d-r-o-c-k'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(42, 'bharney', 'neighbor'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(42, 'bharney', 'n-e-i-g-h-b-o-r'))
+                            in events)
+        self.failUnless(TagRemovedEvent(Tag(13, 'bharney', 'bedrock'))
+                            in events)
+        self.failUnless(TagAddedEvent(Tag(13, 'bharney', 'b-e-d-r-o-c-k'))
+                            in events)
 
         self.failIf('bedrock' in engine.getTags())
         self.failUnless('b-e-d-r-o-c-k' in engine.getTags())
@@ -849,6 +1125,7 @@ class TagsTests(unittest.TestCase):
     def test_getTagsWithPrefix_hit(self):
         engine = self._makeOne()
         self._populate(engine)
+        events = self._registerEventsListener()
         engine.update(13, 'bharney', ('bedrock', 'bambam', 'dinosaur'))
 
         found = list(engine.getTagsWithPrefix('b'))

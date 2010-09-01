@@ -162,6 +162,7 @@ class SiteTests(unittest.TestCase):
                                       ('path', 'CatalogPathIndex2'),
                                       ('creation_date', 'CatalogFieldIndex'),
                                       ('modified_date', 'CatalogFieldIndex'),
+                                      ('content_modified', 'CatalogFieldIndex'),
                                       ('publication_date', 'CatalogFieldIndex'),
                                       ('start_date', 'CatalogFieldIndex'),
                                       ('end_date', 'CatalogFieldIndex'),
@@ -277,6 +278,14 @@ class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.modified = val
+
+class TestGetContentModifiedDate(unittest.TestCase, _TestGetDate):
+    def _callFUT(self, object, default):
+        from karl.models.site import get_content_modified_date
+        return get_content_modified_date(object, default)
+
+    def _decorate(self, context, val):
+        context.content_modified = val
 
 class TestGetStartDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):

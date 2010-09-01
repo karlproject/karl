@@ -48,11 +48,11 @@ class TestGetCatalogBatch(unittest.TestCase):
 
 
     def test_defaults(self):
-        searchkw = self._register([1,2,3])
+        searchkw = self._register([1, 2, 3])
         context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['entries'], [1,2,3])
+        self.assertEqual(info['entries'], [1, 2, 3])
         self.assertEqual(info['batch_start'], 0)
         self.assertEqual(info['batch_size'], 20)
         self.assertEqual(info['batch_end'], 3)
@@ -64,7 +64,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(searchkw['sort_index'], 'modified_date')
 
     def test_with_texts_and_index_query_order(self):
-        searchkw = self._register([1,2,3])
+        searchkw = self._register([1, 2, 3])
         context = testing.DummyModel()
         request = testing.DummyRequest()
         order = ['texts', 'other2', 'other1']
@@ -80,7 +80,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(searchkw['index_query_order'], order)
 
     def test_with_texts_and_sort_index(self):
-        searchkw = self._register([1,2,3])
+        searchkw = self._register([1, 2, 3])
         context = testing.DummyModel()
         request = testing.DummyRequest()
         order = ['texts', 'other2', 'other1']
@@ -94,7 +94,26 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(searchkw['reverse'], True)
 
     def test_overridden(self):
-        searchkw = self._register([1,2,3])
+        searchkw = self._register([1, 2, 3])
+        context = testing.DummyModel()
+        request = testing.DummyRequest(
+            params=dict(batch_start='1', batch_size='10', sort_index='other',
+                        reverse='1')
+            )
+        info = self._callFUT(context, request)
+        self.assertEqual(info['entries'], [2, 3])
+        self.assertEqual(info['batch_start'], 1)
+        self.assertEqual(info['batch_size'], 10)
+        self.assertEqual(info['batch_end'], 3)
+        self.assertEqual(info['total'], 3)
+        self.assertEqual(info['sort_index'], 'other')
+        self.assertEqual(info['reverse'], True)
+        self.assertEqual(len(searchkw), 2)
+        self.assertEqual(searchkw['reverse'], True)
+        self.assertEqual(searchkw['sort_index'], 'other')
+
+    def test_missing_model(self):
+        searchkw = self._register([1, 2, 3, None])
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params=dict(batch_start='1', batch_size='10', sort_index='other',
@@ -112,34 +131,15 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(searchkw['reverse'], True)
         self.assertEqual(searchkw['sort_index'], 'other')
 
-    def test_missing_model(self):
-        searchkw = self._register([1,2,3,None])
-        context = testing.DummyModel()
-        request = testing.DummyRequest(
-            params=dict(batch_start='1', batch_size='10', sort_index='other',
-                        reverse='1')
-            )
-        info = self._callFUT(context, request)
-        self.assertEqual(info['entries'], [2,3])
-        self.assertEqual(info['batch_start'], 1)
-        self.assertEqual(info['batch_size'], 10)
-        self.assertEqual(info['batch_end'], 3)
-        self.assertEqual(info['total'], 4)
-        self.assertEqual(info['sort_index'], 'other')
-        self.assertEqual(info['reverse'], True)
-        self.assertEqual(len(searchkw), 2)
-        self.assertEqual(searchkw['reverse'], True)
-        self.assertEqual(searchkw['sort_index'], 'other')
-
     def test_overflows_batch(self):
-        searchkw = self._register([1,2,3,4,5,6,7])
+        searchkw = self._register([1, 2, 3, 4, 5, 6, 7])
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params=dict(batch_start='0', batch_size='3', sort_index='other',
                         reverse='1')
             )
         info = self._callFUT(context, request)
-        self.assertEqual(info['entries'], [1, 2,3])
+        self.assertEqual(info['entries'], [1, 2, 3])
         self.assertEqual(info['batch_start'], 0)
         self.assertEqual(info['batch_size'], 3)
         self.assertEqual(info['batch_end'], 3)
@@ -153,7 +153,7 @@ class TestGetCatalogBatch(unittest.TestCase):
     def test_batching_urls_next_and_prev(self):
         import urlparse
         from cgi import parse_qs
-        searchkw = self._register([1,2,3])
+        searchkw = self._register([1, 2, 3])
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params=dict(batch_start='0', batch_size='2', reverse='1',

@@ -38,6 +38,10 @@ from karl.utils import find_profiles
 from karl.utils import find_tags
 from karl.utils import find_users
 
+_NOW = None
+def _now():     # unittests can replace this to get known results
+    return _NOW or datetime.now()
+
 def postorder(startnode):
     def visit(node):
         if IFolder.providedBy(node):
@@ -99,17 +103,25 @@ def reindex_content(obj, event):
         catalog.reindex_doc(docid, obj)
 
 def set_modified(obj, event):
-    """ Set the modified date on a single piece of content
-    unconditionally (non-recursive); an IObjectModified event
-    subscriber"""
-    now = datetime.now()
-    obj.modified = now
-    _modify_community(obj, now)
+    """ Set the modified date on a single piece of content.
+    
+    This subscriber is non-recursive.
+    
+    Intended use is as an IObjectModified event subscriber.
+    """
+    if is_content(obj):
+        now = _now()
+        obj.modified = now
+        _modify_community(obj, now)
 
 def set_created(obj, event):
-    """ Add modified and created attributes to nodes which do not yet
-    have them (recursively); an IObjectWillBeAddedEvent subscriber"""
-    now = datetime.now()
+    """ Add modified and created attributes to obj and children.
+    
+    Only add to content objects which do not yet have them (recursively)
+    
+    Intended use is as an IObjectWillBeAddedEvent subscriber.
+    """
+    now = _now()
     for node in postorder(obj):
         if is_content(obj):
             if not getattr(node, 'modified', None):
@@ -126,6 +138,11 @@ def _modify_community(obj, when):
     community = find_interface(obj, ICommunity)
     if community is not None:
         community.content_modified = when
+        catalog = find_catalog(community)
+        if catalog is not None:  # may not be wired into the site yet
+            index = catalog.get('content_modified')
+            if index is not None:
+                index.index_doc(community.docid, community)
 
 def delete_community(obj, event):
     # delete the groups related to the community when a community is

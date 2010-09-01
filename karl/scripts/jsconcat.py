@@ -36,46 +36,52 @@ def main(argv=sys.argv):
         raise RuntimeError, 'jsconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
 
-    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.7' , 'ui')  
+    jquery_dir = os.path.join(static_dir, 'jquery')  
+    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.8.2' , 'js')  
     plugins_dir = os.path.join(static_dir, 'jquery-plugins')
     bgiframe_dir = os.path.join(static_dir, 'jquery-ui', 'bgiframe_2.1.1')
     grid_dir = os.path.join(static_dir, 'jquery-ui', 'grid', 'ui')
     autobox_dir = os.path.join(static_dir, 'jquery-ui', 'autobox2')
     karl_dir = static_dir
-    tinymce_dir = os.path.join(static_dir, 'tiny_mce')
+    multistatusbox_dir = os.path.join(static_dir, 'jquery-ui', 'ui-multistatusbox')
+    captionedimage_dir = os.path.join(static_dir, 'jquery-ui', 'karl-captionedimage')
+    slider_dir = os.path.join(static_dir, 'jquery-ui', 'karl-slider')
     buttonset_dir = os.path.join(static_dir, 'jquery-ui', 'karl-buttonset')
+    tinymce_base_dir = os.path.join(static_dir, 'tinymce')
+    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.8')
 
     packed_dir = os.path.join(static_dir, 'packed')
 
     
-    # XXX We do not currently pack these.
+    # Resources loaded on every page
+    #
+    karl_ui_js = os.path.join(packed_dir, 'karl-ui.js')
+    f = file(karl_ui_js, 'w')
+    for fname in itertools.chain(
+            filesindir(jquery_dir, 'jquery-1.4.2.min.js'),
+            filesindir(bgiframe_dir, 'jquery.bgiframe.js'),
+            filesindir(ui_dir, 'jquery-ui-1.8.2.custom.min.js'),
+            filesindir(grid_dir, 'ui.grid.js', 'ui.gridmodel.js'),
+            filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
+            filesindir(multistatusbox_dir, 'ui.multistatusbox.js'),
+            filesindir(captionedimage_dir, 'karl.captionedimage.js'),
+            filesindir(slider_dir, 'karl.slider.js'),
+            filesindir(buttonset_dir, 'karl.buttonset.js'),
+            filesindir(plugins_dir, 'DD_roundies.js'),
+            filesindir(plugins_dir, 'jquery.scrollTo.js'),
+            filesindir(plugins_dir, 'jquery.tools.js'),
+            ):
+        f.write(file(fname).read())
+    f.close()
+    print "Successfully produced resource", karl_ui_js
 
-    #karl_ui_js = os.path.join(packed_dir, 'karl-ui.js')
-    #f = file(karl_ui_js, 'w')
-    #for fname in itertools.chain(
-    #        filesindir(bgiframe_dir, 'jquery.bgiframe.js'),
-    #        filesindir(ui_dir, 'ui.core.js'),
-    #        filesindir(grid_dir, 'ui.grid.js', 'ui.gridmodel.js'),
-    #        filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
-    #        filesindir(ui_dir, 'effects.core.js', 'effects.pulsate.js', 'effects.fold.js',
-    #                            'ui.datepicker.js', 'ui.dialog.js'),
-    #        filesindir(tinymce_dir, 'plugins/imagedrawer/ajaxfileupload.js'),
-    #        filesindir(buttonset_dir, 'karl.buttonset.js'),
-    #        filesindir(plugins_dir, 'DD_roundies.js'),
-    #        filesindir(plugins_dir, 'jquery.scrollTo.js'),
-    #        filesindir(plugins_dir, 'jquery.tools.js'),
-    #        filesindir(karl_dir, 'karl.js'),
-    #        ):
-    #    f.write(file(fname).read())
-    #f.close()
-    #print "Successfully produced resource", karl_ui_js
 
-
-    # the tinymce resource must be in the tinymce dir,
-    # because it traverses for resources from there.
-    tiny_mce_js = os.path.join(tinymce_dir, 'tiny_mce_gzip.js')
+    # the tinymce resource
+    tiny_mce_js = os.path.join(packed_dir, 'karl-tiny.js')
     f = file(tiny_mce_js, 'w')
     for fname in itertools.chain(
+            filesindir(tinymce_base_dir, 'karl-tiny-wire.js'),
+            filesindir(tinymce_dir, 'jquery.tinysafe.js'),
             filesindir(tinymce_dir, 'tiny_mce.js'),
             filesindir(tinymce_dir, 'langs/en.js'),
             filesindir(tinymce_dir, 'themes/advanced/editor_template.js'),
@@ -88,13 +94,13 @@ def main(argv=sys.argv):
             filesindir(tinymce_dir, 'plugins/wicked/langs/en.js'),
             filesindir(tinymce_dir, 'plugins/spellchecker/editor_plugin.js'),
             filesindir(tinymce_dir, 'plugins/embedmedia/editor_plugin_src.js'),
+            filesindir(tinymce_dir, 'plugins/imagedrawer/ajaxfileupload.js'),
             filesindir(tinymce_dir, 'plugins/imagedrawer/editor_plugin_src.js'),
             filesindir(tinymce_dir, 'plugins/imagedrawer/langs/en.js'),
             ):
         f.write(file(fname).read())
     f.close()
     print "Successfully produced resource", tiny_mce_js
-
 
 if __name__ == '__main__':
     main()

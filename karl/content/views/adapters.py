@@ -628,7 +628,7 @@ class AbstractPortlet(object):
     def asHTML(self):
         """Use lxml to generate a customizable via adapter representation"""
 
-        portlet = fragment_fromstring('<div class="sections"/>')
+        portlet = fragment_fromstring('<div class="generic-portlet""/>')
         heading = SubElement(portlet, 'h3')
         heading.text = self.context.title
 
@@ -733,7 +733,7 @@ class NetworkEventsPortlet(AbstractPortlet):
     @property
     def asHTML(self):
         # The network events portlet is different.  Everything is different.
-        portlet = fragment_fromstring('<div class="sections"/>')
+        portlet = fragment_fromstring('<div class="generic-portlet"/>')
         heading = SubElement(portlet, 'h3')
         heading.text = self.context.title
 

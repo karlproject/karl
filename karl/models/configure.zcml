@@ -15,6 +15,11 @@
 
   <subscriber
       for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".contentfeeds.user_added_content"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectWillBeAddedEvent"
       handler=".subscribers.set_created"/>
 
@@ -22,6 +27,11 @@
       for="repoze.lemonade.interfaces.IContent
            .interfaces.IObjectModifiedEvent"
       handler=".subscribers.set_modified"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           .interfaces.IObjectModifiedEvent"
+      handler=".contentfeeds.user_modified_content"/>
 
   <subscriber
       for="repoze.lemonade.interfaces.IContent
@@ -98,8 +108,20 @@
       handler=".subscribers.reindex_profile_after_group_change"/>
 
   <subscriber
+      for="karl.models.interfaces.IUserAddedGroup"
+      handler=".contentfeeds.user_joined_community"/>
+
+  <subscriber
       for="karl.models.interfaces.IUserRemovedGroup"
       handler=".subscribers.reindex_profile_after_group_change"/>
+
+  <subscriber
+      for="karl.models.interfaces.IUserRemovedGroup"
+      handler=".contentfeeds.user_left_community"/>
+
+  <subscriber
+      for="karl.tagging.interfaces.ITagAddedEvent"
+      handler=".contentfeeds.user_tagged_content"/>
 
   <subscriber
       for="karl.models.interfaces.IPeopleDirectorySchemaChanged"

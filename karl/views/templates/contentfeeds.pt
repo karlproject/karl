@@ -1,0 +1,223 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+
+<head>
+  <metal:slot metal:fill-slot="extra-headers">
+
+    <script src="${api.static_url}/jstemplate.js"></script>
+    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+    <script src="${api.static_url}/karl-plugins/karl-contentfeeds/karl.contentfeeds.js"></script>
+    <script language="javascript" type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+          // wire the widgets
+          var info = $('#feedinfo')
+              .karlcontentfeeds_info({
+                  selectLastUpdate: '#polled',
+                  selectLastGen: '#last_gen',
+                  selectLastIndex: '#last_index',
+                  selectFeedUrl: '#json_feed_url'
+              });
+          var feedlist = $('#feedlist')
+              .karlcontentfeeds({
+                  ajax_url: '/newest_feed_items.json',
+                  filter: $('#filter').text()
+              })
+              .bind('changed.karlcontentfeeds', function(evt, summary_info) {
+                  info.karlcontentfeeds_info('update', summary_info);
+              })
+              .bind('ajaxstatechanged.karlcontentfeeds', function(evt, state, errormsg) {
+                  $('#feed-polling').karlcontentfeeds_polling('setAjaxState', state, {errormsg: errormsg});
+              });
+          $('#feed-polling')
+              .karlcontentfeeds_polling({
+                  // XXX Classes still hardwired in the template ++ js.
+              })
+              .bind('ajaxstatechanged.karlcontentfeeds', function(evt, state) {
+                  feedlist.karlcontentfeeds('setAjaxState', state);
+              });
+
+          // bind the filter buttons
+          $('.filterlink').bind('click', function(e) {
+              $('#filter').text(this.rel);
+              $('.filterlink').parent().removeClass('current');
+              $(this).parent().addClass('current');
+              feedlist.karlcontentfeeds('setFilter', this.rel);
+              return false;
+          });
+          
+          // get the first items
+          feedlist.karlcontentfeeds('get_items');
+
+          // set automatic update of items
+          setInterval(function() {
+              feedlist.karlcontentfeeds('get_items'); 
+          }, 30000);
+
+      });
+      //]]>
+    </script>
+
+    <script type="text/tmpl" id="item_row">
+        <div class="feeditem">
+            <div class="thumbnail">
+                <img src="{%= item.thumbnail %}" />
+            </div>
+
+            <div class="feedoperation">
+                <div class="{%= item.operation %}"><span>{%= item.operation %}</span></div>
+                <div class="contenttype">{%= item.content_type %}</div>
+                <div class="posttime">
+                    <abbr class="timeago"
+                          title="{%= item.timeago %}"
+                      >XXX</abbr>
+                </div>
+            </div>
+
+            <div class="feedtext">
+                <div class="firstline">{%= item.flavor %}</div>
+
+
+                <div class="secondline">
+                     <em>{%= item.description %}</em>
+                    {% if (item.description!='') { %}
+                      <br />
+                    {% } %}
+                    {% if (item.tags!=null) { %}
+                      {% for (var i=0; i!=item.tags.length; i++) { %}
+                        {% if (i==0) { %}
+                         <strong>Tags:</strong>&nbsp;
+                        {% } %}
+                        <a href="/showtag/{%= item.tags[i] %}">{%= item.tags[i] %}</a>
+                        {% if (i==item.tags.length) { %}
+                          ,
+                        {% } %}
+                      {% } %}
+                    {% } %}
+                    {% if (item.comment_count!=false) { %}
+                      {% if (item.tags.length) { %}
+                        |
+                      {% } %}
+                      <strong># comments:</strong>&nbsp;
+                      {%= item.comment_count %} comments
+                    {% } %}
+                </div>
+
+            </div>
+
+            <div class="visualClear"><!-- --></div>
+        </div>
+    </script>
+
+    <script type="text/tmpl" id="added_edited_other">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %} a {%= item.content_type %}
+      <a href="{%= item.url %}">{%= item.title %}</a>
+        in <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="added_edited_profile">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %} profile
+      <a href="{%= item.url %}">{%= item.title %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="added_edited_community">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %}
+        Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="tagged_profile">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a>
+        tagged profile <a href="{%= item.url %}">{%= item.title %}</a>
+        as <a href="/showtag/{%= item.tagname %}">{%= item.tagname %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="tagged_other">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a>
+        tagged {%= item.content_type %} <a href="{%= item.url %}">{%= item.title %}</a>
+        in Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>
+        as <a href="/showtag/{%= item.tagname %}">{%= item.tagname %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="tagged_community">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a> tagged
+        Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>
+        as <a href="/showtag/{%= item.tagname %}">{%= item.tagname %}</a>.
+    </script>
+
+    <script type="text/tmpl" id="joined_left">
+      <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %}
+        Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+    </script>
+
+  </metal:slot>
+</head>
+
+<body>
+  <div metal:fill-slot="content">
+    <div tal:define="filterby request.params.get('filter') or sticky_filter">
+      <div style="display:none" id="filter" tal:content="filterby" />
+
+      <div class="feedOptions"
+           tal:condition="api.user_is_staff and show_filter">
+
+           <div id="feed-filters">
+               Feed Filters<br />
+               <ul>
+                   <li tal:attributes="class not filterby and 'firstItem current' or 'firstItem'">
+                       <a class="filterlink" href="#" rel=""><span>All</span></a>
+                   </li>
+                   <li tal:attributes="class filterby=='mycommunities' and 'current' or ''">
+                       <a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
+                   </li>
+                   <li tal:attributes="class filterby=='mycontent' and 'lastItem current' or 'lastItem'">
+                       <a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a>
+                   </li>
+               </ul>
+           </div>
+           <div id="feed-polling">
+               Auto Update <img id="polling-info" src="/static/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+               <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
+               <a href="#" id="poll-indicator" class="on"><span>
+                   <img class="img-on" src="/static/images/feed-on.gif" alt="Polling is On" />
+                   <img class="img-off" src="/static/images/feed-off.gif" alt="Polling is Off" />
+                   <img class="img-polling" src="/static/images/feed-polling.gif" alt="Polling for New Content" />
+                   <img class="img-error" src="/static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+               </span></a>
+               <div class="polling-details info">
+                   <a href="#" class="close">close</a>
+                   <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
+                   <ul>
+                       <li><img src="/static/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
+                       <li><img src="/static/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
+                       <li><img src="/static/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
+                       <li><img src="/static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+                   </ul>
+                   <p id="feedinfo">
+                      <i>Last updated:</i><br/><span id="polled">AGO</span><br/><br/>
+                      <i>Last generation:</i><span id="last_gen"></span><br/>
+                      <i>Last index:</i><span id="last_index"></span><br/>
+                      <i>JSON Feed URL:</i><br/><a id="json_feed_url" href="#">Unknown</a>
+                   </p>
+               </div>
+               <div class="polling-details errormessage">
+                   <a href="#" class="close">close</a>
+                   <p>The following error occurred:</p>
+           <div id="kf-errordetail"></div>
+               </div>
+           </div>
+      </div>
+
+      <h1>${api.page_title}</h1>
+
+      <p>A real-time list of updates on ${api.system_name} that
+      refreshes automatically every 30 seconds.</p>
+
+      <div id="feedlist"></div>
+
+    </div>
+  </div>
+
+</body>
+</html>

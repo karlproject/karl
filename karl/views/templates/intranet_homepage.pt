@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
@@ -10,7 +11,7 @@
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
 
-  <body>
+  <body class="intranet-homepage">
     <div class="visual-portal-wrapper">
       <div id="header" class="shadow">
 

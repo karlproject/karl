@@ -3,8 +3,8 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal">
   <div metal:use-macro="api.snippets.macros['tagsportlet']"></div>
 
-  <div id="blogarchiveportlet" class="right-portlet">
-    <h3>ARCHIVE</h3>
+  <div id="blogarchiveportlet" class="generic-portlet">
+    <h3>Archive</h3>
     <table class="portlet-table">
     	<tbody>
     		<tr tal:repeat="activity activity_list">

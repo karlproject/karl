@@ -25,16 +25,22 @@ from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
 from zope.component import getMultiAdapter
+from zope.index.text.parsetree import ParseError
 
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 from karl.views.api import TemplateAPI
-from karl.utils import get_setting
-from karl.utils import find_profiles
+from karl.utils import coarse_datetime_repr
 from karl.utils import find_communities
+from karl.utils import find_profiles
+from karl.utils import get_setting
 from karl.views.batch import get_catalog_batch_grid
 
+
+_TODAY = None
+def _today():
+    return _TODAY or datetime.datetime.today()
 
 # The name of the cookie that makes the communites view sticky.
 # Possible cookie values are 'mine', 'active', 'all'.
@@ -42,29 +48,22 @@ from karl.views.batch import get_catalog_batch_grid
 # as default.
 _VIEW_COOKIE = 'karl.communities_view'
 _VIEWS = [
-    ('mine',
-     'Mine',
-     'Communities where I am a member',
-     'my_communities.html',
-    ),
-    ('active',
-     'Active',
-     'Communities with activity within the last 30 days',
-     'active_communities.html',
-    ),
     ('all',
      'All',
      'All communities',
      'all_communities.html',
     ),
+    ('active',
+     'Active',
+     'Communities with activity within the last six months',
+     'active_communities.html',
+    ),
 ]
-_VIEW_URL_LOOKUP = dict([(x[0], x[3])
-                                            for x in _VIEWS])
+_VIEW_URL_LOOKUP = dict([(x[0], x[3]) for x in _VIEWS])
 
 
 def show_communities_view(context, request):
-    # XXX:  make default unconditionally 'mine' once the "new" UI rolls out.
-    default = 'demo' in request.GET and 'mine' or 'all'
+    default = 'all'
     which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
     target = model_url(context, request, urlname)
@@ -80,10 +79,10 @@ def _set_cookie_via_request(request, value):
 
 
 def _show_communities_view_helper(context,
-                                 request,
-                                 prefix='',
-                                 test=lambda x: True,
-                                ):
+                                  request,
+                                  prefix='',
+                                  **kw
+                                 ):
     # Grab the data for the two listings, main communities and portlet
     communities_path = model_path(context)
 
@@ -92,19 +91,31 @@ def _show_communities_view_helper(context,
         interfaces=[ICommunity],
         path={'query': communities_path, 'depth': 1},
         allowed={'query': effective_principals(request), 'operator': 'or'},
+        **kw
         )
 
+    qualifiers = []
     titlestartswith = request.params.get('titlestartswith')
     if titlestartswith:
         query['titlestartswith'] = (titlestartswith, titlestartswith)
+        qualifiers.append("Communities that begin with '%s'" % titlestartswith)
 
-    batch_info = get_catalog_batch_grid(context, request, **query)
+    body = request.params.get('body')
+    if body:
+        query['texts'] = body
+        qualifiers.append('Search for "%s"' % body)
+
+    error = None
+    try:
+        batch_info = get_catalog_batch_grid(context, request, **query)
+    except ParseError, e:
+        batch_info = { 'entries': [], 'batching_required': False }
+        error = 'Error: %s' % e
 
     communities = []
     for community in batch_info['entries']:
         adapted = getMultiAdapter((community, request), ICommunityInfo)
-        if test(adapted):
-            communities.append(adapted)
+        communities.append(adapted)
 
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
@@ -115,8 +126,8 @@ def _show_communities_view_helper(context,
         classes.append({'name': name,
                         'title': title,
                         'description': description,
-                        'urlname': urlname,
-                        'current': name == view_cookie,
+                        'href': urlname,
+                        'selected': name == view_cookie,
                        })
 
     actions = []
@@ -126,23 +137,21 @@ def _show_communities_view_helper(context,
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s%s Communities' % (prefix, system_name)
 
-    # XXX:  make this go away
-    if 'demo' not in request.GET:
-        my_communities = get_my_communities(context, request)
-    else:
-        my_communities = ()
+    my_communities = get_my_communities(context, request)
 
     preferred_communities = get_preferred_communities(context, request)
 
     return {'communities': communities,
             'batch_info': batch_info,
             'letters': letter_info,
-            'subview_classes': classes,
+            'community_tabs': classes,
             'actions': actions,
-            'my_communities': my_communities, #XXX
+            'my_communities': my_communities, 
             'preferred_communities': preferred_communities,
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
+            'qualifiers': qualifiers,
+            'error': error,
            }
 
 
@@ -155,25 +164,13 @@ def show_all_communities_view(context, request):
 def show_active_communities_view(context, request):
     _set_cookie_via_request(request, 'active')
 
-    today = datetime.datetime.today()
-    thirty_days_ago = today - datetime.timedelta(30)
+    six_months_ago = _today() - datetime.timedelta(days=180)
+    content_modified = (coarse_datetime_repr(six_months_ago), None)
 
-    def _thirty(adapted):
-        return (adapted.context.content_modified is not None and
-                adapted.context.content_modified >= thirty_days_ago)
-
-    return _show_communities_view_helper(context, request,
-                                         prefix='Active ', test=_thirty)
-
-
-def show_my_communities_view(context, request):
-    _set_cookie_via_request(request, 'mine')
-
-    def _mine(adapted):
-        return adapted.member
-
-    return _show_communities_view_helper(context, request,
-                                         prefix='My ', test=_mine)
+    return _show_communities_view_helper(context,
+                                         request, prefix='Active ',
+                                         content_modified=content_modified,
+                                        )
 
 
 def get_my_communities(communities_folder, request, ignore_preferred=False):

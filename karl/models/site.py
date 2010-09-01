@@ -207,6 +207,9 @@ def get_creation_date(object, default):
 def get_modified_date(object, default):
     return _get_date_or_datetime(object, 'modified', default)
 
+def get_content_modified_date(object, default):
+    return _get_date_or_datetime(object, 'content_modified', default)
+
 def get_start_date(object, default):
     # For monthly browsing of calendar events
     return _get_date_or_datetime(object, 'startDate', default)
@@ -312,6 +315,7 @@ class Site(Folder):
             'allowed':CatalogKeywordIndex(get_allowed_to_view),
             'creation_date': CatalogFieldIndex(get_creation_date),
             'modified_date': CatalogFieldIndex(get_modified_date),
+            'content_modified': CatalogFieldIndex(get_content_modified_date),
             'start_date': CatalogFieldIndex(get_start_date),
             'end_date': CatalogFieldIndex(get_end_date),
             'publication_date': CatalogFieldIndex(get_publication_date),

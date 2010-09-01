@@ -36,6 +36,8 @@ def main():
     parser.add_option('-p', '--path', dest='path',
         action="store", default=None, metavar='EXPR',
         help="Reindex only objects whose path matches a regular expression")
+    parser.add_option('-n', '--index', dest='indexes',
+        action="append", help="Reindex only the given index (can be repeated)")
 
     options, args = parser.parse_args()
     if args:
@@ -55,8 +57,12 @@ def main():
     def output(msg):
         print msg
 
+    kw = {}
+    if options.indexes:
+        kw['indexes'] = options.indexes
+
     reindex_catalog(root, path_re=path_re, commit_interval=commit_interval,
-                    dry_run=options.dry_run, output=output)
+                    dry_run=options.dry_run, output=output, **kw)
 
 if __name__ == '__main__':
     main()

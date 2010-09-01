@@ -19,6 +19,38 @@ from zope.interface import Interface
 from zope.schema import Int
 from zope.schema import TextLine
 
+class ITagEvent(Interface):
+    """ Base interface for tag-related events.
+    """
+    item = Int(
+        title=u'Item',
+        description=u'The item that is tagged.',
+        required=True)
+
+    user = TextLine(
+        title=u'User',
+        description=u'The user id that created the tag.',
+        required=True)
+
+    name = TextLine(
+        title=u'Tag Name',
+        description=u'The tag name the user provided for the item.',
+        required=True)
+
+    community = TextLine(
+        title=u'Community',
+        description=u'The name of the community containing the item, if any.',
+        required=False,
+        default=None)
+
+class ITagAddedEvent(ITagEvent):
+    """ User added a tag on an item.
+    """
+
+class ITagRemovedEvent(ITagEvent):
+    """ User removed a tag from an item.
+    """
+
 class ITag(Interface):
     """ Scehma for a single tag.
     """

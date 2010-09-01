@@ -33,14 +33,14 @@ except IOError:
     CHANGES = ''
 
 requires = [
-    'coverage',
+    'appendonly',
     'feedparser',
     'icalendar',
     'lxml',
     'markdown2',
     'PILwoTk',
-    'nose',
     'repoze.bfg >= 1.2a6',
+    'repoze.bfg.formish',
     'repoze.browserid',
     'repoze.catalog',
     'repoze.evolution',
@@ -60,14 +60,12 @@ requires = [
     'repoze.zodbconn',
     'setuptools',
     'simplejson',
-    'twill', # for testing
     'ZODB3',
+    # Testing dependencies
+    'coverage',
+    'nose',        
+    'twill',
     'zope.testing', # fwd compat when not directly relied on by BFG
-    'PILwoTk',
-    'icalendar',
-    'markdown2',
-    'repoze.bfg.formish',
-    'twill', # for testing
     # Not really a code depdencency, but used by most buildouts
     # XXX Move to eggs in buildout?
     'repoze.errorlog',

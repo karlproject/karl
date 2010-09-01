@@ -43,6 +43,7 @@
       <input type="hidden" name="text_text_format" value="text/html" />
       <textarea id="text" name="text" rows="1" cols="40"
 		class="mceEditor karlrichtextfield"></textarea>
+      <!-- wiring from karl-tiny-wire.js -->
     </fieldset>
 
     <fieldset metal:define-macro="message-field"
@@ -224,6 +225,7 @@
       <input type="hidden" name="add_comment_text_format" value="text/html" />
       <textarea id="add_comment" name="add_comment" rows="1" cols="40"
 		class="mceEditor karlrichtextfield"></textarea>
+      <!-- wiring from karl-tiny-wire.js -->
     </fieldset>
 
     <fieldset metal:define-macro="email_addresses-field"
@@ -531,6 +533,7 @@
       <input type="hidden" name="text_text_format" value="text/html" />
       <textarea id="biography" name="biography" rows="1" cols="40"
 		class="mceEditor karlrichtextfield"></textarea>
+      <!-- wiring from karl-tiny-wire.js -->
     </fieldset>
 
     <fieldset metal:define-macro="photo-field"

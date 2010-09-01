@@ -103,6 +103,21 @@ class TemplateAPI(object):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
 
+        if settings:
+            self.kaltura_info = dict(
+                enabled =  getattr(settings, 'kaltura_enabled', False) in ('true', 'True'),
+                service_url = getattr(settings, 'kaltura_service_url', ''),
+                partner_id = getattr(settings, 'kaltura_partner_id', ''),
+                sub_partner_id = getattr(settings, 'kaltura_sub_partner_id', ''),
+                admin_secret = getattr(settings, 'kaltura_admin_secret', ''),
+                user_secret = getattr(settings, 'kaltura_user_secret', ''),
+                )
+        else:
+            self.kaltura_info = dict(
+                enabled = False,
+                )
+        #print 'kaltura', self.kaltura_info
+
     @property
     def snippets(self):
         if self._snippets is None:

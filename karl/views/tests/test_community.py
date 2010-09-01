@@ -385,6 +385,8 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(community.description, 'thedescription')
         self.assertEqual(community.text, 'thetext')
         self.assertEqual(community.default_tool, 'blog')
+        self.assertEqual(community.creator, 'userid')
+        self.assertEqual(community.modified_by, 'userid')
         self.assertEqual(
             context.users.added_groups,
             [('userid', 'moderators'), ('userid', 'members') ]
@@ -488,9 +490,10 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(len(L2), 2)
 
     def test_handle_submit_propchanges(self):
+        testing.registerDummySecurityPolicy('user2')
         context = testing.DummyModel(
             title='oldtitle', description='oldescription',
-            default_tool='overview')
+            default_tool='overview', modified_by = 'user1')
         request = testing.DummyRequest()
         self._register()
         view = self._makeOne(context, request)
@@ -506,6 +509,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(context.title, 'Thetitle yo')
         self.assertEqual(context.description, 'thedescription')
         self.assertEqual(context.text, 'thetext')
+        self.assertEqual(context.modified_by, 'user2')
 
     def test_handle_submit_responselocation(self):
         context = testing.DummyModel(
@@ -780,6 +784,6 @@ class DummyCommunity:
         self.title = title
         self.description = description
         self.text = text
-        self.creator = creator
+        self.creator = self.modified_by = creator
         self.members_group_name = 'members'
         self.moderators_group_name = 'moderators'

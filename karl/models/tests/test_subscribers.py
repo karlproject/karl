@@ -252,39 +252,82 @@ class TestReindexContent(unittest.TestCase):
         self._callFUT(model, None)
         self.assertEqual(catalog.reindexed, [model])
 
-class TestSetModified(unittest.TestCase):
+class _NOW_replacer:
+    _old_NOW = None
+
+    def _set_NOW(self, when):
+        import karl.models.subscribers as MUT
+        MUT._NOW, self._old_NOW = when, MUT._NOW
+
+class DummyIndex:
+    def __init__(self):
+        self._called_with = []
+
+    def index_doc(self, docid, obj):
+        self._called_with.append((docid, obj))
+
+class Test_set_modified(unittest.TestCase,
+                        _NOW_replacer,
+                       ):
     def setUp(self):
         cleanUp()
+        self._set_NOW(None)
 
     def tearDown(self):
         cleanUp()
+        self._set_NOW(None)
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import set_modified
         return set_modified(object, event)
 
-    def test_content_object(self):
+    def test_noncontent_object(self):
         model = testing.DummyModel()
-        model.modified = 'abc'
         self._callFUT(model, None)
-        self.assertNotEqual(model.modified, 'abc')
+        self.failIf(hasattr(model, 'modified'))
+
+    def test_content_object(self):
+        from zope.interface import directlyProvides
+        from repoze.lemonade.interfaces import IContent
+        model = testing.DummyModel()
+        directlyProvides(model, IContent)
+        model.modified = 'abc'
+        _now = object()
+        self._set_NOW(_now)
+        self._callFUT(model, None)
+        self.failUnless(model.modified is _now)
 
     def test_with_icommunity(self):
-        root = testing.DummyModel()
-        root.content_modified = None
         from zope.interface import directlyProvides
+        from repoze.catalog.interfaces import ICatalog
+        from repoze.lemonade.interfaces import IContent
         from karl.models.interfaces import ICommunity
+        root = testing.DummyModel()
         directlyProvides(root, ICommunity)
+        root.content_modified = None
+        root.docid = 42
+        catalog = root.catalog = testing.DummyModel()
+        index = catalog['content_modified'] = DummyIndex()
+        directlyProvides(catalog, ICatalog)
         model = testing.DummyModel(__parent__=root)
+        directlyProvides(model, IContent)
+        _now = object()
+        self._set_NOW(_now)
         self._callFUT(model, None)
-        self.assertNotEqual(root.content_modified, None)
+        self.failUnless(root.content_modified is _now)
+        self.assertEqual(len(index._called_with), 1)
+        self.assertEqual(index._called_with[0], (42, root))
 
-class TestSetCreated(unittest.TestCase):
+class Test_set_created(unittest.TestCase,
+                       _NOW_replacer,
+                      ):
     def setUp(self):
         cleanUp()
+        self._set_NOW(None)
 
     def tearDown(self):
         cleanUp()
+        self._set_NOW(None)
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import set_created
@@ -301,9 +344,11 @@ class TestSetCreated(unittest.TestCase):
         from repoze.lemonade.interfaces import IContent
         model = testing.DummyModel()
         directlyProvides(model, IContent)
+        _now = object()
+        self._set_NOW(_now)
         self._callFUT(model, None)
-        self.failUnless(model.created)
-        self.failUnless(model.modified)
+        self.failUnless(model.created is _now)
+        self.failUnless(model.modified is _now)
 
     def test_content_object_already_attrs(self):
         from zope.interface import directlyProvides
@@ -324,16 +369,26 @@ class TestSetCreated(unittest.TestCase):
         self.failIf('content_modified' in root.__dict__)
 
     def test_updates_community_content_modified(self):
-        root = testing.DummyModel()
         from zope.interface import directlyProvides
+        from repoze.catalog.interfaces import ICatalog
         from karl.models.interfaces import ICommunity
+        root = testing.DummyModel()
         directlyProvides(root, ICommunity)
+        root.content_modified = None
+        root.docid = 42
+        catalog = root.catalog = testing.DummyModel()
+        index = catalog['content_modified'] = DummyIndex()
+        directlyProvides(catalog, ICatalog)
+        _now = object()
+        self._set_NOW(_now)
         # bogus:  __parent__ is not yet set on obj in IObjectWillBeAddedEvent
         #model = testing.DummyModel(__parent__=root)
         model = testing.DummyModel()
         event = testing.DummyModel(name='phred', parent=root, object=model)
         self._callFUT(model, event)
-        self.failUnless('content_modified' in root.__dict__)
+        self.failUnless(root.content_modified is _now)
+        self.assertEqual(len(index._called_with), 1)
+        self.assertEqual(index._called_with[0], (42, root))
 
 class TestDeleteCommunity(unittest.TestCase):
     def setUp(self):

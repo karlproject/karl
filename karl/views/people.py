@@ -235,6 +235,7 @@ class EditProfileFormController(object):
         except Invalid, e:
             raise ValidationError(**e.error_dict)
         self.filestore.clear()
+        context.modified_by = authenticated_userid(request)
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
         # Whew, we made it!
@@ -356,6 +357,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         except Invalid, e:
             raise ValidationError(**e.error_dict)
         self.filestore.clear()
+        context.modified_by = authenticated_userid(request)
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
         # Whew, we made it!
@@ -451,6 +453,7 @@ class AddUserFormController(EditProfileFormController):
                 continue
             kw[k] = v
         profile = create_content(IProfile, **kw)
+        profile.modified_by = authenticated_userid(request)
         context[userid] = profile
 
         workflow = get_workflow(IProfile, 'security', context)
@@ -611,6 +614,15 @@ def show_profile_view(context, request):
         tags=tags,
         recent_items=recent_items,
         )
+
+def profile_thumbnail(context, request):
+    api = TemplateAPI(context, request, 'Profile thumbnail redirector')
+    photo = context.get('photo')
+    if photo is not None:
+        url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
+    else:
+        url = api.static_url + "/images/defaultUser.gif"
+    return HTTPFound(location=url)
 
 def recent_content_view(context, request):
     batch = get_catalog_batch(context, request,

@@ -37,8 +37,22 @@ def main(argv=sys.argv):
     if len(argv) > 1:
         raise RuntimeError, 'cssconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
+    tinymce_base_dir = os.path.join(static_dir, 'tinymce')
+    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.8')
 
-    print "Success, nothing to do right now."
+    skin_dir = os.path.join(tinymce_dir, 'themes', 'advanced', 'skins', 'karl')
+
+    # tinymce packed css
+    # It must be in the skin directory, because it traverses resources from there.
+    karl_tiny_css = os.path.join(skin_dir, 'karl-tiny-packed.css')
+    f = file(karl_tiny_css, 'w')
+    for fname in itertools.chain(
+            filesindir(tinymce_dir, 'themes/advanced/skins/karl/ui.css'),
+            filesindir(tinymce_dir, 'plugins/imagedrawer/css/ui.css'),
+            ):
+        f.write(file(fname).read())
+    f.close()
+    print "Successfully produced resource", karl_tiny_css
 
 if __name__ == '__main__':
     main()

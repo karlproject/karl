@@ -3,7 +3,7 @@
 
 new (function() {                  // BEGIN CLOSURE Karl
 
-var Karl = window.Karl = {};
+var Karl = window.Karl = window.Karl || {};
 var t = this;
 
 // Some defaults and constants
@@ -26,102 +26,6 @@ var createLiveForms = function createLiveForms() {
     });
 };
 
-
-/**
- * Load TinyMCE
- */
-var loadTinyMCE = function loadTinyMCE() {
-    // Instead of relying on exception handling, simply check
-    // if tiny is available. This allows catching the real exceptions
-    // during init.
-    var _has_tinyMCE = true;
-    try {
-        tinyMCE;
-    } catch (e) {
-        _has_tinyMCE = false;
-    }
-    if (_has_tinyMCE && tinyMCE.init) {
-        // Say "no thanks" to the scriptloader of tiny.
-        // Reason: it works excellent, but for both development and production
-        // modes, we end up better if we include our resources ourselves.
-        // We do this by marking the resources as loaded already.
-        // Thist must be in sync with what actually gets loaded in the page.
-        var pref = tinymce.baseURL + '/';
-        var mark = function mark(path) {
-            // Mark resource as loaded for both .js and _src.js
-            // Path should not contain the .js ending.
-            tinymce.ScriptLoader.markDone(pref + path + '.js');
-            tinymce.ScriptLoader.markDone(pref + path + '_src.js');
-        };
-        mark('langs/en');
-        mark('themes/advanced/editor_template');
-        mark('plugins/paste/editor_plugin');
-        mark('plugins/wicked/editor_plugin');
-        mark('plugins/wicked/langs/en');
-        mark('plugins/spellchecker/editor_plugin');
-        mark('plugins/embedmedia/editor_plugin');
-        mark('plugins/imagedrawer/editor_plugin');
-        mark('plugins/imagedrawer/langs/en');
-
-        // See if the wiki plugin needs to be enabled.
-        var widget_data = window.karl_client_data && karl_client_data.text || {};
-        var plugins = 'paste,embedmedia,spellchecker';
-        if (widget_data.enable_wiki_plugin) {
-            plugins += ',wicked';
-            // Imagedrawer is default enabled on wiki pages.
-            // Disabled everywhere else. XXX TODO
-            plugins += ',imagedrawer';
-        }
-     
-        // Url that contains the context prefix 
-        var here_url = $('#karl-here-url')[0].content;
-
-        // Do the init.
-        tinyMCE.init({
-            //content_css: false,
-            //editor_css: false,
-            theme: 'advanced',
-            skin: 'karl',
-            mode: 'specific_textareas',
-            editor_selector : 'mceEditor',
-            height: '400',
-            width: '550',
-            convert_urls : false,
-            gecko_spellcheck : true,
-            submit_patch: false,
-            entity_encoding: "numeric",
-            add_form_submit_trigger: false,
-            add_unload_trigger: false,
-            strict_loading_mode: true,
-            paste_create_paragraphs : false,
-            paste_create_linebreaks : false,
-            paste_use_dialog : false,
-            paste_auto_cleanup_on_paste : true,
-            paste_convert_middot_lists : true,
-            paste_unindented_list_class : "unindentedList",
-            paste_convert_headers_to_strong : true,
-            theme_advanced_toolbar_location: 'top',
-            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, addwickedlink, delwickedlink, spellchecker',
-            theme_advanced_buttons2: '',
-            theme_advanced_buttons3: '',
-            plugins: plugins,
-            extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
-            relative_urls : false,
-            forced_root_block : 'p',
-            spellchecker_rpc_url: "/tinymce_spellcheck",
-            spellchecker_languages : "+English=en",
-            // options for imagedrawer
-            imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
-            imagedrawer_upload_url: here_url + 'drawer_upload_view.html',
-            imagedrawer_data_url: here_url + 'drawer_data_view.html'
-        });  
-    } else {
-        // XXX raise an error here?
-    }
-};
-
-// Load TinyMCE
-loadTinyMCE();
 
 
 /**
@@ -2116,6 +2020,13 @@ $(document).ready(function() {
 
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');
+    
+    // add class to #center if there are no right portlets
+    rcol = $(".generic-layout .rightcol").text();
+    if ($.trim(rcol) == '') {
+        //console.log("true");
+        $(".generic-layout #center").addClass("fill-width");
+    }
 
     /** =CALENDAR ATTACH EVENTS
     ----------------------------------------------- */

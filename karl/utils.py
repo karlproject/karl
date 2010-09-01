@@ -51,6 +51,9 @@ def find_users(context):
 def find_catalog(context):
     return getattr(find_site(context), 'catalog', None)
 
+def find_events(context):
+    return getattr(find_site(context), 'events', None)
+
 def find_tags(context):
     return getattr(find_site(context), 'tags', None)
 

@@ -41,23 +41,13 @@ class Test_show_communities_view(unittest.TestCase):
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, target)
 
-    def test_no_cookie_no_qs(self):
-        # XXX:  collapse this with the next testcase once "new" UI rolls out.
+    def test_no_cookie(self):
         from repoze.bfg.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self._checkResponse(response,
                             model_url(context, request, 'all_communities.html'))
-
-    def test_no_cookie_w_qs(self):
-        # XXX:  collapse this with the prior testcase once "new" UI rolls out.
-        from repoze.bfg.url import model_url
-        context = testing.DummyModel()
-        request = testing.DummyRequest(GET={'demo': 1})
-        response = self._callFUT(context, request)
-        self._checkResponse(response,
-                            model_url(context, request, 'my_communities.html'))
 
     def test_w_cookie(self):
         from karl.views.communities import _VIEW_COOKIE
@@ -145,7 +135,20 @@ class Test_show_all_communities_view(_Show_communities_helper,
 
 class Test_show_active_communities_view(_Show_communities_helper,
                                         unittest.TestCase):
+    _old_TODAY = None
 
+    def setUp(self):
+        super(Test_show_active_communities_view, self).setUp()
+        self._set_TODAY(None)
+
+    def tearDown(self):
+        super(Test_show_active_communities_view, self).tearDown()
+        self._set_TODAY(None)
+ 
+    def _set_TODAY(self, when):
+        import karl.views.communities as MUT
+        MUT._TODAY, self._old_TODAY = when, MUT._TODAY
+        
     def _callFUT(self, context, request):
         from karl.views.communities import show_active_communities_view
         return show_active_communities_view(context, request)
@@ -153,47 +156,37 @@ class Test_show_active_communities_view(_Show_communities_helper,
     def test_excludes_inactive(self):
         from datetime import datetime
         from datetime import timedelta
+        from karl.utils import coarse_datetime_repr
         now = datetime.now()
+        today = now.today()
+        six_months_ago = today - timedelta(days=180)
+        self._set_TODAY(today)
         self._register()
         context = testing.DummyModel()
         profiles = context['profiles'] = testing.DummyModel()
         profiles[None] = testing.DummyModel()
-        context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
+        catalog = context.catalog = karltesting.DummyCatalog(
+                                      {1: '/foo', 2: '/bar'})
         foo = testing.DummyModel(content_modified=now - timedelta(1))
         bar = testing.DummyModel(content_modified=now - timedelta(32))
-        testing.registerModels({'/foo':foo, '/bar': bar})
+        testing.registerModels({'/foo': foo,
+                                '/bar': bar,
+                               })
         request = testing.DummyRequest()
+
         info = self._callFUT(context, request)
+
+        self.assertEqual(len(catalog.queries), 1)
+        query = catalog.queries[0]
+        self.assertEqual(query['content_modified'],
+                         (coarse_datetime_repr(six_months_ago), None))
+
         communities = info['communities']
-        self.assertEqual(len(communities), 1)
+        self.assertEqual(len(communities), 2)
         self.assertEqual(communities[0].context, foo)
+        self.assertEqual(communities[1].context, bar)
         self.failUnless(info['actions'])
         _checkCookie(request, 'active')
-
-
-class Test_show_my_communities_view(_Show_communities_helper,
-                                    unittest.TestCase):
-
-    def _callFUT(self, context, request):
-        from karl.views.communities import show_my_communities_view
-        return show_my_communities_view(context, request)
-
-    def test_excludes_nonmember_even_though_permitted(self):
-        self._register()
-        context = testing.DummyModel()
-        profiles = context['profiles'] = testing.DummyModel()
-        profiles[None] = testing.DummyModel()
-        context.catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
-        foo = testing.DummyModel(_is_member=True)
-        bar = testing.DummyModel(_is_member=False)
-        testing.registerModels({'/foo':foo, '/bar': bar})
-        request = testing.DummyRequest()
-        info = self._callFUT(context, request)
-        communities = info['communities']
-        self.assertEqual(len(communities), 1)
-        self.assertEqual(communities[0].context, foo)
-        self.failUnless(info['actions'])
-        _checkCookie(request, 'mine')
 
 
 class Test_get_community_groups(unittest.TestCase):
@@ -211,7 +204,7 @@ class Test_get_community_groups(unittest.TestCase):
         groups = self._callFUT(principals)
         self.assertEqual(groups, [('yo', 'members'), ('yo', 'other_role')])
 
-class Test_jquery_set_preferred_view(unittest.TestCase):
+class Test_jquery_set_preferred_view(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import jquery_set_preferred_view
@@ -236,11 +229,10 @@ class Test_jquery_set_preferred_view(unittest.TestCase):
         request.params['preferred[]'] = ['Yi']
         testing.registerDummySecurityPolicy(
             'foo',
-            groupids=[
+            [
             'group.community:yo:members',
             'group.community:yo:moderators',
             'group.community:yi:moderators',
-            'group.community:yang:moderators'
             ]
             )
         testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
@@ -248,7 +240,7 @@ class Test_jquery_set_preferred_view(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result['my_communities'][0].context, yi)
 
-class Test_jquery_clear_preferred_view(unittest.TestCase):
+class Test_jquery_clear_preferred_view(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import jquery_clear_preferred_view
@@ -284,7 +276,7 @@ class Test_jquery_clear_preferred_view(unittest.TestCase):
         self.assertEqual(result['preferred'], None)
         self.assertEqual(len(result['my_communities']), 2)
 
-class Test_jquery_list_preferred_view(unittest.TestCase):
+class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import jquery_list_preferred_view
@@ -380,7 +372,7 @@ class Test_jquery_list_preferred_view(unittest.TestCase):
         self.assertEqual(result['preferred'], [])
         self.assertEqual(len(result['my_communities']), 2)
 
-class Test_jquery_edit_preferred_view(unittest.TestCase):
+class Test_jquery_edit_preferred_view(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import jquery_edit_preferred_view
@@ -416,7 +408,7 @@ class Test_jquery_edit_preferred_view(unittest.TestCase):
         self.assertEqual(result['preferred'], ['Yi'])
         self.assertEqual(len(result['my_communities']), 2)
 
-class Test_jquery_list_my_communities_view(unittest.TestCase):
+class Test_jquery_list_my_communities_view(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import jquery_list_my_communities_view
@@ -453,7 +445,7 @@ class Test_jquery_list_my_communities_view(unittest.TestCase):
         self.assertEqual(result['show_all'], True)
         self.assertEqual(len(result['my_communities']), 2)
 
-class Test_get_preferred_communities(unittest.TestCase):
+class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import get_preferred_communities
@@ -515,7 +507,7 @@ class Test_get_preferred_communities(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, None)
 
-class Test_set_preferred_communities(unittest.TestCase):
+class Test_set_preferred_communities(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request, communities):
         from karl.views.communities import set_preferred_communities
@@ -553,7 +545,7 @@ class Test_set_preferred_communities(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], 'yi')
 
-class Test_get_my_communities(unittest.TestCase):
+class Test_get_my_communities(_Show_communities_helper, unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.communities import get_my_communities

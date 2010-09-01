@@ -10,10 +10,11 @@ from repoze.lemonade.content import create_content
 
 from karl.bootstrap.interfaces import IInitialData
 from karl.bootstrap.data import DefaultInitialData
-from karl.models.interfaces import IIntranets
 from karl.content.views.intranets import AddIntranetFormController
-from karl.models.site import Site
+from karl.models.contentfeeds import SiteEvents
+from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IProfile
+from karl.models.site import Site
 from karl.views.community import AddCommunityFormController
 
 def populate(root, do_transaction_begin=True):
@@ -23,6 +24,7 @@ def populate(root, do_transaction_begin=True):
     data = queryUtility(IInitialData, default=DefaultInitialData())
     site = root['site'] = Site()
     site.__acl__ = data.site_acl
+    site.events = SiteEvents()
 
     # If a catalog database exists and does not already contain a catalog,
     # put the site-wide catalog in the catalog database.

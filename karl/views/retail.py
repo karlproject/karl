@@ -58,7 +58,7 @@ def retail_view(context, request):
         )
 
 def _get_portlet_html(context, request, portlet_ids):
-    missing = '<div class="sections"><p>Missing portlet at %s</p></div>'
+    missing = '<div class="generic-portlet"><p>Missing portlet at %s</p></div>'
     notaportlet = '<div class="sections"><p>%s is not a portlet</p></div>'
     html = ''
     for portlet_id in portlet_ids:

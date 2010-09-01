@@ -172,14 +172,6 @@
   />
 
   <view
-    name="my_communities.html"
-    for="karl.models.interfaces.ICommunities"
-    view=".communities.show_my_communities_view"
-    renderer="templates/communities.pt"
-    permission="view"
-  />
-
-  <view
     name="active_communities.html"
     for="karl.models.interfaces.ICommunities"
     view=".communities.show_active_communities_view"
@@ -543,7 +535,14 @@
     for="karl.models.interfaces.IProfile"
     view=".people.show_profile_view"
     permission="view_only"
-  />
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.profile_thumbnail"
+    name="profile_thumbnail"
+    permission="view"
+    />
 
   <view
     for="karl.models.interfaces.IProfile"
@@ -935,6 +934,47 @@
     permission="create"
     name="drawer_upload_view.html"
   />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.show_feeds_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeeds.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view="karl.views.contentfeeds.profile_feed_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.contentfeeds.community_feed_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.newest_feed_items"
+    permission="view"
+    name="newest_feed_items.json"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.older_feed_items"
+    permission="view"
+    name="older_feed_items.json"
+    renderer="json"
+    />
+
 
 </configure>
 
