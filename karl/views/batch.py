@@ -323,11 +323,10 @@ def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
             line = line_filter(line)
             if line is None:
                 continue
-        if j > last:
-            # we have to continue counting in order to show total
-            # line count
-            continue
-        entries.append(line)
+        if j <= last:
+            entries.append(line)
+        # we have to continue counting in order to show total
+        # line count
         j = j + 1
 
     page_entries = entries[batch_start : last]
@@ -337,7 +336,7 @@ def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
         'batch_start': batch_start,
         'batch_size': batch_size,
         'batch_end': batch_start + len(page_entries),
-        'total': i,
+        'total': j,
         }
     _add_link_data(info, context, request)
     return info
