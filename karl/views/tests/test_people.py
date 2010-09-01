@@ -144,6 +144,16 @@ class TestEditProfileFormController(unittest.TestCase):
         response = controller()
         self.failUnless(response['api'].user_is_staff)
 
+    def test_admin_redirected(self):
+        from webob.exc import HTTPFound
+        self.request.form = DummyForm()
+        controller = self._makeOne(self.context, self.request)
+        controller.api.user_is_admin = True
+        response = controller()
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                'http://example.com/admin_edit_profile.html')
+
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_cancel()

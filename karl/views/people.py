@@ -205,6 +205,9 @@ class EditProfileFormController(object):
 
     def __call__(self):
         api = self.api
+        if api.user_is_admin:
+            return HTTPFound(location=model_url(self.context,
+                self.request, 'admin_edit_profile.html'))
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         if api.user_is_staff:
