@@ -7,9 +7,12 @@ Unreleased
 3.44 (2010-09-02)
 -----------------
 
-- Made sure icon is centered on filter indicator button (LP #628833)
+- Un-broke the ``manage_tags.html`` view due to clash over main template's
+  use of top-leve ``tags`` name. (LP #629009)
 
-- Fixed filter button display in IE (LP #628281)
+- Made sure icon is centered on filter indicator button. (LP #628833)
+
+- Fixed filter button display in IE. (LP #628281)
 
 - Merged ``ree-jsupgrade-2-tiny`` branch.
 
