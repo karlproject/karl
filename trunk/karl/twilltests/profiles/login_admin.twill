@@ -1,0 +1,4 @@
+# used by some scripts to login as admin
+# normal users can't add users
+
+login "${cur_admin}"

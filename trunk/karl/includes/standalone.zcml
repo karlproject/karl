@@ -1,0 +1,15 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+  <!--
+    This config file is used when Karl is being run without a customization
+    package and includes some declarations we would normally leave up to a
+    customization package to include or not, to make customization and override
+    of default behavior a little easier.
+  -->
+
+  <!-- Standard core includes -->
+  <include package="karl.includes" file="configure.zcml" />
+
+  <!-- Usually left to customization packages -->
+  <include package="karl.includes" file="workflow.zcml" />
+
+</configure>

@@ -1,0 +1,11 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.generic_layout.macros['master']">
+
+<div metal:fill-slot="content">
+
+ <div metal:use-macro="api.snippets.macros['tagusers']" />
+
+</div>
+</div>

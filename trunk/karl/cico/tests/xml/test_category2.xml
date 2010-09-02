@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<category-item id="1062" xmlns="http://xml.karlproject.org/people/category"
+                         xmlns:h="http://www.w3.org/1999/xhtml">
+  <category id="offices">Offices</category>
+  <title>Category 2</title>
+  <description>
+    &lt;h:div>
+      &lt;h:div>143 Avenue Christophe, Port-au-Prince, Apt B&lt;/h:div>
+      &lt;h:div>Port-au-Prince, HT 90210&lt;/h:div>
+      &lt;h:div>&lt;/h:div>
+      &lt;h:div>&lt;h:b>Tel:&lt;/h:b> 212-555-2323, 212-555-2121&lt;/h:div>
+      &lt;h:div>&lt;h:b>Fax:&lt;/h:b> 212-555-1313&lt;/h:div>
+      &lt;h:div>&lt;h:b>Url:&lt;/h:b> http://www.fokal.org&lt;/h:div>
+    &lt;/h:div>
+  </description>
+</category-item>

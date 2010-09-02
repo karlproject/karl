@@ -1,0 +1,18 @@
+## The Delete action goes to a confirmation screen with OK and a Cancel buttons
+go /offices/forums/
+follow "Baloney"
+go delete.html?confirm=1
+find "Deleted"
+#find "Do you really want to delete"
+#find "ok"
+#find "cancel"
+## Cancel takes you back to the parent
+#follow "ok"
+#url /offices/forums/baloney-1
+## OK leads to deleting the resource, which then redirects you to the parent with a status message saying the deletion took place.
+#follow "Delete"
+#follow "ok"
+#url /offices
+#find "Deleted Diesel"
+#go /offices/forums
+#notfind "Diesel"

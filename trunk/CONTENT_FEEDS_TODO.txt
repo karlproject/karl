@@ -1,0 +1,134 @@
+Content Feeds TODOs
+===================
+
+
+Vertical stripe
+---------------
+
+- [X] Prototype main feed view for review with Nat, Jason.
+
+- [X} Implement primary feed store as conflict-resolving, append-only
+      stack.
+
+- [X] Extend the stack with a utility lookup for pruned layers.
+
+- [X] Move the appendstack functionality out into a separate package,
+      to allow installing it on the ZEO server (conflict resoultion code
+      has to be importable server side).
+
+- [X] Ensure that tagging operations emit events required to generate
+      event-stream records for 'tagged' / 'untagged' operations.
+
+- [X] Ensure that membership operations emit events required to generate
+      event-stream records for 'joined' / 'left' operations.
+
+- [X] Work out computation of the ACL for event stream records.
+
+- [X] Wire up event listener for 'joined' operation.
+
+- [X] Wire up event listener for 'left' operation.
+
+- [X} Implement the persistent site events object, using the `AppendStack`
+      class.
+
+- [X] Write the ACL-based filter over the stack.
+
+- [X] Update `bin/start_over` to add the `events` object to the root.
+
+- [X] Wire the ACL-filtered events into the main view.
+
+
+After vertical stripe
+---------------------
+
+- [X] Fix the profile thumbnail URL issue.
+
+      * Create a good-everywhere view which redirects to the correct image.
+
+- [X] Wire up event listener for 'added' operation.
+
+- [X] Wire up event listener for 'edited' operation.
+
+- [X] Wire up event listener for 'tagged' operation.
+
+- [X] Implement 'flavor' computation for all event listeners.
+
+- [X] Implement 'elapsed' lookups for all relevant event listeners.
+
+- [X] Wire the ACL-filtered events into the JSON update view.
+
+- [X] Extend the prototype to query a dummy JSON-emitting view for
+      updates.  (Paul, Carlos)
+
+- [X] Implement 'tags' lookups for all relevant event listeners.
+
+- [X] Implement 'commentcount' lookups for all relevant event listeners.
+
+- [X] Add an evolve step to add the `events` object to the root.
+
+
+Before demo
+-----------
+
+- [X] Verify that all expected operations yield correct contentfeed
+      entries.
+
+      * Editing a community did not show up on feed:  the view didn't
+        set ``modified_by`` on the community.
+
+      * Tagging re-emitted events for existing tags.
+
+
+After demo
+----------
+
+- [X] Add "my communities" view (filter out "group:KarlStaff")?
+
+- [X] Add "my content" view (only content modified / created by user)?
+
+- [X] Wire up filter buttons
+
+- [X} Make events work for content outside any community (especially profiles).
+
+- [_] Update nascent "user guide" docs to document all the event listeners 
+      and any other policies, as part of getting ready for review.
+
+- [_] Get client-side to trim bottom of list
+
+- [_] Consider getting client-side to use the full description
+
+- [_] The label "added" "a event" is wrong grammar, should be "an event".
+
+
+Someday, maybe
+--------------
+
+- [/] Add feeds view for a single community.
+
+      o Needs better integration with community layout.
+
+      o Should it filter out events for content outside the community,
+        but visible to its members?  E.g., members' profile edits.
+
+      o Needs to be surfaced in UI of community.
+
+- [/] Add feeds view for a profile.
+
+      o Needs to be surfaced in UI of profile.
+
+- [_] Add microblogging via profile feeds view.
+
+- [_] Add microblogging bookmarklet.
+
+- [_] Wire up the archive utiltiy to do something sensible:
+
+      o Write out JSON to disk for the pruned layer?
+
+      o Convert the pruned layer into a persistent object and
+        store in a BTree / linked list?  Likely to conflict.
+
+- [_] Add admin UI for tweaking the max layers / max length of the
+      underlying `AppendStack`.
+
+      o Could also show generations, first / last timestamps for archived
+        layers, if accessible.

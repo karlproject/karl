@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">Search Results</h1>
+
+    <div class="search-error" tal:condition="error">${error}</div>
+
+    <p tal:condition="terms">
+        Your search for
+        <span tal:repeat="term terms">
+            <strong tal:content="term">term</strong>
+            <span tal:condition="not repeat['term'].end">and</span>
+        </span>
+        <span tal:condition="community">
+            in community <strong>${community}</strong>
+        </span>
+        returned ${total}
+        match<span tal:condition="total != 1" tal:omit-tag="">es</span>.
+    </p>
+
+    <div tal:repeat="result results">
+      <div style="margin-bottom: 25px;">
+        <div class="klisting_header">
+          <a href="${result['url']}">${result['title']}</a>
+        </div>
+        <p>${result['description']}</p>
+        <p class="kbyline">${result['type']} | ${result['url']}</p>
+      </div>
+    </div>
+
+    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+    <table tal:condition="batch_info['batching_required']" width="100%">
+      <tr class="ui-grid-footer">
+        <th class="ui-widget-header">
+          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          </div>
+        </th>
+      </tr>
+    </table>
+
+  </div>
+
+</html>

@@ -1,0 +1,14 @@
+# Add forum topic
+go /offices/forums/${forum_name}
+follow "Add Forum Topic"
+url /offices/forums/${forum_name}/add_forum_topic.html
+find "Add Forum Topic"
+find "Title"
+find "Text"
+fv save title "${forum_topic}"
+fv save text "This forum topic was created by Twill tests (offices.forumtopic_add)"
+submit
+url /offices/forums/${forum_name}/${forum_topic}
+title "${forum_topic}"
+find "Edit"
+find "Delete"

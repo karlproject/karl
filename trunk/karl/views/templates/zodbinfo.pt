@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal">
+<head>
+  <title>ZODB Info</title>
+</head>
+<body>
+
+<div tal:repeat="db dbinfo">
+<h2>Database: ${db['name']}</h2>
+<table border="1">
+<thead>
+<tr>
+<th>Connection</th>
+<th>Opened</th>
+<th>Non-ghost cache entries</th>
+<th>Total cache entries</th>
+</tr>
+</thead>
+<tbody>
+<!-- See DB.cacheDetailSize() -->
+<tr tal:repeat="conn db['connections']">
+<td>${repr(conn.connection)}</td>
+<td>${conn.opened}</td>
+<td>${conn.ngsize}</td>
+<td>${conn.size}</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</body>
+</html>

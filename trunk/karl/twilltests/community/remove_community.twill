@@ -1,0 +1,2 @@
+# Removes a community using function in twillcommands
+remove_community "$community_name"

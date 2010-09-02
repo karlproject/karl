@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:c="http://xml.karlproject.org/people/category"
+         xmlns:a="http://www.example.com/annotation"
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <!-- The top of the document is a <source> -->
+    <ref name="categoryItemElement"/>
+  </start>
+  <define name="categoryItemElement">
+    <element>
+      <anyName/>
+      <attribute name="id"/>
+      <interleave>
+        <element name="c:category">
+          <attribute name="id"/>
+          <text/>
+        </element>
+        <element name="c:title">
+          <text/>
+        </element>
+        <optional>
+          <element name="c:description">
+            <text/>
+          </element>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+</grammar>

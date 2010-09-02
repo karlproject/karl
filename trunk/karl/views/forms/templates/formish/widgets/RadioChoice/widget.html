@@ -1,0 +1,17 @@
+<div class="karlselectionradiofield">
+  <tal:block condition="field.widget.none_option" class="karlselectionradiofield">
+    <input type="radio" name="${field.name}" id="${field.cssname}-noneoption" value="${field.widget.get_none_option_value(field)}" />
+    <label for="${field.cssname}-noneoption">${field.widget.none_option[1]}</label>
+  </tal:block>
+  <tal:block repeat="pair enumerate(field.widget.get_options(field))">
+    <input 
+       type="radio" 
+       name="${field.name}" 
+       id="${field.cssname}-${pair[0]}"
+       value="${pair[1][0]}"
+       class="noborder"
+       tal:attributes="checked field.widget.selected(pair[1], field) or None"/>
+    <label for="${field.cssname}-${pair[0]}">${pair[1][1]}</label>
+  </tal:block>
+</div>
+

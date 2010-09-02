@@ -1,0 +1,45 @@
+## This view can only be reached by a KarlAdministrator.
+login admin
+go /offices/forums/baloney
+find "Edit"
+login staff1
+go /offices/forums/baloney
+notfind "Edit"
+login affiliate
+go /offices/forums/baloney
+title "Forbidden"
+find "The set of credentials you possess does not allow you to view this"
+## This action is performed via the Community Layout which provides the content-administration interface for office content.
+login admin
+go /offices/forums/baloney
+follow "Edit"
+find "SEARCH COMMUNITY"
+find "ACTIVE PEOPLE"
+## Remainder matches Add Forum
+## When the forum is saved, redirect to the view for the new forum and put a status message on the URL saying it was saved. (note: atm there does not 
+## appear to be a status message on the url)
+fv save title "Bologna"
+fv save description "A little slice of Italy"
+submit
+url /offices/forums/baloney
+title "Bologna"
+find "Add Forum Topic"
+## Both fields contribute to the search content
+catalog_find Bologna /offices/forums
+catalog_find "A little slice of Italy" /offices/forums
+## A Forum shows up in the “Posts” grouping for livesearch
+livesearch_find Posts Bologna Bologna
+## Adding a Forum with a Title that is the same as a previous title simply appends a unique suffix such as -1 to the URL. Both show up with the same title.
+go /offices/forums/baloney-1
+follow "Edit"
+fv save title "Diesel"
+fv save description "Home taping is killing the music industry"
+submit
+go /offices/forums/baloney
+title "Bologna"
+go /offices/forums/baloney-1
+title "Diesel"
+## There is no “is private” or “sendalert” or other such concept in forums (or other “office” content)
+go /offices/forums/edit.html
+notfind "private"
+notfind "Send email alert"

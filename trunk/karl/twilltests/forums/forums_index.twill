@@ -1,0 +1,13 @@
+# Make a random word to insert in the blog title
+set_random_word test_forumindex
+
+# Add a file and ensure the random word appears
+go /communities/${community_name}/forums/add_forum.html
+notfind "Delete"
+fv save title ${test_forumindex}
+fv save description "This is a forum created by Twill test (forums.forums_index) to verify forums are making the index."
+submit
+url "/communities/${community_name}/forums/${test_forumindex}"
+
+catalog_find ${test_forumindex} ${community_name}/forums
+

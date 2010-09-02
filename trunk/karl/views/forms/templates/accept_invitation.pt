@@ -1,0 +1,26 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+ 
+    <tal:block condition="api.userid is not None">
+
+      <p>You cannot accept an invitation while logged in. Please 
+	<a href="${api.app_url}/logout">log out</a> first. </p>
+
+      <form xml:id="contentform"></form>
+
+    </tal:block>
+
+    <tal:block condition="api.userid is None">
+
+      <p>${page_description}</p>
+
+      <span tal:content="structure request.form()" tal:omit-tag=""/>
+
+    </tal:block>
+
+  </div>
+</div>

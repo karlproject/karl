@@ -1,0 +1,18 @@
+# Edit forum topic
+go /offices/forums/${forum_name}
+go /offices/forums/${forum_name}/${forum_topic}/
+url /offices/forums/${forum_name}/${forum_topic}/
+title "${forum_topic}"
+find "Edit"
+follow "Edit"
+url /offices/forums/${forum_name}/${forum_topic}/edit.html
+find "Edit ${forum_topic}"
+find "Title"
+find "Tags"
+find "Text"
+fv save text "This forum topic was edited by Twill tests (offices.forumtopic_edit.twill)"
+submit
+url /offices/forums/${forum_name}/${forum_topic}
+title "${forum_topic}"
+find "Edit"
+find "Delete"

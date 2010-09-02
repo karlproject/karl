@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>calendar_suite1</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">calendar_suite1</td></tr>
+</thead><tbody>
+<tr>
+	
+<!-- Login as admin -->
+<td>open</td>
+	<td>/login.html</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>username</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>image</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Verify Communities exist and click on Selenium-tests -->
+<td>verifyTextPresent</td>
+	<td>Communities</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/communities/?titlestartswith=T</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//div[@id='center']/div/div[4]/div[1]/a</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Go to Calendar tab -->
+<td>clickAndWait</td>
+	<td>link=CALENDAR</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Verify Add event go to Add event -->
+<td>assertTextPresent</td>
+	<td>Add Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/communities/test_selenium/view.html</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=CALENDAR</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Add Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>title</td>
+	
+<td>calendar123</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//fieldset[@id='startdate-field']/span[1]/select[1]</td>
+	<td>label=12</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//fieldset[@id='startdate-field']/span[1]/select[2]</td>
+	<td>label=30</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//fieldset[@id='enddate-field']/span/select[2]</td>
+	<td>label=45</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>location</td>
+	<td>our house with two cats in the yard</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>attendees</td>
+	<td>Staff One<br />Staff Two<br />Affili Atay</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>contact_name</td>
+	<td>Staff One</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>contact_email</td>
+	<td>karltest@mailinator.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>sendalert-false</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>form-submit</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Verify Add worked -->
+<td>assertTextPresent</td>
+	<td>calendar123</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Staff One</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>karltest@mailinator.com</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Edit Calendar Event and change title to calendar 234 -->
+<td>clickAndWait</td>
+	<td>link=Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>title</td>
+	<td>calendar234</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>form-submit</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Verify  Edit worked -->
+<td>assertTextPresent</td>
+	<td>calendar234</td>
+	<td></td>
+</tr>
+
+
+<!-- Delete calendar event-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>exact:Do you really want to delete calendar234 ?<br /> ok cancel</td>
+	<td></td>
+</tr>
+<tr>
+	
+<!-- Verify Delete worked -->
+<td>clickAndWait</td>
+	<td>link=ok</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

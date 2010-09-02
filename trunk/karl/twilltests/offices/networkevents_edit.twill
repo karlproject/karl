@@ -1,0 +1,8 @@
+# Edit network event
+
+go /offices/files/network-events/twill-test-of-${arg1}
+follow "Edit"
+url /offices/files/network-events/twill-test-of-${arg1}/edit.html
+fv save text "This network event edited by Twill test (offices.networkevents_edit)"
+submit
+find "offices.networkevents_edit"

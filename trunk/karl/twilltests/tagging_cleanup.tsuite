@@ -1,0 +1,11 @@
+# This is the cleanup routines for the "tagging" suite
+# To run just the cleanup suite, use the -C flag
+# flunc -C tagging
+#
+# or to run the "tagging" suite without running cleanup 
+# use the -X flag
+# flunc -X search
+# See README.txt for more
+
+# Cleanup tests
+community.delete_testing_community

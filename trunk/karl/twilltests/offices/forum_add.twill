@@ -1,0 +1,2 @@
+# Make a forum
+make_forum "${forum_name}"

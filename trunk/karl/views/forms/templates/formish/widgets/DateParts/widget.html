@@ -1,0 +1,37 @@
+<input tal:condition="field.widget.day_first"
+       id="${field.cssname}"
+       type="text"
+       name="${field.name}.day"
+       value="${field.value['day'][0]}"
+       size="2"
+       />
+<input tal:condition="field.widget.day_first"
+       id="${field.cssname}-month"
+       type="text"
+       name="${field.name}.month"
+       value="${field.value['month'][0]}"
+       size="2"
+       />
+
+<input tal:condition="not field.widget.day_first"
+       id="${field.cssname}-month"
+       type="text"
+       name="${field.name}.month"
+       value="${field.value['month'][0]}"
+       size="2"
+       />
+
+<input tal:condition="not field.widget.day_first"
+       id="${field.cssname}"
+       type="text"
+       name="${field.name}.day"
+       value="${field.value['day'][0]}"
+       size="2"
+       />
+
+<input id="${field.cssname}-year" 
+       type="text" 
+       name="${field.name}.year" 
+       value="${field.value['year'][0]}" 
+       size="4" />
+

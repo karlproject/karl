@@ -1,0 +1,8 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <adapter
+     provides=".interfaces.ITagCommunityFinder"
+     factory=".TagCommunityFinder"
+     for=".interfaces.ITaggingEngine"/>
+
+</configure>

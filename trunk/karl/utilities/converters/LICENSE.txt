@@ -1,0 +1,14 @@
+
+TextIndexNG V 3
+
+(C) 2005, ZOPYX Software-Development and Consulting Andreas Jung
+
+Andreas Jung
+Charlottenstr. 37/1
+D-72070 Tübingen
+Germany
+Web: http://www.zopyx.com
+Mail: info@zopyx.com
+
+TextIndexNG is available under GNU Public License V 2.1.
+

@@ -1,0 +1,33 @@
+# verify user accounts exist that are in karl3.conf
+
+go ${localhost_url}/profiles/admin
+login admin
+
+go ${localhost_url}/profiles/nyc
+login nyc
+
+go ${localhost_url}/profiles/affiliate
+login affiliate
+
+go ${localhost_url}/profiles/affiliate1
+login affiliate1
+
+go ${localhost_url}/profiles/affiliate2
+login affiliate2
+
+go ${localhost_url}/profiles/affiliate3
+login affiliate3
+
+go ${localhost_url}/profiles/staff1
+login staff1
+
+go ${localhost_url}/profiles/staff2
+login staff2
+
+go ${localhost_url}/profiles/staff3
+login staff3
+
+go ${localhost_url}/profiles/staff9
+login staff9
+
+logout

@@ -1,0 +1,980 @@
+<configure xmlns="http://namespaces.repoze.org/bfg"
+           xmlns:formish="http://namespaces.repoze.org/formish">
+
+  <include package=".forms"/>
+
+  <view
+    for="*"
+    view=".zodbinfo.show_zodbinfo"
+    name="zodbinfo.html"
+  />
+
+  <view
+    for="*"
+    view=".ok.ok"
+    name="ok.html"
+  />
+
+  <view
+    for="*"
+    view=".stats.stats"
+    name="admin.html"
+    permission="administer"
+  />
+
+  <view
+    for="*"
+    view=".acl.edit_acl_view"
+    name="edit_acl.html"
+    permission="administer"
+  />
+
+  <view
+    for="*"
+    view=".acl.acl_tree_view"
+    name="acl_tree.html"
+    permission="administer"
+  />
+
+  <!-- Publish static resources in a versioned path under /static/ -->
+
+  <route
+    name="static"
+    path="/static*subpath"
+    view_for=".site.StaticRootFactory"
+    view=".site.versioning_static_view"
+    factory=".site.StaticRootFactory"
+  />
+
+  <!-- Redirect requests to site root, to correct URL -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".site.site_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.advancedsearch_view"
+    renderer="templates/advancedsearch.pt"
+    permission="view"
+    name="advancedsearch.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.searchresults_view"
+    renderer="templates/searchresults.pt"
+    permission="view"
+    name="searchresults.html"
+  />
+
+
+  <!-- Start global tagging related views -->
+
+  <!-- This view gets a tag and returns a view on it -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.showtag_view"
+    renderer="templates/showtag.pt"
+    permission="view"
+    name="showtag"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_showtag_view"
+    renderer="templates/community_showtag.pt"
+    permission="view"
+    name="showtag"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.profile_showtag_view"
+    renderer="templates/profile_showtag.pt"
+    permission="view"
+    name="showtag"
+  />
+
+  <!-- Tag cloud, listing, users -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_cloud_view"
+    renderer="templates/tagcloud.pt"
+    permission="view"
+    name="tagcloud.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_cloud_view"
+    renderer="templates/community_tagcloud.pt"
+    permission="view"
+    name="tagcloud.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_listing_view"
+    renderer="templates/taglisting.pt"
+    permission="view"
+    name="taglisting.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_listing_view"
+    renderer="templates/community_taglisting.pt"
+    permission="view"
+    name="taglisting.html"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.profile_tag_listing_view"
+    renderer="templates/profile_taglisting.pt"
+    permission="view"
+    name="taglisting.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_users_view"
+    renderer="templates/tagusers.pt"
+    permission="view"
+    name="tagusers.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".tags.community_tag_users_view"
+    renderer="templates/community_tagusers.pt"
+    permission="view"
+    name="tagusers.html"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.manage_tags_view"
+    renderer="templates/profile_tagedit.pt"
+    permission="edit"
+    name="manage_tags.html"
+  />
+
+  <!-- /stop global tagging related views -->
+
+  <view
+    for="karl.models.interfaces.ICommunities"
+    view=".communities.show_communities_view"
+    renderer="templates/communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="active_communities.html"
+    for="karl.models.interfaces.ICommunities"
+    view=".communities.show_active_communities_view"
+    renderer="templates/communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="all_communities.html"
+    for="karl.models.interfaces.ICommunities"
+    view=".communities.show_all_communities_view"
+    renderer="templates/communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_set_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_set_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_clear_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_clear_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_list_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_list_preferred_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_edit_preferred.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_edit_preferred_view"
+    renderer="templates/edit_communities.pt"
+    permission="view"
+  />
+
+  <view
+    name="jquery_list_my_communities.html"
+    for="karl.models.interfaces.ISite"
+    view=".communities.jquery_list_my_communities_view"
+    renderer="templates/list_communities.pt"
+    permission="view"
+  />
+
+  <formish:form
+     controller=".community.AddCommunityFormController"
+     name="add_community.html"
+     permission="create"
+     renderer="forms/templates/formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".community.EditCommunityFormController"
+     for="karl.models.interfaces.ICommunity"
+     name="edit.html"
+     permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IMembers"
+     controller=".members.ManageMembersFormController"
+     permission="moderate"
+     name="manage.html"
+     renderer="forms/templates/community_formish_form.pt"
+     >
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".community.redirect_community_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="view.html"
+    view=".community.show_community_view"
+    renderer="templates/community.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="recent_items.html"
+    view=".community.community_recent_items_ajax_view"
+    renderer="templates/community_items_ajax.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="members.html"
+    view=".community.community_members_ajax_view"
+    renderer="templates/community_items_ajax.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="related.html"
+    view=".community.related_communities_ajax_view"
+    renderer="templates/community_items_ajax.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".atom.community_atom_view"
+    name="atom.xml"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="delete.html"
+    view=".community.delete_community_view"
+    permission="delete community"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="searchresults.html"
+    renderer="templates/searchresults.pt"
+    view=".search.searchresults_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="join.html"
+    view=".community.join_community_view"
+    permission="view"
+    />
+
+  <adapter
+    for="karl.models.interfaces.ICommunity
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ISidebar"
+    factory=".community.CommunitySidebar"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="login.html"
+    view=".login.login_view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="logout.html"
+    view=".login.logout_view"
+  />
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.EditProfileFormController"
+     name="edit_profile.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+  </formish:form>
+
+  <view
+     for="karl.models.interfaces.IProfile"
+     view=".people.edit_profile_filestore_photo_view"
+     name="photo_from_filestore"
+     permission="edit"
+     />
+
+  <view
+     for="karl.models.interfaces.IProfiles"
+     view=".people.add_user_filestore_photo_view"
+     name="photo_from_filestore"
+     permission="edit"
+     />
+
+  <formish:form
+     for="karl.models.interfaces.IProfiles"
+     controller=".people.AddUserFormController"
+     name="add.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.AdminEditProfileFormController"
+     name="admin_edit_profile.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.ChangePasswordFormController"
+     name="change_password.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.recent_content_view"
+    name="recent_content.html"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.models.interfaces.ISite"
+     controller=".resetpassword.ResetRequestFormController"
+     name="reset_request.html"
+     renderer="karl.views.forms:templates/anonymous_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="reset_sent.html"
+    view=".resetpassword.reset_sent_view"
+  />
+
+  <formish:form
+     for="karl.models.interfaces.ISite"
+     controller=".resetpassword.ResetConfirmFormController"
+     name="reset_confirm.html"
+     renderer="karl.views.forms:templates/anonymous_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.manage_communities_view"
+    name="manage_communities.html"
+    permission="edit"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.show_profile_view"
+    permission="view_only"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.profile_thumbnail"
+    name="profile_thumbnail"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    name="deactivate.html"
+    view=".people.deactivate_profile_view"
+    permission="delete"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunityContent"
+    name="delete.html"
+    view=".resource.delete_resource_view"
+    permission="delete"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfiles"
+    view=".people.show_profiles_view"
+    permission="view"
+  />
+
+  <view
+     for="karl.models.interfaces.IMembers"
+     view=".members.show_members_view"
+     permission="view"
+     />
+
+  <view
+    for="karl.models.interfaces.IMembers"
+    view=".members.jquery_member_search_view"
+    permission="moderate"
+    name="jquery_member_search"
+  />
+
+  <formish:form
+     controller=".members.AddExistingUserFormController"
+     name="add_existing.html"
+     permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.models.interfaces.IMembers"
+     controller=".members.InviteNewUsersFormController"
+     name="invite_new.html"
+     permission="moderate"
+     renderer="forms/templates/community_formish_form.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".members.AcceptInvitationFormController"
+     for="karl.models.interfaces.IInvitation"
+     renderer="forms/templates/accept_invitation.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+     for="karl.models.interfaces.IInvitation"
+     name="photo"
+     view=".members.accept_invitation_photo_view"
+     />
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".spellcheck.tinymce_spellcheck_view"
+    permission="view"
+    name="tinymce_spellcheck"
+  />
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.jquery_livesearch_view"
+    permission="view"
+    name="jquery_livesearch"
+  />
+
+
+  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".tags.jquery_tag_search_view"
+    permission="view"
+    name="jquery_tag_search"
+  />
+  <view
+    for="*"
+    view=".tags.jquery_tag_add_view"
+    permission="view"
+    name="jquery_tag_add"
+  />
+  <view
+    for="*"
+    view=".tags.jquery_tag_del_view"
+    permission="view"
+    name="jquery_tag_del"
+  />
+
+  <view
+    for="karl.models.interfaces.IAttachmentsFolder"
+    view=".redirects.redirect_up_view"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="favicon.ico"
+    view=".redirects.redirect_favicon"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="rss_view.xml"
+    view=".redirects.redirect_rss_view_xml"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".peopledirectory.peopledirectory_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.opensearch_view"
+    permission="view"
+    name="opensearch.xml"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleSection"
+    view=".peopledirectory.section_view"
+    permission="view"
+    />
+
+  <!-- this view redirects to /profiles/add.html -->
+  <view
+    for="karl.models.interfaces.IPeopleSection"
+    view=".peopledirectory.add_user_view"
+    name="add.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.report_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.jquery_grid_view"
+    permission="view"
+    name="jquery_grid"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.csv_view"
+    permission="view"
+    name="csv"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.print_view"
+    permission="view"
+    name="print.html"
+  />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.picture_view"
+    permission="view"
+    name="picture_view.html"
+  />
+
+  <!-- this view redirects to /profiles/add.html -->
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.add_user_view"
+    name="add.html"
+    />
+
+  <view
+    for="*"
+    view=".error.raise_error"
+    name="raise_error.html"
+  />
+
+  <forbidden
+    view=".forbidden.forbidden"
+    />
+
+  <subscriber
+      for="repoze.bfg.interfaces.INewResponse"
+      handler="karl.handlers.add_no_cache_headers"
+      />
+
+  <view
+    for="karl.models.interfaces.IIntranet"
+    view=".retail.retail_view"
+    permission="view"
+  />
+
+  <!-- Admin UI -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.admin_view"
+    renderer="templates/admin/admin.pt"
+    permission="administer"
+    name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.delete_content_view"
+    renderer="templates/admin/delete_content.pt"
+    permission="administer"
+    name="delete_content.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.move_content_view"
+    renderer="templates/admin/move_content.pt"
+    permission="administer"
+    name="move_content.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.site_announcement_view"
+    renderer="templates/admin/site_announcement.pt"
+    permission="administer"
+    name="site_announcement.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EmailUsersView"
+    renderer="templates/admin/email_users.pt"
+    permission="administer"
+    name="email_users.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.syslog_view"
+    renderer="templates/admin/syslog.pt"
+    permission="administer"
+    name="syslog.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.logs_view"
+    renderer="templates/admin/log.pt"
+    permission="administer"
+    name="logs.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.statistics_view"
+    renderer="templates/admin/statistics.pt"
+    permission="administer"
+    name="statistics.html"
+    />
+
+  <route
+    name="statistics.csv"
+    path="/statistics/:csv_file"
+    view="karl.views.admin.statistics_csv_view"
+    permission="administer"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.UploadUsersView"
+    renderer="templates/admin/upload_users_csv.pt"
+    permission="administer"
+    name="upload_users_csv.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.error_monitor_view"
+    renderer="templates/admin/error_monitor.pt"
+    permission="administer"
+    name="error_monitor.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.error_monitor_subsystem_view"
+    renderer="templates/admin/error_monitor_subsystem.pt"
+    permission="administer"
+    name="error_monitor_subsystem.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.error_monitor_status_view"
+    name="error_monitor_status.txt"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.postoffice_quarantine_view"
+    renderer="templates/admin/po_quarantine.pt"
+    permission="administer"
+    name="po_quarantine.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.postoffice_quarantine_status_view"
+    name="po_quarantine_status.txt"
+    />
+
+  <route
+    name="quarantined_message"
+    path="/po_quarantine/:id"
+    view="karl.views.admin.postoffice_quarantined_message_view"
+    permission="administer"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.mailin_monitor_view"
+    name="mailin"
+    />
+
+  <!-- imagedrawer ajax  -->
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_dialog_view"
+    permission="view"
+    name="drawer_dialog_view.html"
+  />
+
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_data_view"
+    permission="view"
+    name="drawer_data_view.html"
+  />
+
+  <view
+    for="zope.interface.Interface"
+    view=".imagedrawer.drawer_upload_view"
+    permission="create"
+    name="drawer_upload_view.html"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.show_feeds_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeeds.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view="karl.views.contentfeeds.profile_feed_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.contentfeeds.community_feed_view"
+    renderer="templates/contentfeeds.pt"
+    permission="view"
+    name="contentfeed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.newest_feed_items"
+    permission="view"
+    name="newest_feed_items.json"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.older_feed_items"
+    permission="view"
+    name="older_feed_items.json"
+    renderer="json"
+    />
+
+
+</configure>
+

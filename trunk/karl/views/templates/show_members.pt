@@ -1,0 +1,101 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1>${api.page_title}</h1>
+    <div metal:use-macro="api.snippets.macros['submenu']"/>
+    
+    <p>Moderator(s) for this community: 
+      <tal:block tal:repeat="moderator moderators">
+	<a href="${moderator['href']}">${moderator['title']}</a><span 
+           tal:condition="not repeat['moderator'].end">, </span><span 
+           tal:condition="repeat['moderator'].end">.</span>
+      </tal:block>
+    </p>
+
+    <div metal:use-macro="api.snippets.macros['batching']"/>
+
+    <tal:block condition="not hide_pictures">
+
+      <div class="profilesWrapper">
+
+	<tal:block repeat="entry members">
+	  <div class="${entry['css_class']}">
+	    <div class="photoProfileImage">
+	      <a href="${entry['href']}" title="${entry['title']}">
+		<img src="${entry['photo_url']}" alt="${entry['title']}" />
+	      </a>
+	    </div>
+	    <div class="profileInfoBox">
+	      <div>
+		<a href="${entry['href']}">${entry['title']}</a>
+	      </div>
+	      <div>${entry['position']}</div>
+	      <div class="profileNoWrap">
+		<div>${entry['organization']}</div>
+		<div>${entry['department']}</div>
+		<div>${entry['phone']}</div>
+	      </div>
+	    </div>
+	  </div>
+	</tal:block>
+
+      </div> <!-- /end profilesWrapper -->
+      <div class="visualClear"></div>
+
+    </tal:block>
+
+    <tal:block condition="hide_pictures">
+      <table class="content-listing">
+        <thead>
+          <tr>
+            <th class="clname">Name</th>
+            <th class="clname">Title</th>
+            <th class="cltitle">Organization</th>
+            <th class="cldate">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+
+	  <tal:block tal:repeat="entry members">
+	    <tal:block condition="not entry['is_moderator']">
+	      <tr>
+		<td class="clname">
+		  <a href="${entry['href']}">${entry['title']}</a>
+		</td>
+		<td class="clposition">${entry['position']}</td>
+		<td class="cltitle">${entry['organization']}</td>
+		<td class="cllocation">
+		  <a href="mailto:${entry['email']}">${entry['email']}</a>
+		</td>
+              </tr>
+	    </tal:block>
+	    <tal:block condition="entry['is_moderator']">
+	      <tr class="moderator">
+		<td class="clname">
+		  <a href="${entry['href']}">${entry['title']}</a>
+		</td>
+		<td class="clposition">${entry['position']}</td>
+		<td class="cltitle">${entry['organization']}</td>
+		<td class="cllocation">
+		  <a href="mailto:${entry['email']}">${entry['email']}</a>
+		</td>
+              </tr>
+	    </tal:block>
+	  </tal:block>
+        </tbody>
+
+      </table>
+    </tal:block>
+
+
+
+  </div>
+
+</div>

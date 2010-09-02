@@ -1,0 +1,77 @@
+interface GridModel {
+	void fetch(Request request, Callback response);
+	void update(Update update);
+}
+
+interface Callback {
+	void call(Response argument);
+}
+
+enum SortDirection { ASC, DESC }
+
+enum Operation { LIKE, EQUAL, GT, LT }
+
+enum FilterType { STRING, NUMBER, DATE, BOOLEAN, NONE }
+
+class Column {
+	// must be unique for a table
+	String id;
+	
+	String label;
+	
+	// TODO define how state-changes on width and visible are handled
+	// TODO where to define defaults?
+	int width;
+	boolean visible;
+	
+	boolean categorizable;
+	// must be false for categorizable false
+	boolean categorized;
+	
+	FilterType type;
+	// must be null for FilterType NONE
+	Filter filter;
+}
+
+// TODO define query string encoding
+class Filter {
+	Column target;
+	Operation op;
+	Object value;
+}
+
+class Record {
+	Map<Column, Object> columns;
+}
+
+class Request {
+	// paging
+	int start;
+	int limit;
+	
+	// sorting
+	Column sortColumn;
+	SortDirection sortDirection;
+	
+	// grouping, aggregating
+	Set<Column> categories;
+	
+	// filtering
+	Set<Filter> filters;
+	
+	// custom
+	Map<String, Object> custom;
+}
+
+class Response {
+	int totalRecords;
+	
+	Set<Column> columns;
+	List<Record> records;
+	
+	Map<String, Object> custom;
+}
+
+class Update {
+	Set<Column> columns;
+}

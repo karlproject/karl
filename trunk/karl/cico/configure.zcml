@@ -1,0 +1,18 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <adapter
+    for="lxml.etree._Element"
+    provides="karl.cico.interfaces.IContentIn"
+    factory="karl.cico.people.UserProfileImporter"
+    name="http://xml.karlproject.org/people/userprofile"
+    />
+
+  <adapter
+    for="lxml.etree._Element"
+    provides="karl.cico.interfaces.IContentIn"
+    factory="karl.cico.people.PeopleCategoryImporter"
+    name="http://xml.karlproject.org/people/category"
+    />
+
+</configure>
+

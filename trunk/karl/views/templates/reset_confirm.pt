@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <p>
+    Please provide a new password.
+    </p>
+
+  <form method="post" action="${post_url}" class="k3_genericForm"
+        xml:id="contentform" enctype="multipart/form-data" name="save">
+
+    <div metal:use-macro="formfields.macros['formerror']"/>
+
+    <fieldset tal:define="error fielderrors['login']|None"
+              class="${error and 'fieldError' or ''}"
+              id="login-field">
+      <label class="required">Username</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="login"/>
+    </fieldset>
+
+    <fieldset metal:use-macro="formfields.macros['new-password-field']"/>
+    <fieldset metal:use-macro="formfields.macros['new-password_confirm-field']"/>
+    <fieldset metal:use-macro="formfields.macros['form-submit']"/>
+  </form>
+
+</div>
+
+</html>

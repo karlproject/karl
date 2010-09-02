@@ -1,0 +1,15 @@
+finish/re-factor:
+profiles
+forums
+offices
+intranets
+
+done:
+all
+blog
+calendar
+community
+files
+search
+tagging
+wiki

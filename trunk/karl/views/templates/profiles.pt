@@ -1,0 +1,22 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="api.generic_layout.macros['master']">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1>Profiles</h1>
+
+    <div metal:use-macro="api.snippets.macros['letter_box']"/>
+
+    <div class="communityEntry" tal:repeat="profile profiles">
+      <div class="klisting_header">
+        <a href="${api.here_url}${profile.__name__}">
+        ${profile.lastname}, ${profile.firstname}</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,47 @@
+login admin
+## This view can only be reached by a KarlAdministrator.
+go /offices/forums
+find "Add Forum"
+login staff1
+go /offices/forums
+notfind "Add Forum"
+login affiliate
+go /offices/forums
+title "Forbidden"
+find "The set of credentials you possess does not allow you to view"
+## This action is performed via the Community Layout which provides the content-administration interface for office content.
+login admin
+go /offices/forums/add_forum.html
+find "SEARCH COMMUNITY"
+find "ACTIVE PEOPLE"
+## To add a forum, first go to the appropriate Forums tool. If you want a forum’s “context” to be for all offices, go to the Forums tool on the /osi 
+## community. If you want the forum to be tied to an office, go to the Forums tool on that office.
+go /offices/forums
+follow "Add Forum"
+fv save title "Baloney"
+fv save description "Would you like frites with that"
+submit
+## When the forum is saved, redirect to the view for the new forum and put a status message on the URL saying it was saved. (note: atm there does not 
+## appear to be a status message on the url)
+url /offices/forums/baloney
+title "Baloney"
+find "Add Forum Topic"
+## Both fields contribute to the search content
+catalog_find Baloney /offices/forums
+catalog_find "Would you like frites with that" /offices/forums
+## A Forum shows up in the “Posts” grouping for livesearch
+livesearch_find Posts Baloney Baloney
+## Adding a Forum with a Title that is the same as a previous title simply appends a unique suffix such as -1 to the URL. Both show up with the same title.
+go /offices/forums
+follow "Add Forum"
+fv save title "Baloney"
+fv save description "Home taping is killing the music industry"
+submit
+go /offices/forums/baloney
+title "Baloney"
+go /offices/forums/baloney-1
+#title "Diesel"
+## There is no “is private” or “sendalert” or other such concept in forums (or other “office” content)
+go /offices/forums/add_forum.html
+notfind "private"
+notfind "Send email alert"

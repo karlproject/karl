@@ -1,0 +1,30 @@
+# Test the security policies related to office security.  Presumes:
+#
+#     ./runtests.sh offices
+#
+# ...has been run.
+
+
+# staff1 can get to many things in /offices
+
+
+# affiliate1 cannot get to anything in /offices
+
+# It takes an admin to get to the add_community screen, as well as
+# some others.  Shouldn't see the actions either.
+
+# However, once added, the /offices/edit.html (to administer the
+# feature, for example) is possible with a certain group.  This
+# distinction between create and edit isn't strictly necessary.
+
+# Seeing the add actions for various FILES content in various places
+# takes special permissions.
+
+# First, go to the FILES at the /offices/files and see what actions
+# and views are available.
+
+# Make sure other staff users can't see any actions.
+
+# In office folders, adding reference manuals, network news, and
+# network events is available to some and not others.  Test actions
+# and views.
