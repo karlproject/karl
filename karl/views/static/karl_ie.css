@@ -185,9 +185,7 @@ button span {
 }
 .primary_button,
 .primary_button:visited,
-ul.menubar #menubar-1.menubar-lastitem a,
-#poll-indicator.on,
-#poll-indicator.polling {
+ul.menubar #menubar-1.menubar-lastitem a {
     background: transparent url(images/corners.png) no-repeat right -25px;
     border: none !important;
     padding: 0px 5px 0 0;
@@ -196,9 +194,7 @@ ul.menubar #menubar-1.menubar-lastitem a,
     height: 22px !important;
 }
 .primary_button span,
-ul.menubar #menubar-1.menubar-lastitem span,
-#poll-indicator.on span,
-#poll-indicator.polling span {
+ul.menubar #menubar-1.menubar-lastitem span {
     background: #ffffff url(images/corners.png) no-repeat left -25px;
     line-height: 22px;
     height: 20px;
@@ -229,9 +225,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 
 .normal_button,
 .normal_button:hover,
-.normal_button:active,
-#poll-indicator.off,
-#poll-indicator.error {
+.normal_button:active {
     background: transparent url(images/corners.png) no-repeat right -91px;
     border: none !important;
     padding: 0px 5px 0px 0;
@@ -241,22 +235,64 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 }
 .normal_button span,
 .normal_button:hover span,
-.normal_button:active span,
-#poll-indicator.off span,
-#poll-indicator.error span {
+.normal_button:active span {
     background: #ffffff url(images/corners.png) no-repeat left -91px;
     line-height: 22px;
     height: 20px;
     padding: 4px 5px 4px 10px;
     white-space: nowrap;
 }
-
-#poll-indicator.on span,
-#poll-indicator.polling span,
-#poll-indicator.off span,
-#poll-indicator.error span {
+/* poll indicator */
+#poll-indicator.on,
+#poll-indicator.polling {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    border: none !important;
+    padding: 0px 5px 0 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+#poll-indicator.on span {
+    background: #ffffff url(images/corners.png) no-repeat left -23px;
     line-height: 22px;
     height: 22px;
+    padding: 4px 5px 4px 10px;
+    white-space: nowrap;
+    z-index: 2;
+}
+#poll-indicator.polling span {
+    background: #ffffff url(images/corners.png) no-repeat left -21px;
+    line-height: 22px;
+    height: 22px;
+    padding: 4px 5px 4px 10px;
+    white-space: nowrap;
+    z-index: 2;
+}
+#poll-indicator.off,
+#poll-indicator.error {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none !important;
+    padding: 0px 5px 0px 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+#poll-indicator.off span {
+    background: #ffffff url(images/corners.png) no-repeat left -87px;
+    line-height: 22px;
+    height: 22px;
+    padding: 6px 5px 4px 10px;
+    white-space: nowrap;
+}
+#poll-indicator.error span {
+    background: #ffffff url(images/corners.png) no-repeat left -85px;
+    line-height: 22px;
+    height: 22px;
+    padding: 6px 5px 4px 10px;
+    white-space: nowrap;
+}
+#poll-indicator img {
+    padding-top: 3px;
 }
 
 /* calendar buttons, feed filters */
@@ -270,8 +306,8 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     border: none;
     color: #3A74A9;
     font-weight: normal;
-    line-height: 23px;
-    height: 20px;
+    line-height: 22px;
+    height: 22px;
     padding: 4px 10px 5px;
     position: relative;
     top: -2px;
@@ -309,6 +345,8 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 .cal_buttons .menubar li,
 #feed-filters ul li {
     border-right: 1px solid #bcc2c7;
+    height: 21px;
+    padding-top: 0;
 }
 .cal_buttons .menubar .lastItem,
 .cal_buttons .menubar .todayButton,

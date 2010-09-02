@@ -37,3 +37,31 @@ ul#header-menu li a {
 .cal_buttons .next span {
     top: 0px;
 }
+.cal_buttons .menubar li,
+#feed-filters ul li {
+    height: 21px;
+}
+#poll-indicator.on span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    padding: 7px 5px 1px 10px;
+    line-height: 24px;
+    height: 24px;
+}
+#poll-indicator.polling span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    padding: 8px 5px 0px 10px;
+    line-height: 22px;
+    height: 22px;
+}
+#poll-indicator.off span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    padding: 7px 5px 1px 10px;
+    line-height: 22px;
+    height: 22px;
+}
+#poll-indicator.error span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    padding: 8px 5px 0px 10px;
+    line-height: 23px;
+    height: 23px;
+}

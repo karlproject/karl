@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed filter button display in IE (LP #628281)
+
 - Merged ``ree-jsupgrade-2-tiny`` branch.
 
   - Upgraded TinyMCE WYSIWYG widget.
