@@ -1009,9 +1009,9 @@ class ManageTagsViewTests(unittest.TestCase):
 
         result = self._callFUT(context, request)
 
-        self.assertEqual(len(result['tags']), 2)
-        self.assertEqual(result['tags'][0], 'tag1')
-        self.assertEqual(result['tags'][1], 'tag2')
+        self.assertEqual(len(result['my_tags']), 2)
+        self.assertEqual(result['my_tags'][0], 'tag1')
+        self.assertEqual(result['my_tags'][1], 'tag2')
 
     def test_submitted_rename(self):
         context = testing.DummyModel()
@@ -1070,9 +1070,9 @@ class ManageTagsViewTests(unittest.TestCase):
 
         result = self._callFUT(context, request)
 
-        self.assertEqual(len(result['tags']), 2)
-        self.assertEqual(result['tags'][0], 'tag1')
-        self.assertEqual(result['tags'][1], 'tag2')
+        self.assertEqual(len(result['my_tags']), 2)
+        self.assertEqual(result['my_tags'][0], 'tag1')
+        self.assertEqual(result['my_tags'][1], 'tag2')
 
     def test_submitted_delete(self):
         context = testing.DummyModel()
@@ -1130,9 +1130,9 @@ class ManageTagsViewTests(unittest.TestCase):
 
         result = self._callFUT(context, request)
 
-        self.assertEqual(len(result['tags']), 2)
-        self.assertEqual(result['tags'][0], 'tag1')
-        self.assertEqual(result['tags'][1], 'tag2')
+        self.assertEqual(len(result['my_tags']), 2)
+        self.assertEqual(result['my_tags'][0], 'tag1')
+        self.assertEqual(result['my_tags'][1], 'tag2')
         
 
 

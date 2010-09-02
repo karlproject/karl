@@ -40,12 +40,13 @@
       </div>
       <div id="main">
         <div class="rightcol"
-             tal:define="my_communities my_communities|False">
+             tal:define="my_communities my_communities|();
+                         tags tags|();
+                        ">
             
             <metal:portlets define-slot="portlets"></metal:portlets>
             
             <div class="generic-portlet" id="popular-tags-portlet"
-                 tal:define="tags tags|False"
                  tal:condition="tags">
                 <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
                 <h3 tal:condition="my_communities is not None">My Tags</h3>
