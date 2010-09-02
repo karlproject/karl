@@ -1,3 +1,0 @@
-# Delete network event
-go /offices/files/network-events/twill-test-of-${arg1}/delete.html?confirm=1
-find "Deleted"

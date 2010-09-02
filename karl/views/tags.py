@@ -506,7 +506,7 @@ def manage_tags_view(context, request):
 
     return dict(
         api=api,
-        tags=tags,
+        my_tags=tags,
         error=error,
         old=old,
         new=new,

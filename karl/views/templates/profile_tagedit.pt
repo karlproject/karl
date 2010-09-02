@@ -21,7 +21,7 @@
 <fieldset>
  <label for="old_tag">Old tag</label>
  <select name="old_tag">
-   <option tal:repeat="tag tags"
+   <option tal:repeat="tag my_tags"
                 value="${tag}" selected="${tag == old}">${tag}</option>
  </select>
 
@@ -41,7 +41,7 @@
 <fieldset>
  <label for="todelete">Tag to be deleted</label>
  <select name="todelete">
-  <option tal:repeat="to_delete tags"
+  <option tal:repeat="to_delete my_tags"
           value="${to_delete}">${to_delete}</option>
  </select>
 

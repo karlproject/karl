@@ -1,3 +1,0 @@
-../../bin/nosetests -q --where=karl/twilltests/ --tests=test_twill_wsgi --nologcapture | grep -v 'AT LINE'
-
-

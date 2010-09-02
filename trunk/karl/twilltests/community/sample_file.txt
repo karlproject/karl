@@ -1,4 +1,0 @@
-This is a sample file to upload.
-
-This file has been uploaded by a Twill test (community.files_initialize) to test files functionality of a new community.
-
