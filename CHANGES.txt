@@ -4,16 +4,35 @@ karl package Changelog
 Unreleased
 ----------
 
-- Merged 'ree-jsupgrade-2-tiny' branch.
+- Merged ``ree-jsupgrade-2-tiny`` branch.
 
-- Merged 'chrissy-portlets' branch.
+  - Upgraded TinyMCE WYSIWYG widget.
+
+  - Upgraded jQuery libraries.
+
+- Merged ``chrissy-portlets`` branch:
+
+ - Updated intranet portlets to conform to site portlet styles
+
+ - Cleaned up Active People portlet
+
+ - Added DOCTYPE, so IE displays in standards mode
+
+ - Updated styles that changed as a result of adding DOCTYPE
+
+ - Moved portlets out of ``#center``, conforming styles for admin
+   pages, community pages, generic layout
 
 - Added ``--index`` option to ``reindex_catalog`` script, to allow rebuilding
   only a given index.
 
-- Merged content feeds branch.
+- Merged ``content_feeds2`` branch, adding top-level content feeds tab.
+  This tab allows users to see recent changes across all communities in
+  which they participate.
 
-- Merged active communities branch.
+- Merged ``active_communities`` branch, implementing the "active communities"
+  blueprint:
+  https://blueprints.launchpad.net/karl3/+spec/active-communities-tab
 
 - XSLT fix for people pages broken by unclosed divs. (LP #602889)
 
