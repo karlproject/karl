@@ -4,11 +4,15 @@ karl package Changelog
 Unreleased
 ----------
 
+- Workflow initialization is now delayed for temporary images created by
+  Image Drawer when uploading images in the context of an 'Add Content' form.
+  (LP #619977)
+
 3.44 (2010-09-02)
 -----------------
 
 - Un-broke the ``manage_tags.html`` view due to clash over main template's
-  use of top-leve ``tags`` name. (LP #629009)
+  use of top-level ``tags`` name. (LP #629009)
 
 - Made sure icon is centered on filter indicator button. (LP #628833)
 

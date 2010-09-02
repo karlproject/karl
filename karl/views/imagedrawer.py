@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import datetime
 from simplejson import JSONEncoder
 import transaction
 import urlparse
@@ -291,7 +292,7 @@ def drawer_dialog_view(context, request,
         [[images_info: the first batch of the image listing
           * since the default source is now upload which is
           a non-data source, this value is omitted.
-          ]]  
+          ]]
 
         error: ... explicitely raise an error
     """
@@ -393,13 +394,23 @@ def drawer_upload_view(context, request,
 
         target_folder[name] = image
 
+        workflow = get_workflow(ICommunityFile, 'security', context)
+        if workflow is not None:
+            workflow.initialize(image)
+
+    # In cases where the image is to live in a piece of content which has not
+    # yet been created (like when using an 'Add' form), the context is going
+    # to be the eventual parent of the not yet created content, which will be
+    # the eventual parent of the just now created image.  Since we have nowhere
+    # to put the image, we put it in a tempfolder and later move it over after
+    # the content is created.  Normal ContentAdded event handlers are not
+    # called at this stage and workflow is not yet initialized.  These will
+    # occur when the content is moved over.
     else:
+        image.modified = datetime.datetime.now()
         tempfolder = find_tempfolder(context)
         tempfolder.add_document(image)
 
-    workflow = get_workflow(ICommunityFile, 'security', context)
-    if workflow is not None:
-        workflow.initialize(image)
 
     # Return info about the image uploaded
     return dict(

@@ -98,6 +98,10 @@ class Test_relocated_temp_images(unittest.TestCase):
     def test_it(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import IImage
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.content.interfaces import ICommunityFile
+        workflow = registerDummyWorkflow(
+            'security', content_type=ICommunityFile)
         root = testing.DummyModel()
         tempfolder = root['TEMP'] = DummyTempFolder()
         image = tempfolder['1234'] = testing.DummyModel(
@@ -129,6 +133,7 @@ class Test_relocated_temp_images(unittest.TestCase):
                 '     src="http://example.com/doc/kids.png/thumb/300x300.jpg"'
                 '     width="300" height="200"/>')
         self.failUnless(tempfolder.cleanedup)
+        self.assertEqual(workflow.initialized, [image])
 
 class DummyTempFolder(testing.DummyModel):
     cleanedup = False

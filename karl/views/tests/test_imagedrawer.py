@@ -99,9 +99,9 @@ class Test_batch_images(unittest.TestCase):
 
         class DummyBatcher(object):
             def __call__(self, context, request, creator, community,
-                    batch_start, batch_size):
+                    batch_start, batch_size, sort_index=None, reverse=False):
                 self.called = (context, request, creator, community,
-                    batch_start, batch_size)
+                    batch_start, batch_size, sort_index, reverse)
                 return dict(entries=batch,
                     batch_start=batch_start,
                     batch_size=batch_size,
@@ -129,7 +129,38 @@ class Test_batch_images(unittest.TestCase):
         self.assertEqual(batch['records'][1]['title'], 'B')
         self.assertEqual(batch['start'], 0)
         self.assertEqual(batch['totalRecords'], 5)
-        self.assertEqual(self.batcher.called, (context, request, None, None, 0, 12))
+        self.assertEqual(
+            self.batcher.called,
+            (context, request, None, None, 0, 12, None, False)
+        )
+
+    def test_global_search_reverse(self):
+        request = testing.DummyRequest(
+            params={'source': 'allkarl', 'reverse': 1})
+        context = testing.DummyModel()
+        batch = self._call_fut(context, request)
+        self.assertEqual(batch['records'][0]['title'], 'A')
+        self.assertEqual(batch['records'][1]['title'], 'B')
+        self.assertEqual(batch['start'], 0)
+        self.assertEqual(batch['totalRecords'], 5)
+        self.assertEqual(
+            self.batcher.called,
+            (context, request, None, None, 0, 12, None, True)
+        )
+
+    def test_global_search_w_sort_index(self):
+        request = testing.DummyRequest(
+            params={'source': 'allkarl', 'sort_on': 'foobar'})
+        context = testing.DummyModel()
+        batch = self._call_fut(context, request)
+        self.assertEqual(batch['records'][0]['title'], 'A')
+        self.assertEqual(batch['records'][1]['title'], 'B')
+        self.assertEqual(batch['start'], 0)
+        self.assertEqual(batch['totalRecords'], 5)
+        self.assertEqual(
+            self.batcher.called,
+            (context, request, None, None, 0, 12, 'foobar', False)
+        )
 
     def test_search_by_creator(self):
         testing.registerDummySecurityPolicy('admin')
@@ -138,7 +169,8 @@ class Test_batch_images(unittest.TestCase):
         batch = self._call_fut(context, request)
         self.assertEqual(
             # XXX the test are run as admin, so this is what we search for
-            self.batcher.called, (context, request, 'admin', None, 0, 12)
+            self.batcher.called,
+            (context, request, 'admin', None, 0, 12, None, False)
         )
 
     def test_search_by_community(self):
@@ -151,7 +183,8 @@ class Test_batch_images(unittest.TestCase):
         context = community['bar'] = testing.DummyModel()
         batch = self._call_fut(context, request)
         self.assertEqual(
-            self.batcher.called, (context, request, None, '/foo', 0, 12)
+            self.batcher.called,
+            (context, request, None, '/foo', 0, 12, None, False)
         )
 
     def test_search_bad_sources(self):
@@ -599,7 +632,8 @@ class Test_drawer_upload_view(unittest.TestCase):
         self.assertEqual(image.mimetype, 'image/jpeg')
         self.assertEqual(image.filename, 'test.jpg')
         self.assertEqual(image.creator, 'chris')
-        self.assertEqual(self.workflow.initialized, [image,])
+        self.failUnless(hasattr(image, 'modified'))
+        self.assertEqual(self.workflow.initialized, [])
 
     def test_no_upload(self):
         import simplejson
@@ -645,7 +679,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         request = testing.DummyRequest(
             params = {
                 'file': DummyUpload(
-                    filename = '', 
+                    filename = '',
                 ),
                 'title': 'Title',
             },

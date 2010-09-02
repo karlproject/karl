@@ -3,6 +3,9 @@ import re
 from repoze.bfg.security import effective_principals
 from repoze.bfg.url import model_url
 
+from repoze.workflow import get_workflow
+
+from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IImage
 from karl.utils import find_tempfolder
 from karl.views.batch import get_catalog_batch
@@ -71,6 +74,10 @@ def relocate_temp_images(doc, request):
             size = (int(matchdict['width']), int(matchdict['height']))
             url = thumb_url(image, request, size)
             relocated_images[tempid] = url
+            workflow = get_workflow(ICommunityFile, 'security', image)
+            if workflow is not None:
+                workflow.initialize(image)
+
         return ''.join([matchdict['pre'], url, matchdict['post'],])
 
     doc.text = TMP_IMG_RE.sub(relocate, doc.text)
