@@ -317,16 +317,22 @@ $.widget('karl.karlcontentfeeds_polling', {
         // bind events
         //
         
+        this.info_active = false;
+
         this.infoButton.click(function() {
-            self.detailsInfo.fadeIn("fast");
+            self._openDetailsInfo();
+        });
+        $('body').click(function(evt) {
+            // close the info details it if clicked outside of it.
+            if (self.info_active && ! (self.infoButton[0] == evt.target) &&
+                    ! (self.detailsInfo[0] == evt.target) &&
+                    ! jQuery.contains(self.detailsInfo[0], evt.target)) {
+                self._closeDetailsInfo();
+            }
         });
         this.closeButton.click(function() {
-            // The same class functions for both close buttons.
-            // This makes only either one of the following two lines
-            // active at the same time.
-            self.detailsInfo.fadeOut("fast");
-            self.error.fadeOut("fast");
-            });
+            self._closeDetailsInfo();
+        });
         // On-off indicator
         var ind = this.indicator;
         ind.click(function() {
@@ -344,6 +350,20 @@ $.widget('karl.karlcontentfeeds_polling', {
                 self.error.fadeIn("fast");
             }
         });
+    },
+    
+    _openDetailsInfo: function() {
+        this.detailsInfo.fadeIn("fast");
+        this.info_active = true;
+    },
+
+    _closeDetailsInfo: function() {
+        // The same class functions for both close buttons.
+        // This makes only either one of the following two lines
+        // active at the same time.
+        this.detailsInfo.fadeOut("fast");
+        this.error.fadeOut("fast");
+        this.info_active = false;
     },
 
     destroy: function() {
