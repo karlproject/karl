@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Made sure icon is centered on filter indicator button (LP #628833)
+
 - Fixed filter button display in IE (LP #628281)
 
 - Merged ``ree-jsupgrade-2-tiny`` branch.

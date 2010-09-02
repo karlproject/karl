@@ -256,7 +256,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: #ffffff url(images/corners.png) no-repeat left -23px;
     line-height: 22px;
     height: 22px;
-    padding: 4px 5px 4px 10px;
+    padding: 4px 5px 4px 18px;
     white-space: nowrap;
     z-index: 2;
 }
@@ -264,7 +264,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: #ffffff url(images/corners.png) no-repeat left -21px;
     line-height: 22px;
     height: 22px;
-    padding: 4px 5px 4px 10px;
+    padding: 4px 5px 4px 13px;
     white-space: nowrap;
     z-index: 2;
 }
@@ -281,14 +281,14 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: #ffffff url(images/corners.png) no-repeat left -87px;
     line-height: 22px;
     height: 22px;
-    padding: 6px 5px 4px 10px;
+    padding: 6px 5px 4px 18px;
     white-space: nowrap;
 }
 #poll-indicator.error span {
     background: #ffffff url(images/corners.png) no-repeat left -85px;
     line-height: 22px;
     height: 22px;
-    padding: 6px 5px 4px 10px;
+    padding: 6px 5px 4px 13px;
     white-space: nowrap;
 }
 #poll-indicator img {
