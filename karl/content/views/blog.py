@@ -371,7 +371,9 @@ class AddBlogEntryFormController(object):
         # Tags, attachments, alerts, images
         set_tags(blogentry, request, converted['tags'])
         attachments_folder = blogentry['attachments']
-        upload_attachments(converted['attachments'], attachments_folder,
+        upload_attachments(filter(lambda x: x is not None,
+                                  converted['attachments']),
+                           attachments_folder,
                            creator, request)
         relocate_temp_images(blogentry, request)
 
@@ -470,8 +472,11 @@ class EditBlogEntryFormController(object):
         set_tags(context, request, converted['tags'])
         creator = authenticated_userid(request)
         attachments_folder = context['attachments']
-        upload_attachments(converted['attachments'], attachments_folder,
-                           creator, request)
+        upload_attachments(
+            filter(lambda x: x is not None, converted['attachments']),
+            attachments_folder,
+            creator, request)
+
         # modified
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))

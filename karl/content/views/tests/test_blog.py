@@ -332,6 +332,63 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         response = controller.handle_cancel()
         self.assertEqual(response.location, 'http://example.com/')
 
+    def test_handle_submit_attachment_is_None(self):
+        from karl.testing import registerSettings
+        registerSettings()
+
+        context = self.blog
+        self.site.system_email_domain = 'example.com'
+        tags = DummyTags()
+        self.site.tags = tags
+        from karl.testing import DummyCatalog
+        self.site.catalog = DummyCatalog()
+        self.site.sessions = DummySessions()
+        from karl.testing import DummyUpload
+        attachment1 = DummyUpload(filename="test1.txt")
+        attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
+        converted = {
+            'title':'foo',
+            'text':'text',
+            'tags':['tag1', 'tag2'],
+            'sendalert':True,
+            'security_state':'public',
+            'attachments':[attachment1, None, attachment2],
+            }
+        self._register()
+        from karl.content.interfaces import IBlogEntry
+        from karl.content.interfaces import ICommunityFile
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyBlogEntry, IBlogEntry)
+        registerContentFactory(DummyFile, ICommunityFile)
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        testing.registerDummyRenderer(
+            'templates/email_blog_entry_alert.pt')
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/blog/foo/')
+        self.assertEqual(3, len(self.mailer))
+        for x in self.mailer:
+            self.assertEqual(x.mfrom, 'community@karl3.example.com')
+        recipients = reduce(lambda x,y: x+y, [x.mto for x in self.mailer])
+        recipients.sort()
+        self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
+
+        blogentry_url = "http://example.com/communities/community/blog/foo/"
+
+        attachments_url = "%sattachments" % blogentry_url
+        self.failUnless(context['foo']['attachments']['test1.txt'])
+        self.failUnless(context['foo']['attachments']['test2.txt'])
+
+        body = self.mailer[0].msg.get_payload(decode=True)
+        self.assertEqual(body, '')
+
+        attachment1 = context['foo']['attachments']['test1.txt']
+        self.assertEqual(attachment1.filename, "test1.txt")
+
+        attachment2 = context['foo']['attachments']['test2.txt']
+        self.assertEqual(attachment2.filename, "test2.txt")
+
     def test_handle_submit(self):
         from karl.testing import registerSettings
         registerSettings()
@@ -507,6 +564,47 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
                      'security_state':'public',
                      'tags':'thetesttag',
                      'attachments':[SchemaFile(None, None, None)],
+                     }
+        registerContentFactory(DummyBlogEntry, IBlogEntry)
+        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        testing.registerDummySecurityPolicy('testeditor')
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location, 'http://example.com/ablogentry/')
+        self.assertEqual(len(L), 2)
+        self.assertEqual(context.title, 'foo')
+        self.assertEqual(context.text, 'text')
+        self.assertEqual(context.modified_by, 'testeditor')
+
+    def test_handle_submit_attachment_is_None(self):
+        """
+        There seems to be some set of circumstances under which formish will
+        return a None as a value in the attachments sequence.
+        """
+        from schemaish.type import File as SchemaFile
+        from karl.models.interfaces import IObjectModifiedEvent
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        from karl.content.interfaces import IBlogEntry
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.testing import DummyCatalog
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        self._registerDummyWorkflow()
+        context = DummyBlogEntry()
+        context.sessions = DummySessions()
+        context.__name__ ='ablogentry'
+        context.catalog = DummyCatalog()
+        context['attachments'] = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        directlyProvides(context, ISite)
+        converted = {'title':'foo',
+                     'text':'text',
+                     'security_state':'public',
+                     'tags':'thetesttag',
+                     'attachments':[None],
                      }
         registerContentFactory(DummyBlogEntry, IBlogEntry)
         L = testing.registerEventListener((Interface, IObjectModifiedEvent))

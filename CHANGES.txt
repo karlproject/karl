@@ -8,6 +8,9 @@ Unreleased
   Image Drawer when uploading images in the context of an 'Add Content' form.
   (LP #619977)
 
+- Added fault tolerance for 'None' values from formish for blog entry
+  attachments. (LP #618074)
+
 3.44 (2010-09-02)
 -----------------
 
