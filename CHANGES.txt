@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+3.44 (2010-09-02)
+-----------------
+
 - Made sure icon is centered on filter indicator button (LP #628833)
 
 - Fixed filter button display in IE (LP #628281)
