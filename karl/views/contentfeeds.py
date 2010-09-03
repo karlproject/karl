@@ -34,11 +34,11 @@ def _get_criteria(request):
 
     # Check to see if we're asking for only "my" communities.
     filterby = request.params.get('filter', '')
-    if filterby:
-        header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE,
-                                                   str(filterby)))
-        request.cookies[_FILTER_COOKIE] = filterby
-        request.response_headerlist = [header]
+    # cookie must be set even if param is empty or non-existent, to make
+    # the no-filter button sticky.
+    header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
+    request.cookies[_FILTER_COOKIE] = filterby
+    request.response_headerlist = [header]
 
     if filterby == 'mycommunities':
         principals = [x for x in principals if not x.startswith('group.Karl')]

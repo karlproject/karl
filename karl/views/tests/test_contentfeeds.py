@@ -60,6 +60,25 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         self.assertTrue('allowed' not in feed_items[0])
         self.assertEqual(feed_items[0]['timeago'], '2010-07-14T12:47:12Z')
 
+    def test_filter_cookie_empty_no_param(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        context.events = DummyEvents()
+        (last_gen, last_index, earliest_gen, earliest_index, 
+            feed_items) = self._callFUT(context, request)
+        _checkCookie(request, '')
+
+    def test_filter_cookie_empty(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        context.events = DummyEvents()
+        request.params = {
+            'filter': '',
+            }
+        (last_gen, last_index, earliest_gen, earliest_index, 
+            feed_items) = self._callFUT(context, request)
+        _checkCookie(request, '')
+
     def test_filter_cookie_mycommunities(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
