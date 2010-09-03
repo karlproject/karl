@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Improve contentfeeds description of content added / modified inside a
+  profile. (LP #628285)
+
 - Workflow initialization is now delayed for temporary images created by
   Image Drawer when uploading images in the context of an 'Add Content' form.
   (LP #619977)

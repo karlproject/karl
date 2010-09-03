@@ -434,7 +434,8 @@ class _EventSubscriberTestsBase:
         site['communities']['testing'] = c
         c.docid = 123
         c.__acl__ = [('Allow', 'group:KarlAdmin', ('view',)),
-                     ('Allow', 'group.community:testing:moderators', ('view',)),
+                     ('Allow',
+                        'group.community:testing:moderators', ('view',)),
                      ('Allow', 'group.community:testing:members', ('view',)),
                      DENY_ALL,
                     ]
@@ -556,7 +557,8 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((123,), None, None))
@@ -662,7 +664,8 @@ class Test_user_left_community(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((123,), None, None))
@@ -729,7 +732,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((123,), None, None))
@@ -757,8 +761,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['flavor'], 'added_edited_profile')
         self.assertEqual(info['operation'], 'added')
         self.assertEqual(info['userid'], 'phred')
-        self.assertEqual(info['context_name'], None)
-        self.assertEqual(info['context_url'], None)
+        self.assertEqual(info['context_name'], 'J. Phred Bloggs')
+        self.assertEqual(info['context_url'], '/profiles/phred')
         self.assertEqual(info['content_type'], 'Profile')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
@@ -768,10 +772,56 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], 0)
         self.assertEqual(info['author'], 'J. Phred Bloggs')
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((456,), None, None))
+        self.assertEqual(sorted(info['allowed']),
+                         ['group.KarlAdmin',
+                          'group.community:testing:members',
+                          'group.community:testing:moderators',
+                         ])
+
+    def test_added_content_inside_profile(self):
+        from datetime import datetime
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from repoze.bfg.testing import registerUtility
+        NOW = datetime(2010, 7, 13, 12, 47, 12)
+        self._setNow(lambda: NOW)
+        registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
+        site, community, profile = self._makeSite()
+        content = self._makeContent(profile, 'photo',
+                                    creator = 'phred',
+                                    modified_by = 'phred',
+                                    title='Phred @ Beach',
+                                    description = 'DESC')
+        event = self._makeEvent(object=content)
+
+        self._callFUT(content, event)
+
+        self.assertEqual(len(site.events._pushed), 1)
+        info = site.events._pushed[0]
+        self.assertEqual(info['timestamp'], NOW)
+        self.assertEqual(info['flavor'], 'added_edited_other')
+        self.assertEqual(info['operation'], 'added')
+        self.assertEqual(info['userid'], 'phred')
+        self.assertEqual(info['context_name'], 'J. Phred Bloggs')
+        self.assertEqual(info['context_url'], '/profiles/phred')
+        self.assertEqual(info['content_type'], 'Dummy')
+        self.assertEqual(info['content_creator'], 'phred')
+        self.assertEqual(info['url'], '/profiles/phred/photo')
+        self.assertEqual(info['title'], 'Phred @ Beach')
+        self.assertEqual(info['description'], 'DESC')
+        self.assertEqual(info['short_description'], 'DESC')
+        self.assertEqual(info['comment_count'], 0)
+        self.assertEqual(info['author'], 'J. Phred Bloggs')
+        self.assertEqual(info['profile_url'], '/profiles/phred')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['tags'],
+                         ['australia', 'africa', 'north_america'])
+        self.assertEqual(site.tags._called_with, ((789,), None, None))
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
@@ -818,7 +868,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], len(comments))
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((789,), None, None))
@@ -867,14 +918,16 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['context_url'], '/communities/testing')
         self.assertEqual(info['content_type'], 'Dummy')
         self.assertEqual(info['content_creator'], 'bharney')
-        self.assertEqual(info['url'], '/communities/testing/content/comments/one')
+        self.assertEqual(info['url'],
+                         '/communities/testing/content/comments/one')
         self.assertEqual(info['title'], 'TITLE')
         self.assertEqual(info['description'], 'DESC')
         self.assertEqual(info['short_description'], 'DESC')
         self.assertEqual(info['comment_count'], 0)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((789,), None, None))
@@ -941,7 +994,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((123,), None, None))
@@ -969,8 +1023,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['flavor'], 'added_edited_profile')
         self.assertEqual(info['operation'], 'edited')
         self.assertEqual(info['userid'], 'phred')
-        self.assertEqual(info['context_name'], None)
-        self.assertEqual(info['context_url'], None)
+        self.assertEqual(info['context_name'], 'J. Phred Bloggs')
+        self.assertEqual(info['context_url'], '/profiles/phred')
         self.assertEqual(info['content_type'], 'Profile')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
@@ -980,10 +1034,56 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], 'J. Phred Bloggs')
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((456,), None, None))
+        self.assertEqual(sorted(info['allowed']),
+                         ['group.KarlAdmin',
+                          'group.community:testing:members',
+                          'group.community:testing:moderators',
+                         ])
+
+    def test_modified_content_inside_profile(self):
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from repoze.bfg.testing import registerUtility
+        from datetime import datetime
+        NOW = datetime(2010, 7, 13, 12, 47, 12)
+        self._setNow(lambda: NOW)
+        registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
+        site, community, profile = self._makeSite()
+        content = self._makeContent(profile, 'photo',
+                                    creator = 'phred',
+                                    modified_by = 'phred',
+                                    title='Phred @ Beach',
+                                    description = 'DESC')
+        event = self._makeEvent(object=content)
+
+        self._callFUT(content, event)
+
+        self.assertEqual(len(site.events._pushed), 1)
+        info = site.events._pushed[0]
+        self.assertEqual(info['timestamp'], NOW)
+        self.assertEqual(info['flavor'], 'added_edited_other')
+        self.assertEqual(info['operation'], 'edited')
+        self.assertEqual(info['userid'], 'phred')
+        self.assertEqual(info['context_name'], 'J. Phred Bloggs')
+        self.assertEqual(info['context_url'], '/profiles/phred')
+        self.assertEqual(info['content_type'], 'Dummy')
+        self.assertEqual(info['content_creator'], 'phred')
+        self.assertEqual(info['url'], '/profiles/phred/photo')
+        self.assertEqual(info['title'], 'Phred @ Beach')
+        self.assertEqual(info['description'], 'DESC')
+        self.assertEqual(info['short_description'], 'DESC')
+        self.assertEqual(info['comment_count'], False)
+        self.assertEqual(info['author'], 'J. Phred Bloggs')
+        self.assertEqual(info['profile_url'], '/profiles/phred')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['tags'],
+                         ['australia', 'africa', 'north_america'])
+        self.assertEqual(site.tags._called_with, ((789,), None, None))
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
@@ -1023,7 +1123,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
         self.assertEqual(site.tags._called_with, ((789,), None, None))
@@ -1069,7 +1170,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
-        site.catalog.document_map._map[community.docid] = '/communities/testing'
+        site.catalog.document_map._map[community.docid
+                                      ] = '/communities/testing'
         # WAAA:  set up thread-locals 
         manager.push({'request': DummyRequest(context=community),
                       'registry': manager.get()['registry']})
@@ -1098,7 +1200,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tagname'], 'youreit')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
@@ -1136,8 +1239,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['flavor'], 'tagged_profile')
         self.assertEqual(info['operation'], 'tagged')
         self.assertEqual(info['userid'], 'phred')
-        self.assertEqual(info['context_name'], None)
-        self.assertEqual(info['context_url'], None)
+        self.assertEqual(info['context_name'], 'J. Phred Bloggs')
+        self.assertEqual(info['context_url'], '/profiles/phred')
         self.assertEqual(info['content_type'], 'Profile')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
@@ -1147,7 +1250,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], 'J. Phred Bloggs')
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tagname'], 'youreit')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])
@@ -1202,7 +1306,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
-        self.assertEqual(info['thumbnail'], '/profiles/phred/profile_thumbnail')
+        self.assertEqual(info['thumbnail'],
+                         '/profiles/phred/profile_thumbnail')
         self.assertEqual(info['tagname'], 'youreit')
         self.assertEqual(info['tags'],
                          ['australia', 'africa', 'north_america'])

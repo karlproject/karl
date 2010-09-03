@@ -30,9 +30,10 @@ from repoze.folder.interfaces import IObjectAddedEvent
 from repoze.lemonade.content import get_content_type
 from zope.interface import implements
 
-from karl.models.interfaces import IObjectModifiedEvent
-from karl.models.interfaces import IPosts
 from karl.models.interfaces import IComment
+from karl.models.interfaces import IObjectModifiedEvent
+from karl.models.interfaces import IProfile
+from karl.models.interfaces import IPosts
 from karl.models.interfaces import ISiteEvents
 from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemovedGroup
@@ -40,6 +41,7 @@ from karl.tagging.interfaces import ITagAddedEvent
 from karl.utils import find_catalog
 from karl.utils import find_community
 from karl.utils import find_events
+from karl.utils import find_interface
 from karl.utils import find_site
 from karl.utils import find_tags
 
@@ -105,12 +107,15 @@ class SiteEvents(Persistent):
 MEMBER_PREFIX = 'group.community:'
 
 def _getInfo(profile, content):
-    community = find_community(content)
-    if community is None:
+    community = context = find_community(content)
+    if context is None:
+        # try for content inside a profile
+        context = find_interface(content, IProfile)
+    if context is None:
         context_name = context_url = None
     else:
-        context_name = community.title
-        context_url = model_path(community)
+        context_name = context.title
+        context_url = model_path(context)
     tagger = find_tags(content)
     if tagger is not None:
         cloud = list(tagger.getCloud(items=(content.docid,)))
