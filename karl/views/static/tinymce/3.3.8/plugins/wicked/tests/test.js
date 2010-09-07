@@ -67,7 +67,7 @@ module("tiny.wicked", {
             $.each($(node)[0].childNodes, function(n, textNode) {
                 if (textNode.nodeType == 3) {
                     var txt = textNode.nodeValue;
-                    if (index < txt.length) {
+                    if (index <= txt.length) {
                         // found it
                         foundNode = textNode;
                         return false;

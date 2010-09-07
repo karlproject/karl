@@ -1,3 +1,13 @@
+
+
+
+// XXX Changed 2010 by Balazs Ree <ree@greenfinity.hu>
+// On IE, force positioning the caret into the _next_ node,
+// if RETURN is pressed at the last empty row of a list.
+// On IE, this caused the caret jump back to the end of the
+// list. This fix attempts to force it where it belongs.
+// (Workaround bug LP #622764)
+
 (function(win) {
 	var whiteSpaceRe = /^\s*|\s*$/g,
 		undefined;
@@ -10856,6 +10866,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					});
 
 					ed.onKeyUp.add(function(ed, e) {
+                                            //alert(JSON.stringify(e));
 						// Let IE break the element and the wrap the new caret location in the previous formats
 						if (e.keyCode == 13 && !e.shiftKey) {
 							var parent = ed.selection.getStart(), fmt = t._previousFormats;
@@ -10875,6 +10886,48 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 									selection.select(parent, 1);
 									ed.getDoc().execCommand('Delete', false, null);
+                                                                         
+                                                                        // XXX <ree@greenfinity.hu>
+                                                                        // Force positioning the cursor into the _next_ node,
+                                                                        // in case it stayed in the LI. (workaround bug
+                                                                        // LP #622764)
+                                                                        //
+                                                                        // Get the next paragraph first... this is where
+                                                                        // we should arrive at.
+                                                                        var n = selection.getNode();
+                                                                        var next;
+                                                                        while (true) {
+                                                                            next = n.nextSibling;
+                                                                            if (next) {
+                                                                                break;
+                                                                            } else {
+                                                                                n = n.parentNode;
+                                                                            }
+                                                                        }
+                                                                        // We only act if this paragraph is empty.
+                                                                        if (next && next.nodeName == 'P' &&
+                                                                                next.innerHTML.length == 0) {
+                                                                            // Try to fool IE completely.
+                                                                            // First, create a non-breaking space in that
+                                                                            // paragraph, and place the caret after it.
+							                    next.innerHTML = '&nbsp;';
+                                                                            var rng = dom.createRng();
+                                                                            rng.setStart(next, 1);
+                                                                            rng.setEnd(next, 1);
+                                                                            selection.setRng(rng);
+                                                                            // Ok, now, remove the space.
+							                    next.innerHTML = '';
+                                                                            // This seems to 'fool' IE to leave the caret
+                                                                            // there. In all other cases I tried, the
+                                                                            // caret ended up consistently broken:
+                                                                            // it either jumped back up to the end of the LI,
+                                                                            // or, some trash had to be left in the new
+                                                                            // paragraph (or worse).
+                                                                            //
+                                                                            //next.parentNode && alert(next.parentNode.outerHTML);
+                                                                        }
+                                                                        // XXX END <ree@greenfinity.hu>
+
 								}
 							}
 						}
