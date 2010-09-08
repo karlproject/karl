@@ -17,6 +17,8 @@ Unreleased
 - Added fault tolerance for 'None' values from formish for blog entry
   attachments. (LP #618074)
 
+- Fixed 'add_user' script to initialize workflow for new profile.
+
 3.44 (2010-09-02)
 -----------------
 
