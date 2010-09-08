@@ -132,6 +132,10 @@ class TestPathExistsValidator(unittest.TestCase):
         validator = self._makeOne(self.site)
         self.assertRaises(Invalid, validator, '/')
 
+    def test_blank_ok(self):
+        validator = self._makeOne(self.site)
+        self.assertEqual(validator(''), None)
+
 class TestPasswordLengthValidator(unittest.TestCase):
     def _makeOne(self, min_pw_length):
         from karl.views.forms.validators import PasswordLength
