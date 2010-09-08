@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Derive ``creator`` for uploaded photo from the current user, rather than
+  the container's name. (LP #633191)
+
 - Improve contentfeeds description of content added / modified inside a
   profile. (LP #628285)
 

@@ -21,6 +21,7 @@ import re
 from cStringIO import StringIO
 
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.threadlocal import get_current_request
 from repoze.bfg.traversal import traverse
 from repoze.lemonade.content import create_content
 
@@ -272,6 +273,8 @@ def photo_from_filestore_view(context, request, form_id):
 def handle_photo_upload(context, form):
     upload = form.get("photo", None)
     if upload is not None and upload.file is not None:
+        request = get_current_request()
+        userid = authenticated_userid(request)
         upload_file = upload.file
         if hasattr(upload, 'type'):
             upload_type = upload.type # FieldStorage
@@ -285,7 +288,7 @@ def handle_photo_upload(context, form):
             stream=upload_file,
             mimetype=upload_type,
             filename=basename_of_filepath(upload.filename),
-            creator=context.__name__
+            creator=userid,
         )
         if not photo.is_image:
             transaction.get().doom()

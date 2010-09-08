@@ -287,6 +287,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
+        testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -309,12 +310,13 @@ class TestHandlePhotoUpload(unittest.TestCase):
         self.assertEqual(photo.mimetype, 'image/jpeg')
         self.assertEqual(photo.data, one_pixel_jpeg)
         self.assertEqual(photo.filename, 'test.dat')
-        self.assertEqual(photo.creator, 'howdydoody')
+        self.assertEqual(photo.creator, 'userid')
 
     def test_replace_photo(self):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
+        testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -346,7 +348,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         self.assertEqual(photo.mimetype, 'image/jpeg')
         self.assertEqual(photo.data, one_pixel_jpeg)
         self.assertEqual(photo.filename, 'test.dat')
-        self.assertEqual(photo.creator, 'howdydoody')
+        self.assertEqual(photo.creator, 'userid')
 
     def test_invalid_image(self):
         from cStringIO import StringIO
@@ -384,6 +386,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
+        testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -410,7 +413,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         self.assertEqual(photo.mimetype, 'image/jpeg')
         self.assertEqual(photo.data, one_pixel_jpeg)
         self.assertEqual(photo.filename, 'test.dat')
-        self.assertEqual(photo.creator, 'howdydoody')
+        self.assertEqual(photo.creator, 'userid')
 
 class TestConvertEntities(unittest.TestCase):
     def _callFUT(self, s):
