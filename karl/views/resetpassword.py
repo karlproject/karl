@@ -241,7 +241,8 @@ class ResetConfirmFormController(object):
             # The key matched.  Clear the key and reset the password.
             profile.password_reset_key = None
             profile.password_reset_time = None
-            users.change_password(userid, converted['password'])
+            password = converted['password'].encode('UTF-8')
+            users.change_password(userid, password)
 
             page_title = 'Password Reset Complete'
             api = TemplateAPI(context, request, page_title)

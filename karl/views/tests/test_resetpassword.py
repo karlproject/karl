@@ -354,6 +354,34 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         from repoze.who.plugins.zodb.users import get_sha_password
         self.assertEqual(user['password'], get_sha_password('secret'))
 
+    def test_handle_submit_utf8_password(self):
+        password = u'password\xe1'
+        reg = get_current_registry()
+        config = Configurator(reg)
+        renderer = config.testing_add_template('templates/reset_complete.pt')
+        request = self.request
+        request.params['key'] = '0' * 40
+        self._setupUsers()
+        context = self.context
+        context['profiles'] = testing.DummyModel()
+        profile = context['profiles']['me'] = testing.DummyModel()
+        profile.password_reset_key = '0' * 40
+        controller = self._makeOne(context, request)
+        converted = {'login': 'me', 'password': password}
+        import datetime
+        keytime = datetime.datetime.now()
+        profile.password_reset_time = keytime
+        response = controller.handle_submit(converted)
+        self.failUnless(hasattr(renderer, 'api'))
+        self.assertEqual(renderer.api.page_title,
+                         'Password Reset Complete')
+        renderer.assert_(login='me', password=password)
+        self.failUnless(profile.password_reset_key is None)
+        self.failUnless(profile.password_reset_time is None)
+        user = self.context.users.get(login='me')
+        from repoze.who.plugins.zodb.users import get_sha_password
+        self.assertEqual(user['password'], get_sha_password(password.encode('utf8')))
+
 
 class DummyProfileSearch:
     def __init__(self, context):
