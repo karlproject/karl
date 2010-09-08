@@ -20,6 +20,7 @@
   adduser <username> <password>
 """
 
+from repoze.workflow import get_workflow
 from karl.models.interfaces import IProfile
 from karl.scripting import get_default_config
 from karl.scripting import open_root
@@ -43,6 +44,8 @@ def adduser(root, userid, password):
     profiles[userid] = create_content(
         IProfile, firstname='System', lastname='User'
     )
+    wf = get_workflow(IProfile, 'security')
+    wf.initialize(profiles[userid])
 
 def main():
     parser = OptionParser(description=__doc__,
