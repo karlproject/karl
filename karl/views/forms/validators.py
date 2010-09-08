@@ -1,5 +1,6 @@
 import re
 
+import datetime
 from lxml.html.clean import clean_html
 from validatish import validate
 from validatish.validator import Validator
@@ -24,7 +25,7 @@ class FolderNameAvailable(Validator):
             make_name(self.container, v)
         except ValueError, why:
             raise Invalid(why[0])
-    
+
 class WikiTitleAvailable(Validator):
     def __init__(self, container, exceptions=()):
         self.container = container
@@ -37,7 +38,7 @@ class WikiTitleAvailable(Validator):
         for page in self.container.values():
             if page.title.lower() == title:
                 raise Invalid('Title "%s" is already in use on this wiki' % v)
-    
+
 class NotOneOf(Validator):
     """ Checks whether value is not one of a supplied list of values"""
     def __init__(self, set_of_values):
@@ -79,7 +80,7 @@ class PathExists(Validator):
 class PasswordLength(Validator):
     def __init__(self, min_pw_length):
         self.min_pw_length = min_pw_length
-        
+
     def __call__(self, v):
         if v and len(v) < int(self.min_pw_length):
             fmt = "Password must be at least %s characters"
@@ -140,3 +141,12 @@ class WebURL(Validator):
             except Invalid, e:
                 msg = u"Must start with 'http://', 'https://', or 'www.'"
                 raise Invalid(msg, validator=self)
+
+class DateTime(Validator):
+    def __call__(self, v):
+        if not isinstance(v, datetime.datetime):
+            msg = "Must be a valid datetime."
+            raise Invalid(msg, validator=self)
+        if v.year < 1900:
+            msg = "Year must be greater than or equal to 1900."
+            raise Invalid(msg, validator=self)

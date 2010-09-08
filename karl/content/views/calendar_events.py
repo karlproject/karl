@@ -67,6 +67,7 @@ from karl.security.workflow import get_security_states
 from karl.views.api import TemplateAPI
 from karl.views.forms import attr as karlattr
 from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidator
 from karl.views.forms.filestore import get_filestore
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
@@ -381,8 +382,12 @@ def _get_all_calendar_categories(context, request):
 tags_field = schemaish.Sequence(schemaish.String())
 category_field = schemaish.String()
 all_day_field = schemaish.Boolean()
-start_date_field = karlattr.KarlDateTime(validator=validator.Required())
-end_date_field = karlattr.KarlDateTime(validator=validator.Required())
+start_date_field = karlattr.KarlDateTime(
+    validator=validator.All(validator.Required(), karlvalidator.DateTime())
+    )
+end_date_field = karlattr.KarlDateTime(
+    validator=validator.All(validator.Required(), karlvalidator.DateTime())
+    )
 location_field = schemaish.String()
 text_field = schemaish.String()
 attendees_field = schemaish.String(description='One per line')
@@ -515,7 +520,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
     def __init__(self, context, request):
         super(AddCalendarEventFormController, self).__init__(context, request)
         self.show_sendalert = get_show_sendalert(self.context, self.request)
-        
+
     def form_defaults(self):
         start_date, end_date = _default_dates_requested(self.context,
                                                         self.request)
@@ -595,7 +600,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
 
         self.filestore.clear()
         return HTTPFound(location=model_url(calendar_event, request))
-        
+
 
 def show_calendarevent_view(context, request):
 

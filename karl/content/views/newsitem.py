@@ -44,6 +44,7 @@ from karl.utilities.image import thumb_url
 from karl.views.api import TemplateAPI
 from karl.views.forms import attr as karlattr
 from karl.views.forms import widgets as karlwidgets
+from karl.views.forms import validators as karlvalidator
 from karl.views.forms.filestore import get_filestore
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
@@ -74,7 +75,9 @@ text_field = schemaish.String()
 attachments_field = schemaish.Sequence(schemaish.File(), title='Attachments')
 photo_field = schemaish.File()
 caption_field = schemaish.String()
-publication_date_field = karlattr.KarlDateTime(validator=validator.Required())
+publication_date_field = karlattr.KarlDateTime(
+    validator=validator.All(validator.Required(), karlvalidator.DateTime())
+    )
 
 class AddNewsItemFormController(object):
     def __init__(self, context, request):

@@ -19,6 +19,8 @@ Unreleased
 
 - Fixed 'add_user' script to initialize workflow for new profile.
 
+- Added form validation to catch years earlier than 1900. (LP# 632451)
+
 3.44 (2010-09-02)
 -----------------
 

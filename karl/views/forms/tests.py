@@ -228,6 +228,28 @@ class TestWebURLValidator(unittest.TestCase):
         # empty is okay too
         self.assertEqual(validator(''), None)
 
+
+class Test_DateTimeValidator(unittest.TestCase):
+    def _makeOne(self):
+        from karl.views.forms.validators import DateTime as cls
+        return cls()
+
+    def test_not_a_datetime(self):
+        from validatish.error import Invalid
+        validator = self._makeOne()
+        self.assertRaises(Invalid, validator, object())
+
+    def test_year_before_1900(self):
+        from validatish.error import Invalid
+        from datetime import datetime
+        validator = self._makeOne()
+        self.assertRaises(Invalid, validator, datetime(10, 10, 10))
+
+    def test_ok(self):
+        from datetime import datetime
+        validator = self._makeOne()
+        self.assertEqual(validator(datetime.now()), None)
+
 class TestAcceptFieldWidget(unittest.TestCase):
     def _makeOne(self, text, description, **kw):
         from karl.views.forms.widgets import AcceptFieldWidget
