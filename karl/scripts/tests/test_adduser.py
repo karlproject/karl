@@ -16,6 +16,9 @@ class Test_adduser(unittest.TestCase):
         from karl.models.interfaces import IProfile
         registerContentFactory(testing.DummyProfile, IProfile)
 
+        from repoze.workflow.testing import registerDummyWorkflow
+        self.wf = registerDummyWorkflow('security')
+
     def tearDown(self):
         cleanUp()
 
@@ -37,6 +40,7 @@ class Test_adduser(unittest.TestCase):
         profile = root['profiles']['chris']
         self.assertEqual(profile.firstname, 'System')
         self.assertEqual(profile.lastname, 'User')
+        self.assertEqual(self.wf.initialized, [profile])
 
     def test_add_existing_user(self):
         root = self.root
