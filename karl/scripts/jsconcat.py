@@ -43,10 +43,10 @@ def main(argv=sys.argv):
     grid_dir = os.path.join(static_dir, 'jquery-ui', 'grid', 'ui')
     autobox_dir = os.path.join(static_dir, 'jquery-ui', 'autobox2')
     karl_dir = static_dir
-    multistatusbox_dir = os.path.join(static_dir, 'jquery-ui', 'ui-multistatusbox')
-    captionedimage_dir = os.path.join(static_dir, 'jquery-ui', 'karl-captionedimage')
-    slider_dir = os.path.join(static_dir, 'jquery-ui', 'karl-slider')
-    buttonset_dir = os.path.join(static_dir, 'jquery-ui', 'karl-buttonset')
+    multistatusbox_dir = os.path.join(static_dir, 'karl-plugins', 'karl-multistatusbox')
+    captionedimage_dir = os.path.join(static_dir, 'karl-plugins', 'karl-captionedimage')
+    slider_dir = os.path.join(static_dir, 'karl-plugins', 'karl-slider')
+    buttonset_dir = os.path.join(static_dir, 'karl-plugins', 'karl-buttonset')
     tinymce_base_dir = os.path.join(static_dir, 'tinymce')
     tinymce_dir = os.path.join(tinymce_base_dir, '3.3.8')
 
@@ -63,7 +63,7 @@ def main(argv=sys.argv):
             filesindir(ui_dir, 'jquery-ui-1.8.2.custom.min.js'),
             filesindir(grid_dir, 'ui.grid.js', 'ui.gridmodel.js'),
             filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
-            filesindir(multistatusbox_dir, 'ui.multistatusbox.js'),
+            filesindir(multistatusbox_dir, 'karl.multistatusbox.js'),
             filesindir(captionedimage_dir, 'karl.captionedimage.js'),
             filesindir(slider_dir, 'karl.slider.js'),
             filesindir(buttonset_dir, 'karl.buttonset.js'),

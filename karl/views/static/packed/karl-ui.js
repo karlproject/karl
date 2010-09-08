@@ -1766,7 +1766,7 @@ $.widget('ui.autobox3', {
 (function($){
 
 
-$.widget('ui.multistatusbox', {
+$.widget('karl.multistatusbox', {
  
     options: {
         clsContainer: 'ui-widget',
@@ -1816,16 +1816,16 @@ $.widget('ui.multistatusbox', {
             queueCategory = null;
         }
         // Append the item
-        var item = $('<div class="ui-multistatusbox-item ui-helper-clearfix"></div>');
+        var item = $('<div class="karl-multistatusbox-item ui-helper-clearfix"></div>');
         // Add item classes to the item
         if (clsItem === undefined) {
             clsItem = this.options.clsItem;
         }
         item.addClass(clsItem);
         // Create message and (if needed) a close button
-        item.append($('<div class="ui-multistatusbox-message"></div>').append(message));
+        item.append($('<div class="karl-multistatusbox-message"></div>').append(message));
         if (this.options.hasCloseButton) {
-            item.append($('<a href="#" class="ui-multistatusbox-closebutton">' + 
+            item.append($('<a href="#" class="karl-multistatusbox-closebutton">' + 
                           '<span class="ui-icon ui-icon-closethick">X</span></a>')
                         .hover(
                             function(e) { $(this).addClass('ui-state-hover'); },

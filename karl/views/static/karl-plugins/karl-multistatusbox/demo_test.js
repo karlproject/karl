@@ -3,7 +3,7 @@
 
 var sc = function() {
     var result = [];
-    $('#statusbox .ui-multistatusbox-item')
+    $('#statusbox .karl-multistatusbox-item')
         .each(function() {
             result.push($(this).text());
         });
@@ -39,7 +39,7 @@ $(document).ready(function() {
             'Message3X'
             ], 'Statusbox content does not match');
 
-        ok($('#statusbox .ui-multistatusbox-item .ui-multistatusbox-closebutton').length == 3,
+        ok($('#statusbox .karl-multistatusbox-item .karl-multistatusbox-closebutton').length == 3,
             'Has close button');
 
     });
@@ -245,7 +245,7 @@ $(document).ready(function() {
             ], 'Statusbox content does not match');
 
         $('#statusbox').children().eq(2)
-            .find('.ui-multistatusbox-closebutton')
+            .find('.karl-multistatusbox-closebutton')
                 .click();
 
         same(sc(), [
@@ -255,7 +255,7 @@ $(document).ready(function() {
             ], 'Statusbox content does not match');
 
         $('#statusbox').children().eq(2)
-            .find('.ui-multistatusbox-closebutton')
+            .find('.karl-multistatusbox-closebutton')
                 .click();
 
         same(sc(), [
@@ -264,7 +264,7 @@ $(document).ready(function() {
             ], 'Statusbox content does not match');
 
         $('#statusbox').children().eq(1)
-            .find('.ui-multistatusbox-closebutton')
+            .find('.karl-multistatusbox-closebutton')
                 .click();
 
         same(sc(), [
@@ -286,7 +286,7 @@ $(document).ready(function() {
             "Message1"
             ], 'Statusbox content does not match');
 
-        ok($('#statusbox .ui-multistatusbox-item .ui-multistatusbox-closebutton').length == 0,
+        ok($('#statusbox .karl-multistatusbox-item .karl-multistatusbox-closebutton').length == 0,
             'No close button');
 
     });
@@ -308,7 +308,7 @@ $(document).ready(function() {
         ok($('#statusbox.marker-a').length == 1,
             'Cls applied on container');
 
-        ok($('#statusbox .ui-multistatusbox-item.marker-b').length == 1,
+        ok($('#statusbox .karl-multistatusbox-item.marker-b').length == 1,
             'Cls applied on item');
     });
 
@@ -330,11 +330,11 @@ $(document).ready(function() {
         ok($('#statusbox.marker-a').length == 1,
             'Cls applied on container');
 
-        ok($('#statusbox .ui-multistatusbox-item.marker-b').length == 0,
+        ok($('#statusbox .karl-multistatusbox-item.marker-b').length == 0,
             'Cls replaced on item');
-        ok($('#statusbox .ui-multistatusbox-item.marker-c').length == 1,
+        ok($('#statusbox .karl-multistatusbox-item.marker-c').length == 1,
             'Extra cls applied on item');
-        ok($('#statusbox .ui-multistatusbox-item.marker-d').length == 1,
+        ok($('#statusbox .karl-multistatusbox-item.marker-d').length == 1,
             'Second extra cls applied on item');
 
     });
@@ -357,11 +357,11 @@ $(document).ready(function() {
         ok($('#statusbox.marker-a').length == 1,
             'Cls applied on container');
 
-        ok($('#statusbox .ui-multistatusbox-item.marker-b').length == 0,
+        ok($('#statusbox .karl-multistatusbox-item.marker-b').length == 0,
             'Cls replaced on item');
-        ok($('#statusbox .ui-multistatusbox-item.marker-c').length == 1,
+        ok($('#statusbox .karl-multistatusbox-item.marker-c').length == 1,
             'Extra cls applied on item');
-        ok($('#statusbox .ui-multistatusbox-item.marker-d').length == 1,
+        ok($('#statusbox .karl-multistatusbox-item.marker-d').length == 1,
             'Second extra cls applied on item');
 
     });
