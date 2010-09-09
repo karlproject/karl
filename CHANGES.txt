@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- fixed up styles on profile page to make all browsers happy 
+  (LP #634110)
+
 - Slightly reduced content area width to avoid content shifting
   while browser zooming (LP #629577)
 

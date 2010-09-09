@@ -1651,7 +1651,10 @@ ul.tagUsersList li {
 /** =PROFILE
 ----------------------------------------------- */
 .profile_page_body {
-	float: left;
+    clear: both;
+}
+.profile_page_body h3 {
+	clear: both;
 }
 .profile_page_body div.wrapper {
 	margin-left: 113px;
@@ -1688,6 +1691,7 @@ ul.tagUsersList li {
  	margin-bottom: 1em;
 	float: left;
 	display: inline;
+	width: 100%;
 }
 .profileDetails p {
 	margin: 2px 0;
@@ -1700,6 +1704,7 @@ ul.tagUsersList li {
 }
 .profileBio {
   margin-bottom: 2em;
+  float: left;
 }
 table#staffprofile-content th.cldate  {
 	text-align: left;
