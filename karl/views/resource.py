@@ -14,19 +14,15 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-"""Views registered to multiple content types"""
-
-from zope.component import getMultiAdapter
-from webob.exc import HTTPFound
+"""Views registered to multiple content types.
+"""
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import model_url
+from webob.exc import HTTPFound
 
 from karl.utils import get_layout_provider
-
 from karl.views.api import TemplateAPI
-from repoze.folder.interfaces import IFolder
 
 def delete_resource_view(context, request, num_children=0):
 
