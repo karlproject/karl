@@ -109,8 +109,14 @@ def set_tags(context, request, values):
 
 def jquery_tag_search_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
+    try:
+        prefix = request.params['val']
+    except UnicodeDecodeError:
+        # not utf8, just return empty list since tags can't have these chars
+        result = JSONEncoder().encode([])
+        return Response(result, content_type="application/x-json")
     # case insensitive
-    prefix = request.params['val'].lower()
+    prefix = prefix.lower()
     values = tag_query_tool.tags_with_prefix(prefix)
     records = [dict(text=value) for value in values]
     result = JSONEncoder().encode(records)
