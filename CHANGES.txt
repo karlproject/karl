@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix 'delete_resource.html' view for content outside of communities
+  (e.g., profile photos). (LP #634139)
+
 - Derive ``creator`` for uploaded photo from the current user, rather than
   the container's name. (LP #633191)
 

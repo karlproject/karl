@@ -23,8 +23,6 @@ from repoze.bfg import testing
 class TestDeleteResourceView(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
-        testing.registerDummyRenderer(
-            'karl.views:templates/community_layout.pt')
 
     def tearDown(self):
         testing.cleanUp()
@@ -33,39 +31,74 @@ class TestDeleteResourceView(unittest.TestCase):
         from karl.views.resource import delete_resource_view
         return delete_resource_view(context, request, num_children)
 
-    def test_noconfirm(self):
-        from karl.testing import registerLayoutProvider
-        registerLayoutProvider()
+    def _registerLayoutProvider(self, **kw):
+        from repoze.bfg.testing import registerAdapter
+        from zope.interface import Interface
+        from karl.views.interfaces import ILayoutProvider
+        registerAdapter(DummyLayoutProvider,
+                        (Interface, Interface),
+                        ILayoutProvider)
 
-        context = testing.DummyModel()
-        context.title = 'Context'
+    def test_noconfirm_non_community(self):
+        self._registerLayoutProvider()
+        context = testing.DummyModel(title='Context')
         request = testing.DummyRequest()
-        testing.registerDummyRenderer(
-            'templates/delete_resource.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
+
+        info = self._callFUT(context, request)
+
+        self.assertEqual(info['api'].page_title, 'Delete Context')
+        self.assertEqual(info['layout'].name, 'generic')
+        self.assertEqual(info['num_children'], 0)
+
+    def test_noconfirm_community(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        self._registerLayoutProvider()
+        community = testing.DummyModel()
+        directlyProvides(community, ICommunity)
+        context = community['context'] = testing.DummyModel(title='Context')
+        request = testing.DummyRequest()
+
+        info = self._callFUT(context, request)
+
+        self.assertEqual(info['api'].page_title, 'Delete Context')
+        self.assertEqual(info['layout'].name, 'community')
+        self.assertEqual(info['num_children'], 0)
+
+    def test_warn_for_folder_containing_children(self):
+        self._registerLayoutProvider()
+        parent = testing.DummyModel(title='Parent')
+        child = parent['child'] = testing.DummyModel()
+        request = testing.DummyRequest()
+
+        info = self._callFUT(parent, request, len(parent))
+
+        self.assertEqual(info['num_children'], 1)
 
     def test_confirm(self):
         parent = testing.DummyModel()
-        context = testing.DummyModel()
-        context.title = 'Child'
-        parent['child'] = context
+        context = parent['child'] = testing.DummyModel(title='Child')
         request = testing.DummyRequest(params={'confirm':'1'})
+
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location,
                          'http://example.com/?status_message=Deleted+Child')
         self.failIf('child' in parent)
 
-    def test_warn_for_folder_containing_children(self):
-        parent = testing.DummyModel()
-        parent.title = 'Parent'
-        child = testing.DummyModel()
-        child.title = 'Child'
-        parent['child'] = child
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/delete_resource.pt')
-        response = self._callFUT(parent, request, len(parent))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(renderer.num_children, 1)
+
+class DummyLayout(object):
+    def __init__(self, name):
+        self.name = name
+
+
+class DummyLayoutProvider(object):
+    community_layout = DummyLayout('community')
+    generic_layout = DummyLayout('generic')
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, default):
+        return getattr(self, '%s_layout' % default)

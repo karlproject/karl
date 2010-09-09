@@ -556,6 +556,7 @@
     name="delete.html"
     view=".resource.delete_resource_view"
     permission="delete"
+    renderer="templates/delete_resource.pt"
   />
 
   <view

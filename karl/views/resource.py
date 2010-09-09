@@ -17,10 +17,11 @@
 """Views registered to multiple content types.
 """
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
 
+from karl.utils import find_community
+from karl.utils import find_intranet
 from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
 
@@ -40,12 +41,15 @@ def delete_resource_view(context, request, num_children=0):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+    layout_name = 'generic'
+    if find_intranet(context):
+        layout_name = 'intranet'
+    elif find_community(context):
+        layout_name = 'community'
+    layout = layout_provider(layout_name)
 
-    return render_template_to_response(
-        'templates/delete_resource.pt',
-        api=api,
-        layout=layout,
-        num_children=num_children,
-        )
+    return {'api': api,
+            'layout': layout,
+            'num_children': num_children,
+           }
 
