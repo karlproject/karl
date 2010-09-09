@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Slightly reduced content area width to avoid content shifting
+  while browser zooming (LP #629577)
+
 - Fix 'delete_resource.html' view for content outside of communities
   (e.g., profile photos). (LP #634139)
 
