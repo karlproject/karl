@@ -574,6 +574,7 @@
     name="delete.html"
     view="karl.views.resource.delete_resource_view"
     permission="delete"
+    renderer="karl.views:templates/delete_resource.pt"
   />
 
 
@@ -582,6 +583,7 @@
     name="delete.html"
     view="karl.content.views.files.delete_folder_view"
     permission="delete"
+    renderer="karl.views:templates/delete_resource.pt"
   />
 
 
