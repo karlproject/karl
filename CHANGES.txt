@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+3.46 (2010-09-10)
+-----------------
+
 - fixed community filter buttons for Safari (LP #629010)
 
 - fixed up styles on profile page to make all browsers happy 
