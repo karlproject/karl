@@ -2974,6 +2974,7 @@ ul.menu li {
     float: left;
     padding: 9px 0 0 8px;
     margin-bottom: -9px;
+    width: 340px;
 }
 #community-filters label {
     font-size: 11px;
@@ -2986,7 +2987,6 @@ ul.menu li {
     padding-left: 10px;
     list-style: none;
     font-weight: bold;
-    text-align: right;
     position: relative;
     top: -1px;
 }
