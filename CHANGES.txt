@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- removed IE calendar styles, that were actually breaking things
+  (LP #629026)
+
 3.46 (2010-09-10)
 -----------------
 

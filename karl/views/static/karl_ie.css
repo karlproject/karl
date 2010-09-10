@@ -108,24 +108,6 @@ span.sortingArrows {
     left: 2px;
 }
 
-/** =CALENDAR
------------------------------------------------ */
-body .cal th .cal_time_label {
-  height: 50px;
-}
-body .cal_hour_event {
-  height: 25px;
-}
-body .cal_hour_event .cal_event_block  {
-  font-size: 95%;
-}
-body .cal_week .cal_hour_event .cal_event_block  {
-  width: 87px !important;
-}
-body .cal_day .cal_hour_event .cal_event_block  {
-  width: 603px !important;
-}
-
 ol#references-listing li a.topLevelItem {
   margin-left: 8px;
 } 
