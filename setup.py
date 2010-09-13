@@ -120,6 +120,7 @@ setup(name='karl',
       use_pgtextindex = karl.scripts.use_pgtextindex:main
       site_announce = karl.scripts.site_announce:main
       user_activity_report = karl.scripts.user_activity_report:main
+      analyze_queries = karl.scripts.analyze_queries:main
       """
       )
 
