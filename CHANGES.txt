@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- gave profile body a set width, so it doesn't fall out of its
+  area in IE (LP #638326)
+
 - put in correct version if corners.png, so IE will display the
   background on feed actions (LP #629013)
 
