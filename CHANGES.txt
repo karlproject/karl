@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- put in correct version if corners.png, so IE will display the
+  background on feed actions (LP #629013)
+
 - removed IE calendar styles, that were actually breaking things
   (LP #629026)
 
