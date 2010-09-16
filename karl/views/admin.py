@@ -770,6 +770,37 @@ def postoffice_quarantine_view(request):
     """
     context = request.context
     queue, closer = _get_postoffice_queue(context)
+
+    if request.params:
+        for key in request.params.keys():
+            if key.startswith('delete_'):
+                message_id = key.split('_')[1]
+                if message_id == 'all':
+                    messages = [message for message, error in
+                                queue.get_quarantined_messages()]
+                    for message in messages:
+                        queue.remove_from_quarantine(message)
+                else:
+                    queue.remove_from_quarantine(
+                        queue.get_quarantined_message(message_id)
+                    )
+            elif key.startswith('requeue_'):
+                message_id = key.split('_')[1]
+                if message_id == 'all':
+                    messages = [message for message, error in
+                                queue.get_quarantined_messages()]
+                    for message in messages:
+                        queue.remove_from_quarantine(message)
+                        queue.add(message)
+                else:
+                    message = queue.get_quarantined_message(message_id)
+                    queue.remove_from_quarantine(message)
+                    queue.add(message)
+        closer.conn.transaction_manager.commit()
+        return HTTPFound(
+            location=model_url(context, request, request.view_name)
+        )
+
     messages = []
     for message, error in queue.get_quarantined_messages():
         po_id = message['X-Postoffice-Id']
@@ -777,7 +808,8 @@ def postoffice_quarantine_view(request):
             request.application_url, po_id
         )
         messages.append(
-            dict(url=url, message_id=message['Message-Id'], error=error)
+            dict(url=url, message_id=message['Message-Id'], po_id=po_id,
+                 error=error)
         )
 
     return dict(

@@ -16,6 +16,9 @@ Unreleased
 - Removed Karl's implementation of Message in favor of the implementation in
   repoze.postoffice.
 
+- Added a UI for deleting and requeueing messages in the postoffice quarantine.
+  (LP #613424)
+
 3.46 (2010-09-10)
 -----------------
 

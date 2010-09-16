@@ -1213,9 +1213,12 @@ class TestPostofficeQuarantineView(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _call_fut(self):
+    def _call_fut(self, params=None):
         from karl.views.admin import postoffice_quarantine_view as fut
-        request = testing.DummyRequest()
+        if params is None:
+            params = {}
+        request = testing.DummyRequest(params=params)
+        request.view_name = 'view'
         request.context = None
         return fut(request)
 
@@ -1226,12 +1229,42 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         message = messages.pop(0)
         self.assertEqual(message['url'], 'http://example.com/po_quarantine/0')
         self.assertEqual(message['message_id'], 'Message 1')
+        self.assertEqual(message['po_id'], '0')
         self.assertEqual(message['error'], 'Error 1')
 
         message = messages.pop(0)
         self.assertEqual(message['url'], 'http://example.com/po_quarantine/1')
         self.assertEqual(message['message_id'], 'Message 2')
+        self.assertEqual(message['po_id'], '1')
         self.assertEqual(message['error'], 'Error 2')
+
+    def test_requeue_message(self):
+        response = self._call_fut(params={'requeue_0': 1})
+        self.assertEqual(response.location, 'http://example.com/view')
+        self.assertEqual(self.queue.removed, ['Message 1'])
+        self.assertEqual(self.queue.added, ['Message 1'])
+        self.failUnless(self.queue.committed)
+
+    def test_requeue_all(self):
+        response = self._call_fut(params={'requeue_all': 1})
+        self.assertEqual(response.location, 'http://example.com/view')
+        self.assertEqual(self.queue.removed, ['Message 1', 'Message 2'])
+        self.assertEqual(self.queue.added, ['Message 1', 'Message 2'])
+        self.failUnless(self.queue.committed)
+
+    def test_delete_message(self):
+        response = self._call_fut(params={'delete_1': 1})
+        self.assertEqual(response.location, 'http://example.com/view')
+        self.assertEqual(self.queue.removed, ['Message 2'])
+        self.assertEqual(self.queue.added, [])
+        self.failUnless(self.queue.committed)
+
+    def test_delete_all(self):
+        response = self._call_fut(params={'delete_all': 1})
+        self.assertEqual(response.location, 'http://example.com/view')
+        self.assertEqual(self.queue.removed, ['Message 1', 'Message 2'])
+        self.assertEqual(self.queue.added, [])
+        self.failUnless(self.queue.committed)
 
 class TestPostOfficeQuarantineStatusView(unittest.TestCase):
     def setUp(self):
@@ -1296,7 +1329,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
 
     def test_notfound(self):
         from repoze.bfg.exceptions import NotFound
-        self.assertRaises(NotFound, self._call_fut, 1)
+        self.assertRaises(NotFound, self._call_fut, 2)
 
 class DummyProfiles(testing.DummyModel):
 
@@ -1308,34 +1341,57 @@ class DummyProfiles(testing.DummyModel):
 class DummyPostofficeQueue(object):
     _msgs = [
         ({'Message-Id': "Message 1",
-          'X-Postoffice-Id': '0'}, "Error 1"),
+          'X-Postoffice-Id': '0',
+          'body': 'An urgent message for Obi Wan.'}, "Error 1"),
         ({'Message-Id': "Message 2",
-          'X-Postoffice-Id': '1'}, "Error 2"),
+          'X-Postoffice-Id': '1',
+          'body': 'Help me Obi Wan Kenobi.'}, "Error 2"),
     ]
+
+    def __init__(self):
+        self.removed = []
+        self.added = []
+        self.committed = False
 
     def __call__(self, uri, queue_name):
         self.uri = uri
         self.queue_name = queue_name
-        return self, None
+        class DummyCloser(object):
+            @property
+            def conn(myself):
+                return myself
+            @property
+            def transaction_manager(myself):
+                return myself
+            def commit(myself):
+                self.committed = True
+
+        return self, DummyCloser()
 
     def get_quarantined_messages(self):
         for msg in self._msgs:
             yield msg
 
     def get_quarantined_message(self, id):
-        if id == '0':
-            return DummyMessage('An urgent message for Obi Wan.')
-        raise KeyError(id)
+        if int(id) >= len(self._msgs):
+            raise KeyError(id)
+        return DummyMessage(self._msgs[int(id)][0])
+
+    def remove_from_quarantine(self, message):
+        self.removed.append(message['Message-Id'])
+
+    def add(self, message):
+        self.added.append(message['Message-Id'])
 
     def count_quarantined_messages(self):
         return len(self._msgs)
 
-class DummyMessage(object):
-    def __init__(self, body):
-        self.body = body
+class DummyMessage(dict):
+    def __init__(self, d):
+        self.update(d)
 
     def as_string(self):
-        return self.body
+        return self['body']
 
 class DummyCatalogSearch(object):
     def __init__(self):
