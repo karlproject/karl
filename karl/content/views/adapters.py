@@ -21,8 +21,8 @@ import datetime
 import math
 
 from email import Encoders
-from karl.mail import Message
-from karl.mail import MIMEMultipart
+from repoze.postoffice.message import Message
+from repoze.postoffice.message import MIMEMultipart
 from email.mime.multipart import MIMEBase
 from email.mime.text import MIMEText
 

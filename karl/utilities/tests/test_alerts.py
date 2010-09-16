@@ -159,7 +159,7 @@ class DummyEmailAlertAdapter(object):
     mto = ["a@x.org",]
 
     def __init__(self, context, profile, request):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         message = Message()
         message["From"] = "Karl <test@example.org>"
         message["To"] = "Andy Ex <a@x.org>"

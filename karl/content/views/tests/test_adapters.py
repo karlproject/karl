@@ -191,7 +191,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         self.assertEqual("community@karl3.example.com",
@@ -206,7 +206,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_community_name_has_commas(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         self.community.title = 'Dummy, Community'
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
@@ -222,7 +222,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_digest(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         alert.digest = True
@@ -238,7 +238,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                         )
 
     def test_digest_malformed_text(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         self.blogentry.text = malformed_text
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
@@ -334,7 +334,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.failUnless(alert._blogentry is topic)
 
     def test_alert(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         renderer = testing.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
@@ -355,7 +355,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(messages[0], self.blogentry)
 
     def test_digest(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         renderer = testing.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         renderer.string_response = "<body>Dummy message body.</body>"
@@ -376,7 +376,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(renderer.history, ([], 0))
 
     def test_long_history(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         comments = []
         for i in xrange(6):
             comments.append(
@@ -465,7 +465,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
 
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
@@ -488,7 +488,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(alert.attendees, 'alice; bob')
 
     def test_digest(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
 
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
@@ -554,7 +554,7 @@ class TestCommunityFileAlert(unittest.TestCase):
         verifyClass(IAlert, self._getTargetClass())
 
     def test_alert(self):
-        from karl.mail import Message
+        from repoze.postoffice.message import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.f, self.profile, request)
         alert.digest = True

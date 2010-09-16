@@ -13,12 +13,15 @@ Unreleased
 - removed IE calendar styles, that were actually breaking things
   (LP #629026)
 
+- Removed Karl's implementation of Message in favor of the implementation in
+  repoze.postoffice.
+
 3.46 (2010-09-10)
 -----------------
 
 - fixed community filter buttons for Safari (LP #629010)
 
-- fixed up styles on profile page to make all browsers happy 
+- fixed up styles on profile page to make all browsers happy
   (LP #634110)
 
 - Slightly reduced content area width to avoid content shifting

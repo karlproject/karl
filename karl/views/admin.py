@@ -4,7 +4,7 @@ import codecs
 from cStringIO import StringIO
 import csv
 from _csv import Error
-from karl.mail import Message
+from repoze.postoffice.message import Message
 import os
 import re
 import transaction

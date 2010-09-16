@@ -39,7 +39,7 @@ import schemaish
 from karl.consts import countries
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
-from karl.mail import Message
+from repoze.postoffice.message import Message
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager

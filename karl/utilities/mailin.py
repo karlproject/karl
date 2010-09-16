@@ -34,7 +34,7 @@ import transaction
 
 from karl.adapters.interfaces import IMailinDispatcher
 from karl.adapters.interfaces import IMailinHandler
-from karl.mail import Message
+from repoze.postoffice.message import Message
 from karl.utils import find_catalog
 from karl.utils import find_communities
 from karl.utils import get_setting
