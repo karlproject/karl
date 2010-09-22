@@ -19,6 +19,8 @@ Unreleased
 - Added a UI for deleting and requeueing messages in the postoffice quarantine.
   (LP #613424)
 
+- Removed unused formfield snippet from formfields.pt: add_comment-field.
+
 3.46 (2010-09-10)
 -----------------
 

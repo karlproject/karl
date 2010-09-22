@@ -214,20 +214,6 @@
     </fieldset>
 
 
-    <fieldset metal:define-macro="add_comment-field"
-	      tal:define="error fielderrors['add_comment']|None"
-	      class="${error and 'fieldError' or ''}"
-	      id="add-comment-field">
-      <a name="addcomment"></a>
-      <label>Add Comment</label>
-      <div class="fieldHelp">Enter your comments below.</div>
-      <div tal:condition="error" class="errorMessage">${error}</div>
-      <input type="hidden" name="add_comment_text_format" value="text/html" />
-      <textarea id="add_comment" name="add_comment" rows="1" cols="40"
-		class="mceEditor karlrichtextfield"></textarea>
-      <!-- wiring from karl-tiny-wire.js -->
-    </fieldset>
-
     <fieldset metal:define-macro="email_addresses-field"
 	      tal:define="error fielderrors['email_addresses']|None"
 	      class="${error and 'fieldError' or ''}"
