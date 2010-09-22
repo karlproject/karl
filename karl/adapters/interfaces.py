@@ -82,7 +82,7 @@ class IMailinHandler(Interface):
     def handle(message, info, text, attachments):
         """ Do the Right Thing (TM).
 
-        o 'message' is an karl.mail.Message instance.
+        o 'message' is a repoze.postoffice.message.Message instance.
 
         o 'info' is a mapping extracted from the message by
           IMailinDispatcher.crackHeaders.

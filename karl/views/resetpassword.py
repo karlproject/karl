@@ -29,6 +29,7 @@ from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.formish import ValidationError
 from repoze.bfg.url import model_url
+from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
 from validatish import validator
 from webob.exc import HTTPFound
@@ -36,7 +37,6 @@ from zope.component import getAdapter
 from zope.component import getUtility
 import datetime
 import formish
-import karl.mail
 import random
 import schemaish
 import urllib
@@ -127,7 +127,7 @@ class ResetRequestFormController(object):
             "?key=%s" % profile.password_reset_key)
 
         # send email
-        mail = karl.mail.Message()
+        mail = Message()
         admin_email = get_setting(context, 'admin_email')
         mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
         mail["To"] = "%s <%s>" % (profile.title, profile.email)
@@ -152,7 +152,7 @@ class ResetRequestFormController(object):
         url = model_url(context, request, 'reset_sent.html') + (
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
-        
+
 
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'
@@ -252,7 +252,7 @@ class ResetConfirmFormController(object):
                 login=converted['login'],
                 password=converted['password'],
                 )
-            
+
         except ResetFailed, e:
             api = TemplateAPI(context, request, e.page_title)
             return render_template_to_response('templates/reset_failed.pt',

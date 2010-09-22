@@ -63,7 +63,8 @@ class IAlert(Interface):
 
     mfrom = Attribute("Email address of sender.")
     mto = Attribute("Sequence of email addresses for all recipients.")
-    message = Attribute("An instance of karl.mail.Message to be mailed.")
+    message = Attribute("An instance of repoze.postoffice.message.Message "
+                        "to be mailed.")
     digest = Attribute("""Boolean, can be set by caller to indicate alert
                        should be formatted for digest.""")
 

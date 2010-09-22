@@ -15,13 +15,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import karl.mail
-
 import schemaish
 import formish
 from validatish import validator
 
 from repoze.lemonade.content import create_content
+from repoze.postoffice.message import Message
 
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
@@ -495,7 +494,7 @@ def join_community_view(context, request):
     if "form.submitted" in request.POST:
         message = request.POST.get("message", "")
         moderators = [profiles[id] for id in context.moderator_names]
-        mail = karl.mail.Message()
+        mail = Message()
         mail["From"] = "%s <%s>" % (profile.title, profile.email)
         mail["To"] = ",".join(
             ["%s <%s>" % (p.title, p.email) for p in moderators]

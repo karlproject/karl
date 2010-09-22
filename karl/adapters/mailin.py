@@ -6,7 +6,7 @@ from zope.interface import implements
 from zope.component import getUtility
 from repoze.bfg.security import has_permission
 from karl.adapters.interfaces import IMailinDispatcher
-from karl.mail import decode_header
+from repoze.postoffice.message import decode_header
 from karl.utilities.interfaces import IMailinTextScrubber
 from karl.utils import find_communities
 from karl.utils import find_profiles
