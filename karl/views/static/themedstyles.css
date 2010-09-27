@@ -1115,7 +1115,7 @@ ul#offices-listing li {
   list-style:none;
   text-transform: uppercase;
   display: inline;
-  white-space:nowrap;
+  white-space: normal;
 }
 span.officeslistSeparator {
   padding: 0 0.2em 0 0.2em;
