@@ -137,22 +137,22 @@ label {
 label.required {
     background-image: url(images/required.gif);
 }
-input#save-title { 
+input#save-title {
     width: 490px;
 }
-input#save-caption { 
+input#save-caption {
     width: 490px;
 }
-input#save-address { 
+input#save-address {
     width: 490px;
 }
-input#save-city { 
+input#save-city {
     width: 490px;
 }
-input#save-name { 
+input#save-name {
     width: 245px;
 }
-input#save-state { 
+input#save-state {
     width: 40px;
 }
 
@@ -498,7 +498,7 @@ a.chparent:hover {
 
 /** =SITE ANNOUNCEMENT
 ----------------------------------------------- */
-#site-announcement { 
+#site-announcement {
   float: left;
   margin-left: 15px;
 }
@@ -1157,7 +1157,17 @@ div.error {
   padding: 1em;
   width: 49em;
 }
+div.contains-error {
+  background-color: #FFCC00;
+  border: 1px solid #FF8A00;
+  margin: 0pt 0pt 1em;
+  padding: 1em;
+  width: 49em;
+}
 .error .fieldRequired {
+  color: #FFCC00;
+}
+.contains-error .fieldRequired {
   color: #FFCC00;
 }
 
@@ -3059,7 +3069,7 @@ ul.menu li {
     float: left;
 }
 #feed-filters ul {
-    margin: 3px 0 0 0; 
+    margin: 3px 0 0 0;
     padding: 0;
     list-style: none;
     font-weight: bold;
