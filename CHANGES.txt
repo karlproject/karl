@@ -21,6 +21,8 @@ Unreleased
 
 - Removed unused formfield snippet from formfields.pt: add_comment-field.
 
+- Added evolve script to remove duplicate tags. (LP #627065)
+
 3.46 (2010-09-10)
 -----------------
 
