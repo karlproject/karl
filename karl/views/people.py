@@ -127,8 +127,7 @@ class EditProfileFormController(object):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'edit-profile')
-        page_title = "Edit %s" % context.title
-        self.api = TemplateAPI(context, request, page_title)
+        self.page_title = "Edit %s" % context.title
         photo = context.get('photo')
         if photo is not None:
             photo = SchemaFile(None, photo.__name__, photo.mimetype)
@@ -157,7 +156,8 @@ class EditProfileFormController(object):
         return fields
 
     def form_widgets(self, fields):
-        default_icon = '%s/images/defaultUser.gif' % self.api.static_url
+        api = TemplateAPI(self.context, self.request, self.page_title)
+        default_icon = '%s/images/defaultUser.gif' % api.static_url
         show_remove_checkbox = self.photo is not None
         widgets = {'firstname': formish.Input(empty=''),
                    'lastname': formish.Input(empty=''),
@@ -204,7 +204,7 @@ class EditProfileFormController(object):
         return defaults
 
     def __call__(self):
-        api = self.api
+        api = TemplateAPI(self.context, self.request, self.page_title)
         if api.user_is_admin:
             return HTTPFound(location=model_url(self.context,
                 self.request, 'admin_edit_profile.html'))
@@ -307,7 +307,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         return defaults
 
     def __call__(self):
-        api = self.api
+        api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
@@ -388,11 +388,10 @@ class AddUserFormController(EditProfileFormController):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'add-user')
-        page_title = 'Add User'
-        self.api = TemplateAPI(context, request, page_title)
         self.photo = None
         self.users = find_users(context)
         self.group_options = get_group_options(self.context)
+        self.page_title = 'Add User'
 
     def form_fields(self):
         context = self.context
@@ -425,7 +424,7 @@ class AddUserFormController(EditProfileFormController):
         return
 
     def __call__(self):
-        api = self.api
+        api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'

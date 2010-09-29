@@ -88,6 +88,8 @@ class TestEditProfileFormController(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
+        self.user_info = {'groups': set()}
+        request.environ['repoze.who.identity'] = self.user_info
 
     def tearDown(self):
         cleanUp()
@@ -138,9 +140,11 @@ class TestEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.get('form_title'), 'Edit Profile')
         self.assertEqual(response.get('include_blurb'), True)
 
-        # one more time faking user as staff to improve coverage
+    def test___call__user_is_staff(self):
+        self.request.form = DummyForm()
+        self.user_info['groups'].add('group.KarlStaff')
+        karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        controller.api._isStaff = True
         response = controller()
         self.failUnless(response['api'].user_is_staff)
 
@@ -148,7 +152,7 @@ class TestEditProfileFormController(unittest.TestCase):
         from webob.exc import HTTPFound
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
-        controller.api.user_is_admin = True
+        testing.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
         response = controller()
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location,

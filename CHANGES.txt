@@ -23,6 +23,9 @@ Unreleased
 
 - Added evolve script to remove duplicate tags. (LP #627065)
 
+- Make sure top level validation error message shows on edit profile forms.
+  (LP #645614)
+
 3.46 (2010-09-10)
 -----------------
 
