@@ -26,6 +26,11 @@ Unreleased
 - Make sure top level validation error message shows on edit profile forms.
   (LP #645614)
 
+- Make sure sequence fields can be highlighted when there are validation
+  errors.  Formish logically but not helpfully sets the 'contains-error' style
+  instead of the 'error' style we were using in our css.  Copied the .error
+  styles for .contains-error. (LP #645614)
+
 3.46 (2010-09-10)
 -----------------
 
