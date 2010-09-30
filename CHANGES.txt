@@ -31,6 +31,10 @@ Unreleased
   instead of the 'error' style we were using in our css.  Copied the .error
   styles for .contains-error. (LP #645614)
 
+- Implemented workaround to what should probably be considered a bug in
+  formish, to allow formish error messages to be visible for the websites field
+  when editing a profile. (LP #645614)
+
 3.46 (2010-09-10)
 -----------------
 

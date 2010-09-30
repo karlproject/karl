@@ -35,6 +35,7 @@ from zope.component import getMultiAdapter
 from zope.component import getUtility
 import formish
 import schemaish
+import validatish
 
 from karl.consts import countries
 from karl.events import ObjectModifiedEvent
@@ -204,6 +205,7 @@ class EditProfileFormController(object):
         return defaults
 
     def __call__(self):
+        _fix_website_validation_errors(self.request.form)
         api = TemplateAPI(self.context, self.request, self.page_title)
         if api.user_is_admin:
             return HTTPFound(location=model_url(self.context,
@@ -307,6 +309,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         return defaults
 
     def __call__(self):
+        _fix_website_validation_errors(self.request.form)
         api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
@@ -424,6 +427,7 @@ class AddUserFormController(EditProfileFormController):
         return
 
     def __call__(self):
+        _fix_website_validation_errors(self.request.form)
         api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
@@ -476,6 +480,25 @@ def _normalize_websites(converted):
     for i, website in enumerate(websites):
         if website.startswith('www.'):
             websites[i] = 'http://%s' % website
+
+def _fix_website_validation_errors(form):
+    # The websites field is a sequence but it uses a textarea widget, which
+    # seems to confuse formish, because it's assuming you're using that widget
+    # for a scalar.  (At least that's my best theory so far.)  As a work around,
+    # go fishing in the form errors for website errors and move them up to the
+    # level of the entire field rather than the level of a particular value.
+    if 'websites' in form.errors:
+        # Refuse to clobber a field level error message if one is set
+        return
+
+    errors = []
+    for name in list(form.errors):
+        if name.startswith('websites.'):
+            error = form.errors[name]
+            errors.append(error.message)
+            del form.errors[name]
+    if errors:
+        form.errors['websites'] = validatish.Invalid('\n'.join(errors))
 
 def get_profile_actions(profile, request):
     actions = []
