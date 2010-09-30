@@ -23,7 +23,8 @@ from karl import testing as karltesting
 from karl.testing import DummySessions
 
 class DummyForm(object):
-    pass
+    def __init__(self):
+        self.errors = {}
 
 profile_data = {
     'firstname': 'firstname',
@@ -147,6 +148,27 @@ class TestEditProfileFormController(unittest.TestCase):
         controller = self._makeOne(self.context, self.request)
         response = controller()
         self.failUnless(response['api'].user_is_staff)
+
+    def test__call__websites_error(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites'] = Exception("You're doing it wrong.")
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, "You're doing it wrong.")
+
+    def test__call__websites_suberror(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failIf('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, 'You made a boo boo.')
 
     def test_admin_redirected(self):
         from webob.exc import HTTPFound
@@ -317,6 +339,27 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.get('include_blurb'), False)
         self.assertEqual(response.get('admin_edit'), True)
 
+    def test__call__websites_error(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites'] = Exception("You're doing it wrong.")
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, "You're doing it wrong.")
+
+    def test__call__websites_suberror(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failIf('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, 'You made a boo boo.')
+
     def test_handle_submit_normal(self):
         from repoze.who.plugins.zodb.users import get_sha_password
         controller = self._makeOne(self.context, self.request)
@@ -446,6 +489,27 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(response['api'].page_title , 'Add User')
         self.assertEqual(response.get('form_title'), 'Add User')
         self.assertEqual(response.get('include_blurb'), False)
+
+    def test__call__websites_error(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites'] = Exception("You're doing it wrong.")
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failUnless('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, "You're doing it wrong.")
+
+    def test__call__websites_suberror(self):
+        self.request.form = form = DummyForm()
+        form.errors['websites.0'] = Exception("You made a boo boo.")
+        karltesting.registerLayoutProvider()
+        controller = self._makeOne(self.context, self.request)
+        response = controller()
+        self.failIf('websites.0' in form.errors)
+        self.assertEqual(
+            form.errors['websites'].message, 'You made a boo boo.')
 
     def test_handle_submit(self):
         from repoze.lemonade.interfaces import IContentFactory
