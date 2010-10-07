@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+3.47 (2010-10-07)
+-----------------
+
 - gave profile body a set width, so it doesn't fall out of its
   area in IE (LP #638326)
 
