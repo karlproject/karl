@@ -46,11 +46,13 @@ profile_data = {
 
 class DummyProfile(testing.DummyModel):
     websites = ()
+    title = 'firstname lastname'
     def __setitem__(self, name, value):
         """Simulate Folder behavior"""
         if self.get(name, None) is not None:
             raise KeyError(u"An object named %s already exists" % name)
         testing.DummyModel.__setitem__(self, name, value)
+
 
 class DummyLetterManager:
     def __init__(self, context):
@@ -286,13 +288,14 @@ class TestAdminEditProfileFormController(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _makeOne(self, context, request):
+    def _makeOne(self, context, request, active=True):
         # create the site and the users infrastructure first
         site = self.site = testing.DummyModel(sessions=self.sessions)
         site['profile'] = context
         from karl.testing import DummyUsers
         users = self.users = site.users = DummyUsers()
-        users.add('profile', 'profile', 'password', ['group.KarlLovers'])
+        if active:
+            users.add('profile', 'profile', 'password', ['group.KarlLovers'])
         from karl.views.people import AdminEditProfileFormController
         return AdminEditProfileFormController(context, request)
 
@@ -304,6 +307,14 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.failUnless('home_path' in fields)
         self.failUnless('password' in fields)
 
+    def test_form_fields_inactive(self):
+        controller = self._makeOne(self.context, self.request, False)
+        fields = dict(controller.form_fields())
+        self.failIf('login' in fields)
+        self.failIf('groups' in fields)
+        self.failUnless('home_path' in fields)
+        self.failIf('password' in fields)
+
     def test_form_widgets(self):
         controller = self._makeOne(self.context, self.request)
         widgets = controller.form_widgets({})
@@ -311,6 +322,14 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.failUnless('groups' in widgets)
         self.failUnless('home_path' in widgets)
         self.failUnless('password' in widgets)
+
+    def test_form_widgets_inactive(self):
+        controller = self._makeOne(self.context, self.request, False)
+        widgets = controller.form_widgets({})
+        self.failIf('login' in widgets)
+        self.failIf('groups' in widgets)
+        self.failUnless('home_path' in widgets)
+        self.failIf('password' in widgets)
 
     def test_form_defaults(self):
         controller = self._makeOne(self.context, self.request)
@@ -327,6 +346,19 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(defaults['groups'], set(['group.KarlLovers']))
         self.assertEqual(defaults['websites'], ['http://example.com'])
 
+    def test_form_defaults_inactive(self):
+        controller = self._makeOne(self.context, self.request, False)
+        for fieldname, value in profile_data.items():
+            setattr(self.context, fieldname, value)
+        context = self.context
+        context.home_path = '/home_path'
+        defaults = controller.form_defaults()
+        self.failIf('password' in defaults)
+        self.assertEqual(defaults['home_path'], '/home_path')
+        self.failIf('login' in defaults)
+        self.failIf('groups' in defaults)
+        self.assertEqual(defaults['websites'], ['http://example.com'])
+
     def test___call__(self):
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
@@ -338,6 +370,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
                          'Edit User and Profile Information')
         self.assertEqual(response.get('include_blurb'), False)
         self.assertEqual(response.get('admin_edit'), True)
+        self.assertEqual(response.get('is_active'), True)
 
     def test__call__websites_error(self):
         self.request.form = form = DummyForm()
@@ -359,6 +392,19 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.failIf('websites.0' in form.errors)
         self.assertEqual(
             form.errors['websites'].message, 'You made a boo boo.')
+
+    def test___call__inactive(self):
+        self.request.form = DummyForm()
+        controller = self._makeOne(self.context, self.request, False)
+        karltesting.registerLayoutProvider()
+        response = controller()
+        self.failUnless('api' in response)
+        self.assertEqual(response['api'].page_title, 'Edit title')
+        self.assertEqual(response.get('form_title'),
+                         'Edit User and Profile Information')
+        self.assertEqual(response.get('include_blurb'), False)
+        self.assertEqual(response.get('admin_edit'), True)
+        self.assertEqual(response.get('is_active'), False)
 
     def test_handle_submit_normal(self):
         from repoze.who.plugins.zodb.users import get_sha_password
@@ -394,7 +440,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         controller.handle_submit(converted)
         self.assertEqual(self.context.websites, ['http://www.example.com'])
 
-    def test_handle_submit_existing_loign(self):
+    def test_handle_submit_existing_login(self):
         # try w/ a login already in use
         from repoze.bfg.formish import ValidationError
         controller = self._makeOne(self.context, self.request)
@@ -446,6 +492,18 @@ class AddUserFormControllerTests(unittest.TestCase):
         request.environ['repoze.browserid'] = '1'
         self.request = request
         karltesting.registerSettings()
+
+        self.search_results = (0, [], None)
+        class DummySearch(object):
+            def __init__(self, context):
+                pass
+
+            def __call__(myself, **kw):
+                return self.search_results
+
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        testing.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
 
     def tearDown(self):
         cleanUp()
@@ -556,7 +614,8 @@ class AddUserFormControllerTests(unittest.TestCase):
         from repoze.bfg.formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
-        self.context['existing'] = testing.DummyModel(firstname='firstname')
+        self.context['existing'] = testing.DummyModel(
+            firstname='firstname', security_state='active')
         converted = {'login': 'existing',
                      'password': 'password',
                      'groups': ['group.KarlLovers'],
@@ -566,6 +625,68 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         profile = self.context['existing']
         self.failIf(profile.firstname != 'firstname')
+        self.assertEqual(controller.reactivate_user, None)
+
+    def test_handle_submit_duplicate_id_inactive_user(self):
+        from repoze.bfg.formish import ValidationError
+        # try again and make sure it fails
+        controller = self._makeOne(self.context, self.request)
+        self.context['existing'] = testing.DummyModel(
+            firstname='firstname', security_state='inactive')
+        converted = {'login': 'existing',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'firstname': 'different',
+                    }
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        profile = self.context['existing']
+        self.failIf(profile.firstname != 'firstname')
+        self.assertEqual(controller.reactivate_user, {
+            'url': 'http://example.com/profile/existing/reactivate.html',
+            'userid': 'existing'})
+
+    def test_handle_submit_duplicate_email(self):
+        from repoze.bfg.formish import ValidationError
+        # try again and make sure it fails
+        controller = self._makeOne(self.context, self.request)
+        self.context['existing'] = existing = testing.DummyModel(
+            firstname='firstname', security_state='active')
+        converted = {'login': 'newlogin',
+                     'email': 'foo@example.org',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'firstname': 'different',
+                    }
+        self.search_results = (1, [existing], lambda x: x)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        profile = self.context['existing']
+        self.failIf(profile.firstname != 'firstname')
+        self.failIf('newlogin' in self.context)
+        self.assertEqual(controller.reactivate_user, None)
+
+    def test_handle_submit_duplicate_email_inactive_user(self):
+        from repoze.bfg.formish import ValidationError
+        # try again and make sure it fails
+        controller = self._makeOne(self.context, self.request)
+        self.context['existing'] = existing = testing.DummyModel(
+            firstname='firstname', security_state='inactive')
+        converted = {'login': 'newlogin',
+                     'email': 'foo@example.org',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                     'firstname': 'different',
+                    }
+        self.search_results = (1, [existing], lambda x: x)
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        profile = self.context['existing']
+        self.failIf(profile.firstname != 'firstname')
+        self.failIf('newlogin' in self.context)
+        self.assertEqual(controller.reactivate_user, {
+            'url': 'http://example.com/profile/existing/reactivate.html',
+            'userid': 'existing'})
 
     def test_handle_submit_w_websites_no_scheme(self):
         # once more, testing URL prepending
@@ -1327,7 +1448,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         renderer = testing.registerDummyRenderer(
             'templates/deactivate_profile.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(sorted(response.keys()), ['api', 'myself'])
 
     def test_confirm_not_deleting_own_profile(self):
         from karl.testing import DummyUsers
@@ -1371,6 +1492,59 @@ class TestDeactivateProfileView(unittest.TestCase):
             'to_state': 'inactive', 'content': context,
             'request': request, 'guards': (),
             'context': None, 'skip_same': True}])
+
+class TestReactivateProfileView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        self.reset_password_calls = []
+
+    def tearDown(self):
+        cleanUp()
+
+    def _dummy_reset_password(self, user, profile, request):
+        self.reset_password_calls.append((user, profile, request))
+
+    def _callFUT(self, context, request):
+        from karl.views.people import reactivate_profile_view as fut
+        return fut(context, request, self._dummy_reset_password)
+
+    def test_noconfirm(self):
+        context = DummyProfile(firstname='Mori', lastname='Turi')
+        context.title = 'Context'
+        request = testing.DummyRequest()
+        renderer = testing.registerDummyRenderer(
+            'templates/reactivate_profile.pt')
+        response = self._callFUT(context, request)
+        self.assertEqual(sorted(response.keys()), ['api'])
+
+    def test_confirm(self):
+        from karl.testing import DummyUsers
+        from repoze.workflow.testing import registerDummyWorkflow
+        parent = testing.DummyModel()
+        users = parent.users = DummyUsers()
+        workflow = registerDummyWorkflow('security')
+        context = DummyProfile()
+        parent['userid'] = context
+        testing.registerDummySecurityPolicy('admin')
+        request = testing.DummyRequest(params={'confirm':'1'})
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location,
+                         'http://example.com/userid/?status_message='
+                         'Reactivated+user+account%3A+userid')
+        self.assertEqual(users.added[0], 'userid')
+        self.assertEqual(users.added[1], 'userid')
+        self.assertEqual(users.added[3], [])
+        self.assertEqual(workflow.transitioned, [{
+            'to_state': 'active', 'content': context,
+            'request': request, 'guards': (),
+            'context': None, 'skip_same': True}])
+        self.assertEqual(
+            self.reset_password_calls,
+            [(users.get_by_id('userid'), context, request)])
 
 class DummyImageFile(object):
     def __init__(self, title=None, stream=None, mimetype=None, filename=None,

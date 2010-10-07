@@ -22,6 +22,9 @@
           <div class="portlet-item">
               <a href="upload_users_csv.html">Upload users (CSV File)</a>
           </div>
+          <div class="portlet-item">
+              <a href="rename_user.html">Rename or Merge Users</a>
+          </div>
         </div>
         <div class="generic-portlet">
           <h3>Offices</h3>

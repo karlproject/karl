@@ -6,7 +6,7 @@
   <div metal:fill-slot="portlets">
     <div metal:use-macro="menu"/>
   </div>
-  
+
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
@@ -19,7 +19,9 @@
               enctype="multipart/form-data">
           <b>Upload a CSV file.</b><br/>
           <input type="file" name="csv"/>
-          <input type="submit" value="Upload"/>
+          <input type="submit" value="Upload"/><br/>
+          <input type="checkbox" name="reactivate" value="true"/>
+          Reactivate inactive users.
           <br/><br/>
         </form>
       </div>

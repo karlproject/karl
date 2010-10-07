@@ -35,6 +35,8 @@ Unreleased
   formish, to allow formish error messages to be visible for the websites field
   when editing a profile. (LP #645614)
 
+- Added a UI for rename and merging users in the Admin UI.  (LP #629625)
+
 3.46 (2010-09-10)
 -----------------
 
@@ -65,6 +67,35 @@ Unreleased
 - Fixed 'add_user' script to initialize workflow for new profile.
 
 - Added form validation to catch years earlier than 1900. (LP# 632451)
+
+- The groups KarlAdmin and KarlUserAdmin now have the same permissions on
+  profiles of inactive users that they do on active users.  This means they
+  can now edit inactive profiles as well as see inactive users in searches and
+  in the people directory.  Updated the admin edit profile view to handle
+  inactive users. (LP# 629612)
+
+- Inactive users now display a badge in their title, ie
+  'Fred Flintstone (Inactive)'.  This makes inactive users easier to notice
+  when viewing their profiles or when they appear in searches. (LP #629612)
+
+- Inactive users may now be reactivated via a link on the admin edit profile
+  form.  Reactivated users are sent a password reset email so they can reset
+  their password and log into the system.  (LP #629612)
+
+- Inactive users may now be reactivated via the upload new users as CSV
+  feature of the Admin UI.  (LP #629612)
+
+- When creating a new user using the add user form, if the entered userid or
+  email matches that of a deactivated user, an informative error message is
+  displayed and a link to reactivate the user is provided.  (LP #629612)
+
+- Removed cico package.  It was only be used by OSI for gsa_sync.  The code
+  needed by OSI has been moved to OSI's customization package.
+
+- Add existing members view now filters out inactive users.  (LP #629612)
+
+- In the invite new users view, if an email address matches that of a
+  previously deactivated user a validation error is raised.  (LP #629612)
 
 3.44 (2010-09-02)
 -----------------

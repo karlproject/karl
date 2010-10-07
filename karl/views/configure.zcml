@@ -548,7 +548,16 @@
     for="karl.models.interfaces.IProfile"
     name="deactivate.html"
     view=".people.deactivate_profile_view"
-    permission="delete"
+    permission="administer"
+    renderer="templates/deactivate_profile.pt"
+  />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    name="reactivate.html"
+    view=".people.reactivate_profile_view"
+    permission="administer"
+    renderer="templates/reactivate_profile.pt"
   />
 
   <view
@@ -899,6 +908,13 @@
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.postoffice_quarantine_status_view"
     name="po_quarantine_status.txt"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.rename_or_merge_user_view"
+    name="rename_user.html"
+    renderer="templates/admin/rename_merge_user.pt"
     />
 
   <route

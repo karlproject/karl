@@ -178,6 +178,7 @@ class Test_to_profile_inactive(unittest.TestCase):
         from zope.interface import directlyProvides
         from repoze.bfg.security import Allow
         from karl.models.interfaces import ICommunity
+        from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import NO_INHERIT
         ob = testing.DummyModel()
         ob.__acl__ = []
@@ -192,7 +193,13 @@ class Test_to_profile_inactive(unittest.TestCase):
         self._callFUT(ob, None)
         self.assertEqual(ob.__acl__[0],
                          (Allow, 'system.Authenticated', ('view_only',)))
-        self.assertEqual(ob.__acl__[1], NO_INHERIT)
+        self.assertEqual(ob.__acl__[1],
+                         (Allow, 'group.KarlUserAdmin',
+                          ADMINISTRATOR_PERMS + ('view_only',)))
+        self.assertEqual(ob.__acl__[2],
+                         (Allow, 'group.KarlAdmin',
+                          ADMINISTRATOR_PERMS + ('view_only',)))
+        self.assertEqual(ob.__acl__[3], NO_INHERIT)
         self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
         self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})

@@ -314,7 +314,7 @@ class DummyUpload(object):
         self.file = StringIO(data)
 
 class DummySearchAdapter:
-    def __init__(self, context, request=None):
+    def __init__(self, context):
         self.context = context
 
     def __call__(self, **kw):

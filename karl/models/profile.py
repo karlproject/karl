@@ -112,9 +112,10 @@ class Profile(Folder):
 
     @property
     def title(self):
-        return unicode(
-            '%s %s' % (self.firstname.strip(), self.lastname.strip())
-            )
+        title = [self.firstname.strip(), self.lastname.strip()]
+        if getattr(self, 'security_state', None) == 'inactive':
+            title += ['(Inactive)',]
+        return unicode(' '.join(title))
 
     def get_alerts_preference(self, community_name):
         return self._alert_prefs.get(community_name,

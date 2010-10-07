@@ -15,6 +15,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import uuid
+
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -55,6 +57,7 @@ from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.batch import get_catalog_batch
 from karl.views.login import logout_view
+from karl.views.resetpassword import request_password_reset
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import Invalid
 from karl.views.utils import convert_to_script
@@ -262,8 +265,12 @@ class AdminEditProfileFormController(EditProfileFormController):
         self.users = find_users(context)
         self.userid = context.__name__
         self.user = self.users.get_by_id(self.userid)
-        self.user_groups = set(self.user['groups'])
-        self.group_options = get_group_options(self.context)
+        if self.user is not None:
+            self.is_active = True
+            self.user_groups = set(self.user['groups'])
+            self.group_options = get_group_options(self.context)
+        else:
+            self.is_active = False
 
     def form_fields(self):
         context = self.context
@@ -272,27 +279,32 @@ class AdminEditProfileFormController(EditProfileFormController):
             description=('The first page to show after logging in. '
                          'Leave blank to show a community or the '
                          'community list.'))
-        password_field = schemaish.String(
-            validator=karlvalidators.PasswordLength(min_pw_length),
-            title='Reset Password',
-            description=('Enter a new password for the user here, '
-                         'or leave blank to leave the password '
-                         'unchanged.'))
-        fields = [('login', login_field),
-                  ('groups', groups_field),
-                  ('home_path', home_path_field),
-                  ('password', password_field)]
+        if self.user is not None:
+            password_field = schemaish.String(
+                validator=karlvalidators.PasswordLength(min_pw_length),
+                title='Reset Password',
+                description=('Enter a new password for the user here, '
+                             'or leave blank to leave the password '
+                             'unchanged.'))
+            fields = [('login', login_field),
+                      ('groups', groups_field),
+                      ('home_path', home_path_field),
+                      ('password', password_field)]
+        else:
+            fields = [('home_path', home_path_field)]
         fields += super(AdminEditProfileFormController, self).form_fields()
         return fields
 
     def form_widgets(self, fields):
         widgets = super(AdminEditProfileFormController, self
                        ).form_widgets(fields)
-        groups_widget = formish.CheckboxMultiChoice(self.group_options)
-        widgets.update({'login': formish.Input(empty=''),
-                        'groups': groups_widget,
-                        'home_path': formish.Input(empty=''),
-                        'password': karlwidgets.KarlCheckedPassword(),
+        if self.user is not None:
+            groups_widget = formish.CheckboxMultiChoice(self.group_options)
+            widgets.update({'login': formish.Input(empty=''),
+                            'groups': groups_widget,
+                            'password': karlwidgets.KarlCheckedPassword(),
+                           })
+        widgets.update({'home_path': formish.Input(empty=''),
                         'websites': formish.TextArea(
                             rows=3,
                             converter_options={'delimiter':'\n'}),
@@ -302,10 +314,11 @@ class AdminEditProfileFormController(EditProfileFormController):
     def form_defaults(self):
         defaults = super(AdminEditProfileFormController, self).form_defaults()
         context = self.context
-        defaults.update({'login': self.user['login'],
-                         'groups': self.user_groups,
-                         'home_path': context.home_path,
-                         'password': ''})
+        if self.user is not None:
+            defaults.update({'login': self.user['login'],
+                             'groups': self.user_groups,
+                             'password': ''})
+        defaults['home_path'] = context.home_path
         return defaults
 
     def __call__(self):
@@ -317,39 +330,41 @@ class AdminEditProfileFormController(EditProfileFormController):
         form_title = 'Edit User and Profile Information'
         return {'api':api, 'actions':(), 'layout':layout,
                 'form_title': form_title, 'include_blurb': False,
-                'admin_edit': True}
+                'admin_edit': True, 'is_active': self.is_active}
 
     def handle_submit(self, converted):
         context = self.context
         request = self.request
         users = self.users
         userid = self.userid
-        user = users.get_by_id(userid)
-        login = converted.get('login')
-        login_changed = users.get_by_login(login) != user
-        if (login_changed and
-            (users.get_by_id(login) is not None or
-             users.get_by_login(login) is not None or
-             login in context)):
-            msg = "Login '%s' is already in use" % login
-            raise ValidationError(login=msg)
+        user = self.user
+        if user is not None:
+            login = converted.get('login')
+            login_changed = users.get_by_login(login) != user
+            if (login_changed and
+                (users.get_by_id(login) is not None or
+                 users.get_by_login(login) is not None or
+                 login in context)):
+                msg = "Login '%s' is already in use" % login
+                raise ValidationError(login=msg)
         objectEventNotify(ObjectWillBeModifiedEvent(context))
-        # Set new login
-        try:
-            users.change_login(userid, converted['login'])
-        except ValueError, e:
-            raise ValidationError(login=str(e))
-        # Set group memberships
-        user_groups = self.user_groups
-        chosen_groups = set(converted['groups'])
-        for group, group_title in self.group_options:
-            if group in chosen_groups and group not in user_groups:
-                users.add_user_to_group(userid, group)
-            if group in user_groups and group not in chosen_groups:
-                users.remove_user_from_group(userid, group)
-        # Edit password
-        if converted.get('password', None):
-            users.change_password(userid, converted['password'])
+        if user is not None:
+            # Set new login
+            try:
+                users.change_login(userid, converted['login'])
+            except ValueError, e:
+                raise ValidationError(login=str(e))
+            # Set group memberships
+            user_groups = self.user_groups
+            chosen_groups = set(converted['groups'])
+            for group, group_title in self.group_options:
+                if group in chosen_groups and group not in user_groups:
+                    users.add_user_to_group(userid, group)
+                if group in user_groups and group not in chosen_groups:
+                    users.remove_user_from_group(userid, group)
+            # Edit password
+            if converted.get('password', None):
+                users.change_password(userid, converted['password'])
         _normalize_websites(converted)
         # Handle the easy ones
         for name in self.simple_field_names:
@@ -384,6 +399,7 @@ class AddUserFormController(EditProfileFormController):
     enough difference to make it more sane to not try to reuse it, so
     they both inherit from the same base.
     """
+    reactivate_user = None
     simple_field_names = EditProfileFormController.simple_field_names
     simple_field_names = simple_field_names + ['home_path']
 
@@ -412,6 +428,18 @@ class AddUserFormController(EditProfileFormController):
                   ('home_path', home_path_field),
                   ('password', password_field)]
         fields += super(AddUserFormController, self).form_fields()
+
+        # Get rid of unique email address validation, because we need to do
+        # that in the controller so we can manage whether or not email belongs
+        # to deactivated user.
+        email_field = schemaish.String(
+            validator=validator.All(validator.Required(),
+                                    validator.Email()))
+        for i in xrange(len(fields)):
+            if fields[i][0] == 'email':
+                fields[i] = ('email', email_field)
+                break
+
         return fields
 
     def form_widgets(self, fields):
@@ -434,7 +462,8 @@ class AddUserFormController(EditProfileFormController):
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Add User'
         return {'api':api, 'actions':(), 'layout':layout,
-                'form_title': form_title, 'include_blurb': False}
+                'form_title': form_title, 'include_blurb': False,
+                'reactivate_user': self.reactivate_user}
 
     def handle_submit(self, converted):
         context = self.context
@@ -442,10 +471,37 @@ class AddUserFormController(EditProfileFormController):
         userid = converted['login']
         users = self.users
         if (users.get_by_id(userid) is not None or
-            users.get_by_login(userid) is not None or
-            userid in context):
+            users.get_by_login(userid) is not None):
             msg = "User ID '%s' is already in use" % userid
             raise ValidationError(login=msg)
+        profile = context.get(userid)
+        if profile is not None:
+            if profile.security_state == 'inactive':
+                url = model_url(profile, request, 'reactivate.html')
+                self.reactivate_user = dict(userid=userid, url=url)
+                msg = ("User ID '%s' is used by a previously deactivated "
+                       "user.  Perhaps you mean to reactivate this user. "
+                       "See link above."%
+                       userid)
+            else:
+                msg = "User ID '%s' is already in use" % userid
+            raise ValidationError(login=msg)
+
+        search = ICatalogSearch(context)
+        count, docids, resolver = search(email=converted['email'])
+        if count:
+            msg = 'Email address is already in use by another user(s).'
+            if count == 1:
+                profile = resolver(docids[0])
+                if profile.security_state ==  'inactive':
+                    url = model_url(profile, request, 'reactivate.html')
+                    userid = profile.__name__
+                    self.reactivate_user = dict(userid=userid, url=url)
+                    msg = ("Email address is in use by a previously "
+                           "deactivated user.  Perhaps you mean to reactivate "
+                           "this user. See link above.")
+            raise ValidationError(email=msg)
+
         users.add(userid, userid, converted['password'], converted['groups'])
 
         _normalize_websites(converted)
@@ -469,7 +525,6 @@ class AddUserFormController(EditProfileFormController):
             raise ValidationError(**e.error_dict)
         location = model_url(profile, request)
         return HTTPFound(location=location)
-
 
 def _normalize_websites(converted):
     websites = converted.setdefault('websites', [])
@@ -533,6 +588,9 @@ def show_profile_view(context, request):
 
     # 'websites' is a property, so the loop above misses it
     profile["websites"] = context.websites
+
+    # ditto for 'title'
+    profile["title"] = context.title
 
     if profile.has_key("languages"):
         profile["languages"] = context.languages
@@ -869,9 +927,28 @@ def deactivate_profile_view(context, request):
                                                         context.lastname)
     api = TemplateAPI(context, request, page_title)
 
-    # Get a layout
-    return render_template_to_response(
-        'templates/deactivate_profile.pt',
-        api=api,
-        myself=myself,
-        )
+    # Show confirmation page.
+    return dict(api=api, myself=myself)
+
+def reactivate_profile_view(context, request,
+                            reset_password=request_password_reset):
+    name = context.__name__
+    confirm = request.params.get('confirm')
+    if confirm:
+        users = find_users(context)
+        temp_passwd = str(uuid.uuid4())
+        users.add(name, name, temp_passwd, [])
+        workflow = get_workflow(IProfile, 'security', context)
+        workflow.transition_to_state(context, request, 'active')
+        reset_password(users.get_by_id(name), context, request)
+        query = {'status_message': 'Reactivated user account: %s' % name}
+        location = model_url(context, request, query=query)
+
+        return HTTPFound(location=location)
+
+    page_title = 'Reactivate user account for %s %s' % (context.firstname,
+                                                        context.lastname)
+    api = TemplateAPI(context, request, page_title)
+
+    # Show confirmation page.
+    return dict(api=api)

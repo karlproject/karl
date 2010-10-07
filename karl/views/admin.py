@@ -32,6 +32,8 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IProfile
+from karl.utilities.rename_user import rename_user
+
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import find_site
@@ -475,6 +477,8 @@ def statistics_csv_view(request):
     return request.get_response(FileApp(path).get)
 
 class UploadUsersView(object):
+    rename_user = rename_user
+
     required_fields = [
         'username',
         'email',
@@ -516,6 +520,7 @@ class UploadUsersView(object):
         # Handle CSV upload
         field = request.params.get('csv', None)
         if hasattr(field, 'file'):
+            reactivate = request.params.get('reactivate') == 'true'
             reader = csv.DictReader(field.file)
             try:
                 rows = list(reader)
@@ -526,7 +531,9 @@ class UploadUsersView(object):
             if not errors:
                 fieldnames = rows[0].keys()
                 if None in fieldnames:
-                    errors.append("Malformed CSV: line 2 does not match header.")
+                    errors.append(
+                        "Malformed CSV: line 2 does not match header."
+                    )
                 else:
                     for required_field in self.required_fields:
                         if required_field not in fieldnames:
@@ -545,62 +552,26 @@ class UploadUsersView(object):
 
             # Add users
             if not errors:
+                search = ICatalogSearch(context)
                 profiles = find_profiles(context)
                 users = find_users(context)
 
                 n_added = 0
                 for i, row in enumerate(rows):
+                    row_has_errors = False
                     if None in row or None in row.values():
                         errors.append(
                             "Malformed CSV: line %d does not match header." %
                             (i+2))
                         break
+                    added_users, row_messages, row_errors = (
+                        self._add_user_csv_row(search, profiles, users, row,
+                                          reactivate, i)
+                    )
+                    n_added += added_users
+                    messages += row_messages
+                    errors += row_errors
 
-                    username = row.pop('username')
-                    # repoze.folder needs a non-empty name for the profile
-                    if not username:
-                        errors.append(
-                            "Malformed CSV: line %d has an empty username." %
-                            (i+2))
-                        break
-                    login = row.pop('login', username)
-                    website = row.pop('website', None)
-                    if website is not None:
-                        row['websites'] = website.strip().split()
-                    if (users.get_by_id(username) is not None or
-                        username in profiles):
-                        messages.append(
-                            "Skipping user: %s: User already exists." %
-                            username
-                        )
-                    elif users.get_by_login(login):
-                        messages.append(
-                            "Skipping user: %s: User already exists with "
-                            "login: %s" % (username, login)
-                        )
-                    else:
-                        groups = row.pop('groups', '')
-                        groups = set(groups.split())
-                        if 'sha_password' in fieldnames:
-                            users.add(username, login, row.pop('sha_password'),
-                                      groups, encrypted=True)
-                        else:
-                            users.add(username, login, row.pop('password'),
-                                      groups)
-                        decoded = {}
-                        for k, v in row.items():
-                            if isinstance(v, str):
-                                try:
-                                    v = v.decode('utf8')
-                                except UnicodeDecodeError:
-                                    v = v.decode('latin1')
-                            decoded[k] = v
-                        profile = create_content(IProfile, **decoded)
-                        profiles[username] = profile
-                        workflow = get_workflow(IProfile, 'security', profile)
-                        if workflow is not None:
-                            workflow.initialize(profile)
-                        n_added += 1
                 if not errors:
                     messages.append("Created %d users." % n_added)
 
@@ -617,6 +588,123 @@ class UploadUsersView(object):
             required_fields=self.required_fields,
             allowed_fields=self.allowed_fields,
         )
+
+    def _add_user_csv_row(self, search, profiles, users, row, reactivate, i):
+        errors = []
+        messages = []
+
+        username = row.pop('username')
+        login = row.pop('login', username)
+        if not username:
+            errors.append(
+                "Malformed CSV: line %d has an empty username." %
+                (i+2))
+
+        email = row['email']
+        if not email:
+            errors.append(
+                'Malformed CSV: line %d has an empty email address.' % (i+2)
+            )
+
+        if errors:
+            return 0, messages, errors
+
+        website = row.pop('website', None)
+        if website is not None:
+            row['websites'] = website.strip().split()
+
+        profile = profiles.get(username)
+        skip = False
+        if (users.get_by_id(username) is not None or
+            (profile is not None and profile.security_state != 'inactive')):
+            messages.append(
+                "Skipping user: %s: User already exists." %
+                username
+            )
+            skip = True
+        elif users.get_by_login(login):
+            messages.append(
+                "Skipping user: %s: User already exists with "
+                "login: %s" % (username, login)
+            )
+            skip = True
+
+        if skip:
+            return 0, messages, errors
+
+        merge_profile = None
+        count, docids, resolver = search(email=email)
+        if count > 1:
+            errors.append(
+                'Multiple users already exist with email '
+                'address: %s' % email
+            )
+        elif count == 1:
+            merge_profile = resolver(docids[0])
+            if merge_profile.security_state != 'inactive':
+                errors.append(
+                    'An active user already exists with email '
+                    'address: %s.' % email
+                )
+            elif not reactivate:
+                errors.append(
+                    'A previously deactivated user exists with '
+                    'email address: %s.  Consider checking the '
+                    '"Reactivate user" checkbox to reactivate '
+                    'the user.' % email
+                )
+
+            if merge_profile.__name__ == username:
+                merge_profile = None
+
+        if profile is None:
+            profile = profiles.get(username)
+            if profile is not None and not reactivate:
+                errors.append(
+                    'A previously deactivated user exists with username: %s.  '
+                    'Consider checking the "Reactivate user" checkbox to '
+                    'reactivate the user.' % username
+                )
+
+        if errors:
+            return 0, messages, errors
+
+        groups = row.pop('groups', '')
+        groups = set(groups.split())
+        if 'sha_password' in row:
+            users.add(username, login, row.pop('sha_password'),
+                      groups, encrypted=True)
+        else:
+            users.add(username, login, row.pop('password'),
+                      groups)
+        decoded = {}
+        for k, v in row.items():
+            if isinstance(v, str):
+                try:
+                    v = v.decode('utf8')
+                except UnicodeDecodeError:
+                    v = v.decode('latin1')
+            decoded[k] = v
+        if profile is None:
+            profile = create_content(IProfile, **decoded)
+            profiles[username] = profile
+            workflow = get_workflow(IProfile, 'security', profile)
+            if workflow is not None:
+                workflow.initialize(profile)
+        else:
+            messages.append('Reactivated %s.' % username)
+            for k, v in decoded.items():
+                setattr(profile, k, v)
+            workflow = get_workflow(IProfile, 'security', profile)
+            workflow.transition_to_state(profile, None, 'active')
+
+        if merge_profile is not None:
+            merge_messages = StringIO()
+            self.rename_user(profile, merge_profile.__name__, username,
+                             merge=True, out=merge_messages)
+            messages += merge_messages.getvalue().split('\n')
+
+        return 1, messages, errors
 
 def _decode(s):
     """
@@ -839,3 +927,26 @@ def postoffice_quarantined_message_view(request):
     except KeyError:
         raise NotFound
     return Response(body=msg.as_string(), content_type='text/plain')
+
+def rename_or_merge_user_view(request, rename_user=rename_user):
+    """
+    Rename or merge users.
+    """
+    context = request.context
+    api=AdminTemplateAPI(context, request)
+    old_username = request.params.get('old_username')
+    new_username = request.params.get('new_username')
+    if old_username and new_username:
+        merge = bool(request.params.get('merge'))
+        rename_messages = StringIO()
+        try:
+            rename_user(context, old_username, new_username, merge=merge,
+                        out=rename_messages)
+            api.status_message = rename_messages.getvalue()
+        except ValueError, e:
+            api.error_message = e.message
+
+    return dict(
+        api=api,
+        menu=_menu_macro()
+    )

@@ -60,6 +60,11 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne(firstname='fred', lastname='flintstone ')
         self.assertEqual(inst.title, 'fred flintstone')
 
+    def test_title_inactive(self):
+        inst = self._makeOne(firstname='fred', lastname='flintstone ')
+        inst.security_state = 'inactive'
+        self.assertEqual(inst.title, 'fred flintstone (Inactive)')
+
     def test_folderish(self):
         from repoze.folder import Folder
         from repoze.folder.interfaces import IFolder

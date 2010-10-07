@@ -271,6 +271,8 @@ def to_profile_active(ob, info):
 def to_profile_inactive(ob, info):
     acl  = [
         (Allow, 'system.Authenticated', ('view_only',)),
+        (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
+        (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
         NO_INHERIT,
     ]
     msg = None

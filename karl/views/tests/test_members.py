@@ -171,7 +171,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         return request
-    
+
     def _makeOne(self, context, request):
         from karl.views.members import AcceptInvitationFormController
         return AcceptInvitationFormController(context, request)
@@ -349,7 +349,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         result = controller.handle_cancel()
         self.assertEqual(result.location, 'http://example.com/')
-        
+
     def test_handle_submit_new_to_karl(self):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IInvitation
@@ -387,7 +387,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         context = self._makeCommunity()
         mailer = self._registerMailer()
         registerCatalogSearch()
-        profile = karltesting.DummyProfile()
+        profile = karltesting.DummyProfile(security_state='active')
         profile.__name__ = 'd'
         registerCatalogSearch(results={'email=d@x.org': [profile,]})
         def nonrandom(size=6):
@@ -408,6 +408,31 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups,
                          [('d', 'group:community:members')])
+
+    def test_handle_submit_inactive_user(self):
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.models.interfaces import IInvitation
+        from karl.utilities.interfaces import IRandomId
+        request = testing.DummyRequest()
+        context = self._makeCommunity()
+        mailer = self._registerMailer()
+        registerCatalogSearch()
+        profile = karltesting.DummyProfile(security_state='inactive')
+        profile.__name__ = 'd'
+        registerCatalogSearch(results={'email=d@x.org': [profile,]})
+        def nonrandom(size=6):
+            return 'A' * size
+        testing.registerUtility(nonrandom, IRandomId)
+        registerContentFactory(DummyInvitation, IInvitation)
+        controller = self._makeOne(context, request)
+        converted = {
+            'email_addresses': [u'd@x.org'],
+            'text': u'some text',
+            }
+        testing.registerDummyRenderer(
+            'karl.views:templates/email_add_existing.pt')
+        from repoze.bfg.formish import ValidationError
+        self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_already_in_community(self):
         from repoze.lemonade.testing import registerContentFactory
@@ -435,7 +460,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, [])
-        
+
 
 class ManageMembersFormControllerTests(unittest.TestCase):
     def setUp(self):
@@ -539,7 +564,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         result = controller.handle_cancel()
         self.assertEqual(result.location,
                          'http://example.com/communities/community/')
-        
+
     def test_handle_submit_remove_sole_moderator(self):
         from repoze.bfg.formish import ValidationError
         context = self._makeCommunity()
@@ -683,11 +708,16 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         context.moderator_names = set()
         request = testing.DummyRequest(params={'val':'a'})
         profiles = testing.DummyModel()
-        profile_1 = karltesting.DummyProfile(__name__='a')
-        profile_2 = karltesting.DummyProfile(__name__='b')
-        profile_3 = karltesting.DummyProfile(__name__='c')
+        profile_1 = karltesting.DummyProfile(__name__='a',
+                                             security_state='active')
+        profile_2 = karltesting.DummyProfile(__name__='b',
+                                             security_state='active')
+        profile_3 = karltesting.DummyProfile(__name__='c',
+                                             security_state='active')
+        profile_4 = karltesting.DummyProfile(__name__='d',
+                                             security_state='inactive')
         def resolver(docid):
-            d = {1:profile_1, 2:profile_2, 3:profile_3}
+            d = {1:profile_1, 2:profile_2, 3:profile_3, 4:profile_4}
             return d.get(docid)
         def dummy_catalog_search(context):
             def search(**kw):
@@ -696,7 +726,10 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         testing.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
-        self.assertEqual(response.body, '[{"text": "firstname lastname", "id": "b"}, {"text": "firstname lastname", "id": "c"}]')
+        self.assertEqual(
+            response.body,
+            '[{"text": "title", "id": "b"}, '
+            '{"text": "title", "id": "c"}]')
 
 class TestAcceptInvitationPhotoView(unittest.TestCase):
     def _callFUT(self, context, request):

@@ -8,13 +8,13 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
-    <h1 class="kscreentitle">${profile.firstname} ${profile.lastname}</h1>
+    <h1 class="kscreentitle">${profile.title}</h1>
 
     <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
-    
 
-      
+
+
     <div class="profile_page_body">
       <span class="portraid">
         <!-- XXX Browser scaling with fixed dims will not preserve aspect

@@ -105,7 +105,7 @@ class ResetRequestFormControllerTests(unittest.TestCase):
             '&came_from=http%3A%2F%2Fexample.com%2Flogin.html')
 
         # register dummy profile search
-        profile_search = DummyProfileSearch(None)
+        profile_search = DummyProfileSearch(context)
         def search_adapter(context):
             return profile_search
         testing.registerAdapter(search_adapter, (Interface,), ICatalogSearch)
@@ -128,7 +128,7 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         renderer.assert_(login='me', system_name='karl3test')
         self.failUnless(hasattr(renderer, 'reset_url'))
         self.failUnless(renderer.reset_url.startswith(
-            'http://example.com/reset_confirm.html?key='))
+            'http://example.com/reset_confirm.html?key='), renderer.reset_url)
 
 
 class ResetSentViewTests(unittest.TestCase):
@@ -169,7 +169,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
     def _makeOne(self, context, request):
         from karl.views.resetpassword import ResetConfirmFormController
         return ResetConfirmFormController(context, request)
-    
+
     def _setupUsers(self):
         from karl.testing import DummyUsers
         self.context.users = DummyUsers()
@@ -385,7 +385,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
 
 class DummyProfileSearch:
     def __init__(self, context):
-        pass
+        self.context = context
     def __call__(self, interfaces, email):
         address = email[0]
         return 1, [address], self.resolve
@@ -393,4 +393,5 @@ class DummyProfileSearch:
         from karl.testing import DummyProfile
         res = DummyProfile(__name__=docid.split('@')[0], email=docid)
         self.profile = res
+        self.context[res.__name__] = res
         return res

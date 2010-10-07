@@ -18,6 +18,7 @@
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
@@ -119,40 +120,44 @@ class ResetRequestFormController(object):
                     urllib.quote_plus(came_from))
                 return HTTPFound(location=url)
 
-        profile.password_reset_key = sha1(
-            str(random.random())).hexdigest()
-        profile.password_reset_time = datetime.datetime.now()
-        reset_url = model_url(
-            context, request, "reset_confirm.html") + (
-            "?key=%s" % profile.password_reset_key)
-
-        # send email
-        mail = Message()
-        admin_email = get_setting(context, 'admin_email')
-        mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
-        mail["To"] = "%s <%s>" % (profile.title, profile.email)
-        mail["Subject"] = "%s Password Reset Request" % system_name
-        body = render_template(
-            "templates/email_reset_password.pt",
-            login=user['login'],
-            reset_url=reset_url,
-            system_name=system_name,
-        )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        mail.set_payload(body, "UTF-8")
-        mail.set_type("text/html")
-
-        recipients = [profile.email]
-        mailer = getUtility(IMailDelivery)
-        mailer.send(admin_email, recipients, mail)
+        request_password_reset(user, profile, request)
 
         url = model_url(context, request, 'reset_sent.html') + (
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
 
+def request_password_reset(user, profile, request):
+    profile.password_reset_key = sha1(
+        str(random.random())).hexdigest()
+    profile.password_reset_time = datetime.datetime.now()
+    context = find_site(profile)
+    reset_url = model_url(
+        context, request, "reset_confirm.html",
+        query=dict(key=profile.password_reset_key))
+
+    # send email
+    mail = Message()
+    system_name = get_setting(context, 'system_name', 'KARL')
+    admin_email = get_setting(context, 'admin_email')
+    mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+    mail["To"] = "%s <%s>" % (profile.title, profile.email)
+    mail["Subject"] = "%s Password Reset Request" % system_name
+    body = render_template(
+        "templates/email_reset_password.pt",
+        login=user['login'],
+        reset_url=reset_url,
+        system_name=system_name,
+    )
+
+    if isinstance(body, unicode):
+        body = body.encode("UTF-8")
+
+    mail.set_payload(body, "UTF-8")
+    mail.set_type("text/html")
+
+    recipients = [profile.email]
+    mailer = getUtility(IMailDelivery)
+    mailer.send(admin_email, recipients, mail)
 
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'

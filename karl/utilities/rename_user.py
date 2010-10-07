@@ -26,7 +26,7 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
             raise ValueError("No such profile: %s" % new_name)
 
         if out is not None:
-            print >>out, "Renaming user from %s to %s" % (old_name, new_name)
+            print >>out, "Merging user from %s to %s." % (old_name, new_name)
 
         if old_user is not None:
             for group in old_user['groups']:
@@ -42,7 +42,7 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
             raise ValueError("Profile already exists: %s" % new_name)
 
         if out is not None:
-            print >>out, "Merging user %s to %s" % (old_name, new_name)
+            print >>out, "Renaming user %s to %s." % (old_name, new_name)
 
         if old_user is not None:
             users.add(new_name, new_name, old_user['password'],
@@ -61,7 +61,7 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
     for docid in docids:
         doc = resolver(docid)
         if out is not None:
-            print >>out, "Updating creator for %s" % model_path(doc)
+            print >>out, "Updating creator for %s." % model_path(doc)
         doc.creator = new_name
         index.reindex_doc(docid, doc)
 
@@ -70,6 +70,6 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
     for docid in docids:
         doc = resolver(docid)
         if out is not None:
-            print >>out, "Updating modified_by for %s" % model_path(doc)
+            print >>out, "Updating modified_by for %s." % model_path(doc)
         doc.modified_by = new_name
         index.reindex_doc(docid, doc)

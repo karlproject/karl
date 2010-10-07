@@ -783,12 +783,20 @@ class InviteNewUsersFormController(object):
                     nignored += 1
 
                 else:
-                    # User is in Karl but not in this community--just add
-                    # them to the community as though we had used the
-                    # add existing user form.
-                    _add_existing_users(context, community, [profile,],
-                                        html_body, request)
-                    nadded += 1
+                    # User is in Karl but not in this community.  If user is
+                    # active, just add them to the community as though we had
+                    # used the add existing user form.
+                    if profile.security_state == 'active':
+                        _add_existing_users(context, community, [profile,],
+                                            html_body, request)
+                        nadded += 1
+                    else:
+                        msg = ('Address, %s, belongs to a user which has '
+                               'previously been deactivated.  This user must '
+                               'be reactivated by a system administrator '
+                               'before they can be added to this community.' %
+                               email_address)
+                        raise ValidationError(email_addresses=msg)
 
             else:
                 # Invite new user to Karl
@@ -829,6 +837,7 @@ class InviteNewUsersFormController(object):
 
         location = model_url(context, request, 'manage.html',
                              query={'status_message': status})
+
         return HTTPFound(location=location)
 
 def _send_invitation_email(request, community, community_href, invitation):
@@ -877,10 +886,11 @@ def jquery_member_search_view(context, request):
         profiles = filter(None, map(resolver, docids))
         records = [dict(
                     id = profile.__name__,
-                    text = profile.firstname + ' ' + profile.lastname,
+                    text = profile.title,
                     )
-                for profile in profiles
-                if profile.__name__ not in community_member_names ]
+                   for profile in profiles
+                   if profile.__name__ not in community_member_names
+                   and profile.security_state != 'inactive']
     except ParseError:
         records = []
     result = JSONEncoder().encode(records)

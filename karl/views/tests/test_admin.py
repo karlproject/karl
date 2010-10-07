@@ -757,15 +757,32 @@ class TestUploadUsersView(unittest.TestCase):
         registerContentFactory(testing.DummyModel, IProfile)
 
         from repoze.workflow.testing import registerDummyWorkflow
-        registerDummyWorkflow('security')
+        self.workflow = registerDummyWorkflow('security')
         testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+
+        self.search_results = {}
+        class DummySearch(object):
+            def __init__(self, context):
+                pass
+
+            def __call__(myself, **kw):
+                key = tuple(sorted(kw.items()))
+                if key in self.search_results:
+                    return self.search_results[key]
+                return 0, [], None
+
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        testing.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
 
     def tearDown(self):
         cleanUp()
 
-    def _call_fut(self, context, request):
-        from karl.views.admin import UploadUsersView
-        return UploadUsersView(context, request)()
+    def _call_fut(self, context, request, rename_user=None):
+        from karl.views.admin import UploadUsersView as cls
+        fut = cls(context, request)
+        fut.rename_user = rename_user
+        return fut()
 
     def _file_upload(self, fname):
         import os, sys
@@ -972,7 +989,8 @@ class TestUploadUsersView(unittest.TestCase):
                           'Created 1 users.')
 
     def test_skip_existing_user_in_profiles(self):
-        self.site['profiles']['user1'] = testing.DummyModel()
+        self.site['profiles']['user1'] = testing.DummyModel(
+            security_state='active')
         request = testing.DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","password"\n'
@@ -1058,6 +1076,102 @@ class TestUploadUsersView(unittest.TestCase):
         profile = self.site['profiles']['user1']
         self.assertEqual(profile.firstname, FIRSTNAME)
 
+    def test_blank_email(self):
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","phred","","","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+        api = result['api']
+        self.assertEqual(api.error_message,
+            'Malformed CSV: line 2 has an empty email address.')
+
+    def test_email_matches_active_user(self):
+        active_user = testing.DummyModel(security_state='active')
+        active_user.__name__ = 'user0'
+        self.search_results[(('email', 'foo@bar.org'),)] = (
+            1, [active_user], lambda x: x)
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+        api = result['api']
+        self.assertEqual(api.error_message,
+            'An active user already exists with email address: foo@bar.org.')
+
+    def test_email_matches_inactive_user(self):
+        inactive_user = testing.DummyModel(security_state='inactive')
+        inactive_user.__name__ = 'user0'
+        self.search_results[(('email', 'foo@bar.org'),)] = (
+            1, [inactive_user], lambda x: x)
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+        })
+        result = self._call_fut(self.site, request)
+        api = result['api']
+        self.assertEqual(api.error_message,
+            'A previously deactivated user exists with email address: '
+            'foo@bar.org.  Consider checking the "Reactivate user" checkbox '
+            'to reactivate the user.')
+
+    def test_email_matches_inactive_user_reactivate(self):
+        renamed_users = []
+        def rename_user(context, old_name, new_name, merge, out):
+            print >>out, 'Line 1.'
+            print >>out, 'Line 2.'
+            renamed_users.append((old_name, new_name))
+            self.failUnless(merge)
+
+        inactive_user = testing.DummyModel(security_state='inactive')
+        inactive_user.__name__ = 'user0'
+        self.search_results[(('email', 'foo@bar.org'),)] = (
+            1, [inactive_user], lambda x: x)
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+            'reactivate': 'true',
+        })
+        result = self._call_fut(self.site, request, rename_user)
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        self.assertEqual(api.status_message,
+                         'Line 1.\nLine 2.\n\nCreated 1 users.')
+        self.assertEqual(renamed_users, [('user0', 'user1')])
+
+    def test_reactivate_user(self):
+        inactive_user = testing.DummyModel(security_state='inactive')
+        inactive_user.__name__ = 'user1'
+        self.search_results[(('email', 'foo@bar.org'),)] = (
+            1, [inactive_user], lambda x: x)
+        self.site['profiles']['user1'] = inactive_user
+        CSV = '\n'.join([
+            '"username","firstname","lastname","email","password","groups"',
+            '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
+        ])
+        request = testing.DummyRequest({
+            'csv': DummyUpload(CSV),
+            'reactivate': 'true',
+        })
+        result = self._call_fut(self.site, request)
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        self.assertEqual(api.status_message,
+                         'Reactivated user1.\nCreated 1 users.')
+        self.assertEqual(self.workflow.transitioned[0]['to_state'], 'active')
 
 class ErrorMonitorBase:
 
@@ -1330,6 +1444,89 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
     def test_notfound(self):
         from repoze.bfg.exceptions import NotFound
         self.assertRaises(NotFound, self._call_fut, 2)
+
+class Test_rename_or_merge_user_view(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        self.rename_user_calls = []
+
+    def tearDown(self):
+        cleanUp()
+
+    def _dummy_rename_user(self, context, old_name, new_name, merge, out):
+        print >>out, 'Renamed user.'
+        self.rename_user_calls.append((context, old_name, new_name, merge))
+
+    def _call_fut(self, request, rename_user=None):
+        if rename_user is None:
+            rename_user = self._dummy_rename_user
+
+        from karl.views.admin import rename_or_merge_user_view as fut
+        return fut(request, rename_user=rename_user)
+
+    def test_show_form(self):
+        request = testing.DummyRequest()
+        request.context = testing.DummyModel()
+        response = self._call_fut(request)
+        self.failUnless('api' in response)
+        self.failUnless('menu' in response)
+        api = response['api']
+        self.failIf(api.error_message)
+        self.failIf(api.status_message)
+
+    def test_rename_user(self):
+        request = testing.DummyRequest(
+            params={
+            'old_username': 'harry',
+            'new_username': 'henry'
+            },
+        )
+        request.context = testing.DummyModel()
+
+        response = self._call_fut(request)
+        self.assertEqual(
+            self.rename_user_calls,
+            [(request.context, 'harry', 'henry', False)]
+        )
+        api = response['api']
+        self.failIf(api.error_message)
+        self.assertEqual(api.status_message, 'Renamed user.\n')
+
+    def test_merge_user(self):
+        request = testing.DummyRequest(
+            params={
+            'old_username': 'harry',
+            'new_username': 'henry',
+            'merge': '1',
+            },
+        )
+        request.context = testing.DummyModel()
+
+        response = self._call_fut(request)
+        self.assertEqual(
+            self.rename_user_calls,
+            [(request.context, 'harry', 'henry', True)]
+        )
+        api = response['api']
+        self.failIf(api.error_message)
+        self.assertEqual(api.status_message, 'Renamed user.\n')
+
+    def test_error_in_rename_user(self):
+        request = testing.DummyRequest(
+            params={
+            'old_username': 'harry',
+            'new_username': 'henry',
+            'merge': '1',
+            },
+        )
+        request.context = testing.DummyModel()
+        def rename_user(*args, **kw):
+            raise ValueError("You're doing it wrong.")
+
+        response = self._call_fut(request, rename_user=rename_user)
+        api = response['api']
+        self.assertEqual(api.error_message, "You're doing it wrong.")
+        self.failIf(api.status_message)
 
 class DummyProfiles(testing.DummyModel):
 
