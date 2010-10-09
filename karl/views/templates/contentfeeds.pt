@@ -47,13 +47,13 @@
               feedlist.karlcontentfeeds('setFilter', this.rel);
               return false;
           });
-          
+
           // get the first items
           feedlist.karlcontentfeeds('get_items');
 
           // set automatic update of items
           setInterval(function() {
-              feedlist.karlcontentfeeds('get_items'); 
+              feedlist.karlcontentfeeds('get_items');
           }, 30000);
 
       });
@@ -177,22 +177,22 @@
                </ul>
            </div>
            <div id="feed-polling">
-               Auto Update <img id="polling-info" src="/static/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+               Auto Update <img id="polling-info" src="${api.static_url}/images/livesearch_info.png" alt="Click for Polling Info" /><br />
                <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
                <a href="#" id="poll-indicator" class="on"><span>
-                   <img class="img-on" src="/static/images/feed-on.gif" alt="Polling is On" />
-                   <img class="img-off" src="/static/images/feed-off.gif" alt="Polling is Off" />
-                   <img class="img-polling" src="/static/images/feed-polling.gif" alt="Polling for New Content" />
-                   <img class="img-error" src="/static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+                   <img class="img-on" src="${api.static_url}/images/feed-on.gif" alt="Polling is On" />
+                   <img class="img-off" src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" />
+                   <img class="img-polling" src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" />
+                   <img class="img-error" src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
                </span></a>
                <div class="polling-details info">
                    <a href="#" class="close">close</a>
                    <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
                    <ul>
-                       <li><img src="/static/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
-                       <li><img src="/static/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
-                       <li><img src="/static/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
-                       <li><img src="/static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+                       <li><img src="${api.static_url}/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
+                       <li><img src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
+                       <li><img src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
+                       <li><img src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
                    </ul>
                    <p id="feedinfo">
                       <i>Last updated:</i><br/><span id="polled">AGO</span><br/><br/>
