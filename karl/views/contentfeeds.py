@@ -17,6 +17,7 @@
 """Content feeds views
 """
 from itertools import islice
+from urlparse import urljoin
 
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import authenticated_userid
@@ -57,12 +58,26 @@ def _get_criteria(request):
 
     return principals, created_by
 
-def _update_feed_items(entries):
+def _update_feed_items(entries, app_url):
+    if not app_url.endswith('/'):
+        app_url += '/'
+
+    def reroot(fi, name):
+        if name not in fi:
+            return
+        url = fi[name]
+        if url.startswith('/'):
+            url = url[1:]
+        fi[name] = urljoin(app_url, url)
 
     feed_items = [dict(x[2]) for x in entries]
 
     for fi in feed_items:
         fi['timeago'] = str(fi.pop('timestamp').strftime('%Y-%m-%dT%H:%M:%SZ'))
+        reroot(fi, 'url')
+        reroot(fi, 'context_url')
+        reroot(fi, 'profile_url')
+        reroot(fi, 'thumbnail')
         del fi['allowed']
 
     return feed_items
@@ -92,7 +107,7 @@ def newest_feed_items(context, request):
     last_gen, last_index, ignored = latest[0]
     earliest_gen, earliest_index, ignored = latest[-1]
 
-    feed_items = _update_feed_items(latest)
+    feed_items = _update_feed_items(latest, request.application_url)
 
     return last_gen, last_index, earliest_gen, earliest_index, feed_items
 
@@ -118,7 +133,7 @@ def older_feed_items(context, request):
 
     earliest_gen, earliest_index, ignored = older[-1]
 
-    feed_items = _update_feed_items(older)
+    feed_items = _update_feed_items(older, request.application_url)
 
     return earliest_gen, earliest_index, feed_items
 

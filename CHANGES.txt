@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed content feeds to work with an instance not rooted at '/'.
+
 3.47 (2010-10-07)
 -----------------
 
