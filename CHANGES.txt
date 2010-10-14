@@ -6,6 +6,9 @@ Unreleased
 
 - Fixed content feeds to work with an instance not rooted at '/'.
 
+- When adding a new user, any previous invitations that user had are deleted.
+  (LP #659926)
+
 3.47 (2010-10-07)
 -----------------
 

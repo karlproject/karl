@@ -483,23 +483,37 @@ class TestAdminEditProfileFormController(unittest.TestCase):
 
 class AddUserFormControllerTests(unittest.TestCase):
     def setUp(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
         cleanUp()
         sessions = self.sessions = DummySessions()
         context = testing.DummyModel(sessions=sessions)
         context.title = 'profiles'
         self.context = context
+
+        communities = context['communities'] = testing.DummyModel()
+        self.community1 = communities['c1'] = testing.DummyModel()
+        directlyProvides(self.community1, ICommunity)
+        self.community2 = communities['c2'] = testing.DummyModel()
+        directlyProvides(self.community2, ICommunity)
+
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
         karltesting.registerSettings()
 
-        self.search_results = (0, [], None)
+        self.search_results = {}
         class DummySearch(object):
             def __init__(self, context):
                 pass
 
             def __call__(myself, **kw):
-                return self.search_results
+                interfaces = kw.get('interfaces', None)
+                if interfaces:
+                    return self.search_results.get(
+                        tuple(interfaces), (0, [], None)
+                    )
+                return 0, [], None
 
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
@@ -610,6 +624,48 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.failUnless('photo' in profile)
         self.assertEqual(profile['photo'].data, one_pixel_jpeg)
 
+    def test_handle_submit_previously_invited(self):
+        from repoze.lemonade.interfaces import IContentFactory
+        from repoze.lemonade.testing import registerContentFactory
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.content.interfaces import ICommunityFile
+        from karl.models.interfaces import IInvitation
+        from karl.models.interfaces import IProfile
+        from karl.models.profile import Profile
+        from karl.testing import DummyUpload
+
+        # set up invitations
+        self.community1['invite'] = invite1 = testing.DummyModel()
+        self.community2['invite'] = invite2 = testing.DummyModel()
+        self.search_results[(IInvitation,)] = (
+            2, [invite1, invite2], lambda x: x)
+
+        # register defaults
+        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
+                                IContentFactory)
+        workflow = registerDummyWorkflow('security')
+        registerContentFactory(Profile, IProfile)
+        controller = self._makeOne(self.context, self.request)
+        # first set up the easier fields
+        converted = {'login': 'login',
+                     'password': 'password',
+                     'groups': ['group.KarlLovers'],
+                     'home_path': '/home_path',
+                    }
+        for fieldname, value in profile_data.items():
+            if fieldname == 'photo':
+                continue
+            converted[fieldname] = value
+        # then set up the photo
+        converted['photo'] = DummyUpload(filename='test.jpg',
+                                         mimetype='image/jpeg',
+                                         data=one_pixel_jpeg)
+        # finally submit our constructed form
+        response = controller.handle_submit(converted)
+
+        self.failIf('invite' in self.community1)
+        self.failIf('invite' in self.community2)
+
     def test_handle_submit_duplicate_id(self):
         from repoze.bfg.formish import ValidationError
         # try again and make sure it fails
@@ -647,6 +703,7 @@ class AddUserFormControllerTests(unittest.TestCase):
             'userid': 'existing'})
 
     def test_handle_submit_duplicate_email(self):
+        from karl.models.interfaces import IProfile
         from repoze.bfg.formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
@@ -659,7 +716,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                      'home_path': '/home_path',
                      'firstname': 'different',
                     }
-        self.search_results = (1, [existing], lambda x: x)
+        self.search_results[(IProfile,)] = (1, [existing], lambda x: x)
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         profile = self.context['existing']
         self.failIf(profile.firstname != 'firstname')
@@ -667,6 +724,8 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(controller.reactivate_user, None)
 
     def test_handle_submit_duplicate_email_inactive_user(self):
+        from karl.models.interfaces import IProfile
+        from karl.models.interfaces import IProfile
         from repoze.bfg.formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
@@ -679,7 +738,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                      'home_path': '/home_path',
                      'firstname': 'different',
                     }
-        self.search_results = (1, [existing], lambda x: x)
+        self.search_results[(IProfile,)] = (1, [existing], lambda x: x)
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         profile = self.context['existing']
         self.failIf(profile.firstname != 'firstname')

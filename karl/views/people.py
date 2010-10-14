@@ -45,6 +45,7 @@ from karl.events import ObjectWillBeModifiedEvent
 from repoze.postoffice.message import Message
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
+from karl.models.interfaces import IInvitation
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
 from karl.utilities.image import thumb_url
@@ -488,7 +489,9 @@ class AddUserFormController(EditProfileFormController):
             raise ValidationError(login=msg)
 
         search = ICatalogSearch(context)
-        count, docids, resolver = search(email=converted['email'])
+        count, docids, resolver = search(
+            interfaces=[IProfile], email=converted['email']
+        )
         if count:
             msg = 'Email address is already in use by another user(s).'
             if count == 1:
@@ -501,6 +504,14 @@ class AddUserFormController(EditProfileFormController):
                            "deactivated user.  Perhaps you mean to reactivate "
                            "this user. See link above.")
             raise ValidationError(email=msg)
+
+        # If user was previously invited to join any communities, those
+        # invitations are no longer needed.
+        count, docids, resolver = search(
+            interfaces=[IInvitation], email=converted['email'])
+        for docid in docids:
+            invitation = resolver(docid)
+            del invitation.__parent__[invitation.__name__]
 
         users.add(userid, userid, converted['password'], converted['groups'])
 
