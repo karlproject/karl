@@ -557,7 +557,7 @@ class AcceptInvitationFormController(object):
         username = karlvalidators.RegularExpression(
             r'^[\w-]+$',
             'Username must contain only letters, numbers, and dashes')
-        return [
+        fields = [
             ('username', schemaish.String(validator=validator.All(required,
                                                                   username))),
             ('password', schemaish.String(
@@ -579,24 +579,27 @@ class AcceptInvitationFormController(object):
             ('languages', schemaish.String()),
             ('biography', schemaish.String()),
             ('photo', schemaish.File()),
-            ('terms_and_conditions',
-             schemaish.Boolean(validator=validator.Equal(True))),
-            ('accept_privacy_policy',
-             schemaish.Boolean(validator=validator.Equal(True))),
             ]
+
+        r = queryMultiAdapter((self.context, self.request),
+                              IInvitationBoilerplate)
+        if r is not None:
+            if r.terms_and_conditions:
+                fields.append(
+                    ('terms_and_conditions',
+                     schemaish.Boolean(validator=validator.Equal(True)))
+                )
+            if r.privacy_statement:
+                fields.append(
+                    ('accept_privacy_policy',
+                     schemaish.Boolean(validator=validator.Equal(True)))
+                )
+        return fields
 
     def form_widgets(self, fields):
         default_icon = self.api.static_url + '/images/defaultUser.gif'
         system_name = get_setting(self.context, 'system_name', 'KARL')
-        terms_text = "<div><h1>Terms and Conditions</h1><p>text</p></div>"
-        privacy_text = "<div><h1>Privacy</h1><p>text</p></div>"
-        r = queryMultiAdapter((self.context, self.request),
-                              IInvitationBoilerplate)
-        if r is not None:
-            terms_text = r.terms_and_conditions
-            privacy_text = r.privacy_statement
-
-        return {
+        widgets = {
             'biography': karlwidgets.RichTextWidget(),
             'password':formish.Password(),
             'password_confirm':formish.Password(),
@@ -605,14 +608,27 @@ class AcceptInvitationFormController(object):
                 filestore=self.filestore,
                 url_base=model_url(self.context, self.request, 'photo'),
                 image_thumbnail_default=default_icon),
-            'terms_and_conditions': karlwidgets.AcceptFieldWidget(
-                terms_text, 'the %s Terms and Conditions' % system_name),
-            'accept_privacy_policy': karlwidgets.AcceptFieldWidget(
-                privacy_text, 'the %s Privacy Policy' % system_name),
             'websites': formish.TextArea(
                 rows=3,
                 converter_options={'delimiter':'\n'}),
             }
+
+        r = queryMultiAdapter((self.context, self.request),
+                              IInvitationBoilerplate)
+        if r is not None:
+            terms_text = r.terms_and_conditions
+            if terms_text:
+                widgets['terms_and_conditions'] = (
+                    karlwidgets.AcceptFieldWidget(
+                        terms_text, 'the %s Terms and Conditions' % system_name
+                    ))
+            privacy_text = r.privacy_statement
+            if privacy_text:
+                widgets['accept_privacy_policy'] = (
+                    karlwidgets.AcceptFieldWidget(
+                        privacy_text, 'the %s Privacy Policy' % system_name
+                    ))
+        return widgets
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))

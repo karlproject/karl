@@ -9,6 +9,10 @@ Unreleased
 - When adding a new user, any previous invitations that user had are deleted.
   (LP #659926)
 
+- Hide "Terms and Conditions" and "Accept Privacy Policy" fields in the accept
+  invitation form if there is no text to display for those fields.
+  (LP #651209)
+
 3.47 (2010-10-07)
 -----------------
 

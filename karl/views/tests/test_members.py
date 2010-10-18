@@ -195,6 +195,8 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.failUnless('page_title' in info)
         self.failUnless('page_description' in info)
         self.failUnless('api' in info)
+        self.failIf('terms_and_conditions' in info)
+        self.failIf('accept_privacy_policy' in info)
 
     def test_form_fields(self):
         context = self._makeContext()
@@ -202,6 +204,22 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
+        self.assertEqual(len(fields), 16)
+
+    def test_form_fields_w_tos_and_privacy_statement(self):
+        from karl.views.interfaces import IInvitationBoilerplate
+        from zope.interface import Interface
+        from repoze.bfg.testing import registerAdapter
+        registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
+                        IInvitationBoilerplate)
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless(fields)
+        self.assertEqual(len(fields), 18)
+        self.assertEqual(fields[-2][0], "terms_and_conditions")
+        self.assertEqual(fields[-1][0], "accept_privacy_policy")
 
     def test_form_widgets(self):
         context = self._makeContext()
@@ -209,6 +227,22 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         widgets = controller.form_widgets(None)
         self.failUnless(widgets)
+        self.failIf('terms_and_conditions' in widgets)
+        self.failIf('accept_privacy_policy' in widgets)
+
+    def test_form_widgets_w_tos_and_privacty_policy(self):
+        from karl.views.interfaces import IInvitationBoilerplate
+        from zope.interface import Interface
+        from repoze.bfg.testing import registerAdapter
+        registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
+                        IInvitationBoilerplate)
+        context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        widgets = controller.form_widgets(None)
+        self.failUnless(widgets)
+        self.failUnless('terms_and_conditions' in widgets)
+        self.failUnless('accept_privacy_policy' in widgets)
 
     def test_handle_submit_password_mismatch(self):
         from repoze.bfg.formish import ValidationError
@@ -784,6 +818,13 @@ def dummy_search(results):
             return len(search), search, lambda x: x
 
     return DummySearchAdapter
+
+class DummyInvitationBoilerPlate(object):
+    terms_and_conditions = "Do this.  Don't do that."
+    privacy_statement = "We won't sell you out."
+
+    def __init__(self, context, request):
+        pass
 
 def registerCatalogSearch(results={}):
     from repoze.bfg.testing import registerAdapter
