@@ -1524,7 +1524,43 @@ tinyMCE.addI18n('en.wicked',{
                                         inside.removeAttr('mce_src');
                                     }
                                 }
+
+                                // Fix missing params (broken in IE8, kaltura)
+                                var params = ['allowScriptAccess', 'allowNetworking', 'allowFullScreen',
+                                    'bgcolor', 'movie', 'flashVars', 'movie', 'resource'];
+                                var to_add = [];
+                                $.each(params, function(i, value) {
+                                    var found = false;
+                                    root.find('param').each(function(i, elem) {
+                                        a = $(elem).attr('name');
+                                        if (a == value || a == value.toLowerCase()) {
+                                            found = true;
+                                            return false;
+                                        }
+                                    });
+                                    if (! found) {
+                                        // Is there an attr?
+                                        if (root.attr(value)) {
+                                            to_add.push({k: value, v: root.attr(value)});
+                                        } else if (root.attr(value.toLowerCase())) {
+                                            to_add.push({k: value, v: root.attr(value.toLowerCase())});
+                                        }
+                                    }
+                                });
+                                $.each(to_add, function(i, value) {
+                                    if (value.k == 'resource') {
+                                        // XXX Huh?
+                                        value.k = 'movie';
+                                    }
+                                    try {
+                                    $('<param />')
+                                        .attr('name', value.k)
+                                        .attr('value', value.v)
+                                        .prependTo(root);
+                                    } catch(e) {}
+                                });
                             }
+
                             // remove bad attributes. (Important: 
                             // will explode flash if left in)
                             if (root.attr('mce_src')) {
