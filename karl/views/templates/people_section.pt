@@ -20,8 +20,8 @@
         <table id="peopledir-section" class="columns">
         <tbody>
         <tr>
-        <td valign="top" width="50%" tal:repeat="column column_html"
-            tal:content="structure column">
+        <td valign="top" width="${column['width']}%" tal:repeat="column columns"
+            tal:content="structure column['html']">
         </td>
         </tr>
         </tbody>

@@ -406,20 +406,21 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         index = DummyFieldIndex({'A': None, 'M': None})
         site['people'].catalog['lastnamestartswith'] = index
 
-        report = testing.DummyModel(filters={}, query=None)
+        report = testing.DummyModel()
         site['report'] = report
         obj = self._makeOne(report)
         active = obj.get_active_letters()
         self.assertEqual(active, set(['A', 'M']))
 
-    def test_with_filter_and_query(self):
-        site = testing.DummyModel()
-        from karl.models.interfaces import ISite
+    def test_with_filter(self):
+        from BTrees import family32
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportFilter
+        from karl.models.interfaces import ISite
+        site = testing.DummyModel()
         directlyProvides(site, ISite)
         site['people'] = testing.DummyModel()
         site['people'].catalog = karltesting.DummyCatalog({2: None, 3: None})
-        from BTrees import family32
         index = DummyFieldIndex({
             'A': family32.IF.TreeSet([1]),
             'B': family32.IF.TreeSet([2, 5]),
@@ -429,16 +430,14 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         index.family = family32
         site['people'].catalog['lastnamestartswith'] = index
 
-        report = testing.DummyModel(
-            filters={'office': ['nyc']},
-            query={'is_staff': True},
-            )
+        report = testing.DummyModel()
+        nyc = report['office'] = testing.DummyModel(values=['nyc'])
+        directlyProvides(nyc, IPeopleReportFilter)
         site['report'] = report
         obj = self._makeOne(report)
         active = obj.get_active_letters()
         self.assertEqual(active, set(['B', 'C']))
         self.assertEqual(site['people'].catalog.queries, [{
-            'is_staff': True,
             'category_office': {'operator': 'or', 'query': ['nyc']},
             }])
 

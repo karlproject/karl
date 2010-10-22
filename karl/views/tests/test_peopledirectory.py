@@ -14,14 +14,49 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-"""Tests of karl.views.peopledirectory"""
+"""Tests of karl.views.peopledirectory
+"""
 
 import unittest
 
 from repoze.bfg import testing
 
 
-class PeopleDirectoryViewTests(unittest.TestCase):
+class Test_admin_contents(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import admin_contents
+        return admin_contents(context, request)
+
+    def test_GET(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        from karl.views.peopledirectory import _ADDABLES
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel(title='People')
+        directlyProvides(pd, IPeopleDirectory)
+        request = testing.DummyRequest()
+
+        info = self._callFUT(pd, request)
+
+        self.assertEqual(info['api'].context, pd)
+        self.assertEqual(info['peopledir'], pd)
+        actions = info['actions']
+        self.assertEqual(len(actions), len(_ADDABLES[IPeopleDirectory]) + 3)
+        self.assertEqual(actions[0][1], 'edit.html')
+        self.assertEqual(actions[1][1], 'add_section.html')
+        self.assertEqual(actions[2][1], 'admin.html')
+        self.assertEqual(actions[3][1], 'http://example.com/profiles/add.html')
+
+
+class Test_peopledirectory_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -35,98 +70,369 @@ class PeopleDirectoryViewTests(unittest.TestCase):
 
     def _register(self):
         from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
+        registerCatalogSearch()
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
-    def test_index_page(self):
-        self._register()
-
-        report = DummyReport()
-        section = report.__parent__
-        section.columns.append(testing.DummyModel(title='', reports=[]))
-        pd = section.__parent__
-
-        # expect it to show the first section
-        renderer = testing.registerDummyRenderer(
-            'templates/people_section.pt')
+    def test_empty(self):
+        from repoze.bfg.exceptions import Forbidden
+        pd = testing.DummyModel()
+        pd.order = ()
         request = testing.DummyRequest()
-        self._callFUT(pd, request)
+        self.assertRaises(Forbidden, self._callFUT, pd, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.api.context, section)
+    def test_no_sections_allowed(self):
+        from repoze.bfg.exceptions import Forbidden
+        testing.registerDummySecurityPolicy(permissive=False)
+        pd = testing.DummyModel()
+        pd['s1'] = testing.DummyModel()
+        pd.order = ('s1',)
+        request = testing.DummyRequest()
+        self.assertRaises(Forbidden, self._callFUT, pd, request)
+
+    def test_one_section_allowed(self):
+        from webob.exc import HTTPFound
+        testing.registerDummySecurityPolicy(permissive=True)
+        site = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel()
+        pd['s1'] = testing.DummyModel()
+        pd.order = ('s1',)
+        request = testing.DummyRequest()
+        response = self._callFUT(pd, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com/people/s1/')
+
+    def test_first_section_not_allowed(self):
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from repoze.bfg.threadlocal import get_current_registry
+        from webob.exc import HTTPFound
+        testing.registerDummySecurityPolicy(permissive=True)
+        reg = get_current_registry() # b/c
+        authz_policy = reg.queryUtility(IAuthorizationPolicy)
+        authz_policy.permits = (lambda context, prin, perm:
+                                    context.__name__ != 's1')
+        site = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel()
+        pd['s1'] = testing.DummyModel()
+        pd['s2'] = testing.DummyModel()
+        pd['s3'] = testing.DummyModel()
+        pd.order = ('s1', 's2', 's3')
+        request = testing.DummyRequest()
+        response = self._callFUT(pd, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com/people/s2/')
 
 
-class GetTabsTests(unittest.TestCase):
+class Test_download_peopledirectory_xml(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import download_peopledirectory_xml
+        return download_peopledirectory_xml(context, request)
+
+    def test_empty(self):
+        # Actual XML emission tested in karl.utilities.tests.test_peopleconf
+        from lxml import etree
+        pd = testing.DummyModel(order=())
+        pd['categories'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(pd, request)
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/xml; charset=UTF-8')
+        tree = etree.fromstring(response.body)
+        self.failUnless(tree.xpath('/peopledirectory/categories'))
+        self.failIf(tree.xpath('/peopledirectory/categories/*'))
+        self.failUnless(tree.xpath('/peopledirectory/sections'))
+        self.failIf(tree.xpath('/peopledirectory/sections/*'))
+
+
+class Test_upload_peopledirectory_xml(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import upload_peopledirectory_xml
+        return upload_peopledirectory_xml(context, request)
+
+    def test_no_submit(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        site = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel(title='People')
+        directlyProvides(pd, IPeopleDirectory)
+        request = testing.DummyRequest()
+
+        info = self._callFUT(pd, request)
+
+        self.assertEqual(info['api'].context, pd)
+        self.assertEqual(info['peopledir'], pd)
+
+    def test_w_submit_empty_clears_existing(self):
+        from StringIO import StringIO
+        from webob.exc import HTTPFound
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        XML = """<?xml version="1.0"?>
+        <peopledirectory>
+         <categories>
+         </categories>
+         <sections>
+         </sections>
+        </peopledirectory>
+        """
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel(title='People')
+        def _set_order(value):
+            pd._order = value
+        def _update_indexes():
+            pd._indexes_updated = True
+        pd.set_order = _set_order
+        pd.update_indexes = _update_indexes
+        pd.catalog = testing.DummyModel(document_map=testing.DummyModel())
+        directlyProvides(pd, IPeopleDirectory)
+        categories = pd['categories'] = testing.DummyModel()
+        categories['bogus'] = testing.DummyModel()
+        pd['nonesuch'] = testing.DummyModel()
+        class DummyFile:
+            pass
+        xml = DummyFile()
+        xml.file = StringIO(XML)
+        request = testing.DummyRequest(post={'form.submit': '1',
+                                             'xml':  xml,
+                                            })
+
+        response = self._callFUT(pd, request)
+
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com/people/')
+
+        self.failUnless(pd._indexes_updated)
+        self.assertEqual(list(pd.order), [])
+        self.assertEqual(list(pd.keys()), ['categories'])
+        self.assertEqual(list(pd['categories'].keys()), [])
+
+
+class Test_get_tabs(unittest.TestCase):
 
     def _callFUT(self, peopledir, request, current_sectionid):
         from karl.views.peopledirectory import get_tabs
         return get_tabs(peopledir, request, current_sectionid)
 
-    def test_it(self):
+    def test_empty(self):
         pd = testing.DummyModel(order=[])
-        for sectionid in ('s1', 's2'):
-            section = testing.DummyModel(tab_title=sectionid.title())
-            pd[sectionid] = section
-            pd.order.append(sectionid)
         request = testing.DummyRequest()
         tabs = self._callFUT(pd, request, 's2')
-        self.assertEqual(tabs, [
-            {'href': 'http://example.com/s1/',
-                'selected': False, 'title': 'S1'},
-            {'href': 'http://example.com/s2/',
-                'selected': True,'title': 'S2'},
-            ])
+        self.assertEqual(len(tabs), 0)
+
+    def test_one_tab(self):
+        pd = testing.DummyModel(order=['s1'])
+        pd['s1'] = testing.DummyModel(tab_title='Section 1')
+        request = testing.DummyRequest()
+        tabs = self._callFUT(pd, request, 's1')
+        self.assertEqual(len(tabs), 1)
+        tab = tabs[0]
+        self.assertEqual(tab['href'], 'http://example.com/s1/')
+        self.assertEqual(tab['title'], 'Section 1')
+        self.failUnless(tab['selected'])
+
+    def test_multiple_tabs(self):
+        pd = testing.DummyModel(order=['s1', 's2'])
+        pd['s1'] = testing.DummyModel(tab_title='Section 1')
+        pd['s2'] = testing.DummyModel(tab_title='Section 2')
+        request = testing.DummyRequest()
+        tabs = self._callFUT(pd, request, 's2')
+        self.assertEqual(len(tabs), 2)
+        tab = tabs[0]
+        self.assertEqual(tab['href'], 'http://example.com/s1/')
+        self.assertEqual(tab['title'], 'Section 1')
+        self.failIf(tab['selected'])
+        tab = tabs[1]
+        self.assertEqual(tab['href'], 'http://example.com/s2/')
+        self.assertEqual(tab['title'], 'Section 2')
+        self.failUnless(tab['selected'])
+
+    def test_skip_unauthorized(self):
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from repoze.bfg.threadlocal import get_current_registry
+        testing.registerDummySecurityPolicy(permissive=True)
+        reg = get_current_registry() # b/c
+        authz_policy = reg.queryUtility(IAuthorizationPolicy)
+        authz_policy.permits = (lambda context, prin, perm:
+                                    context.__name__ != 's1')
+        pd = testing.DummyModel(order=['s1', 's2', 's3'])
+        pd['s1'] = testing.DummyModel(tab_title='Section 1')
+        pd['s2'] = testing.DummyModel(tab_title='Section 2')
+        pd['s3'] = testing.DummyModel(tab_title='Section 3')
+        request = testing.DummyRequest()
+        tabs = self._callFUT(pd, request, 's2')
+        self.assertEqual(len(tabs), 2)
+        tab = tabs[0]
+        self.assertEqual(tab['href'], 'http://example.com/s2/')
+        self.assertEqual(tab['title'], 'Section 2')
+        self.failUnless(tab['selected'])
+        tab = tabs[1]
+        self.assertEqual(tab['href'], 'http://example.com/s3/')
+        self.assertEqual(tab['title'], 'Section 3')
+        self.failIf(tab['selected'])
 
 
-class RenderReportGroupTests(unittest.TestCase):
+class Test_render_report_group(unittest.TestCase):
 
     def _callFUT(self, group, request, css_class=''):
         from karl.views.peopledirectory import render_report_group
         return render_report_group(group, request, css_class)
+
+    def test_empty(self):
+        group = testing.DummyModel(title='')
+        request = testing.DummyRequest()
+        html = self._callFUT(group, request)
+        self.assertEqual(html, '<ul>\n</ul>')
+
+    def test_empty_no_title(self):
+        group = testing.DummyModel()
+        request = testing.DummyRequest()
+        html = self._callFUT(group, request)
+        self.assertEqual(html, '<ul>\n</ul>')
+
+    def test_empty_w_title(self):
+        group = testing.DummyModel(title='Testing')
+        request = testing.DummyRequest()
+        html = self._callFUT(group, request)
+        self.assertEqual(html, '<h3>Testing</h3>\n<ul>\n</ul>')
 
     def test_structure(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleReportGroup
 
-        group = testing.DummyModel(title='Group 1', reports=[])
+        group = testing.DummyModel(title='Group 1')
 
-        report = testing.DummyModel(
+        report = group['r11'] = testing.DummyModel(
             link_title='Report 1.1', css_class='priority')
         directlyProvides(report, IPeopleReport)
-        group.reports.append(report)
 
-        group2 = testing.DummyModel(title='Group 1.2', reports=[])
+        group2 = group['g12'] = testing.DummyModel(title='Group 1.2')
         directlyProvides(group2, IPeopleReportGroup)
-        group.reports.append(group2)
 
-        report2 = testing.DummyModel(
+        report2 = group2['r121'] = testing.DummyModel(
             link_title='Report 1.2.1', css_class='general')
         directlyProvides(report2, IPeopleReport)
-        group2.reports.append(report2)
 
         request = testing.DummyRequest()
         html = self._callFUT(group, request, 'toplevel')
 
-        self.assert_('<h3>Group 1</h3>' in html)
-        self.assert_('>Report 1.1</a>' in html)
-        self.assert_('<h3>Group 1.2</h3>' in html)
-        self.assert_('>Report 1.2.1</a>' in html)
+        self.failUnless('<h3>Group 1</h3>' in html)
+        self.failUnless('>Report 1.1</a>' in html)
+        self.failUnless('<h3>Group 1.2</h3>' in html)
+        self.failUnless('>Report 1.2.1</a>' in html)
 
-        self.assert_('class="priority"' in html)
-        self.assert_('class="general"' in html)
+        self.failUnless('class="priority"' in html)
+        self.failUnless('class="general"' in html)
 
-    def test_empty(self):
-        group = testing.DummyModel(title='', reports=[])
+
+class Test_get_admin_actions(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import get_admin_actions
+        return get_admin_actions(context, request)
+
+    def _makeContext(self):
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel()
+        return pd
+
+    def test_not_admin(self):
+        testing.registerDummySecurityPolicy(permissive=False)
+        context = self._makeContext()
         request = testing.DummyRequest()
-        html = self._callFUT(group, request)
-        self.assertEqual(html, '<ul>\n</ul>')
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 0)
+
+    def test_w_admin_no_marker(self):
+        testing.registerDummySecurityPolicy(permissive=True)
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action[0], 'Edit')
+        self.assertEqual(action[1], 'edit.html')
+
+    def test_w_admin_w_marker(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        testing.registerDummySecurityPolicy(permissive=True)
+        context = self._makeContext()
+        directlyProvides(context, IPeopleReport)
+        request = testing.DummyRequest()
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 2)
+        action = actions[0]
+        self.assertEqual(action[0], 'Edit')
+        self.assertEqual(action[1], 'edit.html')
+        action = actions[1]
+        self.assertEqual(action[0], 'Add Filter')
+        self.assertEqual(action[1], 'add_report_filter.html')
 
 
-class SectionViewTests(unittest.TestCase):
+class Test_get_actions(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import get_actions
+        return get_actions(context, request)
+
+    def _makeContext(self):
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel()
+        return pd
+
+    def test_not_admin(self):
+        testing.registerDummySecurityPolicy(permissive=False)
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 0)
+
+    def test_w_admin_not_admin_html_view(self):
+        testing.registerDummySecurityPolicy(permissive=True)
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 2)
+        action = actions[0]
+        self.assertEqual(action[0], 'Admin')
+        self.assertEqual(action[1], 'admin.html')
+        action = actions[1]
+        self.assertEqual(action[0], 'Add User')
+        self.assertEqual(action[1], 'http://example.com/profiles/add.html')
+
+    def test_w_admin_and_admin_html_view(self):
+        testing.registerDummySecurityPolicy(permissive=True)
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        request.view_name = 'admin.html'
+        actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action[0], 'Add User')
+        self.assertEqual(action[1], 'http://example.com/profiles/add.html')
+
+
+class Test_section_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -140,50 +446,110 @@ class SectionViewTests(unittest.TestCase):
 
     def _register(self):
         from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
+        registerCatalogSearch()
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
-    def test_index_page(self):
-        report = DummyReport()
-        section = report.__parent__
-        section.columns.append(testing.DummyModel(title='', reports=[]))
-        pd = section.__parent__
+    def test_empty_column(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        site = testing.DummyModel()
+        pd = site['people'] = testing.DummyModel(order=('s1',))
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['s1'] = testing.DummyModel(title='A', tab_title='B')
+        column = section['c1'] = testing.DummyModel(title='', width=40)
 
-        renderer = testing.registerDummyRenderer(
-            'templates/people_section.pt')
         request = testing.DummyRequest()
-        self._callFUT(section, request)
+        info = self._callFUT(section, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.peopledir_tabs, [{
+        self.assertEqual(info['api'].context, section)
+        self.assertEqual(info['peopledir'], pd)
+        self.assertEqual(info['peopledir_tabs'], [{
             'href': 'http://example.com/people/s1/',
             'selected': True,
-            'title': 'A',
+            'title': 'B',
             }])
-        self.assertEqual(renderer.column_html, ['<ul class="column">\n</ul>'])
-        self.assertEqual(renderer.api.context, section)
+        c_info = info['columns']
+        self.assertEqual(len(c_info), 1)
+        self.assertEqual(c_info[0]['html'], '<ul class="column">\n</ul>')
+        self.assertEqual(c_info[0]['width'], 40)
 
-    def test_single_report(self):
-        # when a section contains only a single report, show that report
-        self._register()
+    def test_non_empty_column(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        pd, section, report = _makeReport()
+        del section[report.__name__]
+        directlyProvides(report, IPeopleReport)
+        report.css_class = ''
+        column = section['c1'] = testing.DummyModel(title='')
+        column[report.__name__] = report
 
-        report = DummyReport()
-        section = report.__parent__
-        pd = section.__parent__
-
-        renderer = testing.registerDummyRenderer(
-            'templates/people_report.pt')
         request = testing.DummyRequest()
-        self._callFUT(section, request)
+        info = self._callFUT(section, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.api.context, report)
+        c_info = info['columns']
+        self.assertEqual(len(c_info), 1)
+        html = c_info[0]['html']
+        self.assertEqual(html.split('\n'), [
+                         '<ul class="column">',
+                         '<li><a href="http://example.com/people/s1/c1/r1/"'
+                                    ' class="">A</a></li>',
+                         '</ul>'])
+
+    def test_multiple_columns(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        pd, section, report = _makeReport()
+        del section[report.__name__]
+        directlyProvides(report, IPeopleReport)
+        report.css_class = ''
+        column = section['c1'] = testing.DummyModel(title='')
+        column['r1'] = report
+
+        column2 = section['c2'] = testing.DummyModel(title='')
+        r2 = column2['r2'] = testing.DummyModel(link_title='B',
+                                                css_class='red')
+        directlyProvides(r2, IPeopleReport)
+
+        section.values = lambda: [x[1] for x in sorted(section.items())]
+
+        request = testing.DummyRequest()
+        info = self._callFUT(section, request)
+
+        c_info = info['columns']
+        self.assertEqual(len(c_info), 2)
+        html = c_info[0]['html']
+        self.assertEqual(html.split('\n'), [
+                         '<ul class="column">',
+                         '<li><a href="http://example.com/people/s1/c1/r1/"'
+                                    ' class="">A</a></li>',
+                         '</ul>'])
+        html = c_info[1]['html']
+        self.assertEqual(html.split('\n'), [
+                         '<ul class="column">',
+                         '<li><a href="http://example.com/people/s1/c2/r2/"'
+                                    ' class="red">B</a></li>',
+                         '</ul>'])
+
+    def test_single_allowed_report(self):
+        # when a section contains only a single report, redirect to that report
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from webob.exc import HTTPFound
+        self._register()
+        pd, section, report = _makeReport()
+        directlyProvides(report, IPeopleReport)
+
+        request = testing.DummyRequest()
+        response = self._callFUT(section, request)
+
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com/people/s1/r1/')
 
 
-class ReportViewTests(unittest.TestCase):
+class Test_report_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -196,61 +562,50 @@ class ReportViewTests(unittest.TestCase):
         return report_view(context, request)
 
     def _register(self):
-        from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
-        from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
-        testing.registerAdapter(DummyLetterManager, Interface,
-                                ILetterManager)
+        from karl.testing import registerCatalogSearch
+        from karl.models.interfaces import ILetterManager
+        registerCatalogSearch()
+        testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
 
     def test_unqualified_report(self):
         self._register()
-
-        report = DummyReport()
-        section = report.__parent__
-        pd = section.__parent__
-
-        renderer = testing.registerDummyRenderer(
-            'templates/people_report.pt')
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        self._callFUT(report, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.api.context, report)
-        self.assert_('grid_data' in renderer.head_data)
-        self.assertEqual(renderer.print_url,
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['api'].context, report)
+        self.assertEqual(info['peopledir'], pd)
+        self.failUnless('grid_data' in info['head_data'])
+        self.assertEqual(info['print_url'],
             'http://example.com/people/s1/r1/print.html')
-        self.assertEqual(renderer.csv_url,
+        self.assertEqual(info['csv_url'],
             'http://example.com/people/s1/r1/csv')
-        self.assertEqual(renderer.pictures_url,
+        self.assertEqual(info['pictures_url'],
             'http://example.com/people/s1/r1/picture_view.html')
-        self.assertEqual(renderer.qualifiers, [])
+        self.assertEqual(info['qualifiers'], [])
 
     def test_qualified_report(self):
         self._register()
-
-        report = DummyReport()
-        section = report.__parent__
-        pd = section.__parent__
-
-        renderer = testing.registerDummyRenderer(
-            'templates/people_report.pt')
+        pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': 'spock'})
-        self._callFUT(report, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.api.context, report)
-        self.assert_('grid_data' in renderer.head_data)
-        self.assertEqual(renderer.print_url,
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['peopledir'], pd)
+        self.assertEqual(info['api'].context, report)
+        self.failUnless('grid_data' in info['head_data'])
+        self.assertEqual(info['print_url'],
             'http://example.com/people/s1/r1/print.html?body=spock')
-        self.assertEqual(renderer.csv_url,
+        self.assertEqual(info['csv_url'],
             'http://example.com/people/s1/r1/csv?body=spock')
-        self.assertEqual(renderer.pictures_url,
+        self.assertEqual(info['pictures_url'],
             'http://example.com/people/s1/r1/picture_view.html?body=spock')
-        self.assertEqual(renderer.qualifiers, ['Search for "spock"'])
+        self.assertEqual(info['qualifiers'], ['Search for "spock"'])
 
 
-class JqueryGridViewTests(unittest.TestCase):
+class Test_jquery_grid_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -266,25 +621,22 @@ class JqueryGridViewTests(unittest.TestCase):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
 
-    def test_it(self):
+    def test_view(self):
         self._register()
-        report = testing.DummyModel(
-            title='Report A',
-            columns=['name'],
-            query=None,
-            filters={}
-            )
+        report = testing.DummyModel(title='Report A', columns=['name'])
         request = testing.DummyRequest({'start': 0, 'limit': 10})
-        res = self._callFUT(report, request)
-        self.assertEqual(res.content_type, 'application/x-json')
-        payload = eval(res.body)
+
+        response = self._callFUT(report, request)
+
+        self.assertEqual(response.content_type, 'application/x-json')
+        payload = eval(response.body)
         self.assertEqual(payload['records'], [])
         self.assertEqual(payload['batchSize'], 10)
-        self.assert_(payload.get('columns'))
+        self.failUnless(payload.get('columns'))
         self.assertEqual(payload['columns'][0]['id'], 'name')
 
 
-class GetColumnJsdataTests(unittest.TestCase):
+class Test_get_column_jsdata(unittest.TestCase):
 
     def _callFUT(self, columns, max_width):
         from karl.views.peopledirectory import get_column_jsdata
@@ -313,7 +665,7 @@ class GetColumnJsdataTests(unittest.TestCase):
             ])
 
 
-class ProfilePhotoRowsTests(unittest.TestCase):
+class Test_profile_photo_rows(unittest.TestCase):
 
     def _callFUT(self, entries, request, api):
         from karl.views.peopledirectory import profile_photo_rows
@@ -322,7 +674,7 @@ class ProfilePhotoRowsTests(unittest.TestCase):
     def test_it(self):
         entries = []
         for i in range(4):
-            entries.append(DummyProfile())
+            entries.append(_makeProfile())
         del entries[0]['photo']
 
         class DummyAPI:
@@ -330,6 +682,7 @@ class ProfilePhotoRowsTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         iterator = self._callFUT(entries, request, DummyAPI())
+
         row = iterator.next()
         self.assertEqual(len(row), 3)
         self.assertEqual(row[0], {
@@ -342,15 +695,16 @@ class ProfilePhotoRowsTests(unittest.TestCase):
             'url': 'http://example.com/',
             'photo_url': 'http://example.com/photo/thumb/75x100.jpg',
             })
+
         row = iterator.next()
         self.assertEqual(len(row), 1)
         self.assertEqual(row[0]['profile'], entries[3])
 
         # no more rows
-        for row in iterator:
-            self.fail()
+        self.assertEqual(len(list(iterator)), 0)
 
-class PictureViewTests(unittest.TestCase):
+
+class Test_picture_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -373,42 +727,38 @@ class PictureViewTests(unittest.TestCase):
     def test_unqualified_report(self):
         self._register()
 
-        report = DummyReport()
-        section = report.__parent__
-        pd = section.__parent__
-        renderer = testing.registerDummyRenderer(
-            'templates/people_pictures.pt')
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        self._callFUT(report, request)
 
-        self.assertEqual(renderer.peopledir, pd)
-        self.assertEqual(renderer.api.context, report)
-        self.assertEqual(len(list(renderer.rows)), 0)
-        self.assertEqual(renderer.print_url,
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['peopledir'], pd)
+        self.assertEqual(info['api'].context, report)
+        self.assertEqual(len(list(info['rows'])), 0)
+        self.assertEqual(info['print_url'],
             'http://example.com/people/s1/r1/print.html')
-        self.assertEqual(renderer.csv_url,
+        self.assertEqual(info['csv_url'],
             'http://example.com/people/s1/r1/csv')
-        self.assertEqual(renderer.tabular_url,
+        self.assertEqual(info['tabular_url'],
             'http://example.com/people/s1/r1/')
-        self.assertEqual(renderer.qualifiers, [])
+        self.assertEqual(info['qualifiers'], [])
 
     def test_qualified_report(self):
         self._register()
 
-        report = DummyReport()
-        renderer = testing.registerDummyRenderer(
-            'templates/people_pictures.pt')
+        pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': "spock's brain"})
-        self._callFUT(report, request)
 
-        self.assertEqual(len(list(renderer.rows)), 0)
-        self.assertEqual(renderer.print_url,
+        info = self._callFUT(report, request)
+
+        self.assertEqual(len(list(info['rows'])), 0)
+        self.assertEqual(info['print_url'],
             'http://example.com/people/s1/r1/print.html?body=spock%27s+brain')
-        self.assertEqual(renderer.csv_url,
+        self.assertEqual(info['csv_url'],
             'http://example.com/people/s1/r1/csv?body=spock%27s+brain')
-        self.assertEqual(renderer.tabular_url,
+        self.assertEqual(info['tabular_url'],
             'http://example.com/people/s1/r1/?body=spock%27s+brain')
-        self.assertEqual(renderer.qualifiers, ['Search for "spock\'s brain"'])
+        self.assertEqual(info['qualifiers'], ['Search for "spock\'s brain"'])
 
     def test_bad_search_text(self):
         from zope.index.text.parsetree import ParseError
@@ -424,15 +774,13 @@ class PictureViewTests(unittest.TestCase):
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
-        report = DummyReport()
-        renderer = testing.registerDummyRenderer(
-            'templates/people_pictures.pt')
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        self._callFUT(report, request)
-        self.assertEqual(len(list(renderer.rows)), 0)
+        info = self._callFUT(report, request)
+        self.assertEqual(len(list(info['rows'])), 0)
 
 
-class GetSearchQualifiersTests(unittest.TestCase):
+class Test_get_search_qualifiers(unittest.TestCase):
 
     def _callFUT(self, request):
         from karl.views.peopledirectory import get_search_qualifiers
@@ -457,17 +805,16 @@ class GetSearchQualifiersTests(unittest.TestCase):
         self.assertEqual(qualifiers, ['Search for "a b*"'])
 
 
-class GetReportQueryTests(unittest.TestCase):
+class Test_get_report_query(unittest.TestCase):
 
     def _callFUT(self, report, request):
         from karl.views.peopledirectory import get_report_query
         return get_report_query(report, request)
 
     def test_it(self):
-        report = testing.DummyModel(
-            query={'groups': ['group.KarlStaff']},
-            filters={'office': ['nyc']},
-            )
+        # XXX
+        report = testing.DummyModel()
+        report['office'] = testing.DummyModel(values=['nyc'])
         request = testing.DummyRequest({
             'lastnamestartswith': 'L',
             'body': 'a b*',
@@ -475,14 +822,13 @@ class GetReportQueryTests(unittest.TestCase):
         kw = self._callFUT(report, request)
         self.assertEqual(kw, {
             'allowed': {'operator': 'or', 'query': []},
-            'groups': ['group.KarlStaff'],
             'category_office': {'operator': 'or', 'query': ['nyc']},
             'lastnamestartswith': 'L',
             'texts': 'a b**',
             })
 
 
-class GetGridDataTests(unittest.TestCase):
+class Test_get_grid_data(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -497,7 +843,7 @@ class GetGridDataTests(unittest.TestCase):
     def test_empty(self):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
         self.assertEqual(grid_data, {
@@ -524,7 +870,7 @@ class GetGridDataTests(unittest.TestCase):
             ICatalogSearch)
         testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, start=21, limit=10)
         self.assertEqual(len(grid_data['records']), 4)
@@ -543,7 +889,7 @@ class GetGridDataTests(unittest.TestCase):
             ICatalogSearch)
         testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest({
             'lastnamestartswith': 'A',
             'body': 'stuff',
@@ -565,14 +911,14 @@ class GetGridDataTests(unittest.TestCase):
             ICatalogSearch)
         testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request)
         self.assertEqual(len(grid_data['records']), 0)
         self.assertEqual(grid_data['totalRecords'], 0)
 
 
-class GetReportDescriptionsTests(unittest.TestCase):
+class Test_get_report_descriptions(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -584,26 +930,31 @@ class GetReportDescriptionsTests(unittest.TestCase):
         from karl.views.peopledirectory import get_report_descriptions
         return get_report_descriptions(report)
 
-    def test_one_description(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleDirectory
-        report = testing.DummyModel(
-            filters={'office': ['nyc']},
-            )
-        site = testing.DummyModel()
-        site['people'] = pd = testing.DummyModel()
-        directlyProvides(pd, IPeopleDirectory)
-        site['r1'] = report
-        catitem = testing.DummyModel(
-            title='New York',
-            description='I<b>heart</b>NY',
-            )
-        pd.categories = {'office': catitem}
+    def test_no_matching_category(self):
+        pd, section, report = _makeReport()
+        report['office'] = testing.DummyModel(values=['nyc'])
         res = self._callFUT(report)
         self.assertEqual(res, [])
 
+    def test_no_matching_description(self):
+        pd, section, report = _makeReport()
+        report['office'] = testing.DummyModel(values=['nyc'])
+        office = pd['categories']['office'] = testing.DummyModel()
+        res = self._callFUT(report)
+        self.assertEqual(res, [])
 
-class TextDumpTests(unittest.TestCase):
+    def test_one_description(self):
+        pd, section, report = _makeReport()
+        report['office'] = testing.DummyModel(values=['nyc'])
+        office = pd['categories']['office'] = testing.DummyModel()
+        office['nyc'] = testing.DummyModel(title='New York',
+                                           description='I<b>heart</b>NY',
+                                          )
+        res = self._callFUT(report)
+        self.assertEqual(res, ['I<b>heart</b>NY'])
+
+
+class Test_text_dump(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -618,7 +969,7 @@ class TextDumpTests(unittest.TestCase):
     def test_empty(self):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         dumper = self._callFUT(report, request)
         rows = list(dumper)
@@ -638,7 +989,7 @@ class TextDumpTests(unittest.TestCase):
             ICatalogSearch)
         testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         dumper = self._callFUT(report, request)
         rows = list(dumper)
@@ -648,7 +999,7 @@ class TextDumpTests(unittest.TestCase):
         self.assertEqual(rows[2], ['Profile 1'])
 
 
-class CSVViewTests(unittest.TestCase):
+class Test_csv_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -663,7 +1014,7 @@ class CSVViewTests(unittest.TestCase):
     def test_empty(self):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         response = self._callFUT(report, request)
         self.assertEqual(response.content_type, 'application/x-csv')
@@ -684,7 +1035,7 @@ class CSVViewTests(unittest.TestCase):
             ICatalogSearch)
         testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
         response = self._callFUT(report, request)
         self.assertEqual(response.content_type, 'application/x-csv')
@@ -697,7 +1048,7 @@ class CSVViewTests(unittest.TestCase):
             )
 
 
-class PrintViewTests(unittest.TestCase):
+class Test_print_view(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -712,30 +1063,14 @@ class PrintViewTests(unittest.TestCase):
     def test_it(self):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
-        report = DummyReport()
+        pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/people_print.pt')
-        self._callFUT(report, request)
-        self.assertEqual(renderer.header, ['Name'])
-        self.assertEqual(list(renderer.rows), [])
+        info = self._callFUT(report, request)
+        self.assertEqual(info['header'], ['Name'])
+        self.assertEqual(list(info['rows']), [])
 
 
-class AddUserViewTests(unittest.TestCase):
-
-    def _callFUT(self, context, request):
-        from karl.views.peopledirectory import add_user_view
-        return add_user_view(context, request)
-
-    def test_it(self):
-        context = testing.DummyModel()
-        context['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-            'http://example.com/profiles/add.html')
-
-class TestOpenSearchViews(unittest.TestCase):
+class Test_open_search_view(unittest.TestCase):
     def setUp(self):
         testing.setUp()
 
@@ -750,12 +1085,10 @@ class TestOpenSearchViews(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'Test Report'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
-            'templates/opensearch.xml'
-        )
-        self._callFUT(context, request)
-        self.assertEqual(renderer.report, context)
-        self.assertEqual(renderer.url, 'http://example.com/')
+        info = self._callFUT(context, request)
+        self.assertEqual(info['report'], context)
+        self.assertEqual(info['url'], 'http://example.com/')
+
 
 class ReportColumnTests(unittest.TestCase):
 
@@ -800,7 +1133,14 @@ class ReportColumnTests(unittest.TestCase):
         profile = testing.DummyModel(col1=None)
         self.assertEqual(col.render_text(profile), '')
 
+
 class NameColumnTests(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.views.peopledirectory import NameColumn
@@ -866,13 +1206,19 @@ class DummyLetterManager:
         return {}
 
 
-class DummyProfile(testing.DummyModel):
-    def __init__(self):
-        testing.DummyModel.__init__(self)
-        self['photo'] = testing.DummyModel()
+def _makeReport():
+    from zope.interface import directlyProvides
+    from karl.models.interfaces import IPeopleDirectory
+    site = testing.DummyModel()
+    pd = site['people'] = testing.DummyModel(order=[])
+    directlyProvides(pd, IPeopleDirectory)
+    pd['categories'] = testing.DummyModel()
 
-    def get_photo(self):
-        return self.get('photo')
+    section = pd['s1'] = testing.DummyModel(tab_title='A', title='Section A')
+    pd.order = ('s1',)
+    report = DummyReport()
+    section['r1'] = report
+    return pd, section, report
 
 
 class DummyReport(testing.DummyModel):
@@ -881,49 +1227,37 @@ class DummyReport(testing.DummyModel):
             title='Report A',
             link_title='A',
             columns=['name'],
-            query=None,
-            filters={}
             )
 
-        pd = testing.DummyModel(order=[])
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleDirectory
-        directlyProvides(pd, IPeopleDirectory)
-        pd.categories = {}
-        site = testing.DummyModel()
-        site['people'] = pd
 
-        section = testing.DummyModel(
-            columns=[], tab_title='A', title='Section A')
-        pd['s1'] = section
-        pd.order.append('s1')
-        section['r1'] = self
+def _makeProfile():
+    from karl.content.interfaces import IImage
+    from zope.interface import implements
 
-class DummyProfile(testing.DummyModel):
-    def __init__(self):
-        testing.DummyModel.__init__(self)
-        self['photo'] = DummyImageFile()
+    class DummyImageFile(object):
+        implements(IImage)
+        is_image = True
 
-from karl.content.interfaces import IImage
-from zope.interface import implements
-class DummyImageFile(object):
-    implements(IImage)
-    is_image = True
+        def __init__(self):
+            self.title = None
+            self.data = ONE_PIXEL_JPEG
+            self.size = len(self.data)
+            self.mimetype = None
+            self.filename= None
+            self.creator = None
 
-    def __init__(self, title=None, stream=None, mimetype=None, filename=None,
-                 creator=None):
-        self.title = title
-        self.mimetype = mimetype
-        if stream is not None:
-            self.data = stream.read()
-        else:
-            self.data = one_pixel_jpeg
-        self.size = len(self.data)
-        self.mimetype = mimetype
-        self.filename= filename
-        self.creator = creator
+    class DummyProfile(testing.DummyModel):
+        def __init__(self):
+            testing.DummyModel.__init__(self)
+            self['photo'] = DummyImageFile()
 
-one_pixel_jpeg = [
+        def get_photo(self):
+            return self.get('photo')
+
+    return DummyProfile()
+
+
+ONE_PIXEL_JPEG = [
 0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01,
 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43, 0x00, 0x05,
 0x03, 0x04, 0x04, 0x04, 0x03, 0x05, 0x04, 0x04, 0x04, 0x05, 0x05, 0x05, 0x06,
@@ -948,4 +1282,4 @@ one_pixel_jpeg = [
 0x02, 0x11, 0x03, 0x11, 0x00, 0x3f, 0x00, 0xb2, 0xc0, 0x07, 0xff, 0xd9
 ]
 
-one_pixel_jpeg = ''.join([chr(x) for x in one_pixel_jpeg])
+ONE_PIXEL_JPEG = ''.join([chr(x) for x in ONE_PIXEL_JPEG])

@@ -222,6 +222,7 @@ class Alert(object):
     mfrom = None
     message = None
     digest = False
+    _attachments_folder = None
 
     def __init__(self, context, profile, request):
         self.context = context
@@ -234,6 +235,44 @@ class Alert(object):
     @property
     def mto(self):
         return [self.profile.email,]
+
+    @property
+    def attachments(self):
+        folder = self._attachments_folder
+        if folder is None:
+            return [], [], {}
+
+        profile = self.profile
+        request = self.request
+        attachments = []
+        attachment_links = []
+        attachment_hrefs = {}
+        for name, model in folder.items():
+            if profile.alert_attachments == 'link':
+                attachment_links.append(name)
+                attachment_hrefs[name] = model_url(model, request)
+
+            elif profile.alert_attachments == 'attach':
+                with model.blobfile.open() as f:
+                    f.seek(0, 2)
+                    size = f.tell()
+                    if size > MAX_ATTACHMENT_SIZE:
+                        attachment_links.append(name)
+                        attachment_hrefs[name] = model_url(model, request)
+
+                    else:
+                        f.seek(0, 0)
+                        data = f.read()
+                        type, subtype = model.mimetype.split('/', 1)
+                        attachment = MIMEBase(type, subtype)
+                        attachment.set_payload(data)
+                        Encoders.encode_base64(attachment)
+                        attachment.add_header(
+                            'Content-Disposition',
+                            'attachment; filename="%s"' % model.filename)
+                        attachments.append(attachment)
+
+        return attachments, attachment_links, attachment_hrefs
 
 class BlogAlert(Alert):
     """Adapter for generating an email from a blog entry alert.
@@ -284,33 +323,7 @@ class BlogAlert(Alert):
                                            docid_to_hex(blogentry.docid),
                                            system_email_domain)
 
-        attachments = []
-        attachment_links = []
-        attachment_hrefs = {}
-        for name,model in self._attachments.items():
-            if profile.alert_attachments == 'link':
-                attachment_links.append(name)
-                attachment_hrefs[name] = model_url(model, request)
-
-            elif profile.alert_attachments == 'attach':
-                with model.blobfile.open() as f:
-                    f.seek(0, 2)
-                    size = f.tell()
-                    if size > MAX_ATTACHMENT_SIZE:
-                        attachment_links.append(name)
-                        attachment_hrefs[name] = model_url(model, request)
-
-                    else:
-                        f.seek(0, 0)
-                        data = f.read()
-                        type, subtype = model.mimetype.split('/', 1)
-                        attachment = MIMEBase(type, subtype)
-                        attachment.set_payload(data)
-                        Encoders.encode_base64(attachment)
-                        attachment.add_header(
-                            'Content-Disposition',
-                            'attachment; filename="%s"' % model.filename)
-                        attachments.append(attachment)
+        attachments, attachment_links, attachment_hrefs = self.attachments
 
         body_template = get_template(self._template)
         from_name = "%s | %s" % (self.creator.title, system_name)
@@ -361,7 +374,7 @@ class BlogAlert(Alert):
         return self._message
 
     @property
-    def _attachments(self):
+    def _attachments_folder(self):
         return self._blogentry['attachments']
 
     @property
@@ -397,7 +410,7 @@ class BlogCommentAlert(BlogAlert):
         return "[%s] Re: %s" % (self._community.title, self._blogentry.title)
 
     @property
-    def _attachments(self):
+    def _attachments_folder(self):
         return self.context
 
     @property
@@ -463,19 +476,23 @@ class NonBlogAlert(Alert):
         system_name = get_setting(self.context, "system_name", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
+        attachments, attachment_links, attachment_hrefs = self.attachments
+
         body_template = get_template(self._template)
         from_name = "%s | %s" % (self.creator.title, system_name)
-        msg = Message()
+        msg = MIMEMultipart() if attachments else Message()
         msg["From"] = "%s <%s>" % (from_name, self.mfrom)
         msg["To"] = "%s <%s>" % (community.title, profile.email)
         msg["Subject"] = self._subject
-        body = body_template(
+        body_text = body_template(
             context=self.context,
             community=community,
             community_href=community_href,
             model=model,
             model_href=model_href,
             manage_preferences_href=manage_preferences_href,
+            attachments=attachment_links,
+            attachment_hrefs=attachment_hrefs,
             profile=profile,
             creator=self.creator,
             content_type=self._content_type_name,
@@ -485,17 +502,24 @@ class NonBlogAlert(Alert):
 
         if self.digest:
             # Only interested in body for digest
-            html = document_fromstring(body)
+            html = document_fromstring(body_text)
             body_element = html.cssselect('body')[0]
             span = etree.Element("span", nsmap=body_element.nsmap)
             span[:] = body_element[:] # Copy all body elements to an empty span
-            body = etree.tostring(span, pretty_print=True)
+            body_text = etree.tostring(span, pretty_print=True)
 
-        if isinstance(body, unicode):
-            body = body.encode('utf-8')
+        if isinstance(body_text, unicode):
+            body_text = body_text.encode('utf-8')
 
-        msg.set_payload(body, 'utf-8')
-        msg.set_type("text/html")
+        if attachments:
+            body = MIMEText(body_text, 'html', 'utf-8')
+            msg.attach(body)
+            for attachment in attachments:
+                msg.attach(attachment)
+        else:
+            msg.set_payload(body_text, 'utf-8')
+            msg.set_type("text/html")
+
         self._message = msg
         return msg
 
@@ -536,6 +560,10 @@ class CalendarEventAlert(NonBlogAlert):
         if not model.attendees:
             return None
         return '; '.join(model.attendees)
+
+    @property
+    def _attachments_folder(self):
+        return self.context.get('attachments')
 
 class DefaultFolderAddables(object):
     implements(IFolderAddables)

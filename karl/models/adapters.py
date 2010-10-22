@@ -46,6 +46,7 @@ from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import IProfiles
+from karl.models.interfaces import IPeopleReportFilter
 
 class CatalogSearch(object):
     """ Centralize policies about searching """
@@ -426,7 +427,9 @@ class PeopleReportLetterManager(object):
 
         # Use the lastnamestartswith index directly for speed.
         index = catalog['lastnamestartswith']
-        if not report.filters and not report.query:
+        filters = [(name, obj) for name, obj in report.items()
+                        if IPeopleReportFilter.providedBy(obj)]
+        if not filters:
             # Any letter in the index will suffice.  This is a fast
             # common case.
             # XXX using undocumented _fwd_index attribute
@@ -434,10 +437,10 @@ class PeopleReportLetterManager(object):
 
         # Perform a catalog search, but don't resolve any paths.
         kw = {}
-        if report.query:
-            kw.update(report.query)
-        for catid, values in report.filters.items():
-            kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
+        for catid, filter in filters:
+            kw['category_%s' % str(catid)] = {'query': filter.values,
+                                              'operator': 'or',
+                                             }
         total, docids = catalog.search(**kw)
 
         # Intersect the search result docids with the docid set

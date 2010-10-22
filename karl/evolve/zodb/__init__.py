@@ -1,2 +1,2 @@
-VERSION = 25
+VERSION = 26
 NAME = 'Karl'

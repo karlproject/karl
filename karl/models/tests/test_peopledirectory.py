@@ -18,11 +18,22 @@
 import unittest
 from repoze.bfg import testing
 
+
+def _makeProfile(**kw):
+    from zope.interface import implements
+    from karl.models.interfaces import IProfile
+
+    class DummyProfile(testing.DummyModel):
+        implements(IProfile)
+
+    return DummyProfile(**kw)
+
+
 class TestDiscriminatorFunctions(unittest.TestCase):
 
     def test_get_lastname_firstletter_on_profile(self):
         from karl.models.peopledirectory import get_lastname_firstletter
-        obj = DummyProfile(lastname='Smith')
+        obj = _makeProfile(lastname='Smith')
         self.assertEqual(get_lastname_firstletter(obj, 0), 'S')
 
     def test_get_lastname_firstletter_on_other(self):
@@ -32,47 +43,47 @@ class TestDiscriminatorFunctions(unittest.TestCase):
 
     def test_get_department(self):
         from karl.models.peopledirectory import get_department
-        obj = DummyProfile(department='Redundant')
+        obj = _makeProfile(department='Redundant')
         self.assertEqual(get_department(obj, 0), 'redundant')
         obj.department = None
         self.assertEqual(get_department(obj, 0), 0)
 
     def test_get_email(self):
         from karl.models.peopledirectory import get_email
-        obj = DummyProfile(email='xyz@Example.com')
+        obj = _makeProfile(email='xyz@Example.com')
         self.assertEqual(get_email(obj, 0), 'xyz@example.com')
         obj.email = None
         self.assertEqual(get_email(obj, 0), 0)
 
     def test_get_location(self):
         from karl.models.peopledirectory import get_location
-        obj = DummyProfile(location='SLC')
+        obj = _makeProfile(location='SLC')
         self.assertEqual(get_location(obj, 0), 'slc')
         obj.location = None
         self.assertEqual(get_location(obj, 0), 0)
 
     def test_get_organization(self):
         from karl.models.peopledirectory import get_organization
-        obj = DummyProfile(organization='Fun')
+        obj = _makeProfile(organization='Fun')
         self.assertEqual(get_organization(obj, 0), 'fun')
         obj.organization = None
         self.assertEqual(get_organization(obj, 0), 0)
 
     def test_get_phone(self):
         from karl.models.peopledirectory import get_phone
-        obj = DummyProfile(phone='(123) 456-0')
+        obj = _makeProfile(phone='(123) 456-0')
         self.assertEqual(get_phone(obj, 0), '(123) 456-0')
         obj.phone = None
         self.assertEqual(get_phone(obj, 0), 0)
 
     def test_get_phone_with_extension(self):
         from karl.models.peopledirectory import get_phone
-        obj = DummyProfile(phone='(123) 456-0', extension='42')
+        obj = _makeProfile(phone='(123) 456-0', extension='42')
         self.assertEqual(get_phone(obj, 0), '(123) 456-0 x 42')
 
     def test_get_position(self):
         from karl.models.peopledirectory import get_position
-        obj = DummyProfile(position='Head Boss')
+        obj = _makeProfile(position='Head Boss')
         self.assertEqual(get_position(obj, 0), 'head boss')
         obj.position = None
         self.assertEqual(get_position(obj, 0), 0)
@@ -80,7 +91,7 @@ class TestDiscriminatorFunctions(unittest.TestCase):
     def test_get_groups_for_profile(self):
         from karl.models.peopledirectory import get_groups
         from karl.testing import DummyUsers
-        obj = DummyProfile()
+        obj = _makeProfile()
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
@@ -100,7 +111,7 @@ class TestDiscriminatorFunctions(unittest.TestCase):
     def test_get_groups_for_nonexistent_user(self):
         from karl.models.peopledirectory import get_groups
         from karl.testing import DummyUsers
-        obj = DummyProfile()
+        obj = _makeProfile()
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
@@ -109,7 +120,7 @@ class TestDiscriminatorFunctions(unittest.TestCase):
     def test_is_staff_for_staff(self):
         from karl.models.peopledirectory import is_staff
         from karl.testing import DummyUsers
-        obj = DummyProfile()
+        obj = _makeProfile()
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
@@ -119,7 +130,7 @@ class TestDiscriminatorFunctions(unittest.TestCase):
     def test_is_staff_for_non_staff(self):
         from karl.models.peopledirectory import is_staff
         from karl.testing import DummyUsers
-        obj = DummyProfile()
+        obj = _makeProfile()
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
@@ -139,39 +150,58 @@ class TestDiscriminatorFunctions(unittest.TestCase):
     def test_is_staff_for_nonexistent_user(self):
         from karl.models.peopledirectory import is_staff
         from karl.testing import DummyUsers
-        obj = DummyProfile()
+        obj = _makeProfile()
         site = testing.DummyModel()
         site['testuser'] = obj
         site.users = DummyUsers()
         self.assertEqual(is_staff(obj, ()), ())
 
+
 class TestProfileCategoryGetter(unittest.TestCase):
+
+    def _makeFolder(self, mapping):
+        class DummyFolder(dict):
+            pass
+        return DummyFolder(mapping)
 
     def test_non_profile(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
-        obj = testing.DummyModel(categories={'office': ['slc']})
+        obj = testing.DummyModel()
+        obj['categories'] = self._makeFolder({'office': ['slc']})
         self.assertEqual(getter(obj, 0), 0)
 
     def test_success(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
-        obj = DummyProfile(categories={'office': ['slc']})
+        obj = _makeProfile()
+        obj['categories'] = self._makeFolder({'office': ['slc']})
         self.assertEqual(getter(obj, 0), ['slc'])
 
     def test_empty_category(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
-        obj = DummyProfile(categories={'office': []})
+        obj = _makeProfile()
+        obj['categories'] = self._makeFolder({'office': []})
         self.assertEqual(getter(obj, 0), 0)
 
     def test_no_categories(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
-        obj = DummyProfile(categories={})
+        obj = _makeProfile()
+        obj['categories'] = self._makeFolder({})
         self.assertEqual(getter(obj, 0), 0)
 
+
 class TestPeopleDirectory(unittest.TestCase):
+
+    def setUp(self):
+        from repoze.bfg.testing import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from repoze.bfg.testing import cleanUp
+        cleanUp()
 
     def _getTargetClass(self):
         from karl.models.peopledirectory import PeopleDirectory
@@ -180,65 +210,118 @@ class TestPeopleDirectory(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()()
 
-    def test_verifyImplements(self):
+    def test_class_conforms_to_IPeopleDirectory(self):
         from zope.interface.verify import verifyClass
         from karl.models.interfaces import IPeopleDirectory
         verifyClass(IPeopleDirectory, self._getTargetClass())
 
-    def test_verifyProvides(self):
+    def test_instance_conforms_to_IPeopleDirectory(self):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleDirectory
         verifyObject(IPeopleDirectory, self._makeOne())
 
-    def test_set_order(self):
-        pd = self._makeOne()
-        pd.set_order(['def', 'abc'])
-        self.assertEqual(pd.order, ('def', 'abc'))
-
     def test_update_indexes_no_reindex(self):
         pd = self._makeOne()
         self.assertEqual(pd.update_indexes(), False)
-        self.assertTrue('lastfirst' in pd.catalog)
-        self.assertTrue('lastnamestartswith' in pd.catalog)
-        self.assertTrue('texts' in pd.catalog)
-        self.assertTrue('allowed' in pd.catalog)
+        self.failUnless('lastfirst' in pd.catalog)
+        self.failUnless('lastnamestartswith' in pd.catalog)
+        self.failUnless('texts' in pd.catalog)
+        self.failUnless('allowed' in pd.catalog)
 
     def test_update_indexes_after_new_category(self):
         pd = self._makeOne()
-        pd.categories['office'] = 1
-        self.assertFalse('category_office' in pd.catalog)
+        pd['categories']['office'] = testing.DummyModel()
+        self.failIf('category_office' in pd.catalog)
         self.assertEqual(pd.update_indexes(), True)
-        self.assertTrue('category_office' in pd.catalog)
+        self.failUnless('category_office' in pd.catalog)
 
-    def test_remove_category(self):
+    def test_update_indexes_after_removing_category(self):
         pd = self._makeOne()
-        pd.categories['office'] = 1
+        pd['categories']['office'] = testing.DummyModel()
         pd.update_indexes()
-        self.assertTrue('category_office' in pd.catalog)
-        del pd.categories['office']
+        self.failUnless('category_office' in pd.catalog)
+        del pd['categories']['office']
         self.assertEqual(pd.update_indexes(), False)
-        self.assertFalse('category_office' in pd.catalog)
+        self.failIf('category_office' in pd.catalog)
+
+
+class TestPeopleCategories(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleCategories
+        return PeopleCategories
+
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def test_class_conforms_to_IPeopleCategories(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleCategories
+        verifyClass(IPeopleCategories, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleCategories(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleCategories
+        verifyObject(IPeopleCategories, self._makeOne())
+
+    def test_it(self):
+        from karl.models.peopledirectory import PeopleCategories
+        pc = PeopleCategories()
+        self.assertEqual(pc.title, 'People Categories')
 
 
 class TestPeopleCategory(unittest.TestCase):
 
-    def test_it(self):
+    def _getTargetClass(self):
         from karl.models.peopledirectory import PeopleCategory
-        pc = PeopleCategory('Offices')
+        return PeopleCategory
+
+    def _makeOne(self, title='Testing'):
+        return self._getTargetClass()(title)
+
+    def test_class_conforms_to_IPeopleCategory(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleCategory
+        verifyClass(IPeopleCategory, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleCategory(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleCategory
+        verifyObject(IPeopleCategory, self._makeOne())
+
+    def test_it(self):
+        pc = self._makeOne('Offices')
         self.assertEqual(pc.title, 'Offices')
 
 
 class TestPeopleCategoryItem(unittest.TestCase):
 
-    def test_with_description(self):
+    def _getTargetClass(self):
         from karl.models.peopledirectory import PeopleCategoryItem
-        pci = PeopleCategoryItem('Title', 'Description')
+        return PeopleCategoryItem
+
+    def _makeOne(self, title='Testing', description=None):
+        if description is not None:
+            return self._getTargetClass()(title, description)
+        return self._getTargetClass()(title)
+
+    def test_class_conforms_to_IPeopleCategoryItem(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleCategoryItem
+        verifyClass(IPeopleCategoryItem, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleCategory(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleCategoryItem
+        verifyObject(IPeopleCategoryItem, self._makeOne())
+
+    def test_with_description(self):
+        pci = self._makeOne('Title', 'Description')
         self.assertEqual(pci.title, 'Title')
         self.assertEqual(pci.description, 'Description')
 
     def test_without_description(self):
-        from karl.models.peopledirectory import PeopleCategoryItem
-        pci = PeopleCategoryItem('Title')
+        pci = self._makeOne('Title')
         self.assertEqual(pci.title, 'Title')
         self.assertEqual(pci.description, '')
 
@@ -252,22 +335,16 @@ class TestPeopleSection(unittest.TestCase):
     def _makeOne(self, title='Organizations', tab_title='Orgs'):
         return self._getTargetClass()(title, tab_title)
 
-    def test_verifyImplements(self):
+    def test_class_conforms_to_IPeopleSection(self):
         from zope.interface.verify import verifyClass
         from karl.models.interfaces import IPeopleSection
         verifyClass(IPeopleSection, self._getTargetClass())
 
-    def test_verifyProvides(self):
+    def test_instance_conforms_to_IPeopleSection(self):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleSection
         verifyObject(IPeopleSection, self._makeOne())
 
-    def test_set_columns(self):
-        obj = self._makeOne()
-        a = testing.DummyModel()
-        b = testing.DummyModel()
-        obj.set_columns([a, b])
-        self.assertEqual(obj.columns, (a, b))
 
 class TestPeopleReportGroup(unittest.TestCase):
 
@@ -278,22 +355,16 @@ class TestPeopleReportGroup(unittest.TestCase):
     def _makeOne(self, title='G1'):
         return self._getTargetClass()(title)
 
-    def test_verifyImplements(self):
+    def test_class_conforms_to_IPeopleReportGroup(self):
         from zope.interface.verify import verifyClass
         from karl.models.interfaces import IPeopleReportGroup
         verifyClass(IPeopleReportGroup, self._getTargetClass())
 
-    def test_verifyProvides(self):
+    def test_instance_conforms_to_IPeopleReportGroup(self):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleReportGroup
         verifyObject(IPeopleReportGroup, self._makeOne())
 
-    def test_set_reports(self):
-        obj = self._makeOne()
-        a = testing.DummyModel()
-        b = testing.DummyModel()
-        obj.set_reports([a, b])
-        self.assertEqual(obj.reports, (a, b))
 
 class TestPeopleSectionColumn(unittest.TestCase):
 
@@ -304,15 +375,36 @@ class TestPeopleSectionColumn(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()()
 
-    def test_verifyImplements(self):
+    def test_class_conforms_to_IPeopleSectionColumn(self):
         from zope.interface.verify import verifyClass
-        from karl.models.interfaces import IPeopleReportGroup
-        verifyClass(IPeopleReportGroup, self._getTargetClass())
+        from karl.models.interfaces import IPeopleSectionColumn
+        verifyClass(IPeopleSectionColumn, self._getTargetClass())
 
-    def test_verifyProvides(self):
+    def test_instance_conforms_to_IPeopleSectionColumn(self):
         from zope.interface.verify import verifyObject
-        from karl.models.interfaces import IPeopleReportGroup
-        verifyObject(IPeopleReportGroup, self._makeOne())
+        from karl.models.interfaces import IPeopleSectionColumn
+        verifyObject(IPeopleSectionColumn, self._makeOne())
+
+
+class TestPeopleReportFilter(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleReportFilter
+        return PeopleReportFilter
+
+    def _makeOne(self, values=('a', 'b', 'c')):
+        return self._getTargetClass()(values)
+
+    def test_class_conforms_to_IPeopleReportFilter(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleReportFilter
+        verifyClass(IPeopleReportFilter, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleReportFilter(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleReportFilter
+        verifyObject(IPeopleReportFilter, self._makeOne())
+
 
 class TestPeopleReport(unittest.TestCase):
 
@@ -323,35 +415,40 @@ class TestPeopleReport(unittest.TestCase):
     def _makeOne(self, title='R1', link_title='Report One', css_class='normal'):
         return self._getTargetClass()(title, link_title, css_class)
 
-    def test_verifyImplements(self):
+    def test_class_conforms_to_IPeopleReport(self):
         from zope.interface.verify import verifyClass
         from karl.models.interfaces import IPeopleReport
         verifyClass(IPeopleReport, self._getTargetClass())
 
-    def test_verifyProvides(self):
+    def test_instance_conforms_to_IPeopleReport(self):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleReport
         verifyObject(IPeopleReport, self._makeOne())
 
-    def test_set_query(self):
-        obj = self._makeOne()
-        obj.set_query({'x': 'y'})
-        self.assertEqual(obj.query, {'x': 'y'})
 
-    def test_set_filter(self):
-        obj = self._makeOne()
-        obj.set_filter('office', ['nyc'])
-        obj.set_filter('organization', ['fan-club'])
-        self.assertEqual(obj.filters,
-            {'office': ('nyc',), 'organization': ('fan-club',)})
+class TestPeopleDirectorySchemaChanged(unittest.TestCase):
 
-    def test_set_columns(self):
-        obj = self._makeOne()
-        obj.set_columns(['name', 'email'])
-        self.assertEqual(obj.columns, ('name', 'email'))
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleDirectorySchemaChanged
+        return PeopleDirectorySchemaChanged
+
+    def _makeOne(self, peopledir=None):
+        if peopledir is None:
+            peopledir = testing.DummyModel()
+        return self._getTargetClass()(peopledir)
+
+    def test_class_conforms_to_IPeopleDirectorySchemaChanged(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleDirectorySchemaChanged
+        verifyClass(IPeopleDirectorySchemaChanged, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleDirectorySchemaChanged(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleDirectorySchemaChanged
+        verifyObject(IPeopleDirectorySchemaChanged, self._makeOne())
 
 
-class ReindexPeopleDirectoryTests(unittest.TestCase):
+class Test_reindex_peopledirectory(unittest.TestCase):
 
     def _callFUT(self, peopledir):
         from karl.models.peopledirectory import reindex_peopledirectory
@@ -406,9 +503,3 @@ class ReindexPeopleDirectoryTests(unittest.TestCase):
         self.assertEquals(peopledir.catalog.document_map.added,
             [(10, '/profiles/p1')])
 
-
-from zope.interface import implements
-from karl.models.interfaces import IProfile
-
-class DummyProfile(testing.DummyModel):
-    implements(IProfile)

@@ -389,7 +389,7 @@ end_date_field = karlattr.KarlDateTime(
     validator=validator.All(validator.Required(), karlvalidator.DateTime())
     )
 location_field = schemaish.String()
-text_field = schemaish.String()
+text_field = schemaish.String(title='Description')
 attendees_field = schemaish.String(description='One per line')
 contact_name_field = schemaish.String()
 contact_email_field = schemaish.String(

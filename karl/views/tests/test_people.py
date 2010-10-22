@@ -23,6 +23,7 @@ from karl import testing as karltesting
 from karl.testing import DummySessions
 
 class DummyForm(object):
+    allfields = ()
     def __init__(self):
         self.errors = {}
 

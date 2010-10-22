@@ -509,6 +509,7 @@
       <input name="languages" />
     </fieldset>
 
+    <!-- XXX DDD Appears to be unused. -->
     <fieldset metal:define-macro="biography-field"
 	      tal:define="error fielderrors['biography']|None"
 	      class="${error and 'fieldError' or ''}"

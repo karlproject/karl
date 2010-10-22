@@ -17,8 +17,8 @@
 
 import uuid
 
+import formish
 from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.formish import ValidationError
 from repoze.bfg.security import authenticated_userid
@@ -27,22 +27,19 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
-from repoze.sendmail.interfaces import IMailDelivery
+from repoze.postoffice.message import Message
 from repoze.workflow import get_workflow
+import schemaish
 from schemaish.type import File as SchemaFile
+import validatish
 from validatish import validator
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
-from zope.component import getUtility
-import formish
-import schemaish
-import validatish
 
 from karl.consts import countries
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
-from repoze.postoffice.message import Message
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import IInvitation
@@ -72,19 +69,20 @@ from karl.views.communities import get_my_communities
 
 PROFILE_THUMB_SIZE = (75, 100)
 
+_MIN_PW_LENGTH = None
+
+def min_pw_length():
+    global _MIN_PW_LENGTH
+    if _MIN_PW_LENGTH is None:
+        _MIN_PW_LENGTH = get_setting(None, 'min_pw_length', 8)
+    return _MIN_PW_LENGTH
+
 def edit_profile_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'edit-profile')
 
 def add_user_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'add-user')
 
-
-# 'context' arg isn't actually used in the get_setting call, we can
-# use None and it will still work; for some reason, however, the
-# settings aren't initialized when we use the 'test_all' script (even
-# though they are when we use 'test' or 'test_twill'), so we provide a
-# default
-min_pw_length = get_setting(None, 'min_pw_length', 8)
 
 firstname_field = schemaish.String(validator=validator.Required(),
                                    title='First Name')
@@ -97,7 +95,7 @@ department_field = schemaish.String()
 position_field = schemaish.String()
 organization_field = schemaish.String()
 location_field = schemaish.String()
-country_field = schemaish.String()
+country_field = schemaish.String(validator=validator.Required())
 websites_field = schemaish.Sequence(
                     schemaish.String(validator=karlvalidators.WebURL()))
 languages_field = schemaish.String()
@@ -282,7 +280,7 @@ class AdminEditProfileFormController(EditProfileFormController):
                          'community list.'))
         if self.user is not None:
             password_field = schemaish.String(
-                validator=karlvalidators.PasswordLength(min_pw_length),
+                validator=karlvalidators.PasswordLength(min_pw_length()),
                 title='Reset Password',
                 description=('Enter a new password for the user here, '
                              'or leave blank to leave the password '
@@ -422,7 +420,7 @@ class AddUserFormController(EditProfileFormController):
                          'community list.'))
         password_field = schemaish.String(
             validator=(validator.All(
-                karlvalidators.PasswordLength(min_pw_length),
+                karlvalidators.PasswordLength(min_pw_length()),
                 validator.Required())))
         fields = [('login', login_field),
                   ('groups', groups_field),
@@ -608,6 +606,10 @@ def show_profile_view(context, request):
 
     if profile.has_key("department"):
         profile["department"] = context.department
+
+    if profile.has_key("last_login_time"):
+        stamp = context.last_login_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        profile["last_login_time"] = stamp
 
     if profile.has_key("country"):
         # translate from country code to country name
@@ -859,12 +861,6 @@ def show_profiles_view(context, request):
         )
 
 
-new_password_field = schemaish.String(
-    title="New Password",
-    validator=validator.All(karlvalidators.PasswordLength(min_pw_length),
-                            validator.Required())
-    )
-
 class ChangePasswordFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -880,6 +876,12 @@ class ChangePasswordFormController(object):
                 validator.Required(),
                 karlvalidators.CorrectUserPassword(user),
                 )
+            )
+        new_password_field = schemaish.String(
+            title="New Password",
+            validator=validator.All(
+                            karlvalidators.PasswordLength(min_pw_length()),
+                            validator.Required())
             )
         fields = [('old_password', old_password_field),
                   ('password', new_password_field),

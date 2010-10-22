@@ -23,6 +23,7 @@ from zope.interface import implements
 from zope.component import adapter
 
 from repoze.folder import Folder
+from karl.consts import countries
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
@@ -34,6 +35,7 @@ class Profile(Folder):
     alert_attachments = 'link'
     fax = '' # BBB
     _websites = ()
+    last_login_time = None # BBB
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -91,6 +93,8 @@ class Profile(Folder):
         self.position = position
         self.organization = organization
         self.location = location
+        if country not in countries.as_dict:
+            country = 'XX'
         self.country = country
         if websites is not None:
             self.websites = websites
@@ -105,6 +109,7 @@ class Profile(Folder):
         self.password_reset_key = None
         self.password_reset_time = None
         self.preferred_communities = preferred_communities
+        self.last_login_time = None
 
     @property
     def creator(self):

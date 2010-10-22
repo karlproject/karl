@@ -262,6 +262,7 @@ countries = Countries([
     ('GB', 'United Kingdom'),
     ('US', 'United States'),
     ('UM', 'United States Minor Outlying Islands'),
+    ('XX', 'Unknown'),
     ('UY', 'Uruguay'),
     ('UZ', 'Uzbekistan'),
     ('VU', 'Vanuatu'),

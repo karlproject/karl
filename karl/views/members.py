@@ -570,7 +570,11 @@ class AcceptInvitationFormController(object):
             ('extension', schemaish.String()),
             ('organization', schemaish.String()),
             ('country', schemaish.String(
-                validator=validator.OneOf(countries.as_dict.keys()))),
+                validator=validator.All(
+                            validator.OneOf(countries.as_dict.keys()),
+                            validator.Required()),
+                ),
+            ),
             ('location', schemaish.String()),
             ('department', schemaish.String()),
             ('position', schemaish.String()),

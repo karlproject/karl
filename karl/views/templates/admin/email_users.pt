@@ -3,6 +3,10 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout.macros['master']">
 
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <script type="text/javascript" src="${api.static_url}/packed/karl-tiny.js">//</script>
+  </span>
+
   <div metal:fill-slot="portlets">
     <div metal:use-macro="menu"/>
   </div>

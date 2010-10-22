@@ -14,12 +14,46 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+import csv
+import formish
+import math
+import schemaish
+import StringIO
+from xml.sax.saxutils import escape
+from xml.sax.saxutils import quoteattr
+
+from lxml import etree
+from repoze.bfg.exceptions import Forbidden
+from repoze.bfg.security import effective_principals
+from repoze.bfg.security import has_permission
+from repoze.bfg.url import model_url
+from simplejson import JSONEncoder
+from webob import Response
+from webob.exc import HTTPFound
+from zope.interface import providedBy
+from validatish import validator
+from validatish import validate
+from zope.index.text.parsetree import ParseError
 
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ILetterManager
+from karl.models.interfaces import IPeopleCategories
+from karl.models.interfaces import IPeopleCategory
+from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportGroup
+from karl.models.interfaces import IPeopleSection
+from karl.models.interfaces import IPeopleSectionColumn
+from karl.models.peopledirectory import PeopleCategory
+from karl.models.peopledirectory import PeopleCategoryItem
+from karl.models.peopledirectory import PeopleReport
+from karl.models.peopledirectory import PeopleReportFilter
+from karl.models.peopledirectory import PeopleReportGroup
+from karl.models.peopledirectory import PeopleSection
+from karl.models.peopledirectory import PeopleSectionColumn
 from karl.utilities.image import thumb_url
+from karl.utilities.peopleconf import dump_peopledir
+from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
@@ -27,119 +61,208 @@ from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import convert_to_script
-from repoze.bfg.exceptions import Forbidden
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
-from simplejson import JSONEncoder
-from webob import Response
-from webob.exc import HTTPFound
-from xml.sax.saxutils import escape
-from xml.sax.saxutils import quoteattr
-from zope.index.text.parsetree import ParseError
-import csv
-import math
-import StringIO
 
+
+def admin_contents(context, request):
+    peopledir = find_peopledirectory(context)
+    api = TemplateAPI(context, request, 'Contents')
+    if 'form.delete' in request.POST:
+        if 'selected' not in request.POST:
+            api.status_message = 'Please select a value'
+        else: 
+            selected = request.POST['selected']
+            if isinstance(selected, basestring):
+               selected = [selected]
+            for name in selected:
+                del context[name]
+            return HTTPFound(location=model_url(context, request, 
+                                                'admin.html')
+                            )
+    return dict(api=api,
+                peopledir=peopledir,
+                actions=get_admin_actions(context, request) + 
+                        get_actions(context, request),
+                has_categories=peopledir is context,
+               )
+
+def admin_contents_moveup_view(context, request):
+    peopledir = find_peopledirectory(context)
+    api = TemplateAPI(context, request, 'Contents')
+    name = request.GET['name']
+    order = context.order
+    n = order.index(name)
+    if n == 0:
+       api.status_message = 'Already at top of list'
+    else:
+       order[n], order[n-1] = order[n-1], order[n]
+       context.order = order
+    return HTTPFound(location=model_url(context, request, 'admin.html'))
+
+def admin_contents_movedown_view(context, request):
+    peopledir = find_peopledirectory(context)
+    api = TemplateAPI(context, request, 'Contents')
+    name = request.GET['name']
+    order = context.order
+    n = order.index(name)
+    if n+1 == len(order):
+       api.status_message = 'Already at bottom of list'
+    else:
+       order[n], order[n+1] = order[n+1], order[n]
+       context.order = order
+    return HTTPFound(location=model_url(context, request, 'admin.html'))
 
 def peopledirectory_view(context, request):
     # show the first accessible tab
     for section_id in context.order:
         section = context[section_id]
         if has_permission('view', section, request):
-            return section_view(section, request)
+            return HTTPFound(location=model_url(section, request))
     raise Forbidden("No accessible sections")
+
+
+def download_peopledirectory_xml(context, request):
+    response = Response(dump_peopledir(context))
+    response.content_type = 'application/xml'
+    # suggest a filename based on the report name
+    response.headers.add('Content-Disposition',
+        'attachment;filename=%s.xml' % str(context.__name__))
+    return response
+
+def upload_peopledirectory_xml(context, request):
+    peopledir = find_peopledirectory(context)
+
+    if 'form.submit' in request.POST:
+        # 'xml' should be the uploaded file.
+        xml = request.POST['xml'].file
+        tree = etree.parse(xml)
+        peopleconf(context, tree, force_reindex=True)
+        return HTTPFound(location=model_url(context, request))
+
+    return dict(api=TemplateAPI(context, request, 'Upload People XML'),
+                peopledir=peopledir,
+                #actions=get_actions(context, request),
+               )
 
 def get_tabs(peopledir, request, current_sectionid):
     """Return a list of dictionaries containing tabs to display in the UI"""
-    res = []
+    result = []
     for sectionid in peopledir.order:
         section = peopledir[sectionid]
         if not has_permission('view', section, request):
             continue
-        res.append({
+        result.append({
             'href': model_url(section, request),
             'title': section.tab_title,
             'selected': current_sectionid == section.__name__,
             })
-    return res
+    return result
+
 
 def render_report_group(group, request, css_class=''):
     """Produce the HTML for a report group on a section index page"""
-    res = []
-    if group.title:
-        res.append('<h3>%s</h3>' % escape(group.title))
+    result = []
+    title = getattr(group, 'title', '')
+    if title:
+        result.append('<h3>%s</h3>' % escape(group.title))
     if css_class:
-        res.append('<ul class=%s>' % quoteattr(css_class))
+        result.append('<ul class=%s>' % quoteattr(css_class))
     else:
-        res.append('<ul>')
-    for obj in group.reports:
+        result.append('<ul>')
+    for obj in group.values():
         if IPeopleReport.providedBy(obj):
             url = model_url(obj, request)
-            res.append('<li><a href=%s class=%s>%s</a></li>' % (
+            result.append('<li><a href=%s class=%s>%s</a></li>' % (
                 quoteattr(url),
                 quoteattr(obj.css_class),
                 escape(obj.link_title)))
         elif IPeopleReportGroup.providedBy(obj):
             html = render_report_group(obj, request)
-            res.append('<li>')
-            res.append(html)
-            res.append('</li>')
-    res.append('</ul>')
-    return '\n'.join(res)
+            result.append('<li>')
+            result.append(html)
+            result.append('</li>')
+    result.append('</ul>')
+    return '\n'.join(result)
+
+_ADDABLES = {
+    IPeopleDirectory: [('Section', 'add_section.html')],
+    IPeopleCategories: [('Category', 'add_category.html')],
+    IPeopleCategory: [('CategoryItem', 'add_category_item.html')],
+    IPeopleSection: [('Column', 'add_column.html'),
+                     ('ReportGroup', 'add_report_group.html'),
+                     ('Report', 'add_report.html'),
+                    ],
+    IPeopleSectionColumn: [('ReportGroup', 'add_report_group.html'),
+                           ('Report', 'add_report.html'),
+                          ],
+    IPeopleReportGroup: [('Report', 'add_report.html')],
+    IPeopleReport: [('Filter', 'add_report_filter.html')],
+}
+
+
+def get_admin_actions(context, request):
+    actions = []
+    if has_permission('administer', context, request):
+        actions.append(('Edit', 'edit.html'))
+        ifaces = list(providedBy(context))
+        if ifaces:
+            for name, path_elem in _ADDABLES.get(ifaces[0], ()):
+                actions.append(('Add %s' % name, path_elem))
+    return actions
+
 
 def get_actions(context, request):
     actions = []
     profiles = find_profiles(context)
     if has_permission('administer', profiles, request):
-        actions.append(('Add User', 'add.html'))
+        if request.view_name != 'admin.html':
+            actions.append(('Admin', 'admin.html'))
+        actions.append(('Add User', model_url(profiles, request, 'add.html')))
     return actions
 
+
 def section_view(context, request):
-    if not context.columns:
-        if len(context) == 1:
-            # display the single report as the content of this section
-            report = context.values()[0]
-            if has_permission('view', report, request):
-                return report_view(report, request)
-            raise Forbidden("Report is not accessible")
+
+    subs = [sub for sub in context.values()
+              if has_permission('view', sub, request) and
+                 IPeopleReport.providedBy(sub)]
+
+    if len(subs) == 1:
+        return HTTPFound(location=model_url(subs[0], request))
 
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     peopledir_tabs = get_tabs(peopledir, request, context.__name__)
-    column_html = [render_report_group(column, request, 'column')
-        for column in context.columns]
-    return render_template_to_response(
-        'templates/people_section.pt',
-        api=api,
-        peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs,
-        column_html=column_html,
-        actions=get_actions(context, request),
-        )
+    columns = [{'html': render_report_group(x, request, 'column'),
+                'width': getattr(x, 'width', 50)}
+                        for x in context.values()]
+    return dict(api=api,
+                peopledir=peopledir,
+                peopledir_tabs=peopledir_tabs,
+                columns=columns,
+                actions=get_actions(context, request),
+               )
+
+def section_column_view(context, request):
+    return HTTPFound(location=context.__parent__)
 
 def report_view(context, request):
-    client_json_data = {
-        'grid_data': get_grid_data(context, request),
-        }
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     section = context.__parent__
     peopledir_tabs = get_tabs(peopledir, request, section.__name__)
-
-    mgr = ILetterManager(context)
-    letter_info = mgr.get_info(request)
-    kw, qualifiers = get_search_qualifiers(request)
+    client_json_data = {'grid_data': get_grid_data(context, request)}
 
     descriptions = get_report_descriptions(context)
+    mgr = ILetterManager(context)
+    letter_info = mgr.get_info(request)
+
+    kw, qualifiers = get_search_qualifiers(request)
     print_url = model_url(context, request, 'print.html', **kw)
     csv_url = model_url(context, request, 'csv', **kw)
     pictures_url = model_url(context, request, 'picture_view.html', **kw)
     opensearch_url = model_url(context, request, 'opensearch.xml')
 
-    return render_template_to_response(
-        'templates/people_report.pt',
+    return dict(
         api=api,
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs,
@@ -152,7 +275,7 @@ def report_view(context, request):
         qualifiers=qualifiers,
         opensearch_url=opensearch_url,
         actions=get_actions(context, request),
-        )
+    )
 
 def jquery_grid_view(context, request):
     sort_on = request.params.get('sortColumn', None)
@@ -162,22 +285,24 @@ def jquery_grid_view(context, request):
         limit=int(request.params['limit']),
         sort_on=sort_on,
         reverse=reverse,
-        )
+    )
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")
 
+
 def get_column_jsdata(columns, max_width):
-    """Produce a list of dictionaries about report columns for jquery"""
+    """Produce a list of dictionaries about report columns for jquery
+    """
     total_weight = sum(c.weight for c in columns)
-    res = []
+    result = []
     for c in columns:
         width = int(math.floor(c.weight * max_width / total_weight))
-        res.append({
-            'id': c.id,
-            'label': c.title,
-            'width': width,
-            })
-    return res
+        result.append({'id': c.id,
+                       'label': c.title,
+                       'width': width,
+                      })
+    return result
+
 
 def profile_photo_rows(entries, request, api, columns=3):
     """Arrange profiles in a series of rows.
@@ -199,6 +324,7 @@ def profile_photo_rows(entries, request, api, columns=3):
             row = []
     if row:
         yield row
+
 
 def picture_view(context, request):
     sort_index = COLUMNS[context.columns[0]].sort_index
@@ -228,8 +354,7 @@ def picture_view(context, request):
     csv_url = model_url(context, request, 'csv', **kw)
     tabular_url = model_url(context, request, **kw)
 
-    return render_template_to_response(
-        'templates/people_pictures.pt',
+    return dict(
         api=api,
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs,
@@ -242,6 +367,7 @@ def picture_view(context, request):
         batch_info=batch_info,
         rows=rows,
         )
+
 
 def get_search_qualifiers(request):
     """Gets search qualifiers from the request.
@@ -268,13 +394,14 @@ def get_search_qualifiers(request):
 
     return kw, qualifiers
 
+
 def get_report_query(report, request):
-    """Produce query parameters for a catalog search"""
+    """Produce query parameters for a catalog search
+    """
     kw = {}
-    if report.query:
-        kw.update(report.query)
-    for catid, values in report.filters.items():
-        kw['category_%s' % catid] = {'query': values, 'operator': 'or'}
+    for catid, filter in report.items():
+        kw['category_%s' % str(catid)] = {'query': filter.values,
+                                          'operator': 'or'}
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     letter = request.params.get('lastnamestartswith')
@@ -284,6 +411,7 @@ def get_report_query(report, request):
     if body:
         kw['texts'] = body.strip() + '*'
     return kw
+
 
 def get_grid_data(context, request, start=0, limit=12,
         sort_on=None, reverse=False, width=880):
@@ -329,18 +457,20 @@ def get_grid_data(context, request, start=0, limit=12,
         )
     return payload
 
+
 def get_report_descriptions(report):
     descriptions = []  # [(value title, description)]
-    categories = find_peopledirectory(report).categories
-    for catid, values in report.filters.items():
+    categories = find_peopledirectory(report)['categories']
+    for catid, filter in report.items():
         cat = categories.get(catid)
         if cat:
-            for value in values:
+            for value in filter.values:
                 catitem = cat.get(value)
                 if catitem:
                     descriptions.append((catitem.title, catitem.description))
     descriptions.sort()
     return [d for (t, d) in descriptions]
+
 
 def text_dump(report, request):
     """Generates a table of text for a report.
@@ -360,9 +490,10 @@ def text_dump(report, request):
     for docid in docids:
         profile = resolver(docid)
         if profile is None:
-            continue
+            continue    #pragma NO COVERAGE
         record = [column.render_text(profile) for column in columns]
         yield record
+
 
 def csv_view(context, request):
     dumper = text_dump(context, request)
@@ -378,30 +509,25 @@ def csv_view(context, request):
         'attachment;filename=%s.csv' % str(context.__name__))
     return response
 
+
 def print_view(context, request):
     dumper = text_dump(context, request)
     header = dumper.next()
     api = TemplateAPI(context, request, context.title)
 
-    return render_template_to_response(
-        'templates/people_print.pt',
-        api=api,
-        header=header,
-        rows=dumper,
-    )
+    return dict(api=api,
+                header=header,
+                rows=dumper,
+               )
 
-def add_user_view(context, request):
-    profiles = find_profiles(context)
-    return HTTPFound(location=model_url(profiles, request, 'add.html'))
 
 def opensearch_view(context, request):
     api = TemplateAPI(context, request, 'KARL People OpenSearch')
-    return render_template_to_response(
-        'templates/opensearch.xml',
-        api=api,
-        report=context,
-        url=model_url(context, request),
-    )
+    return dict(api=api,
+                report=context,
+                url=model_url(context, request),
+               )
+
 
 class ReportColumn(object):
 
@@ -455,3 +581,238 @@ COLUMNS = {
     'phone': PhoneColumn('phone', 'Phone'),
     'position': ReportColumn('position', 'Position'),
     }
+
+
+class EditBase(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_defaults(self):
+        context = self.context
+        defaults = {}
+        for field_name, field in self.schema:
+            defaults[field_name] = getattr(context, field_name)
+        return defaults
+
+    def form_fields(self):
+        return self.schema
+ 
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request)
+        actions = (get_admin_actions(context, request) +
+                   get_actions(context, request))
+        return {'api':api,
+                'actions':actions,
+                'page_title': self.page_title,
+                }
+ 
+    def handle_cancel(self):
+        location = model_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+ 
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        for name, field in self.schema:
+            setattr(context, name, converted[name])
+        location = model_url(context, request, 'admin.html')
+        return HTTPFound(location=location)
+
+name_schema = [
+    ('name', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=40),
+                        validator.Required(),
+                     ))),
+]
+
+class AddBase(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        return name_schema + self.schema
+ 
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request)
+        return {'api':api,
+                'actions': [],
+                'page_title': self.page_title,
+                }
+ 
+    def handle_cancel(self):
+        location = model_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+ 
+    def handle_submit(self, converted):
+        context = self.context
+        request = self.request
+        name = converted['name']
+        to_add = context[name] = self.factory()
+        for field_name, field in self.schema:
+            setattr(to_add, field_name, converted[field_name])
+        location = model_url(to_add, request, 'admin.html')
+        return HTTPFound(location=location)
+
+category_schema = [
+    ('title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=100),
+                        validator.Required(),
+                     ))),
+]
+
+def edit_categories_view(context, request):
+    # There is nothing useful to be done here.
+    return HTTPFound(location=model_url(context, request, 'admin.html'))
+
+class EditCategoryFormController(EditBase):
+    page_title = 'Edit Category'
+    schema = category_schema
+
+class AddCategoryFormController(AddBase):
+    page_title = 'Add Category'
+    schema = category_schema
+    factory = PeopleCategory
+
+category_item_schema = [
+    ('title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=100),
+                        validator.Required(),
+                     ))),
+    ('description', schemaish.String()),
+]
+
+class EditCategoryItemFormController(EditBase):
+    page_title = 'Edit Category Item'
+    schema = category_item_schema
+    
+class AddCategoryItemFormController(AddBase):
+    page_title = 'Add Category Item'
+    schema = category_item_schema
+    factory = PeopleCategoryItem
+
+section_schema = [
+    ('title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=100),
+                        validator.Required(),
+                     ))),
+    ('tab_title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=20),
+                        validator.Required(),
+                     ))),
+]
+
+class EditSectionFormController(EditBase):
+    page_title = 'Edit Section'
+    schema = section_schema
+
+class AddSectionFormController(AddBase):
+    page_title = 'Add Section'
+    schema = section_schema
+    factory = PeopleSection
+
+report_group_schema = [
+    ('title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=100),
+                        validator.Required(),
+                     ))),
+]
+
+class EditReportGroupFormController(EditBase):
+    page_title = 'Edit Report Group'
+    schema = report_group_schema
+
+class AddReportGroupFormController(AddBase):
+    page_title = 'Add Report Group'
+    schema = report_group_schema
+    factory = PeopleReportGroup
+
+section_column_schema = [
+   ('width', schemaish.Integer()),
+]
+
+class EditSectionColumnFormController(EditBase):
+    page_title = 'Edit Section Column'
+    schema = section_column_schema
+    
+class AddSectionColumnFormController(AddBase):
+    page_title = 'Add Section Column'
+    schema = section_column_schema
+    factory = PeopleSectionColumn
+
+report_schema = [
+    ('title', schemaish.String(
+                    validator=validator.All(
+                        validator.Length(max=100),
+                        validator.Required(),
+                     ))),
+    ('link_title', schemaish.String()),
+    ('css_class', schemaish.String()),
+    ('columns', schemaish.Sequence(
+                    schemaish.String(
+                       validator = lambda v: 
+                           validate.is_one_of(v, COLUMNS.keys())))),
+]
+
+report_filter_schema = [
+    ('values', schemaish.Sequence(
+                  schemaish.String())),
+]
+
+class EditReportFilterFormController(EditBase):
+    page_title = 'Edit Report Filter'
+    schema = report_filter_schema
+    
+    def form_widgets(self, schema):
+        widgets = {
+            'values':formish.TextArea(rows=5,
+                           converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+        
+class AddReportFilterFormController(AddBase):
+    page_title = 'Add Report Filter'
+    schema = report_filter_schema
+    factory = PeopleReportFilter
+
+    def form_widgets(self, schema):
+        widgets = {
+            'values':formish.TextArea(rows=5,
+                           converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+class EditReportFormController(EditBase):
+    page_title = 'Edit Report'
+    schema = report_schema
+    
+    def form_widgets(self, schema):
+        widgets = {
+            'columns':formish.TextArea(rows=5,
+                            converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+class AddReportFormController(AddBase):
+    page_title = 'Edit Report'
+    schema = report_schema
+    factory = PeopleReport
+    
+    def form_widgets(self, schema):
+        widgets = {
+            'columns':formish.TextArea(rows=5,
+                            converter_options={'delimiter':'\n'}),
+                  }
+        return widgets

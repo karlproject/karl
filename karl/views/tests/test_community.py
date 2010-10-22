@@ -765,6 +765,7 @@ class DummyWorkflow:
 class DummyForm:
     def __init__(self):
         self.widgets = {}
+        self.allfields = []
 
     def validate(self, request, render, succeed):
         pass
@@ -774,6 +775,7 @@ class DummyForm:
 
     def set_widget(self, name, field):
         self.widgets[name] = field
+        self.allfields.append(field)
 
 class DummySchema:
     def __init__(self, **kw):

@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout.macros['master']">
+<body>
+
+<div metal:fill-slot="content">
+
+ <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+ <h1 class="peopledir-title">${peopledir.title}</h1>
+ <div id="peopledir-content-wrapper">
+  <h1>${api.page_title}</h1>
+  <form method="POST" enctype="multipart/form-data">
+   <label for="xml">Upload XML file</label
+   >&nbsp;&nbsp;<a href="index.xml">Current XML</a><br />
+   <input type="file" id="xml" name="xml" /><br />
+   <input type="submit" name="form.submit" value="Upload" />
+  </form>
+ </div>
+
+</div>
+
+</body>
+</html>

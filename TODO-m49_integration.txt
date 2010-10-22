@@ -1,0 +1,41 @@
+TODO's for M49 Integration
+==========================
+
+- [X] Create 'm49_integration' branch of buildout.
+
+- [X] Create 'm49_integration' branch of src/karl.
+
+- [X] Review M49 LP bugs marked 'fixcompleted' to ensure that they have
+      landed on branchpoint of trunk.
+
+      * LP #658418: group name error when adding existing member
+        (Chris Rossi, fix rolled out last week).
+
+      * LP #658546: TinyMCE emits unclean Kaltura enbeds in IE 8
+        (Balasz, fix on trunk 2010-10-18).
+
+      * LP #659243: Can't email-in to a community from Cc field 
+        (this fix was in 'repoze.postoffice', rolled out last week.
+
+      * LP #659926: people: invitation has no 'security_state' attr
+        (Chris Rossi, fix on trunk 2010-10-14).
+
+      x LP #622813: Decrease amount of CSS and JS loaded per page
+        (Balasz landed work on the 'ree-jsupgrade-3-resources' branch;
+        need to figure out if that branch got merged last week).
+
+      * LP #651209: Remove accept tos link from invitations for oxfam
+        (Chris Rossi, fix on trunk 2010-10-18).
+
+      * LP #654633: Account "ghosting" doesn't work on
+        'tseaver-last_login_time' branch (fix deployed on that branch).
+
+- [X] Merge 'ree-jsupgrade-3-resources' branch.
+
+- [X] Merge 'useful_calendar_alerts' branch.
+
+- [X] Merge 'tseaver-profile_requires_country' branch.
+
+- [X] Merge 'tseaver-last_login_time' branch.
+
+- [X] Merge 'tseaver-people_reports_admin' branch.

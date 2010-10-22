@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
-     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="layout.macros['master']">
 
   <div metal:fill-slot="content">
@@ -11,7 +11,7 @@
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div tal:condition="startDate">
       <h4>Event Starts</h4>
@@ -29,9 +29,9 @@
     </div>
 
     <div tal:condition="api.context.text != u''">
-      <h4>Body</h4>
+      <h4>Description</h4>
       <div class="kbody" >
-	<span tal:replace="structure api.context.text"/>
+        <span tal:replace="structure api.context.text"/>
       </div>
     </div>
 

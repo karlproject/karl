@@ -2,7 +2,17 @@
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout.macros['master']">
-
+<head>
+<metal:block metal:fill-slot="extra-headers">
+<script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("abbr.timeago").timeago();
+});
+</script>
+</metal:block>
+</head>
+<body>
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
@@ -23,6 +33,12 @@
       </span>
       <div class="wrapper">
         <div class="profileDetails">
+          <p tal:condition="profile.last_login_time | False">
+            <span class="profileLabel">Last login:</span>
+            <abbr class="timeago"
+                  title="${profile.last_login_time}"
+            >${profile.last_login_time}</abbr>
+          </p>
           <p tal:condition="profile.department">
             <span class="profileLabel">Department:</span>
             <span class="value">${profile.department}</span>
@@ -84,7 +100,8 @@
 
         <div class="profileBio" tal:content="structure profile.biography" />
         <h3> Content Added Recently </h3>
-        <table class="content-listing" id="staffprofile-content" style="clear: none">
+        <table class="content-listing" id="staffprofile-content"
+               style="clear: none">
           <thead>
             <tr>
               <th class="cldate">Created</th>
@@ -102,8 +119,8 @@
           </tbody>
         </table>
         <p style="font-size: 0.9em">
-          <a href="${api.here_url}recent_content.html">More Content Added
-          Recently</a>
+          <a href="${api.here_url}recent_content.html"
+          >More Content Added Recently</a>
         </p>
 
       </div>

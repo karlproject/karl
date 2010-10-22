@@ -278,3 +278,4 @@ class DateTime(Widget):
 
 class VerticalRadioChoice(formish.RadioChoice):
     template = 'field.VerticalRadioChoice'
+

@@ -3,6 +3,10 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal" 
      metal:use-macro="api.anonymous_layout.macros['master']">
 
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <script type="text/javascript" src="${api.static_url}/packed/karl-tiny.js">//</script>
+  </span>
+
   <div metal:fill-slot="content">
  
     <tal:block condition="api.userid is not None">

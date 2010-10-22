@@ -4,6 +4,29 @@ karl package Changelog
 Unreleased
 ----------
 
+- Made '/people' objects editable TTW by administrators.  See
+  https://blueprints.launchpad.net/karl3/+spec/ttw-people-configuration
+
+- Display last login time on main profile view, using relative time via
+  the 'timeago' jQuery plugin.
+
+- Record users' last login time on their profile.  Note that this requires
+  taking over control of the login form POST from the ``repoze.who`` form
+  plugin.  See https://blueprints.launchpad.net/karl3/+spec/last-login-date
+
+- Made profile's ``country`` field required, and added new ``XX`` country
+  code to account for unknown / blank items.  See
+  https://blueprints.launchpad.net/karl3/+spec/country-required
+
+- Changed label of text field in calendar events to 'Description' for all
+  occurrences in the user interface.  (LP #629663)
+
+- Added attachments to calendar event alerts. (LP #629663)
+
+- Load TinyMCE JS / CSS only on pages which need it (LP #622813).
+
+- Attempt to fix unclean kaltura embeds on IE8 (LP #658546).
+
 - Fixed content feeds to work with an instance not rooted at '/'.
 
 - When adding a new user, any previous invitations that user had are deleted.

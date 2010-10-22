@@ -15,14 +15,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from repoze.bfg.traversal import model_path
+from repoze.catalog.document import DocumentMap
+from repoze.catalog.indexes.field import CatalogFieldIndex
+from repoze.catalog.indexes.keyword import CatalogKeywordIndex
+from repoze.catalog.indexes.path2 import CatalogPathIndex2
+from repoze.catalog.indexes.text import CatalogTextIndex
+from repoze.folder import Folder
+from persistent import Persistent
+from zope.interface import implements
+
 from karl.models.catalog import CachingCatalog
+from karl.models.interfaces import IPeopleCategories
 from karl.models.interfaces import IPeopleCategory
 from karl.models.interfaces import IPeopleCategoryItem
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleDirectorySchemaChanged
 from karl.models.interfaces import IPeopleReport
+from karl.models.interfaces import IPeopleReportFilter
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleSection
+from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.interfaces import IProfile
 from karl.models.site import get_acl
 from karl.models.site import get_allowed_to_view
@@ -31,22 +44,78 @@ from karl.models.site import get_path
 from karl.models.site import get_textrepr
 from karl.utils import find_profiles
 from karl.utils import find_users
-from persistent import Persistent
-from persistent.mapping import PersistentMapping
-from repoze.bfg.traversal import model_path
-from repoze.catalog.document import DocumentMap
-from repoze.catalog.indexes.field import CatalogFieldIndex
-from repoze.catalog.indexes.keyword import CatalogKeywordIndex
-from repoze.catalog.indexes.path2 import CatalogPathIndex2
-from repoze.catalog.indexes.text import CatalogTextIndex
-from repoze.folder import Folder
-from zope.interface import implements
 
 
 def get_lastname_firstletter(obj, default):
     if not IProfile.providedBy(obj):
         return default
     return obj.lastname[:1].upper()
+
+
+def get_department(obj, default):
+    res = getattr(obj, 'department', None)
+    if res is None:
+        return default
+    return res.lower()
+
+
+def get_email(obj, default):
+    res = getattr(obj, 'email', None)
+    if res is None:
+        return default
+    return res.lower()
+
+
+def get_location(obj, default):
+    res = getattr(obj, 'location', None)
+    if res is None:
+        return default
+    return res.lower()
+
+
+def get_organization(obj, default):
+    res = getattr(obj, 'organization', None)
+    if res is None:
+        return default
+    return res.lower()
+
+
+def get_phone(obj, default):
+    phone = getattr(obj, 'phone', None)
+    if phone is None:
+        return default
+    ext = getattr(obj, 'extension', None)
+    if ext:
+        return '%s x %s' % (phone, ext)
+    else:
+        return phone
+
+
+def get_position(obj, default):
+    res = getattr(obj, 'position', None)
+    if res is None:
+        return default
+    return res.lower()
+
+
+def get_groups(obj, default):
+    if not IProfile.providedBy(obj):
+        return default
+    users = find_users(obj)
+    user = users.get_by_id(obj.__name__)
+    if user:
+        return user.get('groups', default)
+    return default
+
+
+def is_staff(obj, default):
+    groups = get_groups(obj, default)
+    if groups is default:
+        return default
+    if groups and 'group.KarlStaff' in groups:
+        return True
+    else:
+        return False
 
 
 class ProfileCategoryGetter:
@@ -61,7 +130,7 @@ class ProfileCategoryGetter:
     def __call__(self, obj, default):
         if not IProfile.providedBy(obj):
             return default
-        categories = getattr(obj, 'categories', None)
+        categories = obj.get('categories')
         if not categories:
             return default
         values = categories.get(self.catid)
@@ -70,85 +139,23 @@ class ProfileCategoryGetter:
         return values
 
 
-def get_department(obj, default):
-    res = getattr(obj, 'department', None)
-    if res is None:
-        return default
-    return res.lower()
-
-def get_email(obj, default):
-    res = getattr(obj, 'email', None)
-    if res is None:
-        return default
-    return res.lower()
-
-def get_location(obj, default):
-    res = getattr(obj, 'location', None)
-    if res is None:
-        return default
-    return res.lower()
-
-def get_organization(obj, default):
-    res = getattr(obj, 'organization', None)
-    if res is None:
-        return default
-    return res.lower()
-
-def get_phone(obj, default):
-    phone = getattr(obj, 'phone', None)
-    if phone is None:
-        return default
-    ext = getattr(obj, 'extension', None)
-    if ext:
-        return '%s x %s' % (phone, ext)
-    else:
-        return phone
-
-def get_position(obj, default):
-    res = getattr(obj, 'position', None)
-    if res is None:
-        return default
-    return res.lower()
-
-def get_groups(obj, default):
-    if not IProfile.providedBy(obj):
-        return default
-    users = find_users(obj)
-    user = users.get_by_id(obj.__name__)
-    if user:
-        return user.get('groups', default)
-    return default
-
-def is_staff(obj, default):
-    groups = get_groups(obj, default)
-    if groups is default:
-        return default
-    if groups and 'group.KarlStaff' in groups:
-        return True
-    else:
-        return False
-
 class PeopleDirectory(Folder):
     implements(IPeopleDirectory)
     title = 'People'
+    is_ordered = True
 
     def __init__(self):
         super(PeopleDirectory, self).__init__()
-        self.categories = PersistentMapping()  # {id: PeopleCategory}
-        self.categories.__parent__ = self
+        self['categories'] = Folder()  # {id: PeopleCategory}
         self.catalog = CachingCatalog()
         self.catalog.document_map = DocumentMap()
         self.update_indexes()
-        self.order = ()  # order of sections
 
         # Set up a default configuration
         self['all'] = section = PeopleSection('All')
         section['all'] = report = PeopleReport('All')
-        report.set_columns(['name', 'organization', 'location', 'email'])
-        self.set_order(['all'])
-
-    def set_order(self, order):
-        self.order = tuple(order)
+        report.columns = ('name', 'organization', 'location', 'email')
+        self.order = ['all']
 
     def update_indexes(self):
         indexes = {
@@ -171,9 +178,9 @@ class PeopleDirectory(Folder):
             }
 
         # provide indexes for filtering reports
-        for catid in self.categories.keys():
-            getter = ProfileCategoryGetter(catid)
-            indexes['category_%s' % catid] = CatalogKeywordIndex(getter)
+        for name in self['categories'].keys():
+            getter = ProfileCategoryGetter(name)
+            indexes['category_%s' % name] = CatalogKeywordIndex(getter)
 
         catalog = self.catalog
         need_reindex = False
@@ -192,72 +199,84 @@ class PeopleDirectory(Folder):
         return need_reindex
 
 
-class PeopleCategory(PersistentMapping):
+class PeopleCategories(Folder):
+    implements(IPeopleCategories)
+    title = 'People Categories'
+    tab_title = 'Title'
+    is_ordered = False
+
+
+class PeopleCategory(Folder):
     implements(IPeopleCategory)
+    is_ordered = False
 
     def __init__(self, title):
         super(PeopleCategory, self).__init__()
         self.title = title
 
+
 class PeopleCategoryItem(Persistent):
     implements(IPeopleCategoryItem)
+    is_ordered = False
+    sync_id = None # normally set by GSA sync.
 
     def __init__(self, title, description=u''):
         self.title = title
         self.description = description  # HTML blob
 
+
 class PeopleSection(Folder):
     implements(IPeopleSection)
+    is_ordered = True
 
-    def __init__(self, title, tab_title=None):
+    def __init__(self, title='', tab_title=None):
         super(PeopleSection, self).__init__()
         self.title = title
         if tab_title is None:
             tab_title = title
         self.tab_title = tab_title
-        self.columns = ()  # a sequence of PeopleSectionColumns
 
-    def set_columns(self, columns):
-        self.columns = tuple(columns)
 
-class PeopleReportGroup(Persistent):
+class PeopleReportGroup(Folder):
     implements(IPeopleReportGroup)
+    is_ordered = True
 
-    def __init__(self, title):
+    def __init__(self, title=''):
+        super(PeopleReportGroup, self).__init__()
         self.title = title
-        self.reports = ()  # a sequence of PeopleReports and PeopleReportGroups
 
-    def set_reports(self, reports):
-        self.reports = tuple(reports)
 
-class PeopleSectionColumn(PeopleReportGroup):
-    implements(IPeopleSection)
+class PeopleSectionColumn(Folder):
+    implements(IPeopleSectionColumn)
+    width = 50
+    is_ordered = True
+    
+    def __init__(self, width=50):
+       super(PeopleSectionColumn, self).__init__()
+       self.width = width
 
-    def __init__(self):
-        # a report group with an empty title
-        super(PeopleSectionColumn, self).__init__('')
 
-class PeopleReport(Persistent):
+class PeopleReportFilter(Persistent):
+    implements(IPeopleReportFilter)
+    is_ordered = False
+
+    def __init__(self, values=()):
+        self.values = values
+
+
+class PeopleReport(Folder):
     implements(IPeopleReport)
+    is_ordered = False
 
-    def __init__(self, title, link_title=None, css_class=''):
+    def __init__(self, title='', link_title=None, css_class=''):
+        super(PeopleReport, self).__init__()
         self.title = title
         if link_title is None:
             link_title = title
         self.link_title = link_title
         self.css_class = css_class
-        self.query = None  # a dictionary of catalog query params
-        self.filters = PersistentMapping()  # {category ID -> [value]}
-        self.columns = ()  # column IDs
+        self.columns = ()  # column IDs to display
 
-    def set_query(self, query):
-        self.query = query
-
-    def set_filter(self, catid, values):
-        self.filters[catid] = tuple(values)
-
-    def set_columns(self, columns):
-        self.columns = tuple(columns)
 
 class PeopleDirectorySchemaChanged(object):
     implements(IPeopleDirectorySchemaChanged)

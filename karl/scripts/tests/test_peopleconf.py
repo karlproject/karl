@@ -16,45 +16,85 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
-# since this depends on a fixture not on the package, we will not run tests
-# for this module as part of the regular tests. To run the tests specify this
-# module's name as a command line argument for nose
-__test__ = False
 
-class PeopleConfScriptTests(unittest.TestCase):
+class Test_load_peopleconf(unittest.TestCase):
 
-    def _callFUT(self, root, args=[]):
-        from karl.scripts.peopleconf import main
-        argv = ['peopleconf'] + args
-        res = []
-        def peopleconf_func(peopledir, tree, **kw):
-            res[:] = [(peopledir, tree, kw)]
-        main(argv, root=root, peopleconf_func=peopleconf_func)
-        return res[0]
+    _tempdir = None
 
-    def test_force_reindex(self):
-        from repoze.bfg import testing
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+        if self._tempdir is not None:
+            import shutil
+            shutil.rmtree(self._tempdir)
+
+    def _getTempDir(self):
+        if self._tempdir is None:
+            import tempfile
+            self._tempdir = tempfile.mkdtemp()
+        return self._tempdir
+
+    @property
+    def xml_filename(self):
+        import os
+        return os.path.join(self._getTempDir(), 'peopleconf.xml')
+
+    @property
+    def config_filename(self):
+        import os
+        return os.path.join(self._getTempDir(), 'karl.ini')
+
+    def _makeXML(self, xml):
+        f = open(self.xml_filename, 'w')
+        f.write(xml)
+        f.flush()
+        f.close()
+
+    def _callFUT(self, root=None, filename=None, force_reindex=False):
+        from karl.scripts.peopleconf import load_peopleconf
+
+        args = []
+        def _func(root, tree, force_reindex):
+            args.append((root, tree, force_reindex))
+
+        if root is None:
+            from repoze.bfg.testing import DummyModel
+            root = DummyModel()
+
+        if filename is None:
+            filename = self.xml_filename
+
+        load_peopleconf(root, filename, peopleconf_func=_func,
+                        force_reindex=force_reindex)
+
+        self.assertEqual(len(args), 1)
+        return args[0]
+
+    def test_force_reindex_w_existing(self):
+        from repoze.bfg.testing import DummyModel
         from karl.models.peopledirectory import PeopleDirectory
-        root = testing.DummyModel()
-        original_peopledir = PeopleDirectory()
-        _, _, kw = self._callFUT(root, ['--force-reindex'])
-        self.assertEqual(kw, {'force_reindex': True})
+        self._makeXML(_EMPTY_XML_TEMPLATE)
+        root = DummyModel()
+        original_peopledir = root['people'] = PeopleDirectory()
+        pdir, tree, force_reindex = self._callFUT(root, force_reindex=True)
+        self.failUnless(pdir is original_peopledir)
+        self.assertEqual(force_reindex, True)
 
-    def test_retain_people_directory(self):
-        from repoze.bfg import testing
+    def test_force_reindex_no_existing(self):
+        from repoze.bfg.testing import DummyModel
         from karl.models.peopledirectory import PeopleDirectory
-        root = testing.DummyModel()
-        original_peopledir = PeopleDirectory()
-        root['people'] = original_peopledir
-        peopledir, _, _ = self._callFUT(root)
-        self.assert_(peopledir is original_peopledir)
+        self._makeXML(_EMPTY_XML_TEMPLATE)
+        root = DummyModel()
+        pdir, tree, force_reindex = self._callFUT(root, force_reindex=True)
+        self.failUnless(isinstance(pdir, PeopleDirectory))
+        self.assertEqual(force_reindex, True)
 
-    def test_install_people_directory(self):
-        from repoze.bfg import testing
-        from karl.models.peopledirectory import PeopleDirectory
-        root = testing.DummyModel()
-        root['people'] = testing.DummyModel()
-        peopledir, _, _ = self._callFUT(root)
-        self.assert_(isinstance(peopledir, PeopleDirectory))
+_EMPTY_XML_TEMPLATE = """\
+<?xml version="1.0"?>
+<peopledirectory/>
+"""

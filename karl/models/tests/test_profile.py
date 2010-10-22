@@ -107,6 +107,18 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne()
         self.failUnless(isinstance(inst._pending_alerts, PersistentList))
 
+    def test_empty_country(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.country, 'XX')
+
+    def test_invalid_country(self):
+        inst = self._makeOne(country='XY')
+        self.assertEqual(inst.country, 'XX')
+
+    def test_valid_country(self):
+        inst = self._makeOne(country='HT')
+        self.assertEqual(inst.country, 'HT')
+
     def test_website_websites_new_instance(self):
         inst = self._makeOne()
         self.assertEqual(inst.website, '')

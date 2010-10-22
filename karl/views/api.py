@@ -71,6 +71,7 @@ class TemplateAPI(object):
     _snippets = None
     _start_time = int(time.time())
     countries = countries
+    _form_field_templates = None
 
     def __init__(self, context, request, page_title=None):
         self.context = context
@@ -91,7 +92,10 @@ class TemplateAPI(object):
         full_static_path = getattr(settings, 'full_static_path', False)
         if full_static_path:
             if '%d' in full_static_path:
-                full_static_path = full_static_path % _start_time
+                # XXX XXX note self._start_time is needed... and not _start_time
+                # XXX XXX since this was a trivial bug, there is chance that
+                # XXX XXX this actually never runs! TODO testing???
+                full_static_path = full_static_path % self._start_time
             self.static_url = full_static_path
         self.page_title = page_title
         self.system_name = get_setting(context, 'system_name', 'KARL')
@@ -99,6 +103,12 @@ class TemplateAPI(object):
         site = find_site(context)
         self.admin_url = model_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
+        # XXX XXX XXX This will never work from peoples formish templates
+        # XXX XXX XXX (edit_profile and derivates) because, in those form
+        # XXX XXX XXX controllers, the api is instantiated from __init__,
+        # XXX XXX XXX where request.form is still unset!!! (From all other
+        # XXX XXX XXX formcontrollers the api is instantiated from __call__,
+        # XXX XXX XXX which is why this works. A chicken-and-egg problem, really.
         if hasattr(request, 'form') and getattr(request.form, 'errors', False):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
@@ -159,6 +169,9 @@ class TemplateAPI(object):
         return self._current_intranet
 
     def __getitem__(self, key):
+        if key == 'form_field_templates':
+            # Allow this, for ZPT's sake!
+            return self.form_field_templates
         raise ValueError, "ZPT attempted to fetch %s" % key
 
     @property
@@ -218,6 +231,16 @@ class TemplateAPI(object):
     def formfields(self):
         macro_template = get_template(self.formfields_fn)
         return macro_template
+       
+    @property
+    def form_field_templates(self):
+        if self._form_field_templates is None:
+            # calculate and cache value
+            if hasattr(self.request, 'form'):
+                self._form_field_templates =  [field.widget.template for field in self.request.form.allfields]
+            else:
+                self._form_field_templates = []
+        return self._form_field_templates
 
     _status_message = None
     def get_status_message(self):

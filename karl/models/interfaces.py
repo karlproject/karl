@@ -208,6 +208,9 @@ class IProfile(IFolder, IPeople):
 
         """
 
+    last_login_time = Attribute(
+        u"Datetime when user last logged into the system.  Display-only.")
+
 IProfile.ALERT_IMMEDIATELY = 0
 IProfile.ALERT_DIGEST = 1
 IProfile.ALERT_NEVER = 2
@@ -422,30 +425,38 @@ class IAttachmentPolicy(Interface):
     def support():
         """Return true if the given object should support attachments"""
 
-class IPeopleDirectory(IFolder):
+class IOrderedFolder(IFolder):
+    """Orderable container
+    """
+    order = Attribute("Ordered sequence of IDs")
+
+class IPeopleDirectory(IOrderedFolder):
     """Searchable directory of profiles.
 
     Contains IPeopleSection objects.
     """
     title = Attribute("Directory title")
-    categories = Attribute("Mapping of category ID to PeopleCategory")
     catalog = Attribute("Catalog of profiles")
-    order = Attribute("Sequence of section IDs to display as tabs")
+
+class IPeopleCategories(Interface):
+    """ Marker for the 'categories' container under a peopledir.
+    """
+    title = Attribute("Directory title")
 
 class IPeopleCategory(Interface):
     """A vocabulary for profile category values.
 
     This object is a mapping. It maps an identifier for the category
     value (for example, 'payroll-department') to an object that
-    implements IPeopleCategoryValue.
+    implements IPeopleCategoryItem.
     """
     title = Attribute("The name of the category.  Example: 'Departments'")
 
     def __getitem__(value_id):
-        """Return the specified IPeopleCategoryValue, or raise KeyError"""
+        """Return the specified IPeopleCategoryItem, or raise KeyError"""
 
     def get(value_id, default=None):
-        """Return the specified IPeopleCategoryValue, or None"""
+        """Return the specified IPeopleCategoryItem, or None"""
 
 class IPeopleCategoryItem(Interface):
     """Metadata about a person category value."""
@@ -461,34 +472,25 @@ class IPeopleSection(IFolder):
     """
     title = Attribute("Section title")
     tab_title = Attribute("Title to put on the section tab")
-    columns = Attribute("Sequence of IPeopleReportGroups")
 
-    def set_columns(columns):
-        """Set the sequence of IPeopleReportGroups for this section"""
+class IPeopleSectionColumn(Interface):
+    """A visual column within a section display"""
+    width = Attribute("Width of a section column")
 
 class IPeopleReportGroup(Interface):
     """A group of reports displayed in a section"""
     title = Attribute("Report group title")
-    reports = Attribute("Sequence of IPeopleReports and IPeopleReportGroups")
 
-    def set_reports(reports):
-        """Set the sequence of IPeopleReports and IPeopleReportGroups"""
+class IPeopleReportFilter(Interface):
+    """A group of reports displayed in a section"""
+    values = Attribute("Category values for which the filter applies")
 
 class IPeopleReport(Interface):
     """A report about people"""
     title = Attribute("Report title")
     link_title = Attribute("Title to use for the link to the report")
     css_class = Attribute("CSS class of the link to the report")
-    filters = Attribute(
-        "Limit the report to the specified category values. "
-        "Maps category ID to a list of category value IDs.")
     columns = Attribute("IDs of columns to display in the report.")
-
-    def set_filter(catid, values):
-        """Add a profile category value filter to this report."""
-
-    def set_columns(columns):
-        """Set the IDs of columns to display"""
 
 class IPeopleDirectorySchemaChanged(Interface):
     """Notification that the schema of the people directory has changed"""

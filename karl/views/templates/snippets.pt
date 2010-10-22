@@ -27,7 +27,6 @@
       <tal:resources condition="not api.js_devel_mode == 'true'">
         <script src="${api.static_url}/packed/karl-ui.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
-        <script type="text/javascript" src="${api.static_url}/packed/karl-tiny.js">//</script>
       </tal:resources>
 
       <!-- Resource composition for javascript development.
@@ -59,7 +58,40 @@
         <script src="${api.static_url}/jquery-plugins/jquery.tools.js" type="text/javascript">//</script>
         <script type="text/javascript">window.Karl={}; window.Karl.loadTinyMCE = function() {};</script>
         <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
+      </tal:resources>
 
+      <tal:resources condition="api.form_field_templates">
+        <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
+        <metal:resources use-macro="api.snippets.macros['js_extra_resources']"/>
+      </tal:resources>
+
+    </metal:resources>
+
+    <!-- Javascript resources for formish pages -->
+    <metal:resources define-macro="js_formish_resources">
+      <script type="text/javascript"
+           src="${api.static_url}/jquery-ui/1.8.2/development-bundle/ui/jquery.ui.sortable.js">//</script>
+      <script type="text/javascript"
+          src="${api.static_url}/formish.js">//</script>
+      <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+          formish();
+        });
+        //]]>
+      </script>
+    </metal:resources>
+
+    <!-- Javascript extra resource composition -->
+    <metal:resources define-macro="js_extra_resources">
+
+      <!-- tinymce, production mode -->
+      <tal:resources condition="not api.js_devel_mode == 'true' and 'field.KarlTinyMCE' in api.form_field_templates">
+        <script type="text/javascript" src="${api.static_url}/packed/karl-tiny.js">//</script>
+      </tal:resources>
+
+      <!-- tinymce, development mode -->
+      <tal:resources condition="api.js_devel_mode == 'true' and 'field.KarlTinyMCE' in api.form_field_templates">
         <script src="${api.static_url}/tinymce/karl-tiny-wire.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce/3.3.8/jquery.tinysafe.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce/3.3.8/tiny_mce_src.js" type="text/javascript">//</script>
@@ -161,11 +193,22 @@
               <li tal:attributes="id string:menubar-${repeat.action.number()}"
                   class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
                 <a href="${api.here_url}${action[1]}"
-                  class="${action[2] and 'karldropdown-heading' or ''}"><span>${action[0]}</span></a>
+                   class="${action[2] and 'karldropdown-heading' or ''}"
+                   tal:condition="not action[1].startswith('http://')"
+                   ><span>${action[0]}</span></a>
+                <a href="${action[1]}"
+                   class="${action[2] and 'karldropdown-heading' or ''}"
+                   tal:condition="action[1].startswith('http://')"
+                   ><span>${action[0]}</span></a>
                 <tal:submenu condition="action[2]">
                   <ul class="karldropdown-menu">
                     <li tal:repeat="subaction action[2]">
-                      <a href="${api.here_url}${subaction[1]}">${subaction[0]}</a>
+                      <a href="${api.here_url}${subaction[1]}"
+                         tal:condition="not subaction[1].startswith('http://')"
+                      >${subaction[0]}</a>
+                      <a href="${subaction[1]}"
+                         tal:condition="subaction[1].startswith('http://')"
+                      >${subaction[0]}</a>
                     </li>
                   </ul>
                 </tal:submenu>
