@@ -386,14 +386,7 @@ class TestPeopleSectionColumn(unittest.TestCase):
         verifyObject(IPeopleSectionColumn, self._makeOne())
 
 
-class TestPeopleReportFilter(unittest.TestCase):
-
-    def _getTargetClass(self):
-        from karl.models.peopledirectory import PeopleReportFilter
-        return PeopleReportFilter
-
-    def _makeOne(self, values=('a', 'b', 'c')):
-        return self._getTargetClass()(values)
+class _Conforms_to_IPeopleReportFilter(object):
 
     def test_class_conforms_to_IPeopleReportFilter(self):
         from zope.interface.verify import verifyClass
@@ -404,6 +397,27 @@ class TestPeopleReportFilter(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleReportFilter
         verifyObject(IPeopleReportFilter, self._makeOne())
+
+
+class TestPeopleReportCategoryFilter(unittest.TestCase,
+                                     _Conforms_to_IPeopleReportFilter,
+                                    ):
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleReportCategoryFilter
+        return PeopleReportCategoryFilter
+
+    def _makeOne(self, values=('a', 'b', 'c')):
+        return self._getTargetClass()(values)
+
+    def test_class_conforms_to_IPeopleReportCategoryFilter(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        verifyClass(IPeopleReportCategoryFilter, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleReportCategoryFilter(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        verifyObject(IPeopleReportCategoryFilter, self._makeOne())
 
 
 class TestPeopleReport(unittest.TestCase):

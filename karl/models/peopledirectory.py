@@ -32,7 +32,7 @@ from karl.models.interfaces import IPeopleCategoryItem
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleDirectorySchemaChanged
 from karl.models.interfaces import IPeopleReport
-from karl.models.interfaces import IPeopleReportFilter
+from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
@@ -256,13 +256,14 @@ class PeopleSectionColumn(Folder):
        self.width = width
 
 
-class PeopleReportFilter(Persistent):
-    implements(IPeopleReportFilter)
+class PeopleReportCategoryFilter(Persistent):
+    implements(IPeopleReportCategoryFilter)
     is_ordered = False
 
     def __init__(self, values=()):
         self.values = values
 
+PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 
 class PeopleReport(Folder):
     implements(IPeopleReport)

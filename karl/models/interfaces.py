@@ -482,8 +482,11 @@ class IPeopleReportGroup(Interface):
     title = Attribute("Report group title")
 
 class IPeopleReportFilter(Interface):
-    """A group of reports displayed in a section"""
+    """A filter for a report displayed in a section"""
     values = Attribute("Category values for which the filter applies")
+
+class IPeopleReportCategoryFilter(IPeopleReportFilter):
+    """A category-based filter for a report displayed in a section"""
 
 class IPeopleReport(Interface):
     """A report about people"""
