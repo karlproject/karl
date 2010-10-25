@@ -255,13 +255,14 @@ class PeopleSectionColumn(Folder):
        super(PeopleSectionColumn, self).__init__()
        self.width = width
 
-
-class PeopleReportCategoryFilter(Persistent):
-    implements(IPeopleReportCategoryFilter)
+class _PeopleReportFilter(Persistent):
     is_ordered = False
 
     def __init__(self, values=()):
         self.values = values
+
+class PeopleReportCategoryFilter(_PeopleReportFilter):
+    implements(IPeopleReportCategoryFilter)
 
 PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 
