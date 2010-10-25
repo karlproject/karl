@@ -69,18 +69,18 @@ def admin_contents(context, request):
     if 'form.delete' in request.POST:
         if 'selected' not in request.POST:
             api.status_message = 'Please select a value'
-        else: 
+        else:
             selected = request.POST['selected']
             if isinstance(selected, basestring):
                selected = [selected]
             for name in selected:
                 del context[name]
-            return HTTPFound(location=model_url(context, request, 
+            return HTTPFound(location=model_url(context, request,
                                                 'admin.html')
                             )
     return dict(api=api,
                 peopledir=peopledir,
-                actions=get_admin_actions(context, request) + 
+                actions=get_admin_actions(context, request) +
                         get_actions(context, request),
                 has_categories=peopledir is context,
                )
@@ -597,7 +597,7 @@ class EditBase(object):
 
     def form_fields(self):
         return self.schema
- 
+
     def __call__(self):
         context = self.context
         request = self.request
@@ -608,11 +608,11 @@ class EditBase(object):
                 'actions':actions,
                 'page_title': self.page_title,
                 }
- 
+
     def handle_cancel(self):
         location = model_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
- 
+
     def handle_submit(self, converted):
         context = self.context
         request = self.request
@@ -637,7 +637,7 @@ class AddBase(object):
 
     def form_fields(self):
         return name_schema + self.schema
- 
+
     def __call__(self):
         context = self.context
         request = self.request
@@ -646,11 +646,11 @@ class AddBase(object):
                 'actions': [],
                 'page_title': self.page_title,
                 }
- 
+
     def handle_cancel(self):
         location = model_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
- 
+
     def handle_submit(self, converted):
         context = self.context
         request = self.request
@@ -694,7 +694,7 @@ category_item_schema = [
 class EditCategoryItemFormController(EditBase):
     page_title = 'Edit Category Item'
     schema = category_item_schema
-    
+
 class AddCategoryItemFormController(AddBase):
     page_title = 'Add Category Item'
     schema = category_item_schema
@@ -746,7 +746,7 @@ section_column_schema = [
 class EditSectionColumnFormController(EditBase):
     page_title = 'Edit Section Column'
     schema = section_column_schema
-    
+
 class AddSectionColumnFormController(AddBase):
     page_title = 'Add Section Column'
     schema = section_column_schema
@@ -762,7 +762,7 @@ report_schema = [
     ('css_class', schemaish.String()),
     ('columns', schemaish.Sequence(
                     schemaish.String(
-                       validator = lambda v: 
+                       validator = lambda v:
                            validate.is_one_of(v, COLUMNS.keys())))),
 ]
 
@@ -774,14 +774,14 @@ report_filter_schema = [
 class EditReportFilterFormController(EditBase):
     page_title = 'Edit Report Filter'
     schema = report_filter_schema
-    
+
     def form_widgets(self, schema):
         widgets = {
             'values':formish.TextArea(rows=5,
                            converter_options={'delimiter':'\n'}),
                   }
         return widgets
-        
+
 class AddReportFilterFormController(AddBase):
     page_title = 'Add Report Filter'
     schema = report_filter_schema
@@ -797,7 +797,7 @@ class AddReportFilterFormController(AddBase):
 class EditReportFormController(EditBase):
     page_title = 'Edit Report'
     schema = report_schema
-    
+
     def form_widgets(self, schema):
         widgets = {
             'columns':formish.TextArea(rows=5,
@@ -809,7 +809,7 @@ class AddReportFormController(AddBase):
     page_title = 'Edit Report'
     schema = report_schema
     factory = PeopleReport
-    
+
     def form_widgets(self, schema):
         widgets = {
             'columns':formish.TextArea(rows=5,
