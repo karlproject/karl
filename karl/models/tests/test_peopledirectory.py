@@ -168,28 +168,28 @@ class TestProfileCategoryGetter(unittest.TestCase):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
         obj = testing.DummyModel()
-        obj['categories'] = self._makeFolder({'office': ['slc']})
+        obj.categories = {'office': ['slc']}
         self.assertEqual(getter(obj, 0), 0)
 
     def test_success(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
         obj = _makeProfile()
-        obj['categories'] = self._makeFolder({'office': ['slc']})
+        obj.categories = {'office': ['slc']}
         self.assertEqual(getter(obj, 0), ['slc'])
 
     def test_empty_category(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
         obj = _makeProfile()
-        obj['categories'] = self._makeFolder({'office': []})
+        obj.categories = {'office': []}
         self.assertEqual(getter(obj, 0), 0)
 
     def test_no_categories(self):
         from karl.models.peopledirectory import ProfileCategoryGetter
         getter = ProfileCategoryGetter('office')
         obj = _makeProfile()
-        obj['categories'] = self._makeFolder({})
+        obj.categories = {}
         self.assertEqual(getter(obj, 0), 0)
 
 

@@ -130,7 +130,7 @@ class ProfileCategoryGetter:
     def __call__(self, obj, default):
         if not IProfile.providedBy(obj):
             return default
-        categories = obj.get('categories')
+        categories = getattr(obj, 'categories', None)
         if not categories:
             return default
         values = categories.get(self.catid)
