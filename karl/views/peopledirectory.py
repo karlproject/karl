@@ -41,13 +41,16 @@ from karl.models.interfaces import IPeopleCategories
 from karl.models.interfaces import IPeopleCategory
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
+from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
+from karl.models.interfaces import IPeopleReportGroupFilter
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleReport
-from karl.models.peopledirectory import PeopleReportFilter
+from karl.models.peopledirectory import PeopleReportCategoryFilter
+from karl.models.peopledirectory import PeopleReportGroupFilter
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
@@ -195,7 +198,9 @@ _ADDABLES = {
                            ('Report', 'add_report.html'),
                           ],
     IPeopleReportGroup: [('Report', 'add_report.html')],
-    IPeopleReport: [('Filter', 'add_report_filter.html')],
+    IPeopleReport: [('CategoryFilter', 'add_category_report_filter.html'),
+                    ('GroupFilter', 'add_group_report_filter.html')
+                   ],
 }
 
 
@@ -400,8 +405,13 @@ def get_report_query(report, request):
     """
     kw = {}
     for catid, filter in report.items():
-        kw['category_%s' % str(catid)] = {'query': filter.values,
-                                          'operator': 'or'}
+        if IPeopleReportCategoryFilter.providedBy(filter):
+            kw['category_%s' % str(catid)] = {'query': filter.values,
+                                              'operator': 'or'}
+        elif IPeopleReportGroupFilter.providedBy(filter):
+            kw['groups'] =  {'query': filter.values,
+                             'operator': 'or',
+                            }
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     letter = request.params.get('lastnamestartswith')
@@ -782,10 +792,22 @@ class EditReportFilterFormController(EditBase):
                   }
         return widgets
 
-class AddReportFilterFormController(AddBase):
-    page_title = 'Add Report Filter'
+class AddCategoryReportFilterFormController(AddBase):
+    page_title = 'Add Category Report Filter'
     schema = report_filter_schema
-    factory = PeopleReportFilter
+    factory = PeopleReportCategoryFilter
+
+    def form_widgets(self, schema):
+        widgets = {
+            'values':formish.TextArea(rows=5,
+                           converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+class AddGroupReportFilterFormController(AddBase):
+    page_title = 'Add Group Report Filter'
+    schema = report_filter_schema
+    factory = PeopleReportGroupFilter
 
     def form_widgets(self, schema):
         widgets = {

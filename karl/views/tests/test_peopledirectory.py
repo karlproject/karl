@@ -379,13 +379,16 @@ class Test_get_admin_actions(unittest.TestCase):
         directlyProvides(context, IPeopleReport)
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 3)
         action = actions[0]
         self.assertEqual(action[0], 'Edit')
         self.assertEqual(action[1], 'edit.html')
         action = actions[1]
-        self.assertEqual(action[0], 'Add Filter')
-        self.assertEqual(action[1], 'add_report_filter.html')
+        self.assertEqual(action[0], 'Add CategoryFilter')
+        self.assertEqual(action[1], 'add_category_report_filter.html')
+        action = actions[2]
+        self.assertEqual(action[0], 'Add GroupFilter')
+        self.assertEqual(action[1], 'add_group_report_filter.html')
 
 
 class Test_get_actions(unittest.TestCase):
@@ -811,10 +814,12 @@ class Test_get_report_query(unittest.TestCase):
         from karl.views.peopledirectory import get_report_query
         return get_report_query(report, request)
 
-    def test_it(self):
-        # XXX
+    def test_w_category_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportCategoryFilter
         report = testing.DummyModel()
-        report['office'] = testing.DummyModel(values=['nyc'])
+        office = report['office'] = testing.DummyModel(values=['nyc'])
+        directlyProvides(office, IPeopleReportCategoryFilter)
         request = testing.DummyRequest({
             'lastnamestartswith': 'L',
             'body': 'a b*',
@@ -823,6 +828,24 @@ class Test_get_report_query(unittest.TestCase):
         self.assertEqual(kw, {
             'allowed': {'operator': 'or', 'query': []},
             'category_office': {'operator': 'or', 'query': ['nyc']},
+            'lastnamestartswith': 'L',
+            'texts': 'a b**',
+            })
+
+    def test_w_group_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        report = testing.DummyModel()
+        groups = report['groups'] = testing.DummyModel(values=['staff'])
+        directlyProvides(groups, IPeopleReportGroupFilter)
+        request = testing.DummyRequest({
+            'lastnamestartswith': 'L',
+            'body': 'a b*',
+            })
+        kw = self._callFUT(report, request)
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'groups': {'operator': 'or', 'query': ['staff']},
             'lastnamestartswith': 'L',
             'texts': 'a b**',
             })

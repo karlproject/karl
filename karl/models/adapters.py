@@ -47,6 +47,8 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import IPeopleReportFilter
+from karl.models.interfaces import IPeopleReportCategoryFilter
+from karl.models.interfaces import IPeopleReportGroupFilter
 
 class CatalogSearch(object):
     """ Centralize policies about searching """
@@ -438,9 +440,14 @@ class PeopleReportLetterManager(object):
         # Perform a catalog search, but don't resolve any paths.
         kw = {}
         for catid, filter in filters:
-            kw['category_%s' % str(catid)] = {'query': filter.values,
-                                              'operator': 'or',
-                                             }
+            if IPeopleReportCategoryFilter.providedBy(filter):
+                kw['category_%s' % str(catid)] = {'query': filter.values,
+                                                  'operator': 'or',
+                                                 }
+            elif IPeopleReportGroupFilter.providedBy(filter):
+                kw['groups'] =  {'query': filter.values,
+                                 'operator': 'or',
+                                }
         total, docids = catalog.search(**kw)
 
         # Intersect the search result docids with the docid set

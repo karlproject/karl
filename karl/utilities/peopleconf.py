@@ -30,7 +30,8 @@ from karl.models.peopledirectory import PeopleCategories
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleReport
-from karl.models.peopledirectory import PeopleReportFilter
+from karl.models.peopledirectory import PeopleReportCategoryFilter
+from karl.models.peopledirectory import PeopleReportGroupFilter
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
@@ -111,8 +112,12 @@ _DUMP_XML =  """\
              title="${item.title}"
              link-title="${item.link_title}"
              class="${item.css_class}">
-      <filter tal:repeat="(catid, values) in sorted(report_filter_items(item))"
-              category="$catid" values="${' '.join(values)}"/>
+      <tal:loop tal:repeat="(id, values) in sorted(report_filter_items(item))">
+       <filter tal:condition="id != 'groups'"
+               category="$id" values="${' '.join(values)}"/>
+       <filter tal:condition="id == 'groups'"
+               values="${' '.join(values)}"/>
+      </tal:loop>
       <columns names="${' '.join(item.columns)}"/>
      </report>
     </metal:chunk>
@@ -249,17 +254,20 @@ def parse_report(people, elem):
 
     categories = people.get('categories', {})
     for e in elem.findall('filter'):
-        category = e.get('category')
         values = e.get('values', '').split()
         if not values:
-            raise ParseError("No category values given", e)
-        pc = categories.get(category)
-        if pc is None:
-            raise ParseError("No such category defined", e)
-        for v in values:
-            if v not in pc:
-                raise ParseError("No such category value: %s" % v, e)
-        report[category] = PeopleReportFilter(tuple(values))
+            raise ParseError("No values given", e)
+        category = e.get('category')
+        if category is not None:
+            pc = categories.get(category)
+            if pc is None:
+                raise ParseError("No such category defined", e)
+            for v in values:
+                if v not in pc:
+                    raise ParseError("No such category value: %s" % v, e)
+            report[category] = PeopleReportCategoryFilter(tuple(values))
+        else:
+            report['groups'] = PeopleReportGroupFilter(tuple(values))
 
     columns = None
     e = elem.find('columns')

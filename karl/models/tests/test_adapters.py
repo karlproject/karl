@@ -412,10 +412,10 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         active = obj.get_active_letters()
         self.assertEqual(active, set(['A', 'M']))
 
-    def test_with_filter(self):
+    def test_with_category_filter(self):
         from BTrees import family32
         from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleReportFilter
+        from karl.models.interfaces import IPeopleReportCategoryFilter
         from karl.models.interfaces import ISite
         site = testing.DummyModel()
         directlyProvides(site, ISite)
@@ -432,13 +432,42 @@ class TestPeopleReportLetterManager(unittest.TestCase):
 
         report = testing.DummyModel()
         nyc = report['office'] = testing.DummyModel(values=['nyc'])
-        directlyProvides(nyc, IPeopleReportFilter)
+        directlyProvides(nyc, IPeopleReportCategoryFilter)
         site['report'] = report
         obj = self._makeOne(report)
         active = obj.get_active_letters()
         self.assertEqual(active, set(['B', 'C']))
         self.assertEqual(site['people'].catalog.queries, [{
             'category_office': {'operator': 'or', 'query': ['nyc']},
+            }])
+
+    def test_with_group_filter(self):
+        from BTrees import family32
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        from karl.models.interfaces import ISite
+        site = testing.DummyModel()
+        directlyProvides(site, ISite)
+        site['people'] = testing.DummyModel()
+        site['people'].catalog = karltesting.DummyCatalog({2: None, 3: None})
+        index = DummyFieldIndex({
+            'A': family32.IF.TreeSet([1]),
+            'B': family32.IF.TreeSet([2, 5]),
+            'C': family32.IF.TreeSet([3]),
+            'D': family32.IF.TreeSet([4, 6]),
+            })
+        index.family = family32
+        site['people'].catalog['lastnamestartswith'] = index
+
+        report = testing.DummyModel()
+        staff = report['office'] = testing.DummyModel(values=['staff'])
+        directlyProvides(staff, IPeopleReportGroupFilter)
+        site['report'] = report
+        obj = self._makeOne(report)
+        active = obj.get_active_letters()
+        self.assertEqual(active, set(['B', 'C']))
+        self.assertEqual(site['people'].catalog.queries, [{
+            'groups': {'operator': 'or', 'query': ['staff']},
             }])
 
 

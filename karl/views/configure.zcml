@@ -543,8 +543,8 @@
   </formish:form>
 
   <formish:form
-     controller=".peopledirectory.AddReportFilterFormController"
-     name="add_report_filter.html"
+     controller=".peopledirectory.AddCategoryReportFilterFormController"
+     name="add_category_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
      renderer="forms/templates/formish_form.pt"
@@ -552,7 +552,28 @@
      
      <formish:action
        name="submit"
-       title="Add Report Filter"
+       title="Add Category Report Filter"
+       />
+       
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+       
+  </formish:form>
+
+  <formish:form
+     controller=".peopledirectory.AddGroupReportFilterFormController"
+     name="add_group_report_filter.html"
+     for="karl.models.interfaces.IPeopleReport"
+     permission="administer"
+     renderer="forms/templates/formish_form.pt"
+     form_id="add">
+     
+     <formish:action
+       name="submit"
+       title="Add Group Report Filter"
        />
        
      <formish:action

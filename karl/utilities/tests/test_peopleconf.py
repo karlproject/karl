@@ -438,6 +438,7 @@ class Test_parse_report(unittest.TestCase):
         self.assertEqual(report.columns, ('name',))
 
     def test_complete(self):
+        from karl.models.peopledirectory import PeopleReportCategoryFilter
         xml = """
         <report name="r1" title="Report One" link-title="One">
             <filter category="office" values="nyc la"/>
@@ -454,7 +455,11 @@ class Test_parse_report(unittest.TestCase):
         self.assertEqual(report.title, 'Report One')
         self.assertEqual(report.link_title, 'One')
         self.assertEqual(len(report), 2)
+        self.failUnless(isinstance(report['department'],
+                        PeopleReportCategoryFilter))
         self.assertEqual(report['department'].values, ('toys',))
+        self.failUnless(isinstance(report['office'],
+                        PeopleReportCategoryFilter))
         self.assertEqual(report['office'].values, ('nyc', 'la'))
         self.assertEqual(report.columns, ('name', 'email'))
 
@@ -495,6 +500,24 @@ class Test_parse_report(unittest.TestCase):
         peopledir = DummyPeopleDirectory()
         peopledir['categories']['office'] = {'nyc': 'NYC'}
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
+
+    def test_group_value(self):
+        from karl.models.peopledirectory import PeopleReportGroupFilter
+        xml = """
+        <report name="r1">
+            <filter values="g1"/>
+            <columns ids="name"/>
+        </report>
+        """
+        elem = parse_xml(xml)
+        peopledir = DummyPeopleDirectory()
+        elem = parse_xml(xml)
+        peopledir = DummyPeopleDirectory()
+        name, report = self._callFUT(peopledir, elem)
+        self.assertEqual(len(report), 1)
+        self.failUnless(isinstance(report['groups'], PeopleReportGroupFilter))
+        self.assertEqual(report['groups'].values, ('g1',))
+        self.assertEqual(report.columns, ('name',))
 
     def test_no_columns(self):
         from karl.utilities.peopleconf import ParseError
