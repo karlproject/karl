@@ -27,7 +27,6 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
-from repoze.postoffice.message import Message
 from repoze.workflow import get_workflow
 import schemaish
 from schemaish.type import File as SchemaFile
