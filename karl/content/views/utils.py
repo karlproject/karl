@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+from itertools import islice
 
 from lxml.etree import XMLSyntaxError
 from lxml.html import document_fromstring
@@ -118,6 +119,28 @@ def get_previous_next(context, request, viewname=''):
 
     return previous, next
 
+_WIKI_WORDS = re.compile(r'[(][(]([^)]+)[)][)]')
+
+def _crack_words(text):
+    text = text.strip()
+    text = _WIKI_WORDS.sub(r'\1', text)
+    for word in text.split():
+        yield word.strip()
+
+def _crack_html_words(htmlstring):
+    # Yield words from markup.
+    try:
+        d = document_fromstring(htmlstring)
+    except XMLSyntaxError:
+        return
+    for element in d.iter():
+        text = element.text or ''
+        for word in _crack_words(text):
+            yield word
+        tail = element.tail or ''
+        for word in _crack_words(tail):
+            yield word
+
 def extract_description(htmlstring):
     """ Get a summary-style description from the HTML in text field """
     # Lots of resources don't have a user-visible description field,
@@ -128,22 +151,7 @@ def extract_description(htmlstring):
 
     summary_limit = 50 # number of "words"
 
-    try:
-        doc = document_fromstring(htmlstring)
-    except XMLSyntaxError:
-        return u''
-
-    words = []
-    for node in doc.xpath("//text()"):
-        clean_node = node.strip()
-        # strip wiki links
-        clean_node = re.sub(r'[(][(]([^)]+)[)][)]', r'\1', clean_node)
-        # simplify whitespace
-        if clean_node:
-            for word in clean_node.split():
-                clean_word = word.strip()
-                if clean_word:
-                    words.append(clean_word)
+    words = list(islice(_crack_html_words(htmlstring), summary_limit + 1))
     summary_list = words[0:summary_limit]
     summary = " ".join(summary_list)
     if len(words) > summary_limit:

@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Improve descrption-extraction utility, avoiding a bug in older libxml2
+  and making it more lazy (LP #663399).
+
 - Made '/people' objects editable TTW by administrators.  See
   https://blueprints.launchpad.net/karl3/+spec/ttw-people-configuration
 

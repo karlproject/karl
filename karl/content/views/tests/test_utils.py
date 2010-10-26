@@ -60,6 +60,25 @@ class ExtractDescriptionTests(unittest.TestCase):
         self.assertEqual(len(summary), 222)
         self.assertTrue(summary.endswith('...'))
 
+    def test_link_text(self):
+        # See https://bugs.launchpad.net/karl3/+bug/663399
+        HTML = ('<p>Hi All,</p>\r\n<p>I just came across this post '
+                'via the Council on Foundations\' Twitter Feed.&#160; '
+                'Apparently the '
+                '<a href="http://craigslistfoundation.org/">Craigslist '
+                'Foundation</a> is going to build a knowledge sharing '
+                'tool/community/platform - it\'s a bit unclear at this '
+                'point.&#160;')
+        WORDS = ('Hi All, I just came across this post '
+                 'via the Council on Foundations\' Twitter Feed. '
+                 'Apparently the Craigslist Foundation '
+                 'is going to build a knowledge sharing '
+                 'tool/community/platform - it\'s a bit unclear '
+                 'at this point.'
+                )
+        summary = self._callFUT(HTML)
+        self.assertEqual(summary, WORDS)
+
 class Test_get_show_sendalert(unittest.TestCase):
     def setUp(self):
         cleanUp()
