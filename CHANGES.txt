@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+3.48 (2010-10-28)
+-----------------
+
 - Improve descrption-extraction utility, avoiding a bug in older libxml2
   and making it more lazy (LP #663399).
 
