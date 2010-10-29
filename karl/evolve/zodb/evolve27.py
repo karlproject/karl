@@ -16,6 +16,7 @@ def evolve(root):
                 userid, info['login'], userid)
             info['login'] = userid
             data[userid] = info  # trigger persistence
+            logins[userid] = userid
 
     for login, userid in list(logins.items()):
         if userid not in data or data[userid]['login'] != login:
