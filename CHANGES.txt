@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added evolve script to clean up logins in user database.
+
 - Make "external" action URL detection work for HTTPS URLs (LP #661381).
 
 3.48 (2010-10-28)
