@@ -194,20 +194,20 @@
                   class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
                 <a href="${api.here_url}${action[1]}"
                    class="${action[2] and 'karldropdown-heading' or ''}"
-                   tal:condition="not action[1].startswith('http://')"
+                   tal:condition="not action[1].startswith('http')"
                    ><span>${action[0]}</span></a>
                 <a href="${action[1]}"
                    class="${action[2] and 'karldropdown-heading' or ''}"
-                   tal:condition="action[1].startswith('http://')"
+                   tal:condition="action[1].startswith('http')"
                    ><span>${action[0]}</span></a>
                 <tal:submenu condition="action[2]">
                   <ul class="karldropdown-menu">
                     <li tal:repeat="subaction action[2]">
                       <a href="${api.here_url}${subaction[1]}"
-                         tal:condition="not subaction[1].startswith('http://')"
+                         tal:condition="not subaction[1].startswith('http')"
                       >${subaction[0]}</a>
                       <a href="${subaction[1]}"
-                         tal:condition="subaction[1].startswith('http://')"
+                         tal:condition="subaction[1].startswith('http')"
                       >${subaction[0]}</a>
                     </li>
                   </ul>
