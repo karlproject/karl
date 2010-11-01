@@ -14,6 +14,8 @@ Unreleased
 
 - Make "external" action URL detection work for HTTPS URLs (LP #661381).
 
+- Update feed code to read unicode from config file.  (LP #663403)
+
 3.48 (2010-10-28)
 -----------------
 

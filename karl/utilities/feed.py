@@ -17,6 +17,7 @@
 """Download each feed defined in a config file and put it into ZODB.
 """
 
+import codecs
 from ConfigParser import ConfigParser
 from karl.models.interfaces import IFeed
 from karl.models.interfaces import IFeedsContainer
@@ -34,7 +35,8 @@ def update_feeds(site, config_filename, force=False,
         site['feeds'] = container
 
     config = ConfigParser()
-    config.read(config_filename)
+    config_fp = codecs.open(config_filename, "r", "utf-8")
+    config.readfp(config_fp)
 
     for section_name in config.sections():
         if ':' not in section_name:

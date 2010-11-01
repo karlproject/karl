@@ -25,13 +25,13 @@ class UpdateFeedsTests(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, site, parse, **kw):
+    def _callFUT(self, site, parse, config='testfeeds.ini', **kw):
         from karl.utilities.feed import update_feeds
         from cStringIO import StringIO
         import os
         out = StringIO()
         config_filename = os.path.join(
-            os.path.dirname(__file__), 'feedtests', 'testfeeds.ini')
+            os.path.dirname(__file__), 'feedtests', config)
         update_feeds(site, config_filename, out=out, parse=parse, **kw)
         return out.getvalue()
 
@@ -177,6 +177,31 @@ class UpdateFeedsTests(unittest.TestCase):
         # ensure the old entries were not removed
         feed = site['feeds']['example.com']
         self.assertEquals(3, len(feed.entries))
+
+    def test_unicode_config(self):
+        # first update will create container and get feeds
+        site = {}
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.models.interfaces import IFeedsContainer
+        from karl.models.interfaces import IFeed
+        from repoze.bfg.testing import DummyModel
+        registerContentFactory(DummyModel, IFeedsContainer)
+        registerContentFactory(DummyFeed, IFeed)
+
+        out = self._callFUT(site, parse=FakeFeedParser,
+                            config='testfeeds2.ini')
+
+        self.assertEquals(out,
+            "Getting feed 'example.com' from http://example.com/atom.xml... "
+            "200 (ok)\n")
+
+        self.assertTrue('feeds' in site)
+        self.assertTrue('example.com' in site['feeds'])
+        self.assertEquals(1, len(site['feeds']))
+        feed = site['feeds']['example.com']
+        self.assertEquals(3, len(feed.entries))
+        self.assertEquals(['E1', 'E2', 'E3'], [e.title for e in feed.entries])
+        self.assertEquals(u'Overr\xecdden title', feed.title)
 
 
 class FakeFeedParser(dict):
