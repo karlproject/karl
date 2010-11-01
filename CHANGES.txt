@@ -10,6 +10,8 @@ Unreleased
 
 - Make "external" action URL detection work for HTTPS URLs (LP #661381).
 
+- Fix show_profile_view for case when user has never logged in.  (LP #668352)
+
 3.48 (2010-10-28)
 -----------------
 

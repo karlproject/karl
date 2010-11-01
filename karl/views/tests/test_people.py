@@ -1139,6 +1139,23 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(len(renderer.actions), 1)
         self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
 
+    def test_never_logged_in(self):
+        self._registerTagbox()
+        self._registerCatalogSearch()
+
+        from karl.testing import DummyUsers
+        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        request = testing.DummyRequest()
+        context = DummyProfile()
+        context.__name__ = 'userid'
+        context.last_login_time = None
+        context.users = DummyUsers()
+        context.users.add("userid", "userlogin", "password", [])
+        context['communities'] = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        self._callFUT(context, request)
+        self.assertEqual(renderer.profile['last_login_time'], None)
+
 
 class ProfileThumbnailTests(unittest.TestCase):
     def setUp(self):

@@ -606,7 +606,7 @@ def show_profile_view(context, request):
     if profile.has_key("department"):
         profile["department"] = context.department
 
-    if profile.has_key("last_login_time"):
+    if profile.get("last_login_time"):
         stamp = context.last_login_time.strftime('%Y-%m-%dT%H:%M:%SZ')
         profile["last_login_time"] = stamp
 
