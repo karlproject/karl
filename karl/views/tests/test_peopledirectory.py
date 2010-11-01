@@ -49,11 +49,14 @@ class Test_admin_contents(unittest.TestCase):
         self.assertEqual(info['api'].context, pd)
         self.assertEqual(info['peopledir'], pd)
         actions = info['actions']
-        self.assertEqual(len(actions), len(_ADDABLES[IPeopleDirectory]) + 3)
+        # See LP #668489
+        #self.assertEqual(len(actions), len(_ADDABLES[IPeopleDirectory]) + 3)
+        self.assertEqual(len(actions), len(_ADDABLES[IPeopleDirectory]) + 2)
         self.assertEqual(actions[0][1], 'edit.html')
         self.assertEqual(actions[1][1], 'add_section.html')
-        self.assertEqual(actions[2][1], 'admin.html')
-        self.assertEqual(actions[3][1], 'http://example.com/profiles/add.html')
+        #self.assertEqual(actions[2][1], 'admin.html')
+        #self.assertEqual(actions[3][1], 'http://example.com/profiles/add.html')
+        self.assertEqual(actions[2][1], 'http://example.com/profiles/add.html')
 
 
 class Test_peopledirectory_view(unittest.TestCase):
@@ -415,11 +418,12 @@ class Test_get_actions(unittest.TestCase):
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
-        self.assertEqual(len(actions), 2)
+        #self.assertEqual(len(actions), 2) # see LP #668489
+        self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action[0], 'Admin')
-        self.assertEqual(action[1], 'admin.html')
-        action = actions[1]
+        #self.assertEqual(action[0], 'Admin')
+        #self.assertEqual(action[1], 'admin.html')
+        #action = actions[1]
         self.assertEqual(action[0], 'Add User')
         self.assertEqual(action[1], 'http://example.com/profiles/add.html')
 

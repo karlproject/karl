@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Suppressed "Admin" action on peopledir objects (LP #668489).
+
 - Added evolve script to clean up logins in user database.
 
 - Make "external" action URL detection work for HTTPS URLs (LP #661381).

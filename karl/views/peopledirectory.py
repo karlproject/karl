@@ -220,7 +220,8 @@ def get_actions(context, request):
     profiles = find_profiles(context)
     if has_permission('administer', profiles, request):
         if request.view_name != 'admin.html':
-            actions.append(('Admin', 'admin.html'))
+            #actions.append(('Admin', 'admin.html'))
+            pass # see LP #668489
         actions.append(('Add User', model_url(profiles, request, 'add.html')))
     return actions
 
