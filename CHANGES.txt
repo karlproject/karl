@@ -16,6 +16,8 @@ Unreleased
 
 - Update feed code to read unicode from config file.  (LP #663403)
 
+- Repaired busted HTML in template used to view profile.  (LP #668350)
+
 3.48 (2010-10-28)
 -----------------
 
