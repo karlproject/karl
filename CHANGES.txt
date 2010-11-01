@@ -4,13 +4,15 @@ karl package Changelog
 Unreleased
 ----------
 
+- Harden 'deactivate_profile.html' view against missing user (LP #669451).
+
+- Fix 'show_profile_view' for case when user has never logged in.  (LP #668352)
+
 - Suppressed "Admin" action on peopledir objects (LP #668489).
 
 - Added evolve script to clean up logins in user database.
 
 - Make "external" action URL detection work for HTTPS URLs (LP #661381).
-
-- Fix show_profile_view for case when user has never logged in.  (LP #668352)
 
 3.48 (2010-10-28)
 -----------------

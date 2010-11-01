@@ -1527,6 +1527,34 @@ class TestDeactivateProfileView(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(sorted(response.keys()), ['api', 'myself'])
 
+    def test_confirm_no_user_matching_profile(self):
+        from karl.testing import DummyUsers
+        from repoze.workflow.testing import registerDummyWorkflow
+        parent = testing.DummyModel()
+        users = parent.users = DummyUsers()
+        # Simulate a profile which has no corresponding user.
+        def _raise_KeyError(name):
+            users.removed_users.append(name)
+            raise KeyError(name)
+        users.remove = _raise_KeyError
+        workflow = registerDummyWorkflow('security')
+        context = DummyProfile()
+        parent['userid'] = context
+        testing.registerDummySecurityPolicy('admin')
+        request = testing.DummyRequest(params={'confirm':'1'})
+
+        response = self._callFUT(context, request)
+
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location,
+                         'http://example.com/?status_message='
+                         'Deactivated+user+account%3A+userid')
+        self.assertEqual(users.removed_users, ['userid'])
+        self.assertEqual(workflow.transitioned, [{
+            'to_state': 'inactive', 'content': context,
+            'request': request, 'guards': (),
+            'context': None, 'skip_same': True}])
+
     def test_confirm_not_deleting_own_profile(self):
         from karl.testing import DummyUsers
         from repoze.workflow.testing import registerDummyWorkflow

@@ -924,7 +924,10 @@ def deactivate_profile_view(context, request):
 
     confirm = request.params.get('confirm')
     if confirm:
-        find_users(context).remove(name)
+        try:
+            find_users(context).remove(name)
+        except KeyError:
+            pass
         workflow = get_workflow(IProfile, 'security', context)
         workflow.transition_to_state(context, request, 'inactive')
         if myself:
