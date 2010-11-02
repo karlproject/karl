@@ -17,6 +17,7 @@
 
 import re
 from itertools import islice
+import mimetypes
 
 from lxml.etree import XMLSyntaxError
 from lxml.html import document_fromstring
@@ -47,7 +48,7 @@ def upload_attachments(attachments, folder, creator, request):
     retrieved from a form"""
     for attachment in attachments:
         if attachment.filename:
-            mimetype = attachment.mimetype
+            mimetype = get_upload_mimetype(attachment)
             filename = make_unique_name(
                 folder,
                 basename_of_filepath(attachment.filename)
@@ -176,3 +177,31 @@ def split_lines(lines):
         if stripped:
             result.append(stripped)
     return result
+
+# Table mapping mime types sent by IE to standard types
+ie_types = {
+    "image/x-png": "image/png",
+    "image/pjpeg": "image/jpeg",
+}
+
+
+def get_upload_mimetype(upload):
+    mimetype = getattr(upload, 'mimetype', None)
+    if mimetype is None:
+        mimetype = getattr(upload, 'type', None)
+    mimetype = ie_types.get(mimetype, mimetype)
+    if mimetype in (
+            'application/x-download',
+            'application/x-application',
+            'application/binary',
+            'application/octet-stream',
+            ):
+        # The browser sent a meaningless file type.  Firefox on Ubuntu
+        # does this to some people:
+        #  https://bugs.launchpad.net/ubuntu/+source/firefox-3.0/+bug/84880
+        # Try to guess a more sensible mime type from the filename.
+        guessed_type, _ = mimetypes.guess_type(upload.filename)
+        if guessed_type:
+            mimetype = guessed_type
+    return mimetype
+

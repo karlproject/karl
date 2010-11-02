@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- The same code is used to guess mimetypes for files uploaded to the files tool
+  is now used to guess mimetypes for files uploaded as attachments to other
+  content types, ie blog entries, wiki pages, et al.  (LP #667494)
 
 3.49 (2010-11-02)
 -----------------

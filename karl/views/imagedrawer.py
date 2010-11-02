@@ -32,7 +32,7 @@ from repoze.workflow import get_workflow
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IImage
-from karl.content.views.files import get_upload_mimetype
+from karl.content.views.utils import get_upload_mimetype
 from karl.models.interfaces import ICommunity
 from karl.utilities.image import get_images_batch
 from karl.utilities.image import thumb_url

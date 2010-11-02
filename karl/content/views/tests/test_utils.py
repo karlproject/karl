@@ -118,3 +118,47 @@ class Test_get_show_sendalert(unittest.TestCase):
         request = bfgtesting.DummyRequest()
         self.assertEqual(self._call_fut(context, request), 'foo')
 
+class TestGetUploadMimetype(unittest.TestCase):
+    def _callFUT(self, fieldstorage):
+        from karl.content.views.utils import get_upload_mimetype
+        return get_upload_mimetype(fieldstorage)
+
+    def test_good_upload(self):
+        fieldstorage = DummyFieldStorage()
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "x/foo")
+
+    def test_fix_broken_upload(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = 'application/x-download'
+        fieldstorage.filename = 'file.pdf'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "application/pdf")
+
+    def test_cant_fix_broken_upload(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = 'application/x-download'
+        fieldstorage.filename = 'somefile'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "application/x-download")
+
+    def test_fix_bad_ie_jpeg_mimetype(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = None
+        fieldstorage.mimetype = 'image/pjpeg'
+        fieldstorage.filename = 'file.jpg'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "image/jpeg")
+
+    def test_fix_bad_ie_png_mimetype(self):
+        fieldstorage = DummyFieldStorage()
+        fieldstorage.type = 'image/x-png'
+        fieldstorage.filename = 'file.png'
+        mimetype = self._callFUT(fieldstorage)
+        self.assertEqual(mimetype, "image/png")
+
+
+class DummyFieldStorage:
+    file = 'abc'
+    filename = 'filename'
+    type = 'x/foo'

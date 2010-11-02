@@ -74,6 +74,7 @@ from karl.content.views.interfaces import INetworkEventsMarker
 
 from karl.content.interfaces import IReferencesFolder
 
+from karl.content.views.utils import get_upload_mimetype
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import get_show_sendalert
 
@@ -407,7 +408,7 @@ class AddFileFormController(object):
         file = create_content(ICommunityFile,
                               title=converted['title'],
                               stream=f.file,
-                              mimetype=get_mimetype(f.mimetype, f.filename),
+                              mimetype=get_upload_mimetype(f),
                               filename=f.filename,
                               creator=creator,
                               )
@@ -694,7 +695,7 @@ class EditFileFormController(object):
 
         if f.filename:
             context.upload(f.file)
-            context.mimetype = get_mimetype(f.mimetype, f.filename)
+            context.mimetype = get_upload_mimetype(f)
             context.filename = f.filename
             check_upload_size(context, context, 'file')
         else:
@@ -798,33 +799,3 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     )
 
     return payload
-
-
-def get_upload_mimetype(fieldstorage):
-    res = fieldstorage.type
-    filename = fieldstorage.filename
-    return get_mimetype(res, filename)
-
-# Table mapping mime types sent by IE to standard types
-ie_types = {
-    "image/x-png": "image/png",
-    "image/pjpeg": "image/jpeg",
-}
-
-def get_mimetype(res, filename):
-    res = ie_types.get(res, res)
-    if res in (
-            'application/x-download',
-            'application/x-application',
-            'application/binary',
-            'application/octet-stream',
-            ):
-        # The browser sent a meaningless file type.  Firefox on Ubuntu
-        # does this to some people:
-        #  https://bugs.launchpad.net/ubuntu/+source/firefox-3.0/+bug/84880
-        # Try to guess a more sensible mime type from the filename.
-        guessed_type, _ = mimetypes.guess_type(filename)
-        if guessed_type:
-            res = guessed_type
-    return res
-
