@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+
+3.49 (2010-11-02)
+-----------------
+
 - Harden 'deactivate_profile.html' view against missing user (LP #669451).
 
 - Fix 'show_profile_view' for case when user has never logged in.  (LP #668352)
