@@ -8,6 +8,10 @@ Unreleased
   is now used to guess mimetypes for files uploaded as attachments to other
   content types, ie blog entries, wiki pages, et al.  (LP #667494)
 
+- Added an evolve script to update mimetypes for community files with generic,
+  meaningless mimetypes to something more specific based on file extension.
+  (LP #667494)
+
 3.49 (2010-11-02)
 -----------------
 
