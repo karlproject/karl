@@ -59,6 +59,14 @@ function insertMedia() {
 
     // update snippet
     var snippet = fetchSnippetFromForm();
+    var content = snippet.getContent();
+    if (! content) {
+        // nothing to do
+        // important to bail out here for the sake of IE
+        tinyMCEPopup.close();
+        return;
+    }
+
     var parms = snippet.getParms();
     if (! parms.width) parms.width = 100;
     if (! parms.height) parms.height = 100;
@@ -177,11 +185,14 @@ function jsEncode(s) {
 
 function generatePreview() {
     var snippet = fetchSnippetFromForm();
-    $('#prev')
-        .html(snippet.getContent());
+    var content = snippet.getContent();
+    if (content) {
+        $('#prev')
+            .html(content);
     // XXX problems with resizing on ie
-        //.css('width', parseInt(snippet.getParms().width) + 4)
-        //.css('height', parseInt(snippet.getParms().height) + 4);
+            //.css('width', parseInt(snippet.getParms().width) + 4)
+            //.css('height', parseInt(snippet.getParms().height) + 4);
+    }
 }
 
 tinyMCEPopup.onInit.add(init);
