@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add a peopledirectory report filter based on the 'is_staff' index.
+  and configure it as an addable in a report.  (LP #669523).
+
 - Make the jQuery UI dialog on Accept Invitation show an OK button
   that isn't misaligned.  We have some pretty horrible CSS styling
   going on where we have overridden <button> as a whole, rather than

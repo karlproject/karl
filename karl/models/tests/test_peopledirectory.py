@@ -441,6 +441,27 @@ class TestPeopleReportGroupFilter(unittest.TestCase,
         verifyObject(IPeopleReportGroupFilter, self._makeOne())
 
 
+class TestPeopleReportIsStaffFilter(unittest.TestCase,
+                                    _Conforms_to_IPeopleReportFilter,
+                                   ):
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleReportIsStaffFilter
+        return PeopleReportIsStaffFilter
+
+    def _makeOne(self, values=('a', 'b', 'c')):
+        return self._getTargetClass()(values)
+
+    def test_class_conforms_to_IPeopleReportIsStaffFilter(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        verifyClass(IPeopleReportIsStaffFilter, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleReportIsStaffFilter(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        verifyObject(IPeopleReportIsStaffFilter, self._makeOne())
+
+
 class TestPeopleReport(unittest.TestCase):
 
     def _getTargetClass(self):

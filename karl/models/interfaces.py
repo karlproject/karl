@@ -491,6 +491,10 @@ class IPeopleReportCategoryFilter(IPeopleReportFilter):
 class IPeopleReportGroupFilter(IPeopleReportFilter):
     """A group-based filter for a report displayed in a section"""
 
+class IPeopleReportIsStaffFilter(IPeopleReportFilter):
+    """A staff filter for a report displayed in a section"""
+    include_staff = Attribute("Include staff in query?")
+
 class IPeopleReport(Interface):
     """A report about people"""
     title = Attribute("Report title")

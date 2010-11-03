@@ -34,6 +34,7 @@ from karl.models.interfaces import IPeopleDirectorySchemaChanged
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroupFilter
+from karl.models.interfaces import IPeopleReportIsStaffFilter
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
@@ -267,6 +268,10 @@ class PeopleReportCategoryFilter(_PeopleReportFilter):
 
 class PeopleReportGroupFilter(_PeopleReportFilter):
     implements(IPeopleReportGroupFilter)
+
+class PeopleReportIsStaffFilter(_PeopleReportFilter):
+    implements(IPeopleReportIsStaffFilter)
+    include_staff = False
 
 PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 

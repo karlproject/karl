@@ -382,7 +382,7 @@ class Test_get_admin_actions(unittest.TestCase):
         directlyProvides(context, IPeopleReport)
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 4)
         action = actions[0]
         self.assertEqual(action[0], 'Edit')
         self.assertEqual(action[1], 'edit.html')
@@ -392,6 +392,9 @@ class Test_get_admin_actions(unittest.TestCase):
         action = actions[2]
         self.assertEqual(action[0], 'Add GroupFilter')
         self.assertEqual(action[1], 'add_group_report_filter.html')
+        action = actions[3]
+        self.assertEqual(action[0], 'Add IsStaffFilter')
+        self.assertEqual(action[1], 'add_is_staff_report_filter.html')
 
 
 class Test_get_actions(unittest.TestCase):
@@ -850,6 +853,24 @@ class Test_get_report_query(unittest.TestCase):
         self.assertEqual(kw, {
             'allowed': {'operator': 'or', 'query': []},
             'groups': {'operator': 'or', 'query': ['staff']},
+            'lastnamestartswith': 'L',
+            'texts': 'a b**',
+            })
+
+    def test_w_is_staff_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        report = testing.DummyModel()
+        groups = report['groups'] = testing.DummyModel(include_staff=False)
+        directlyProvides(groups, IPeopleReportIsStaffFilter)
+        request = testing.DummyRequest({
+            'lastnamestartswith': 'L',
+            'body': 'a b*',
+            })
+        kw = self._callFUT(report, request)
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'is_staff': False,
             'lastnamestartswith': 'L',
             'texts': 'a b**',
             })

@@ -44,6 +44,7 @@ from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleReportGroupFilter
+from karl.models.interfaces import IPeopleReportIsStaffFilter
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategory
@@ -51,6 +52,7 @@ from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
 from karl.models.peopledirectory import PeopleReportGroupFilter
+from karl.models.peopledirectory import PeopleReportIsStaffFilter
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
@@ -187,9 +189,12 @@ def render_report_group(group, request, css_class=''):
     return '\n'.join(result)
 
 _ADDABLES = {
-    IPeopleDirectory: [('Section', 'add_section.html')],
-    IPeopleCategories: [('Category', 'add_category.html')],
-    IPeopleCategory: [('CategoryItem', 'add_category_item.html')],
+    IPeopleDirectory: [('Section', 'add_section.html'),
+                      ],
+    IPeopleCategories: [('Category', 'add_category.html'),
+                       ],
+    IPeopleCategory: [('CategoryItem', 'add_category_item.html'),
+                     ],
     IPeopleSection: [('Column', 'add_column.html'),
                      ('ReportGroup', 'add_report_group.html'),
                      ('Report', 'add_report.html'),
@@ -197,9 +202,11 @@ _ADDABLES = {
     IPeopleSectionColumn: [('ReportGroup', 'add_report_group.html'),
                            ('Report', 'add_report.html'),
                           ],
-    IPeopleReportGroup: [('Report', 'add_report.html')],
+    IPeopleReportGroup: [('Report', 'add_report.html'),
+                        ],
     IPeopleReport: [('CategoryFilter', 'add_category_report_filter.html'),
-                    ('GroupFilter', 'add_group_report_filter.html')
+                    ('GroupFilter', 'add_group_report_filter.html'),
+                    ('IsStaffFilter', 'add_is_staff_report_filter.html'),
                    ],
 }
 
@@ -413,6 +420,8 @@ def get_report_query(report, request):
             kw['groups'] =  {'query': filter.values,
                              'operator': 'or',
                             }
+        elif IPeopleReportIsStaffFilter.providedBy(filter):
+            kw['is_staff'] =  filter.include_staff
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     letter = request.params.get('lastnamestartswith')
@@ -782,17 +791,6 @@ report_filter_schema = [
                   schemaish.String())),
 ]
 
-class EditReportFilterFormController(EditBase):
-    page_title = 'Edit Report Filter'
-    schema = report_filter_schema
-
-    def form_widgets(self, schema):
-        widgets = {
-            'values':formish.TextArea(rows=5,
-                           converter_options={'delimiter':'\n'}),
-                  }
-        return widgets
-
 class AddCategoryReportFilterFormController(AddBase):
     page_title = 'Add Category Report Filter'
     schema = report_filter_schema
@@ -817,6 +815,37 @@ class AddGroupReportFilterFormController(AddBase):
                   }
         return widgets
 
+class EditReportFilterFormController(EditBase):
+    page_title = 'Edit Report Filter'
+    schema = report_filter_schema
+
+    def form_widgets(self, schema):
+        widgets = {'values':formish.TextArea(rows=5,
+                                             converter_options={
+                                                    'delimiter':'\n'}),
+                  }
+        return widgets
+
+is_staff_schema = [('include_staff', schemaish.Boolean())]
+
+class AddIsStaffReportFilterFormController(AddBase):
+    page_title = 'Add IsStaff Report Filter'
+    schema = is_staff_schema
+    factory = PeopleReportIsStaffFilter
+
+    def form_widgets(self, schema):
+        widgets = {'include_staff':formish.Checkbox()}
+        return widgets
+
+class EditIsStaffReportFilterFormController(EditBase):
+    page_title = 'Edit Report Filter'
+    schema = is_staff_schema
+
+    def form_widgets(self, schema):
+        widgets = {'include_staff':formish.Checkbox(),
+                  }
+        return widgets
+
 class EditReportFormController(EditBase):
     page_title = 'Edit Report'
     schema = report_schema
@@ -825,7 +854,7 @@ class EditReportFormController(EditBase):
         widgets = {
             'columns':formish.TextArea(rows=5,
                             converter_options={'delimiter':'\n'}),
-                  }
+        }
         return widgets
 
 class AddReportFormController(AddBase):
