@@ -617,7 +617,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         # tags?
         self.assertEqual(self.site.tags._called_with[1]['tags'],
                          [u'foo', u'bar'])
-    
+
 
 class Test_show_calendarevent_ics_view(unittest.TestCase):
 
@@ -678,6 +678,51 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(evt['dtstart'].dt, start)
         self.assertEqual(evt['dtend'].dt, end)
 
+
+    def test_unicode_attendee(self):
+        from datetime import datetime
+        from icalendar import Calendar
+        from icalendar import UTC
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import DummyRequest
+        community = DummyModel()
+        community.__name__ = 'testing'
+        community['calendar'] = tool = DummyModel()
+        tool['dummy'] = event = DummyModel()
+        event.docid = 'DOCID'
+        event.title = 'TITLE'
+        event.description = 'DESCRIPTION'
+        event.location = 'LOCATION'
+        event.attendees = [u'R\xe8n & Stimpy']
+        event.contact_name = ''
+        event.contact_email = ''
+        event['attachments'] = DummyModel()
+        start = event.startDate = datetime(2009,3,16,22,0,0,tzinfo=UTC)
+        end = event.endDate = datetime(2009,3,16,23,59,59,tzinfo=UTC)
+        created = event.created = datetime(2009,3,16,16,45,0,tzinfo=UTC)
+        modified = event.modified = datetime(2009,3,16,16,45,0,tzinfo=UTC)
+
+        request = DummyRequest()
+
+        response = self._callFUT(event, request)
+        self.assertEqual(response.content_type, 'text/calendar')
+        self.assertEqual(response.charset, 'UTF8')
+
+        cal = Calendar.from_string(response.body)
+        self.assertEqual(str(cal['prodid']), '-//KARL3//Event//')
+        self.assertEqual(str(cal['version']), '2.0')
+        self.assertEqual(str(cal['method']), 'PUBLISH')
+        self.assertEqual(len(cal.subcomponents), 1)
+        evt = cal.subcomponents[0]
+        self.assertEqual(str(evt['uid']), 'testing:DOCID')
+        self.assertEqual(str(evt['summary']), 'TITLE')
+        self.assertEqual(str(evt['description']), 'DESCRIPTION')
+        self.assertEqual(str(evt['location']), 'LOCATION')
+        self.assertEqual(evt['dtstamp'].dt, modified)
+        self.assertEqual(evt['created'].dt, created)
+        self.assertEqual(evt['dtstart'].dt, start)
+        self.assertEqual(evt['dtend'].dt, end)
+        self.assertEqual(str(evt['attendee']), 'R\xc3\xa8n & Stimpy')
 
 class CalendarCategoriesViewTests(unittest.TestCase):
     def setUp(self):
@@ -1382,7 +1427,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_day_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'], 
+        self.assertEqual(response.headers['Set-Cookie'],
             '%s=day; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
 
     def test_week(self):
@@ -1404,7 +1449,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_week_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'], 
+        self.assertEqual(response.headers['Set-Cookie'],
             '%s=week; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
 
     def test_month(self):
@@ -1426,7 +1471,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_month_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'], 
+        self.assertEqual(response.headers['Set-Cookie'],
             '%s=month; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
 
     def test_list(self):
@@ -1448,7 +1493,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_list_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'], 
+        self.assertEqual(response.headers['Set-Cookie'],
             '%s=list; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
 
     def test_default(self):
@@ -1485,7 +1530,7 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         # Test with 'day' view selected as sticky
         request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'day'
-        
+
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
 
@@ -1507,7 +1552,7 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         # Test with 'week' view selected as sticky
         request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'week'
-        
+
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
 
@@ -1529,7 +1574,7 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         # Test with 'month' view selected as sticky
         request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'month'
-        
+
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
 
@@ -1551,7 +1596,7 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         # Test with 'list' view selected as sticky
         request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'list'
-        
+
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
 
@@ -1565,7 +1610,7 @@ class DummyContentFactory:
     def __init__(self, klass):
         self._klass = klass
         self.created_instances = []
-    
+
     def __call__(self, *args, **kargs):
         content_object = self._klass(*args, **kargs)
         self.created_instances.append(content_object)
@@ -1574,7 +1619,7 @@ class DummyContentFactory:
 
 class DummyCalendarEvent(testing.DummyModel):
     implements(ICalendarEvent)
-    
+
     def __init__(self, title='', startDate=None, endDate=None, creator=0,
                  text='', location='', attendees=[], contact_name='',
                  contact_email='', calendar_category=''):

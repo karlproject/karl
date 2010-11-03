@@ -668,6 +668,7 @@ def show_calendarevent_view(context, request):
         layout=layout,
         )
 
+
 def show_calendarevent_ics_view(context, request):
     from icalendar import Calendar
     from icalendar import Event
@@ -700,6 +701,8 @@ def show_calendarevent_ics_view(context, request):
         event.add('contact', ', '.join(contacts))
 
     for name in context.attendees:
+        if isinstance(name, unicode):
+            name = name.encode('UTF-8')
         event.add('attendee', name)
 
     for f in context['attachments'].values():

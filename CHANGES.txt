@@ -19,6 +19,9 @@ Unreleased
   generic, meaningless mimetypes to something more specific based on
   file extension.  (LP #667494)
 
+- Attendees are now converted to to UTF-8 in the ical view for calendar events.
+  (LP #666295)
+
 3.49 (2010-11-02)
 -----------------
 
