@@ -4,20 +4,28 @@ karl package Changelog
 Unreleased
 ----------
 
-- The same code is used to guess mimetypes for files uploaded to the files tool
-  is now used to guess mimetypes for files uploaded as attachments to other
-  content types, ie blog entries, wiki pages, et al.  (LP #667494)
+- Make the jQuery UI dialog on Accept Invitation show an OK button
+  that isn't misaligned.  We have some pretty horrible CSS styling
+  going on where we have overridden <button> as a whole, rather than
+  in targeted places.  We have a buttongeddon coming at some
+  point. (LP #651279)
 
-- Added an evolve script to update mimetypes for community files with generic,
-  meaningless mimetypes to something more specific based on file extension.
-  (LP #667494)
+- The same code is used to guess mimetypes for files uploaded to the
+  files tool is now used to guess mimetypes for files uploaded as
+  attachments to other content types, ie blog entries, wiki pages, et
+  al.  (LP #667494)
+
+- Added an evolve script to update mimetypes for community files with
+  generic, meaningless mimetypes to something more specific based on
+  file extension.  (LP #667494)
 
 3.49 (2010-11-02)
 -----------------
 
 - Harden 'deactivate_profile.html' view against missing user (LP #669451).
 
-- Fix 'show_profile_view' for case when user has never logged in.  (LP #668352)
+- Fix 'show_profile_view' for case when user has never logged in.  (LP
+  #668352)
 
 - Suppressed "Admin" action on peopledir objects (LP #668489).
 
@@ -63,9 +71,9 @@ Unreleased
 - When adding a new user, any previous invitations that user had are deleted.
   (LP #659926)
 
-- Hide "Terms and Conditions" and "Accept Privacy Policy" fields in the accept
-  invitation form if there is no text to display for those fields.
-  (LP #651209)
+- Hide "Terms and Conditions" and "Accept Privacy Policy" fields in
+  the accept invitation form if there is no text to display for those
+  fields.  (LP #651209)
 
 3.47 (2010-10-07)
 -----------------
@@ -82,8 +90,8 @@ Unreleased
 - Removed Karl's implementation of Message in favor of the implementation in
   repoze.postoffice.
 
-- Added a UI for deleting and requeueing messages in the postoffice quarantine.
-  (LP #613424)
+- Added a UI for deleting and requeueing messages in the postoffice
+  quarantine.  (LP #613424)
 
 - Removed unused formfield snippet from formfields.pt: add_comment-field.
 
@@ -92,14 +100,14 @@ Unreleased
 - Make sure top level validation error message shows on edit profile forms.
   (LP #645614)
 
-- Make sure sequence fields can be highlighted when there are validation
-  errors.  Formish logically but not helpfully sets the 'contains-error' style
-  instead of the 'error' style we were using in our css.  Copied the .error
-  styles for .contains-error. (LP #645614)
+- Make sure sequence fields can be highlighted when there are
+  validation errors.  Formish logically but not helpfully sets the
+  'contains-error' style instead of the 'error' style we were using in
+  our css.  Copied the .error styles for .contains-error. (LP #645614)
 
-- Implemented workaround to what should probably be considered a bug in
-  formish, to allow formish error messages to be visible for the websites field
-  when editing a profile. (LP #645614)
+- Implemented workaround to what should probably be considered a bug
+  in formish, to allow formish error messages to be visible for the
+  websites field when editing a profile. (LP #645614)
 
 - Added a UI for rename and merging users in the Admin UI.  (LP #629625)
 
@@ -134,11 +142,11 @@ Unreleased
 
 - Added form validation to catch years earlier than 1900. (LP# 632451)
 
-- The groups KarlAdmin and KarlUserAdmin now have the same permissions on
-  profiles of inactive users that they do on active users.  This means they
-  can now edit inactive profiles as well as see inactive users in searches and
-  in the people directory.  Updated the admin edit profile view to handle
-  inactive users. (LP# 629612)
+- The groups KarlAdmin and KarlUserAdmin now have the same permissions
+  on profiles of inactive users that they do on active users.  This
+  means they can now edit inactive profiles as well as see inactive
+  users in searches and in the people directory.  Updated the admin
+  edit profile view to handle inactive users. (LP# 629612)
 
 - Inactive users now display a badge in their title, ie
   'Fred Flintstone (Inactive)'.  This makes inactive users easier to notice
@@ -218,7 +226,8 @@ Unreleased
   uploaded previously with newline and tab characters in the filename.
   (LP #616511)
 
-- Rename user script can now rename or merge profiles which don't have logins.
+- Rename user script can now rename or merge profiles which don't have
+  logins.
 
 3.43 (2010-08-19)
 -----------------
@@ -233,8 +242,8 @@ Unreleased
 - Ensured that comment alerts work for comments made agaisnt forum posts
   (LP #614370).
 
-- Ensured that CSV profile import decodes attributes encoded as UTF8 or latin1
-  (LP #614398).
+- Ensured that CSV profile import decodes attributes encoded as UTF8
+  or latin1 (LP #614398).
 
 - Fixed text indexing of profiles with attributes encoded as UTF8 or latin1
   (LP #614398).

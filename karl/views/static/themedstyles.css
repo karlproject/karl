@@ -2803,6 +2803,12 @@ button,
     text-align: center;
     text-transform: capitalize;
 }
+.ui-dialog-buttonpane button {
+    /* We are overdue for a button-geddon, we overrode too generally */
+    line-height: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+}
 button {
     line-height: 20px !important;
     height: 20px !important;
