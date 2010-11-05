@@ -70,6 +70,7 @@
                                     .attr('height', embed.attr('height'));
                                     //.attr('align', f.align.options[f.align.selectedIndex].value);
                                 // XXX for some reason, this serialization is essential on IE
+                                ////alert('txt: ' + embed_text);
                                 result = $('<div />').append(result).html();
                                 embed.replaceWith(result);
                             });
@@ -102,23 +103,51 @@
 
 		},
 			
+
+
 		newEmbedSnippet : function() {
                     // manipulation of embed snippets
                     // created here because at this point we have jquery
                     // for sure.
+
                     var EmbedSnippet = function EmbedSnippet() {};
                     $.extend(EmbedSnippet.prototype, {
+
+                        _objectsToSpans : function(str) {
+                            str = str.replace(/<object([^>]*)>/gi, '<span class="mceItemObject"$1>');
+                            str = str.replace(/<embed([^>]*)\/?>/gi, '<span class="mceItemEmbed"$1></span>');
+                            str = str.replace(/<embed([^>]*)>/gi, '<span class="mceItemEmbed"$1>');
+                            str = str.replace(/<\/(object)([^>]*)>/gi, '<span class="mceEndObject"></span></span>');
+                            str = str.replace(/<\/embed>/gi, '');
+                            str = str.replace(/<param([^>]*)\/?>/gi, '<span class="mceItemParam"$1></span>');
+                            str = str.replace(/<\/param>/gi, '');
+                            return str;
+                        },
+
+                        _spansToObjects : function(str) {
+                            str = str.replace(/<span([^>]*) class="?mceItemParam"?([^>]*)><\/span>/gi, '<param$1 $2></param>');
+                            str = str.replace(/<span([^>]*) class="?mceItemEmbed"?([^>]*)><\/span>/gi, '<embed$1 $2></embed>');
+                            str = str.replace(/<span([^>]*) class="?mceItemObject"?([^>]*)>/gi, '<object$1 $2>');
+                            str = str.replace(/<span class="?mceEndObject"?><\/span><\/span>/gi, '</object>');
+                            return str;
+                        },
 
                         setContent: function(html) {
                             this.wrapper = $('<div />');
                             var wrapper = this.wrapper;
-                            wrapper.append(html);
+                            var shtml = this._objectsToSpans(html);
+                            wrapper[0].innerHTML = shtml;
+                            ////if (html) {
+                            ////alert('html: ' + html);
+                            ////alert('shtml: ' + shtml);
+                            ////alert('XRESULT: ' + wrapper.html()); }
+
                             this.root = wrapper.children();
                             var root = this.root;
                             // detect type
                             this.emtype = null;
-                            if (root.is('object')) {
-                                var inside = root.find('embed');
+                            if (root.is('span.mceItemObject')) {
+                                var inside = root.find('span.mceItemEmbed');
                                 if (inside) {
                                     this.emtype = 'object+embed';
                                     this.inside = inside;
@@ -135,7 +164,7 @@
                                 var to_add = [];
                                 $.each(params, function(i, value) {
                                     var found = false;
-                                    root.find('param').each(function(i, elem) {
+                                    root.find('span.mceItemParam').each(function(i, elem) {
                                         a = $(elem).attr('name');
                                         if (a == value || a == value.toLowerCase()) {
                                             found = true;
@@ -153,11 +182,10 @@
                                 });
                                 $.each(to_add, function(i, value) {
                                     if (value.k == 'resource') {
-                                        // XXX Huh?
                                         value.k = 'movie';
                                     }
                                     try {
-                                    $('<param />')
+                                    $('<span class="mceItemParam"></span>')
                                         .attr('name', value.k)
                                         .attr('value', value.v)
                                         .prependTo(root);
@@ -175,7 +203,12 @@
                         },
 
                         getContent: function() {
-                            return this.wrapper.html();
+                            var shtml = this.wrapper.html();
+                            ////alert('backShtml: ' + shtml);
+                            var html = this._spansToObjects(shtml);
+                            ////alert('backhtml: ' + html);
+
+                            return html;
                         },
 
                         getParms: function() {
@@ -204,6 +237,10 @@
                         return new EmbedSnippet();   
                     };
                     return this.newEmbedSnippet();
+                },
+
+                getJQuery: function() {
+                    return window.jQuery;
                 },
 
 		getInfo : function() {

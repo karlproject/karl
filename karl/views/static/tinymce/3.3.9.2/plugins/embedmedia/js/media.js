@@ -66,6 +66,8 @@ function insertMedia() {
     f.width.value = parms.width;
     f.height.value = parms.height;
 
+    var $ = tinyMCEPopup.editor.plugins.embedmedia.getJQuery();
+
     var result = $('<img />')
         .attr('src', tinyMCEPopup.getWindowArg("plugin_url") + '/img/trans.gif')
         .addClass('mceItemFlash')
@@ -79,10 +81,7 @@ function insertMedia() {
     //tinyMCEPopup.editor.selection.setContent(h, {source_view : true});
     
     ed.execCommand('mceInsertContent', false, h);
-
-    
     ed.execCommand('mceRepaint');
-    
     tinyMCEPopup.close();
 }
 
@@ -177,8 +176,11 @@ function jsEncode(s) {
 
 function generatePreview() {
     var snippet = fetchSnippetFromForm();
-    $('#prev')
-        .html(snippet.getContent());
+    var content = snippet.getContent();
+    if (! content) {
+        return;
+    }
+    document.getElementById('prev').innerHTML = content;
     // XXX problems with resizing on ie
         //.css('width', parseInt(snippet.getParms().width) + 4)
         //.css('height', parseInt(snippet.getParms().height) + 4);
