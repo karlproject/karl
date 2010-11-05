@@ -26,7 +26,7 @@ def evolve(root):
     for docid in docids:
         doc = resolver(docid)
         mimetype = mimetypes.guess_type(doc.filename)[0]
-        if mimetype != doc.mimetype:
+        if mimetype is not None and mimetype != doc.mimetype:
             addr = model_path(doc)
             print "Updating mimetype for %s: %s" % (addr, mimetype)
             doc.mimetype = mimetype
