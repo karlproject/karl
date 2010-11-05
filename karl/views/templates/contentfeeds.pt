@@ -113,8 +113,10 @@
 
     <script type="text/tmpl" id="added_edited_other">
       <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %} a {%= item.content_type %}
-      <a href="{%= item.url %}">{%= item.title %}</a>
-        in <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+      <a href="{%= item.url %}">{%= item.title %}</a>{%
+        if (item.context_url) { %}
+        in <a href="{%= item.context_url %}">{%= item.context_name %}</a>
+        {% } %}.
     </script>
 
     <script type="text/tmpl" id="added_edited_profile">
