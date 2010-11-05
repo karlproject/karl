@@ -33,6 +33,9 @@ from karl.scripting import open_root
 from karl.utilities.peopleconf import peopleconf
 from karl.utilities.peopleconf import dump_peopledir
 
+import logging
+logging.basicConfig()
+
 
 class HelpFormatter(optparse.IndentedHelpFormatter):
 
@@ -105,7 +108,7 @@ def main(argv=None):
         if options.force_reindex:
             kw['force_reindex'] = True
         do_commit = not options.dry_run
- 
+
     config = options.config
     if config is None:
         config = get_default_config()

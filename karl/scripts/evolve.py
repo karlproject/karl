@@ -13,6 +13,9 @@ from repoze.evolution import evolve_to_latest
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 
+import logging
+logging.basicConfig()
+
 def usage(e=None):
     if e is not None:
         print e

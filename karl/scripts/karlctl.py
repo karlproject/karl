@@ -23,6 +23,9 @@ import sys
 from paste.script.serve import ServeCommand
 from karl.scripting import get_default_config
 
+import logging
+logging.basicConfig()
+
 def main():
     os.environ['PASTE_CONFIG_FILE'] = get_default_config()
 

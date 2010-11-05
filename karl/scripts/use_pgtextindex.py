@@ -18,6 +18,9 @@ from optparse import OptionParser
 
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main(args=sys.argv):
     parser = OptionParser(description=__doc__)
     parser.add_option('-C', '--config', dest='config', default=None,

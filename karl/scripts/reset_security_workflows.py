@@ -29,6 +29,9 @@ from optparse import OptionParser
 from karl.security.workflow import reset_security_workflow
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main():
     parser = OptionParser(description=__doc__,
                           usage='usage: %prog [options] username password')

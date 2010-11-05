@@ -27,6 +27,9 @@ import os
 import sys
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main(argv=sys.argv):
     logging.basicConfig()
     logging.getLogger('karl').setLevel(logging.INFO)

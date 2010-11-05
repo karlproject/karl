@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added basic logging configuration to console scripts. (LP #670610)
+
 - Fixed bug which caused content feeds to break if an edited item was not
   contained by a community. (LP #670967)
 

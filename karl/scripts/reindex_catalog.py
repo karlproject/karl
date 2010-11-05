@@ -23,6 +23,9 @@ from karl.models.catalog import reindex_catalog
 from optparse import OptionParser
 import re
 
+import logging
+logging.basicConfig()
+
 def main():
     parser = OptionParser(description=__doc__)
     parser.add_option('-C', '--config', dest='config', default=None,

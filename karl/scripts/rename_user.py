@@ -24,6 +24,9 @@ from optparse import OptionParser
 import sys
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main():
     parser = OptionParser(description=__doc__,
                           usage="%prog [options] old_name new_name")

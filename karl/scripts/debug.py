@@ -23,6 +23,9 @@ import sys
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 
+import logging
+logging.basicConfig()
+
 def main(argv=sys.argv):
     config = None
     script = None

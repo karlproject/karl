@@ -30,6 +30,9 @@ from repoze.bfg.scripting import get_root
 from karl.scripting import get_default_config
 from karl.utilities import stats
 
+import logging
+logging.basicConfig()
+
 def main(argv=sys.argv):
     parser = optparse.OptionParser(
         description=__doc__,

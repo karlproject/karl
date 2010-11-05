@@ -37,6 +37,9 @@ import getopt
 import sys
 import transaction
 
+import logging
+logging.basicConfig()
+
 class StartOver:
 
     do_commit = False

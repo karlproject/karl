@@ -49,6 +49,7 @@ import sys
 import transaction
 
 log = logging.getLogger(__name__)
+logging.basicConfig()
 
 
 def postorder(startnode):

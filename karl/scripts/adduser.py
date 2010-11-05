@@ -31,6 +31,9 @@ from repoze.lemonade.content import create_content
 
 import transaction
 
+import logging
+logging.basicConfig()
+
 def adduser(root, userid, password):
     users = find_users(root)
     if users.get_by_id(userid) is not None:

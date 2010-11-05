@@ -28,6 +28,9 @@ from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
 from zope.component import queryUtility
 
+import logging
+logging.basicConfig()
+
 def main():
     parser = optparse.OptionParser(description=__doc__)
     parser.add_option('-C', '--config', dest='config',

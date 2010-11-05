@@ -8,6 +8,7 @@ import sys
 import transaction
 
 log = logging.getLogger("cleantags")
+logging.basicConfig()
 
 def cleantags(site, assign_to):
     profiles = site['profiles']

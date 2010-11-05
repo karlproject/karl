@@ -28,6 +28,9 @@ import socket
 import sys
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
     parser = optparse.OptionParser(description=__doc__)
     parser.add_option('-C', '--config', dest='config',

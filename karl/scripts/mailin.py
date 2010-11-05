@@ -36,6 +36,9 @@ import os
 import sys
 import transaction
 
+import logging
+logging.basicConfig()
+
 def main(argv=sys.argv, factory=MailinRunner, root=None):
     parser = optparse.OptionParser(
         description=__doc__,

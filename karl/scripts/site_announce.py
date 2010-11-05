@@ -30,11 +30,14 @@ from optparse import OptionParser
 
 import transaction
 
+import logging
+logging.basicConfig()
+
 def clear_site_announce(root, *args):
     previous, root.site_announcement = getattr(root, 'site_announcement',
                                                ''), ''
     return previous, ''
-    
+
 def set_site_announce(root, *args):
     previous = getattr(root, 'site_announcement', '')
 
