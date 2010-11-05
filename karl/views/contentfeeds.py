@@ -66,6 +66,8 @@ def _update_feed_items(entries, app_url):
         if name not in fi:
             return
         url = fi[name]
+        if url is None:
+            return
         if url.startswith('/'):
             url = url[1:]
         fi[name] = urljoin(app_url, url)

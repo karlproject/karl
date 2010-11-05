@@ -49,7 +49,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         context.events = DummyEvents()
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(last_gen, 1)
         self.assertEqual(last_index, 2)
@@ -64,7 +64,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         context.events = DummyEvents()
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, '')
 
@@ -75,7 +75,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'filter': '',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, '')
 
@@ -86,7 +86,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'filter': 'mycommunities',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, 'mycommunities')
 
@@ -97,7 +97,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'filter': 'mycontent',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, 'mycontent')
 
@@ -108,7 +108,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'filter': 'profile:phred',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, 'profile:phred')
 
@@ -119,7 +119,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'filter': 'community:bhedrock',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         _checkCookie(request, 'community:bhedrock')
 
@@ -130,7 +130,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'newer_than': '0:0',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(last_gen, 0)
         self.assertEqual(last_index, 1)
@@ -148,7 +148,7 @@ class NewestFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'newer_than': '0:0',
             }
-        (last_gen, last_index, earliest_gen, earliest_index, 
+        (last_gen, last_index, earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(last_gen, 0)
         self.assertEqual(last_index, 0)
@@ -171,7 +171,7 @@ class OlderFeedItemsViewTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         context.events = DummyEvents()
-        (earliest_gen, earliest_index, 
+        (earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(earliest_gen, -1L)
         self.assertEqual(earliest_index, -1)
@@ -184,7 +184,7 @@ class OlderFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'older_than': '0:5',
             }
-        (earliest_gen, earliest_index, 
+        (earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(earliest_gen, 2)
         self.assertEqual(earliest_index, 3)
@@ -200,7 +200,7 @@ class OlderFeedItemsViewTests(unittest.TestCase):
         request.params = {
             'older_than': '0:5',
             }
-        (earliest_gen, earliest_index, 
+        (earliest_gen, earliest_index,
             feed_items) = self._callFUT(context, request)
         self.assertEqual(earliest_gen, 0)
         self.assertEqual(earliest_index, 5)
@@ -209,13 +209,14 @@ class OlderFeedItemsViewTests(unittest.TestCase):
 class DummyEvents:
     def checked(self, principals, created_by):
         results = [(1, 2, {'foo': 'bam', 'allowed': ['phred', 'bharney'],
-                   'content_creator': 'phred', 'content_type': 'Blog Entry', 
-                   'timestamp': datetime(2010, 7, 14, 12, 47, 12)})]
+                   'content_creator': 'phred', 'content_type': 'Blog Entry',
+                   'timestamp': datetime(2010, 7, 14, 12, 47, 12),
+                   'context_url': None})]
         return results
 
     def newer(self, gen, index, principals, created_by):
         results = [(0, 1, {'foo': 'bam', 'allowed': ['phred', 'bharney'],
-                   'content_creator': 'phred', 'content_type': 'Blog Entry', 
+                   'content_creator': 'phred', 'content_type': 'Blog Entry',
                    'timestamp': datetime(2010, 7, 13, 12, 47, 12)}),
                    (0, 0, {'foo': 'bar', 'allowed': ['phred', 'bharney'],
                     'userid': 'phred', 'content_type': 'Community',
@@ -225,7 +226,8 @@ class DummyEvents:
     def older(self, gen, index, principals, created_by):
         results = [(2, 3, {'foo': 'bar', 'allowed': ['phred', 'bharney'],
                     'userid': 'phred', 'content_type': 'Community',
-                   'timestamp': datetime(2010, 7, 15, 13, 47, 12)})]
+                   'timestamp': datetime(2010, 7, 15, 13, 47, 12),
+                   'context_url': '/foo'})]
         return results
 
 class DummyEventsEmpty:
