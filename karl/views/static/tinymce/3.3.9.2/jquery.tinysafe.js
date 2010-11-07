@@ -10,7 +10,7 @@
  * Copyright 2010, Balazs Ree <ree@greenfinity.hu>
  * Released under LGPL License.
  *
- * Tested with tinymce 3.3.8.
+ * Tested with tinymce 3.3.9.2.
  *
  ***************************************************************
  *

@@ -48,7 +48,7 @@ def main(argv=sys.argv):
     slider_dir = os.path.join(static_dir, 'karl-plugins', 'karl-slider')
     buttonset_dir = os.path.join(static_dir, 'karl-plugins', 'karl-buttonset')
     tinymce_base_dir = os.path.join(static_dir, 'tinymce')
-    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.8')
+    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.9.2')
 
     packed_dir = os.path.join(static_dir, 'packed')
 

@@ -38,7 +38,7 @@ def main(argv=sys.argv):
         raise RuntimeError, 'cssconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
     tinymce_base_dir = os.path.join(static_dir, 'tinymce')
-    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.8')
+    tinymce_dir = os.path.join(tinymce_base_dir, '3.3.9.2')
 
     skin_dir = os.path.join(tinymce_dir, 'themes', 'advanced', 'skins', 'karl')
 

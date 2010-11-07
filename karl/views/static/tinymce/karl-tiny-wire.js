@@ -20,7 +20,7 @@ $(document).ready(function() {
     // Url that contains the context prefix 
     var here_url = $('#karl-here-url')[0].content;
     // the root url of the tinymce tree
-    var tinymce_url = $('#karl-static-url')[0].content + '/tinymce/3.3.8';
+    var tinymce_url = $('#karl-static-url')[0].content + '/tinymce/3.3.9.2';
 
     // initialize the editor widget(s)
     $('.mceEditor').tinysafe({
