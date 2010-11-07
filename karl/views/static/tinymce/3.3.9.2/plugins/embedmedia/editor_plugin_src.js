@@ -51,16 +51,36 @@
 				}
 			});
 
+                        ed.onBeforeSetContent.add(function(ed, o) {
+                            var snippet = t.newEmbedSnippet();
+                            var html = o.content;
+                            var shtml = snippet._objectsToSpans(html);
+                            o.content = shtml;
+                        }, t);
+
 			ed.onSetContent.add(function() {
                             var content = $(ed.getBody());
-                            content.find('embed,object').each(function() {
+
+                            content.find('span.mceItemEmbed,span.mceItemObject').each(function() {
                                 var embed = $(this);
                                 // If we are an embed inside an object, do not process
-                                if (embed.is('embed') && embed.parent().is('object')) {
+                                if (embed.is('span.mceItemEmbed') && embed.parent().is('span.mceItemObject')) {
                                     return;
                                 }
                                 // Do the transformation
-                                var embed_text = $('<div />').append(embed.clone()).html();
+
+                                var snippet = t.newEmbedSnippet();
+                                var embed_shtml;
+                                if ($.browser.msie) {
+                                    embed_shtml = embed[0].outerHTML;
+                                } else {
+                                    var wrapper = $('<div />');
+                                    wrapper.append(embed.clone());
+                                    embed_shtml = wrapper[0].innerHTML;
+                                    wrapper.remove();
+                                }
+                                var embed_text = snippet._spansToObjects(embed_shtml);
+
                                 var result = $('<img />')
                                     .attr('src', t.url + '/img/trans.gif')
                                     .addClass('mceItemFlash')
@@ -70,10 +90,10 @@
                                     .attr('height', embed.attr('height'));
                                     //.attr('align', f.align.options[f.align.selectedIndex].value);
                                 // XXX for some reason, this serialization is essential on IE
-                                ////alert('txt: ' + embed_text);
                                 result = $('<div />').append(result).html();
                                 embed.replaceWith(result);
                             });
+                            content.find('span.mceEndObject').remove();
 
 			});
 
@@ -96,6 +116,7 @@
                                         height: getAttr(img, 'height')
                                     });
                                     img = snippet.getContent();
+                                    snippet.wrapper.remove();
                                 }
                                 return img;
                             });
@@ -103,7 +124,6 @@
 
 		},
 			
-
 
 		newEmbedSnippet : function() {
                     // manipulation of embed snippets
@@ -137,10 +157,6 @@
                             var wrapper = this.wrapper;
                             var shtml = this._objectsToSpans(html);
                             wrapper[0].innerHTML = shtml;
-                            ////if (html) {
-                            ////alert('html: ' + html);
-                            ////alert('shtml: ' + shtml);
-                            ////alert('XRESULT: ' + wrapper.html()); }
 
                             this.root = wrapper.children();
                             var root = this.root;
@@ -204,10 +220,7 @@
 
                         getContent: function() {
                             var shtml = this.wrapper.html();
-                            ////alert('backShtml: ' + shtml);
                             var html = this._spansToObjects(shtml);
-                            ////alert('backhtml: ' + html);
-
                             return html;
                         },
 
