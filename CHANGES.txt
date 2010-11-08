@@ -2,7 +2,10 @@ karl package Changelog
 ======================
 
 Unreleased
-----------
+-----------
+
+3.50 (2010-11-08)
+-----------------
 
 - Added basic logging configuration to console scripts. (LP #670610)
 
