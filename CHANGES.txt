@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+- Fixed dump of peopledir sections without any ``__acl__`` (LP #672744).
+
+
 3.50 (2010-11-08)
 -----------------
 

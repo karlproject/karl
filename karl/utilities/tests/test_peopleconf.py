@@ -133,6 +133,17 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(a_nodes[0].tag, 'allow')
         self.assertEqual(a_nodes[1].tag, 'no-inherit')
 
+    def test_section_no_acl(self):
+        pd = self._makeContext(order=('testing',))
+        pd['testing'] = testing.DummyModel(
+                            title='Testing',
+                            tab_title='Testing (TAB)',
+                        )
+        xml = self._callFUT(pd)
+        a_nodes = self._xpath(xml, '/peopledirectory/sections'
+                                    '/section[@name="testing"]/acl/*')
+        self.assertEqual(len(a_nodes), 0)
+
     def test_section_w_no_columns(self):
         pd = self._makeContext(order=('testing',))
         section = pd['testing'] = testing.DummyModel(

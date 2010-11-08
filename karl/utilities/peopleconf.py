@@ -135,7 +135,7 @@ def _category_items(category):
 def _acl_info(section):
     result = {'inherit': True}
     aces = result['aces'] = []
-    for ace in section.__acl__:
+    for ace in getattr(section, '__acl__', ()):
         if ace == DENY_ALL:
             result['inherit'] = False
             break
