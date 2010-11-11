@@ -45,9 +45,9 @@ def login_view(context, request):
             credentials['max_age'] = max_age
 
         # authenticate
-        zodb = plugins.get('zodb')
-        authenticators = [plugins.get(name)
-                                for name in ['zodb', 'zodb_impersonate']]
+        authenticators = filter(None, 
+                                [plugins.get(name)
+                                   for name in ['zodb', 'zodb_impersonate']])
         userid = None
         if authenticators:
             reason = 'Bad username or password'
