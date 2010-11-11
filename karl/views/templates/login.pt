@@ -28,7 +28,10 @@
            tal:attributes="value password|None" />
         <a href="${api.app_url}/reset_request.html">I forgot my password</a>
 
-        <div class="field loginLeftPadding discreet">
+        <div class="field loginLeftPadding discreet"
+             tal:condition="False">
+          <!-- Disable the "Remember me" checkbox while we investigate /
+               fix LP #674123 -->
           <input type="checkbox" name="max_age" id="remember"
                  class="noborder" value="315360000"/> <!-- Ten years -->
           <label for="remember">Remember me on this computer</label>

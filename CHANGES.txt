@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Disable the "Remember me" checkbox on the login form while pending
+  resolution of LP #674123.
+
 
 3.49 (2010-11-02)
 -----------------
