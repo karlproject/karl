@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+- Don't allow unicode value of ``max_age`` to propagate into cookies emitted
+  on successful login (LP #674123).
+
 - Fixed dump of peopledir sections without any ``__acl__`` (LP #672744).
 
 

@@ -273,7 +273,7 @@ class TestLoginView(unittest.TestCase):
                          (request.environ,
                           {'login': 'login',
                            'password': 'password',
-                           'max_age': '100',
+                           'max_age': 100,
                            'repoze.who.userid': 'zodb'}))
         self.assertEqual(impostor._auth_called, None)
         self.assertEqual(auth_tkt._auth_called, None)
@@ -281,7 +281,44 @@ class TestLoginView(unittest.TestCase):
                          (request.environ,
                           {'login': 'login',
                            'password': 'password',
-                           'max_age': '100',
+                           'max_age': 100,
+                           'repoze.who.userid': 'zodb'}))
+        headers = dict(response.headers)
+        self.assertEqual(headers['Faux-Header'], 'Faux-Value')
+
+    def test_POST_w_zodb_hit_w_max_age_unicode(self):
+        from webob.exc import HTTPFound
+        request = testing.DummyRequest()
+        request.POST['form.submitted'] = 1
+        request.POST['login'] = 'login'
+        request.POST['password'] = 'password'
+        request.POST['max_age'] = u'100'
+        zodb = DummyAuthenticationPlugin()
+        zodb._userid = 'zodb'
+        impostor = DummyAuthenticationPlugin()
+        #impostor._userid = 'impostor'
+        auth_tkt = DummyAuthenticationPlugin()
+        request.environ['repoze.who.plugins'] = {'zodb': zodb,
+                                                 'zodb_impersonate': impostor,
+                                                 'auth_tkt': auth_tkt,
+                                                }
+        context = testing.DummyModel()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com')
+        self.assertEqual(zodb._auth_called,
+                         (request.environ,
+                          {'login': 'login',
+                           'password': 'password',
+                           'max_age': 100,
+                           'repoze.who.userid': 'zodb'}))
+        self.assertEqual(impostor._auth_called, None)
+        self.assertEqual(auth_tkt._auth_called, None)
+        self.assertEqual(auth_tkt._remember_called,
+                         (request.environ,
+                          {'login': 'login',
+                           'password': 'password',
+                           'max_age': 100,
                            'repoze.who.userid': 'zodb'}))
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
@@ -308,7 +345,7 @@ class TestLoginView(unittest.TestCase):
                          (request.environ,
                           {'login': 'login',
                            'password': 'password',
-                           'max_age': '100',
+                           'max_age': 100,
                            'repoze.who.userid': 'zodb'}))
         self.assertEqual(impostor._auth_called, None)
         headers = dict(response.headers)

@@ -55,7 +55,7 @@ def login_view(context, request):
         credentials = {'login': login, 'password': password}
         max_age = request.POST.get('max_age')
         if max_age is not None:
-            credentials['max_age'] = max_age
+            credentials['max_age'] = int(max_age)
 
         # authenticate
         authenticators = filter(None, 
