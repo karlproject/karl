@@ -17,6 +17,7 @@
 
 from datetime import datetime
 from urllib import urlencode
+from urlparse import urljoin
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from webob.exc import HTTPFound
@@ -25,11 +26,23 @@ from webob.exc import HTTPUnauthorized
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 
+def _fixup_came_from(request, came_from):
+    if came_from is None:
+        return request.application_url
+    came_from = urljoin(request.application_url, came_from)
+    if came_from.endswith('login.html'):
+        came_from = came_from[:-len('login.html')]
+    elif came_from.endswith('logout.html'):
+        came_from = came_from[:-len('logout.html')]
+    return came_from
+
 def login_view(context, request):
 
     plugins = request.environ.get('repoze.who.plugins', {})
     auth_tkt = plugins.get('auth_tkt')
-    came_from = request.POST.get('came_from', request.application_url)
+
+    came_from = _fixup_came_from(request, request.POST.get('came_from'))
+
     if request.params.get('form.submitted', None) is not None:
 
         challenge_qs = {'came_from': came_from}
@@ -86,12 +99,8 @@ def login_view(context, request):
     page_title = '' # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
 
-    came_from = request.params.get('came_from', request.url)
-
-    if came_from.endswith('login.html'):
-        came_from = came_from[:-len('login.html')]
-    elif came_from.endswith('logout.html'):
-        came_from = came_from[:-len('logout.html')]
+    came_from = _fixup_came_from(request,
+                                 request.params.get('came_from', request.url))
 
     api.status_message = request.params.get('reason', None)
     response = render_template_to_response(

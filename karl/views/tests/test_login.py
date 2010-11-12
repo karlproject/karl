@@ -30,28 +30,57 @@ class TestLoginView(unittest.TestCase):
         from karl.views.login import login_view
         return login_view(context, request)
 
-    def test_GET_came_from_endswith_login_html(self):
+    def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest({'came_from':'/login.html'})
         context = testing.DummyModel()
         renderer = testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, '/')
+        self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
-    def test_GET_came_from_endswith_logout_html(self):
+    def test_GET_came_from_endswith_login_html_absolute(self):
+        request = testing.DummyRequest({'came_from':
+                                            'http://example.com/login.html'})
+        context = testing.DummyModel()
+        renderer = testing.registerDummyRenderer('templates/login.pt')
+        response = self._callFUT(context, request)
+        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(renderer.app_url, 'http://example.com')
+
+    def test_GET_came_from_endswith_logout_html_relative(self):
         request = testing.DummyRequest({'came_from':'/logout.html'})
         context = testing.DummyModel()
         renderer = testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, '/')
+        self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
-    def test_GET_came_from_other(self):
+    def test_GET_came_from_endswith_logout_html_absolute(self):
+        request = testing.DummyRequest({'came_from':
+                                            'http://example.com/logout.html'})
+        context = testing.DummyModel()
+        renderer = testing.registerDummyRenderer('templates/login.pt')
+        response = self._callFUT(context, request)
+        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(renderer.app_url, 'http://example.com')
+
+    def test_GET_came_from_other_relative(self):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
         context = testing.DummyModel()
         renderer = testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, '/somewhere.html')
+        self.assertEqual(renderer.came_from,
+                         'http://example.com/somewhere.html')
+        self.assertEqual(renderer.app_url, 'http://example.com')
+
+    def test_GET_came_from_other_absolute(self):
+        request = testing.DummyRequest({'came_from':
+                                         'http://example.com/somewhere.html'})
+        context = testing.DummyModel()
+        renderer = testing.registerDummyRenderer('templates/login.pt')
+        response = self._callFUT(context, request)
+        self.assertEqual(renderer.came_from,
+                         'http://example.com/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_forget_headers_when_auth_tkt_not_None(self):
@@ -199,7 +228,8 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
-        self.assertEqual(response.location, '/somewhere.html')
+        self.assertEqual(response.location,
+                         'http://example.com/somewhere.html')
         self.assertEqual(zodb._auth_called,
                          (request.environ,
                           {'login': 'login',
