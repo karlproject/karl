@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from lxml.html.clean import Cleaner
 from lxml.html.clean import clean_html
 import formish
 import schemaish
@@ -279,6 +280,10 @@ feature_field = schemaish.String(
     "home pages. Leave empty for an example.",
     validator=karlvalidators.HTML())
 
+
+clean_feature_html = Cleaner(embedded=False).clean_html
+
+
 class EditIntranetRootFormController(EditCommunityFormController):
     """
     Adds a 'feature' field to the default community schema.
@@ -325,7 +330,7 @@ class EditIntranetRootFormController(EditCommunityFormController):
         context.description = converted['description']
         context.text = converted['text']
         if converted.get('feature'):
-            context.feature = clean_html(converted['feature'])
+            context.feature = clean_feature_html(converted['feature'])
         else:
             context.feature = sample_feature
         # NB: this is an edit form, so tags are added immediately via

@@ -353,6 +353,61 @@ class EditIntranetRootFormControllerTests(unittest.TestCase):
         from karl.content.views.intranets import sample_feature
         self.assertEqual(context.feature, sample_feature)
 
+    def test_handle_submit_keep_embedded_video_in_feature(self):
+        feature = """<object>foo<embed>bar</embed>baz</object>"""
+        converted = {'title': 'New Title',
+                     'description': 'new description',
+                     'text': 'new text',
+                     'feature': feature,
+                     'tags': ['foo', 'bar'],
+                     'security_state': 'public',
+                     'tools': ['hammer', 'screwdriver', 'drill'],
+                     'default_tool': 'drill',
+                     }
+        context = self.context
+        context.workflow = self._registerDummyWorkflow()
+        hammer_factory = DummyToolFactory()
+        screwdriver_factory = DummyToolFactory(present=True)
+        drill_factory = DummyToolFactory()
+        wrench_factory = DummyToolFactory(present=True)
+        saw_factory = DummyToolFactory()
+        laser_factory = DummyToolFactory(present=True)
+        self._registerAddables([{'name': 'hammer', 'title': 'hammer',
+                                 'component': hammer_factory},
+                                {'name': 'screwdriver', 'title': 'screwdriver',
+                                 'component': screwdriver_factory},
+                                {'name': 'drill', 'title': 'drill',
+                                 'component': drill_factory},
+                                {'name': 'wrench', 'title': 'wrench',
+                                 'component': wrench_factory},
+                                {'name': 'saw', 'title': 'saw',
+                                 'component': saw_factory},
+                                {'name': 'laser', 'title': 'laser',
+                                 'component': laser_factory},
+                                ])
+        context.default_tool = 'hammer'
+        controller = self._makeOne(context, self.request)
+        controller.handle_submit(converted)
+        self.assertEqual(context.title, 'New Title')
+        self.assertEqual(context.description, 'new description')
+        self.assertEqual(context.text, 'new text')
+        self.assertEqual(context.feature, feature)
+        self.assertEqual(context.workflow.transitioned[0]['to_state'],
+                         'public')
+        self.failUnless(hammer_factory.added)
+        self.failIf(getattr(screwdriver_factory, 'removed', False))
+        self.failUnless(drill_factory.added)
+        self.failUnless(wrench_factory.removed)
+        self.failIf(getattr(saw_factory, 'added', False))
+        self.failUnless(laser_factory.removed)
+        self.assertEqual(context.default_tool, 'drill')
+
+        converted['feature'] = u''
+        controller.handle_submit(converted)
+        from karl.content.views.intranets import sample_feature
+        self.assertEqual(context.feature, sample_feature)
+
+
 class DummyAdapter:
     url = 'someurl'
     title = 'sometitle'

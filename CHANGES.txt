@@ -2,7 +2,9 @@ karl package Changelog
 ======================
 
 Unreleased
------------
+----------
+
+- Allow embedded objects in intranets feature HTML. (LP #677497)
 
 - Don't allow unicode value of ``max_age`` to propagate into cookies emitted
   on successful login (LP #674123).
