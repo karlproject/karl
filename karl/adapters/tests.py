@@ -225,6 +225,20 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
 
+    def test_getMessageTarget_reply_ok_community_with_period(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-.dot'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-.dot+tool-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
+        self.assertEqual(info['community'], 'with-.dot')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
     def test_getMessageTarget_tool_invalid_community(self):
         context = self._makeContext()
         context['communities'] = self._makeContext()
@@ -263,6 +277,20 @@ class MailinDispatcherTests(unittest.TestCase):
         info = mailin.getMessageTarget(message)
         self.failIf(info.get('error'), info)
         self.assertEqual(info['community'], 'with-hyphen')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_tool_ok_community_with_period(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-.dot'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-.dot+tool@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['community'], 'with-.dot')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
 

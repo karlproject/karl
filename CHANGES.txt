@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix mailin for communities which contain periods in the id. (LP #673152)
+
 - Allow embedded objects in intranets feature HTML. (LP #677497)
 
 - Don't allow unicode value of ``max_age`` to propagate into cookies emitted

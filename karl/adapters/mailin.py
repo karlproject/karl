@@ -12,9 +12,9 @@ from karl.utils import find_communities
 from karl.utils import find_profiles
 from karl.utils import find_users
 
-REPLY_REGX = re.compile(r'(?P<community>\w+(-\w+)*)\+(?P<tool>\w+)'
+REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
                          '-(?P<reply>\w+)@')
-TOOL_REGX = re.compile(r'(?P<community>\w+(-\w+)*)\+(?P<tool>\w+)@')
+TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
 class MailinDispatcher(object):
     implements(IMailinDispatcher)
