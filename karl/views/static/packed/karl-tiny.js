@@ -1123,6 +1123,10 @@ tinyMCE.addI18n('en.wicked',{
                             var root = this.root;
                             // detect type
                             this.emtype = null;
+                            // wmode = opaque workaround
+                            var wmode_key = 'wmode';
+                            var wmode_value = 'opaque';
+                            //
                             if (root.is('span.mceItemObject')) {
                                 var inside = root.find('span.mceItemEmbed');
                                 if (inside) {
@@ -1133,6 +1137,9 @@ tinyMCE.addI18n('en.wicked',{
                                     if (inside.attr('mce_src')) {
                                         inside.removeAttr('mce_src');
                                     }
+                                    // wmode = opaque workaround,
+                                    // also add to embed
+                                    inside.attr(wmode_key, wmode_value);
                                 }
 
                                 // Fix missing params (broken in IE8, kaltura)
@@ -1142,7 +1149,7 @@ tinyMCE.addI18n('en.wicked',{
                                 $.each(params, function(i, value) {
                                     var found = false;
                                     root.find('span.mceItemParam').each(function(i, elem) {
-                                        a = $(elem).attr('name');
+                                        var a = $(elem).attr('name');
                                         if (a == value || a == value.toLowerCase()) {
                                             found = true;
                                             return false;
@@ -1162,12 +1169,36 @@ tinyMCE.addI18n('en.wicked',{
                                         value.k = 'movie';
                                     }
                                     try {
-                                    $('<span class="mceItemParam"></span>')
-                                        .attr('name', value.k)
-                                        .attr('value', value.v)
-                                        .prependTo(root);
+                                        $('<span class="mceItemParam"></span>')
+                                            .attr('name', value.k)
+                                            .attr('value', value.v)
+                                            .prependTo(root);
                                     } catch(e) {}
                                 });
+
+                                // Workaround broken z-index implemention in IE6, IE7
+                                // add wmode = opaque both as param. and as an attribute
+                                // of the object tag.
+                                // If it already exists, we overwrite them
+                                var found = false;
+                                root.find('span.mceItemParam').each(function(i, elem) {
+                                    var a = $(elem).attr('name');
+                                    if (a == wmode_key) {
+                                        found = true;
+                                        $(elem).attr('value', wmode_value);
+                                        return false;
+                                    }
+                                });
+                                if (! found) {
+                                    try {
+                                        $('<span class="mceItemParam"></span>')
+                                            .attr('name', wmode_key)
+                                            .attr('value', wmode_value)
+                                            .prependTo(root);
+                                    } catch(e) {}
+                                }
+                                root.attr(wmode_key, wmode_value);
+
                             }
 
                             // remove bad attributes. (Important: 
