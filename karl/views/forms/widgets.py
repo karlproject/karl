@@ -12,9 +12,34 @@ from schemaish.type import File as SchemaFile
 
 from convertish.convert import string_converter
 
+import cgi
+
 class RichTextWidget(Widget):
     template = 'field.KarlTinyMCE'
     type = 'Input'
+
+    def to_request_data(self, field, data):
+        """
+        Before the widget is rendered, the data is converted to a string
+        format.If the data is None then we return an empty string. The sequence
+        is request data representation.
+        """
+        if data is None:
+            return ['']
+        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
+        # Do the html entity conversion from here, as it seems structure is broken.
+        # it does not convert the & from html entities, so for example both &gt; and >
+        # will flat out as &gt; in the textarea, which means that < > characters and
+        # possibly also content between them will be stripped when a correctly saved
+        # document is opened.
+        #
+        # XXX May be a recently introduced bug in chameleon? OR the usage of structure 
+        # in the formish widget was broken since the beginning?
+
+        string_data = cgi.escape(string_data)
+
+        result = [string_data]
+        return result
 
 class TagsWidget(Widget):
     type = 'Input'
