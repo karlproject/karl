@@ -1217,6 +1217,7 @@ div.contains-error {
 }
 .blogAttachments {
   margin: 1em 0em 2em 0em;
+  clear: both;
 }
 .blogAttachments span {
   margin-right: 1em;
@@ -1687,8 +1688,9 @@ ul.tagUsersList li {
 	color: #639332;
 }
 .portraid {
-	float: left;
-	margin: 0 8px 8px 0;
+	float: right;
+    clear: both;
+	margin: 20px 0 8px 20px;
 }
 .portraid img {
   display: block;
@@ -1751,9 +1753,8 @@ table#staffprofile-content td a:hover {
   text-decoration: none;
 }
 .quotedreplytext {
-  background-color: silver;
-  border: 1px solid gray;
-  margin-left: 8.5em;
+  border-left: 2px solid #3A74A9;
+  margin-left: 0em;
   padding: 2em;
 }
 
