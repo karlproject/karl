@@ -21,6 +21,7 @@ import schemaish
 import StringIO
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+from urllib import basejoin
 
 from lxml import etree
 from repoze.bfg.exceptions import Forbidden
@@ -49,6 +50,7 @@ from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
+from karl.models.peopledirectory import PeopleRedirector
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
 from karl.models.peopledirectory import PeopleReportGroupFilter
@@ -204,6 +206,7 @@ _ADDABLES = {
     IPeopleSection: [('Column', 'add_column.html'),
                      ('ReportGroup', 'add_report_group.html'),
                      ('Report', 'add_report.html'),
+                     ('Redirector', 'add_redirector.html'),
                     ],
     IPeopleSectionColumn: [('ReportGroup', 'add_report_group.html'),
                            ('Report', 'add_report.html'),
@@ -558,6 +561,22 @@ def opensearch_view(context, request):
                )
 
 
+def redirector_view(context, request):
+    where = context.target_url
+    if not where.startswith('http'):
+        if where.startswith('/'):
+            where = basejoin(model_url(context, request), where)
+        else:
+            elements = where.split('/')
+            where = model_url(context.__parent__, request, *elements)
+    return HTTPFound(location=where)
+
+
+def redirector_admin_view(context, request):
+    where = model_url(context, request, 'edit.html')
+    return HTTPFound(location=where)
+
+
 class ReportColumn(object):
 
     def __init__(self, id, title, sort_index=None, weight=1.0):
@@ -885,6 +904,19 @@ report_schema = [
 ]
 
 
+class AddReportFormController(AddBase):
+    page_title = 'Edit Report'
+    schema = report_schema
+    factory = PeopleReport
+
+    def form_widgets(self, schema):
+        widgets = {
+            'columns':formish.TextArea(rows=5,
+                            converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+
 class EditReportFormController(EditBase):
     page_title = 'Edit Report'
     schema = report_schema
@@ -897,14 +929,17 @@ class EditReportFormController(EditBase):
         return widgets
 
 
-class AddReportFormController(AddBase):
-    page_title = 'Edit Report'
-    schema = report_schema
-    factory = PeopleReport
+redirector_schema = [
+    ('target_url', schemaish.String(validator=validator.Required())),
+]
 
-    def form_widgets(self, schema):
-        widgets = {
-            'columns':formish.TextArea(rows=5,
-                            converter_options={'delimiter':'\n'}),
-                  }
-        return widgets
+
+class AddRedirectorFormController(AddBase):
+    page_title = 'Edit Redirector'
+    schema = redirector_schema
+    factory = PeopleRedirector
+
+
+class EditRedirectorFormController(EditBase):
+    page_title = 'Edit Redirector'
+    schema = redirector_schema

@@ -1138,6 +1138,69 @@ class Test_open_search_view(unittest.TestCase):
         self.assertEqual(info['url'], 'http://example.com/')
 
 
+class Test_redirector_view(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import redirector_view
+        return redirector_view(context, request)
+
+    def test_w_absolute_url(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        context.target_url = 'http://other.example.com/'
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://other.example.com/')
+
+    def test_w_site_relative_url(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        context.target_url = '/somewhere/over/the/rainbow'
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                         'http://example.com/somewhere/over/the/rainbow')
+
+    def test_w_relative_url(self):
+        from webob.exc import HTTPFound
+        grandparent = testing.DummyModel()
+        parent = grandparent['parent'] = testing.DummyModel()
+        context = parent['context'] = testing.DummyModel()
+        context.target_url = 'somewhere/over/the/rainbow'
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location,
+                         'http://example.com/parent/somewhere/over/the/rainbow')
+
+
+class Test_redirector_admin_view(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, context, request):
+        from karl.views.peopledirectory import redirector_admin_view
+        return redirector_admin_view(context, request)
+
+    def test_it(self):
+        from webob.exc import HTTPFound
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertEqual(response.location, 'http://example.com/edit.html')
+
+
 class ReportColumnTests(unittest.TestCase):
 
     def _getTargetClass(self):

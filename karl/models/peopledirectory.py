@@ -31,6 +31,7 @@ from karl.models.interfaces import IPeopleCategory
 from karl.models.interfaces import IPeopleCategoryItem
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleDirectorySchemaChanged
+from karl.models.interfaces import IPeopleRedirector
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroupFilter
@@ -287,6 +288,11 @@ class PeopleReport(Folder):
         self.link_title = link_title
         self.css_class = css_class
         self.columns = ()  # column IDs to display
+
+
+class PeopleRedirector(Persistent):
+    implements(IPeopleRedirector)
+    target_url = None
 
 
 class PeopleDirectorySchemaChanged(object):

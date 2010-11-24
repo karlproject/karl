@@ -502,6 +502,10 @@ class IPeopleReport(Interface):
     css_class = Attribute("CSS class of the link to the report")
     columns = Attribute("IDs of columns to display in the report.")
 
+class IPeopleRedirector(Interface):
+    """Redirect to another url"""
+    target_url = Attribute("Target URL")
+
 class IPeopleDirectorySchemaChanged(Interface):
     """Notification that the schema of the people directory has changed"""
     peopledir = Attribute('The IPeopleDirectory object')

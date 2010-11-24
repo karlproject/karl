@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Enabled adding redirector objects to peopledir sections, in order to
+  provide backward compatibility for old URLs.
+
 - Fix mailin for communities which contain periods in the id. (LP #673152)
 
 - Allow embedded objects in intranets feature HTML. (LP #677497)

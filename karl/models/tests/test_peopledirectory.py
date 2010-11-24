@@ -482,6 +482,26 @@ class TestPeopleReport(unittest.TestCase):
         verifyObject(IPeopleReport, self._makeOne())
 
 
+class TestPeopleRedirector(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleRedirector
+        return PeopleRedirector
+
+    def _makeOne(self, title='R1', link_title='Report One', css_class='normal'):
+        return self._getTargetClass()(title, link_title, css_class)
+
+    def test_class_conforms_to_IPeopleRedirector(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleRedirector
+        verifyClass(IPeopleRedirector, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopledirector(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleRedirector
+        verifyObject(IPeopleRedirector, self._makeOne())
+
+
 class TestPeopleDirectorySchemaChanged(unittest.TestCase):
 
     def _getTargetClass(self):

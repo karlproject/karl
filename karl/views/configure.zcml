@@ -459,6 +459,48 @@
   </formish:form>
 
   <formish:form
+     controller=".peopledirectory.AddRedirectorFormController"
+     name="add_redirector.html"
+     for="karl.models.interfaces.IPeopleSection"
+     permission="administer"
+     renderer="forms/templates/formish_form.pt"
+     form_id="add">
+     
+     <formish:action
+       name="submit"
+       title="Add Redirector"
+       />
+       
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".peopledirectory.EditRedirectorFormController"
+     name="edit.html"
+     for="karl.models.interfaces.IPeopleRedirector"
+     permission="administer"
+     renderer="forms/templates/formish_form.pt"
+     form_id="edit">
+     
+     <formish:action
+       name="submit"
+       title="Edit Redirector"
+       />
+       
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
      controller=".peopledirectory.AddReportFormController"
      name="add_report.html"
      for="karl.models.interfaces.IPeopleSection"
@@ -1229,7 +1271,7 @@
   <view
     for="karl.models.interfaces.IPeopleDirectory"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1237,7 +1279,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategories"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1245,7 +1287,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategory"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1253,7 +1295,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategoryItem"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1261,7 +1303,7 @@
   <view
     for="karl.models.interfaces.IPeopleSection"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1269,7 +1311,7 @@
   <view
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1277,7 +1319,7 @@
   <view
     for="karl.models.interfaces.IPeopleReportGroup"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1285,7 +1327,7 @@
   <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1293,7 +1335,7 @@
   <view
     for="karl.models.interfaces.IPeopleReportFilter"
     view=".peopledirectory.admin_contents_moveup_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
@@ -1301,7 +1343,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategories"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1309,7 +1351,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategory"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1317,7 +1359,7 @@
   <view
     for="karl.models.interfaces.IPeopleCategoryItem"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1325,7 +1367,7 @@
   <view
     for="karl.models.interfaces.IPeopleSection"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1333,7 +1375,7 @@
   <view
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1341,7 +1383,7 @@
   <view
     for="karl.models.interfaces.IPeopleReportGroup"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1349,7 +1391,7 @@
   <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1357,7 +1399,7 @@
   <view
     for="karl.models.interfaces.IPeopleReportFilter"
     view=".peopledirectory.admin_contents_movedown_view"
-    permission="view"
+    permission="administer"
     renderer="templates/people_contents.pt"
     name="movedown.html"
     />
@@ -1374,6 +1416,19 @@
     view=".peopledirectory.section_column_view"
     permission="view"
     renderer="templates/people_section.pt"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleRedirector"
+    view=".peopledirectory.redirector_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleRedirector"
+    view=".peopledirectory.redirector_admin_view"
+    permission="administer"
+    name="admin.html"
     />
 
   <view
