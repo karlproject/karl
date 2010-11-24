@@ -90,6 +90,7 @@ def admin_contents(context, request):
                 has_categories=peopledir is context,
                )
 
+
 def admin_contents_moveup_view(context, request):
     peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
@@ -103,6 +104,7 @@ def admin_contents_moveup_view(context, request):
        context.order = order
     return HTTPFound(location=model_url(context, request, 'admin.html'))
 
+
 def admin_contents_movedown_view(context, request):
     peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
@@ -115,6 +117,7 @@ def admin_contents_movedown_view(context, request):
        order[n], order[n+1] = order[n+1], order[n]
        context.order = order
     return HTTPFound(location=model_url(context, request, 'admin.html'))
+
 
 def peopledirectory_view(context, request):
     # show the first accessible tab
@@ -133,6 +136,7 @@ def download_peopledirectory_xml(context, request):
         'attachment;filename=%s.xml' % str(context.__name__))
     return response
 
+
 def upload_peopledirectory_xml(context, request):
     peopledir = find_peopledirectory(context)
 
@@ -147,6 +151,7 @@ def upload_peopledirectory_xml(context, request):
                 peopledir=peopledir,
                 #actions=get_actions(context, request),
                )
+
 
 def get_tabs(peopledir, request, current_sectionid):
     """Return a list of dictionaries containing tabs to display in the UI"""
@@ -187,6 +192,7 @@ def render_report_group(group, request, css_class=''):
             result.append('</li>')
     result.append('</ul>')
     return '\n'.join(result)
+
 
 _ADDABLES = {
     IPeopleDirectory: [('Section', 'add_section.html'),
@@ -255,8 +261,10 @@ def section_view(context, request):
                 actions=get_actions(context, request),
                )
 
+
 def section_column_view(context, request):
     return HTTPFound(location=context.__parent__)
+
 
 def report_view(context, request):
     api = TemplateAPI(context, request, context.title)
@@ -289,6 +297,7 @@ def report_view(context, request):
         opensearch_url=opensearch_url,
         actions=get_actions(context, request),
     )
+
 
 def jquery_grid_view(context, request):
     sort_on = request.params.get('sortColumn', None)
@@ -572,6 +581,7 @@ class ReportColumn(object):
         else:
             return escape(value)
 
+
 class NameColumn(ReportColumn):
 
     def render_text(self, profile):
@@ -583,6 +593,7 @@ class NameColumn(ReportColumn):
         return '%s<a href=%s style="display: none;"/>' % (
             escape(value), quoteattr(url))
 
+
 class PhoneColumn(ReportColumn):
 
     def render_text(self, profile):
@@ -591,6 +602,7 @@ class PhoneColumn(ReportColumn):
         if ext and ext.strip():
             value += ' x %s' % ext
         return value
+
 
 COLUMNS = {
     'name': NameColumn('name', 'Name', sort_index='lastfirst'),
@@ -641,6 +653,7 @@ class EditBase(object):
         location = model_url(context, request, 'admin.html')
         return HTTPFound(location=location)
 
+
 name_schema = [
     ('name', schemaish.String(
                     validator=validator.All(
@@ -648,6 +661,7 @@ name_schema = [
                         validator.Required(),
                      ))),
 ]
+
 
 class AddBase(object):
 
@@ -681,6 +695,7 @@ class AddBase(object):
         location = model_url(to_add, request, 'admin.html')
         return HTTPFound(location=location)
 
+
 category_schema = [
     ('title', schemaish.String(
                     validator=validator.All(
@@ -689,18 +704,22 @@ category_schema = [
                      ))),
 ]
 
+
 def edit_categories_view(context, request):
     # There is nothing useful to be done here.
     return HTTPFound(location=model_url(context, request, 'admin.html'))
+
 
 class EditCategoryFormController(EditBase):
     page_title = 'Edit Category'
     schema = category_schema
 
+
 class AddCategoryFormController(AddBase):
     page_title = 'Add Category'
     schema = category_schema
     factory = PeopleCategory
+
 
 category_item_schema = [
     ('title', schemaish.String(
@@ -711,14 +730,17 @@ category_item_schema = [
     ('description', schemaish.String()),
 ]
 
+
 class EditCategoryItemFormController(EditBase):
     page_title = 'Edit Category Item'
     schema = category_item_schema
+
 
 class AddCategoryItemFormController(AddBase):
     page_title = 'Add Category Item'
     schema = category_item_schema
     factory = PeopleCategoryItem
+
 
 section_schema = [
     ('title', schemaish.String(
@@ -733,14 +755,17 @@ section_schema = [
                      ))),
 ]
 
+
 class EditSectionFormController(EditBase):
     page_title = 'Edit Section'
     schema = section_schema
+
 
 class AddSectionFormController(AddBase):
     page_title = 'Add Section'
     schema = section_schema
     factory = PeopleSection
+
 
 report_group_schema = [
     ('title', schemaish.String(
@@ -750,27 +775,100 @@ report_group_schema = [
                      ))),
 ]
 
+
 class EditReportGroupFormController(EditBase):
     page_title = 'Edit Report Group'
     schema = report_group_schema
+
 
 class AddReportGroupFormController(AddBase):
     page_title = 'Add Report Group'
     schema = report_group_schema
     factory = PeopleReportGroup
 
+
 section_column_schema = [
    ('width', schemaish.Integer()),
 ]
+
 
 class EditSectionColumnFormController(EditBase):
     page_title = 'Edit Section Column'
     schema = section_column_schema
 
+
 class AddSectionColumnFormController(AddBase):
     page_title = 'Add Section Column'
     schema = section_column_schema
     factory = PeopleSectionColumn
+
+
+report_filter_schema = [
+    ('values', schemaish.Sequence(
+                  schemaish.String())),
+]
+
+
+class AddCategoryReportFilterFormController(AddBase):
+    page_title = 'Add Category Report Filter'
+    schema = report_filter_schema
+    factory = PeopleReportCategoryFilter
+
+    def form_widgets(self, schema):
+        widgets = {
+            'values':formish.TextArea(rows=5,
+                           converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+
+class AddGroupReportFilterFormController(AddBase):
+    page_title = 'Add Group Report Filter'
+    schema = report_filter_schema
+    factory = PeopleReportGroupFilter
+
+    def form_widgets(self, schema):
+        widgets = {
+            'values':formish.TextArea(rows=5,
+                           converter_options={'delimiter':'\n'}),
+                  }
+        return widgets
+
+
+class EditReportFilterFormController(EditBase):
+    page_title = 'Edit Report Filter'
+    schema = report_filter_schema
+
+    def form_widgets(self, schema):
+        widgets = {'values':formish.TextArea(rows=5,
+                                             converter_options={
+                                                    'delimiter':'\n'}),
+                  }
+        return widgets
+
+
+is_staff_schema = [('include_staff', schemaish.Boolean())]
+
+
+class AddIsStaffReportFilterFormController(AddBase):
+    page_title = 'Add IsStaff Report Filter'
+    schema = is_staff_schema
+    factory = PeopleReportIsStaffFilter
+
+    def form_widgets(self, schema):
+        widgets = {'include_staff':formish.Checkbox()}
+        return widgets
+
+
+class EditIsStaffReportFilterFormController(EditBase):
+    page_title = 'Edit Report Filter'
+    schema = is_staff_schema
+
+    def form_widgets(self, schema):
+        widgets = {'include_staff':formish.Checkbox(),
+                  }
+        return widgets
+
 
 report_schema = [
     ('title', schemaish.String(
@@ -786,65 +884,6 @@ report_schema = [
                            validate.is_one_of(v, COLUMNS.keys())))),
 ]
 
-report_filter_schema = [
-    ('values', schemaish.Sequence(
-                  schemaish.String())),
-]
-
-class AddCategoryReportFilterFormController(AddBase):
-    page_title = 'Add Category Report Filter'
-    schema = report_filter_schema
-    factory = PeopleReportCategoryFilter
-
-    def form_widgets(self, schema):
-        widgets = {
-            'values':formish.TextArea(rows=5,
-                           converter_options={'delimiter':'\n'}),
-                  }
-        return widgets
-
-class AddGroupReportFilterFormController(AddBase):
-    page_title = 'Add Group Report Filter'
-    schema = report_filter_schema
-    factory = PeopleReportGroupFilter
-
-    def form_widgets(self, schema):
-        widgets = {
-            'values':formish.TextArea(rows=5,
-                           converter_options={'delimiter':'\n'}),
-                  }
-        return widgets
-
-class EditReportFilterFormController(EditBase):
-    page_title = 'Edit Report Filter'
-    schema = report_filter_schema
-
-    def form_widgets(self, schema):
-        widgets = {'values':formish.TextArea(rows=5,
-                                             converter_options={
-                                                    'delimiter':'\n'}),
-                  }
-        return widgets
-
-is_staff_schema = [('include_staff', schemaish.Boolean())]
-
-class AddIsStaffReportFilterFormController(AddBase):
-    page_title = 'Add IsStaff Report Filter'
-    schema = is_staff_schema
-    factory = PeopleReportIsStaffFilter
-
-    def form_widgets(self, schema):
-        widgets = {'include_staff':formish.Checkbox()}
-        return widgets
-
-class EditIsStaffReportFilterFormController(EditBase):
-    page_title = 'Edit Report Filter'
-    schema = is_staff_schema
-
-    def form_widgets(self, schema):
-        widgets = {'include_staff':formish.Checkbox(),
-                  }
-        return widgets
 
 class EditReportFormController(EditBase):
     page_title = 'Edit Report'
@@ -856,6 +895,7 @@ class EditReportFormController(EditBase):
                             converter_options={'delimiter':'\n'}),
         }
         return widgets
+
 
 class AddReportFormController(AddBase):
     page_title = 'Edit Report'
