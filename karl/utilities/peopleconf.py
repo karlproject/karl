@@ -345,8 +345,10 @@ def parse_section(people, section_elem):
 def peopleconf(peopledir, tree, force_reindex=False):
     # tree is an lxml.etree element.
     if tree.find('categories') is not None:
-        if 'categories' in peopledir.__dict__:
+        try:
             del peopledir.categories
+        except AttributeError:  # already scrubbed
+            pass
         categories = peopledir.get('categories')
         if not isinstance(categories, PeopleCategories):
             if 'categories' in peopledir:
