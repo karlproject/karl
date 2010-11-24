@@ -281,7 +281,7 @@ feature_field = schemaish.String(
     validator=karlvalidators.HTML())
 
 
-clean_feature_html = Cleaner(embedded=False).clean_html
+clean_feature_html = Cleaner(embedded=False, safe_attrs_only=False).clean_html
 
 
 class EditIntranetRootFormController(EditCommunityFormController):

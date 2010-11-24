@@ -354,7 +354,8 @@ class EditIntranetRootFormControllerTests(unittest.TestCase):
         self.assertEqual(context.feature, sample_feature)
 
     def test_handle_submit_keep_embedded_video_in_feature(self):
-        feature = """<object>foo<embed>bar</embed>baz</object>"""
+        feature = ('<object wmode="opaque">foo<embed wmode="opaque">bar'
+                   '</embed>baz</object>')
         converted = {'title': 'New Title',
                      'description': 'new description',
                      'text': 'new text',
