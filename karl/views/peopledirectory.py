@@ -172,6 +172,9 @@ def get_tabs(peopledir, request, current_sectionid):
 
 def render_report_group(group, request, css_class=''):
     """Produce the HTML for a report group on a section index page"""
+    if not (IPeopleSectionColumn.providedBy(group) or
+            IPeopleReportGroup.providedBy(group)):
+        return ''
     result = []
     title = getattr(group, 'title', '')
     if title:
@@ -257,6 +260,7 @@ def section_view(context, request):
     columns = [{'html': render_report_group(x, request, 'column'),
                 'width': getattr(x, 'width', 50)}
                         for x in context.values()]
+    columns = [x for x in columns if x['html']]
     return dict(api=api,
                 peopledir=peopledir,
                 peopledir_tabs=peopledir_tabs,
