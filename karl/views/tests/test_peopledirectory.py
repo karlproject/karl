@@ -297,41 +297,56 @@ class Test_render_report_group(unittest.TestCase):
         from karl.views.peopledirectory import render_report_group
         return render_report_group(group, request, css_class)
 
+    def _makeSectionColumn(self, **kw):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleSectionColumn
+        column = testing.DummyModel(**kw)
+        directlyProvides(column, IPeopleSectionColumn)
+        return column
+
+    def _makeGroup(self, **kw):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroup
+        group = testing.DummyModel(**kw)
+        directlyProvides(group, IPeopleReportGroup)
+        return group
+
+    def _makeReport(self, **kw):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        report = testing.DummyModel(**kw)
+        directlyProvides(report, IPeopleReport)
+        return report
+
     def test_empty(self):
-        group = testing.DummyModel(title='')
+        group = self._makeGroup(title='')
         request = testing.DummyRequest()
         html = self._callFUT(group, request)
         self.assertEqual(html, '<ul>\n</ul>')
 
     def test_empty_no_title(self):
-        group = testing.DummyModel()
+        group = self._makeGroup()
         request = testing.DummyRequest()
         html = self._callFUT(group, request)
         self.assertEqual(html, '<ul>\n</ul>')
 
     def test_empty_w_title(self):
-        group = testing.DummyModel(title='Testing')
+        group = self._makeGroup(title='Testing')
         request = testing.DummyRequest()
         html = self._callFUT(group, request)
         self.assertEqual(html, '<h3>Testing</h3>\n<ul>\n</ul>')
 
     def test_structure(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleReport
-        from karl.models.interfaces import IPeopleReportGroup
 
-        group = testing.DummyModel(title='Group 1')
+        group = self._makeGroup(title='Group 1')
 
-        report = group['r11'] = testing.DummyModel(
+        report = group['r11'] = self._makeReport(
             link_title='Report 1.1', css_class='priority')
-        directlyProvides(report, IPeopleReport)
 
-        group2 = group['g12'] = testing.DummyModel(title='Group 1.2')
-        directlyProvides(group2, IPeopleReportGroup)
+        group2 = group['g12'] = self._makeGroup(title='Group 1.2')
 
-        report2 = group2['r121'] = testing.DummyModel(
+        report2 = group2['r121'] = self._makeReport(
             link_title='Report 1.2.1', css_class='general')
-        directlyProvides(report2, IPeopleReport)
 
         request = testing.DummyRequest()
         html = self._callFUT(group, request, 'toplevel')
@@ -465,11 +480,13 @@ class Test_section_view(unittest.TestCase):
     def test_empty_column(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
+        from karl.models.interfaces import IPeopleSectionColumn
         site = testing.DummyModel()
         pd = site['people'] = testing.DummyModel(order=('s1',))
         directlyProvides(pd, IPeopleDirectory)
         section = pd['s1'] = testing.DummyModel(title='A', tab_title='B')
         column = section['c1'] = testing.DummyModel(title='', width=40)
+        directlyProvides(column, IPeopleSectionColumn)
 
         request = testing.DummyRequest()
         info = self._callFUT(section, request)
@@ -489,11 +506,13 @@ class Test_section_view(unittest.TestCase):
     def test_non_empty_column(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleSectionColumn
         pd, section, report = _makeReport()
         del section[report.__name__]
         directlyProvides(report, IPeopleReport)
         report.css_class = ''
         column = section['c1'] = testing.DummyModel(title='')
+        directlyProvides(column, IPeopleSectionColumn)
         column[report.__name__] = report
 
         request = testing.DummyRequest()
@@ -511,14 +530,17 @@ class Test_section_view(unittest.TestCase):
     def test_multiple_columns(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleSectionColumn
         pd, section, report = _makeReport()
         del section[report.__name__]
         directlyProvides(report, IPeopleReport)
         report.css_class = ''
         column = section['c1'] = testing.DummyModel(title='')
+        directlyProvides(column, IPeopleSectionColumn)
         column['r1'] = report
 
         column2 = section['c2'] = testing.DummyModel(title='')
+        directlyProvides(column2, IPeopleSectionColumn)
         r2 = column2['r2'] = testing.DummyModel(link_title='B',
                                                 css_class='red')
         directlyProvides(r2, IPeopleReport)
