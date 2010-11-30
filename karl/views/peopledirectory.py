@@ -943,6 +943,9 @@ class AddRedirectorFormController(AddBase):
     schema = redirector_schema
     factory = PeopleRedirector
 
+    def form_defaults(self):
+        return {'target_url': self.request.params.get('target_url', '')}
+
 
 class EditRedirectorFormController(EditBase):
     page_title = 'Edit Redirector'
