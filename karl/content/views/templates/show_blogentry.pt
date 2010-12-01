@@ -4,6 +4,8 @@
   metal:use-macro="api.community_layout.macros['master']">
  
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <!-- This page adds the fields manually, therefore formish + tinymce both needed to be added manually -->
+    <div metal:use-macro="api.snippets.macros['js_formish_resources']"/>
     <script type="text/javascript" src="${api.static_url}/packed/karl-tiny.js">//</script>
   </span>
 
