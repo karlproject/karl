@@ -4,6 +4,13 @@ karl package Changelog
 Unreleased
 ----------
 
+- On the community members table: moved hidden inputs into a table cell,
+  so IE doesn't add extra random space (LP #684209).
+
+- Add missing formish resources to a page that manually constructs its form
+  (LP #683651).
+
+
 3.51 (2010-11-30)
 -----------------
 
