@@ -678,11 +678,7 @@ class EditBase(object):
 
 
 name_schema = [
-    ('name', schemaish.String(
-                    validator=validator.All(
-                        validator.Length(max=40),
-                        validator.Required(),
-                     ))),
+    ('name', schemaish.String(validator=validator.Required())),
 ]
 
 

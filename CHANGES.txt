@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Remove 40-character limit for names of items inside the people directory.
+
 - On the community members table: moved hidden inputs into a table cell,
   so IE doesn't add extra random space (LP #684209).
 
