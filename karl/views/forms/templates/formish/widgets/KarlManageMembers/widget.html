@@ -3,6 +3,7 @@
   <!-- widgets/KarlManageMembers/widgets.html -->
   <thead>
     <tr>
+      <th class="hiddenCell"></th>
       <th style="text-align: center">Name</th>
       <th style="text-align: center">Moderator</th>
       <th style="text-align: center">Resend Info</th>
@@ -11,9 +12,10 @@
   </thead>
   <tbody>
   <tr tal:repeat="row rows">
-    <span tal:define="fields row.fields"
-          tal:condition="len(row.form.defaults['members']) > 0"
-          tal:omit-tag="">
+    <tal:rows define="fields row.fields"
+              condition="len(row.form.defaults['members']) > 0"
+              omit-tag="">
+      <td class="hiddenCell">
       <input type="hidden"
             value="${row['title'].value[0]}"
             tal:attributes="name 'members.%s.title' % repeat['row'].index"/>
@@ -23,6 +25,7 @@
       <input type="hidden"
             value="${row['name'].value[0]}"
             tal:attributes="name 'members.%s.name' % repeat['row'].index"/>
+      </td>
       <td>
         <span title="${row['name'].value[0]}">${row['title'].value[0]}</span>
       </td>
@@ -78,7 +81,7 @@
                tal:attributes="name 'members.%s.remove' % repeat['row'].index;
                                checked False"/>
       </td>
-    </span>
+    </tal:rows>
   </tr>
   </tbody>
 </table>
