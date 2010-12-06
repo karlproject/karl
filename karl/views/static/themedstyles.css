@@ -958,6 +958,7 @@ ul#peopledir-tabs li.selected a {
 	display: block;
 	background-color: white;
 	margin-top: 0px;
+	overflow: hidden;
 }
 .community_view #cleftcol #cheader ul {
   padding: 3px 0 3px 1em;
