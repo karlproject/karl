@@ -2,7 +2,11 @@ karl package Changelog
 ======================
 
 Unreleased
-----------
+-----------
+
+
+3.52 (2010-12-06)
+-----------------
 
 - Remove 40-character limit for names of items inside the people directory.
 
