@@ -2344,7 +2344,7 @@ body .cal_hour_event .cal_event_block .time {
   background-color: #ecf2ff !important;
 }
 .cal div.hov_below {
-  background-color: transparent !important;
+  background-color: #ecf2ff !important;
 }
 .cal td .add,
 .cal div .add {

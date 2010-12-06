@@ -102,6 +102,10 @@ ul.karldropdown-menu {
     top: 21px !important;
 }
 
+.cal div.hov_below {
+  background-color: transparent !important;
+}
+
 /* rounded corners fix */
 * html li.bit-box {
   padding: 1px 15px 4px 6px !important;
