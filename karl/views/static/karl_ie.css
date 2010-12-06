@@ -93,6 +93,15 @@ span.sortingArrows {
 * html .statusbox-item {
   height: 26px;
 }
+
+ul.menubar div.karldropdown-indicator {
+    top: 3px;
+    right: 4px;
+}
+ul.karldropdown-menu {
+    top: 21px !important;
+}
+
 /* rounded corners fix */
 * html li.bit-box {
   padding: 1px 15px 4px 6px !important;
