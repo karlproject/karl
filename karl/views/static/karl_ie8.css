@@ -1,3 +1,6 @@
+.cal div.hov_below {
+  background-color: #ecf2ff !important;
+}
 ul#header-menu li a {
     background: transparent url(images/corners.png) no-repeat left -4px;
     padding: 5px 9px 4px 27px;

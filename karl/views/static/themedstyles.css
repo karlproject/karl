@@ -461,7 +461,8 @@ ul.menubar ul.karldropdown-menu li {
   background-color: #666666;
   background-image: none;
   text-align: left;
-  padding: 2px 11px;
+  padding: 2px 11px !important;
+  border: none;
   /** no fixed width and height here! **/
 }
 ul.menubar ul.karldropdown-menu li a {
@@ -476,13 +477,13 @@ ul.menubar div.karldropdown-indicator {
   top: 2px;
   right: 2px;
   /* use lighter icon set */
-  background-image: url("/static/jquery-ui/1.7/themes/ui-lightness/images/ui-icons_ffffff_256x240.png");
+  background-image: url("images/ui-icons_ffffff_256x240.png");
   background-color: transparent;
   border: 0;
 }
 ul.menubar a.karldropdown-heading {
   display: inline;
-  padding-right: 22px;
+  padding-right: 22px !important;
 }
 
 /** =LINK TO PARENT (BREADCRUMB)
@@ -2343,7 +2344,7 @@ body .cal_hour_event .cal_event_block .time {
   background-color: #ecf2ff !important;
 }
 .cal div.hov_below {
-  background-color: transparent !important;
+  background-color: #ecf2ff !important;
 }
 .cal td .add,
 .cal div .add {
