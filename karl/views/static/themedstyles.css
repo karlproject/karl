@@ -2957,7 +2957,9 @@ ul.menu li {
     width: 161px;
     position: relative;
 }
-
+#right .generic-portlet {
+    overflow: hidden;
+}
 .generic-portlet h3,
 #left .menu h3 {
     text-align: center;
