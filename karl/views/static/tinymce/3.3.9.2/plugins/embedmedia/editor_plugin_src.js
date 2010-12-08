@@ -183,7 +183,7 @@
 
                                 // Fix missing params (broken in IE8, kaltura)
                                 var params = ['allowScriptAccess', 'allowNetworking', 'allowFullScreen',
-                                    'bgcolor', 'movie', 'flashVars', 'movie', 'resource'];
+                                    'bgcolor', 'movie', 'flashVars'];
                                 var to_add = [];
                                 $.each(params, function(i, value) {
                                     var found = false;
@@ -200,13 +200,15 @@
                                             to_add.push({k: value, v: root.attr(value)});
                                         } else if (root.attr(value.toLowerCase())) {
                                             to_add.push({k: value, v: root.attr(value.toLowerCase())});
+                                        } else if (value == 'movie') {
+                                            // special handling of resource
+                                            if (root.attr('resource')) {
+                                                to_add.push({k: value, v: root.attr('resource')});
+                                            }
                                         }
                                     }
                                 });
                                 $.each(to_add, function(i, value) {
-                                    if (value.k == 'resource') {
-                                        value.k = 'movie';
-                                    }
                                     try {
                                         $('<span class="mceItemParam"></span>')
                                             .attr('name', value.k)

@@ -43,6 +43,7 @@ from karl.utils import find_intranets
 from karl.utils import find_site
 from karl.utils import get_setting
 from karl.utils import support_attachments
+from karl.views.utils import convert_to_script
 
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import ICommunity
@@ -116,12 +117,17 @@ class TemplateAPI(object):
         if settings:
             self.kaltura_info = dict(
                 enabled =  getattr(settings, 'kaltura_enabled', False) in ('true', 'True'),
-                service_url = getattr(settings, 'kaltura_service_url', ''),
                 partner_id = getattr(settings, 'kaltura_partner_id', ''),
                 sub_partner_id = getattr(settings, 'kaltura_sub_partner_id', ''),
                 admin_secret = getattr(settings, 'kaltura_admin_secret', ''),
                 user_secret = getattr(settings, 'kaltura_user_secret', ''),
-                )
+                kcw_uiconf_id = getattr(settings, 'kaltura_kcw_uiconf_id', '1000741'),
+                player_uiconf_id = getattr(settings, 'kaltura_player_uiconf_id', ''),
+                local_user = self.userid,
+            )
+            if not getattr(settings, 'kaltura_client_session', False) in ('true', 'True'):
+                # Secrets will not be sent to client, instead session is handled on the server.
+                self.kaltura_info['session_url'] = app_url + '/' + 'kaltura_create_session.json'
         else:
             self.kaltura_info = dict(
                 enabled = False,
@@ -421,6 +427,14 @@ class TemplateAPI(object):
         logo_path = get_setting(self.context, 'logo_path', 'images/logo.gif')
         return '%s/%s' % (self.static_url, logo_path)
 
+    @property
+    def kaltura_data(self):
+        d = dict(self.kaltura_info)
+        if 'session_url' in d:
+            # server side session management, do not send secrets to client
+            del d['user_secret']
+            del d['admin_secret']
+        return convert_to_script(d, var_name='kaltura_data')
 
 class SettingsReader:
     """Convenience for reading settings in templates"""

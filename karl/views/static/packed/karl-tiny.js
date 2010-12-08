@@ -9,6 +9,7 @@ $(document).ready(function() {
 
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
+    var kaltura_data = window.kaltura_data && window.kaltura_data || {};
     var plugins = 'paste,embedmedia,spellchecker';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
@@ -16,6 +17,10 @@ $(document).ready(function() {
         // Disabled everywhere else. XXX TODO
         plugins += ',imagedrawer';
     }
+    if (kaltura_data.enabled) {
+        plugins += ',kaltura';
+    }
+
      
     // Url that contains the context prefix 
     var here_url = $('#karl-here-url')[0].content;
@@ -50,7 +55,7 @@ $(document).ready(function() {
         paste_unindented_list_class : "unindentedList",
         paste_convert_headers_to_strong : true,
         theme_advanced_toolbar_location: 'top',
-        theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, addwickedlink, delwickedlink, spellchecker',
+        theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, kaltura, addwickedlink, delwickedlink, spellchecker',
         theme_advanced_buttons2: '',
         theme_advanced_buttons3: '',
         plugins: plugins,
@@ -62,7 +67,16 @@ $(document).ready(function() {
         // options for imagedrawer
         imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
         imagedrawer_upload_url: here_url + 'drawer_upload_view.html',
-        imagedrawer_data_url: here_url + 'drawer_data_view.html'
+        imagedrawer_data_url: here_url + 'drawer_data_view.html',
+        //options for kaltura
+        kaltura_partner_id: kaltura_data.partner_id,
+        kaltura_sub_partner_id: kaltura_data.sub_partner_id,
+        kaltura_local_user: kaltura_data.local_user,
+        kaltura_user_secret: kaltura_data.user_secret,
+        kaltura_admin_secret: kaltura_data.admin_secret,
+        kaltura_kcw_uiconf_id: kaltura_data.kcw_uiconf_id,
+        kaltura_player_uiconf_id: kaltura_data.player_uiconf_id,
+        kaltura_session_url: kaltura_data.session_url
     });  
 
 });
@@ -1144,7 +1158,7 @@ tinyMCE.addI18n('en.wicked',{
 
                                 // Fix missing params (broken in IE8, kaltura)
                                 var params = ['allowScriptAccess', 'allowNetworking', 'allowFullScreen',
-                                    'bgcolor', 'movie', 'flashVars', 'movie', 'resource'];
+                                    'bgcolor', 'movie', 'flashVars'];
                                 var to_add = [];
                                 $.each(params, function(i, value) {
                                     var found = false;
@@ -1161,13 +1175,15 @@ tinyMCE.addI18n('en.wicked',{
                                             to_add.push({k: value, v: root.attr(value)});
                                         } else if (root.attr(value.toLowerCase())) {
                                             to_add.push({k: value, v: root.attr(value.toLowerCase())});
+                                        } else if (value == 'movie') {
+                                            // special handling of resource
+                                            if (root.attr('resource')) {
+                                                to_add.push({k: value, v: root.attr('resource')});
+                                            }
                                         }
                                     }
                                 });
                                 $.each(to_add, function(i, value) {
-                                    if (value.k == 'resource') {
-                                        value.k = 'movie';
-                                    }
                                     try {
                                         $('<span class="mceItemParam"></span>')
                                             .attr('name', value.k)
@@ -3425,4 +3441,1458 @@ jQuery.extend({
 tinyMCE.addI18n('en.imagedrawer',{
 image_desc: "Insert/edit image",
 loading_title: 'Loading...'
+});
+/**
+ * SWFObject v1.5: Flash Player detection and embed - http://blog.deconcept.com/swfobject/
+ *
+ * SWFObject is (c) 2007 Geoff Stearns and is released under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ */
+if(typeof deconcept=="undefined"){var deconcept=new Object();}if(typeof deconcept.util=="undefined"){deconcept.util=new Object();}if(typeof deconcept.SWFObjectUtil=="undefined"){deconcept.SWFObjectUtil=new Object();}deconcept.SWFObject=function(_1,id,w,h,_5,c,_7,_8,_9,_a){if(!document.getElementById){return;}this.DETECT_KEY=_a?_a:"detectflash";this.skipDetect=deconcept.util.getRequestParameter(this.DETECT_KEY);this.params=new Object();this.variables=new Object();this.attributes=new Array();if(_1){this.setAttribute("swf",_1);}if(id){this.setAttribute("id",id);}if(w){this.setAttribute("width",w);}if(h){this.setAttribute("height",h);}if(_5){this.setAttribute("version",new deconcept.PlayerVersion(_5.toString().split(".")));}this.installedVer=deconcept.SWFObjectUtil.getPlayerVersion();if(!window.opera&&document.all&&this.installedVer.major>7){deconcept.SWFObject.doPrepUnload=true;}if(c){this.addParam("bgcolor",c);}var q=_7?_7:"high";this.addParam("quality",q);this.setAttribute("useExpressInstall",false);this.setAttribute("doExpressInstall",false);var _c=(_8)?_8:window.location;this.setAttribute("xiRedirectUrl",_c);this.setAttribute("redirectUrl","");if(_9){this.setAttribute("redirectUrl",_9);}};deconcept.SWFObject.prototype={useExpressInstall:function(_d){this.xiSWFPath=!_d?"expressinstall.swf":_d;this.setAttribute("useExpressInstall",true);},setAttribute:function(_e,_f){this.attributes[_e]=_f;},getAttribute:function(_10){return this.attributes[_10];},addParam:function(_11,_12){this.params[_11]=_12;},getParams:function(){return this.params;},addVariable:function(_13,_14){this.variables[_13]=_14;},getVariable:function(_15){return this.variables[_15];},getVariables:function(){return this.variables;},getVariablePairs:function(){var _16=new Array();var key;var _18=this.getVariables();for(key in _18){_16[_16.length]=key+"="+_18[key];}return _16;},getSWFHTML:function(){var _19="";if(navigator.plugins&&navigator.mimeTypes&&navigator.mimeTypes.length){if(this.getAttribute("doExpressInstall")){this.addVariable("MMplayerType","PlugIn");this.setAttribute("swf",this.xiSWFPath);}_19="<embed type=\"application/x-shockwave-flash\" src=\""+this.getAttribute("swf")+"\" width=\""+this.getAttribute("width")+"\" height=\""+this.getAttribute("height")+"\" style=\""+this.getAttribute("style")+"\"";_19+=" id=\""+this.getAttribute("id")+"\" name=\""+this.getAttribute("id")+"\" ";var _1a=this.getParams();for(var key in _1a){_19+=[key]+"=\""+_1a[key]+"\" ";}var _1c=this.getVariablePairs().join("&");if(_1c.length>0){_19+="flashvars=\""+_1c+"\"";}_19+="/>";}else{if(this.getAttribute("doExpressInstall")){this.addVariable("MMplayerType","ActiveX");this.setAttribute("swf",this.xiSWFPath);}_19="<object id=\""+this.getAttribute("id")+"\" classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" width=\""+this.getAttribute("width")+"\" height=\""+this.getAttribute("height")+"\" style=\""+this.getAttribute("style")+"\">";_19+="<param name=\"movie\" value=\""+this.getAttribute("swf")+"\" />";var _1d=this.getParams();for(var key in _1d){_19+="<param name=\""+key+"\" value=\""+_1d[key]+"\" />";}var _1f=this.getVariablePairs().join("&");if(_1f.length>0){_19+="<param name=\"flashvars\" value=\""+_1f+"\" />";}_19+="</object>";}return _19;},write:function(_20){if(this.getAttribute("useExpressInstall")){var _21=new deconcept.PlayerVersion([6,0,65]);if(this.installedVer.versionIsValid(_21)&&!this.installedVer.versionIsValid(this.getAttribute("version"))){this.setAttribute("doExpressInstall",true);this.addVariable("MMredirectURL",escape(this.getAttribute("xiRedirectUrl")));document.title=document.title.slice(0,47)+" - Flash Player Installation";this.addVariable("MMdoctitle",document.title);}}if(this.skipDetect||this.getAttribute("doExpressInstall")||this.installedVer.versionIsValid(this.getAttribute("version"))){var n=(typeof _20=="string")?document.getElementById(_20):_20;n.innerHTML=this.getSWFHTML();return true;}else{if(this.getAttribute("redirectUrl")!=""){document.location.replace(this.getAttribute("redirectUrl"));}}return false;}};deconcept.SWFObjectUtil.getPlayerVersion=function(){var _23=new deconcept.PlayerVersion([0,0,0]);if(navigator.plugins&&navigator.mimeTypes.length){var x=navigator.plugins["Shockwave Flash"];if(x&&x.description){_23=new deconcept.PlayerVersion(x.description.replace(/([a-zA-Z]|\s)+/,"").replace(/(\s+r|\s+b[0-9]+)/,".").split("."));}}else{if(navigator.userAgent&&navigator.userAgent.indexOf("Windows CE")>=0){var axo=1;var _26=3;while(axo){try{_26++;axo=new ActiveXObject("ShockwaveFlash.ShockwaveFlash."+_26);_23=new deconcept.PlayerVersion([_26,0,0]);}catch(e){axo=null;}}}else{try{var axo=new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7");}catch(e){try{var axo=new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6");_23=new deconcept.PlayerVersion([6,0,21]);axo.AllowScriptAccess="always";}catch(e){if(_23.major==6){return _23;}}try{axo=new ActiveXObject("ShockwaveFlash.ShockwaveFlash");}catch(e){}}if(axo!=null){_23=new deconcept.PlayerVersion(axo.GetVariable("$version").split(" ")[1].split(","));}}}return _23;};deconcept.PlayerVersion=function(_29){this.major=_29[0]!=null?parseInt(_29[0]):0;this.minor=_29[1]!=null?parseInt(_29[1]):0;this.rev=_29[2]!=null?parseInt(_29[2]):0;};deconcept.PlayerVersion.prototype.versionIsValid=function(fv){if(this.major<fv.major){return false;}if(this.major>fv.major){return true;}if(this.minor<fv.minor){return false;}if(this.minor>fv.minor){return true;}if(this.rev<fv.rev){return false;}return true;};deconcept.util={getRequestParameter:function(_2b){var q=document.location.search||document.location.hash;if(_2b==null){return q;}if(q){var _2d=q.substring(1).split("&");for(var i=0;i<_2d.length;i++){if(_2d[i].substring(0,_2d[i].indexOf("="))==_2b){return _2d[i].substring((_2d[i].indexOf("=")+1));}}}return "";}};deconcept.SWFObjectUtil.cleanupSWFs=function(){var _2f=document.getElementsByTagName("OBJECT");for(var i=_2f.length-1;i>=0;i--){_2f[i].style.display="none";for(var x in _2f[i]){if(typeof _2f[i][x]=="function"){_2f[i][x]=function(){};}}}};if(deconcept.SWFObject.doPrepUnload){if(!deconcept.unloadSet){deconcept.SWFObjectUtil.prepUnload=function(){__flash_unloadHandler=function(){};__flash_savedUnloadHandler=function(){};window.attachEvent("onunload",deconcept.SWFObjectUtil.cleanupSWFs);};window.attachEvent("onbeforeunload",deconcept.SWFObjectUtil.prepUnload);deconcept.unloadSet=true;}}if(!document.getElementById&&document.all){document.getElementById=function(id){return document.all[id];};}var getQueryParamValue=deconcept.util.getRequestParameter;var FlashObject=deconcept.SWFObject;var SWFObject=deconcept.SWFObject;
+
+var MD5=function(string){function RotateLeft(lValue,iShiftBits){return(lValue<<iShiftBits)|(lValue>>>(32-iShiftBits));}
+function AddUnsigned(lX,lY){var lX4,lY4,lX8,lY8,lResult;lX8=(lX&0x80000000);lY8=(lY&0x80000000);lX4=(lX&0x40000000);lY4=(lY&0x40000000);lResult=(lX&0x3FFFFFFF)+(lY&0x3FFFFFFF);if(lX4&lY4){return(lResult^0x80000000^lX8^lY8);}
+if(lX4|lY4){if(lResult&0x40000000){return(lResult^0xC0000000^lX8^lY8);}else{return(lResult^0x40000000^lX8^lY8);}}else{return(lResult^lX8^lY8);}}
+function F(x,y,z){return(x&y)|((~x)&z);}
+function G(x,y,z){return(x&z)|(y&(~z));}
+function H(x,y,z){return(x^y^z);}
+function I(x,y,z){return(y^(x|(~z)));}
+function FF(a,b,c,d,x,s,ac){a=AddUnsigned(a,AddUnsigned(AddUnsigned(F(b,c,d),x),ac));return AddUnsigned(RotateLeft(a,s),b);};function GG(a,b,c,d,x,s,ac){a=AddUnsigned(a,AddUnsigned(AddUnsigned(G(b,c,d),x),ac));return AddUnsigned(RotateLeft(a,s),b);};function HH(a,b,c,d,x,s,ac){a=AddUnsigned(a,AddUnsigned(AddUnsigned(H(b,c,d),x),ac));return AddUnsigned(RotateLeft(a,s),b);};function II(a,b,c,d,x,s,ac){a=AddUnsigned(a,AddUnsigned(AddUnsigned(I(b,c,d),x),ac));return AddUnsigned(RotateLeft(a,s),b);};function ConvertToWordArray(string){var lWordCount;var lMessageLength=string.length;var lNumberOfWords_temp1=lMessageLength+8;var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1%64))/64;var lNumberOfWords=(lNumberOfWords_temp2+1)*16;var lWordArray=Array(lNumberOfWords-1);var lBytePosition=0;var lByteCount=0;while(lByteCount<lMessageLength){lWordCount=(lByteCount-(lByteCount%4))/4;lBytePosition=(lByteCount%4)*8;lWordArray[lWordCount]=(lWordArray[lWordCount]|(string.charCodeAt(lByteCount)<<lBytePosition));lByteCount++;}
+lWordCount=(lByteCount-(lByteCount%4))/4;lBytePosition=(lByteCount%4)*8;lWordArray[lWordCount]=lWordArray[lWordCount]|(0x80<<lBytePosition);lWordArray[lNumberOfWords-2]=lMessageLength<<3;lWordArray[lNumberOfWords-1]=lMessageLength>>>29;return lWordArray;};function WordToHex(lValue){var WordToHexValue="",WordToHexValue_temp="",lByte,lCount;for(lCount=0;lCount<=3;lCount++){lByte=(lValue>>>(lCount*8))&255;WordToHexValue_temp="0"+lByte.toString(16);WordToHexValue=WordToHexValue+WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);}
+return WordToHexValue;};function Utf8Encode(string){string=string.replace(/\r\n/g,"\n");var utftext="";for(var n=0;n<string.length;n++){var c=string.charCodeAt(n);if(c<128){utftext+=String.fromCharCode(c);}
+else if((c>127)&&(c<2048)){utftext+=String.fromCharCode((c>>6)|192);utftext+=String.fromCharCode((c&63)|128);}
+else{utftext+=String.fromCharCode((c>>12)|224);utftext+=String.fromCharCode(((c>>6)&63)|128);utftext+=String.fromCharCode((c&63)|128);}}
+return utftext;};var x=Array();var k,AA,BB,CC,DD,a,b,c,d;var S11=7,S12=12,S13=17,S14=22;var S21=5,S22=9,S23=14,S24=20;var S31=4,S32=11,S33=16,S34=23;var S41=6,S42=10,S43=15,S44=21;string=Utf8Encode(string);x=ConvertToWordArray(string);a=0x67452301;b=0xEFCDAB89;c=0x98BADCFE;d=0x10325476;for(k=0;k<x.length;k+=16){AA=a;BB=b;CC=c;DD=d;a=FF(a,b,c,d,x[k+0],S11,0xD76AA478);d=FF(d,a,b,c,x[k+1],S12,0xE8C7B756);c=FF(c,d,a,b,x[k+2],S13,0x242070DB);b=FF(b,c,d,a,x[k+3],S14,0xC1BDCEEE);a=FF(a,b,c,d,x[k+4],S11,0xF57C0FAF);d=FF(d,a,b,c,x[k+5],S12,0x4787C62A);c=FF(c,d,a,b,x[k+6],S13,0xA8304613);b=FF(b,c,d,a,x[k+7],S14,0xFD469501);a=FF(a,b,c,d,x[k+8],S11,0x698098D8);d=FF(d,a,b,c,x[k+9],S12,0x8B44F7AF);c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);a=FF(a,b,c,d,x[k+12],S11,0x6B901122);d=FF(d,a,b,c,x[k+13],S12,0xFD987193);c=FF(c,d,a,b,x[k+14],S13,0xA679438E);b=FF(b,c,d,a,x[k+15],S14,0x49B40821);a=GG(a,b,c,d,x[k+1],S21,0xF61E2562);d=GG(d,a,b,c,x[k+6],S22,0xC040B340);c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);b=GG(b,c,d,a,x[k+0],S24,0xE9B6C7AA);a=GG(a,b,c,d,x[k+5],S21,0xD62F105D);d=GG(d,a,b,c,x[k+10],S22,0x2441453);c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);b=GG(b,c,d,a,x[k+4],S24,0xE7D3FBC8);a=GG(a,b,c,d,x[k+9],S21,0x21E1CDE6);d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);c=GG(c,d,a,b,x[k+3],S23,0xF4D50D87);b=GG(b,c,d,a,x[k+8],S24,0x455A14ED);a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);d=GG(d,a,b,c,x[k+2],S22,0xFCEFA3F8);c=GG(c,d,a,b,x[k+7],S23,0x676F02D9);b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);a=HH(a,b,c,d,x[k+5],S31,0xFFFA3942);d=HH(d,a,b,c,x[k+8],S32,0x8771F681);c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);a=HH(a,b,c,d,x[k+1],S31,0xA4BEEA44);d=HH(d,a,b,c,x[k+4],S32,0x4BDECFA9);c=HH(c,d,a,b,x[k+7],S33,0xF6BB4B60);b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);d=HH(d,a,b,c,x[k+0],S32,0xEAA127FA);c=HH(c,d,a,b,x[k+3],S33,0xD4EF3085);b=HH(b,c,d,a,x[k+6],S34,0x4881D05);a=HH(a,b,c,d,x[k+9],S31,0xD9D4D039);d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);b=HH(b,c,d,a,x[k+2],S34,0xC4AC5665);a=II(a,b,c,d,x[k+0],S41,0xF4292244);d=II(d,a,b,c,x[k+7],S42,0x432AFF97);c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);b=II(b,c,d,a,x[k+5],S44,0xFC93A039);a=II(a,b,c,d,x[k+12],S41,0x655B59C3);d=II(d,a,b,c,x[k+3],S42,0x8F0CCC92);c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);b=II(b,c,d,a,x[k+1],S44,0x85845DD1);a=II(a,b,c,d,x[k+8],S41,0x6FA87E4F);d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);c=II(c,d,a,b,x[k+6],S43,0xA3014314);b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);a=II(a,b,c,d,x[k+4],S41,0xF7537E82);d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);c=II(c,d,a,b,x[k+2],S43,0x2AD7D2BB);b=II(b,c,d,a,x[k+9],S44,0xEB86D391);a=AddUnsigned(a,AA);b=AddUnsigned(b,BB);c=AddUnsigned(c,CC);d=AddUnsigned(d,DD);}
+var temp=WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);return temp.toLowerCase();}
+if(typeof(OX)==='undefined')var OX={};OX.AJAST={Broker:function(url,callbackparameter,optional_decode_json_response,optional_timeout_milliseconds,optional_default_params)
+{this.url=url;this.cb=callbackparameter;this.params=[];this.timeout=optional_timeout_milliseconds||5000;if(typeof(optional_default_params)!=='undefined')
+{for(p in optional_default_params)
+this.params.push(p+'='+encodeURIComponent(optional_default_params[p]));}
+this.jsonmode=optional_decode_json_response||false;},__callbacks__:{},__callid__:1,call:function(url,callbackparameter,callbackfunction,optional_timeout,optional_decode_json_response)
+{var callbackid='callback'+OX.AJAST.__callid__;url+='&'+encodeURIComponent(callbackparameter)+'='+encodeURIComponent('OX.AJAST.__callbacks__.'+callbackid);var tag=OX.AJAST.createScriptTag(url);var head=document.getElementsByTagName('head').item(0);var timedout=function()
+{if(OX.AJAST.__callbacks__[callbackid]!=='undefined')
+{OX.AJAST.__callbacks__[callbackid]=function(){delete OX.AJAST.__callbacks__[callbackid];};callbackfunction(false);head.removeChild(tag);}};var timer=setTimeout(timedout,optional_timeout||5000);var decode_response=optional_decode_json_response||false;OX.AJAST.__callbacks__[callbackid]=function(data)
+{clearTimeout(timer);if(typeof(data)==='undefined')
+callbackfunction(false);else
+{callbackfunction(true,decode_response?eval(data):data);}
+delete OX.AJAST.__callbacks__[callbackid];head.removeChild(tag);};head.appendChild(tag);},createScriptTag:function(url)
+{var s=document.createElement('script');s.setAttribute('type','text/javascript');s.setAttribute('id','oxajastcall'+OX.AJAST.__callid__++);s.setAttribute('src',url);return s;}};OX.AJAST.Broker.prototype.call=function(params,callback)
+{var args=[];for(p in params)
+args.push(p+'='+encodeURIComponent(params[p]));for(p in this.params)
+args.push(this.params[p]);if(this.url.indexOf('?',0)>-1)
+this.url+='&'+args.join('&');else
+this.url+='?'+args.join('&');OX.AJAST.call(this.url,this.cb,callback,this.timeout,this.jsonmode);};function http_build_query(formdata,numeric_prefix,arg_separator){var value,key,tmp=[];var _http_build_query_helper=function(key,val,arg_separator){var k,tmp=[];if(val===true){val="1";}else if(val===false){val="0";}
+if(val!==null&&typeof(val)==="object"){for(k in val){if(val[k]!==null){tmp.push(_http_build_query_helper(key+"["+k+"]",val[k],arg_separator));}}
+return tmp.join(arg_separator);}else if(typeof(val)!=="function"){return key+"="+encodeURIComponent(val);}else{return'';}};if(!arg_separator){arg_separator="&";}
+for(key in formdata){value=formdata[key];if(numeric_prefix&&!isNaN(key)){key=String(numeric_prefix)+key;}
+tmp.push(_http_build_query_helper(key,value,arg_separator));}
+return tmp.join(arg_separator);}
+function getFunctionName(func){if(typeof func=="function"||typeof func=="object")
+var fName=(""+func).match(/^function\s*([\w\$]*)\s*\(/);if(fName!==null)
+return fName[1];return null;}
+function getClass(obj,forceConstructor){if(typeof obj=="undefined")return"undefined";if(obj===null)return"null";if(forceConstructor==true&&obj.hasOwnProperty("constructor"))delete obj.constructor;if(forceConstructor!=false&&!obj.hasOwnProperty("constructor"))return getFunctionName(obj.constructor);return Object.prototype.toString.call(obj).match(/^\[object\s(.*)\]$/)[1];}
+function addIfNotNull(obj,params,paramName,paramValue)
+{if(paramValue!=null){if(paramValue instanceof KalturaObjectBase){params[paramName]=toParams(paramValue);}else{params[paramName]=paramValue;}}}
+function toParams(obj)
+{var params=new Object();params["objectType"]=getClass(obj);for(var prop in obj){var val=obj[prop];addIfNotNull(obj,params,prop,val);}
+return params;}
+Function.prototype.inheritsFrom=function(parentClassOrObject){if(parentClassOrObject.constructor==Function)
+{this.prototype=new parentClassOrObject;this.prototype.constructor=this;this.prototype.parentClass=parentClassOrObject.prototype;}
+else
+{this.prototype=parentClassOrObject;this.prototype.constructor=this;this.prototype.parentClass=parentClassOrObject;}
+return this;}
+function ksort(arr){var sArr=[];var tArr=[];var n=0;for(i in arr)
+tArr[n++]=i+"|"+arr[i];tArr=tArr.sort();for(var i=0;i<tArr.length;i++){var x=tArr[i].split("|");sArr[x[0]]=x[1];}
+return sArr;}
+function KalturaServiceActionCall(service,action,params,files)
+{if(!params)
+params=new Object();if(!files)
+files=new Object();this.service=service;this.action=action;this.params=this.parseParams(params);this.files=files;}
+KalturaServiceActionCall.prototype.service=null;KalturaServiceActionCall.prototype.action=null;KalturaServiceActionCall.prototype.params=null;KalturaServiceActionCall.prototype.files=null;KalturaServiceActionCall.prototype.parseParams=function(params)
+{var newParams=new Object();for(var key in params){var val=params[key];if(typeof(val)=='object'){newParams[key]=this.parseParams(val);}else{newParams[key]=val;}}
+return newParams;};KalturaServiceActionCall.prototype.getParamsForMultiRequest=function(multiRequestIndex)
+{var multiRequestParams=new Object();multiRequestParams[multiRequestIndex+":service"]=this.service;multiRequestParams[multiRequestIndex+":action"]=this.action;for(var key in this.params){var val=this.params[key];multiRequestParams[multiRequestIndex+":"+key]=val;}
+return multiRequestParams;};function IKalturaLogger()
+{}
+IKalturaLogger.prototype.log=function(msg){if(console&&console.log){console.log(msg);}};function KalturaClientBase()
+{}
+KalturaClientBase.prototype.init=function(config)
+{this.config=config;var logger=this.config.getLogger();if(logger){this.shouldLog=true;}};KalturaClientBase.prototype.KALTURA_API_VERSION="3.0";KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSON=1;KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_XML=2;KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_PHP=3;KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP=9;KalturaClientBase.prototype.config=null;KalturaClientBase.prototype.ks=null;KalturaClientBase.prototype.shouldLog=false;KalturaClientBase.prototype.useMultiRequest=false;KalturaClientBase.prototype.callsQueue=new Array();KalturaClientBase.prototype.queueServiceActionCall=function(service,action,params,files)
+{if(!params.hasOwnProperty("partnerId")||params["partnerId"]==-1)
+params["partnerId"]=this.config.partnerId;this.addParam(params,"ks",this.ks);var call=new KalturaServiceActionCall(service,action,params,files);this.callsQueue.push(call);};KalturaClientBase.prototype.doQueue=function(callback)
+{if(this.callsQueue.length==0)
+return null;var params=new Object();var files=new Object();this.log("service url: ["+this.config.serviceUrl+"]");this.addParam(params,"apiVersion",this.KALTURA_API_VERSION);this.addParam(params,"format",this.config.format);this.addParam(params,"clientTag",this.config.clientTag);var url=this.config.serviceUrl+this.config.serviceBase;var call=null;if(this.useMultiRequest){url+="multirequest";$i=1;for(var v in this.callsQueue){call=this.callsQueue[v];var callParams=call.getParamsForMultiRequest($i++);for(var sv1 in callParams)
+params[sv1]=callParams[sv1];for(var sv2 in call.files)
+files[sv2]=call.files[sv2];}}else{call=this.callsQueue[0];url+=call.service+"&action="+call.action;for(var sv3 in call.params)
+params[sv3]=call.params[sv3];for(var sv4 in call.files)
+files[sv4]=call.files[sv4];}
+this.callsQueue=new Array();this.useMultiRequest=false;var signature=this.signature(params);this.addParam(params,"kalsig",signature);this.doHttpRequest(callback,url,params,files);return true;};KalturaClientBase.prototype.signature=function(params)
+{params=ksort(params);var str="";for(var v in params){var k=params[v];str+=k+v;}
+return MD5(str);};KalturaClientBase.prototype.doHttpRequest=function(callCompletedCallback,url,params,files)
+{url+='&'+http_build_query(params);OX.AJAST.call(url,"callback",callCompletedCallback,20000,false);};KalturaClientBase.prototype.getKs=function()
+{return this.ks;};KalturaClientBase.prototype.setKs=function(ks)
+{this.ks=ks;};KalturaClientBase.prototype.getConfig=function()
+{return this.config;};KalturaClientBase.prototype.setConfig=function(config)
+{this.config=config;logger=this.config.getLogger();if(logger instanceof IKalturaLogger){this.shouldLog=true;}};KalturaClientBase.prototype.addParam=function(params,paramName,paramValue)
+{if(paramValue==null)
+return;if(typeof(paramValue)!='object'){params[paramName]=paramValue;return;}
+for(var subParamName in paramValue){var subParamValue=paramValue[subParamName];this.addParam(params,paramName+":"+subParamName,subParamValue);}};KalturaClientBase.prototype.startMultiRequest=function()
+{this.useMultiRequest=true;};KalturaClientBase.prototype.doMultiRequest=function(callback)
+{return this.doQueue(callback);};KalturaClientBase.prototype.isMultiRequest=function()
+{return this.useMultiRequest;};KalturaClientBase.prototype.log=function(msg)
+{if(this.shouldLog)
+this.config.getLogger().log(msg);};function KalturaObjectBase()
+{}
+function KalturaServiceBase()
+{}
+KalturaServiceBase.prototype.init=function(client)
+{this.client=client;};KalturaServiceBase.prototype.client=null;function KalturaConfiguration(partnerId)
+{if(!partnerId)
+partnerId=-1;if(typeof(partnerId)!='number')
+throw"Invalid partner id - partnerId must be numeric!";this.partnerId=partnerId;}
+KalturaConfiguration.prototype.logger=null;KalturaConfiguration.prototype.serviceUrl="http://www.kaltura.com";KalturaConfiguration.prototype.serviceBase="/api_v3/index.php?service=";KalturaConfiguration.prototype.partnerId=null;KalturaConfiguration.prototype.format=KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP;KalturaConfiguration.prototype.clientTag="js";KalturaConfiguration.prototype.setLogger=function(log)
+{this.logger=log;};KalturaConfiguration.prototype.getLogger=function()
+{return this.logger;};function KalturaClient(config){this.init(config);}
+KalturaClient.inheritsFrom(KalturaClientBase);KalturaClient.prototype.accessControl=null;KalturaClient.prototype.adminconsole=null;KalturaClient.prototype.adminUser=null;KalturaClient.prototype.baseEntry=null;KalturaClient.prototype.bulkUpload=null;KalturaClient.prototype.category=null;KalturaClient.prototype.conversionProfile=null;KalturaClient.prototype.data=null;KalturaClient.prototype.flavorAsset=null;KalturaClient.prototype.flavorParams=null;KalturaClient.prototype.media=null;KalturaClient.prototype.mixing=null;KalturaClient.prototype.notification=null;KalturaClient.prototype.partner=null;KalturaClient.prototype.playlist=null;KalturaClient.prototype.report=null;KalturaClient.prototype.search=null;KalturaClient.prototype.session=null;KalturaClient.prototype.stats=null;KalturaClient.prototype.syndicationFeed=null;KalturaClient.prototype.system=null;KalturaClient.prototype.uiConf=null;KalturaClient.prototype.upload=null;KalturaClient.prototype.user=null;KalturaClient.prototype.widget=null;KalturaClient.prototype.xInternal=null;KalturaClient.prototype.systemUser=null;KalturaClient.prototype.systemPartner=null;KalturaClient.prototype.fileSync=null;KalturaClient.prototype.flavorParamsOutput=null;KalturaClient.prototype.mediaInfo=null;KalturaClient.prototype.entryAdmin=null;KalturaClient.prototype.init=function(config){KalturaClientBase.prototype.init.apply(this,arguments);this.accessControl=new KalturaAccessControlService(this);this.adminconsole=new KalturaAdminconsoleService(this);this.adminUser=new KalturaAdminUserService(this);this.baseEntry=new KalturaBaseEntryService(this);this.bulkUpload=new KalturaBulkUploadService(this);this.category=new KalturaCategoryService(this);this.conversionProfile=new KalturaConversionProfileService(this);this.data=new KalturaDataService(this);this.flavorAsset=new KalturaFlavorAssetService(this);this.flavorParams=new KalturaFlavorParamsService(this);this.media=new KalturaMediaService(this);this.mixing=new KalturaMixingService(this);this.notification=new KalturaNotificationService(this);this.partner=new KalturaPartnerService(this);this.playlist=new KalturaPlaylistService(this);this.report=new KalturaReportService(this);this.search=new KalturaSearchService(this);this.session=new KalturaSessionService(this);this.stats=new KalturaStatsService(this);this.syndicationFeed=new KalturaSyndicationFeedService(this);this.system=new KalturaSystemService(this);this.uiConf=new KalturaUiConfService(this);this.upload=new KalturaUploadService(this);this.user=new KalturaUserService(this);this.widget=new KalturaWidgetService(this);this.xInternal=new KalturaXInternalService(this);this.systemUser=new KalturaSystemUserService(this);this.systemPartner=new KalturaSystemPartnerService(this);this.fileSync=new KalturaFileSyncService(this);this.flavorParamsOutput=new KalturaFlavorParamsOutputService(this);this.mediaInfo=new KalturaMediaInfoService(this);this.entryAdmin=new KalturaEntryAdminService(this);}
+function KalturaAccessControlOrderBy(){}
+KalturaAccessControlOrderBy.CREATED_AT_ASC="+createdAt";KalturaAccessControlOrderBy.CREATED_AT_DESC="-createdAt";function KalturaAudioCodec(){}
+KalturaAudioCodec.NONE="";KalturaAudioCodec.MP3="mp3";KalturaAudioCodec.AAC="aac";function KalturaBaseEntryOrderBy(){}
+KalturaBaseEntryOrderBy.NAME_ASC="+name";KalturaBaseEntryOrderBy.NAME_DESC="-name";KalturaBaseEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaBaseEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaBaseEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaBaseEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaBaseEntryOrderBy.RANK_ASC="+rank";KalturaBaseEntryOrderBy.RANK_DESC="-rank";function KalturaBaseJobOrderBy(){}
+KalturaBaseJobOrderBy.CREATED_AT_ASC="+createdAt";KalturaBaseJobOrderBy.CREATED_AT_DESC="-createdAt";KalturaBaseJobOrderBy.EXECUTION_ATTEMPTS_ASC="+executionAttempts";KalturaBaseJobOrderBy.EXECUTION_ATTEMPTS_DESC="-executionAttempts";function KalturaBaseSyndicationFeedOrderBy(){}
+KalturaBaseSyndicationFeedOrderBy.PLAYLIST_ID_ASC="+playlistId";KalturaBaseSyndicationFeedOrderBy.PLAYLIST_ID_DESC="-playlistId";KalturaBaseSyndicationFeedOrderBy.NAME_ASC="+name";KalturaBaseSyndicationFeedOrderBy.NAME_DESC="-name";KalturaBaseSyndicationFeedOrderBy.TYPE_ASC="+type";KalturaBaseSyndicationFeedOrderBy.TYPE_DESC="-type";KalturaBaseSyndicationFeedOrderBy.CREATED_AT_ASC="+createdAt";KalturaBaseSyndicationFeedOrderBy.CREATED_AT_DESC="-createdAt";function KalturaBatchJobErrorTypes(){}
+KalturaBatchJobErrorTypes.APP=0;KalturaBatchJobErrorTypes.RUNTIME=1;KalturaBatchJobErrorTypes.HTTP=2;KalturaBatchJobErrorTypes.CURL=3;function KalturaBatchJobOrderBy(){}
+KalturaBatchJobOrderBy.STATUS_ASC="+status";KalturaBatchJobOrderBy.STATUS_DESC="-status";KalturaBatchJobOrderBy.QUEUE_TIME_ASC="+queueTime";KalturaBatchJobOrderBy.QUEUE_TIME_DESC="-queueTime";KalturaBatchJobOrderBy.FINISH_TIME_ASC="+finishTime";KalturaBatchJobOrderBy.FINISH_TIME_DESC="-finishTime";KalturaBatchJobOrderBy.CREATED_AT_ASC="+createdAt";KalturaBatchJobOrderBy.CREATED_AT_DESC="-createdAt";KalturaBatchJobOrderBy.EXECUTION_ATTEMPTS_ASC="+executionAttempts";KalturaBatchJobOrderBy.EXECUTION_ATTEMPTS_DESC="-executionAttempts";function KalturaBatchJobStatus(){}
+KalturaBatchJobStatus.PENDING=0;KalturaBatchJobStatus.QUEUED=1;KalturaBatchJobStatus.PROCESSING=2;KalturaBatchJobStatus.PROCESSED=3;KalturaBatchJobStatus.MOVEFILE=4;KalturaBatchJobStatus.FINISHED=5;KalturaBatchJobStatus.FAILED=6;KalturaBatchJobStatus.ABORTED=7;KalturaBatchJobStatus.ALMOST_DONE=8;KalturaBatchJobStatus.RETRY=9;KalturaBatchJobStatus.FATAL=10;KalturaBatchJobStatus.DONT_PROCESS=11;function KalturaBatchJobType(){}
+KalturaBatchJobType.CONVERT=0;KalturaBatchJobType.IMPORT=1;KalturaBatchJobType.DELETE=2;KalturaBatchJobType.FLATTEN=3;KalturaBatchJobType.BULKUPLOAD=4;KalturaBatchJobType.DVDCREATOR=5;KalturaBatchJobType.DOWNLOAD=6;KalturaBatchJobType.OOCONVERT=7;KalturaBatchJobType.CONVERT_PROFILE=10;KalturaBatchJobType.POSTCONVERT=11;KalturaBatchJobType.PULL=12;KalturaBatchJobType.REMOTE_CONVERT=13;KalturaBatchJobType.EXTRACT_MEDIA=14;KalturaBatchJobType.MAIL=15;KalturaBatchJobType.NOTIFICATION=16;KalturaBatchJobType.CLEANUP=17;KalturaBatchJobType.SCHEDULER_HELPER=18;KalturaBatchJobType.BULKDOWNLOAD=19;KalturaBatchJobType.PROJECT=1000;function KalturaBitRateMode(){}
+KalturaBitRateMode.CBR=1;KalturaBitRateMode.VBR=2;function KalturaBulkUploadCsvVersion(){}
+KalturaBulkUploadCsvVersion.V1="1";KalturaBulkUploadCsvVersion.V2="2";function KalturaCategoryOrderBy(){}
+KalturaCategoryOrderBy.DEPTH_ASC="+depth";KalturaCategoryOrderBy.DEPTH_DESC="-depth";KalturaCategoryOrderBy.FULL_NAME_ASC="+fullName";KalturaCategoryOrderBy.FULL_NAME_DESC="-fullName";KalturaCategoryOrderBy.CREATED_AT_ASC="+createdAt";KalturaCategoryOrderBy.CREATED_AT_DESC="-createdAt";function KalturaCommercialUseType(){}
+KalturaCommercialUseType.COMMERCIAL_USE="commercial_use";KalturaCommercialUseType.NON_COMMERCIAL_USE="non-commercial_use";function KalturaContainerFormat(){}
+KalturaContainerFormat.FLV="flv";KalturaContainerFormat.MP4="mp4";KalturaContainerFormat.AVI="avi";KalturaContainerFormat.MOV="mov";KalturaContainerFormat._3GP="3gp";function KalturaControlPanelCommandOrderBy(){}
+KalturaControlPanelCommandOrderBy.CREATED_AT_ASC="+createdAt";KalturaControlPanelCommandOrderBy.CREATED_AT_DESC="-createdAt";KalturaControlPanelCommandOrderBy.UPDATED_AT_ASC="+updatedAt";KalturaControlPanelCommandOrderBy.UPDATED_AT_DESC="-updatedAt";function KalturaControlPanelCommandStatus(){}
+KalturaControlPanelCommandStatus.PENDING=1;KalturaControlPanelCommandStatus.HANDLED=2;KalturaControlPanelCommandStatus.DONE=3;KalturaControlPanelCommandStatus.FAILED=4;function KalturaControlPanelCommandTargetType(){}
+KalturaControlPanelCommandTargetType.DATA_CENTER=1;KalturaControlPanelCommandTargetType.SCHEDULER=2;KalturaControlPanelCommandTargetType.JOB_TYPE=3;KalturaControlPanelCommandTargetType.JOB=4;KalturaControlPanelCommandTargetType.BATCH=5;function KalturaControlPanelCommandType(){}
+KalturaControlPanelCommandType.STOP=1;KalturaControlPanelCommandType.START=2;KalturaControlPanelCommandType.CONFIG=3;KalturaControlPanelCommandType.KILL=4;function KalturaConversionProfileOrderBy(){}
+KalturaConversionProfileOrderBy.CREATED_AT_ASC="+createdAt";KalturaConversionProfileOrderBy.CREATED_AT_DESC="-createdAt";function KalturaCountryRestrictionType(){}
+KalturaCountryRestrictionType.RESTRICT_COUNTRY_LIST=0;KalturaCountryRestrictionType.ALLOW_COUNTRY_LIST=1;function KalturaDataEntryOrderBy(){}
+KalturaDataEntryOrderBy.NAME_ASC="+name";KalturaDataEntryOrderBy.NAME_DESC="-name";KalturaDataEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaDataEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaDataEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaDataEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaDataEntryOrderBy.RANK_ASC="+rank";KalturaDataEntryOrderBy.RANK_DESC="-rank";function KalturaDirectoryRestrictionType(){}
+KalturaDirectoryRestrictionType.DONT_DISPLAY=0;KalturaDirectoryRestrictionType.DISPLAY_WITH_LINK=1;function KalturaDocumentEntryOrderBy(){}
+KalturaDocumentEntryOrderBy.NAME_ASC="+name";KalturaDocumentEntryOrderBy.NAME_DESC="-name";KalturaDocumentEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaDocumentEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaDocumentEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaDocumentEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaDocumentEntryOrderBy.RANK_ASC="+rank";KalturaDocumentEntryOrderBy.RANK_DESC="-rank";function KalturaDocumentType(){}
+KalturaDocumentType.DOCUMENT=11;KalturaDocumentType.SWF=12;function KalturaDurationType(){}
+KalturaDurationType.NOT_AVAILABLE="notavailable";KalturaDurationType.SHORT="short";KalturaDurationType.MEDIUM="medium";KalturaDurationType.LONG="long";function KalturaEditorType(){}
+KalturaEditorType.SIMPLE=1;KalturaEditorType.ADVANCED=2;function KalturaEntryModerationStatus(){}
+KalturaEntryModerationStatus.PENDING_MODERATION=1;KalturaEntryModerationStatus.APPROVED=2;KalturaEntryModerationStatus.REJECTED=3;KalturaEntryModerationStatus.FLAGGED_FOR_REVIEW=5;KalturaEntryModerationStatus.AUTO_APPROVED=6;function KalturaEntryStatus(){}
+KalturaEntryStatus.ERROR_IMPORTING=-2;KalturaEntryStatus.ERROR_CONVERTING=-1;KalturaEntryStatus.IMPORT=0;KalturaEntryStatus.PRECONVERT=1;KalturaEntryStatus.READY=2;KalturaEntryStatus.DELETED=3;KalturaEntryStatus.PENDING=4;KalturaEntryStatus.MODERATE=5;KalturaEntryStatus.BLOCKED=6;function KalturaEntryType(){}
+KalturaEntryType.AUTOMATIC=-1;KalturaEntryType.MEDIA_CLIP=1;KalturaEntryType.MIX=2;KalturaEntryType.PLAYLIST=5;KalturaEntryType.DATA=6;KalturaEntryType.DOCUMENT=10;function KalturaFileSyncObjectType(){}
+KalturaFileSyncObjectType.ENTRY=1;KalturaFileSyncObjectType.UICONF=2;KalturaFileSyncObjectType.BATCHJOB=3;KalturaFileSyncObjectType.FLAVOR_ASSET=4;function KalturaFileSyncOrderBy(){}
+KalturaFileSyncOrderBy.CREATED_AT_ASC="+createdAt";KalturaFileSyncOrderBy.CREATED_AT_DESC="-createdAt";KalturaFileSyncOrderBy.UPDATED_AT_ASC="+updatedAt";KalturaFileSyncOrderBy.UPDATED_AT_DESC="-updatedAt";KalturaFileSyncOrderBy.READY_AT_ASC="+readyAt";KalturaFileSyncOrderBy.READY_AT_DESC="-readyAt";KalturaFileSyncOrderBy.SYNC_TIME_ASC="+syncTime";KalturaFileSyncOrderBy.SYNC_TIME_DESC="-syncTime";KalturaFileSyncOrderBy.FILE_SIZE_ASC="+fileSize";KalturaFileSyncOrderBy.FILE_SIZE_DESC="-fileSize";function KalturaFileSyncStatus(){}
+KalturaFileSyncStatus.ERROR=-1;KalturaFileSyncStatus.PENDING=1;KalturaFileSyncStatus.READY=2;KalturaFileSyncStatus.DELETED=3;KalturaFileSyncStatus.PURGED=4;function KalturaFileSyncType(){}
+KalturaFileSyncType.FILE=1;KalturaFileSyncType.LINK=2;KalturaFileSyncType.URL=3;function KalturaFlavorAssetStatus(){}
+KalturaFlavorAssetStatus.ERROR=-1;KalturaFlavorAssetStatus.QUEUED=0;KalturaFlavorAssetStatus.CONVERTING=1;KalturaFlavorAssetStatus.READY=2;KalturaFlavorAssetStatus.DELETED=3;KalturaFlavorAssetStatus.NOT_APPLICABLE=4;function KalturaFlavorParamsOrderBy(){}
+function KalturaFlavorParamsOutputOrderBy(){}
+function KalturaGender(){}
+KalturaGender.UNKNOWN=0;KalturaGender.MALE=1;KalturaGender.FEMALE=2;function KalturaGoogleSyndicationFeedAdultValues(){}
+KalturaGoogleSyndicationFeedAdultValues.YES="Yes";KalturaGoogleSyndicationFeedAdultValues.NO="No";function KalturaGoogleVideoSyndicationFeedOrderBy(){}
+KalturaGoogleVideoSyndicationFeedOrderBy.PLAYLIST_ID_ASC="+playlistId";KalturaGoogleVideoSyndicationFeedOrderBy.PLAYLIST_ID_DESC="-playlistId";KalturaGoogleVideoSyndicationFeedOrderBy.NAME_ASC="+name";KalturaGoogleVideoSyndicationFeedOrderBy.NAME_DESC="-name";KalturaGoogleVideoSyndicationFeedOrderBy.TYPE_ASC="+type";KalturaGoogleVideoSyndicationFeedOrderBy.TYPE_DESC="-type";KalturaGoogleVideoSyndicationFeedOrderBy.CREATED_AT_ASC="+createdAt";KalturaGoogleVideoSyndicationFeedOrderBy.CREATED_AT_DESC="-createdAt";function KalturaITunesSyndicationFeedAdultValues(){}
+KalturaITunesSyndicationFeedAdultValues.YES="yes";KalturaITunesSyndicationFeedAdultValues.NO="no";KalturaITunesSyndicationFeedAdultValues.CLEAN="clean";function KalturaITunesSyndicationFeedCategories(){}
+KalturaITunesSyndicationFeedCategories.ARTS="Arts";KalturaITunesSyndicationFeedCategories.ARTS_DESIGN="Arts/Design";KalturaITunesSyndicationFeedCategories.ARTS_FASHION_BEAUTY="Arts/Fashion &amp; Beauty";KalturaITunesSyndicationFeedCategories.ARTS_FOOD="Arts/Food";KalturaITunesSyndicationFeedCategories.ARTS_LITERATURE="Arts/Literature";KalturaITunesSyndicationFeedCategories.ARTS_PERFORMING_ARTS="Arts/Performing Arts";KalturaITunesSyndicationFeedCategories.ARTS_VISUAL_ARTS="Arts/Visual Arts";KalturaITunesSyndicationFeedCategories.BUSINESS="Business";KalturaITunesSyndicationFeedCategories.BUSINESS_BUSINESS_NEWS="Business/Business News";KalturaITunesSyndicationFeedCategories.BUSINESS_CAREERS="Business/Careers";KalturaITunesSyndicationFeedCategories.BUSINESS_INVESTING="Business/Investing";KalturaITunesSyndicationFeedCategories.BUSINESS_MANAGEMENT_MARKETING="Business/Management &amp; Marketing";KalturaITunesSyndicationFeedCategories.BUSINESS_SHOPPING="Business/Shopping";KalturaITunesSyndicationFeedCategories.COMEDY="Comedy";KalturaITunesSyndicationFeedCategories.EDUCATION="Education";KalturaITunesSyndicationFeedCategories.EDUCATION_TECHNOLOGY="Education/Education Technology";KalturaITunesSyndicationFeedCategories.EDUCATION_HIGHER_EDUCATION="Education/Higher Education";KalturaITunesSyndicationFeedCategories.EDUCATION_K_12="Education/K-12";KalturaITunesSyndicationFeedCategories.EDUCATION_LANGUAGE_COURSES="Education/Language Courses";KalturaITunesSyndicationFeedCategories.EDUCATION_TRAINING="Education/Training";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES="Games &amp; Hobbies";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES_AUTOMOTIVE="Games &amp; Hobbies/Automotive";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES_AVIATION="Games &amp; Hobbies/Aviation";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES_HOBBIES="Games &amp; Hobbies/Hobbies";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES_OTHER_GAMES="Games &amp; Hobbies/Other Games";KalturaITunesSyndicationFeedCategories.GAMES_HOBBIES_VIDEO_GAMES="Games &amp; Hobbies/Video Games";KalturaITunesSyndicationFeedCategories.GOVERNMENT_ORGANIZATIONS="Government &amp; Organizations";KalturaITunesSyndicationFeedCategories.GOVERNMENT_ORGANIZATIONS_LOCAL="Government &amp; Organizations/Local";KalturaITunesSyndicationFeedCategories.GOVERNMENT_ORGANIZATIONS_NATIONAL="Government &amp; Organizations/National";KalturaITunesSyndicationFeedCategories.GOVERNMENT_ORGANIZATIONS_NON_PROFIT="Government &amp; Organizations/Non-Profit";KalturaITunesSyndicationFeedCategories.GOVERNMENT_ORGANIZATIONS_REGIONAL="Government &amp; Organizations/Regional";KalturaITunesSyndicationFeedCategories.HEALTH="Health";KalturaITunesSyndicationFeedCategories.HEALTH_ALTERNATIVE_HEALTH="Health/Alternative Health";KalturaITunesSyndicationFeedCategories.HEALTH_FITNESS_NUTRITION="Health/Fitness &amp; Nutrition";KalturaITunesSyndicationFeedCategories.HEALTH_SELF_HELP="Health/Self-Help";KalturaITunesSyndicationFeedCategories.HEALTH_SEXUALITY="Health/Sexuality";KalturaITunesSyndicationFeedCategories.KIDS_FAMILY="Kids &amp; Family";KalturaITunesSyndicationFeedCategories.MUSIC="Music";KalturaITunesSyndicationFeedCategories.NEWS_POLITICS="News &amp; Politics";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY="Religion &amp; Spirituality";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_BUDDHISM="Religion &amp; Spirituality/Buddhism";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_CHRISTIANITY="Religion &amp; Spirituality/Christianity";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_HINDUISM="Religion &amp; Spirituality/Hinduism";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_ISLAM="Religion &amp; Spirituality/Islam";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_JUDAISM="Religion &amp; Spirituality/Judaism";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_OTHER="Religion &amp; Spirituality/Other";KalturaITunesSyndicationFeedCategories.RELIGION_SPIRITUALITY_SPIRITUALITY="Religion &amp; Spirituality/Spirituality";KalturaITunesSyndicationFeedCategories.SCIENCE_MEDICINE="Science &amp; Medicine";KalturaITunesSyndicationFeedCategories.SCIENCE_MEDICINE_MEDICINE="Science &amp; Medicine/Medicine";KalturaITunesSyndicationFeedCategories.SCIENCE_MEDICINE_NATURAL_SCIENCES="Science &amp; Medicine/Natural Sciences";KalturaITunesSyndicationFeedCategories.SCIENCE_MEDICINE_SOCIAL_SCIENCES="Science &amp; Medicine/Social Sciences";KalturaITunesSyndicationFeedCategories.SOCIETY_CULTURE="Society &amp; Culture";KalturaITunesSyndicationFeedCategories.SOCIETY_CULTURE_HISTORY="Society &amp; Culture/History";KalturaITunesSyndicationFeedCategories.SOCIETY_CULTURE_PERSONAL_JOURNALS="Society &amp; Culture/Personal Journals";KalturaITunesSyndicationFeedCategories.SOCIETY_CULTURE_PHILOSOPHY="Society &amp; Culture/Philosophy";KalturaITunesSyndicationFeedCategories.SOCIETY_CULTURE_PLACES_TRAVEL="Society &amp; Culture/Places &amp; Travel";KalturaITunesSyndicationFeedCategories.SPORTS_RECREATION="Sports &amp; Recreation";KalturaITunesSyndicationFeedCategories.SPORTS_RECREATION_AMATEUR="Sports &amp; Recreation/Amateur";KalturaITunesSyndicationFeedCategories.SPORTS_RECREATION_COLLEGE_HIGH_SCHOOL="Sports &amp; Recreation/College &amp; High School";KalturaITunesSyndicationFeedCategories.SPORTS_RECREATION_OUTDOOR="Sports &amp; Recreation/Outdoor";KalturaITunesSyndicationFeedCategories.SPORTS_RECREATION_PROFESSIONAL="Sports &amp; Recreation/Professional";KalturaITunesSyndicationFeedCategories.TECHNOLOGY="Technology";KalturaITunesSyndicationFeedCategories.TECHNOLOGY_GADGETS="Technology/Gadgets";KalturaITunesSyndicationFeedCategories.TECHNOLOGY_TECH_NEWS="Technology/Tech News";KalturaITunesSyndicationFeedCategories.TECHNOLOGY_PODCASTING="Technology/Podcasting";KalturaITunesSyndicationFeedCategories.TECHNOLOGY_SOFTWARE_HOW_TO="Technology/Software How-To";KalturaITunesSyndicationFeedCategories.TV_FILM="TV &amp; Film";function KalturaITunesSyndicationFeedOrderBy(){}
+KalturaITunesSyndicationFeedOrderBy.PLAYLIST_ID_ASC="+playlistId";KalturaITunesSyndicationFeedOrderBy.PLAYLIST_ID_DESC="-playlistId";KalturaITunesSyndicationFeedOrderBy.NAME_ASC="+name";KalturaITunesSyndicationFeedOrderBy.NAME_DESC="-name";KalturaITunesSyndicationFeedOrderBy.TYPE_ASC="+type";KalturaITunesSyndicationFeedOrderBy.TYPE_DESC="-type";KalturaITunesSyndicationFeedOrderBy.CREATED_AT_ASC="+createdAt";KalturaITunesSyndicationFeedOrderBy.CREATED_AT_DESC="-createdAt";function KalturaLicenseType(){}
+KalturaLicenseType.UNKNOWN=-1;KalturaLicenseType.NONE=0;KalturaLicenseType.COPYRIGHTED=1;KalturaLicenseType.PUBLIC_DOMAIN=2;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION=3;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION_SHARE_ALIKE=4;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION_NO_DERIVATIVES=5;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL=6;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL_SHARE_ALIKE=7;KalturaLicenseType.CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL_NO_DERIVATIVES=8;KalturaLicenseType.GFDL=9;KalturaLicenseType.GPL=10;KalturaLicenseType.AFFERO_GPL=11;KalturaLicenseType.LGPL=12;KalturaLicenseType.BSD=13;KalturaLicenseType.APACHE=14;KalturaLicenseType.MOZILLA=15;function KalturaMailJobOrderBy(){}
+KalturaMailJobOrderBy.CREATED_AT_ASC="+createdAt";KalturaMailJobOrderBy.CREATED_AT_DESC="-createdAt";KalturaMailJobOrderBy.EXECUTION_ATTEMPTS_ASC="+executionAttempts";KalturaMailJobOrderBy.EXECUTION_ATTEMPTS_DESC="-executionAttempts";function KalturaMailJobStatus(){}
+KalturaMailJobStatus.PENDING=1;KalturaMailJobStatus.SENT=2;KalturaMailJobStatus.ERROR=3;KalturaMailJobStatus.QUEUED=4;function KalturaMailType(){}
+KalturaMailType.MAIL_TYPE_KALTURA_NEWSLETTER=10;KalturaMailType.MAIL_TYPE_ADDED_TO_FAVORITES=11;KalturaMailType.MAIL_TYPE_ADDED_TO_CLIP_FAVORITES=12;KalturaMailType.MAIL_TYPE_NEW_COMMENT_IN_PROFILE=13;KalturaMailType.MAIL_TYPE_CLIP_ADDED_YOUR_KALTURA=20;KalturaMailType.MAIL_TYPE_VIDEO_ADDED=21;KalturaMailType.MAIL_TYPE_ROUGHCUT_CREATED=22;KalturaMailType.MAIL_TYPE_ADDED_KALTURA_TO_YOUR_FAVORITES=23;KalturaMailType.MAIL_TYPE_NEW_COMMENT_IN_KALTURA=24;KalturaMailType.MAIL_TYPE_CLIP_ADDED=30;KalturaMailType.MAIL_TYPE_VIDEO_CREATED=31;KalturaMailType.MAIL_TYPE_ADDED_KALTURA_TO_HIS_FAVORITES=32;KalturaMailType.MAIL_TYPE_NEW_COMMENT_IN_KALTURA_YOU_CONTRIBUTED=33;KalturaMailType.MAIL_TYPE_CLIP_CONTRIBUTED=40;KalturaMailType.MAIL_TYPE_ROUGHCUT_CREATED_SUBSCRIBED=41;KalturaMailType.MAIL_TYPE_ADDED_KALTURA_TO_HIS_FAVORITES_SUBSCRIBED=42;KalturaMailType.MAIL_TYPE_NEW_COMMENT_IN_KALTURA_YOU_SUBSCRIBED=43;KalturaMailType.MAIL_TYPE_REGISTER_CONFIRM=50;KalturaMailType.MAIL_TYPE_PASSWORD_RESET=51;KalturaMailType.MAIL_TYPE_LOGIN_MAIL_RESET=52;KalturaMailType.MAIL_TYPE_REGISTER_CONFIRM_VIDEO_SERVICE=54;KalturaMailType.MAIL_TYPE_VIDEO_READY=60;KalturaMailType.MAIL_TYPE_VIDEO_IS_READY=62;KalturaMailType.MAIL_TYPE_BULK_DOWNLOAD_READY=63;KalturaMailType.MAIL_TYPE_NOTIFY_ERR=70;KalturaMailType.MAIL_TYPE_ACCOUNT_UPGRADE_CONFIRM=80;KalturaMailType.MAIL_TYPE_VIDEO_SERVICE_NOTICE=81;KalturaMailType.MAIL_TYPE_VIDEO_SERVICE_NOTICE_LIMIT_REACHED=82;KalturaMailType.MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_LOCKED=83;KalturaMailType.MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_DELETED=84;KalturaMailType.MAIL_TYPE_VIDEO_SERVICE_NOTICE_UPGRADE_OFFER=85;KalturaMailType.MAIL_TYPE_ACCOUNT_REACTIVE_CONFIRM=86;KalturaMailType.MAIL_TYPE_SYSTEM_USER_RESET_PASSWORD=110;KalturaMailType.MAIL_TYPE_SYSTEM_USER_RESET_PASSWORD_SUCCESS=111;function KalturaMediaEntryOrderBy(){}
+KalturaMediaEntryOrderBy.MEDIA_TYPE_ASC="+mediaType";KalturaMediaEntryOrderBy.MEDIA_TYPE_DESC="-mediaType";KalturaMediaEntryOrderBy.PLAYS_ASC="+plays";KalturaMediaEntryOrderBy.PLAYS_DESC="-plays";KalturaMediaEntryOrderBy.VIEWS_ASC="+views";KalturaMediaEntryOrderBy.VIEWS_DESC="-views";KalturaMediaEntryOrderBy.DURATION_ASC="+duration";KalturaMediaEntryOrderBy.DURATION_DESC="-duration";KalturaMediaEntryOrderBy.NAME_ASC="+name";KalturaMediaEntryOrderBy.NAME_DESC="-name";KalturaMediaEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaMediaEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaMediaEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaMediaEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaMediaEntryOrderBy.RANK_ASC="+rank";KalturaMediaEntryOrderBy.RANK_DESC="-rank";function KalturaMediaInfoOrderBy(){}
+function KalturaMediaType(){}
+KalturaMediaType.VIDEO=1;KalturaMediaType.IMAGE=2;KalturaMediaType.AUDIO=5;function KalturaMixEntryOrderBy(){}
+KalturaMixEntryOrderBy.PLAYS_ASC="+plays";KalturaMixEntryOrderBy.PLAYS_DESC="-plays";KalturaMixEntryOrderBy.VIEWS_ASC="+views";KalturaMixEntryOrderBy.VIEWS_DESC="-views";KalturaMixEntryOrderBy.DURATION_ASC="+duration";KalturaMixEntryOrderBy.DURATION_DESC="-duration";KalturaMixEntryOrderBy.NAME_ASC="+name";KalturaMixEntryOrderBy.NAME_DESC="-name";KalturaMixEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaMixEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaMixEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaMixEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaMixEntryOrderBy.RANK_ASC="+rank";KalturaMixEntryOrderBy.RANK_DESC="-rank";function KalturaModerationFlagStatus(){}
+KalturaModerationFlagStatus.PENDING=1;KalturaModerationFlagStatus.MODERATED=2;function KalturaModerationFlagType(){}
+KalturaModerationFlagType.SEXUAL_CONTENT=1;KalturaModerationFlagType.VIOLENT_REPULSIVE=2;KalturaModerationFlagType.HARMFUL_DANGEROUS=3;KalturaModerationFlagType.SPAM_COMMERCIALS=4;function KalturaModerationObjectType(){}
+KalturaModerationObjectType.ENTRY=2;KalturaModerationObjectType.USER=3;function KalturaNotificationObjectType(){}
+KalturaNotificationObjectType.ENTRY=1;KalturaNotificationObjectType.KSHOW=2;KalturaNotificationObjectType.USER=3;KalturaNotificationObjectType.BATCH_JOB=4;function KalturaNotificationOrderBy(){}
+KalturaNotificationOrderBy.CREATED_AT_ASC="+createdAt";KalturaNotificationOrderBy.CREATED_AT_DESC="-createdAt";KalturaNotificationOrderBy.EXECUTION_ATTEMPTS_ASC="+executionAttempts";KalturaNotificationOrderBy.EXECUTION_ATTEMPTS_DESC="-executionAttempts";function KalturaNotificationStatus(){}
+KalturaNotificationStatus.PENDING=1;KalturaNotificationStatus.SENT=2;KalturaNotificationStatus.ERROR=3;KalturaNotificationStatus.SHOULD_RESEND=4;KalturaNotificationStatus.ERROR_RESENDING=5;KalturaNotificationStatus.SENT_SYNCH=6;KalturaNotificationStatus.QUEUED=7;function KalturaNotificationType(){}
+KalturaNotificationType.ENTRY_ADD=1;KalturaNotificationType.ENTR_UPDATE_PERMISSIONS=2;KalturaNotificationType.ENTRY_DELETE=3;KalturaNotificationType.ENTRY_BLOCK=4;KalturaNotificationType.ENTRY_UPDATE=5;KalturaNotificationType.ENTRY_UPDATE_THUMBNAIL=6;KalturaNotificationType.ENTRY_UPDATE_MODERATION=7;KalturaNotificationType.USER_ADD=21;KalturaNotificationType.USER_BANNED=26;function KalturaNullableBoolean(){}
+KalturaNullableBoolean.NULL_VALUE=-1;KalturaNullableBoolean.FALSE_VALUE=0;KalturaNullableBoolean.TRUE_VALUE=1;function KalturaPartnerOrderBy(){}
+KalturaPartnerOrderBy.ID_ASC="+id";KalturaPartnerOrderBy.ID_DESC="-id";KalturaPartnerOrderBy.NAME_ASC="+name";KalturaPartnerOrderBy.NAME_DESC="-name";KalturaPartnerOrderBy.WEBSITE_ASC="+website";KalturaPartnerOrderBy.WEBSITE_DESC="-website";KalturaPartnerOrderBy.CREATED_AT_ASC="+createdAt";KalturaPartnerOrderBy.CREATED_AT_DESC="-createdAt";KalturaPartnerOrderBy.ADMIN_NAME_ASC="+adminName";KalturaPartnerOrderBy.ADMIN_NAME_DESC="-adminName";KalturaPartnerOrderBy.ADMIN_EMAIL_ASC="+adminEmail";KalturaPartnerOrderBy.ADMIN_EMAIL_DESC="-adminEmail";KalturaPartnerOrderBy.STATUS_ASC="+status";KalturaPartnerOrderBy.STATUS_DESC="-status";function KalturaPartnerStatus(){}
+KalturaPartnerStatus.ACTIVE=1;KalturaPartnerStatus.BLOCKED=2;KalturaPartnerStatus.FULL_BLOCK=3;function KalturaPartnerType(){}
+KalturaPartnerType.KMC=1;KalturaPartnerType.WIKI=100;KalturaPartnerType.WORDPRESS=101;KalturaPartnerType.DRUPAL=102;KalturaPartnerType.DEKIWIKI=103;KalturaPartnerType.MOODLE=104;KalturaPartnerType.COMMUNITY_EDITION=105;KalturaPartnerType.JOOMLA=106;function KalturaPlayableEntryOrderBy(){}
+KalturaPlayableEntryOrderBy.PLAYS_ASC="+plays";KalturaPlayableEntryOrderBy.PLAYS_DESC="-plays";KalturaPlayableEntryOrderBy.VIEWS_ASC="+views";KalturaPlayableEntryOrderBy.VIEWS_DESC="-views";KalturaPlayableEntryOrderBy.DURATION_ASC="+duration";KalturaPlayableEntryOrderBy.DURATION_DESC="-duration";KalturaPlayableEntryOrderBy.NAME_ASC="+name";KalturaPlayableEntryOrderBy.NAME_DESC="-name";KalturaPlayableEntryOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaPlayableEntryOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaPlayableEntryOrderBy.CREATED_AT_ASC="+createdAt";KalturaPlayableEntryOrderBy.CREATED_AT_DESC="-createdAt";KalturaPlayableEntryOrderBy.RANK_ASC="+rank";KalturaPlayableEntryOrderBy.RANK_DESC="-rank";function KalturaPlaylistOrderBy(){}
+KalturaPlaylistOrderBy.NAME_ASC="+name";KalturaPlaylistOrderBy.NAME_DESC="-name";KalturaPlaylistOrderBy.MODERATION_COUNT_ASC="+moderationCount";KalturaPlaylistOrderBy.MODERATION_COUNT_DESC="-moderationCount";KalturaPlaylistOrderBy.CREATED_AT_ASC="+createdAt";KalturaPlaylistOrderBy.CREATED_AT_DESC="-createdAt";KalturaPlaylistOrderBy.RANK_ASC="+rank";KalturaPlaylistOrderBy.RANK_DESC="-rank";function KalturaPlaylistType(){}
+KalturaPlaylistType.DYNAMIC=10;KalturaPlaylistType.STATIC_LIST=3;KalturaPlaylistType.EXTERNAL=101;function KalturaReportType(){}
+KalturaReportType.TOP_CONTENT=1;KalturaReportType.CONTENT_DROPOFF=2;KalturaReportType.CONTENT_INTERACTIONS=3;KalturaReportType.MAP_OVERLAY=4;KalturaReportType.TOP_CONTRIBUTORS=5;KalturaReportType.TOP_SYNDICATION=6;KalturaReportType.CONTENT_CONTRIBUTIONS=7;KalturaReportType.ADMIN_CONSOLE=10;function KalturaSearchProviderType(){}
+KalturaSearchProviderType.FLICKR=3;KalturaSearchProviderType.YOUTUBE=4;KalturaSearchProviderType.MYSPACE=7;KalturaSearchProviderType.PHOTOBUCKET=8;KalturaSearchProviderType.JAMENDO=9;KalturaSearchProviderType.CCMIXTER=10;KalturaSearchProviderType.NYPL=11;KalturaSearchProviderType.CURRENT=12;KalturaSearchProviderType.MEDIA_COMMONS=13;KalturaSearchProviderType.KALTURA=20;KalturaSearchProviderType.KALTURA_USER_CLIPS=21;KalturaSearchProviderType.ARCHIVE_ORG=22;KalturaSearchProviderType.KALTURA_PARTNER=23;KalturaSearchProviderType.METACAFE=24;KalturaSearchProviderType.SEARCH_PROXY=28;function KalturaSessionType(){}
+KalturaSessionType.USER=0;KalturaSessionType.ADMIN=2;function KalturaSiteRestrictionType(){}
+KalturaSiteRestrictionType.RESTRICT_SITE_LIST=0;KalturaSiteRestrictionType.ALLOW_SITE_LIST=1;function KalturaSourceType(){}
+KalturaSourceType.FILE=1;KalturaSourceType.WEBCAM=2;KalturaSourceType.URL=5;KalturaSourceType.SEARCH_PROVIDER=6;function KalturaStatsEventType(){}
+KalturaStatsEventType.WIDGET_LOADED=1;KalturaStatsEventType.MEDIA_LOADED=2;KalturaStatsEventType.PLAY=3;KalturaStatsEventType.PLAY_REACHED_25=4;KalturaStatsEventType.PLAY_REACHED_50=5;KalturaStatsEventType.PLAY_REACHED_75=6;KalturaStatsEventType.PLAY_REACHED_100=7;KalturaStatsEventType.OPEN_EDIT=8;KalturaStatsEventType.OPEN_VIRAL=9;KalturaStatsEventType.OPEN_DOWNLOAD=10;KalturaStatsEventType.OPEN_REPORT=11;KalturaStatsEventType.BUFFER_START=12;KalturaStatsEventType.BUFFER_END=13;KalturaStatsEventType.OPEN_FULL_SCREEN=14;KalturaStatsEventType.CLOSE_FULL_SCREEN=15;KalturaStatsEventType.REPLAY=16;KalturaStatsEventType.SEEK=17;KalturaStatsEventType.OPEN_UPLOAD=18;KalturaStatsEventType.SAVE_PUBLISH=19;KalturaStatsEventType.CLOSE_EDITOR=20;KalturaStatsEventType.PRE_BUMPER_PLAYED=21;KalturaStatsEventType.POST_BUMPER_PLAYED=22;KalturaStatsEventType.BUMPER_CLICKED=23;KalturaStatsEventType.FUTURE_USE_1=24;KalturaStatsEventType.FUTURE_USE_2=25;KalturaStatsEventType.FUTURE_USE_3=26;function KalturaStatsKmcEventType(){}
+KalturaStatsKmcEventType.CONTENT_PAGE_VIEW=1001;KalturaStatsKmcEventType.CONTENT_ADD_PLAYLIST=1010;KalturaStatsKmcEventType.CONTENT_EDIT_PLAYLIST=1011;KalturaStatsKmcEventType.CONTENT_DELETE_PLAYLIST=1012;KalturaStatsKmcEventType.CONTENT_DELETE_ITEM=1058;KalturaStatsKmcEventType.CONTENT_EDIT_ENTRY=1013;KalturaStatsKmcEventType.CONTENT_CHANGE_THUMBNAIL=1014;KalturaStatsKmcEventType.CONTENT_ADD_TAGS=1015;KalturaStatsKmcEventType.CONTENT_REMOVE_TAGS=1016;KalturaStatsKmcEventType.CONTENT_ADD_ADMIN_TAGS=1017;KalturaStatsKmcEventType.CONTENT_REMOVE_ADMIN_TAGS=1018;KalturaStatsKmcEventType.CONTENT_DOWNLOAD=1019;KalturaStatsKmcEventType.CONTENT_APPROVE_MODERATION=1020;KalturaStatsKmcEventType.CONTENT_REJECT_MODERATION=1021;KalturaStatsKmcEventType.CONTENT_BULK_UPLOAD=1022;KalturaStatsKmcEventType.CONTENT_ADMIN_KCW_UPLOAD=1023;KalturaStatsKmcEventType.CONTENT_CONTENT_GO_TO_PAGE=1057;KalturaStatsKmcEventType.ACCOUNT_CHANGE_PARTNER_INFO=1030;KalturaStatsKmcEventType.ACCOUNT_CHANGE_LOGIN_INFO=1031;KalturaStatsKmcEventType.ACCOUNT_CONTACT_US_USAGE=1032;KalturaStatsKmcEventType.ACCOUNT_UPDATE_SERVER_SETTINGS=1033;KalturaStatsKmcEventType.ACCOUNT_ACCOUNT_OVERVIEW=1034;KalturaStatsKmcEventType.ACCOUNT_ACCESS_CONTROL=1035;KalturaStatsKmcEventType.ACCOUNT_TRANSCODING_SETTINGS=1036;KalturaStatsKmcEventType.ACCOUNT_ACCOUNT_UPGRADE=1037;KalturaStatsKmcEventType.ACCOUNT_SAVE_SERVER_SETTINGS=1038;KalturaStatsKmcEventType.ACCOUNT_ACCESS_CONTROL_DELETE=1039;KalturaStatsKmcEventType.ACCOUNT_SAVE_TRANSCODING_SETTINGS=1040;KalturaStatsKmcEventType.LOGIN=1041;KalturaStatsKmcEventType.DASHBOARD_IMPORT_CONTENT=1042;KalturaStatsKmcEventType.DASHBOARD_UPDATE_CONTENT=1043;KalturaStatsKmcEventType.DASHBOARD_ACCOUNT_CONTACT_US=1044;KalturaStatsKmcEventType.DASHBOARD_VIEW_REPORTS=1045;KalturaStatsKmcEventType.DASHBOARD_EMBED_PLAYER=1046;KalturaStatsKmcEventType.DASHBOARD_EMBED_PLAYLIST=1047;KalturaStatsKmcEventType.DASHBOARD_CUSTOMIZE_PLAYERS=1048;KalturaStatsKmcEventType.APP_STUDIO_NEW_PLAYER_SINGLE_VIDEO=1050;KalturaStatsKmcEventType.APP_STUDIO_NEW_PLAYER_PLAYLIST=1051;KalturaStatsKmcEventType.APP_STUDIO_NEW_PLAYER_MULTI_TAB_PLAYLIST=1052;KalturaStatsKmcEventType.APP_STUDIO_EDIT_PLAYER_SINGLE_VIDEO=1053;KalturaStatsKmcEventType.APP_STUDIO_EDIT_PLAYER_PLAYLIST=1054;KalturaStatsKmcEventType.APP_STUDIO_EDIT_PLAYER_MULTI_TAB_PLAYLIST=1055;KalturaStatsKmcEventType.APP_STUDIO_DUPLICATE_PLAYER=1056;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_TAB=1070;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_REPORTS_TAB=1071;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_USERS_AND_COMMUNITY_REPORTS_TAB=1072;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_TOP_CONTRIBUTORS=1073;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_MAP_OVERLAYS=1074;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_TOP_SYNDICATIONS=1075;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_TOP_CONTENT=1076;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_DROPOFF=1077;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_INTERACTIONS=1078;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_CONTRIBUTIONS=1079;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_VIDEO_DRILL_DOWN=1080;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_DRILL_DOWN_INTERACTION=1081;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_CONTENT_CONTRIBUTIONS_DRILLDOWN=1082;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_VIDEO_DRILL_DOWN_DROPOFF=1083;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_MAP_OVERLAYS_DRILLDOWN=1084;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_TOP_SYNDICATIONS_DRILL_DOWN=1085;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_VIEW_MONTHLY=1086;KalturaStatsKmcEventType.REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_VIEW_YEARLY=1087;function KalturaSyndicationFeedStatus(){}
+KalturaSyndicationFeedStatus.DELETED=-1;KalturaSyndicationFeedStatus.ACTIVE=1;function KalturaSyndicationFeedType(){}
+KalturaSyndicationFeedType.GOOGLE_VIDEO=1;KalturaSyndicationFeedType.YAHOO=2;KalturaSyndicationFeedType.ITUNES=3;KalturaSyndicationFeedType.TUBE_MOGUL=4;function KalturaSystemPartnerPackage(){}
+KalturaSystemPartnerPackage.PACKAGE_FREE="1";KalturaSystemPartnerPackage.PACKAGE_20="2";KalturaSystemPartnerPackage.PACKAGE_50="3";KalturaSystemPartnerPackage.PACKAGE_100="4";KalturaSystemPartnerPackage.PACKAGE_250="5";KalturaSystemPartnerPackage.PACKAGE_500="6";function KalturaSystemUserOrderBy(){}
+KalturaSystemUserOrderBy.ID_ASC="+id";KalturaSystemUserOrderBy.ID_DESC="-id";KalturaSystemUserOrderBy.STATUS_ASC="+status";KalturaSystemUserOrderBy.STATUS_DESC="-status";function KalturaSystemUserStatus(){}
+KalturaSystemUserStatus.BLOCKED=0;KalturaSystemUserStatus.ACTIVE=1;function KalturaTubeMogulSyndicationFeedCategories(){}
+KalturaTubeMogulSyndicationFeedCategories.ARTS_AND_ANIMATION="Arts &amp; Animation";KalturaTubeMogulSyndicationFeedCategories.COMEDY="Comedy";KalturaTubeMogulSyndicationFeedCategories.ENTERTAINMENT="Entertainment";KalturaTubeMogulSyndicationFeedCategories.MUSIC="Music";KalturaTubeMogulSyndicationFeedCategories.NEWS_AND_BLOGS="News &amp; Blogs";KalturaTubeMogulSyndicationFeedCategories.SCIENCE_AND_TECHNOLOGY="Science &amp; Technology";KalturaTubeMogulSyndicationFeedCategories.SPORTS="Sports";KalturaTubeMogulSyndicationFeedCategories.TRAVEL_AND_PLACES="Travel &amp; Places";KalturaTubeMogulSyndicationFeedCategories.VIDEO_GAMES="Video Games";KalturaTubeMogulSyndicationFeedCategories.ANIMALS_AND_PETS="Animals &amp; Pets";KalturaTubeMogulSyndicationFeedCategories.AUTOS="Autos";KalturaTubeMogulSyndicationFeedCategories.VLOGS_PEOPLE="Vlogs &amp; People";KalturaTubeMogulSyndicationFeedCategories.HOW_TO_INSTRUCTIONAL_DIY="How To/Instructional/DIY";KalturaTubeMogulSyndicationFeedCategories.COMMERCIALS_PROMOTIONAL="Commercials/Promotional";KalturaTubeMogulSyndicationFeedCategories.FAMILY_AND_KIDS="Family &amp; Kids";function KalturaTubeMogulSyndicationFeedOrderBy(){}
+KalturaTubeMogulSyndicationFeedOrderBy.PLAYLIST_ID_ASC="+playlistId";KalturaTubeMogulSyndicationFeedOrderBy.PLAYLIST_ID_DESC="-playlistId";KalturaTubeMogulSyndicationFeedOrderBy.NAME_ASC="+name";KalturaTubeMogulSyndicationFeedOrderBy.NAME_DESC="-name";KalturaTubeMogulSyndicationFeedOrderBy.TYPE_ASC="+type";KalturaTubeMogulSyndicationFeedOrderBy.TYPE_DESC="-type";KalturaTubeMogulSyndicationFeedOrderBy.CREATED_AT_ASC="+createdAt";KalturaTubeMogulSyndicationFeedOrderBy.CREATED_AT_DESC="-createdAt";function KalturaUiConfCreationMode(){}
+KalturaUiConfCreationMode.WIZARD=2;KalturaUiConfCreationMode.ADVANCED=3;function KalturaUiConfObjType(){}
+KalturaUiConfObjType.PLAYER=1;KalturaUiConfObjType.CONTRIBUTION_WIZARD=2;KalturaUiConfObjType.SIMPLE_EDITOR=3;KalturaUiConfObjType.ADVANCED_EDITOR=4;KalturaUiConfObjType.PLAYLIST=5;KalturaUiConfObjType.APP_STUDIO=6;function KalturaUiConfOrderBy(){}
+KalturaUiConfOrderBy.CREATED_AT_ASC="+createdAt";KalturaUiConfOrderBy.CREATED_AT_DESC="-createdAt";function KalturaUploadErrorCode(){}
+KalturaUploadErrorCode.NO_ERROR=0;KalturaUploadErrorCode.GENERAL_ERROR=1;KalturaUploadErrorCode.PARTIAL_UPLOAD=2;function KalturaUserOrderBy(){}
+KalturaUserOrderBy.CREATED_AT_ASC="+createdAt";KalturaUserOrderBy.CREATED_AT_DESC="-createdAt";function KalturaUserStatus(){}
+KalturaUserStatus.BLOCKED=0;KalturaUserStatus.ACTIVE=1;KalturaUserStatus.DELETED=2;function KalturaVideoCodec(){}
+KalturaVideoCodec.NONE="";KalturaVideoCodec.VP6="vp6";KalturaVideoCodec.H263="h263";KalturaVideoCodec.H264="h264";KalturaVideoCodec.FLV="flv";function KalturaWidgetOrderBy(){}
+KalturaWidgetOrderBy.CREATED_AT_ASC="+createdAt";KalturaWidgetOrderBy.CREATED_AT_DESC="-createdAt";function KalturaWidgetSecurityType(){}
+KalturaWidgetSecurityType.NONE=1;KalturaWidgetSecurityType.TIMEHASH=2;function KalturaYahooSyndicationFeedAdultValues(){}
+KalturaYahooSyndicationFeedAdultValues.ADULT="adult";KalturaYahooSyndicationFeedAdultValues.NON_ADULT="nonadult";function KalturaYahooSyndicationFeedCategories(){}
+KalturaYahooSyndicationFeedCategories.ACTION="Action";KalturaYahooSyndicationFeedCategories.ART_AND_ANIMATION="Art &amp; Animation";KalturaYahooSyndicationFeedCategories.ENTERTAINMENT_AND_TV="Entertainment &amp; TV";KalturaYahooSyndicationFeedCategories.FOOD="Food";KalturaYahooSyndicationFeedCategories.GAMES="Games";KalturaYahooSyndicationFeedCategories.HOW_TO="How-To";KalturaYahooSyndicationFeedCategories.MUSIC="Music";KalturaYahooSyndicationFeedCategories.PEOPLE_AND_VLOGS="People &amp; Vlogs";KalturaYahooSyndicationFeedCategories.SCIENCE_AND_ENVIRONMENT="Science &amp; Environment";KalturaYahooSyndicationFeedCategories.TRANSPORTATION="Transportation";KalturaYahooSyndicationFeedCategories.ANIMALS="Animals";KalturaYahooSyndicationFeedCategories.COMMERCIALS="Commercials";KalturaYahooSyndicationFeedCategories.FAMILY="Family";KalturaYahooSyndicationFeedCategories.FUNNY_VIDEOS="Funny Videos";KalturaYahooSyndicationFeedCategories.HEALTH_AND_BEAUTY="Health &amp; Beauty";KalturaYahooSyndicationFeedCategories.MOVIES_AND_SHORTS="Movies &amp; Shorts";KalturaYahooSyndicationFeedCategories.NEWS_AND_POLITICS="News &amp; Politics";KalturaYahooSyndicationFeedCategories.PRODUCTS_AND_TECH="Products &amp; Tech.";KalturaYahooSyndicationFeedCategories.SPORTS="Sports";KalturaYahooSyndicationFeedCategories.TRAVEL="Travel";function KalturaYahooSyndicationFeedOrderBy(){}
+KalturaYahooSyndicationFeedOrderBy.PLAYLIST_ID_ASC="+playlistId";KalturaYahooSyndicationFeedOrderBy.PLAYLIST_ID_DESC="-playlistId";KalturaYahooSyndicationFeedOrderBy.NAME_ASC="+name";KalturaYahooSyndicationFeedOrderBy.NAME_DESC="-name";KalturaYahooSyndicationFeedOrderBy.TYPE_ASC="+type";KalturaYahooSyndicationFeedOrderBy.TYPE_DESC="-type";KalturaYahooSyndicationFeedOrderBy.CREATED_AT_ASC="+createdAt";KalturaYahooSyndicationFeedOrderBy.CREATED_AT_DESC="-createdAt";function KalturaAccessControl(){this.id=null;this.partnerId=null;this.name=null;this.description=null;this.createdAt=null;this.isDefault=null;this.restrictions=null;}
+KalturaAccessControl.inheritsFrom(KalturaObjectBase);function KalturaAccessControlFilter(){this.idEqual=null;this.idIn=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;}
+KalturaAccessControlFilter.inheritsFrom(KalturaFilter);function KalturaAccessControlListResponse(){this.objects=null;this.totalCount=null;}
+KalturaAccessControlListResponse.inheritsFrom(KalturaObjectBase);function KalturaAdminUser(){this.password=null;this.email=null;this.screenName=null;}
+KalturaAdminUser.inheritsFrom(KalturaObjectBase);function KalturaBaseEntry(){this.id=null;this.name=null;this.description=null;this.partnerId=null;this.userId=null;this.tags=null;this.adminTags=null;this.categories=null;this.status=null;this.moderationStatus=null;this.moderationCount=null;this.type=null;this.createdAt=null;this.rank=null;this.totalRank=null;this.votes=null;this.groupId=null;this.partnerData=null;this.downloadUrl=null;this.searchText=null;this.licenseType=null;this.version=null;this.thumbnailUrl=null;this.accessControlId=null;this.startDate=null;this.endDate=null;}
+KalturaBaseEntry.inheritsFrom(KalturaObjectBase);function KalturaBaseEntryFilter(){this.idEqual=null;this.idIn=null;this.nameLike=null;this.nameMultiLikeOr=null;this.nameMultiLikeAnd=null;this.nameEqual=null;this.partnerIdEqual=null;this.partnerIdIn=null;this.userIdEqual=null;this.tagsLike=null;this.tagsMultiLikeOr=null;this.tagsMultiLikeAnd=null;this.adminTagsLike=null;this.adminTagsMultiLikeOr=null;this.adminTagsMultiLikeAnd=null;this.categoriesMatchAnd=null;this.categoriesMatchOr=null;this.statusEqual=null;this.statusNotEqual=null;this.statusIn=null;this.statusNotIn=null;this.moderationStatusEqual=null;this.moderationStatusNotEqual=null;this.moderationStatusIn=null;this.moderationStatusNotIn=null;this.typeEqual=null;this.typeIn=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;this.groupIdEqual=null;this.searchTextMatchAnd=null;this.searchTextMatchOr=null;this.accessControlIdEqual=null;this.accessControlIdIn=null;this.startDateGreaterThanOrEqual=null;this.startDateLessThanOrEqual=null;this.startDateGreaterThanOrEqualOrNull=null;this.startDateLessThanOrEqualOrNull=null;this.endDateGreaterThanOrEqual=null;this.endDateLessThanOrEqual=null;this.endDateGreaterThanOrEqualOrNull=null;this.endDateLessThanOrEqualOrNull=null;this.tagsNameMultiLikeOr=null;this.tagsAdminTagsMultiLikeOr=null;this.tagsAdminTagsNameMultiLikeOr=null;this.tagsNameMultiLikeAnd=null;this.tagsAdminTagsMultiLikeAnd=null;this.tagsAdminTagsNameMultiLikeAnd=null;}
+KalturaBaseEntryFilter.inheritsFrom(KalturaFilter);function KalturaBaseEntryListResponse(){this.objects=null;this.totalCount=null;}
+KalturaBaseEntryListResponse.inheritsFrom(KalturaObjectBase);function KalturaBaseJob(){this.id=null;this.partnerId=null;this.createdAt=null;this.updatedAt=null;this.deletedAt=null;this.processorExpiration=null;this.executionAttempts=null;}
+KalturaBaseJob.inheritsFrom(KalturaObjectBase);function KalturaBaseJobFilter(){this.idEqual=null;this.idGreaterThanOrEqual=null;this.partnerIdEqual=null;this.partnerIdIn=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;}
+KalturaBaseJobFilter.inheritsFrom(KalturaFilter);function KalturaBaseRestriction(){}
+KalturaBaseRestriction.inheritsFrom(KalturaObjectBase);function KalturaBaseSyndicationFeed(){this.id=null;this.feedUrl=null;this.partnerId=null;this.playlistId=null;this.name=null;this.status=null;this.type=null;this.landingPage=null;this.createdAt=null;this.allowEmbed=null;this.playerUiconfId=null;this.flavorParamId=null;this.transcodeExistingContent=null;this.addToDefaultConversionProfile=null;this.categories=null;}
+KalturaBaseSyndicationFeed.inheritsFrom(KalturaObjectBase);function KalturaBaseSyndicationFeedFilter(){}
+KalturaBaseSyndicationFeedFilter.inheritsFrom(KalturaFilter);function KalturaBaseSyndicationFeedListResponse(){this.objects=null;this.totalCount=null;}
+KalturaBaseSyndicationFeedListResponse.inheritsFrom(KalturaObjectBase);function KalturaBatchJob(){this.entryId=null;this.entryName=null;this.jobType=null;this.jobSubType=null;this.onStressDivertTo=null;this.data=null;this.status=null;this.abort=null;this.checkAgainTimeout=null;this.progress=null;this.message=null;this.description=null;this.updatesCount=null;this.priority=null;this.workGroupId=null;this.twinJobId=null;this.bulkJobId=null;this.parentJobId=null;this.rootJobId=null;this.queueTime=null;this.finishTime=null;this.errType=null;this.errNumber=null;this.fileSize=null;this.lastWorkerRemote=null;this.schedulerId=null;this.workerId=null;this.batchIndex=null;this.lastSchedulerId=null;this.lastWorkerId=null;this.dc=null;}
+KalturaBatchJob.inheritsFrom(KalturaBaseJob);function KalturaBatchJobFilter(){this.entryIdEqual=null;this.jobTypeEqual=null;this.jobTypeIn=null;this.jobTypeNotIn=null;this.jobSubTypeEqual=null;this.jobSubTypeIn=null;this.onStressDivertToIn=null;this.statusEqual=null;this.statusIn=null;this.workGroupIdIn=null;this.queueTimeGreaterThanOrEqual=null;this.queueTimeLessThanOrEqual=null;this.finishTimeGreaterThanOrEqual=null;this.finishTimeLessThanOrEqual=null;this.errTypeIn=null;this.fileSizeLessThan=null;this.fileSizeGreaterThan=null;}
+KalturaBatchJobFilter.inheritsFrom(KalturaBaseJobFilter);function KalturaBatchJobFilterExt(){this.jobTypeAndSubTypeIn=null;}
+KalturaBatchJobFilterExt.inheritsFrom(KalturaBatchJobFilter);function KalturaBatchJobListResponse(){this.objects=null;this.totalCount=null;}
+KalturaBatchJobListResponse.inheritsFrom(KalturaObjectBase);function KalturaBulkDownloadJobData(){this.entryIds=null;this.flavorParamsId=null;this.puserId=null;}
+KalturaBulkDownloadJobData.inheritsFrom(KalturaJobData);function KalturaBulkUpload(){this.id=null;this.uploadedBy=null;this.uploadedOn=null;this.numOfEntries=null;this.status=null;this.logFileUrl=null;this.csvFileUrl=null;this.results=null;}
+KalturaBulkUpload.inheritsFrom(KalturaObjectBase);function KalturaBulkUploadJobData(){this.userId=null;this.uploadedBy=null;this.conversionProfileId=null;this.csvFilePath=null;this.resultsFileLocalPath=null;this.resultsFileUrl=null;this.numOfEntries=null;this.csvVersion=null;}
+KalturaBulkUploadJobData.inheritsFrom(KalturaJobData);function KalturaBulkUploadListResponse(){this.objects=null;this.totalCount=null;}
+KalturaBulkUploadListResponse.inheritsFrom(KalturaObjectBase);function KalturaBulkUploadResult(){this.id=null;this.bulkUploadJobId=null;this.lineIndex=null;this.partnerId=null;this.entryId=null;this.entryStatus=null;this.rowData=null;this.title=null;this.description=null;this.tags=null;this.url=null;this.contentType=null;this.conversionProfileId=null;this.accessControlProfileId=null;this.category=null;this.scheduleStartDate=null;this.scheduleEndDate=null;this.thumbnailUrl=null;this.thumbnailSaved=null;this.partnerData=null;this.errorDescription=null;}
+KalturaBulkUploadResult.inheritsFrom(KalturaObjectBase);function KalturaCEError(){this.id=null;this.partnerId=null;this.browser=null;this.serverIp=null;this.serverOs=null;this.phpVersion=null;this.ceAdminEmail=null;this.type=null;this.description=null;this.data=null;}
+KalturaCEError.inheritsFrom(KalturaObjectBase);function KalturaCategory(){this.id=null;this.parentId=null;this.depth=null;this.partnerId=null;this.name=null;this.fullName=null;this.entriesCount=null;this.createdAt=null;}
+KalturaCategory.inheritsFrom(KalturaObjectBase);function KalturaCategoryFilter(){this.idEqual=null;this.idIn=null;this.parentIdEqual=null;this.parentIdIn=null;this.depthEqual=null;this.fullNameEqual=null;this.fullNameStartsWith=null;}
+KalturaCategoryFilter.inheritsFrom(KalturaFilter);function KalturaCategoryListResponse(){this.objects=null;this.totalCount=null;}
+KalturaCategoryListResponse.inheritsFrom(KalturaObjectBase);function KalturaClientNotification(){this.url=null;this.data=null;}
+KalturaClientNotification.inheritsFrom(KalturaObjectBase);function KalturaControlPanelCommandFilter(){this.idEqual=null;this.idIn=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;this.createdByIdEqual=null;this.typeEqual=null;this.typeIn=null;this.targetTypeEqual=null;this.targetTypeIn=null;this.statusEqual=null;this.statusIn=null;}
+KalturaControlPanelCommandFilter.inheritsFrom(KalturaFilter);function KalturaConvartableJobData(){this.srcFileSyncLocalPath=null;this.srcFileSyncRemoteUrl=null;this.flavorParamsOutputId=null;this.flavorParamsOutput=null;this.mediaInfoId=null;}
+KalturaConvartableJobData.inheritsFrom(KalturaJobData);function KalturaConversionProfile(){this.id=null;this.partnerId=null;this.name=null;this.description=null;this.createdAt=null;this.flavorParamsIds=null;this.isDefault=null;this.cropDimensions=null;this.clipStart=null;this.clipDuration=null;}
+KalturaConversionProfile.inheritsFrom(KalturaObjectBase);function KalturaConversionProfileFilter(){this.idEqual=null;this.idIn=null;}
+KalturaConversionProfileFilter.inheritsFrom(KalturaFilter);function KalturaConversionProfileListResponse(){this.objects=null;this.totalCount=null;}
+KalturaConversionProfileListResponse.inheritsFrom(KalturaObjectBase);function KalturaConvertJobData(){this.destFileSyncLocalPath=null;this.destFileSyncRemoteUrl=null;this.logFileSyncLocalPath=null;this.flavorAssetId=null;this.remoteMediaId=null;}
+KalturaConvertJobData.inheritsFrom(KalturaConvartableJobData);function KalturaConvertProfileJobData(){this.inputFileSyncLocalPath=null;this.thumbHeight=null;this.thumbBitrate=null;}
+KalturaConvertProfileJobData.inheritsFrom(KalturaJobData);function KalturaCountryRestriction(){this.countryRestrictionType=null;this.countryList=null;}
+KalturaCountryRestriction.inheritsFrom(KalturaBaseRestriction);function KalturaCropDimensions(){this.left=null;this.top=null;this.width=null;this.height=null;}
+KalturaCropDimensions.inheritsFrom(KalturaObjectBase);function KalturaDataEntry(){this.dataContent=null;}
+KalturaDataEntry.inheritsFrom(KalturaBaseEntry);function KalturaDataEntryFilter(){}
+KalturaDataEntryFilter.inheritsFrom(KalturaBaseEntryFilter);function KalturaDataListResponse(){this.objects=null;this.totalCount=null;}
+KalturaDataListResponse.inheritsFrom(KalturaObjectBase);function KalturaDirectoryRestriction(){this.directoryRestrictionType=null;}
+KalturaDirectoryRestriction.inheritsFrom(KalturaBaseRestriction);function KalturaDocumentEntry(){this.documentType=null;}
+KalturaDocumentEntry.inheritsFrom(KalturaBaseEntry);function KalturaDocumentEntryFilter(){this.documentTypeEqual=null;this.documentTypeIn=null;}
+KalturaDocumentEntryFilter.inheritsFrom(KalturaBaseEntryFilter);function KalturaEntryContextDataParams(){this.referrer=null;}
+KalturaEntryContextDataParams.inheritsFrom(KalturaObjectBase);function KalturaEntryContextDataResult(){this.isSiteRestricted=null;this.isCountryRestricted=null;this.isSessionRestricted=null;this.previewLength=null;this.isScheduledNow=null;this.isAdmin=null;}
+KalturaEntryContextDataResult.inheritsFrom(KalturaObjectBase);function KalturaExtractMediaJobData(){this.flavorAssetId=null;}
+KalturaExtractMediaJobData.inheritsFrom(KalturaConvartableJobData);function KalturaFileSync(){this.id=null;this.partnerId=null;this.objectType=null;this.objectId=null;this.version=null;this.objectSubType=null;this.dc=null;this.original=null;this.createdAt=null;this.updatedAt=null;this.readyAt=null;this.syncTime=null;this.status=null;this.fileType=null;this.linkedId=null;this.linkCount=null;this.fileRoot=null;this.filePath=null;this.fileSize=null;this.fileUrl=null;this.fileContent=null;}
+KalturaFileSync.inheritsFrom(KalturaObjectBase);function KalturaFileSyncFilter(){this.partnerIdEqual=null;this.objectTypeEqual=null;this.objectTypeIn=null;this.objectIdEqual=null;this.objectIdIn=null;this.versionEqual=null;this.versionIn=null;this.objectSubTypeEqual=null;this.objectSubTypeIn=null;this.dcEqual=null;this.dcIn=null;this.originalEqual=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;this.updatedAtGreaterThanOrEqual=null;this.updatedAtLessThanOrEqual=null;this.readyAtGreaterThanOrEqual=null;this.readyAtLessThanOrEqual=null;this.syncTimeGreaterThanOrEqual=null;this.syncTimeLessThanOrEqual=null;this.statusEqual=null;this.statusIn=null;this.fileTypeEqual=null;this.fileTypeIn=null;this.linkedIdEqual=null;this.linkCountGreaterThanOrEqual=null;this.linkCountLessThanOrEqual=null;this.fileSizeGreaterThanOrEqual=null;this.fileSizeLessThanOrEqual=null;}
+KalturaFileSyncFilter.inheritsFrom(KalturaFilter);function KalturaFileSyncListResponse(){this.objects=null;this.totalCount=null;}
+KalturaFileSyncListResponse.inheritsFrom(KalturaObjectBase);function KalturaFilter(){this.orderBy=null;}
+KalturaFilter.inheritsFrom(KalturaObjectBase);function KalturaFilterPager(){this.pageSize=null;this.pageIndex=null;}
+KalturaFilterPager.inheritsFrom(KalturaObjectBase);function KalturaFlattenJobData(){}
+KalturaFlattenJobData.inheritsFrom(KalturaJobData);function KalturaFlavorAsset(){this.id=null;this.entryId=null;this.partnerId=null;this.status=null;this.flavorParamsId=null;this.version=null;this.width=null;this.height=null;this.bitrate=null;this.frameRate=null;this.size=null;this.isOriginal=null;this.tags=null;this.isWeb=null;this.fileExt=null;this.containerFormat=null;this.videoCodecId=null;this.createdAt=null;this.updatedAt=null;this.deletedAt=null;this.description=null;}
+KalturaFlavorAsset.inheritsFrom(KalturaObjectBase);function KalturaFlavorAssetWithParams(){this.flavorAsset=null;this.flavorParams=null;this.entryId=null;}
+KalturaFlavorAssetWithParams.inheritsFrom(KalturaObjectBase);function KalturaFlavorParams(){this.id=null;this.partnerId=null;this.name=null;this.description=null;this.createdAt=null;this.isSystemDefault=null;this.tags=null;this.format=null;this.videoCodec=null;this.videoBitrate=null;this.audioCodec=null;this.audioBitrate=null;this.audioChannels=null;this.audioSampleRate=null;this.width=null;this.height=null;this.frameRate=null;this.gopSize=null;this.conversionEngines=null;this.conversionEnginesExtraParams=null;this.twoPass=null;}
+KalturaFlavorParams.inheritsFrom(KalturaObjectBase);function KalturaFlavorParamsFilter(){this.isSystemDefaultEqual=null;}
+KalturaFlavorParamsFilter.inheritsFrom(KalturaFilter);function KalturaFlavorParamsListResponse(){this.objects=null;this.totalCount=null;}
+KalturaFlavorParamsListResponse.inheritsFrom(KalturaObjectBase);function KalturaFlavorParamsOutput(){this.flavorParamsId=null;this.commandLinesStr=null;this.flavorParamsVersion=null;this.flavorAssetId=null;this.flavorAssetVersion=null;}
+KalturaFlavorParamsOutput.inheritsFrom(KalturaFlavorParams);function KalturaFlavorParamsOutputFilter(){this.flavorParamsIdEqual=null;this.flavorParamsVersionEqual=null;this.flavorAssetIdEqual=null;this.flavorAssetVersionEqual=null;}
+KalturaFlavorParamsOutputFilter.inheritsFrom(KalturaFlavorParamsFilter);function KalturaFlavorParamsOutputListResponse(){this.objects=null;this.totalCount=null;}
+KalturaFlavorParamsOutputListResponse.inheritsFrom(KalturaObjectBase);function KalturaGoogleVideoSyndicationFeed(){this.adultContent=null;}
+KalturaGoogleVideoSyndicationFeed.inheritsFrom(KalturaBaseSyndicationFeed);function KalturaGoogleVideoSyndicationFeedFilter(){}
+KalturaGoogleVideoSyndicationFeedFilter.inheritsFrom(KalturaBaseSyndicationFeedFilter);function KalturaITunesSyndicationFeed(){this.feedDescription=null;this.language=null;this.feedLandingPage=null;this.ownerName=null;this.ownerEmail=null;this.feedImageUrl=null;this.category=null;this.adultContent=null;this.feedAuthor=null;}
+KalturaITunesSyndicationFeed.inheritsFrom(KalturaBaseSyndicationFeed);function KalturaITunesSyndicationFeedFilter(){}
+KalturaITunesSyndicationFeedFilter.inheritsFrom(KalturaBaseSyndicationFeedFilter);function KalturaImportJobData(){this.srcFileUrl=null;this.destFileLocalPath=null;this.flavorAssetId=null;}
+KalturaImportJobData.inheritsFrom(KalturaJobData);function KalturaJobData(){}
+KalturaJobData.inheritsFrom(KalturaObjectBase);function KalturaMailJob(){this.mailType=null;this.mailPriority=null;this.status=null;this.recipientName=null;this.recipientEmail=null;this.recipientId=null;this.fromName=null;this.fromEmail=null;this.bodyParams=null;this.subjectParams=null;this.templatePath=null;this.culture=null;this.campaignId=null;this.minSendDate=null;}
+KalturaMailJob.inheritsFrom(KalturaBaseJob);function KalturaMailJobData(){this.mailType=null;this.mailPriority=null;this.status=null;this.recipientName=null;this.recipientEmail=null;this.recipientId=null;this.fromName=null;this.fromEmail=null;this.bodyParams=null;this.subjectParams=null;this.templatePath=null;this.culture=null;this.campaignId=null;this.minSendDate=null;this.isHtml=null;}
+KalturaMailJobData.inheritsFrom(KalturaJobData);function KalturaMailJobFilter(){}
+KalturaMailJobFilter.inheritsFrom(KalturaBaseJobFilter);function KalturaMediaEntry(){this.mediaType=null;this.conversionQuality=null;this.sourceType=null;this.searchProviderType=null;this.searchProviderId=null;this.creditUserName=null;this.creditUrl=null;this.mediaDate=null;this.dataUrl=null;this.flavorParamsIds=null;}
+KalturaMediaEntry.inheritsFrom(KalturaPlayableEntry);function KalturaMediaEntryFilter(){this.mediaTypeEqual=null;this.mediaTypeIn=null;this.mediaDateGreaterThanOrEqual=null;this.mediaDateLessThanOrEqual=null;this.flavorParamsIdsMatchOr=null;this.flavorParamsIdsMatchAnd=null;}
+KalturaMediaEntryFilter.inheritsFrom(KalturaPlayableEntryFilter);function KalturaMediaEntryFilterForPlaylist(){this.limit=null;}
+KalturaMediaEntryFilterForPlaylist.inheritsFrom(KalturaMediaEntryFilter);function KalturaMediaInfo(){this.id=null;this.flavorAssetId=null;this.fileSize=null;this.containerFormat=null;this.containerId=null;this.containerProfile=null;this.containerDuration=null;this.containerBitRate=null;this.videoFormat=null;this.videoCodecId=null;this.videoDuration=null;this.videoBitRate=null;this.videoBitRateMode=null;this.videoWidth=null;this.videoHeight=null;this.videoFrameRate=null;this.videoDar=null;this.videoRotation=null;this.audioFormat=null;this.audioCodecId=null;this.audioDuration=null;this.audioBitRate=null;this.audioBitRateMode=null;this.audioChannels=null;this.audioSamplingRate=null;this.audioResolution=null;this.writingLib=null;this.rawData=null;}
+KalturaMediaInfo.inheritsFrom(KalturaObjectBase);function KalturaMediaInfoFilter(){this.flavorAssetIdEqual=null;}
+KalturaMediaInfoFilter.inheritsFrom(KalturaFilter);function KalturaMediaInfoListResponse(){this.objects=null;this.totalCount=null;}
+KalturaMediaInfoListResponse.inheritsFrom(KalturaObjectBase);function KalturaMediaListResponse(){this.objects=null;this.totalCount=null;}
+KalturaMediaListResponse.inheritsFrom(KalturaObjectBase);function KalturaMixEntry(){this.hasRealThumbnail=null;this.editorType=null;this.dataContent=null;}
+KalturaMixEntry.inheritsFrom(KalturaPlayableEntry);function KalturaMixEntryFilter(){}
+KalturaMixEntryFilter.inheritsFrom(KalturaPlayableEntryFilter);function KalturaMixListResponse(){this.objects=null;this.totalCount=null;}
+KalturaMixListResponse.inheritsFrom(KalturaObjectBase);function KalturaModerationFlag(){this.id=null;this.partnerId=null;this.userId=null;this.moderationObjectType=null;this.flaggedEntryId=null;this.flaggedUserId=null;this.status=null;this.comments=null;this.flagType=null;this.createdAt=null;this.updatedAt=null;}
+KalturaModerationFlag.inheritsFrom(KalturaObjectBase);function KalturaModerationFlagListResponse(){this.objects=null;this.totalCount=null;}
+KalturaModerationFlagListResponse.inheritsFrom(KalturaObjectBase);function KalturaNotification(){this.puserId=null;this.type=null;this.objectId=null;this.status=null;this.notificationData=null;this.numberOfAttempts=null;this.notificationResult=null;this.objType=null;}
+KalturaNotification.inheritsFrom(KalturaBaseJob);function KalturaNotificationFilter(){}
+KalturaNotificationFilter.inheritsFrom(KalturaBaseJobFilter);function KalturaNotificationJobData(){this.userId=null;this.type=null;this.typeAsString=null;this.objectId=null;this.status=null;this.data=null;this.numberOfAttempts=null;this.notificationResult=null;this.objType=null;}
+KalturaNotificationJobData.inheritsFrom(KalturaJobData);function KalturaPartner(){this.id=null;this.name=null;this.website=null;this.notificationUrl=null;this.appearInSearch=null;this.createdAt=null;this.adminName=null;this.adminEmail=null;this.description=null;this.commercialUse=null;this.landingPage=null;this.userLandingPage=null;this.contentCategories=null;this.type=null;this.phone=null;this.describeYourself=null;this.adultContent=null;this.defConversionProfileType=null;this.notify=null;this.status=null;this.allowQuickEdit=null;this.mergeEntryLists=null;this.notificationsConfig=null;this.maxUploadSize=null;this.partnerPackage=null;this.secret=null;this.adminSecret=null;this.cmsPassword=null;this.allowMultiNotification=null;}
+KalturaPartner.inheritsFrom(KalturaObjectBase);function KalturaPartnerFilter(){this.idEqual=null;this.idIn=null;this.nameLike=null;this.nameMultiLikeOr=null;this.nameMultiLikeAnd=null;this.nameEqual=null;this.statusEqual=null;this.statusIn=null;this.partnerNameDescriptionWebsiteAdminNameAdminEmailLike=null;}
+KalturaPartnerFilter.inheritsFrom(KalturaFilter);function KalturaPartnerListResponse(){this.objects=null;this.totalCount=null;}
+KalturaPartnerListResponse.inheritsFrom(KalturaObjectBase);function KalturaPartnerUsage(){this.hostingGB=null;this.Percent=null;this.packageBW=null;this.usageGB=null;this.reachedLimitDate=null;this.usageGraph=null;}
+KalturaPartnerUsage.inheritsFrom(KalturaObjectBase);function KalturaPlayableEntry(){this.plays=null;this.views=null;this.width=null;this.height=null;this.duration=null;this.durationType=null;}
+KalturaPlayableEntry.inheritsFrom(KalturaBaseEntry);function KalturaPlayableEntryFilter(){this.durationLessThan=null;this.durationGreaterThan=null;this.durationLessThanOrEqual=null;this.durationGreaterThanOrEqual=null;this.durationTypeMatchOr=null;}
+KalturaPlayableEntryFilter.inheritsFrom(KalturaBaseEntryFilter);function KalturaPlaylist(){this.playlistContent=null;this.filters=null;this.totalResults=null;this.playlistType=null;this.plays=null;this.views=null;this.duration=null;}
+KalturaPlaylist.inheritsFrom(KalturaBaseEntry);function KalturaPlaylistFilter(){}
+KalturaPlaylistFilter.inheritsFrom(KalturaBaseEntryFilter);function KalturaPlaylistListResponse(){this.objects=null;this.totalCount=null;}
+KalturaPlaylistListResponse.inheritsFrom(KalturaObjectBase);function KalturaPostConvertJobData(){this.srcFileSyncLocalPath=null;this.flavorAssetId=null;this.createThumb=null;this.thumbPath=null;this.thumbOffset=null;this.thumbHeight=null;this.thumbBitrate=null;this.flavorParamsOutputId=null;}
+KalturaPostConvertJobData.inheritsFrom(KalturaJobData);function KalturaPreviewRestriction(){this.previewLength=null;}
+KalturaPreviewRestriction.inheritsFrom(KalturaSessionRestriction);function KalturaPullJobData(){this.srcFileUrl=null;this.destFileLocalPath=null;}
+KalturaPullJobData.inheritsFrom(KalturaJobData);function KalturaRemoteConvertJobData(){this.srcFileUrl=null;this.destFileUrl=null;}
+KalturaRemoteConvertJobData.inheritsFrom(KalturaConvartableJobData);function KalturaReportGraph(){this.id=null;this.data=null;}
+KalturaReportGraph.inheritsFrom(KalturaObjectBase);function KalturaReportInputFilter(){this.fromDate=null;this.toDate=null;this.keywords=null;this.searchInTags=null;this.searchInAdminTags=null;this.categories=null;}
+KalturaReportInputFilter.inheritsFrom(KalturaObjectBase);function KalturaReportTable(){this.header=null;this.data=null;this.totalCount=null;}
+KalturaReportTable.inheritsFrom(KalturaObjectBase);function KalturaReportTotal(){this.header=null;this.data=null;}
+KalturaReportTotal.inheritsFrom(KalturaObjectBase);function KalturaSearch(){this.keyWords=null;this.searchSource=null;this.mediaType=null;this.extraData=null;this.authData=null;}
+KalturaSearch.inheritsFrom(KalturaObjectBase);function KalturaSearchAuthData(){this.authData=null;this.loginUrl=null;this.message=null;}
+KalturaSearchAuthData.inheritsFrom(KalturaObjectBase);function KalturaSearchResult(){this.id=null;this.title=null;this.thumbUrl=null;this.description=null;this.tags=null;this.url=null;this.sourceLink=null;this.credit=null;this.licenseType=null;this.flashPlaybackType=null;}
+KalturaSearchResult.inheritsFrom(KalturaSearch);function KalturaSearchResultResponse(){this.objects=null;this.needMediaInfo=null;}
+KalturaSearchResultResponse.inheritsFrom(KalturaObjectBase);function KalturaSessionRestriction(){}
+KalturaSessionRestriction.inheritsFrom(KalturaBaseRestriction);function KalturaSiteRestriction(){this.siteRestrictionType=null;this.siteList=null;}
+KalturaSiteRestriction.inheritsFrom(KalturaBaseRestriction);function KalturaStartWidgetSessionResponse(){this.partnerId=null;this.ks=null;this.userId=null;}
+KalturaStartWidgetSessionResponse.inheritsFrom(KalturaObjectBase);function KalturaStatsEvent(){this.clientVer=null;this.eventType=null;this.eventTimestamp=null;this.sessionId=null;this.partnerId=null;this.entryId=null;this.uniqueViewer=null;this.widgetId=null;this.uiconfId=null;this.userId=null;this.currentPoint=null;this.duration=null;this.userIp=null;this.processDuration=null;this.controlId=null;this.seek=null;this.newPoint=null;this.referrer=null;this.isFirstInSession=null;}
+KalturaStatsEvent.inheritsFrom(KalturaObjectBase);function KalturaStatsKmcEvent(){this.clientVer=null;this.kmcEventActionPath=null;this.kmcEventType=null;this.eventTimestamp=null;this.sessionId=null;this.partnerId=null;this.entryId=null;this.widgetId=null;this.uiconfId=null;this.userId=null;this.userIp=null;}
+KalturaStatsKmcEvent.inheritsFrom(KalturaObjectBase);function KalturaSyndicationFeedEntryCount(){this.totalEntryCount=null;this.actualEntryCount=null;this.requireTranscodingCount=null;}
+KalturaSyndicationFeedEntryCount.inheritsFrom(KalturaObjectBase);function KalturaSystemPartnerConfiguration(){this.host=null;this.cdnHost=null;this.maxBulkSize=null;this.partnerPackage=null;}
+KalturaSystemPartnerConfiguration.inheritsFrom(KalturaObjectBase);function KalturaSystemPartnerUsageFilter(){this.fromDate=null;this.toDate=null;}
+KalturaSystemPartnerUsageFilter.inheritsFrom(KalturaFilter);function KalturaSystemPartnerUsageItem(){this.partnerId=null;this.partnerName=null;this.partnerStatus=null;this.partnerPackage=null;this.partnerCreatedAt=null;this.views=null;this.plays=null;this.entriesCount=null;this.totalEntriesCount=null;this.videoEntriesCount=null;this.imageEntriesCount=null;this.audioEntriesCount=null;this.mixEntriesCount=null;this.bandwidth=null;this.totalStorage=null;this.storage=null;}
+KalturaSystemPartnerUsageItem.inheritsFrom(KalturaObjectBase);function KalturaSystemPartnerUsageListResponse(){this.objects=null;this.totalCount=null;}
+KalturaSystemPartnerUsageListResponse.inheritsFrom(KalturaObjectBase);function KalturaSystemUser(){this.id=null;this.email=null;this.firstName=null;this.lastName=null;this.password=null;this.createdBy=null;this.status=null;this.statusUpdatedAt=null;this.createdAt=null;}
+KalturaSystemUser.inheritsFrom(KalturaObjectBase);function KalturaSystemUserFilter(){}
+KalturaSystemUserFilter.inheritsFrom(KalturaFilter);function KalturaSystemUserListResponse(){this.objects=null;this.totalCount=null;}
+KalturaSystemUserListResponse.inheritsFrom(KalturaObjectBase);function KalturaTubeMogulSyndicationFeed(){this.category=null;}
+KalturaTubeMogulSyndicationFeed.inheritsFrom(KalturaBaseSyndicationFeed);function KalturaTubeMogulSyndicationFeedFilter(){}
+KalturaTubeMogulSyndicationFeedFilter.inheritsFrom(KalturaBaseSyndicationFeedFilter);function KalturaUiConf(){this.id=null;this.name=null;this.description=null;this.partnerId=null;this.objType=null;this.objTypeAsString=null;this.width=null;this.height=null;this.htmlParams=null;this.swfUrl=null;this.confFilePath=null;this.confFile=null;this.confFileFeatures=null;this.confVars=null;this.useCdn=null;this.tags=null;this.swfUrlVersion=null;this.createdAt=null;this.updatedAt=null;this.creationMode=null;}
+KalturaUiConf.inheritsFrom(KalturaObjectBase);function KalturaUiConfFilter(){this.idEqual=null;this.idIn=null;this.nameLike=null;this.objTypeEqual=null;this.tagsMultiLikeOr=null;this.tagsMultiLikeAnd=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;this.updatedAtGreaterThanOrEqual=null;this.updatedAtLessThanOrEqual=null;}
+KalturaUiConfFilter.inheritsFrom(KalturaFilter);function KalturaUiConfListResponse(){this.objects=null;this.totalCount=null;}
+KalturaUiConfListResponse.inheritsFrom(KalturaObjectBase);function KalturaUploadResponse(){this.uploadTokenId=null;this.fileSize=null;this.errorCode=null;this.errorDescription=null;}
+KalturaUploadResponse.inheritsFrom(KalturaObjectBase);function KalturaUser(){this.id=null;this.partnerId=null;this.screenName=null;this.fullName=null;this.email=null;this.dateOfBirth=null;this.country=null;this.state=null;this.city=null;this.zip=null;this.thumbnailUrl=null;this.description=null;this.tags=null;this.adminTags=null;this.gender=null;this.status=null;this.createdAt=null;this.updatedAt=null;this.partnerData=null;this.indexedPartnerDataInt=null;this.indexedPartnerDataString=null;this.storageSize=null;}
+KalturaUser.inheritsFrom(KalturaObjectBase);function KalturaUserFilter(){this.idEqual=null;this.idIn=null;this.partnerIdEqual=null;this.screenNameLike=null;this.screenNameStartsWith=null;this.emailLike=null;this.emailStartsWith=null;this.tagsMultiLikeOr=null;this.tagsMultiLikeAnd=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;}
+KalturaUserFilter.inheritsFrom(KalturaFilter);function KalturaUserListResponse(){this.objects=null;this.totalCount=null;}
+KalturaUserListResponse.inheritsFrom(KalturaObjectBase);function KalturaWidget(){this.id=null;this.sourceWidgetId=null;this.rootWidgetId=null;this.partnerId=null;this.entryId=null;this.uiConfId=null;this.securityType=null;this.securityPolicy=null;this.createdAt=null;this.updatedAt=null;this.partnerData=null;this.widgetHTML=null;}
+KalturaWidget.inheritsFrom(KalturaObjectBase);function KalturaWidgetFilter(){this.idEqual=null;this.idIn=null;this.sourceWidgetIdEqual=null;this.rootWidgetIdEqual=null;this.partnerIdEqual=null;this.entryIdEqual=null;this.uiConfIdEqual=null;this.createdAtGreaterThanOrEqual=null;this.createdAtLessThanOrEqual=null;this.updatedAtGreaterThanOrEqual=null;this.updatedAtLessThanOrEqual=null;this.partnerDataLike=null;}
+KalturaWidgetFilter.inheritsFrom(KalturaFilter);function KalturaWidgetListResponse(){this.objects=null;this.totalCount=null;}
+KalturaWidgetListResponse.inheritsFrom(KalturaObjectBase);function KalturaYahooSyndicationFeed(){this.category=null;this.adultContent=null;this.feedDescription=null;this.feedLandingPage=null;}
+KalturaYahooSyndicationFeed.inheritsFrom(KalturaBaseSyndicationFeed);function KalturaYahooSyndicationFeedFilter(){}
+KalturaYahooSyndicationFeedFilter.inheritsFrom(KalturaBaseSyndicationFeedFilter);function KalturaAccessControlService(client){this.init(client);}
+KalturaAccessControlService.inheritsFrom(KalturaServiceBase);KalturaAccessControlService.prototype.add=function(callback,accessControl){var kparams=new Object();this.client.addParam(kparams,"accessControl",toParams(accessControl));this.client.queueServiceActionCall("accessControl","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAccessControlService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("accessControl","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAccessControlService.prototype.update=function(callback,id,accessControl){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"accessControl",toParams(accessControl));this.client.queueServiceActionCall("accessControl","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAccessControlService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("accessControl","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAccessControlService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("accessControl","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaAdminconsoleService(client){this.init(client);}
+KalturaAdminconsoleService.inheritsFrom(KalturaServiceBase);KalturaAdminconsoleService.prototype.listBatchJobs=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("adminconsole","listBatchJobs",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaAdminUserService(client){this.init(client);}
+KalturaAdminUserService.inheritsFrom(KalturaServiceBase);KalturaAdminUserService.prototype.updatePassword=function(callback,email,password,newEmail,newPassword){if(!newEmail)
+newEmail="";if(!newPassword)
+newPassword="";var kparams=new Object();this.client.addParam(kparams,"email",email);this.client.addParam(kparams,"password",password);this.client.addParam(kparams,"newEmail",newEmail);this.client.addParam(kparams,"newPassword",newPassword);this.client.queueServiceActionCall("adminUser","updatePassword",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAdminUserService.prototype.resetPassword=function(callback,email){var kparams=new Object();this.client.addParam(kparams,"email",email);this.client.queueServiceActionCall("adminUser","resetPassword",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaAdminUserService.prototype.login=function(callback,email,password){var kparams=new Object();this.client.addParam(kparams,"email",email);this.client.addParam(kparams,"password",password);this.client.queueServiceActionCall("adminUser","login",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaBaseEntryService(client){this.init(client);}
+KalturaBaseEntryService.inheritsFrom(KalturaServiceBase);KalturaBaseEntryService.prototype.addFromUploadedFile=function(callback,entry,uploadTokenId,type){if(!type)
+type=-1;var kparams=new Object();this.client.addParam(kparams,"entry",toParams(entry));this.client.addParam(kparams,"uploadTokenId",uploadTokenId);this.client.addParam(kparams,"type",type);this.client.queueServiceActionCall("baseEntry","addFromUploadedFile",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.get=function(callback,entryId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("baseEntry","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.update=function(callback,entryId,baseEntry){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"baseEntry",toParams(baseEntry));this.client.queueServiceActionCall("baseEntry","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.getByIds=function(callback,entryIds){var kparams=new Object();this.client.addParam(kparams,"entryIds",entryIds);this.client.queueServiceActionCall("baseEntry","getByIds",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.deleteAction=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("baseEntry","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("baseEntry","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.count=function(callback,filter){if(!filter)
+filter=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));this.client.queueServiceActionCall("baseEntry","count",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.upload=function(callback,fileData){var kparams=new Object();kfiles=new Object();this.client.addParam(kfiles,"fileData",fileData);this.client.queueServiceActionCall("baseEntry","upload",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.updateThumbnailJpeg=function(callback,entryId,fileData){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);kfiles=new Object();this.client.addParam(kfiles,"fileData",fileData);this.client.queueServiceActionCall("baseEntry","updateThumbnailJpeg",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.updateThumbnailFromUrl=function(callback,entryId,url){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"url",url);this.client.queueServiceActionCall("baseEntry","updateThumbnailFromUrl",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.updateThumbnailFromSourceEntry=function(callback,entryId,sourceEntryId,timeOffset){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"sourceEntryId",sourceEntryId);this.client.addParam(kparams,"timeOffset",timeOffset);this.client.queueServiceActionCall("baseEntry","updateThumbnailFromSourceEntry",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.flag=function(callback,moderationFlag){var kparams=new Object();this.client.addParam(kparams,"moderationFlag",toParams(moderationFlag));this.client.queueServiceActionCall("baseEntry","flag",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.reject=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("baseEntry","reject",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.approve=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("baseEntry","approve",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.listFlags=function(callback,entryId,pager){if(!pager)
+pager=null;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("baseEntry","listFlags",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.anonymousRank=function(callback,entryId,rank){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"rank",rank);this.client.queueServiceActionCall("baseEntry","anonymousRank",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBaseEntryService.prototype.getContextData=function(callback,entryId,contextDataParams){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"contextDataParams",toParams(contextDataParams));this.client.queueServiceActionCall("baseEntry","getContextData",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaBulkUploadService(client){this.init(client);}
+KalturaBulkUploadService.inheritsFrom(KalturaServiceBase);KalturaBulkUploadService.prototype.add=function(callback,conversionProfileId,csvFileData){var kparams=new Object();this.client.addParam(kparams,"conversionProfileId",conversionProfileId);kfiles=new Object();this.client.addParam(kfiles,"csvFileData",csvFileData);this.client.queueServiceActionCall("bulkUpload","add",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBulkUploadService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("bulkUpload","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaBulkUploadService.prototype.listAction=function(callback,pager){if(!pager)
+pager=null;var kparams=new Object();if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("bulkUpload","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaCategoryService(client){this.init(client);}
+KalturaCategoryService.inheritsFrom(KalturaServiceBase);KalturaCategoryService.prototype.add=function(callback,category){var kparams=new Object();this.client.addParam(kparams,"category",toParams(category));this.client.queueServiceActionCall("category","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaCategoryService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("category","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaCategoryService.prototype.update=function(callback,id,category){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"category",toParams(category));this.client.queueServiceActionCall("category","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaCategoryService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("category","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaCategoryService.prototype.listAction=function(callback,filter){if(!filter)
+filter=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));this.client.queueServiceActionCall("category","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaConversionProfileService(client){this.init(client);}
+KalturaConversionProfileService.inheritsFrom(KalturaServiceBase);KalturaConversionProfileService.prototype.add=function(callback,conversionProfile){var kparams=new Object();this.client.addParam(kparams,"conversionProfile",toParams(conversionProfile));this.client.queueServiceActionCall("conversionProfile","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaConversionProfileService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("conversionProfile","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaConversionProfileService.prototype.update=function(callback,id,conversionProfile){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"conversionProfile",toParams(conversionProfile));this.client.queueServiceActionCall("conversionProfile","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaConversionProfileService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("conversionProfile","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaConversionProfileService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("conversionProfile","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaDataService(client){this.init(client);}
+KalturaDataService.inheritsFrom(KalturaServiceBase);KalturaDataService.prototype.add=function(callback,dataEntry){var kparams=new Object();this.client.addParam(kparams,"dataEntry",toParams(dataEntry));this.client.queueServiceActionCall("data","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaDataService.prototype.get=function(callback,entryId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("data","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaDataService.prototype.update=function(callback,entryId,documentEntry){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"documentEntry",toParams(documentEntry));this.client.queueServiceActionCall("data","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaDataService.prototype.deleteAction=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("data","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaDataService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("data","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaFlavorAssetService(client){this.init(client);}
+KalturaFlavorAssetService.inheritsFrom(KalturaServiceBase);KalturaFlavorAssetService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorAsset","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.getByEntryId=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("flavorAsset","getByEntryId",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.getWebPlayableByEntryId=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("flavorAsset","getWebPlayableByEntryId",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.convert=function(callback,entryId,flavorParamsId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"flavorParamsId",flavorParamsId);this.client.queueServiceActionCall("flavorAsset","convert",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.reconvert=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorAsset","reconvert",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorAsset","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.getDownloadUrl=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorAsset","getDownloadUrl",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorAssetService.prototype.getFlavorAssetsWithParams=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("flavorAsset","getFlavorAssetsWithParams",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaFlavorParamsService(client){this.init(client);}
+KalturaFlavorParamsService.inheritsFrom(KalturaServiceBase);KalturaFlavorParamsService.prototype.add=function(callback,flavorParams){var kparams=new Object();this.client.addParam(kparams,"flavorParams",toParams(flavorParams));this.client.queueServiceActionCall("flavorParams","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorParamsService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorParams","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorParamsService.prototype.update=function(callback,id,flavorParams){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"flavorParams",toParams(flavorParams));this.client.queueServiceActionCall("flavorParams","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorParamsService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("flavorParams","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorParamsService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("flavorParams","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaFlavorParamsService.prototype.getByConversionProfileId=function(callback,conversionProfileId){var kparams=new Object();this.client.addParam(kparams,"conversionProfileId",conversionProfileId);this.client.queueServiceActionCall("flavorParams","getByConversionProfileId",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaMediaService(client){this.init(client);}
+KalturaMediaService.inheritsFrom(KalturaServiceBase);KalturaMediaService.prototype.addFromBulk=function(callback,mediaEntry,url,bulkUploadId){var kparams=new Object();this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));this.client.addParam(kparams,"url",url);this.client.addParam(kparams,"bulkUploadId",bulkUploadId);this.client.queueServiceActionCall("media","addFromBulk",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.addFromUrl=function(callback,mediaEntry,url){var kparams=new Object();this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));this.client.addParam(kparams,"url",url);this.client.queueServiceActionCall("media","addFromUrl",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.addFromSearchResult=function(callback,mediaEntry,searchResult){if(!mediaEntry)
+mediaEntry=null;if(!searchResult)
+searchResult=null;var kparams=new Object();if(mediaEntry!=null)
+this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));if(searchResult!=null)
+this.client.addParam(kparams,"searchResult",toParams(searchResult));this.client.queueServiceActionCall("media","addFromSearchResult",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.addFromUploadedFile=function(callback,mediaEntry,uploadTokenId){var kparams=new Object();this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));this.client.addParam(kparams,"uploadTokenId",uploadTokenId);this.client.queueServiceActionCall("media","addFromUploadedFile",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.addFromRecordedWebcam=function(callback,mediaEntry,webcamTokenId){var kparams=new Object();this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));this.client.addParam(kparams,"webcamTokenId",webcamTokenId);this.client.queueServiceActionCall("media","addFromRecordedWebcam",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.get=function(callback,entryId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("media","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.update=function(callback,entryId,mediaEntry){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"mediaEntry",toParams(mediaEntry));this.client.queueServiceActionCall("media","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.deleteAction=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("media","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("media","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.count=function(callback,filter){if(!filter)
+filter=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));this.client.queueServiceActionCall("media","count",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.upload=function(callback,fileData){var kparams=new Object();kfiles=new Object();this.client.addParam(kfiles,"fileData",fileData);this.client.queueServiceActionCall("media","upload",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.updateThumbnail=function(callback,entryId,timeOffset){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"timeOffset",timeOffset);this.client.queueServiceActionCall("media","updateThumbnail",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.updateThumbnailFromSourceEntry=function(callback,entryId,sourceEntryId,timeOffset){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"sourceEntryId",sourceEntryId);this.client.addParam(kparams,"timeOffset",timeOffset);this.client.queueServiceActionCall("media","updateThumbnailFromSourceEntry",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.updateThumbnailJpeg=function(callback,entryId,fileData){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);kfiles=new Object();this.client.addParam(kfiles,"fileData",fileData);this.client.queueServiceActionCall("media","updateThumbnailJpeg",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.updateThumbnailFromUrl=function(callback,entryId,url){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"url",url);this.client.queueServiceActionCall("media","updateThumbnailFromUrl",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.requestConversion=function(callback,entryId,fileFormat){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"fileFormat",fileFormat);this.client.queueServiceActionCall("media","requestConversion",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.flag=function(callback,moderationFlag){var kparams=new Object();this.client.addParam(kparams,"moderationFlag",toParams(moderationFlag));this.client.queueServiceActionCall("media","flag",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.reject=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("media","reject",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.approve=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("media","approve",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.listFlags=function(callback,entryId,pager){if(!pager)
+pager=null;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("media","listFlags",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMediaService.prototype.anonymousRank=function(callback,entryId,rank){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"rank",rank);this.client.queueServiceActionCall("media","anonymousRank",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaMixingService(client){this.init(client);}
+KalturaMixingService.inheritsFrom(KalturaServiceBase);KalturaMixingService.prototype.add=function(callback,mixEntry){var kparams=new Object();this.client.addParam(kparams,"mixEntry",toParams(mixEntry));this.client.queueServiceActionCall("mixing","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.get=function(callback,entryId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("mixing","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.update=function(callback,entryId,mixEntry){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"mixEntry",toParams(mixEntry));this.client.queueServiceActionCall("mixing","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.deleteAction=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("mixing","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("mixing","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.count=function(callback,filter){if(!filter)
+filter=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));this.client.queueServiceActionCall("mixing","count",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.cloneAction=function(callback,entryId){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.queueServiceActionCall("mixing","clone",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.appendMediaEntry=function(callback,mixEntryId,mediaEntryId){var kparams=new Object();this.client.addParam(kparams,"mixEntryId",mixEntryId);this.client.addParam(kparams,"mediaEntryId",mediaEntryId);this.client.queueServiceActionCall("mixing","appendMediaEntry",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.requestFlattening=function(callback,entryId,fileFormat,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"fileFormat",fileFormat);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("mixing","requestFlattening",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.getMixesByMediaId=function(callback,mediaEntryId){var kparams=new Object();this.client.addParam(kparams,"mediaEntryId",mediaEntryId);this.client.queueServiceActionCall("mixing","getMixesByMediaId",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.getReadyMediaEntries=function(callback,mixId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"mixId",mixId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("mixing","getReadyMediaEntries",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaMixingService.prototype.anonymousRank=function(callback,entryId,rank){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"rank",rank);this.client.queueServiceActionCall("mixing","anonymousRank",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaNotificationService(client){this.init(client);}
+KalturaNotificationService.inheritsFrom(KalturaServiceBase);KalturaNotificationService.prototype.getClientNotification=function(callback,entryId,type){var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"type",type);this.client.queueServiceActionCall("notification","getClientNotification",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaPartnerService(client){this.init(client);}
+KalturaPartnerService.inheritsFrom(KalturaServiceBase);KalturaPartnerService.prototype.register=function(callback,partner,cmsPassword){if(!cmsPassword)
+cmsPassword="";var kparams=new Object();this.client.addParam(kparams,"partner",toParams(partner));this.client.addParam(kparams,"cmsPassword",cmsPassword);this.client.queueServiceActionCall("partner","register",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPartnerService.prototype.update=function(callback,partner,allowEmpty){if(!allowEmpty)
+allowEmpty=false;var kparams=new Object();this.client.addParam(kparams,"partner",toParams(partner));this.client.addParam(kparams,"allowEmpty",allowEmpty);this.client.queueServiceActionCall("partner","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPartnerService.prototype.getSecrets=function(callback,partnerId,adminEmail,cmsPassword){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.addParam(kparams,"adminEmail",adminEmail);this.client.addParam(kparams,"cmsPassword",cmsPassword);this.client.queueServiceActionCall("partner","getSecrets",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPartnerService.prototype.getInfo=function(callback){var kparams=new Object();this.client.queueServiceActionCall("partner","getInfo",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPartnerService.prototype.getUsage=function(callback,year,month,resolution){if(!year)
+year="";if(!month)
+month=1;if(!resolution)
+resolution="days";var kparams=new Object();this.client.addParam(kparams,"year",year);this.client.addParam(kparams,"month",month);this.client.addParam(kparams,"resolution",resolution);this.client.queueServiceActionCall("partner","getUsage",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaPlaylistService(client){this.init(client);}
+KalturaPlaylistService.inheritsFrom(KalturaServiceBase);KalturaPlaylistService.prototype.add=function(callback,playlist,updateStats){if(!updateStats)
+updateStats=false;var kparams=new Object();this.client.addParam(kparams,"playlist",toParams(playlist));this.client.addParam(kparams,"updateStats",updateStats);this.client.queueServiceActionCall("playlist","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.get=function(callback,id,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("playlist","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.update=function(callback,id,playlist,updateStats){if(!updateStats)
+updateStats=false;var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"playlist",toParams(playlist));this.client.addParam(kparams,"updateStats",updateStats);this.client.queueServiceActionCall("playlist","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("playlist","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("playlist","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.execute=function(callback,id,detailed){if(!detailed)
+detailed="";var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"detailed",detailed);this.client.queueServiceActionCall("playlist","execute",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.executeFromContent=function(callback,playlistType,playlistContent,detailed){if(!detailed)
+detailed="";var kparams=new Object();this.client.addParam(kparams,"playlistType",playlistType);this.client.addParam(kparams,"playlistContent",playlistContent);this.client.addParam(kparams,"detailed",detailed);this.client.queueServiceActionCall("playlist","executeFromContent",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.executeFromFilters=function(callback,filters,totalResults,detailed){if(!detailed)
+detailed="";var kparams=new Object();for(var index in filters)
+{var obj=filters[index];this.client.addParam(kparams,"filters:"+index,toParams(obj));}
+this.client.addParam(kparams,"totalResults",totalResults);this.client.addParam(kparams,"detailed",detailed);this.client.queueServiceActionCall("playlist","executeFromFilters",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaPlaylistService.prototype.getStatsFromContent=function(callback,playlistType,playlistContent){var kparams=new Object();this.client.addParam(kparams,"playlistType",playlistType);this.client.addParam(kparams,"playlistContent",playlistContent);this.client.queueServiceActionCall("playlist","getStatsFromContent",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaReportService(client){this.init(client);}
+KalturaReportService.inheritsFrom(KalturaServiceBase);KalturaReportService.prototype.getGraphs=function(callback,reportType,reportInputFilter,dimension,objectIds){if(!dimension)
+dimension="";if(!objectIds)
+objectIds="";var kparams=new Object();this.client.addParam(kparams,"reportType",reportType);this.client.addParam(kparams,"reportInputFilter",toParams(reportInputFilter));this.client.addParam(kparams,"dimension",dimension);this.client.addParam(kparams,"objectIds",objectIds);this.client.queueServiceActionCall("report","getGraphs",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaReportService.prototype.getTotal=function(callback,reportType,reportInputFilter,objectIds){if(!objectIds)
+objectIds="";var kparams=new Object();this.client.addParam(kparams,"reportType",reportType);this.client.addParam(kparams,"reportInputFilter",toParams(reportInputFilter));this.client.addParam(kparams,"objectIds",objectIds);this.client.queueServiceActionCall("report","getTotal",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaReportService.prototype.getTable=function(callback,reportType,reportInputFilter,pager,order,objectIds){if(!order)
+order="";if(!objectIds)
+objectIds="";var kparams=new Object();this.client.addParam(kparams,"reportType",reportType);this.client.addParam(kparams,"reportInputFilter",toParams(reportInputFilter));this.client.addParam(kparams,"pager",toParams(pager));this.client.addParam(kparams,"order",order);this.client.addParam(kparams,"objectIds",objectIds);this.client.queueServiceActionCall("report","getTable",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaReportService.prototype.getUrlForReportAsCsv=function(callback,reportTitle,reportText,headers,reportType,reportInputFilter,dimension,pager,order,objectIds){if(!dimension)
+dimension="";if(!pager)
+pager=null;if(!order)
+order="";if(!objectIds)
+objectIds="";var kparams=new Object();this.client.addParam(kparams,"reportTitle",reportTitle);this.client.addParam(kparams,"reportText",reportText);this.client.addParam(kparams,"headers",headers);this.client.addParam(kparams,"reportType",reportType);this.client.addParam(kparams,"reportInputFilter",toParams(reportInputFilter));this.client.addParam(kparams,"dimension",dimension);if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.addParam(kparams,"order",order);this.client.addParam(kparams,"objectIds",objectIds);this.client.queueServiceActionCall("report","getUrlForReportAsCsv",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSearchService(client){this.init(client);}
+KalturaSearchService.inheritsFrom(KalturaServiceBase);KalturaSearchService.prototype.search=function(callback,search,pager){if(!pager)
+pager=null;var kparams=new Object();this.client.addParam(kparams,"search",toParams(search));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("search","search",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSearchService.prototype.getMediaInfo=function(callback,searchResult){var kparams=new Object();this.client.addParam(kparams,"searchResult",toParams(searchResult));this.client.queueServiceActionCall("search","getMediaInfo",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSearchService.prototype.searchUrl=function(callback,mediaType,url){var kparams=new Object();this.client.addParam(kparams,"mediaType",mediaType);this.client.addParam(kparams,"url",url);this.client.queueServiceActionCall("search","searchUrl",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSearchService.prototype.externalLogin=function(callback,searchSource,userName,password){var kparams=new Object();this.client.addParam(kparams,"searchSource",searchSource);this.client.addParam(kparams,"userName",userName);this.client.addParam(kparams,"password",password);this.client.queueServiceActionCall("search","externalLogin",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSessionService(client){this.init(client);}
+KalturaSessionService.inheritsFrom(KalturaServiceBase);KalturaSessionService.prototype.start=function(callback,secret,userId,type,partnerId,expiry,privileges){if(!userId)
+userId="";if(!type)
+type=0;if(!partnerId)
+partnerId=-1;if(!expiry)
+expiry=86400;if(!privileges)
+privileges="";var kparams=new Object();this.client.addParam(kparams,"secret",secret);this.client.addParam(kparams,"userId",userId);this.client.addParam(kparams,"type",type);this.client.addParam(kparams,"partnerId",partnerId);this.client.addParam(kparams,"expiry",expiry);this.client.addParam(kparams,"privileges",privileges);this.client.queueServiceActionCall("session","start",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSessionService.prototype.startWidgetSession=function(callback,widgetId,expiry){if(!expiry)
+expiry=86400;var kparams=new Object();this.client.addParam(kparams,"widgetId",widgetId);this.client.addParam(kparams,"expiry",expiry);this.client.queueServiceActionCall("session","startWidgetSession",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaStatsService(client){this.init(client);}
+KalturaStatsService.inheritsFrom(KalturaServiceBase);KalturaStatsService.prototype.collect=function(callback,event){var kparams=new Object();this.client.addParam(kparams,"event",toParams(event));this.client.queueServiceActionCall("stats","collect",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaStatsService.prototype.kmcCollect=function(callback,kmcEvent){var kparams=new Object();this.client.addParam(kparams,"kmcEvent",toParams(kmcEvent));this.client.queueServiceActionCall("stats","kmcCollect",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaStatsService.prototype.reportKceError=function(callback,kalturaCEError){var kparams=new Object();this.client.addParam(kparams,"kalturaCEError",toParams(kalturaCEError));this.client.queueServiceActionCall("stats","reportKceError",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSyndicationFeedService(client){this.init(client);}
+KalturaSyndicationFeedService.inheritsFrom(KalturaServiceBase);KalturaSyndicationFeedService.prototype.add=function(callback,syndicationFeed){var kparams=new Object();this.client.addParam(kparams,"syndicationFeed",toParams(syndicationFeed));this.client.queueServiceActionCall("syndicationFeed","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("syndicationFeed","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.update=function(callback,id,syndicationFeed){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"syndicationFeed",toParams(syndicationFeed));this.client.queueServiceActionCall("syndicationFeed","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("syndicationFeed","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("syndicationFeed","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.getEntryCount=function(callback,feedId){var kparams=new Object();this.client.addParam(kparams,"feedId",feedId);this.client.queueServiceActionCall("syndicationFeed","getEntryCount",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSyndicationFeedService.prototype.requestConversion=function(callback,feedId){var kparams=new Object();this.client.addParam(kparams,"feedId",feedId);this.client.queueServiceActionCall("syndicationFeed","requestConversion",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSystemService(client){this.init(client);}
+KalturaSystemService.inheritsFrom(KalturaServiceBase);KalturaSystemService.prototype.ping=function(callback){var kparams=new Object();this.client.queueServiceActionCall("system","ping",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaUiConfService(client){this.init(client);}
+KalturaUiConfService.inheritsFrom(KalturaServiceBase);KalturaUiConfService.prototype.add=function(callback,uiConf){var kparams=new Object();this.client.addParam(kparams,"uiConf",toParams(uiConf));this.client.queueServiceActionCall("uiConf","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.update=function(callback,id,uiConf){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"uiConf",toParams(uiConf));this.client.queueServiceActionCall("uiConf","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("uiConf","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.deleteAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("uiConf","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.cloneAction=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("uiConf","clone",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.listTemplates=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("uiConf","listTemplates",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUiConfService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("uiConf","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaUploadService(client){this.init(client);}
+KalturaUploadService.inheritsFrom(KalturaServiceBase);KalturaUploadService.prototype.upload=function(callback,fileData){var kparams=new Object();kfiles=new Object();this.client.addParam(kfiles,"fileData",fileData);this.client.queueServiceActionCall("upload","upload",kparams,kfiles);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUploadService.prototype.getUploadedFileTokenByFileName=function(callback,fileName){var kparams=new Object();this.client.addParam(kparams,"fileName",fileName);this.client.queueServiceActionCall("upload","getUploadedFileTokenByFileName",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaUserService(client){this.init(client);}
+KalturaUserService.inheritsFrom(KalturaServiceBase);KalturaUserService.prototype.add=function(callback,user){var kparams=new Object();this.client.addParam(kparams,"user",toParams(user));this.client.queueServiceActionCall("user","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUserService.prototype.update=function(callback,userId,user){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.addParam(kparams,"user",toParams(user));this.client.queueServiceActionCall("user","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUserService.prototype.get=function(callback,userId){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.queueServiceActionCall("user","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUserService.prototype.deleteAction=function(callback,userId){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.queueServiceActionCall("user","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUserService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("user","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaUserService.prototype.notifyBan=function(callback,userId){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.queueServiceActionCall("user","notifyBan",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaWidgetService(client){this.init(client);}
+KalturaWidgetService.inheritsFrom(KalturaServiceBase);KalturaWidgetService.prototype.add=function(callback,widget){var kparams=new Object();this.client.addParam(kparams,"widget",toParams(widget));this.client.queueServiceActionCall("widget","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaWidgetService.prototype.update=function(callback,id,widget){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.addParam(kparams,"widget",toParams(widget));this.client.queueServiceActionCall("widget","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaWidgetService.prototype.get=function(callback,id){var kparams=new Object();this.client.addParam(kparams,"id",id);this.client.queueServiceActionCall("widget","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaWidgetService.prototype.cloneAction=function(callback,widget){var kparams=new Object();this.client.addParam(kparams,"widget",toParams(widget));this.client.queueServiceActionCall("widget","clone",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaWidgetService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("widget","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaXInternalService(client){this.init(client);}
+KalturaXInternalService.inheritsFrom(KalturaServiceBase);KalturaXInternalService.prototype.xAddBulkDownload=function(callback,entryIds,flavorParamsId){if(!flavorParamsId)
+flavorParamsId="";var kparams=new Object();this.client.addParam(kparams,"entryIds",entryIds);this.client.addParam(kparams,"flavorParamsId",flavorParamsId);this.client.queueServiceActionCall("xInternal","xAddBulkDownload",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSystemUserService(client){this.init(client);}
+KalturaSystemUserService.inheritsFrom(KalturaServiceBase);KalturaSystemUserService.prototype.verifyPassword=function(callback,email,password){var kparams=new Object();this.client.addParam(kparams,"email",email);this.client.addParam(kparams,"password",password);this.client.queueServiceActionCall("systemUser","verifyPassword",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.generateNewPassword=function(callback){var kparams=new Object();this.client.queueServiceActionCall("systemUser","generateNewPassword",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.setNewPassword=function(callback,userId,password){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.addParam(kparams,"password",password);this.client.queueServiceActionCall("systemUser","setNewPassword",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.add=function(callback,systemUser){var kparams=new Object();this.client.addParam(kparams,"systemUser",toParams(systemUser));this.client.queueServiceActionCall("systemUser","add",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.get=function(callback,userId){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.queueServiceActionCall("systemUser","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.getByEmail=function(callback,email){var kparams=new Object();this.client.addParam(kparams,"email",email);this.client.queueServiceActionCall("systemUser","getByEmail",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.update=function(callback,userId,systemUser){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.addParam(kparams,"systemUser",toParams(systemUser));this.client.queueServiceActionCall("systemUser","update",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.deleteAction=function(callback,userId){var kparams=new Object();this.client.addParam(kparams,"userId",userId);this.client.queueServiceActionCall("systemUser","delete",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemUserService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("systemUser","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaSystemPartnerService(client){this.init(client);}
+KalturaSystemPartnerService.inheritsFrom(KalturaServiceBase);KalturaSystemPartnerService.prototype.get=function(callback,partnerId){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.queueServiceActionCall("systemPartner","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.getUsage=function(callback,partnerFilter,usageFilter,pager){if(!partnerFilter)
+partnerFilter=null;if(!usageFilter)
+usageFilter=null;if(!pager)
+pager=null;var kparams=new Object();if(partnerFilter!=null)
+this.client.addParam(kparams,"partnerFilter",toParams(partnerFilter));if(usageFilter!=null)
+this.client.addParam(kparams,"usageFilter",toParams(usageFilter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("systemPartner","getUsage",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("systemPartner","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.updateStatus=function(callback,partnerId,status){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.addParam(kparams,"status",status);this.client.queueServiceActionCall("systemPartner","updateStatus",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.getAdminSession=function(callback,partnerId){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.queueServiceActionCall("systemPartner","getAdminSession",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.updateConfiguration=function(callback,partnerId,configuration){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.addParam(kparams,"configuration",toParams(configuration));this.client.queueServiceActionCall("systemPartner","updateConfiguration",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+KalturaSystemPartnerService.prototype.getConfiguration=function(callback,partnerId){var kparams=new Object();this.client.addParam(kparams,"partnerId",partnerId);this.client.queueServiceActionCall("systemPartner","getConfiguration",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaFileSyncService(client){this.init(client);}
+KalturaFileSyncService.inheritsFrom(KalturaServiceBase);KalturaFileSyncService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("fileSync","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaFlavorParamsOutputService(client){this.init(client);}
+KalturaFlavorParamsOutputService.inheritsFrom(KalturaServiceBase);KalturaFlavorParamsOutputService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("flavorParamsOutput","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaMediaInfoService(client){this.init(client);}
+KalturaMediaInfoService.inheritsFrom(KalturaServiceBase);KalturaMediaInfoService.prototype.listAction=function(callback,filter,pager){if(!filter)
+filter=null;if(!pager)
+pager=null;var kparams=new Object();if(filter!=null)
+this.client.addParam(kparams,"filter",toParams(filter));if(pager!=null)
+this.client.addParam(kparams,"pager",toParams(pager));this.client.queueServiceActionCall("mediaInfo","list",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);}
+function KalturaEntryAdminService(client){this.init(client);}
+KalturaEntryAdminService.inheritsFrom(KalturaServiceBase);KalturaEntryAdminService.prototype.get=function(callback,entryId,version){if(!version)
+version=-1;var kparams=new Object();this.client.addParam(kparams,"entryId",entryId);this.client.addParam(kparams,"version",version);this.client.queueServiceActionCall("entryAdmin","get",kparams);if(!this.client.isMultiRequest())
+this.client.doQueue(callback);};
+
+/**
+ *
+ * @author Moxiecode
+ * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ *
+ * @copyright Copyright (C) 2010 Open Society Institute
+ * @author Thomas Moroz: tmoroz@sorosny.org
+ *
+ */
+
+(function() {
+
+    //
+    // A console.log replacement that works on all browsers
+    // If the browser does not have a console, it's silent
+    //
+    // usage: log('This happened.');
+    // or:    log('Variables:', var1, var2, var3);
+    //
+    var log = function() {
+        if (window.console && console.log) {
+            // log for FireBug or WebKit console
+            console.log(Array.prototype.slice.call(arguments));
+        }
+    };
+
+    tinymce.create('tinymce.plugins.Kaltura', {
+        /**
+         * Initializes the plugin, this will be executed after the plugin has been created.
+         * This call is done before the editor instance has finished it's initialization so use the onInit event
+         * of the editor instance to intercept that event.
+         *
+         * @param {tinymce.Editor} ed Editor instance that the plugin is initialized in.
+         * @param {string} url Absolute URL to where the plugin is located.
+         */
+        init : function(ed, url) {
+            var self = this;
+            var t = this;
+            this._url = url
+            this.editor = ed;
+
+            this.entry_ids = [];
+
+            ed.onInit.add(function() {
+                //ed.dom.loadCSS(url + "/css/ui.css");
+            });
+            function isMedia(n) {
+                // XXX Need to check if this is a kaltura resource!
+                return /^mceItemFlash$/.test(n.className);
+            }; 
+            
+             // Register commands
+            ed.addCommand('mceKaltura', function() {
+                log('button pressed');
+
+                var callback = function(success, session_key) {
+                    if (success) {
+
+                        log('We have a session', session_key);
+                        self.session_key = session_key;
+                        self.flashVars = {
+                            uid: self.local_user,
+                            partnerId: self.partner_id,
+                            ks: session_key,
+                            afterAddEntry: '_onContributionWizardAddEntry',
+                            close: '_onContributionWizardClose',
+                            showCloseButton: true,
+                            Permissions: 1
+                        };
+                        window._onContributionWizardAddEntry = function(entries) {self._onContributionWizardAddEntry(entries);},
+                        window._onContributionWizardClose = function() {self._onContributionWizardClose();},
+
+                        // delete the old entry
+                        this.entry_ids = [];
+                        self._createDialog();
+                        self.dialog.dialog('open');
+                    } else {
+                        alert('Session creation failed');
+                    }
+                };
+
+                self._requestKalturaSession(callback);
+
+                log('session requested');
+                
+            });
+
+            // Register buttons
+            ed.addButton('kaltura', {
+                title : 'kaltura.kaltura_button_desc',
+                image: url+ '/images/interactive_video_button.gif',
+                cmd : 'mceKaltura'
+            });
+
+
+            ed.onNodeChange.add(function(ed, cm, n) {
+                    cm.setActive('kaltura', n.nodeName == 'IMG' && isMedia(n));
+            });
+
+            ed.onInit.add(function() {
+
+                    if (ed.settings.content_css !== false)
+                            ed.dom.loadCSS(url + "/css/content.css");
+                  
+                    if (ed && ed.plugins.contextmenu) {
+                            ed.plugins.contextmenu.onContextMenu.add(function(th, m, e) {
+                                    if (e.nodeName == 'IMG' && /mceItemFlash/.test(e.className)) {
+                                            m.add({title : 'media.edit', icon : 'media', cmd : 'mceEmbedMedia'});
+                                    }
+                            });
+                    }
+            });
+
+            ed.onBeforeSetContent.add(function(ed, o) {
+                var snippet = t.newEmbedSnippet();
+                var html = o.content;
+                var shtml = snippet._objectsToSpans(html);
+                o.content = shtml;
+            }, t);
+
+            ed.onSetContent.add(function() {
+                var content = $(ed.getBody());
+
+                content.find('span.mceItemEmbed,span.mceItemObject').each(function() {
+                    var embed = $(this);
+                    // If we are an embed inside an object, do not process
+                    if (embed.is('span.mceItemEmbed') && embed.parent().is('span.mceItemObject')) {
+                        return;
+                    }
+                    // Do the transformation
+
+                    var snippet = t.newEmbedSnippet();
+                    var embed_shtml;
+                    if ($.browser.msie) {
+                        embed_shtml = embed[0].outerHTML;
+                    } else {
+                        var wrapper = $('<div />');
+                        wrapper.append(embed.clone());
+                        embed_shtml = wrapper[0].innerHTML;
+                        wrapper.remove();
+                    }
+                    var embed_text = snippet._spansToObjects(embed_shtml);
+
+                    var result = $('<img />')
+                        .attr('src', t.url + '/images/trans.gif')
+                        .addClass('mceItemFlash')
+                        .addClass('mceMarker-embedmedia')
+                        .attr('title', embed_text)
+                        .attr('width', embed.attr('width'))
+                        .attr('height', embed.attr('height'));
+                        //.attr('align', f.align.options[f.align.selectedIndex].value);
+                    // XXX for some reason, this serialization is essential on IE
+                    result = $('<div />').append(result).html();
+                    embed.replaceWith(result);
+                });
+                content.find('span.mceEndObject').remove();
+
+            });
+
+            function getAttr(s, n) {
+                    n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
+
+                    return n ? ed.dom.decode(n[1]) : '';
+            };
+
+            ed.onPostProcess.add(function(ed, o) {
+                o.content = o.content.replace(/<img[^>]+>/g, function(img) {
+                    var cl = getAttr(img, 'class');
+                    // this class is never removed
+                    if (cl == 'mceMarker-embedmedia') {
+                        // update width, height
+                        var snippet = t.newEmbedSnippet();
+                        snippet.setContent(getAttr(img, 'title'));
+                        snippet.setParms({
+                            width: getAttr(img, 'width'),
+                            height: getAttr(img, 'height')
+                        });
+                        img = snippet.getContent();
+                        snippet.wrapper.remove();
+                    }
+                    return img;
+                });
+            });
+
+        },
+            
+
+        newEmbedSnippet : function() {
+            // manipulation of embed snippets
+            // created here because at this point we have jquery
+            // for sure.
+
+            var EmbedSnippet = function EmbedSnippet() {};
+            $.extend(EmbedSnippet.prototype, {
+
+                _objectsToSpans : function(str) {
+                    str = str.replace(/<object([^>]*)>/gi, '<span class="mceItemObject"$1>');
+                    str = str.replace(/<embed([^>]*)\/?>/gi, '<span class="mceItemEmbed"$1></span>');
+                    str = str.replace(/<embed([^>]*)>/gi, '<span class="mceItemEmbed"$1>');
+                    str = str.replace(/<\/(object)([^>]*)>/gi, '<span class="mceEndObject"></span></span>');
+                    str = str.replace(/<\/embed>/gi, '');
+                    str = str.replace(/<param([^>]*)\/?>/gi, '<span class="mceItemParam"$1></span>');
+                    str = str.replace(/<\/param>/gi, '');
+                    return str;
+                },
+
+                _spansToObjects : function(str) {
+                    str = str.replace(/<span([^>]*) class="?mceItemParam"?([^>]*)><\/span>/gi, '<param$1 $2></param>');
+                    str = str.replace(/<span([^>]*) class="?mceItemEmbed"?([^>]*)><\/span>/gi, '<embed$1 $2></embed>');
+                    str = str.replace(/<span([^>]*) class="?mceItemObject"?([^>]*)>/gi, '<object$1 $2>');
+                    str = str.replace(/<span class="?mceEndObject"?><\/span><\/span>/gi, '</object>');
+                    return str;
+                },
+
+                setContent: function(html) {
+                    this.wrapper = $('<div />');
+                    var wrapper = this.wrapper;
+                    var shtml = this._objectsToSpans(html);
+                    wrapper[0].innerHTML = shtml;
+
+                    this.root = wrapper.children();
+                    var root = this.root;
+                    // detect type
+                    this.emtype = null;
+                    if (root.is('span.mceItemObject')) {
+                        var inside = root.find('span.mceItemEmbed');
+                        if (inside) {
+                            this.emtype = 'object+embed';
+                            this.inside = inside;
+                            // remove bad attributes. (Important: 
+                            // will explode flash if left in)
+                            if (inside.attr('mce_src')) {
+                                inside.removeAttr('mce_src');
+                            }
+                        }
+
+                        // Fix missing params (broken in IE8, kaltura)
+                        var params = ['allowScriptAccess', 'allowNetworking', 'allowFullScreen',
+                            'bgcolor', 'movie', 'flashVars'];
+                        var to_add = [];
+                        $.each(params, function(i, value) {
+                            var found = false;
+                            root.find('span.mceItemParam').each(function(i, elem) {
+                                a = $(elem).attr('name');
+                                if (a == value || a == value.toLowerCase()) {
+                                    found = true;
+                                    return false;
+                                }
+                            });
+                            if (! found) {
+                                // Is there an attr?
+                                if (root.attr(value)) {
+                                    to_add.push({k: value, v: root.attr(value)});
+                                } else if (root.attr(value.toLowerCase())) {
+                                    to_add.push({k: value, v: root.attr(value.toLowerCase())});
+                                } else if (value == 'movie') {
+                                    // special handling of resource
+                                    if (root.attr('resource')) {
+                                        to_add.push({k: value, v: root.attr('resource')});
+                                    }
+                                }
+                            }
+                        });
+                        $.each(to_add, function(i, value) {
+                            try {
+                            $('<span class="mceItemParam"></span>')
+                                .attr('name', value.k)
+                                .attr('value', value.v)
+                                .prependTo(root);
+                            } catch(e) {}
+                        });
+                    }
+
+                    // remove bad attributes. (Important: 
+                    // will explode flash if left in)
+                    if (root.attr('mce_src')) {
+                        root.removeAttr('mce_src');
+                    }
+                    // cascade
+                    return this;
+                },
+
+                getContent: function() {
+                    var shtml = this.wrapper.html();
+                    var html = this._spansToObjects(shtml);
+                    return html;
+                },
+
+                getParms: function() {
+                    return {
+                        width: this.root.attr('width'),
+                        height: this.root.attr('height')
+                    };
+                },
+
+                setParms: function(parms) {
+                    if (this.emtype == 'object+embed') {
+                        parms.width && this.root.attr('width', parms.width); 
+                        parms.height && this.root.attr('height', parms.height); 
+                        parms.width && this.inside.attr('width', parms.width); 
+                        parms.height && this.inside.attr('height', parms.height); 
+                    } else {
+                        parms.width && this.root.attr('width', parms.width); 
+                        parms.height && this.root.attr('height', parms.height); 
+                    }
+                    return this;
+                }
+
+            });
+            // give access to the class from the popup
+            this.newEmbedSnippet = function newEmbedSnippet() {
+                return new EmbedSnippet();   
+            };
+            return this.newEmbedSnippet();
+        },
+
+        getJQuery: function() {
+            return window.jQuery;
+        },
+
+
+        _requestKalturaSession: function(callback) {
+            var self = this;
+
+            // Do we have a session already?
+            if (this.session_key) {
+                // Yes, so return it.
+                callback(true, this.session_key);
+            } else {
+                // Create session directly from the client.
+                // XXX TODO: create session from the server with ajax. 
+                this.partner_id = this.editor.getParam('kaltura_partner_id');
+                this.sub_partner_id =  this.editor.getParam('kaltura_sub_partner_id');
+                var user_secret = this.editor.getParam('kaltura_user_secret', '');
+                var admin_secret = this.editor.getParam('kaltura_admin_secret', '');
+                var session_url = this.editor.getParam('kaltura_session_url', '');
+                this.local_user = this.editor.getParam('kaltura_local_user', 'ANONYMOUS');
+                var session_url = this.editor.getParam('kaltura_session_url', '');
+                this.kcw_uiconf_id = this.editor.getParam('kaltura_kcw_uiconf_id', '1000741');
+                this.player_uiconf_id = this.editor.getParam('kaltura_player_uiconf_id', '');
+                var is_admin = true; // XXX should come from the server ?
+
+                if (session_url) {
+                    //server session
+                    log('Start server session');
+                    $.ajax({
+                        url: session_url,
+                        success: function(json) {
+                            if (json.error) {
+                                log('Ajax returned error', json);
+                                callback(false);
+                            } else {
+                                // pipe to the passed callback.
+                                callback(true, json.result.ks);
+                            }
+                        },
+                        error: function(json, status, e) {
+                            log('Ajax failed', json, status, e);
+                            callback(false);
+                        }
+                    });
+                } else {
+                    //client session
+                    log('Start client session');
+                    var kc = new KalturaConfiguration(Number(this.partner_id));
+                    this.client = new KalturaClient(kc);
+                    this.session = new KalturaSessionService(this.client);
+                    this.session.start(function(success, session_key) {
+                            if (success) {
+                                log('session created', session_key);
+                                self.session_key = session_key;
+                            }
+                            // pipe to the passed callback.
+                            callback(success, session_key);
+                        },
+                        is_admin && admin_secret || user_secret,
+                        self.local_user,
+                        is_admin && KalturaSessionType.ADMIN || KalturaSessionType.USER,
+                        self.partner_id,
+                        undefined, undefined);
+                }
+            }
+        },
+
+        _createDialog: function() {
+            if (! this.dialog) {
+                this.dialog = $('<div id="tiny-kaltura-kcw"></div>');
+                this.dialog.hide().appendTo('body');
+                this.dialog.dialog({
+                    // the next options are adjustable if the style changes
+                    // Full width is computed from width border and padding.
+                    // IE's quirkmode is also taken to consideration.
+                    //width: 6 + 390 + 7 + 320 + 6 + (jQuery.boxModel ? 0 : 10), // ?? XXX
+                    width: 680,
+                    dialogClass: 'tiny-kaltura-dialog',
+                    // the next options are mandatory for desired behaviour
+                    autoOpen: false,
+                    modal: true,
+                    bgiframe: true,    // XXX bgiFrame is currently needed for modal
+                    hide: 'fold'
+                });
+                // remove these classes from the dialog. This is to avoid
+                // the outside border that this class adds by default.
+                // Instead we add our own panel, with the advantage that
+                // sizes can be set correctly even on IE.
+                // XXX actually one problem is that we get rid of the header,
+                // and the component does not really support this oob.
+                var dialog_parent = this.dialog
+                    .css('border', '0')
+                    .css('padding', '0')
+                    .css('overflow', 'hidden')
+                    .parents('.ui-dialog');
+                dialog_parent
+                        //.removeClass('ui-dialog-content ui-widget-content')
+                        .removeClass('ui-dialog-content')
+                        .css('overflow', 'hidden');
+                // We need a close button. For simplicity, we just move the
+                // close button from the header here, since it's already wired
+                // up correctly.
+                dialog_parent.find('.ui-dialog-titlebar-close').eq(0)
+                    .appendTo(this.dialog.find('.tiny-imagedrawer-panel-top'))
+                    .removeClass('ui-dialog-titlebar-close')
+                    .addClass('tiny-imagedrawer-button-close');
+
+                // add the flash
+                //
+                //Prepare variables to be passed to embedded flash object.
+                //swfobject.embedSWF "http://www.kaltura.com/kcw/ui_conf_id/1000199", 
+                var so = new SWFObject('http://www.kaltura.com/kcw/ui_conf_id/' + this.kcw_uiconf_id, 'kcw',
+                    "680", "360", "9.0.0", "#FFFFFF");
+                so.addParam('allowScriptAccess', 'always');
+                so.addParam('allowNetworking', 'all');
+                so.addParam('wmode', "opaque");
+                $.each(this.flashVars, function(key, value) {
+                    so.addVariable(key, value);
+                });
+                so.useExpressInstall('expressInstall.swf');
+                so.write('tiny-kaltura-kcw');
+            }
+        },
+
+        _onContributionWizardAddEntry: function(entries) {
+            log(entries.length + " media file/s was/were successfully uploaded");
+            for(var i = 0; i < entries.length; i++) {
+                log("entries["+i+"]:EntryID = " + entries[i].entryId);
+                log("entries["+i+"]:",  entries[i]);
+                this.entry_ids.push(entries[i].entryId);
+            }
+        },
+
+        _onContributionWizardClose: function() {
+            var self = this;
+
+            this.dialog.dialog('close');
+            log("closed Kaltura Contribution Wizard");
+
+            if (this.entry_ids.length == 0) {
+                log("No entry.");
+                return;
+            }
+
+            //var width = 400;
+            //var height = 333;
+            //var align = 'left';
+            
+            log("Will insert videos #:", this.entry_ids.length);
+            $.each(this.entry_ids, function(i) {
+                if (i > 0) {
+                    self.editor.execCommand('mceInsertContent', false, '<br>');
+                }
+                var entry_id = this;
+                log("Inserting entry id", entry_id, i);
+
+                self._insertMedia({
+                    entry_id: entry_id
+                });
+            });
+            this.editor.execCommand('mceRepaint');
+            log('Success with insertion.');
+
+        },
+
+
+        /**
+         * Creates control instances based in the incoming name. This method is normally not
+         * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons
+         * but you sometimes need to create more complex controls like listboxes, split buttons etc then this
+         * method can be used to create those.
+         *
+         * @param {String} n Name of the control to create.
+         * @param {tinymce.ControlManager} cm Control manager to use inorder to create new control.
+         * @return {tinymce.ui.Control} New control instance or null if no control was created.
+         */
+        createControl : function(n, cm) {
+            return null;
+        },
+
+
+        _makeKalturaMarkup: function(parms) {
+
+            // parms:
+            //   entry_id
+            //   width
+            //   height
+
+            // title
+            parms.width = parms.width || 400;
+            parms.height = parms.height || 333;
+
+            var markup = '<object' +
+                'id="kaltura_player"' +
+                'name="kaltura_player"' +
+                'type="application/x-shockwave-flash"' +
+                'allowfullscreen="true"' +
+                'allownetworking="all"' +
+                'allowscriptaccess="always"' +
+                'xmlns:dc="http://purl.org/dc/terms/"' +
+                'xmlns:media="http://search.yahoo.com/searchmonkey/media/"' +
+                'rel="media:video"' +
+                'resource="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
+                'data="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
+                'height="' + parms.height + '"' +
+                'width="' + parms.width + '">' +
+
+                '<param name="allowFullScreen" value="true">' +
+                '<param name="allowNetworking" value="all">' +
+                '<param name="allowScriptAccess" value="always">' +
+                '<param name="bgcolor" value="#000000">' +
+                '<param name="flashVars" value="&amp;">' +
+                '<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '">' +
+                '<a href="http://corp.kaltura.com">video platform</a>' +
+                '<a href="http://corp.kaltura.com/video_platform/video_management">video management</a>' +
+                '<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a>' +
+                '<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a>' +
+                '<a rel="media:thumbnail" href="http://cdnbakmi.kaltura.com/p/' + this.partner_id + '/sp/' + this.sub_partner_id + '/thumbnail/entry_id/' + parms.entry_id + '/width/120/height/90/bgcolor/000000/type/2"></a>' +
+
+                //'<span property="dc:description" content="' + parms.title + '"></span>' +
+                //'<span property="media:title" content="' + parms.title + '"></span>' +
+                '<span property="media:width" content="' + parms.width + '"></span>' +
+                '<span property="media:height" content="' + parms.height + '"></span>' +
+                '<span property="media:type" content="application/x-shockwave-flash"></span>' +
+
+            '</object>';
+
+            return markup;
+
+        },
+
+        _insertMedia: function(_parms) {
+
+            var markup = this._makeKalturaMarkup(_parms);
+
+            // update snippet
+            var snippet = this.newEmbedSnippet();
+            snippet
+                .setContent(markup);
+
+            var parms = snippet.getParms();
+            //if (! parms.width) parms.width = 400;
+            //if (! parms.height) parms.height = 333;
+
+
+            var result = $('<img />')
+                .attr('src', this._url + '/images/trans.gif')
+                .addClass('mceItemFlash')
+                .addClass('mceMarker-embedmedia')
+                .attr('title', snippet.getContent())
+                .attr('width', parms.width)
+                .attr('height', parms.height);
+                //.attr('align', f.align.options[f.align.selectedIndex].value);
+            h = $('<div />').append(result).html();
+
+            
+            log('Will insert:', h);
+
+            this.editor.execCommand('mceInsertContent', false, h);
+            //this.editor.execCommand('mceRepaint');
+        },
+
+
+        /**
+         * Returns information about the plugin as a name/value array.
+         * The current keys are longname, author, authorurl, infourl and version.
+         *
+         * @return {Object} Name/value array containing information about the plugin.
+         */
+        getInfo : function() {
+            return {
+                longname : 'All in One Video Pack',
+                author : 'Kaltura',
+                authorurl : 'http://www.kaltura.com',
+                infourl : 'http://corp.kaltura.com',
+                version : "1.0"
+            };
+        }
+        
+
+
+
+    });
+    
+    // Register plugin
+    tinymce.PluginManager.add('kaltura', tinymce.plugins.Kaltura);
+    tinymce.PluginManager.requireLangPack('kaltura');
+
+})();
+tinyMCE.addI18n('en.kaltura',{
+kaltura_button_desc: "Insert/edit Kaltura video"
 });

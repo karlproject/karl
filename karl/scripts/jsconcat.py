@@ -97,6 +97,11 @@ def main(argv=sys.argv):
             filesindir(tinymce_dir, 'plugins/imagedrawer/ajaxfileupload.js'),
             filesindir(tinymce_dir, 'plugins/imagedrawer/editor_plugin_src.js'),
             filesindir(tinymce_dir, 'plugins/imagedrawer/langs/en.js'),
+
+            filesindir(tinymce_dir, 'plugins/kaltura/js/swfobject.js'),
+            filesindir(tinymce_dir, 'plugins/kaltura/js/kaltura.min.js'),
+            filesindir(tinymce_dir, 'plugins/kaltura/editor_plugin_src.js'),
+            filesindir(tinymce_dir, 'plugins/kaltura/langs/en.js'),
             ):
         f.write(file(fname).read())
     f.close()

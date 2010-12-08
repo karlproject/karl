@@ -180,14 +180,14 @@ def basename_of_filepath(title):
     return title.rsplit("\\", 1)[-1].rsplit('/', 1)[-1]
 
 
-def convert_to_script(data):
+def convert_to_script(data, var_name='karl_client_data'):
     if data:
         ##print data
         result = JSONEncoder().encode(data)
         script = dedent("""\
             <script type="text/javascript">
-            window.karl_client_data = %s;
-            </script>""" % (result, ))
+            window.%s = %s;
+            </script>""" % (var_name, result))
     else:
         # no data, no script.
         script = ''

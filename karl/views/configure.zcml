@@ -1695,6 +1695,15 @@
     renderer="json"
     />
 
+  <!-- kaltura ajax  -->
+  <view
+    for="zope.interface.Interface"
+    view=".kaltura.create_session"
+    permission="view"
+    name="kaltura_create_session.json"
+  />
+
+
 
 </configure>
 

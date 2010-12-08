@@ -15,6 +15,13 @@ $(document).ready(function() {
         plugins: 'kaltura',
         extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         forced_root_block : 'p',
+        //options for kaltura
+        kaltura_partner_id: '333261',
+        kaltura_sub_partner_id: '33326100',
+        kaltura_user_secret: 'put_user_secret_here',
+        kaltura_admin_secret: 'put_admin_secret_here',
+        kaltura_kcw_uiconf_id: '1000741',
+        kaltura_player_uiconf_id: '1913582'
     });
 
     $('.preview-button').click(function() {

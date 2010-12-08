@@ -490,3 +490,14 @@ input.tiny-imagedrawer-input-captiontext {
     margin-left: 8px;
 }
 
+
+.tiny-kaltura-dialog {
+    text-align: left;
+}
+
+
+/* hide title bar */
+.tiny-kaltura-dialog .ui-dialog-titlebar {
+    display: none;
+}
+

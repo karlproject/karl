@@ -49,6 +49,7 @@ def main(argv=sys.argv):
     for fname in itertools.chain(
             filesindir(tinymce_dir, 'themes/advanced/skins/karl/ui.css'),
             filesindir(tinymce_dir, 'plugins/imagedrawer/css/ui.css'),
+            filesindir(tinymce_dir, 'plugins/kaltura/css/ui.css'),
             ):
         f.write(file(fname).read())
     f.close()
