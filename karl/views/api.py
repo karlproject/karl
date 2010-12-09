@@ -123,6 +123,7 @@ class TemplateAPI(object):
                 user_secret = getattr(settings, 'kaltura_user_secret', ''),
                 kcw_uiconf_id = getattr(settings, 'kaltura_kcw_uiconf_id', '1000741'),
                 player_uiconf_id = getattr(settings, 'kaltura_player_uiconf_id', ''),
+                player_cache_st = getattr(settings, 'kaltura_player_cache_st', ''),
                 local_user = self.userid,
             )
             if not getattr(settings, 'kaltura_client_session', False) in ('true', 'True'):

@@ -241,6 +241,7 @@ class TemplateAPITests(unittest.TestCase):
         settings.kaltura_user_secret = '0123456789abcdef123456789abcdef1'
         settings.kaltura_kcw_uiconf_id = '9999999'
         settings.kaltura_player_uiconf_id = '8888888'
+        settings.kaltura_player_cache_st = '77777777'
         testing.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
@@ -252,10 +253,11 @@ class TemplateAPITests(unittest.TestCase):
             user_secret = '0123456789abcdef123456789abcdef1',
             kcw_uiconf_id = '9999999',
             player_uiconf_id = '8888888',
+            player_cache_st = '77777777',
             local_user = None,
             ))
         # secrets are not sent to client
-        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "session_url": "http://example.com/kaltura_create_session.json", "kcw_uiconf_id": "9999999", "partner_id": "123456"};\n</script>')
+        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"};\n</script>')
         
         settings.kaltura_client_session = 'false'
         api = self._makeOne(context, request)
@@ -268,10 +270,11 @@ class TemplateAPITests(unittest.TestCase):
             user_secret = '0123456789abcdef123456789abcdef1',
             kcw_uiconf_id = '9999999',
             player_uiconf_id = '8888888',
+            player_cache_st = '77777777',
             local_user = None,
             ))
         # secrets are not sent to client
-        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "session_url": "http://example.com/kaltura_create_session.json", "kcw_uiconf_id": "9999999", "partner_id": "123456"};\n</script>')
+        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"};\n</script>')
         
         settings.kaltura_client_session = 'true'
         api = self._makeOne(context, request)
@@ -283,11 +286,12 @@ class TemplateAPITests(unittest.TestCase):
             user_secret = '0123456789abcdef123456789abcdef1',
             kcw_uiconf_id = '9999999',
             player_uiconf_id = '8888888',
+            player_cache_st = '77777777',
             local_user = None,
             # no session_url means client side session management
             ))
         # secrets are sent to client
-        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"admin_secret": "123456789abcdef123456789abcdef12", "user_secret": "0123456789abcdef123456789abcdef1", "sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "kcw_uiconf_id": "9999999", "partner_id": "123456"};\n</script>')
+        self.assertEqual(api.kaltura_data, '<script type="text/javascript">\nwindow.kaltura_data = {"admin_secret": "123456789abcdef123456789abcdef12", "user_secret": "0123456789abcdef123456789abcdef1", "sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456"};\n</script>') 
 
 
 class DummyTagQuery:

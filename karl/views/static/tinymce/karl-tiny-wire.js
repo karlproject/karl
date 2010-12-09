@@ -76,6 +76,7 @@ $(document).ready(function() {
         kaltura_admin_secret: kaltura_data.admin_secret,
         kaltura_kcw_uiconf_id: kaltura_data.kcw_uiconf_id,
         kaltura_player_uiconf_id: kaltura_data.player_uiconf_id,
+        kaltura_player_cache_st: kaltura_data.player_cache_st,
         kaltura_session_url: kaltura_data.session_url
     });  
 

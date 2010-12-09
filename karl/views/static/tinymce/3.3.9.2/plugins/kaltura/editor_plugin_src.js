@@ -338,6 +338,7 @@
                 var session_url = this.editor.getParam('kaltura_session_url', '');
                 this.kcw_uiconf_id = this.editor.getParam('kaltura_kcw_uiconf_id', '1000741');
                 this.player_uiconf_id = this.editor.getParam('kaltura_player_uiconf_id', '');
+                this.player_cache_st = this.editor.getParam('kaltura_player_cache_st', '');
                 var is_admin = true; // XXX should come from the server ?
 
                 if (session_url) {
@@ -517,8 +518,8 @@
                 'xmlns:dc="http://purl.org/dc/terms/"' +
                 'xmlns:media="http://search.yahoo.com/searchmonkey/media/"' +
                 'rel="media:video"' +
-                'resource="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
-                'data="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
+                'resource="http://www.kaltura.com/index.php/kwidget/cache_st/' + this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
+                'data="http://www.kaltura.com/index.php/kwidget/cache_st/' + this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
                 'height="' + parms.height + '"' +
                 'width="' + parms.width + '">' +
 
@@ -527,7 +528,7 @@
                 '<param name="allowScriptAccess" value="always">' +
                 '<param name="bgcolor" value="#000000">' +
                 '<param name="flashVars" value="&amp;">' +
-                '<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/1286785355/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '">' +
+                '<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/' + this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + this.player_uiconf_id + '/entry_id/' + parms.entry_id + '">' +
                 '<a href="http://corp.kaltura.com">video platform</a>' +
                 '<a href="http://corp.kaltura.com/video_platform/video_management">video management</a>' +
                 '<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a>' +

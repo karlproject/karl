@@ -21,7 +21,8 @@ $(document).ready(function() {
         kaltura_user_secret: 'put_user_secret_here',
         kaltura_admin_secret: 'put_admin_secret_here',
         kaltura_kcw_uiconf_id: '1000741',
-        kaltura_player_uiconf_id: '1913582'
+        kaltura_player_uiconf_id: '1913582',
+        kaltura_player_cache_st: '1286785355'
     });
 
     $('.preview-button').click(function() {
