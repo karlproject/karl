@@ -339,6 +339,9 @@ class AddBlogEntryFormController(object):
     def __call__(self):
         api = TemplateAPI(self.context, self.request,
                           'Add Blog Entry')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -448,6 +451,9 @@ class EditBlogEntryFormController(object):
     def __call__(self):
         page_title = 'Edit ' + self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):

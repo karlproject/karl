@@ -141,12 +141,11 @@ class AddWikiPageFormController(object):
     def __call__(self):
         api = TemplateAPI(self.context, self.request,
                           'Add Wiki Page')
-        head_data = convert_to_script(dict(
-            text = dict(
+        api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
-                ),
-            ))
-        return {'api':api, 'actions':(), 'head_data':head_data}
+                enable_imagedrawer_upload = True,
+                )
+        return {'api':api, 'actions':()}
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))
@@ -288,14 +287,13 @@ class EditWikiPageFormController(object):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
-        head_data = convert_to_script(dict(
-            text = dict(
+        api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
-                ),
-            ))
+                enable_imagedrawer_upload = True,
+                )
         return {'api':api,
                 'actions':(),
-                'head_data':head_data}
+                }
 
     def handle_cancel(self):
         return HTTPFound(location=model_url(self.context, self.request))

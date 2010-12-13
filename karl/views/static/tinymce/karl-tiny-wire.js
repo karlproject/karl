@@ -9,13 +9,10 @@ $(document).ready(function() {
 
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
-    var kaltura_data = window.kaltura_data && window.kaltura_data || {};
-    var plugins = 'paste,embedmedia,spellchecker';
+    var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
+    var plugins = 'paste,embedmedia,spellchecker,imagedrawer';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
-        // Imagedrawer is default enabled on wiki pages.
-        // Disabled everywhere else. XXX TODO
-        plugins += ',imagedrawer';
     }
     if (kaltura_data.enabled) {
         plugins += ',kaltura';
@@ -68,6 +65,7 @@ $(document).ready(function() {
         imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
         imagedrawer_upload_url: here_url + 'drawer_upload_view.html',
         imagedrawer_data_url: here_url + 'drawer_data_view.html',
+        imagedrawer_enable_upload: widget_data.enable_imagedrawer_upload,
         //options for kaltura
         kaltura_partner_id: kaltura_data.partner_id,
         kaltura_sub_partner_id: kaltura_data.sub_partner_id,

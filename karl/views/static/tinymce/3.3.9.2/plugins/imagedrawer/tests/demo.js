@@ -69,7 +69,8 @@ $(document).ready(function() {
         // options for imagedrawer
         imagedrawer_dialog_url: 'drawer_dialog_view.html',
         imagedrawer_upload_url: 'drawer_upload_view.html',
-        imagedrawer_data_url: 'drawer_data_view.html'
+        imagedrawer_data_url: 'drawer_data_view.html',
+        imagedrawer_enable_upload: true
     });
 
     $('.preview-button').click(function() {

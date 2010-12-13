@@ -709,6 +709,17 @@
                 .removeClass('ui-dialog-titlebar-close')
                 .addClass('tiny-imagedrawer-button-close');
             
+            // Enable/disable the upload button, if needed
+            if (! ed.getParam('imagedrawer_enable_upload', false)) {
+                var buttons_markup = this.dialog
+                    .find('.karl-buttonset.tiny-imagedrawer-buttonset-tabselect option');
+                buttons_markup.eq(0)
+                    .attr('disabled', '1')
+                    .attr('selected', null);
+                buttons_markup.eq(1)
+                    .attr('selected', 'selected');
+            }
+            
 
             //
             // Wire up the dialog

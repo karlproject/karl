@@ -35,8 +35,15 @@ class TestClientJsonData(unittest.TestCase):
         from textwrap import dedent
         self.assertEqual(injection, dedent("""\
             <script type="text/javascript">
+            window._karl_client_data = {"widget2": ["cc", "dd", {"ee": 4, "ff": 5}], "widget1": {"aa": 1, "bb": [2, 3]}};
+            </script>"""))
+        injection = convert_to_script(client_json_data, 'karl_client_data')
+        from textwrap import dedent
+        self.assertEqual(injection, dedent("""\
+            <script type="text/javascript">
             window.karl_client_data = {"widget2": ["cc", "dd", {"ee": 4, "ff": 5}], "widget1": {"aa": 1, "bb": [2, 3]}};
             </script>"""))
+
 
 class TestMakeName(unittest.TestCase):
     def test_make_name(self):

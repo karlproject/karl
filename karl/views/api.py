@@ -87,6 +87,9 @@ class TemplateAPI(object):
                                                   'js_devel_mode', None)
         self.static_url = '%s/static/%s' % (app_url, _get_static_rev())
 
+        # this data will be provided for the client javascript
+        self.karl_client_data = {}
+
         # Provide a setting in the INI to fully control the entire URL
         # to the static.  This is when the proxy runs a different port
         # number, or to "pipeline" resources on a different URL path.
@@ -133,7 +136,14 @@ class TemplateAPI(object):
             self.kaltura_info = dict(
                 enabled = False,
                 )
-        #print 'kaltura', self.kaltura_info
+
+        # propagate the head data to the client
+        d = self.karl_client_data['kaltura'] = dict(self.kaltura_info)
+        # remove secrets if needed
+        if 'session_url' in d:
+            # server side session management, do not send secrets to client
+            del d['user_secret']
+            del d['admin_secret']
 
     @property
     def snippets(self):
@@ -428,14 +438,47 @@ class TemplateAPI(object):
         logo_path = get_setting(self.context, 'logo_path', 'images/logo.gif')
         return '%s/%s' % (self.static_url, logo_path)
 
-    @property
-    def kaltura_data(self):
-        d = dict(self.kaltura_info)
-        if 'session_url' in d:
-            # server side session management, do not send secrets to client
-            del d['user_secret']
-            del d['admin_secret']
-        return convert_to_script(d, var_name='kaltura_data')
+    def render_karl_client_data(self, update_dict=None):
+        """
+        How to provide data to the client? There are 3 ways:
+
+        1. specify the data via the template api
+
+           api.karl_client_data['my_widget'] = {...my_data...}
+
+           The code will be injected to all pages automatically.
+           Be careful not to overwrite api.karl_client_data, only update
+           one or more fields of the dictionary.
+
+
+        2. Pass the data directly to the template
+
+           render_template_to_response(...
+                ...
+                karl_client_data = {'my_widget': {...my_data...}},
+                ...)
+
+            The passed dictionary will update the one specified via the template api.
+
+
+        3. Legacy way: head_data
+
+
+           from karl.views.utils import convert_to_script
+
+           render_template_to_response(...
+                ...
+                head_data = convert_to_script({'my_widget': {...my_data...}),
+                ...)
+
+           Data inserted this way is supported in order to not break old code, but for
+           new code please prefer to use the methods described in point 1. or 2.
+
+        """
+        d = dict(self.karl_client_data)
+        if update_dict:
+            d.update(update_dict)
+        return convert_to_script(d, var_name='karl_client_data')
 
 class SettingsReader:
     """Convenience for reading settings in templates"""
