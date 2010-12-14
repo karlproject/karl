@@ -500,28 +500,40 @@ class Test_parse_report(unittest.TestCase):
 
     def test_complete(self):
         from karl.models.peopledirectory import PeopleReportCategoryFilter
+        from karl.models.peopledirectory import PeopleReportGroupFilter
+        from karl.models.peopledirectory import PeopleReportIsStaffFilter
         xml = """
         <report name="r1" title="Report One" link-title="One">
-            <filter category="office" values="nyc la"/>
-            <filter category="department" values="toys"/>
+            <filter name="offices" type="category" category="offices"
+                    values="nyc la"/>
+            <filter name="departments" type="category" category="departments"
+                    values="toys"/>
+            <filter name="groups" type="groups" values="g1 g2"/>
+            <filter name="is_staff" type="is_staff" include_staff="False"/>
             <columns names="name email"/>
         </report>
         """
         elem = parse_xml(xml)
         peopledir = DummyPeopleDirectory()
-        peopledir['categories']['office'] = {'nyc': 'NYC', 'la': 'LA'}
-        peopledir['categories']['department'] = {'toys': 'Toys'}
+        peopledir['categories']['offices'] = {'nyc': 'NYC', 'la': 'LA'}
+        peopledir['categories']['departments'] = {'toys': 'Toys'}
         name, report = self._callFUT(peopledir, elem)
         self.assertEqual(name, 'r1')
         self.assertEqual(report.title, 'Report One')
         self.assertEqual(report.link_title, 'One')
-        self.assertEqual(len(report), 2)
-        self.failUnless(isinstance(report['department'],
+        self.assertEqual(len(report), 4)
+        self.failUnless(isinstance(report['departments'],
                         PeopleReportCategoryFilter))
-        self.assertEqual(report['department'].values, ('toys',))
-        self.failUnless(isinstance(report['office'],
+        self.assertEqual(report['departments'].values, ('toys',))
+        self.failUnless(isinstance(report['offices'],
                         PeopleReportCategoryFilter))
-        self.assertEqual(report['office'].values, ('nyc', 'la'))
+        self.assertEqual(report['offices'].values, ('nyc', 'la'))
+        self.failUnless(isinstance(report['groups'],
+                        PeopleReportGroupFilter))
+        self.assertEqual(report['groups'].values, ('g1', 'g2'))
+        self.failUnless(isinstance(report['is_staff'],
+                        PeopleReportIsStaffFilter))
+        self.failIf(report['is_staff'].include_staff)
         self.assertEqual(report.columns, ('name', 'email'))
 
     def test_no_such_category(self):
@@ -566,7 +578,7 @@ class Test_parse_report(unittest.TestCase):
         from karl.models.peopledirectory import PeopleReportGroupFilter
         xml = """
         <report name="r1">
-            <filter values="g1"/>
+            <filter name="groups" type="groups" values="g1"/>
             <columns ids="name"/>
         </report>
         """
@@ -857,7 +869,8 @@ class Test_peopleconf(unittest.TestCase):
                         <report-group name="cities" title="Cities">
                             <report name="ny" title="NYC Office"
                                     link-title="NYC">
-                                <filter category="offices" values="nyc"/>
+                                <filter type="category" category="offices"
+                                        values="nyc"/>
                                 <columns names="name email"/>
                             </report>
                         </report-group>

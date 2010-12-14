@@ -38,6 +38,7 @@ from karl.models.peopledirectory import PeopleRedirector
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
 from karl.models.peopledirectory import PeopleReportGroupFilter
+from karl.models.peopledirectory import PeopleReportIsStaffFilter
 from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
@@ -295,11 +296,15 @@ def parse_report(people, elem):
 
     categories = people.get('categories', {})
     for e in elem.findall('filter'):
+        f_name = e.get('name')
+        typ = e.get('type')
         values = e.get('values', '').split()
-        if not values:
+        if typ in ('category', 'groups') and not values:
             raise ParseError("No values given", e)
-        category = e.get('category')
-        if category is not None:
+        if typ == 'category':
+            category = e.get('category')
+            if category is None:
+                raise ParseError("No category given", e)
             pc = categories.get(category)
             if pc is None:
                 raise ParseError("No such category defined", e)
@@ -307,8 +312,13 @@ def parse_report(people, elem):
                 if v not in pc:
                     raise ParseError("No such category value: %s" % v, e)
             report[category] = PeopleReportCategoryFilter(tuple(values))
+        elif typ == 'groups':
+            report[f_name] = PeopleReportGroupFilter(tuple(values))
+        elif typ == 'is_staff':
+            include_staff = report.get('include_staff', False)
+            report[f_name] = PeopleReportIsStaffFilter(include_staff)
         else:
-            report['groups'] = PeopleReportGroupFilter(tuple(values))
+            raise ParseError("Unknown filter type", e)
 
     columns = None
     e = elem.find('columns')
