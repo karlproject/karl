@@ -324,7 +324,7 @@
     </metal:table>
 
 
-    <div metal:define-macro="rss_icon" style="margin-top:20px;text-align:right"
+    <div metal:define-macro="rss_icon" class="rss-icon" 
          tal:condition="feed_url|None">
       <a href="${feed_url}">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"

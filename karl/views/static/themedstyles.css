@@ -1023,7 +1023,8 @@ ul#peopledir-tabs li.selected a {
 	color: #748b93;
 }
 .recentItemsWrapper {
-	margin-top: 1em;
+	padding-top: 1.0em;
+    clear: both;
 }
 .communityEntry {
   margin-bottom: 20px;
@@ -3401,3 +3402,10 @@ ul.menu li {
   text-align: left;
   border: none;
 }
+
+.rss-icon {
+    padding-top: 20px;
+    text-align: right;
+    clear: both;
+}
+
