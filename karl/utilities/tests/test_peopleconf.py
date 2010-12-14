@@ -795,6 +795,20 @@ class Test_parse_section(unittest.TestCase):
         report = group['r1']
         self.assertEqual(list(report.columns), ['name'])
 
+    def test_redirector(self):
+        xml = """
+        <section>
+            <redirector name="old_name" target_url="path/to/new_name"/>
+        </section>
+        """
+        elem = parse_xml(xml)
+        peopledir = DummyPeopleDirectory()
+        items = self._callFUT(peopledir, elem)
+        self.assertEqual(len(items), 1)
+        name, redirector = items[0]
+        self.assertEqual(name, 'old_name')
+        self.assertEqual(redirector.target_url, 'path/to/new_name')
+
     def test_unrecognized(self):
         from karl.utilities.peopleconf import ParseError
         xml = """

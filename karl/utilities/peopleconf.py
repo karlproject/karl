@@ -34,6 +34,7 @@ from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategories
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
+from karl.models.peopledirectory import PeopleRedirector
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
 from karl.models.peopledirectory import PeopleReportGroupFilter
@@ -376,6 +377,11 @@ def parse_section(people, section_elem):
                 c_order.append(sub_name)
             column.order = tuple(c_order)
             items.append((name, column))
+        elif e.tag == 'redirector':
+            name, _ = name_and_title(e)
+            redirector = PeopleRedirector()
+            redirector.target_url = e.get('target_url')
+            items.append((name, redirector))
         elif e.tag == 'acl':
             pass  # section ACL is set by caller
         else:
