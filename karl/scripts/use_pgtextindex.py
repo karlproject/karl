@@ -2,13 +2,7 @@ import sys
 try:
     from repoze.pgtextindex.index import PGTextIndex
 except ImportError:
-    print >>sys.stderr, (
-        "In order to use this experimental functionality, you must install\n"
-        "repoze.pgtextindex from subversion as a development egg. The source\n"
-        "code is located here:\n\n"
-        "http://svn.repoze.org/repoze.pgtextindex/trunk/"
-    )
-    sys.exit(1)
+    PGTextIndex = None
 
 from karl.models.catalog import reindex_catalog
 from karl.models.site import get_weighted_textrepr
@@ -21,7 +15,18 @@ import transaction
 import logging
 logging.basicConfig()
 
+NO_PG_TEXT_INDEX = """\
+In order to use this experimental functionality, you must install
+repoze.pgtextindex from subversion as a development egg. The source
+code is located here:
+
+http://svn.repoze.org/repoze.pgtextindex/trunk/
+"""
+
 def main(args=sys.argv):
+    if PGTextIndex is None:
+        print >>sys.stderr, NO_PG_TEXT_INDEX
+        sys.exit(1)
     parser = OptionParser(description=__doc__)
     parser.add_option('-C', '--config', dest='config', default=None,
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
