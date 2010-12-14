@@ -74,6 +74,9 @@ from karl.content.views.interfaces import INetworkEventsMarker
 
 from karl.content.interfaces import IReferencesFolder
 
+# This import is BBB for karl.evolve.zodb.evolve15
+from karl.content.views.utils import ie_types
+
 from karl.content.views.utils import get_upload_mimetype
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import get_show_sendalert
