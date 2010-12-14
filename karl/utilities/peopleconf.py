@@ -135,6 +135,10 @@ _DUMP_XML =  """\
       <columns names="${' '.join(item.columns)}"/>
      </report>
     </metal:chunk>
+    <metal:chunk metal:define-macro="redirector">
+     <redirector tal:condition="is_redirector(item)"
+             name="${r_id}" target_url="${item.target_url}" />
+    </metal:chunk>
    </tal:loop>
   </section>
  </sections>
@@ -191,7 +195,7 @@ def _report_filter_items(report):
     #return [(name, filter.values) for name, filter in report.items()]
     else:
         for name, obj in sorted(report.items()):
-            info = {'name': name, 'obj': obj}
+            info = {'name': name, 'type': 'unknown', 'obj': obj}
             if IPeopleReportCategoryFilter.providedBy(obj):
                 info['type'] = 'category'
                 info['values'] = ' '.join(obj.values)
@@ -201,8 +205,6 @@ def _report_filter_items(report):
             elif IPeopleReportIsStaffFilter.providedBy(obj):
                 info['type'] = 'is_staff'
                 info['include_staff'] = str(obj.include_staff)
-            else:
-                import pdb; pdb.set_trace()
             yield info
 
 def dump_peopledir(peopledir):
@@ -221,6 +223,8 @@ def dump_peopledir(peopledir):
                                     IPeopleReportGroup.providedBy(x),
                     is_report=lambda x:
                                     IPeopleReport.providedBy(x),
+                    is_redirector=lambda x:
+                                    IPeopleRedirector.providedBy(x),
                     category_items=_category_items,
                     acl_info=_acl_info,
                     column_info=_column_info,

@@ -144,17 +144,41 @@ class Test_dump_peopledir(unittest.TestCase):
                                     '/section[@name="testing"]/acl/*')
         self.assertEqual(len(a_nodes), 0)
 
-    def test_section_w_no_columns(self):
+    def test_section_acl_w_redirector(self):
+        from repoze.bfg.security import DENY_ALL
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
         pd = self._makeContext(order=('testing',))
         section = pd['testing'] = testing.DummyModel(
                             title='Testing',
                             tab_title='Testing (TAB)',
-                            __acl__=[('Allow', 'system.Everyone', 'view')])
+                            __acl__=[('Allow', 'system.Everyone', ('view',)),
+                                     DENY_ALL,
+                                    ])
+        redirect = section['redirect'] = testing.DummyModel(
+                                    target_url='http://example.com/')
+        directlyProvides(redirect, IPeopleRedirector)
+        xml = self._callFUT(pd)
+        a_nodes = self._xpath(xml, '/peopledirectory/sections'
+                                    '/section[@name="testing"]/acl/*')
+        self.assertEqual(len(a_nodes), 2)
+        self.assertEqual(a_nodes[0].tag, 'allow')
+        self.assertEqual(a_nodes[1].tag, 'no-inherit')
+
+    def test_section_w_no_columns(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        pd = self._makeContext(order=('testing',))
+        section = pd['testing'] = testing.DummyModel(
+                            title='Testing',
+                            tab_title='Testing (TAB)',
+                            __acl__=[('Allow', 'system.Everyone', ('view',))])
         report = section['report'] = testing.DummyModel(title='Report',
                                     link_title='Report (Link)',
                                     css_class='CSS',
                                     columns=('name', 'phone'),
                                     filters={'offices': ['nyc', 'london']})
+        directlyProvides(report, IPeopleReport)
         xml = self._callFUT(pd)
         r_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section/report')
@@ -175,18 +199,21 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(x_nodes[0].get('names'), 'name phone')
 
     def test_section_w_oldstyle_columns(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         pd = self._makeContext(order=('testing',))
         report = testing.DummyModel(title='Report',
                                     link_title='Report (Link)',
                                     css_class='CSS',
                                     columns=('name', 'phone'),
                                     filters={'offices': ['nyc', 'london']})
+        directlyProvides(report, IPeopleReport)
         column = testing.DummyModel(reports=(report,))
         pd['testing'] = testing.DummyModel(
                             title='Testing',
                             tab_title='Testing (TAB)',
                             columns=(column,),
-                            __acl__=[('Allow', 'system.Everyone', 'view')])
+                            __acl__=[('Allow', 'system.Everyone', ('view',))])
         xml = self._callFUT(pd)
         c_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section[@name="testing"]/column')
@@ -212,21 +239,23 @@ class Test_dump_peopledir(unittest.TestCase):
 
     def test_section_w_newstyle_columns(self):
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleReportCategoryFilter
         from karl.models.interfaces import IPeopleReportGroupFilter
         from karl.models.interfaces import IPeopleReportIsStaffFilter
         from karl.models.interfaces import IPeopleSectionColumn
         pd = self._makeContext(order=('testing',))
         section = pd['testing'] = testing.DummyModel(
-                                title='Testing',
-                                tab_title='Testing (TAB)',
-                                __acl__=[('Allow', 'system.Everyone', 'view')])
+                            title='Testing',
+                            tab_title='Testing (TAB)',
+                            __acl__=[('Allow', 'system.Everyone', ('view',))])
         column = section['c1'] = testing.DummyModel(order=('report',))
         directlyProvides(column, IPeopleSectionColumn)
         report = column['report'] = testing.DummyModel(title='Report',
                                         link_title='Report (Link)',
                                         css_class='CSS',
                                         columns=('name', 'phone'))
+        directlyProvides(report, IPeopleReport)
         offices = report['offices'] = testing.DummyModel(
                                             values=['nyc', 'london'])
         directlyProvides(offices, IPeopleReportCategoryFilter)
@@ -257,7 +286,7 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(f_nodes[0].get('values'), 'group1 group2')
         self.assertEqual(f_nodes[1].get('name'), 'is_staff')
         self.assertEqual(f_nodes[1].get('type'), 'is_staff')
-        self.assertEqual(f_nodes[1].get('is_staff'), 'False')
+        self.assertEqual(f_nodes[1].get('include_staff'), 'False')
         self.assertEqual(f_nodes[2].get('name'), 'offices')
         self.assertEqual(f_nodes[2].get('type'), 'category')
         self.assertEqual(f_nodes[2].get('category'), 'offices')
@@ -269,12 +298,13 @@ class Test_dump_peopledir(unittest.TestCase):
 
     def test_section_w_report_group(self):
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleReportGroup
         pd = self._makeContext(order=('testing',))
         section = pd['testing'] = testing.DummyModel(
                             title='Testing',
                             tab_title='Testing (TAB)',
-                            __acl__=[('Allow', 'system.Everyone', 'view')])
+                            __acl__=[('Allow', 'system.Everyone', ('view',))])
         group = section['rg1'] = testing.DummyModel(title='Group')
         directlyProvides(group, IPeopleReportGroup)
         report = group['report'] = testing.DummyModel(title='Report',
@@ -282,6 +312,7 @@ class Test_dump_peopledir(unittest.TestCase):
                                     css_class='CSS',
                                     columns=('name', 'phone'),
                                     filters={'offices': ['nyc', 'london']})
+        directlyProvides(report, IPeopleReport)
         xml = self._callFUT(pd)
         g_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section/report-group')
