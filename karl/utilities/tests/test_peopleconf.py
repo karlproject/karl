@@ -212,6 +212,9 @@ class Test_dump_peopledir(unittest.TestCase):
 
     def test_section_w_newstyle_columns(self):
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
         from karl.models.interfaces import IPeopleSectionColumn
         pd = self._makeContext(order=('testing',))
         section = pd['testing'] = testing.DummyModel(
@@ -224,7 +227,15 @@ class Test_dump_peopledir(unittest.TestCase):
                                         link_title='Report (Link)',
                                         css_class='CSS',
                                         columns=('name', 'phone'))
-        report['offices'] = testing.DummyModel(values=['nyc', 'london'])
+        offices = report['offices'] = testing.DummyModel(
+                                            values=['nyc', 'london'])
+        directlyProvides(offices, IPeopleReportCategoryFilter)
+        groups = report['groups'] = testing.DummyModel(
+                                            values=['group1', 'group2'])
+        directlyProvides(groups, IPeopleReportGroupFilter)
+        is_staff = report['is_staff'] = testing.DummyModel(
+                                            include_staff=False)
+        directlyProvides(is_staff, IPeopleReportIsStaffFilter)
         xml = self._callFUT(pd)
         c_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section[@name="testing"]/column')
@@ -240,9 +251,17 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(r_nodes[0].get('class'), 'CSS')
         f_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section/column/report/filter')
-        self.assertEqual(len(f_nodes), 1)
-        self.assertEqual(f_nodes[0].get('category'), 'offices')
-        self.assertEqual(f_nodes[0].get('values'), 'nyc london')
+        self.assertEqual(len(f_nodes), 3)
+        self.assertEqual(f_nodes[0].get('name'), 'groups')
+        self.assertEqual(f_nodes[0].get('type'), 'groups')
+        self.assertEqual(f_nodes[0].get('values'), 'group1 group2')
+        self.assertEqual(f_nodes[1].get('name'), 'is_staff')
+        self.assertEqual(f_nodes[1].get('type'), 'is_staff')
+        self.assertEqual(f_nodes[1].get('is_staff'), 'False')
+        self.assertEqual(f_nodes[2].get('name'), 'offices')
+        self.assertEqual(f_nodes[2].get('type'), 'category')
+        self.assertEqual(f_nodes[2].get('category'), 'offices')
+        self.assertEqual(f_nodes[2].get('values'), 'nyc london')
         x_nodes = self._xpath(xml, '/peopledirectory/sections'
                                     '/section/column/report/columns')
         self.assertEqual(len(x_nodes), 1)

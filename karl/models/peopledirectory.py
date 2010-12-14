@@ -276,6 +276,7 @@ class PeopleReportIsStaffFilter(_PeopleReportFilter):
 
 PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 
+
 class PeopleReport(Folder):
     implements(IPeopleReport)
     is_ordered = False

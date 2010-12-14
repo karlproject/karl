@@ -24,8 +24,13 @@ from repoze.bfg.security import Deny
 from repoze.bfg.security import DENY_ALL
 from chameleon.zpt.template import PageTemplate
 
-from karl.models.interfaces import IPeopleSectionColumn
+from karl.models.interfaces import IPeopleRedirector
+from karl.models.interfaces import IPeopleReport
+from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
+from karl.models.interfaces import IPeopleReportGroupFilter
+from karl.models.interfaces import IPeopleReportIsStaffFilter
+from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategories
 from karl.models.peopledirectory import PeopleCategory
 from karl.models.peopledirectory import PeopleCategoryItem
@@ -107,16 +112,25 @@ _DUMP_XML =  """\
      </report-group>
     </metal:chunk>
     <metal:chunk metal:define-macro="report">
-     <report tal:condition="not is_group(item) and not is_column(item)"
+     <report tal:condition="is_report(item)"
              name="${r_id}"
              title="${item.title}"
              link-title="${item.link_title}"
              class="${item.css_class}">
-      <tal:loop tal:repeat="(id, values) in sorted(report_filter_items(item))">
-       <filter tal:condition="id != 'groups'"
-               category="$id" values="${' '.join(values)}"/>
-       <filter tal:condition="id == 'groups'"
-               values="${' '.join(values)}"/>
+      <tal:loop tal:repeat="info in report_filter_items(item)">
+       <filter tal:condition="info['type'] == 'category'"
+               name="${info['name']}"
+               type="${info['type']}"
+               category="${info['name']}"
+               values="${info['values']}"/>
+       <filter tal:condition="info['type'] == 'groups'"
+               name="${info['name']}"
+               type="${info['type']}"
+               values="${info['values']}"/>
+       <filter tal:condition="info['type'] == 'is_staff'"
+               name="${info['name']}"
+               type="${info['type']}"
+               include_staff="${info['include_staff']}"/>
       </tal:loop>
       <columns names="${' '.join(item.columns)}"/>
      </report>
@@ -168,8 +182,28 @@ def _report_items(container):
 
 def _report_filter_items(report):
     if 'filters' in report.__dict__:
-        return report.filters.items()
-    return [(name, filter.values) for name, filter in report.items()]
+        # Old-skool
+        for key, values in report.filters.items():
+            yield {'name': key,
+                   'type': 'category',
+                   'values': ' '.join(values),
+                  }
+    #return [(name, filter.values) for name, filter in report.items()]
+    else:
+        for name, obj in sorted(report.items()):
+            info = {'name': name, 'obj': obj}
+            if IPeopleReportCategoryFilter.providedBy(obj):
+                info['type'] = 'category'
+                info['values'] = ' '.join(obj.values)
+            elif IPeopleReportGroupFilter.providedBy(obj):
+                info['type'] = 'groups'
+                info['values'] = ' '.join(obj.values)
+            elif IPeopleReportIsStaffFilter.providedBy(obj):
+                info['type'] = 'is_staff'
+                info['include_staff'] = str(obj.include_staff)
+            else:
+                import pdb; pdb.set_trace()
+            yield info
 
 def dump_peopledir(peopledir):
     old_style = getattr(peopledir, 'categories', None) is not None
@@ -185,6 +219,8 @@ def dump_peopledir(peopledir):
                                     IPeopleSectionColumn.providedBy(x),
                     is_group=lambda x:
                                     IPeopleReportGroup.providedBy(x),
+                    is_report=lambda x:
+                                    IPeopleReport.providedBy(x),
                     category_items=_category_items,
                     acl_info=_acl_info,
                     column_info=_column_info,
