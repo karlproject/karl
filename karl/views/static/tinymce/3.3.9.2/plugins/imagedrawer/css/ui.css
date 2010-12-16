@@ -80,6 +80,8 @@
 /* Image listing */
 .tiny-imagedrawer-panel-images {
     overflow: hidden;
+    /* for IE7's sake */
+    position: relative;
 }
 
 .tiny-imagedrawer-images {
@@ -155,6 +157,7 @@ div.tiny-imagedrawer-image img {
     #position: relative;
     #top: -50%;
     #left: -50%;
+
 }
 
 span.tiny-imagedrawer-imagelabel {
