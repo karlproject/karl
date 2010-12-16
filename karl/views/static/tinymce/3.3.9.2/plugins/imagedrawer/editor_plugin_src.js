@@ -518,6 +518,8 @@
                 // XXX Workaround IE selection handle problem
                 self._save_editor_selection(img);
 
+                self.enable_upload = ed.getParam('imagedrawer_enable_upload', false);
+                
                 // Do we need a dialog?
                 if (! self.dialog) {
                     var data = {};
@@ -529,6 +531,11 @@
                         data = {
                             source: 'myrecent',
                             include_image_url: self.editor_image_data.image_url
+                        };
+                    } else if (! self.enable_upload) {
+                        // Special case: upload is disabled
+                        data = {
+                            source: 'myrecent'
                         };
                     }
                     // Make a request to the server to fetch the dialog snippet
@@ -570,16 +577,16 @@
                         // We are replacing. Source is either My Recent or Web.
                         if (self.editor_image_data.external) {
                             self.buttonset
-                                .karlbuttonset('getButton', 3)   // Web
+                                .karlbuttonset('getButton', self._findSourceButtonIndex('external'))   // Web
                                 .click();
                             self.input_url.val(self.editor_image_data.image_url);
                             self._externalDoCheck({
                                 image_url: self.editor_image_data.image_url
                             });
                         } else {
-                            if (self.selected_source != 1) {
+                            if (self.selected_source != self._findSourceButtonIndex('myrecent')) {
                                 self.buttonset
-                                    .karlbuttonset('getButton', 1)   // My Recent
+                                    .karlbuttonset('getButton', self._findSourceButtonIndex('myrecent'))   // My Recent
                                     .click();
                             } else if (button_value == 'myrecent' ||
                                        button_value == 'thiscommunity' ) {
@@ -710,14 +717,13 @@
                 .addClass('tiny-imagedrawer-button-close');
             
             // Enable/disable the upload button, if needed
-            if (! ed.getParam('imagedrawer_enable_upload', false)) {
+            if (! this.enable_upload) {
                 var buttons_markup = this.dialog
                     .find('.karl-buttonset.tiny-imagedrawer-buttonset-tabselect option');
-                buttons_markup.eq(0)
-                    .attr('disabled', '1')
-                    .attr('selected', null);
                 buttons_markup.eq(1)
-                    .attr('selected', 'selected');
+                    .attr('selected', 'selected')
+                buttons_markup.eq(0)
+                    .remove();
             }
             
 
@@ -1099,18 +1105,18 @@
                 // We are replacing. Source is either My Recent or Web.
                 if (this.editor_image_data.external) {
                     this.buttonset
-                        .karlbuttonset('getButton', 3)   // Web
+                        .karlbuttonset('getButton', this._findSourceButtonIndex('external'))   // Web 
                         .click();
                     this.input_url.val(this.editor_image_data.image_url);
                     this._externalDoCheck({
                         image_url: this.editor_image_data.image_url
                     });
                 } else {
-                    this.selected_source = 1;    // My Recent
+                    this.selected_source = this._findSourceButtonIndex('myrecent');    // My Recent
                     // this will change the tabbing but importantly
                     // _not_ re-fetch the data set
                     this.buttonset
-                        .karlbuttonset('getButton', 1)   // My Recent
+                        .karlbuttonset('getButton', this._findSourceButtonIndex('myrecent'))   // My Recent
                         .click();
                     // We select the
                     // first element. XXX Note in a refined implementation,
@@ -1155,6 +1161,21 @@
             this._restore_formstate();  // XXX XXX
         },
             
+        _findSourceButtonIndex: function(button_value) {
+            // button_value can be: uploadnew, myrecent, thiscommunity, external
+            // (must match the value attribute of one of the source selection buttons)
+            var index;
+            this.buttonset.data('karlbuttonset')
+                .element.children().each(function(i) {
+                    if ($(this).attr('value') == button_value) {
+                        index = i;
+                        // stop iteration
+                        return false;
+                    }
+                });
+            return index;
+        },
+
         // Initialize images for the given search criteria.
         _initImages: function(images_info) {
             // Reset the region control
