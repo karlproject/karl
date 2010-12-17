@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+- Fixed bug when uploading images to new content via image drawer where the
+  image would wind up stranded in a temp folder and would not show up in
+  'My Recent' or 'Community' in the image drawer. (LP #691141)
 
 3.52 (2010-12-06)
 -----------------

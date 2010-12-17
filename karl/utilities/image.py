@@ -45,7 +45,7 @@ def get_images_batch(context,
     return batcher(context, request, **search_params)
 
 TMP_IMG_RE = re.compile('(?P<pre><img[^>]+src=")'
-                        '(?P<url>[^"]+/TEMP/(?P<tempid>[^/]+)'
+                        '(?P<url>[^"]*/TEMP/(?P<tempid>[^/]+)'
                          '/thumb/(?P<width>\d+)x(?P<height>\d+)\.jpg)'
                         '(?P<post>"[^>]*>)')
 
