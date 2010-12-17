@@ -111,6 +111,9 @@ class AddPageFormController(object):
             layout = layout_provider('community')
         else:
             layout = layout_provider('generic')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
@@ -200,6 +203,9 @@ class EditPageFormController(object):
             layout = layout_provider('community')
         else:
             layout = layout_provider('generic')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):

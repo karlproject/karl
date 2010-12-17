@@ -136,6 +136,9 @@ class AddNewsItemFormController(object):
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api': self.api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):

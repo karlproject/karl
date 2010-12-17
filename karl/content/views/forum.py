@@ -458,6 +458,11 @@ def show_forum_topic_view(context, request):
     for name, widget in widgets.items():
         comment_form[name].widget = widget
 
+    # enable imagedrawer for adding forum replies (comments)
+    api.karl_client_data['text'] = dict(
+            enable_imagedrawer_upload = True,
+            )
+
     return render_template_to_response(
         'templates/show_forum_topic.pt',
         api=api,
@@ -535,6 +540,9 @@ class AddForumTopicFormController(object):
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
@@ -638,6 +646,9 @@ class EditForumTopicFormController(object):
         layout = layout_provider('community')
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):

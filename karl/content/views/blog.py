@@ -251,6 +251,11 @@ def show_blogentry_view(context, request):
     for name, widget in widgets.items():
         comment_form[name].widget = widget
 
+    # this is for enable imagedrawer for adding blog comments
+    api.karl_client_data['text'] = dict(
+            enable_imagedrawer_upload = True,
+            )
+
     return render_template_to_response(
         'templates/show_blogentry.pt',
         api=api,

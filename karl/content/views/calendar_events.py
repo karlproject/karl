@@ -482,6 +482,9 @@ class CalendarEventFormControllerBase(object):
         api = TemplateAPI(context, request, self.page_title)
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
+        api.karl_client_data['text'] = dict(
+                enable_imagedrawer_upload = True,
+                )
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
