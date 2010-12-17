@@ -71,7 +71,7 @@
       <!-- BBB for head_data -->
         <script type="text/javascript">
           jQuery.extend(window.karl_client_data || {}, window._karl_client_data || {});
-        </script>'
+        </script>
       <!-- end BBB -->
 
     </metal:resources>
