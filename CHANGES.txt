@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
------------
+3.53 (2010-12-20)
+-----------------
 
 - Fixed bug when uploading images to new content via image drawer where the
   image would wind up stranded in a temp folder and would not show up in
