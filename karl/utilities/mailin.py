@@ -24,28 +24,27 @@ from __future__ import with_statement
 
 import datetime
 import logging
-import markdown2
-import os
 import re
 import sys
-import time
 import traceback
 import transaction
 
-from karl.adapters.interfaces import IMailinDispatcher
-from karl.adapters.interfaces import IMailinHandler
-from repoze.postoffice.message import Message
-from karl.utils import find_catalog
-from karl.utils import find_communities
-from karl.utils import get_setting
-from karl.utils import hex_to_docid
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.traversal import find_model
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
+from repoze.postoffice.message import Message
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
 from zope.component import getUtility
+
+from karl.adapters.interfaces import IMailinDispatcher
+from karl.adapters.interfaces import IMailinHandler
+from karl.utils import find_catalog
+from karl.utils import find_communities
+from karl.utils import find_peopledirectory
+from karl.utils import get_setting
+from karl.utils import hex_to_docid
 
 #BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
 REPLY_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)-(?P<reply>\w+)@')
@@ -101,21 +100,26 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
                                     isolation_level='DEFERRED')
 
     def processMessage(self, message, info, text, attachments):
-        community = find_communities(self.root)[info['community']]
-        target = tool = community[info['tool']]
+        report_name = info.get('report')
+        if report_name is not None:
+            pd = find_peopledirectory(self.root)
+            target = find_model(pd, report_name.split('+'))
+        else:
+            community = find_communities(self.root)[info['community']]
+            target = tool = community[info['tool']]
 
-        # XXX this should be more like:
-        if info['in_reply_to'] is not None:
-            docid = int(hex_to_docid(info['in_reply_to']))
-            catalog = find_catalog(target)
-            path = catalog.document_map.address_for_docid(docid)
-            item = find_model(self.root, path)
-            target = item
+            # XXX this should be more like:
+            if info['in_reply_to'] is not None:
+                docid = int(hex_to_docid(info['in_reply_to']))
+                catalog = find_catalog(target)
+                path = catalog.document_map.address_for_docid(docid)
+                item = find_model(self.root, path)
+                target = item
 
         IMailinHandler(target).handle(message, info, text, attachments)
 
     def bounceMessage(self, message, info):
-        pass
+        return
 
     def handleMessage(self, message_id):
         # return 'True' if processed, 'False' if bounced.
@@ -133,7 +137,11 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
                 text, attachments = self.dispatcher.crackPayload(message)
                 self.processMessage(message, info, text, attachments)
                 extra = ['%s:%s' % (x, info.get(x))
-                            for x in ('community', 'in_reply_to', 'tool', 'author')
+                            for x in ('community',
+                                      'in_reply_to',
+                                      'tool',
+                                      'author',
+                                     )
                                 if info.get(x) is not None]
                 self.log('PROCESSED', message_id, ','.join(extra))
                 if self.verbosity > 1:
@@ -177,8 +185,7 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
             self.pending.sql.commit()
 
 class MailinRunner2(object):
-    """
-    Compatible with repoze.postoffice.
+    """ Compatible with repoze.postoffice.
     """
 
     def __init__(self, root, zodb_uri, zodb_path, queue_name,
@@ -235,15 +242,20 @@ class MailinRunner2(object):
             return False
 
     def process_message(self, message, info, text, attachments):
-        community = find_communities(self.root)[info['community']]
-        target = tool = community[info['tool']]
+        report_name = info.get('report')
+        if report_name is not None:
+            pd = find_peopledirectory(self.root)
+            target = find_model(pd, report_name.split('+'))
+        else:
+            community = find_communities(self.root)[info['community']]
+            target = tool = community[info['tool']]
 
-        if info['in_reply_to'] is not None:
-            docid = int(hex_to_docid(info['in_reply_to']))
-            catalog = find_catalog(target)
-            path = catalog.document_map.address_for_docid(docid)
-            item = find_model(self.root, path)
-            target = item
+            if info['in_reply_to'] is not None:
+                docid = int(hex_to_docid(info['in_reply_to']))
+                catalog = find_catalog(target)
+                path = catalog.document_map.address_for_docid(docid)
+                item = find_model(self.root, path)
+                target = item
 
         IMailinHandler(target).handle(message, info, text, attachments)
 

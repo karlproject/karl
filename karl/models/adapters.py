@@ -15,40 +15,44 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from email.message import Message
 import string
-
-from zope.interface import implements
-from zope.component import queryUtility
+import warnings
 
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import effective_principals
+from repoze.bfg.traversal import find_interface
+from repoze.bfg.traversal import find_model
+from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
-
 from repoze.lemonade.listitem import get_listitems
+from repoze.sendmail.interfaces import IMailDelivery
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.interface import implements
 
-from karl.utils import get_content_type_name
-from karl.utils import find_catalog
-from karl.utils import find_profiles
-from karl.utils import find_tags
-from karl.utils import find_peopledirectory_catalog
-
+from karl.adapters.interfaces import IMailinHandler
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IComment
+from karl.models.interfaces import ICommunities
 from karl.models.interfaces import ICommunity
-from karl.models.interfaces import IToolFactory
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import IGridEntryInfo
-from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ILetterManager
-from karl.models.interfaces import ICommunities
-from karl.models.interfaces import IProfiles
-from karl.models.interfaces import IPeopleReportFilter
 from karl.models.interfaces import IPeopleReportCategoryFilter
+from karl.models.interfaces import IPeopleReportFilter
 from karl.models.interfaces import IPeopleReportGroupFilter
+from karl.models.interfaces import IProfiles
+from karl.models.interfaces import ITagQuery
+from karl.models.interfaces import IToolFactory
+from karl.utils import find_catalog
+from karl.utils import find_peopledirectory_catalog
+from karl.utils import find_profiles
+from karl.utils import find_tags
+from karl.utils import get_content_type_name
+from karl.utils import get_setting
+
 
 class CatalogSearch(object):
     """ Centralize policies about searching """
@@ -58,6 +62,9 @@ class CatalogSearch(object):
         #     compatability.  Should be phased out.
         self.context = context
         self.catalog = find_catalog(self.context)
+        if request is not None:
+            warnings.warn('Creating CatalogSearch with request is deprecated.',
+                          DeprecationWarning, stacklevel=2)
 
     def __call__(self, **kw):
         num, docids = self.catalog.search(**kw)
@@ -73,6 +80,7 @@ class CatalogSearch(object):
                 logger and logger.warn('Model missing: %s' % path)
                 return None
         return num, docids, resolver
+
 
 class PeopleDirectoryCatalogSearch(CatalogSearch):
     """ Catalog search from the PeopleDirectory catalog """
@@ -173,6 +181,7 @@ class GridEntryInfo(object):
     @property
     def modified_by_url(self):
         return model_url(self.modified_by_profile, self.request)
+
 
 class TagQuery(object):
     implements(ITagQuery)
@@ -411,11 +420,14 @@ class LetterManager(object): # abstract adapter class, requires iface attr
                        })
         return letters
 
+
 class CommunityLetterManager(LetterManager):
     iface = ICommunities
 
+
 class ProfileLetterManager(LetterManager):
     iface = IProfiles
+
 
 class PeopleReportLetterManager(object):
     implements(ILetterManager)
@@ -486,3 +498,72 @@ class PeopleReportLetterManager(object):
                 'is_current': letter == current,
                 })
         return letters
+
+
+class PeopleReportMailinHandler(object):
+    implements(IMailinHandler)
+
+    def __init__(self, context):
+        self.context = context
+
+    def handle(self, message, info, text, attachments):
+        """ See IMailinHandler.
+        """
+        """ Later on, we might want to archive messages, something like::
+
+        entry = create_content(
+            IListMessage,
+            title=info['subject'],
+            creator=info['author'],
+            text=text,
+            description=extract_description(text),
+            )
+
+        if attachments:
+            if 'attachments' not in entry:
+                # XXX Not a likely code path, left here for safety
+                entry['attachments'] = att_folder = AttachmentsFolder()
+                att_folder.title = 'Attachments'
+                att_folder.creator = info['author']
+            else:
+                att_folder = entry['attachments']
+            _addAttachments(att_folder, info, attachments)
+
+        entry_id = make_unique_name(self.context, entry.title)
+        self.context[entry_id] = entry
+
+        workflow = get_workflow(IBlogEntry, 'security', self.context)
+        if workflow is not None:
+            workflow.initialize(entry)
+
+        alerts = queryUtility(IAlerts, default=Alerts())
+        alerts.emit(entry, offline_request)
+        """
+        if 'mailinglist' in self.context:
+            system_email_domain = get_setting(self.context,
+                                              "system_email_domain")
+            reply_to = "peopledir-%s@%s" % (info['report'],
+                                           system_email_domain)
+            clone = self._cloneMessage(message)
+            clone['Reply-To'] = reply_to
+            mailer = getUtility(IMailDelivery)
+            for address in self._reportAddresses(self.context):
+                mailer.send(message['From'], address, clone)
+
+    def _cloneMessage(self, message):
+        clone = Message()
+        for key, value in message.items():
+            if key.lower() != 'message-id':
+                clone[key] = value
+        clone.set_payload(message.get_payload())
+        return clone
+
+    def _reportAddresses(self, report):
+        query = report.getQuery()
+        searcher = ICatalogSearch(report)
+        total, docids, resolver = searcher(**query)
+
+        for docid in docids:
+            profile = resolver(docid)
+            if profile is not None:
+                yield profile.email

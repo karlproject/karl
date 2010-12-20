@@ -17,11 +17,10 @@
 
 from cStringIO import StringIO
 
-from zope.component import queryUtility
-from zope.interface import implements
-
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
+from zope.component import queryUtility
+from zope.interface import implements
 
 from karl.adapters.interfaces import IMailinHandler
 from karl.adapters.url import OfflineRequest
@@ -34,7 +33,9 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.models.attachments import AttachmentsFolder
 from karl.content.views.utils import extract_description
 
+
 offline_request = OfflineRequest()
+
 
 def _addAttachments(att_folder, info, attachments):
     for filename, mimetype, data in attachments:
@@ -48,6 +49,7 @@ def _addAttachments(att_folder, info, attachments):
                                     creator = info['author'],
                                     )
         att_folder[name] = attachment
+
 
 class BlogEntryMailinHandler(object):
     implements(IMailinHandler)
@@ -83,6 +85,7 @@ class BlogEntryMailinHandler(object):
         # Mailin always sends alerts
         alerts = queryUtility(IAlerts, default=Alerts())
         alerts.emit(reply, offline_request)
+
 
 class BlogMailinHandler(object):
     implements(IMailinHandler)

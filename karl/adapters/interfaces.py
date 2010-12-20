@@ -19,7 +19,11 @@ class IMailinDispatcher(Interface):
         """
 
     def isCommunity(name):
-        """ Does the site has a community matching 'name'?
+        """ Does the site hav a community matching 'name'?
+        """
+
+    def isReport(name):
+        """ Does the site have a peopledir report matching 'name'?
         """
 
     def getCommunityId(email):

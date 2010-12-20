@@ -690,6 +690,48 @@
   </formish:form>
 
   <formish:form
+     controller=".peopledirectory.AddReportMailingListFormController"
+     name="add_mailing_list.html"
+     for="karl.models.interfaces.IPeopleReport"
+     permission="administer"
+     renderer="forms/templates/formish_form.pt"
+     form_id="add">
+     
+     <formish:action
+       name="submit"
+       title="Add Mailing List"
+       />
+       
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+       
+  </formish:form>
+  
+  <formish:form
+     controller=".peopledirectory.EditReportMailingListFormController"
+     name="edit.html"
+     for="karl.models.interfaces.IPeopleReportMailingList"
+     permission="administer"
+     renderer="forms/templates/formish_form.pt"
+     form_id="edit">
+     
+     <formish:action
+       name="submit"
+       title="Edit Mailing List"
+       />
+     
+     <formish:action
+       name="cancel"
+       title="Cancel"
+       validate="false"
+       />
+  
+  </formish:form>
+
+  <formish:form
      controller=".community.AddCommunityFormController"
      name="add_community.html"
      permission="create"
@@ -1262,6 +1304,14 @@
 
   <view
     for="karl.models.interfaces.IPeopleReportFilter"
+    view=".peopledirectory.admin_contents"
+    permission="administer"
+    renderer="templates/people_contents.pt"
+    name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReportMailingList"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"

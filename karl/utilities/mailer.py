@@ -53,7 +53,7 @@ class FakeMailDelivery:
         self.quiet = quiet
 
     def send(self, mfrom, mto, msg):
-        if not self.quiet:
+        if not self.quiet: #pragma NO COVERAGE
             print 'From:', mfrom
             print 'To:', mto
             print 'Message:', msg

@@ -87,12 +87,13 @@ class MailinRunnerTests(unittest.TestCase):
         mailin.section('foobar', verbosity=2)
         self.assertEqual(mailin.printed, [])
 
-    def test_processMessage_reply_no_attachments(self):
+    def test_processMessage_reply_no_attachments_community(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerAdapter
         from repoze.bfg.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
-        INFO = {'community': 'testing',
+        INFO = {'report': None,
+                'community': 'testing',
                 'tool': 'random',
                 'in_reply_to': '7FFFFFFF', # token for docid 0
                 'author': 'phreddy',
@@ -118,16 +119,17 @@ class MailinRunnerTests(unittest.TestCase):
 
         mailin.processMessage(message, INFO, text, attachments)
 
-        self.assertEqual(handler.context, entry)
+        self.failUnless(handler.context is entry)
         self.assertEqual(handler.handle_args,
                          (message, INFO, text, attachments))
 
-    def test_processMessage_reply_w_attachment(self):
+    def test_processMessage_reply_w_attachment_community(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerAdapter
         from repoze.bfg.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
-        INFO = {'community': 'testing',
+        INFO = {'report': None,
+                'community': 'testing',
                 'tool': 'random',
                 'in_reply_to': '7FFFFFFF', # token for docid 0
                 'author': 'phreddy',
@@ -153,7 +155,40 @@ class MailinRunnerTests(unittest.TestCase):
 
         mailin.processMessage(message, INFO, text, attachments)
 
-        self.assertEqual(handler.context, entry)
+        self.failUnless(handler.context is entry)
+        self.assertEqual(handler.handle_args,
+                         (message, INFO, text, attachments))
+
+    def test_processMessage_report(self):
+        from zope.interface import directlyProvides
+        from repoze.bfg.testing import DummyModel
+        from repoze.bfg.testing import registerAdapter
+        from karl.adapters.interfaces import IMailinHandler
+        from karl.models.interfaces import IPeopleDirectory
+        INFO = {'report': 'section+testing',
+                'community': None,
+                'tool': None,
+                'author': 'phreddy',
+                'subject': 'Feedback'
+               }
+        handler = DummyHandler()
+        def _handlerFactory(context):
+            handler.context = context
+            return handler
+        registerAdapter(_handlerFactory, DummyModel, IMailinHandler)
+        mailin = self._makeOne()
+        catalog = mailin.root.catalog = DummyCatalog()
+        pd = mailin.root['people'] = DummyModel()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = DummyModel()
+        testing = section['testing'] = DummyModel()
+        message = DummyMessage()
+        text = 'This entry stinks!'
+        attachments = [('foo.txt', 'text/plain', 'My attachment')]
+
+        mailin.processMessage(message, INFO, text, attachments)
+
+        self.failUnless(handler.context is testing)
         self.assertEqual(handler.handle_args,
                          (message, INFO, text, attachments))
 
@@ -203,7 +238,8 @@ class MailinRunner2Tests(unittest.TestCase):
     def test_one_message_reply_no_attachments(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerModels
-        info = {'community': 'testing',
+        info = {'report': None,
+                'community': 'testing',
                 'tool': 'random',
                 'in_reply_to': '7FFFFFFF', # token for docid 0
                 'author': 'phreddy',
@@ -237,7 +273,8 @@ class MailinRunner2Tests(unittest.TestCase):
     def test_process_message_reply_w_attachment(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerModels
-        info = {'community': 'testing',
+        info = {'report': None,
+                'community': 'testing',
                 'tool': 'random',
                 'in_reply_to': '7FFFFFFF', # token for docid 0
                 'author': 'phreddy',
@@ -259,12 +296,44 @@ class MailinRunner2Tests(unittest.TestCase):
         registerModels({'/communities/testing/random/entry': entry})
 
         mailin()
+        mailin.close()
 
         self.assertEqual(len(self.handlers), 1)
         handler = self.handlers[0]
         self.assertEqual(handler.context, entry)
         self.assertEqual(handler.handle_args,
                          (message, info, text, attachments))
+        self.assertEqual(len(self.mailer), 0)
+
+    def test_process_message_report(self):
+        from zope.interface import directlyProvides
+        from repoze.bfg.testing import DummyModel
+        from karl.models.interfaces import IPeopleDirectory
+        INFO = {'report': 'section+testing',
+                'community': None,
+                'tool': None,
+                'author': 'phreddy',
+                'subject': 'Feedback'
+               }
+        text = 'This entry stinks!'
+        attachments = [('foo.txt', 'text/plain', 'My attachment')]
+        message = DummyMessage(INFO, text, attachments)
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        pd = mailin.root['people'] = DummyModel()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = DummyModel()
+        testing = section['testing'] = DummyModel()
+
+        mailin()
+        mailin.close()
+
+        self.assertEqual(len(self.handlers), 1)
+        handler = self.handlers[0]
+        self.failUnless(handler.context is testing)
+        self.assertEqual(handler.handle_args,
+                         (message, INFO, text, attachments))
         self.assertEqual(len(self.mailer), 0)
 
     def test_bounce_message(self):
@@ -413,20 +482,3 @@ class DummyDispatcher(object):
 class DummyMailer(list):
     def send(self, from_addr, to_addrs, message):
         self.append((from_addr, to_addrs, message))
-
-
-class DummySend(object):
-    def __init__(self):
-        self.calls = []
-
-    def __call__(self, fromaddr, toaddrs, message):
-        self.calls.append(dict(
-            fromaddr=fromaddr,
-            toaddrs=toaddrs,
-            message=message,
-        ))
-
-class DummySettings:
-    def __init__(self, **kw):
-        for k, v in kw.items():
-            setattr(self, k, v)

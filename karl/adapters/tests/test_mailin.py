@@ -1,12 +1,13 @@
 import unittest
-from zope.testing.cleanup import cleanUp
 
 class MailinDispatcherTests(unittest.TestCase):
 
     def setUp(self):
+        from zope.testing.cleanup import cleanUp
         cleanUp()
 
     def tearDown(self):
+        from zope.testing.cleanup import cleanUp
         cleanUp()
 
     def _getTargetClass(self):
@@ -22,12 +23,12 @@ class MailinDispatcherTests(unittest.TestCase):
         from repoze.bfg.testing import DummyModel
         return DummyModel()
 
-    def test_class_conforms_to_IMailinHandler(self):
+    def test_class_conforms_to_IMailinDispatcher(self):
         from zope.interface.verify import verifyClass
         from karl.adapters.interfaces import IMailinDispatcher
         verifyClass(IMailinDispatcher, self._getTargetClass())
 
-    def test_instance_conforms_to_IMailinHandler(self):
+    def test_instance_conforms_to_IMailinDispatcher(self):
         from zope.interface.verify import verifyObject
         from karl.adapters.interfaces import IMailinDispatcher
         verifyObject(IMailinDispatcher, self._makeOne())
@@ -69,6 +70,46 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.failUnless(mailin.isCommunity('extant'))
 
+    def test_isReport_nonesuch(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        mailin = self._makeOne(context)
+        self.failIf(mailin.isReport('nonesuch'))
+
+    def test_isReport_extant(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        pd['extant'] = self._makeContext()
+        mailin = self._makeOne(context)
+        self.failUnless(mailin.isReport('extant'))
+
+    def test_isReport_subpath_miss(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        pd['section'] = self._makeContext()
+        mailin = self._makeOne(context)
+        self.failIf(mailin.isReport('section+nonesuch'))
+
+    def test_isReport_subpath_hit(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        section['extant'] = self._makeContext()
+        mailin = self._makeOne(context)
+        self.failUnless(mailin.isReport('section+extant'))
+
     def test_getCommunityId_nonesuch(self):
         context = self._makeContext()
         context['communities'] = self._makeContext()
@@ -99,27 +140,230 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getAuthor('extant@example.com'), 'extant')
 
-    def test_getAutomationIndicators_precedence(self):
-        mailin = self._makeOne()
-        message = DummyMessage()
-        message.precedence = 'bulk'
-
-        info = mailin.getAutomationIndicators(message)
-        self.assertEqual(info['error'], 'Precedence: bulk')
-
-    def test_getAutomationIndicators_auto_submitted(self):
-        mailin = self._makeOne()
-        message = DummyMessage()
-        setattr(message, 'auto-submitted', 'auto-generated')
-
-        info = mailin.getAutomationIndicators(message)
-        self.assertEqual(info['error'], 'Auto-Submitted: auto-generated')
-
     def test_getMessageTarget_no_To(self):
         mailin = self._makeOne()
         message = DummyMessage()
         info = mailin.getMessageTarget(message)
         self.assertEqual(info['error'], 'no community specified')
+
+    def test_getMessageTarget_reply_invalid_community(self):
+        context = self._makeContext()
+        context['communities'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('nonesuch+tool-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid community: nonesuch')
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'nonesuch')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_reply_invalid_to_addr(self):
+        context = self._makeContext()
+        context['communities'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('undisclosed-recipients:;',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['error'], 'no community specified')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_reply_ok(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('testing+tool-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_reply_ok_community_with_hyphen(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-hyphen'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-hyphen+tool-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'with-hyphen')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_reply_ok_community_with_period(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-.dot'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-.dot+tool-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
+        self.assertEqual(info['community'], 'with-.dot')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_tool_invalid_community(self):
+        context = self._makeContext()
+        context['communities'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('nonesuch+tool@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid community: nonesuch')
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'nonesuch')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_tool_ok(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('testing+tool@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'))
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_tool_ok_community_with_hyphen(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-hyphen'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-hyphen+tool@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'with-hyphen')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_tool_ok_community_with_period(self):
+        context = self._makeContext()
+        cf = context['communities'] = self._makeContext()
+        cf['with-.dot'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('with-.dot+tool@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['community'], 'with-.dot')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_default_invalid_community(self):
+        context = self._makeContext()
+        context['communities'] = self._makeContext()
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('nonesuch@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'no community specified')
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], 'default')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_report_reply_invalid_report(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('peopledir-section+nonesuch-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid report: section+nonesuch')
+        self.assertEqual(info['report'], 'section+nonesuch')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_report_reply_valid_report(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        section['extant'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('peopledir-section+extant-12345@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['report'], 'section+extant')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.assertEqual(info['in_reply_to'], '12345')
+
+    def test_getMessageTarget_report_invalid_report(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('peopledir-section+nonesuch@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.assertEqual(info['error'], 'invalid report: section+nonesuch')
+        self.assertEqual(info['report'], 'section+nonesuch')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.failIf(info.get('in_reply_to'), info)
+
+    def test_getMessageTarget_report_valid_report(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        section['extant'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('peopledir-section+extant@example.com',)
+
+        info = mailin.getMessageTarget(message)
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['report'], 'section+extant')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.failIf(info.get('in_reply_to'), info)
 
     def test_getMessageAuthorAndSubject_no_From(self):
         mailin = self._makeOne()
@@ -150,14 +394,6 @@ class MailinDispatcherTests(unittest.TestCase):
         info = mailin.getMessageAuthorAndSubject(message)
         self.assertEqual(info['error'], 'missing Subject:')
 
-    def test_getAutomationIndicators_vacation(self):
-        mailin = self._makeOne()
-        message = DummyMessage()
-        message.subject = 'Out of Office AutoReply'
-
-        info = mailin.getAutomationIndicators(message)
-        self.assertEqual(info['error'], 'vacation message')
-
     def test_getMessageAuthorAndSubject_bad_author(self):
         context = self._makeContext()
         by_email = {}
@@ -171,142 +407,109 @@ class MailinDispatcherTests(unittest.TestCase):
         info = mailin.getMessageAuthorAndSubject(message)
         self.assertEqual(info['error'], 'author not found')
 
-    def test_getMessageTarget_reply_invalid_community(self):
-        context = self._makeContext()
-        context['communities'] = self._makeContext()
-        mailin = self._makeOne(context)
+    def test_getAutomationIndicators_precedence(self):
+        mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('nonesuch+tool-12345@example.com',)
+        message.precedence = 'bulk'
 
-        info = mailin.getMessageTarget(message)
-        self.assertEqual(info['error'], 'invalid community: nonesuch')
-        self.assertEqual(info['community'], 'nonesuch')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'Precedence: bulk')
 
-    def test_getMessageTarget_reply_invalid_to_addr(self):
-        context = self._makeContext()
-        context['communities'] = self._makeContext()
-        mailin = self._makeOne(context)
+    def test_getAutomationIndicators_auto_submitted(self):
+        mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('undisclosed-recipients:;',)
+        setattr(message, 'auto-submitted', 'auto-generated')
 
-        info = mailin.getMessageTarget(message)
-        self.assertEqual(info['error'], 'no community specified')
-        self.assertEqual(info['community'], None)
-        self.assertEqual(info['tool'], None)
-        self.assertEqual(info['in_reply_to'], None)
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'Auto-Submitted: auto-generated')
 
-    def test_getMessageTarget_reply_ok(self):
-        context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['testing'] = self._makeContext()
-        mailin = self._makeOne(context)
+    def test_getAutomationIndicators_vacation(self):
+        mailin = self._makeOne()
         message = DummyMessage()
-        message.to = ('testing+tool-12345@example.com',)
+        message.subject = 'Out of Office AutoReply'
 
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'))
-        self.assertEqual(info['community'], 'testing')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
+        info = mailin.getAutomationIndicators(message)
+        self.assertEqual(info['error'], 'vacation message')
 
-    def test_getMessageTarget_reply_ok_community_with_hyphen(self):
+    def test_checkPermission_community_miss(self):
+        from karl.testing import DummyUsers
+        from repoze.bfg.testing import registerDummySecurityPolicy
+        registerDummySecurityPolicy('phred', permissive=False)
         context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['with-hyphen'] = self._makeContext()
+        communities = context['communities'] = self._makeContext()
+        community = communities['testcommunity'] = self._makeContext()
+        community['testtool'] = self._makeContext()
+        users = context.users = DummyUsers()
+        userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('with-hyphen+tool-12345@example.com',)
+        info = {'author': 'phred',
+                'community': 'testcommunity',
+                'tool': 'testtool',
+                'report': None,
+               }
+        self.assertEqual(mailin.checkPermission(info),
+                         {'error': 'Permission Denied'})
 
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'))
-        self.assertEqual(info['community'], 'with-hyphen')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
-
-    def test_getMessageTarget_reply_ok_community_with_period(self):
+    def test_checkPermission_community_hit(self):
+        from karl.testing import DummyUsers
+        from repoze.bfg.testing import registerDummySecurityPolicy
+        registerDummySecurityPolicy('phred', permissive=True)
         context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['with-.dot'] = self._makeContext()
+        communities = context['communities'] = self._makeContext()
+        community = communities['testcommunity'] = self._makeContext()
+        community['testtool'] = self._makeContext()
+        users = context.users = DummyUsers()
+        userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('with-.dot+tool-12345@example.com',)
+        info = {'author': 'phred',
+                'community': 'testcommunity',
+                'tool': 'testtool',
+                'report': None,
+               }
+        self.assertEqual(mailin.checkPermission(info), {})
 
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'))
-        self.assertEqual(info['community'], 'with-.dot')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
-
-    def test_getMessageTarget_tool_invalid_community(self):
+    def test_checkPermission_report_miss(self):
+        from zope.interface import directlyProvides
+        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.models.interfaces import IPeopleDirectory
+        from karl.testing import DummyUsers
+        registerDummySecurityPolicy('phred', permissive=False)
         context = self._makeContext()
-        context['communities'] = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        report = section['report'] = self._makeContext()
+        users = context.users = DummyUsers()
+        userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('nonesuch+tool@example.com',)
+        info = {'author': 'phred',
+                'community': None,
+                'tool': None,
+                'report': 'section+report',
+               }
+        self.assertEqual(mailin.checkPermission(info),
+                         {'error': 'Permission Denied'})
 
-        info = mailin.getMessageTarget(message)
-        self.assertEqual(info['error'], 'invalid community: nonesuch')
-        self.assertEqual(info['community'], 'nonesuch')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], None)
-
-    def test_getMessageTarget_tool_ok(self):
+    def test_checkPermission_report_hit(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        from karl.testing import DummyUsers
+        from repoze.bfg.testing import registerDummySecurityPolicy
+        registerDummySecurityPolicy('phred', permissive=True)
         context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['testing'] = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        report = section['report'] = self._makeContext()
+        users = context.users = DummyUsers()
+        userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('testing+tool@example.com',)
-
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'))
-        self.assertEqual(info['community'], 'testing')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], None)
-
-    def test_getMessageTarget_tool_ok_community_with_hyphen(self):
-        context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['with-hyphen'] = self._makeContext()
-        mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('with-hyphen+tool@example.com',)
-
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'), info)
-        self.assertEqual(info['community'], 'with-hyphen')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], None)
-
-    def test_getMessageTarget_tool_ok_community_with_period(self):
-        context = self._makeContext()
-        cf = context['communities'] = self._makeContext()
-        cf['with-.dot'] = self._makeContext()
-        mailin = self._makeOne(context)
-        message = DummyMessage()
-        message.to = ('with-.dot+tool@example.com',)
-
-        info = mailin.getMessageTarget(message)
-        self.failIf(info.get('error'), info)
-        self.assertEqual(info['community'], 'with-.dot')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], None)
-
-    def test_getMessageTarget_default_invalid_community(self):
-        context = self._makeContext()
-        context['communities'] = self._makeContext()
-        mailin = self._makeOne(context)
-        mailin.default_tool = 'default'
-        message = DummyMessage()
-        message.to = ('nonesuch@example.com',)
-
-        info = mailin.getMessageTarget(message)
-        self.assertEqual(info['error'], 'no community specified')
-        self.assertEqual(info['community'], None)
-        self.assertEqual(info['tool'], 'default')
-        self.assertEqual(info['in_reply_to'], None)
+        info = {'author': 'phred',
+                'community': None,
+                'tool': None,
+                'report': 'section+report',
+               }
+        self.assertEqual(mailin.checkPermission(info), {})
 
     def test_crackHeaders_no_To(self):
         mailin = self._makeOne()
@@ -665,40 +868,6 @@ class MailinDispatcherTests(unittest.TestCase):
 
         self.assertEqual(text, u'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s')
         self.assertEqual(len(attachments), 0)
-
-class TestOfflineContextURL(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-        from karl.testing import registerSettings
-        registerSettings()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _make_one(self, model):
-        from karl.adapters.url import OfflineContextURL
-        return OfflineContextURL(model, None)
-
-    def test_it(self):
-        from repoze.bfg.testing import DummyModel
-        context = DummyModel()
-        url = self._make_one(context)
-        self.assertEqual(url(), 'http://offline.example.com/app/')
-
-    def test_it_again(self):
-        from repoze.bfg.testing import DummyModel
-        parent = DummyModel()
-        context = parent['foo'] = DummyModel()
-        url = self._make_one(context)
-        self.assertEqual(url(), 'http://offline.example.com/app/foo')
-
-    def test_it_w_feeling(self):
-        from repoze.bfg.testing import DummyModel
-        parent = DummyModel()
-        foo = parent['foo'] = DummyModel()
-        context = foo['bar'] = DummyModel()
-        url = self._make_one(context)
-        self.assertEqual(url(), 'http://offline.example.com/app/foo/bar')
 
 
 class DummyMessage:

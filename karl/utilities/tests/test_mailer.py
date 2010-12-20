@@ -1,6 +1,3 @@
-from __future__ import with_statement
-
-import os
 import unittest
 from repoze.bfg import testing
 
@@ -12,7 +9,9 @@ class TestMailDeliveryFactory(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, os=os):
+    def _callFUT(self, os=None):
+        if os is None:
+            import os
         from karl.utilities.mailer import mail_delivery_factory
         return mail_delivery_factory(os=os)
 
@@ -31,6 +30,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         self.assertEqual(delivery.__class__, FakeMailDelivery)
 
     def test_mail_queue_path_unspecified(self):
+        import os
         import sys
         from repoze.bfg.interfaces import ISettings
         settings = DummySettings()
@@ -60,17 +60,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         self.assertEqual(delivery.__class__, WhiteListMailDelivery)
 
 class TestWhiteListMailDelivery(unittest.TestCase):
-    tmp_name = '/tmp/white_list.txt'
-
-    def _set_whitelist(self, white_list):
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.interfaces import ISettings
-        settings = DummySettings(mail_white_list=self.tmp_name)
-        registerUtility(settings, ISettings)
-
-        with open(self.tmp_name, "w") as f:
-            for email in white_list:
-                print >>f, email
+    tmp_file = None
 
     def setUp(self):
         testing.setUp()
@@ -79,65 +69,82 @@ class TestWhiteListMailDelivery(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-        import os
-        if os.path.exists(self.tmp_name):
-            os.remove(self.tmp_name)
+        if self.tmp_file is not None:
+            self.tmp_file.close()
+
+    def _getTargetClass(self):
+        from karl.utilities.mailer import WhiteListMailDelivery
+        return WhiteListMailDelivery
+
+    def _makeOne(self, sender=None):
+        if sender is None:
+            sender = DummyMailDelivery()
+        return self._getTargetClass()(sender), sender
+
+    def _set_whitelist(self, white_list):
+        import tempfile
+        from repoze.bfg.testing import registerUtility
+        from repoze.bfg.interfaces import ISettings
+        tmp = self.tmp_file = tempfile.NamedTemporaryFile()
+        settings = DummySettings(mail_white_list=tmp.name)
+        registerUtility(settings, ISettings)
+
+        for email in white_list:
+            print >>tmp, email
+        tmp.flush()
+
+    def test_queuePath(self):
+        BEFORE = '/var/spool/before'
+        AFTER = '/var/spool/after'
+        delivery, sender = self._makeOne()
+        sender.queuePath = BEFORE
+        self.assertEqual(delivery.queuePath, BEFORE)
+        delivery.queuePath = AFTER
+        self.assertEqual(sender.queuePath, AFTER)
 
     def test_no_whitelist(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
-        delivery = WhiteListMailDelivery(sender)
+        delivery, sender = self._makeOne()
 
         delivery.send("a", ["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b", "c"], sender.calls[0]["toaddrs"])
 
     def test_one_recipient(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
         self._set_whitelist(["b"])
+        delivery, sender = self._makeOne()
 
-        delivery = WhiteListMailDelivery(sender)
         delivery.send("a", ["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b",], sender.calls[0]["toaddrs"])
 
     def test_no_recipients(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
         self._set_whitelist(["d"])
+        delivery, sender = self._makeOne()
 
-        delivery = WhiteListMailDelivery(sender)
         delivery.send("a", ["b", "c"], "message")
         self.assertEqual(0, len(sender.calls))
 
     def test_all_recipients(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
         self._set_whitelist(["b", "c"])
+        delivery, sender = self._makeOne()
 
-        delivery = WhiteListMailDelivery(sender)
         delivery.send("a", ["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b", "c"], sender.calls[0]["toaddrs"])
 
     def test_case_insensitive(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
         self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
+        delivery, sender = self._makeOne()
 
-        delivery = WhiteListMailDelivery(sender)
         delivery.send("a", ["b@example.com", "C@EXAMPLE.COM"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(
             ["b@example.com", "C@EXAMPLE.COM"], sender.calls[0]["toaddrs"])
 
     def test_address_normalization(self):
-        from karl.utilities.mailer import WhiteListMailDelivery
-        sender = DummyMailDelivery()
         self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
+        delivery, sender = self._makeOne()
 
-        delivery = WhiteListMailDelivery(sender)
         delivery.send("a", ["Fred <b@example.com>",
                             "Bill <C@EXAMPLE.COM>"], "message")
         self.assertEqual(1, len(sender.calls))
@@ -145,7 +152,9 @@ class TestWhiteListMailDelivery(unittest.TestCase):
             ["Fred <b@example.com>", "Bill <C@EXAMPLE.COM>"],
             sender.calls[0]["toaddrs"])
 
+
 class DummyMailDelivery(object):
+
     def __init__(self):
         self.calls = []
 

@@ -27,6 +27,7 @@ from lxml import etree
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
+from repoze.bfg.traversal import model_path_tuple
 from repoze.bfg.url import model_url
 from simplejson import JSONEncoder
 from webob import Response
@@ -42,10 +43,7 @@ from karl.models.interfaces import IPeopleCategories
 from karl.models.interfaces import IPeopleCategory
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.interfaces import IPeopleReport
-from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
-from karl.models.interfaces import IPeopleReportGroupFilter
-from karl.models.interfaces import IPeopleReportIsStaffFilter
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategory
@@ -53,9 +51,10 @@ from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleRedirector
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
+from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleReportGroupFilter
 from karl.models.peopledirectory import PeopleReportIsStaffFilter
-from karl.models.peopledirectory import PeopleReportGroup
+from karl.models.peopledirectory import PeopleReportMailingList
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
 from karl.utilities.image import thumb_url
@@ -63,6 +62,7 @@ from karl.utilities.peopleconf import dump_peopledir
 from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
+from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
@@ -219,6 +219,7 @@ _ADDABLES = {
     IPeopleReport: [('CategoryFilter', 'add_category_report_filter.html'),
                     ('GroupFilter', 'add_group_report_filter.html'),
                     ('IsStaffFilter', 'add_is_staff_report_filter.html'),
+                    ('MailingList', 'add_mailing_list.html'),
                    ],
 }
 
@@ -230,6 +231,8 @@ def get_admin_actions(context, request):
         ifaces = list(providedBy(context))
         if ifaces:
             for name, path_elem in _ADDABLES.get(ifaces[0], ()):
+                if name == 'MailingList' and 'mailinglist' in context:
+                    continue
                 actions.append(('Add %s' % name, path_elem))
     return actions
 
@@ -290,6 +293,14 @@ def report_view(context, request):
     pictures_url = model_url(context, request, 'picture_view.html', **kw)
     opensearch_url = model_url(context, request, 'opensearch.xml')
 
+    mailto = None
+    if 'mailinglist' in context:
+        pd_path = model_path_tuple(peopledir)
+        report_path = model_path_tuple(context)
+        mail_name = '+'.join(report_path[len(pd_path):])
+        system_email_domain = get_setting(context, "system_email_domain")
+        mailto = 'mailto:peopledir-%s@%s' % (mail_name, system_email_domain)
+
     return dict(
         api=api,
         peopledir=peopledir,
@@ -303,6 +314,7 @@ def report_view(context, request):
         qualifiers=qualifiers,
         opensearch_url=opensearch_url,
         actions=get_actions(context, request),
+        mailto=mailto,
     )
 
 
@@ -427,17 +439,7 @@ def get_search_qualifiers(request):
 def get_report_query(report, request):
     """Produce query parameters for a catalog search
     """
-    kw = {}
-    for catid, filter in report.items():
-        if IPeopleReportCategoryFilter.providedBy(filter):
-            kw['category_%s' % str(catid)] = {'query': filter.values,
-                                              'operator': 'or'}
-        elif IPeopleReportGroupFilter.providedBy(filter):
-            kw['groups'] =  {'query': filter.values,
-                             'operator': 'or',
-                            }
-        elif IPeopleReportIsStaffFilter.providedBy(filter):
-            kw['is_staff'] =  filter.include_staff
+    kw = report.getQuery()
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     letter = request.params.get('lastnamestartswith')
@@ -888,6 +890,28 @@ class EditIsStaffReportFilterFormController(EditBase):
                   }
         return widgets
 
+mailing_list_schema = []
+
+
+class AddReportMailingListFormController(AddBase):
+    page_title = 'Add Report Mailing List'
+    schema = mailing_list_schema
+    factory = PeopleReportMailingList
+
+    def form_widgets(self, schema):
+        widgets = {
+            'name':formish.Hidden(),
+                  }
+        return widgets
+
+    def form_defaults(self):
+        return {'name': 'mailinglist'}
+
+
+class EditReportMailingListFormController(EditBase):
+    page_title = 'Edit Mailing List'
+    schema = mailing_list_schema
+
 
 report_schema = [
     ('title', schemaish.String(
@@ -905,7 +929,7 @@ report_schema = [
 
 
 class AddReportFormController(AddBase):
-    page_title = 'Edit Report'
+    page_title = 'Add Report'
     schema = report_schema
     factory = PeopleReport
 

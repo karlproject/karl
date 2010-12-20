@@ -397,6 +397,32 @@ class Test_get_admin_actions(unittest.TestCase):
         directlyProvides(context, IPeopleReport)
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
+        self.assertEqual(len(actions), 5)
+        action = actions[0]
+        self.assertEqual(action[0], 'Edit')
+        self.assertEqual(action[1], 'edit.html')
+        action = actions[1]
+        self.assertEqual(action[0], 'Add CategoryFilter')
+        self.assertEqual(action[1], 'add_category_report_filter.html')
+        action = actions[2]
+        self.assertEqual(action[0], 'Add GroupFilter')
+        self.assertEqual(action[1], 'add_group_report_filter.html')
+        action = actions[3]
+        self.assertEqual(action[0], 'Add IsStaffFilter')
+        self.assertEqual(action[1], 'add_is_staff_report_filter.html')
+        action = actions[4]
+        self.assertEqual(action[0], 'Add MailingList')
+        self.assertEqual(action[1], 'add_mailing_list.html')
+
+    def test_w_admin_w_marker_already_mailinglist(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        testing.registerDummySecurityPolicy(permissive=True)
+        context = self._makeContext()
+        context['mailinglist'] = testing.DummyModel()
+        directlyProvides(context, IPeopleReport)
+        request = testing.DummyRequest()
+        actions = self._callFUT(context, request)
         self.assertEqual(len(actions), 4)
         action = actions[0]
         self.assertEqual(action[0], 'Edit')
@@ -596,11 +622,13 @@ class Test_report_view(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.testing import registerCatalogSearch
+        from karl.testing import registerSettings
         from karl.models.interfaces import ILetterManager
         registerCatalogSearch()
+        registerSettings()
         testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
 
-    def test_unqualified_report(self):
+    def test_unqualified_report_no_mailinglist(self):
         self._register()
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -617,6 +645,18 @@ class Test_report_view(unittest.TestCase):
         self.assertEqual(info['pictures_url'],
             'http://example.com/people/s1/r1/picture_view.html')
         self.assertEqual(info['qualifiers'], [])
+        self.assertEqual(info['mailto'], None)
+
+    def test_report_with_mailinglist(self):
+        self._register()
+        pd, section, report = _makeReport()
+        report['mailinglist'] = testing.DummyModel()
+        request = testing.DummyRequest()
+
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['mailto'],
+                         'mailto:peopledir-s1+r1@karl3.example.com')
 
     def test_qualified_report(self):
         self._register()
@@ -655,7 +695,9 @@ class Test_jquery_grid_view(unittest.TestCase):
 
     def test_view(self):
         self._register()
-        report = testing.DummyModel(title='Report A', columns=['name'])
+        report = DummyReport()
+        report.title = 'Report A'
+        report.columns = ['name']
         request = testing.DummyRequest({'start': 0, 'limit': 10})
 
         response = self._callFUT(report, request)
@@ -843,12 +885,10 @@ class Test_get_report_query(unittest.TestCase):
         from karl.views.peopledirectory import get_report_query
         return get_report_query(report, request)
 
-    def test_w_category_filter(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleReportCategoryFilter
-        report = testing.DummyModel()
-        office = report['office'] = testing.DummyModel(values=['nyc'])
-        directlyProvides(office, IPeopleReportCategoryFilter)
+    def test_uses_underlying_reports_query(self):
+        report = DummyReport()
+        report._query = {'category_office': {'query': ['nyc'],
+                                             'operator': 'or'}}
         request = testing.DummyRequest({
             'lastnamestartswith': 'L',
             'body': 'a b*',
@@ -861,41 +901,6 @@ class Test_get_report_query(unittest.TestCase):
             'texts': 'a b**',
             })
 
-    def test_w_group_filter(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleReportGroupFilter
-        report = testing.DummyModel()
-        groups = report['groups'] = testing.DummyModel(values=['staff'])
-        directlyProvides(groups, IPeopleReportGroupFilter)
-        request = testing.DummyRequest({
-            'lastnamestartswith': 'L',
-            'body': 'a b*',
-            })
-        kw = self._callFUT(report, request)
-        self.assertEqual(kw, {
-            'allowed': {'operator': 'or', 'query': []},
-            'groups': {'operator': 'or', 'query': ['staff']},
-            'lastnamestartswith': 'L',
-            'texts': 'a b**',
-            })
-
-    def test_w_is_staff_filter(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleReportIsStaffFilter
-        report = testing.DummyModel()
-        groups = report['groups'] = testing.DummyModel(include_staff=False)
-        directlyProvides(groups, IPeopleReportIsStaffFilter)
-        request = testing.DummyRequest({
-            'lastnamestartswith': 'L',
-            'body': 'a b*',
-            })
-        kw = self._callFUT(report, request)
-        self.assertEqual(kw, {
-            'allowed': {'operator': 'or', 'query': []},
-            'is_staff': False,
-            'lastnamestartswith': 'L',
-            'texts': 'a b**',
-            })
 
 
 class Test_get_grid_data(unittest.TestCase):
@@ -1355,12 +1360,16 @@ def _makeReport():
 
 
 class DummyReport(testing.DummyModel):
+    _query = None
     def __init__(self):
         testing.DummyModel.__init__(self,
             title='Report A',
             link_title='A',
             columns=['name'],
             )
+
+    def getQuery(self):
+        return self._query or {}
 
 
 def _makeProfile():

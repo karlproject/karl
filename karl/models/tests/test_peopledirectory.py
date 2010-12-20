@@ -462,6 +462,26 @@ class TestPeopleReportIsStaffFilter(unittest.TestCase,
         verifyObject(IPeopleReportIsStaffFilter, self._makeOne())
 
 
+class TestPeopleReportMailingList(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.models.peopledirectory import PeopleReportMailingList
+        return PeopleReportMailingList
+
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def test_class_conforms_to_IPeopleReportMailingList(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import IPeopleReportMailingList
+        verifyClass(IPeopleReportMailingList, self._getTargetClass())
+
+    def test_instance_conforms_to_IPeopleReportMailingList(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import IPeopleReportMailingList
+        verifyObject(IPeopleReportMailingList, self._makeOne())
+
+
 class TestPeopleReport(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -480,6 +500,46 @@ class TestPeopleReport(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IPeopleReport
         verifyObject(IPeopleReport, self._makeOne())
+
+    def test_getQuery_empty(self):
+        report = self._makeOne()
+        self.assertEqual(report.getQuery(), {})
+
+    def test_getQuery_non_criteria(self):
+        report = self._makeOne()
+        report['fluff'] = testing.DummyModel()
+        self.assertEqual(report.getQuery(), {})
+
+    def test_getQuery_w_category_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        report = self._makeOne()
+        filter = report['fluff'] = testing.DummyModel()
+        directlyProvides(filter, IPeopleReportCategoryFilter)
+        filter.values = ('bother', 'mess')
+        self.assertEqual(report.getQuery(),
+                         {'category_fluff': {'query': ('bother', 'mess'),
+                                             'operator': 'or'}})
+
+    def test_getQuery_w_group_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        report = self._makeOne()
+        filter = report['groups'] = testing.DummyModel()
+        directlyProvides(filter, IPeopleReportGroupFilter)
+        filter.values = ('bother', 'mess')
+        self.assertEqual(report.getQuery(),
+                         {'groups': {'query': ('bother', 'mess'),
+                                     'operator': 'or'}})
+
+    def test_getQuery_w_is_staff_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        report = self._makeOne()
+        filter = report['groups'] = testing.DummyModel()
+        directlyProvides(filter, IPeopleReportIsStaffFilter)
+        filter.include_staff = False
+        self.assertEqual(report.getQuery(), {'is_staff': False})
 
 
 class TestPeopleRedirector(unittest.TestCase):

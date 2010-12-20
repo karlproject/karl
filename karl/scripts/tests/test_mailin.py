@@ -16,16 +16,17 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 class MailinScriptTests(unittest.TestCase):
 
     def setUp(self):
+        from zope.testing.cleanup import cleanUp
         self.maildir_root = self._makeMaildir()
         cleanUp()
 
     def tearDown(self):
         import shutil
+        from zope.testing.cleanup import cleanUp
         shutil.rmtree(self.maildir_root)
         cleanUp()
 

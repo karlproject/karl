@@ -1,19 +1,47 @@
-import webob
-
+# Copyright (C) 2008-2009 Open Society Institute
+#               Thomas Moroz: tmoroz@sorosny.org
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License Version 2 as published
+# by the Free Software Foundation.  You may not use, modify or distribute
+# this program under any other version of the GNU General Public License.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 from email.utils import getaddresses
 import re
-from zope.interface import implements
-from zope.component import getUtility
+
 from repoze.bfg.security import has_permission
-from karl.adapters.interfaces import IMailinDispatcher
+from repoze.bfg.traversal import find_model
+from repoze.bfg.traversal import traverse
 from repoze.postoffice.message import decode_header
+from zope.component import getUtility
+from zope.interface import implements
+import webob
+
+from karl.adapters.interfaces import IMailinDispatcher
 from karl.utilities.interfaces import IMailinTextScrubber
 from karl.utils import find_communities
+from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.utils import find_users
 
+REPORT_REPLY_REGX = re.compile(r'peopledir-'
+                                '(?P<report>\w+(\+\w+)*)'
+                                '-(?P<reply>\w+)@')
+
+REPORT_REGX = re.compile(r'peopledir-'
+                          '(?P<report>\w+(\+\w+)*)')
+
 REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
                          '-(?P<reply>\w+)@')
+
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
 class MailinDispatcher(object):
@@ -38,6 +66,17 @@ class MailinDispatcher(object):
         """
         return name in find_communities(self.context)
 
+    def isReport(self, name):
+        """ See IMailinDispatcher.
+        """
+        pd = find_peopledirectory(self.context)
+        tokens = name.split('+')
+        try:
+            find_model(pd, tokens)
+        except KeyError:
+            return False
+        return True
+
     def getCommunityId(self, email):
         """ See IMailinDispatcher.
         """
@@ -61,6 +100,7 @@ class MailinDispatcher(object):
         contain 'error' if the target can not be identified.
         """
         info = {
+            'report': None,
             'community': None,
             'tool': self.default_tool,
             'in_reply_to': None,
@@ -71,6 +111,23 @@ class MailinDispatcher(object):
         cc = self.getAddrList(message, 'Cc')
 
         for realname, email in to + cc:
+
+            match = REPORT_REPLY_REGX.search(email)
+            if match:
+                report = match.group('report')
+                info['report'] = report
+                info['in_reply_to'] = match.group('reply')
+                if not self.isReport(report):
+                    info['error'] = 'invalid report: %s' % report
+                return info
+
+            match = REPORT_REGX.search(email)
+            if match:
+                report = match.group('report')
+                info['report'] = report
+                if not self.isReport(report):
+                    info['error'] = 'invalid report: %s' % report
+                return info
 
             match = REPLY_REGX.search(email)
             if match:
@@ -100,7 +157,7 @@ class MailinDispatcher(object):
         return info
 
     def getMessageAuthorAndSubject(self, message):
-        """Return a mapping describing the author and subject of a message.
+        """ Return a mapping describing the author and subject of a message.
 
         If there is no error, the mapping will contain 'author' (a
         profile ID) and 'subject'.  It will also contain 'from' for
@@ -141,7 +198,7 @@ class MailinDispatcher(object):
         return info
 
     def getAutomationIndicators(self, message):
-        """Look for headers that indicate automated email.
+        """ Look for headers that indicate automated email.
 
         If the message appears to be automated rather than written
         by a person, this method returns a mapping containing 'error'.
@@ -172,18 +229,25 @@ class MailinDispatcher(object):
         return info
 
     def checkPermission(self, info):
+        """ Does user have permission to author content in the given context?
+
+        Uses ACL security policy to test.
         """
-        Uses ACL security policy to determine whether user has permission to
-        author content in the given context.
-        """
-        communities = find_communities(self.context)
-        community = communities[info['community']]
-        target = community[info['tool']]
+        report_name = info.get('report')
+        if report_name is not None:
+            pd = find_peopledirectory(self.context)
+            target = find_model(pd, report_name.split('+'))
+            permission = "email"
+        else:
+            communities = find_communities(self.context)
+            community = communities[info['community']]
+            target = community[info['tool']]
+            permission = "create"   # XXX In theory could depend on target
         users = find_users(self.context)
         user = users.get_by_id(info['author'])
         if user is not None:
+            user = dict(user)
             user['repoze.who.userid'] = info['author']
-        permission = "create"   # XXX In theory could depend on target
 
         # BFG Security API always assumes http request, so we fabricate a fake
         # request.

@@ -474,33 +474,48 @@ class IPeopleSection(IFolder):
     tab_title = Attribute("Title to put on the section tab")
 
 class IPeopleSectionColumn(Interface):
-    """A visual column within a section display"""
+    """A visual column within a section display
+    """
     width = Attribute("Width of a section column")
 
 class IPeopleReportGroup(Interface):
-    """A group of reports displayed in a section"""
+    """A group of reports displayed in a section
+    """
     title = Attribute("Report group title")
 
 class IPeopleReportFilter(Interface):
-    """A filter for a report displayed in a section"""
+    """A filter for a report displayed in a section
+    """
     values = Attribute("Category values for which the filter applies")
 
 class IPeopleReportCategoryFilter(IPeopleReportFilter):
-    """A category-based filter for a report displayed in a section"""
+    """A category-based filter for a report displayed in a section
+    """
 
 class IPeopleReportGroupFilter(IPeopleReportFilter):
-    """A group-based filter for a report displayed in a section"""
+    """A group-based filter for a report displayed in a section
+    """
 
 class IPeopleReportIsStaffFilter(IPeopleReportFilter):
-    """A staff filter for a report displayed in a section"""
+    """A staff filter for a report displayed in a section
+    """
     include_staff = Attribute("Include staff in query?")
 
+class IPeopleReportMailingList(Interface):
+    """Marker object indicating that the parent report enables mailing list.
+    """
+
 class IPeopleReport(Interface):
-    """A report about people"""
+    """A report about people
+    """
     title = Attribute("Report title")
     link_title = Attribute("Title to use for the link to the report")
     css_class = Attribute("CSS class of the link to the report")
     columns = Attribute("IDs of columns to display in the report.")
+
+    def getQuery():
+        """ Return a catalog query mapping corresponding to our criteria.
+        """
 
 class IPeopleRedirector(Interface):
     """Redirect to another url"""

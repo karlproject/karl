@@ -21,22 +21,22 @@ IMailStore-enabled maildir. The actual maildir must be named 'Maildir'
 within that folder.
 """
 import logging
-from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
-from repoze.mailin.scripts.draino import Draino
-from karl.log import set_subsystem
-from karl.scripting import get_default_config
-from karl.scripting import open_root
-from karl.scripting import run_daemon
-from karl.utils import get_setting
-from karl.utilities.mailin import MailinRunner
-from karl.utilities.mailin import MailinRunner2
 import optparse
 import os
 import sys
 import transaction
 
-import logging
+from paste.deploy import loadapp
+from repoze.bfg.scripting import get_root
+from repoze.mailin.scripts.draino import Draino
+
+from karl.log import set_subsystem
+from karl.scripting import get_default_config
+from karl.scripting import run_daemon
+from karl.utils import get_setting
+from karl.utilities.mailin import MailinRunner
+from karl.utilities.mailin import MailinRunner2
+
 logging.basicConfig()
 
 def main(argv=sys.argv, factory=MailinRunner, root=None):
@@ -140,8 +140,7 @@ def main(argv=sys.argv, factory=MailinRunner, root=None):
         run()
 
 def main2(argv=sys.argv[1:]):
-    """
-    Version which uses repoze.postoffice.
+    """ Version which uses repoze.postoffice.
     """
     logging.basicConfig()
 

@@ -34,9 +34,10 @@ from karl.models.interfaces import IPeopleDirectorySchemaChanged
 from karl.models.interfaces import IPeopleRedirector
 from karl.models.interfaces import IPeopleReport
 from karl.models.interfaces import IPeopleReportCategoryFilter
+from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleReportGroupFilter
 from karl.models.interfaces import IPeopleReportIsStaffFilter
-from karl.models.interfaces import IPeopleReportGroup
+from karl.models.interfaces import IPeopleReportMailingList
 from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.interfaces import IProfile
@@ -274,6 +275,9 @@ class PeopleReportIsStaffFilter(_PeopleReportFilter):
     implements(IPeopleReportIsStaffFilter)
     include_staff = False
 
+class PeopleReportMailingList(Folder):
+    implements(IPeopleReportMailingList)
+
 PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 
 
@@ -289,6 +293,21 @@ class PeopleReport(Folder):
         self.link_title = link_title
         self.css_class = css_class
         self.columns = ()  # column IDs to display
+
+    def getQuery(self):
+        """ See IPeopleReport.
+        """
+        query = {}
+        for catid, filter in self.items():
+            if IPeopleReportCategoryFilter.providedBy(filter):
+                query['category_%s' % str(catid)] = {'query': filter.values,
+                                                     'operator': 'or'}
+            elif IPeopleReportGroupFilter.providedBy(filter):
+                query['groups'] =  {'query': filter.values,
+                                    'operator': 'or'}
+            elif IPeopleReportIsStaffFilter.providedBy(filter):
+                query['is_staff'] =  filter.include_staff
+        return query
 
 
 class PeopleRedirector(Persistent):

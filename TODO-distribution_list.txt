@@ -1,0 +1,56 @@
+Distribution List Blueprint TODOs
+=================================
+
+Phase 1 -- Report-Driven Lists
+------------------------------
+
+- [X] Tidy up mailin adapters / utilities / scripts, get to 100% coverage.
+
+      - See r6451, r6452, r6453, r6454, r6457, r6458, r6459, r6460,
+        r6461, r6462, r6463, r6464, r6466, r6467, r6468, r6469, 
+
+- [X] Make the "mailin dispatcher" return 'report' info, in addition to
+      'community' info.
+
+      - See r6455.
+
+- [X] Add an ``IMailinHandler`` adapter for reports.
+
+      * Forwards clone of message to all people in the report, with
+        'Reply-To' set to the report's mail-in address.
+
+      - See r6470, 6471.
+
+- [X] Make the "mailin runners" cope with 'report' info.
+
+      * Use the report path to pick up the report-as-target.
+
+      * Ensure that appropriate permission checking occurs:  the
+        user corresponding to the 'From:' address must have 'email'
+        permission on the report (normally KarlStaff).
+
+      * Add an evolve step which grants the 'email' permission to
+        'group.KarlStaff' on '/people'.
+
+      - See r6472, r6477, r6478.
+
+- [X] Create ``ReportMailinglist`` object, addable to reports via admin UI.
+
+      * Majyk name, 'mailinglist'.
+
+      * No schema at present:  later, perhaps keeps archive, allows choices
+        about ``Reply-To`` header.
+
+      - See r6473.
+
+- [X] Expose ``mailto:`` link on retail view of reports which have a
+      ``ReportMailinglist`` in them.
+
+      - See r6474.
+
+
+Phase 2 -- Moderated lists
+--------------------------
+
+Q:  Should these really be communities, with a custom tool?  I.e.,
+    shouldn't any community potentially be usable as a mailing list?

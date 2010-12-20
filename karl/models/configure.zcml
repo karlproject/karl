@@ -3,6 +3,11 @@
 
   <include package="repoze.lemonade.includes" file="meta.zcml" />
 
+  <adapter for="karl.models.interfaces.IPeopleReport"
+           provides="karl.adapters.interfaces.IMailinHandler"
+           factory="karl.models.adapters.PeopleReportMailinHandler"
+           />
+
   <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectWillBeRemovedEvent"

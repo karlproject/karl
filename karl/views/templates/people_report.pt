@@ -54,6 +54,13 @@
         //]]>
       </script>
 
+      <div style="margin-top:20px;text-align:right"
+           tal:condition="1 or mailto" >
+        <a href="${mailto}"
+        ><img src="${api.static_url}/images/email.gif"
+              border="0" alt="E-mail Community" id="EmailIcon"/></a>
+      </div>
+
       <div metal:use-macro="api.snippets.macros['opensearch']"></div>
 
     </div>
