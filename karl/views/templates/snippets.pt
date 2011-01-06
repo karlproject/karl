@@ -683,16 +683,16 @@
     <div metal:define-macro="peopledir-report-head">
       <div id="peopledir-actions">
         <ul class="ui-widget ui-helper-clearfix">
-          <li tal:condition="mailto" >
-           <a href="${mailto}"
-           ><img src="${api.static_url}/images/email.gif"
-                 border="0" alt="E-mail Community" id="EmailIcon"/></a>
-          </li>
-          <li class="ui-state-default ui-corner-all" title="Print">
-            <a class="button-print" href="${print_url}" title="Print">
-                <span class="ui-icon ui-icon-print">Print</span>
+          <li tal:condition="mailto" class="ui-state-default ui-corner-all" title="Email">
+            <a class="button-email" href="${mailto}" title="Email">
+                <span class="ui-icon ui-icon-mail-closed">Email</span>
             </a>
           </li>
+            <li class="ui-state-default ui-corner-all" title="Print">
+              <a class="button-print" href="${print_url}" title="Print">
+                  <span class="ui-icon ui-icon-print">Print</span>
+              </a>
+            </li>
           <li class="ui-state-default ui-corner-all" title="Export as CSV">
             <a class="button-export-csv" href="${csv_url}" title="Export as CSV">
                 <span class="ui-icon ui-icon-circle-arrow-s">Export as CSV</span>
