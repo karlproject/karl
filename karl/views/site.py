@@ -32,8 +32,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 # five year expires time
 static_view = static('static', cache_max_age=157680000)
 
-version_match = re.compile(r'^r\d{1,19}$').match
-# version number is "r" plus an intified timetime, e.g. r1234567890
+version_match = re.compile(r'^r-?\d+$').match
+# version number is "r" plus an integer (possibly negative)
 
 def versioning_static_view(context, request):
     # if the first element in the subpath is the version number, strip

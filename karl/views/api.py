@@ -248,7 +248,7 @@ class TemplateAPI(object):
     def formfields(self):
         macro_template = get_template(self.formfields_fn)
         return macro_template
-       
+
     @property
     def form_field_templates(self):
         if self._form_field_templates is None:
@@ -493,8 +493,13 @@ _static_rev = None
 def _get_static_rev():
     global _static_rev
     if _static_rev is None:
-        # See if we can get a subversion revision.  This is more fragile but
-        # ensures that the static revision is the same across processes
+        # If Karl is installed via an egg, we can try to get the Karl version
+        # number from the egg and use that.
+        _static_rev = _get_egg_rev()
+
+    if _static_rev is None:
+        # Development builds will use a checked out SVN copy.  See if we can
+        # get the SVN revision number.
         _static_rev = _get_svn_rev()
 
     if _static_rev is None:
@@ -509,12 +514,27 @@ def _get_svn_rev():
     module = sys.modules[__name__]
     path = os.path.dirname(os.path.abspath(module.__file__))
     try:
-        proc = Popen(['svn', 'info', path], stdout=PIPE, close_fds=True)
+        proc = Popen(['svn', 'info', path], stdout=PIPE, stderr=PIPE,
+                     close_fds=True)
         output = proc.stdout.readlines()
         proc.stdout.close()
+        proc.stderr.close() # Ignore
         for line in output:
             if line.startswith('Revision:'):
                 rev = int(line.split(':')[1])
                 return 'r%d' % rev
     except OSError:
         pass
+
+def _get_egg_rev():
+    # Find folder that this module is contained in
+    module = sys.modules[__name__]
+    path = os.path.dirname(os.path.abspath(module.__file__))
+
+    # Walk up the tree until we find the parent folder of an EGG-INFO folder.
+    while path != '/':
+        egg_info = os.path.join(path, 'EGG-INFO')
+        if os.path.exists(egg_info):
+            rev = os.path.split(path)[1]
+            return 'r%d' % hash(rev)
+        path = os.path.dirname(path)
