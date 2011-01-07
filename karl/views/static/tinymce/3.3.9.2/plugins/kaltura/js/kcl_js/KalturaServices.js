@@ -1,4 +1,11 @@
 /**
+ * 2011 Balazs Ree <ree@greenfinity.hu>
+ * - Fix missing semicolon in the end that disabled YUI compressor from working correctly
+ *
+ */
+
+
+/**
  *Class definition for the Kaltura service: accessControl.
  * The available service actions:
  * @action	add	Add new Access Control Profile.
@@ -3014,5 +3021,5 @@ KalturaEntryAdminService.prototype.get = function(callback, entryId, version){
 	this.client.queueServiceActionCall("entryAdmin", "get", kparams);
 	if (!this.client.isMultiRequest())
 		this.client.doQueue(callback);
-}
+};
 

@@ -1,0 +1,15 @@
+
+/**
+* TinyMCE resource composition
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+*
+* XXX TODO. Load all tiny css this way. (As, this only loads the ui css)
+*
+*/
+
+@import url("3.3.9.2/themes/advanced/skins/karl/ui.css");
+@import url("3.3.9.2/plugins/imagedrawer/css/ui.css");
+@import url("3.3.9.2/plugins/kaltura/css/ui.css");
+

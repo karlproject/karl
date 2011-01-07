@@ -1,0 +1,352 @@
+
+/* XXX belongs to the theme, not here
+ *
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    background-image: url("ui-bg_glass_75_f0f2f4_1x400.png");
+}
+
+.ui-widget-content,
+.ui-widget-content a {
+    color: #333333;
+}
+*/
+
+.ui-autocomplete-category {
+    font-weight: bold;
+    padding: 6px 364px 0 0;
+    margin: 4px 0 0 -102px;
+    line-height: 1.5;
+    border-top: solid #a3a3a3 1px;
+    text-align: right;
+    height: 0px;
+}
+
+.bc-header-toolbox .ui-menu { 
+    width: 100px; 
+    position: absolute; 
+    margin-right:0;
+    border-radius: 4px 0px 0px 4px;
+    z-index: 99999;
+    text-align: left;
+}
+
+.ui-ls-autocomplete-first {
+    border: none;
+}
+
+#ui-menu-1 {
+    width: 350px;
+    padding-left: 104px;
+    background: #ffffff url(images/livesearch_bg.gif) repeat-y top left;
+    font-size: .7em;
+    border-color: #a3a3a3;
+    min-height: 55px;
+}
+#ui-menu-1 {
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    z-index: 99999 !important;
+    text-align: left;
+    font-size: 12px;
+    font-family: Verdana,Arial,sans-serif;
+}
+
+.ui-autocomplete-notification {
+    padding: 0;
+    margin: 0;
+    /**width: 190px;**/
+    width: 293px !important;
+    background-color: white;
+    font-size: x-small;
+    display: block;
+    position: absolute;
+}
+.ui-autocomplete-notification {
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    z-index: 99999 !important;
+    text-align: left;
+    font-family: Verdana,Arial,sans-serif;
+}
+
+.ui-autocomplete-msgicon {
+    display: inline-block;
+}
+
+.ui-autocomplete-message {
+    display: inline-block;
+}
+
+/*
+.bc-header {
+    background-color: #ADD8E6;
+    border-bottom: solid #999999 1px;
+    padding: 0.5em;
+}
+
+.ui-widget {
+    font-size: 1.2em;
+}
+
+.bc-header h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.6em;
+}
+*/
+
+.bc-header {
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    width: 300px !important;
+}
+.bc-header-toolbox {
+    font-size: 10px;
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    text-align: left !important;
+}
+
+.bc-header-toolbox .ui-widget {
+    font-size: 1.2em;
+}
+
+.bc-header-toolbox button {
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    float: none;
+    margin: 0 1px 0 0;
+    height: 28px !important;
+    *height: 26px !important;
+    font-size: 12px;
+    font-family: Verdana,Arial,sans-serif;
+}
+.bc-header-toolbox .ui-button .ui-button-text {
+    line-height: 16px !important;
+}
+.bc-header-toolbox input {
+    font-size: 12px;
+}
+
+.bc-header-toolbox .ui-ls-menu {
+    -moz-border-radius: 4px 0 0 4px;
+    border-radius: 4px 0 0 4px;
+    border-color: #cecece;
+}
+
+.bc-header-toolbox .ui-ls-autocomplete {
+    border-width: 1px 0;
+    border-color: #cecece;
+    border-style: solid;
+    *line-height: 14px;      /* XXX get rid of this ??? */
+    padding: 0;
+    margin: 0 -3px 0 0;
+}
+
+.bc-header-toolbox .ui-ls-gobtn {
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+    border-color: #cecece;
+}
+
+.bc-content-frame {
+    margin: 2em;
+}
+
+.ui-menu .ui-menu-item a {
+    border: 1px solid #ffffff;
+}
+
+/* XXX belongs to the theme
+.ui-menu .ui-menu-item a:hover,
+.ui-menu .ui-menu-item a.ui-state-hover {
+    margin: 0;
+    border: 1px solid #999999;
+    background: #e1e1e1 url('images/ui-bg_glass_75_dadada_1x400.png') repeat-x scroll 50% 50%;
+}
+*/
+.ui-menu .ui-menu-item a:hover,
+.ui-menu .ui-menu-item a.ui-state-hover {
+/* override the jiggling efect of menu lines
+ * ... belongs to the theme. This setting will crack all other components
+ * that don't wish to override the theme in the same way.
+ */
+    margin: 0;
+    border: 1px solid #999999;
+}
+
+
+.ui-ls-profile img {
+    float: left; 
+    margin-right: 10px;
+    height: 32px;
+    width: 32px;
+}
+
+.ui-ls-profilelabel {
+    display: inline-block;
+    width: 250px;
+}
+
+.ui-ls-category-text {
+    position: absolute;
+    left: 0;
+    width: 91px;
+}
+
+.ui-ls-more {
+    color: #999999;
+    display: block;
+    position: absolute;
+    width: 91px;
+    margin-top: 15px;
+    left: 0;
+}
+
+.ui-ls-more:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* search results page */
+.sras-header {
+    text-align: center;
+    padding-bottom: 1em;
+}
+
+.sras-header input {
+    border: 1px solid #cecece;
+    border-right: none;
+    padding: 3px 0 4px 3px;
+    -moz-border-radius: 4px 0 0 4px;
+    border-radius: 4px 0 0 4px;
+}
+
+.sras-header button {
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.discreet {
+    font-size: 65%;
+    color: #999999;
+}
+
+.sras-header .discreet {
+    display: block;
+}
+
+#sras-content {
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    width: 85%;
+    overflow: hidden;
+}
+
+.sras-searchknobs {
+    width: 150px;
+    float: left;
+    border-right: 1px solid #A3A3A3;
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
+}
+
+.sras-searchknobgroup {
+    border-bottom: solid #A3A3A3 1px; 
+    padding: 1em 0;
+}
+.sras-searchknobs a,
+.sras-searchknobs a:visited {
+    text-decoration: none;
+    color: #3A74A9;
+}
+
+.sras-searchknobs .content a {
+    padding-left: 5px;
+    line-height: 2em;
+}
+
+.sras-searchknobs p {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}
+
+.sras-searchknobgroup.last {
+    border-bottom: none;
+}
+
+.sras-searchknobgroup label {
+    display: block;
+    font-weight: bold;
+    margin: 10px 0 3px;
+}
+
+.sras-searchknobgroup input {
+    font-size: 0.8em;
+    border: 1px solid #cecece;
+    border-right: none;
+    width: 120px;
+    -moz-border-radius: 4px 0 0 4px;
+    border-radius: 4px 0 0 4px;
+    padding: 1px 0 2px 2px;
+}
+
+.sras-searchknobgroup button {
+    font-size: 0.6em;
+    padding: 0;
+    margin-left: -0.5em;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.sras-searchknobgroup ul {
+    margin: 0;
+    padding: 0;
+}
+
+.sras-searchknobgroup li {
+    display: block;
+}
+
+#sras-results {
+    margin-left: 170px;
+}
+
+.sras-result {
+    margin-bottom: 1em;
+}
+
+.sras-result-title,
+.sras-result-title:visited {
+    font-size: 123%;
+    font-weight: bold;
+    color: #3A74A9;
+}
+
+.sras-summary {
+    margin: 0.2em 0;
+}
+
+.sras-highlight {
+    font-weight: bold;
+}
+
+.sras-details,
+.sras-details a {
+    color: gray;
+}
+
+.sras-details img {
+    width: 12px;
+    height: 12px;
+}
+
+#sras-pagination {
+    margin: 2em 0 0 170px;
+    background-color: lightgray;
+    text-align: right;
+    padding: 0.4em
+}
+
+.ui-autocomplete-loading {
+    background-image: url('images/pbar-ani.gif');
+}
+
+

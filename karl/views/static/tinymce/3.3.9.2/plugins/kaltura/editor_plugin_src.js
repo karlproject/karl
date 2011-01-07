@@ -364,8 +364,8 @@
                     //client session
                     log('Start client session');
                     var kc = new KalturaConfiguration(Number(this.partner_id));
-                    this.client = new KalturaClient(kc);
-                    this.session = new KalturaSessionService(this.client);
+                    var client = new KalturaClient(kc);
+                    this.session = new KalturaSessionService(client);
                     this.session.start(function(success, session_key) {
                             if (success) {
                                 log('session created', session_key);

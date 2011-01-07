@@ -105,10 +105,8 @@ setup(name='karl',
       errorlog = karl.errorlog:make_middleware
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
-      cssconcat = karl.scripts.cssconcat:main
       evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
-      jsconcat = karl.scripts.jsconcat:main
       karl = karl.scripts.karlctl:main
       mvcontent = karl.scripts.mvcontent:main
       samplegen = karl.scripts.samplegen:main
@@ -121,6 +119,7 @@ setup(name='karl',
       site_announce = karl.scripts.site_announce:main
       user_activity_report = karl.scripts.user_activity_report:main
       analyze_queries = karl.scripts.analyze_queries:main
+      juice_all = karl.scripts.juice_all:main
       """
       )
 

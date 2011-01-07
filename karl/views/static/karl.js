@@ -140,6 +140,7 @@ $.widget('ui.karlstatusbox', {
 
 });
 
+/*
 $.widget('ui.karllivesearch', $.extend({}, $.ui.autobox3.prototype, {
 
     options: $.extend({}, $.ui.autobox3.prototype.options, {
@@ -187,6 +188,7 @@ $.widget('ui.karllivesearch', $.extend({}, $.ui.autobox3.prototype, {
     }
                     
 }));
+*/
 
 
 Karl.makeSnippets = function(snippetmap) {
@@ -1943,6 +1945,7 @@ function initCalendarLayersOrCategoriesDelete() {
 }
 
 
+
 // Initialize jquery
 $(document).ready(function() {
     
@@ -1952,6 +1955,7 @@ $(document).ready(function() {
     var app_url = $("#karl-app-url").eq(0).attr('content');
     var here_url = $("#karl-here-url").eq(0).attr('content');
 
+    /*
     $("#livesearch-input").karllivesearch({
         ajax: app_url + "/jquery_livesearch",
         match: function(typed) { return true; },
@@ -1961,6 +1965,7 @@ $(document).ready(function() {
         minQueryNotice: {"pre": "", "post": "", "header": "", "href": "#", "rowclass": "notice",
                          "title":  "Words must contain at least 3 characters to narrow the search"}
     });
+    */
 
     var tagbox_data = window.karl_client_data && karl_client_data.tagbox || {};
 
