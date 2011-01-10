@@ -32,7 +32,11 @@ def run_juicer(resource, output="min/"):
     attrs = ('juicer', 'merge', '-i', '--force', 
         '-o', os.path.join(os.path.dirname(resource), output), resource)
     print '##### Will run: ' + ' '.join(attrs) 
-    subprocess.call(attrs)
+    status = subprocess.call(attrs)
+    if status != 0:
+        print "\n\n##### ERROR: FAILED compression of " + resource
+        print '\nTry to consolidate problems by running manually:\n\n' + ' '.join(attrs) + '\n'
+        raise SystemExit, "Compression of " + resource + " failed"
 
 def main(argv=sys.argv):
     if len(argv) > 1:
@@ -45,6 +49,8 @@ def main(argv=sys.argv):
 
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.js')) 
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.css')) 
+
+    print "\n\n##### All files compressed OK"
 
 if __name__ == '__main__':
     main()
