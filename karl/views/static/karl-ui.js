@@ -5,7 +5,7 @@
 *
 * JQuery and JQuery-UI:
 *     @depends jquery/jquery-1.4.4.js       
-*     @depends jquery-ui/jquery-ui-1.9m3.js
+*     @depends min/jquery-ui-1.9m3.karl.js
 *
 * Additional JQuery-UI:
 *     @depends jquery-ui/grid/ui/ui.grid.js

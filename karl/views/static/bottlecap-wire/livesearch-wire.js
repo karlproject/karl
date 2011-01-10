@@ -14,8 +14,8 @@ $(document).ready(function() {
     ///var livesearch_url = app_url + '/livesearch.json');
     ///var livesearch_url = app_url + '/livesearch_people.json');
     // XXX static testing
-    var livesearch_url = app_url + '/static/bottlecap/sl/livesearch/data.json';
-    var livesearch_people_url = app_url + '/static/bottlecap/sl/livesearch/data-people.json';
+    var livesearch_url = app_url + '/static/bottlecap/bc.livesearch/data.json';
+    var livesearch_people_url = app_url + '/static/bottlecap/bc.livesearch/data-people.json';
 
     $('.ui-ls-autocomplete').livesearch({
         urlFn: createUrlFn(livesearch_url),

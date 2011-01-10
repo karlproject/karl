@@ -7,7 +7,7 @@
 */
 
 /* jquery-ui */
-@import url("jquery-ui/jquery-ui-1.9m3.smoothness.css");
+@import url("min/jquery-ui-1.9m3.karl.smoothness.css");
 @import url("jquery-ui/autobox2/jquery.ui.autobox.css");
 
 /* KARL plugins */

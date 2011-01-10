@@ -12,7 +12,7 @@
 *     @depends ../bottlecap/sl/min/bc-core.js
 *
 * livesearch:
-*     @depends ../bottlecap/sl/livesearch/livesearch.js
+*     @depends ../bottlecap/bc.livesearch/livesearch.js
 *   
 *
 */
