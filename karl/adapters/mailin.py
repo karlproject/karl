@@ -304,17 +304,7 @@ class MailinDispatcher(object):
 
             if mimetype.startswith('text/'):
                 charset = part.get_content_charset() or 'utf-8'
-                try:
-                    data = data.decode(charset)
-                except UnicodeDecodeError:
-                    # At this point we've run out of options in terms of
-                    # determining what the character encoding of this text
-                    # might be.  We will decode as though it is latin-1--if
-                    # the character encoding is not actually latin-1, some of
-                    # the characters will be mistranslated, but we at least
-                    # avoid a show-stopping UnicodeDecodeError.
-                    data = data.decode('latin-1')
-
+                data = self._decode_messsage_body(data, charset)
             if filename is not None:
                 attachments.append((filename, mimetype, data))
             elif mimetype.startswith('text/plain'):
@@ -334,3 +324,45 @@ class MailinDispatcher(object):
                     "is not supported.")
 
         return text, attachments
+
+    def _decode_messsage_body(self, body, charset):
+        try:
+            return body.decode(charset)
+        except (LookupError, UnicodeDecodeError):
+            pass
+
+        # We know of at least one case where a mail client is sending us
+        # messages using the 'windows-874' encoding which is not in Python's
+        # database of character encodings. Some research, however, shows that
+        # 'windows-874' is the same encoding as 'cp874', which is an encoding
+        # that Python knows about. Here, since we know we don't know the
+        # character encoding, we attempt to apply a general rule where
+        # 'windows-XXX' is turned into 'cpXXX'. Although we don't know that
+        # every windows-XXX encoding is exactly equivalent to it's 'cpXXX'
+        # counterpart, it's likely they will be very close and will translate
+        # almost every character correctly. To the extent that their may be
+        # mistranslations, the end result will still probably be readable and
+        # is better than simply throwing the message away as undecodable.
+        if charset.startswith('windows-'):
+            charset = charset.replace('windows-', 'cp')
+            try:
+                return body.decode(charset)
+            except (LookupError, UnicodeDecodeError):
+                pass
+
+
+        # Try UTF-8 if we haven't already
+        if charset.lower().replace('-', '') != 'utf8':
+            try:
+                return body.decode('UTF-8')
+            except UnicodeDecodeError:
+                pass
+
+        # As a last resort, decode as 'latin-1'.  This guarantees that every
+        # character will be translated as something.  Characters outside of the
+        # ASCII range may wind up getting mistranslated, but it is better to
+        # show the user something than to fail altogether.  Since content in
+        # all known instances of Karl is in English, and since this method will
+        # correctly translate all characters in the ASCII range, this should
+        # yield readable results for the vast majority of user content.
+        return body.decode('latin1')

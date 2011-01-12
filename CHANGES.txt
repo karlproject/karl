@@ -7,7 +7,10 @@ After 3.53
 - Implemented " Distribution lists on organizational reports" blueprint;  see:
   https://blueprints.launchpad.net/karl3/+spec/distribution-list-organizational
 
-  Merge from 'tseaver-distribution_lists' branch.
+- Merge from 'tseaver-distribution_lists' branch.
+
+- Added fault tolerance in mailin for messages in unknown character encodings.
+  (LP #698153)
 
 3.53 (2010-12-20)
 -----------------

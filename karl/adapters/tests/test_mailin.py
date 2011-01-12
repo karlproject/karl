@@ -689,6 +689,42 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(text, u'cnlybnq')
         self.assertEqual(len(attachments), 0)
 
+    def test_crackPayload_single_encoded_windows_874(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.payload = 'payload'
+        message.content_type = 'text/plain'
+        message.charset = 'windows-874'
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'payload')
+        self.assertEqual(len(attachments), 0)
+
+    def test_crackPayload_single_says_ascii_but_is_really_utf8(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.payload = 'p\xc3\xa0yload'
+        message.content_type = 'text/plain'
+        message.charset = 'ASCII'
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'p\xe0yload')
+        self.assertEqual(len(attachments), 0)
+
+    def test_crackPayload_single_bad_encoding(self):
+        mailin = self._makeOne()
+        message = DummyMessage()
+        message.payload = 'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s'
+        message.content_type = 'text/plain'
+        message.charset = 'windows-foo'
+
+        text, attachments = mailin.crackPayload(message)
+
+        self.assertEqual(text, u'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s')
+        self.assertEqual(len(attachments), 0)
+
     def test_crackPayload_multiple_no_attachments(self):
         mailin = self._makeOne()
         message = DummyMessage()
@@ -857,17 +893,6 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][0], 'cnlybnq\n\nhowdy folks.\n')
         self.assertEqual(_called_with[0][1], 'text/plain')
         self.assertEqual(_called_with[0][2], False)
-
-    def test_crackPayload_bad_encoding(self):
-        mailin = self._makeOne()
-        message = DummyMessage()
-        message.payload = 'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s'
-        message.content_type = 'text/plain'
-
-        text, attachments = mailin.crackPayload(message)
-
-        self.assertEqual(text, u'Atbild\xe7\xf0u jums p\xe7c atgrie\xf0an\xe2s')
-        self.assertEqual(len(attachments), 0)
 
 
 class DummyMessage:
