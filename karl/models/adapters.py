@@ -539,11 +539,15 @@ class PeopleReportMailinHandler(object):
         alerts = queryUtility(IAlerts, default=Alerts())
         alerts.emit(entry, offline_request)
         """
-        if 'mailinglist' in self.context:
+        mailinglist = self.context.get('mailinglist')
+        if mailinglist is not None:
             system_email_domain = get_setting(self.context,
-                                              "system_email_domain")
-            reply_to = "peopledir-%s@%s" % (info['report'],
-                                           system_email_domain)
+                                                "system_email_domain")
+            system_list_subdomain = get_setting(self.context,
+                                                "system_list_subdomain",
+                                                system_email_domain)
+            reply_to = "%s@%s" % (mailinglist.short_address,
+                                  system_list_subdomain)
             clone = self._cloneMessage(message)
             clone['Reply-To'] = reply_to
             mailer = getUtility(IMailDelivery)

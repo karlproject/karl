@@ -78,6 +78,7 @@ class IIndexFactory(Interface):
 class ISite(IFolder):
     """ Karl site """
     taggedValue('name', 'Site')
+    list_aliases = Attribute("Mailng list address -> path")
 
     def update_indexes():
         """Add and remove catalog indexes to match a fixed schema"""
@@ -504,6 +505,7 @@ class IPeopleReportIsStaffFilter(IPeopleReportFilter):
 class IPeopleReportMailingList(Interface):
     """Marker object indicating that the parent report enables mailing list.
     """
+    short_address = Attribute("Short / pretty e-mail prefix for the list.")
 
 class IPeopleReport(Interface):
     """A report about people

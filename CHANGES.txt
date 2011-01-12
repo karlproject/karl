@@ -4,10 +4,10 @@ karl package Changelog
 After 3.53
 ----------
 
+- Made report-based distribution lists addressable using "pretty" aliases.
+
 - Implemented " Distribution lists on organizational reports" blueprint;  see:
   https://blueprints.launchpad.net/karl3/+spec/distribution-list-organizational
-
-- Merge from 'tseaver-distribution_lists' branch.
 
 - Added fault tolerance in mailin for messages in unknown character encodings.
   (LP #698153)

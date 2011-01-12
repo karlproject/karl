@@ -195,6 +195,38 @@ class TestUniqueEmailValidator(unittest.TestCase):
         validator = self._makeOne(self.context)
         self.assertEqual(validator(email), None)
 
+class TestUniqueShortAddressValidator(unittest.TestCase):
+
+    def _makeOne(self, context):
+        from karl.views.forms.validators import UniqueShortAddress
+        return UniqueShortAddress(context)
+
+    def _makeContext(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ISite
+        root = testing.DummyModel()
+        root.list_aliases = {'match': 'path/to/list'}
+        directlyProvides(root, ISite)
+        context = root['list'] = testing.DummyModel()
+        return context
+
+    def test_fail(self):
+        from validatish.error import Invalid
+        context = self._makeContext()
+        validator = self._makeOne(context)
+        self.assertRaises(Invalid, validator, 'match')
+
+    def test_nofail(self):
+        context = self._makeContext()
+        validator = self._makeOne(context)
+        self.assertEqual(validator('nomatch'), None)
+
+    def test_nofail_on_self_match(self):
+        context = self._makeContext()
+        context.short_address = short_address = 'match'
+        validator = self._makeOne(context)
+        self.assertEqual(validator(short_address), None)
+
 class TestHTMLValidator(unittest.TestCase):
     def _makeOne(self):
         from karl.views.forms.validators import HTML

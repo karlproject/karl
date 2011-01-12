@@ -194,7 +194,7 @@ class Test_upload_peopledirectory_xml(unittest.TestCase):
          </sections>
         </peopledirectory>
         """
-        site = testing.DummyModel()
+        site = testing.DummyModel(list_aliases={})
         site['profiles'] = testing.DummyModel()
         pd = site['people'] = testing.DummyModel(title='People')
         def _set_order(value):
@@ -619,13 +619,13 @@ class Test_report_view(unittest.TestCase):
         from karl.views.peopledirectory import report_view
         return report_view(context, request)
 
-    def _register(self):
+    def _register(self, **kw):
         from zope.interface import Interface
         from karl.testing import registerCatalogSearch
         from karl.testing import registerSettings
         from karl.models.interfaces import ILetterManager
+        registerSettings(**kw)
         registerCatalogSearch()
-        registerSettings()
         testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
 
     def test_unqualified_report_no_mailinglist(self):
@@ -647,16 +647,27 @@ class Test_report_view(unittest.TestCase):
         self.assertEqual(info['qualifiers'], [])
         self.assertEqual(info['mailto'], None)
 
-    def test_report_with_mailinglist(self):
+    def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
         pd, section, report = _makeReport()
-        report['mailinglist'] = testing.DummyModel()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
-                         'mailto:peopledir-s1+r1@karl3.example.com')
+                         'mailto:alias@karl3.example.com')
+
+    def test_report_with_mailinglist_w_subdomain(self):
+        self._register(system_list_subdomain='lists.example.com')
+        pd, section, report = _makeReport()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        request = testing.DummyRequest()
+
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['mailto'],
+                         'mailto:alias@lists.example.com')
 
     def test_qualified_report(self):
         self._register()

@@ -22,6 +22,7 @@ from lxml import etree
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Deny
 from repoze.bfg.security import DENY_ALL
+from repoze.bfg.traversal import model_path
 from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
@@ -30,6 +31,7 @@ from karl.models.interfaces import IPeopleReportCategoryFilter
 from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleReportGroupFilter
 from karl.models.interfaces import IPeopleReportIsStaffFilter
+from karl.models.interfaces import IPeopleReportMailingList
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategories
 from karl.models.peopledirectory import PeopleCategory
@@ -37,13 +39,15 @@ from karl.models.peopledirectory import PeopleCategoryItem
 from karl.models.peopledirectory import PeopleRedirector
 from karl.models.peopledirectory import PeopleReport
 from karl.models.peopledirectory import PeopleReportCategoryFilter
+from karl.models.peopledirectory import PeopleReportGroup
 from karl.models.peopledirectory import PeopleReportGroupFilter
 from karl.models.peopledirectory import PeopleReportIsStaffFilter
-from karl.models.peopledirectory import PeopleReportGroup
+from karl.models.peopledirectory import PeopleReportMailingList
 from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
 from karl.models.peopledirectory import reindex_peopledirectory
 from karl.security.policy import NO_INHERIT
+from karl.utils import find_site
 
 
 _DUMP_XML =  """\
@@ -134,6 +138,9 @@ _DUMP_XML =  """\
                type="${info['type']}"
                include_staff="${info['include_staff']}"/>
       </tal:loop>
+      <mailinglist tal:condition="'mailinglist' in item"
+                   tal:attributes="short_address
+                                        item['mailinglist'].short_address"/>
       <columns names="${' '.join(item.columns)}"/>
      </report>
     </metal:chunk>
@@ -320,6 +327,16 @@ def parse_report(people, elem):
         else:
             raise ParseError("Unknown filter type", e)
 
+    mlist_elem = elem.find('mailinglist')
+    if mlist_elem is not None:
+        mlist = report['mailinglist'] = PeopleReportMailingList()
+        short_address = mlist_elem.get('short_address')
+        if short_address is not None:
+            if short_address in find_site(people).list_aliases:
+                raise ParseError("Duplicate short address: %s" % short_address,
+                                 mlist_elem)
+            mlist.short_address = short_address
+
     columns = None
     e = elem.find('columns')
     if e is not None:
@@ -398,6 +415,38 @@ def parse_section(people, section_elem):
             raise ParseError('Unrecognized element', e)
     return items
 
+
+def clear_mailinglist_aliases(peopledir):
+    site = find_site(peopledir)
+    aliases = site.list_aliases
+    pd_path = model_path(peopledir)
+    for k, v in list(aliases.items()): # avoid mutating-while-iterating
+        if v.startswith(pd_path):
+            del aliases[k]
+    
+
+def find_mailinglist_aliases(peopledir):
+
+    def _walk_mailinglists(container, mailinglists=None):
+        if mailinglists is None:
+            mailinglists = []
+        if IPeopleReportMailingList.providedBy(container):
+            mailinglists.append(container)
+        values = getattr(container, 'values', lambda: ())
+        if callable(values):
+            for v in values():
+                _walk_mailinglists(v, mailinglists)
+        return mailinglists
+
+    site = find_site(peopledir)
+    aliases = site.list_aliases
+    for mailinglist in _walk_mailinglists(peopledir):
+        short_address = mailinglist.short_address
+        if short_address in aliases:
+            raise ValueError('Duplicate short_address: %s' % short_address)
+        aliases[short_address] = model_path(mailinglist.__parent__)
+
+
 def peopleconf(peopledir, tree, force_reindex=False):
     # tree is an lxml.etree element.
     if tree.find('categories') is not None:
@@ -435,6 +484,8 @@ def peopleconf(peopledir, tree, force_reindex=False):
         if name != 'categories':
             del peopledir[name]
 
+    clear_mailinglist_aliases(peopledir)
+
     section_order = []
     for section_elem in tree.findall('sections/section'):
         name, title = name_and_title(section_elem)
@@ -448,6 +499,8 @@ def peopleconf(peopledir, tree, force_reindex=False):
             section[sub_name] = sub
             sub_order.append(sub_name)
         section.order = tuple(sub_order)
+
+    find_mailinglist_aliases(peopledir)
 
     # 'categories' never in the order.
     peopledir.order = section_order

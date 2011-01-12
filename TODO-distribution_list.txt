@@ -1,6 +1,7 @@
 Distribution List Blueprint TODOs
 =================================
 
+
 Phase 1 -- Report-Driven Lists
 ------------------------------
 
@@ -49,8 +50,37 @@ Phase 1 -- Report-Driven Lists
       - See r6474.
 
 
+Phase 1a -- "Prettified" list aliases
+-------------------------------------
+
+- [X] Merge initial "Phase 1" work to trunk.
+
+- [X] Give mailinglist objects a 'short_address' schema field.
+
+      * Default to '__name__'
+
+      * Allow editing in admin UI.
+
+      * "Index" that field on the 'list_aliases' attribute of the root object,
+        which needs to be a b-tree mapping alias -> path.
+
+      * Ensure that aliases are unique across site.
+
+- [X] Update inbound mail dispatch to check aliases against the root object's
+      'list_aliases';  if present, use the mapped path to find the target.
+
+- [X] Update the 'mailto:' link shown on the report to use the 'short_address'
+      plus a new setting, 'list_subdomain' (fall back to the main site domain).
+
+- [X] Use the same "pretty" address for the 'Reply-To' header.
+
+- [X] Style the envelope icon on reports with mailinglists consistent with
+      with others (Paul, done on trunk).
+
+- [X] Merge this work to trunk.
+
+
 Phase 2 -- Moderated lists
 --------------------------
 
-Q:  Should these really be communities, with a custom tool?  I.e.,
-    shouldn't any community potentially be usable as a mailing list?
+- [_] Implement a custom 'mailinglist' tool for communities.

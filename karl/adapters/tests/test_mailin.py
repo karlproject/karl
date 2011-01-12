@@ -19,9 +19,12 @@ class MailinDispatcherTests(unittest.TestCase):
             context = self._makeContext()
         return self._getTargetClass()(context)
 
-    def _makeContext(self):
+    def _makeContext(self, **kw):
         from repoze.bfg.testing import DummyModel
-        return DummyModel()
+        return DummyModel(**kw)
+
+    def _makeRoot(self):
+        return self._makeContext(list_aliases={})
 
     def test_class_conforms_to_IMailinDispatcher(self):
         from zope.interface.verify import verifyClass
@@ -58,13 +61,13 @@ class MailinDispatcherTests(unittest.TestCase):
                          ])
 
     def test_isCommunity_nonesuch(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         self.failIf(mailin.isCommunity('nonesuch'))
 
     def test_isCommunity_extant(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['extant'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -73,7 +76,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_isReport_nonesuch(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         mailin = self._makeOne(context)
@@ -82,7 +85,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_isReport_extant(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         pd['extant'] = self._makeContext()
@@ -92,7 +95,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_isReport_subpath_miss(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         pd['section'] = self._makeContext()
@@ -102,7 +105,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_isReport_subpath_hit(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -110,28 +113,41 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.failUnless(mailin.isReport('section+extant'))
 
+    def test_isReport_alias(self):
+        from repoze.bfg.traversal import model_path
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeRoot()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        extant = section['extant'] = self._makeContext()
+        context.list_aliases['alias'] = model_path(extant)
+        mailin = self._makeOne(context)
+        self.failUnless(mailin.isReport('alias'))
+
     def test_getCommunityId_nonesuch(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getCommunityId('nonesuch@example.com'), None)
 
     def test_getCommunityId_extant(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['extant'] = self._makeContext()
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getCommunityId('extant@example.com'), 'extant')
 
     def test_getAuthor_nonesuch(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         pf = context['profiles'] = self._makeContext()
         pf.getProfileByEmail = lambda email: None
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getAuthor('nonesuch@example.com'), None)
 
     def test_getAuthor_extant(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         profile = self._makeContext()
         profile.__name__ = 'extant'
         by_email = {'extant@example.com': profile}
@@ -144,16 +160,18 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne()
         message = DummyMessage()
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'no community specified')
 
     def test_getMessageTarget_reply_invalid_community(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('nonesuch+tool-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'invalid community: nonesuch')
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'nonesuch')
@@ -161,13 +179,14 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_getMessageTarget_reply_invalid_to_addr(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('undisclosed-recipients:;',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['report'], None)
         self.assertEqual(info['error'], 'no community specified')
         self.assertEqual(info['community'], None)
@@ -175,7 +194,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_reply_ok(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -183,6 +202,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('testing+tool-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'))
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'testing')
@@ -190,7 +210,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_getMessageTarget_reply_ok_community_with_hyphen(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['with-hyphen'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -198,6 +218,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('with-hyphen+tool-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'))
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'with-hyphen')
@@ -205,7 +226,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_getMessageTarget_reply_ok_community_with_period(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['with-.dot'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -213,19 +234,21 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('with-.dot+tool-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'))
         self.assertEqual(info['community'], 'with-.dot')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_getMessageTarget_tool_invalid_community(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('nonesuch+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'invalid community: nonesuch')
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'nonesuch')
@@ -233,7 +256,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_tool_ok(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -241,6 +264,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('testing+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'))
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'testing')
@@ -248,7 +272,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_tool_ok_community_with_hyphen(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['with-hyphen'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -256,6 +280,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('with-hyphen+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'), info)
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'with-hyphen')
@@ -263,7 +288,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_tool_ok_community_with_period(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['with-.dot'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -271,13 +296,14 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('with-.dot+tool@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'), info)
         self.assertEqual(info['community'], 'with-.dot')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_default_invalid_community(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
@@ -285,6 +311,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('nonesuch@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'no community specified')
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], None)
@@ -294,7 +321,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_getMessageTarget_report_reply_invalid_report(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -303,6 +330,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('peopledir-section+nonesuch-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'invalid report: section+nonesuch')
         self.assertEqual(info['report'], 'section+nonesuch')
         self.assertEqual(info['community'], None)
@@ -312,7 +340,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_getMessageTarget_report_reply_valid_report(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -322,6 +350,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('peopledir-section+extant-12345@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'), info)
         self.assertEqual(info['report'], 'section+extant')
         self.assertEqual(info['community'], None)
@@ -331,7 +360,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_getMessageTarget_report_invalid_report(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -340,6 +369,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('peopledir-section+nonesuch@example.com',)
 
         info = mailin.getMessageTarget(message)
+
         self.assertEqual(info['error'], 'invalid report: section+nonesuch')
         self.assertEqual(info['report'], 'section+nonesuch')
         self.assertEqual(info['community'], None)
@@ -349,7 +379,7 @@ class MailinDispatcherTests(unittest.TestCase):
     def test_getMessageTarget_report_valid_report(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -359,6 +389,29 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('peopledir-section+extant@example.com',)
 
         info = mailin.getMessageTarget(message)
+
+        self.failIf(info.get('error'), info)
+        self.assertEqual(info['report'], 'section+extant')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.failIf(info.get('in_reply_to'), info)
+
+    def test_getMessageTarget_report_alias(self):
+        from repoze.bfg.traversal import model_path
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = self._makeRoot()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        extant = section['extant'] = self._makeContext()
+        context.list_aliases['alias'] = model_path(extant)
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('alias@example.com',)
+
+        info = mailin.getMessageTarget(message)
+
         self.failIf(info.get('error'), info)
         self.assertEqual(info['report'], 'section+extant')
         self.assertEqual(info['community'], None)
@@ -381,7 +434,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['error'], 'multiple From:')
 
     def test_getMessageAuthorAndSubject_no_subject(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         profile = self._makeContext()
         profile.__name__ = 'extant'
         by_email = {'extant@example.com': profile}
@@ -395,7 +448,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['error'], 'missing Subject:')
 
     def test_getMessageAuthorAndSubject_bad_author(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         by_email = {}
         pf = context['profiles'] = self._makeContext()
         pf.getProfileByEmail = lambda email: by_email.get(email)
@@ -435,7 +488,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from karl.testing import DummyUsers
         from repoze.bfg.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=False)
-        context = self._makeContext()
+        context = self._makeRoot()
         communities = context['communities'] = self._makeContext()
         community = communities['testcommunity'] = self._makeContext()
         community['testtool'] = self._makeContext()
@@ -454,7 +507,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from karl.testing import DummyUsers
         from repoze.bfg.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=True)
-        context = self._makeContext()
+        context = self._makeRoot()
         communities = context['communities'] = self._makeContext()
         community = communities['testcommunity'] = self._makeContext()
         community['testtool'] = self._makeContext()
@@ -474,7 +527,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from karl.models.interfaces import IPeopleDirectory
         from karl.testing import DummyUsers
         registerDummySecurityPolicy('phred', permissive=False)
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -496,7 +549,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from karl.testing import DummyUsers
         from repoze.bfg.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=True)
-        context = self._makeContext()
+        context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
@@ -518,7 +571,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['error'], 'no community specified')
 
     def test_crackHeaders_no_From(self):
-        context = self._makeContext()
+        context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
@@ -533,7 +586,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
     def test_crackHeaders_default_ok(self):
         from karl.testing import DummyUsers
-        context = self._makeContext()
+        context = self._makeRoot()
         context.users = DummyUsers()
         profile = self._makeContext()
         profile.__name__ = 'extant'
@@ -560,7 +613,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
     def test_crackHeaders_default_community_in_CC(self):
         from karl.testing import DummyUsers
-        context = self._makeContext()
+        context = self._makeRoot()
         context.users = DummyUsers()
         profile = self._makeContext()
         profile.__name__ = 'extant'
@@ -590,7 +643,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from repoze.bfg.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('someuser', permissive=False)
         from karl.testing import DummyUsers
-        context = self._makeContext()
+        context = self._makeRoot()
         context.users = DummyUsers()
         profile = self._makeContext()
         profile.__name__ = 'extant'

@@ -277,6 +277,25 @@ class PeopleReportIsStaffFilter(_PeopleReportFilter):
 
 class PeopleReportMailingList(Folder):
     implements(IPeopleReportMailingList)
+    _short_address = None
+
+    def _get_short_address(self):
+        if self._short_address is None:
+            parent = self.__parent__
+            return parent and parent.__name__
+        return self._short_address
+
+    def _set_short_address(self, value):
+        self._short_address = value
+
+    def _del_short_address(self):
+        del self._short_address
+
+    short_address = property(_get_short_address,
+                             _set_short_address,
+                             _del_short_address,
+                            )
+
 
 PeopleReportFilter = PeopleReportCategoryFilter  # BBB
 

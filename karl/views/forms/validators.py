@@ -1,13 +1,14 @@
+import datetime
 import re
 
-import datetime
 from lxml.html.clean import clean_html
+from repoze.bfg.traversal import find_model
+from repoze.who.plugins.zodb.users import get_sha_password
 from validatish import validate
 from validatish.validator import Validator
 from validatish.error import Invalid
 from zope.component import getAdapter
-from repoze.bfg.traversal import find_model
-from repoze.who.plugins.zodb.users import get_sha_password
+
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_site
@@ -120,6 +121,24 @@ class UniqueEmail(Validator):
             if n:
                 raise Invalid(
                     'Email address is already in use by another user.')
+
+class UniqueShortAddress(Validator):
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, v):
+        if v:
+            context = self.context
+            # Let's not find conflicts with our own selves
+            prev = getattr(context, 'short_address', None)
+            if prev == v:
+                # Nothing's changed, no need to check
+                return
+
+            root = find_site(context)
+            if v in root.list_aliases:
+                raise Invalid(
+                 "'short_address' is already in use by another mailing list.")
 
 class HTML(Validator):
     def __call__(self, v):

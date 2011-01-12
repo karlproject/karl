@@ -935,15 +935,18 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         adapter.handle(message, {'report': 'section+report'}, 'text', ())
         self.assertEqual(len(md._sent), 0)
 
-    def test_handle_w_mailinglist(self):
+    def test_handle_w_mailinglist_wo_subdomain(self):
         karltesting.registerSettings()
         md = self._registerMailDelivery()
         _called_with = self._registerCatalogSearch([0, 1])
         message = self._makeMessage()
-        context = testing.DummyModel()
-        context['mailinglist'] = testing.DummyModel()
-        context.getQuery = lambda: {'testing': True}
-        adapter = self._makeOne(context)
+        root = testing.DummyModel()
+        people = root['people'] = testing.DummyModel()
+        section = people['section'] = testing.DummyModel()
+        report = section['report'] = testing.DummyModel()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        report.getQuery = lambda: {'testing': True}
+        adapter = self._makeOne(report)
 
         adapter.handle(message, {'report': 'section+report'}, 'text', ())
 
@@ -953,7 +956,32 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
             self.assertEqual(to, 'profile_%d@example.com' % index)
             self.failIf('Message-Id' in sentmessage)
             self.assertEqual(sentmessage['Reply-To'],
-                            'peopledir-section+report@karl3.example.com')
+                            'alias@karl3.example.com')
+        self.assertEqual(_called_with, [{'testing': True}])
+
+    def test_handle_w_mailinglist_w_subdomain(self):
+        karltesting.registerSettings(
+                system_list_subdomain='lists.example.com')
+        md = self._registerMailDelivery()
+        _called_with = self._registerCatalogSearch([0, 1])
+        message = self._makeMessage()
+        root = testing.DummyModel()
+        people = root['people'] = testing.DummyModel()
+        section = people['section'] = testing.DummyModel()
+        report = section['report'] = testing.DummyModel()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        report.getQuery = lambda: {'testing': True}
+        adapter = self._makeOne(report)
+
+        adapter.handle(message, {'report': 'section+report'}, 'text', ())
+
+        self.assertEqual(len(md._sent), 2)
+        for index, (frm, to, sentmessage) in enumerate(md._sent):
+            self.assertEqual(frm, message['From'])
+            self.assertEqual(to, 'profile_%d@example.com' % index)
+            self.failIf('Message-Id' in sentmessage)
+            self.assertEqual(sentmessage['Reply-To'],
+                            'alias@lists.example.com')
         self.assertEqual(_called_with, [{'testing': True}])
 
 

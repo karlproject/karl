@@ -296,6 +296,38 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(len(x_nodes), 1)
         self.assertEqual(x_nodes[0].get('names'), 'name phone')
 
+    def test_section_w_mailinglist(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        from karl.models.interfaces import IPeopleReportMailingList
+        from karl.models.interfaces import IPeopleSectionColumn
+        pd = self._makeContext(order=('testing',))
+        section = pd['testing'] = testing.DummyModel(
+                            title='Testing',
+                            tab_title='Testing (TAB)',
+                            __acl__=[('Allow', 'system.Everyone', ('view',))])
+        column = section['c1'] = testing.DummyModel(order=('report',))
+        directlyProvides(column, IPeopleSectionColumn)
+        report = column['report'] = testing.DummyModel(title='Report',
+                                        link_title='Report (Link)',
+                                        css_class='CSS',
+                                        columns=('name', 'phone'))
+        directlyProvides(report, IPeopleReport)
+        offices = report['offices'] = testing.DummyModel(
+                                            values=['nyc', 'london'])
+        directlyProvides(offices, IPeopleReportCategoryFilter)
+        mlist = report['mailinglist'] = testing.DummyModel(
+                                            short_address='alias')
+        directlyProvides(mlist, IPeopleReportMailingList)
+        xml = self._callFUT(pd)
+        m_nodes = self._xpath(xml, '/peopledirectory/sections'
+                                    '/section/column/report/mailinglist')
+        self.assertEqual(len(m_nodes), 1)
+        self.assertEqual(m_nodes[0].get('short_address'), 'alias')
+
     def test_section_w_report_group(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
@@ -335,6 +367,7 @@ class Test_dump_peopledir(unittest.TestCase):
                                     '/section/report-group/report/columns')
         self.assertEqual(len(x_nodes), 1)
         self.assertEqual(x_nodes[0].get('names'), 'name phone')
+
 
 class ParseErrorTests(unittest.TestCase):
 
@@ -471,14 +504,6 @@ class Test_set_acl(unittest.TestCase):
 
 class Test_parse_report(unittest.TestCase):
 
-    def setUp(self):
-        from repoze.bfg.testing import cleanUp
-        cleanUp()
-
-    def tearDown(self):
-        from repoze.bfg.testing import cleanUp
-        cleanUp()
-
     def _callFUT(self, peopledir, elem):
         from karl.utilities.peopleconf import parse_report
         return parse_report(peopledir, elem)
@@ -490,7 +515,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         name, report = self._callFUT(peopledir, elem)
         self.assertEqual(name, 'r1')
         self.assertEqual(report.title, 'r1')
@@ -502,6 +528,7 @@ class Test_parse_report(unittest.TestCase):
         from karl.models.peopledirectory import PeopleReportCategoryFilter
         from karl.models.peopledirectory import PeopleReportGroupFilter
         from karl.models.peopledirectory import PeopleReportIsStaffFilter
+        from karl.models.peopledirectory import PeopleReportMailingList
         xml = """
         <report name="r1" title="Report One" link-title="One">
             <filter name="offices" type="category" category="offices"
@@ -511,17 +538,19 @@ class Test_parse_report(unittest.TestCase):
             <filter name="groups" type="groups" values="g1 g2"/>
             <filter name="is_staff" type="is_staff" include_staff="False"/>
             <columns names="name email"/>
+            <mailinglist short_address="alias"/>
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['categories']['offices'] = {'nyc': 'NYC', 'la': 'LA'}
         peopledir['categories']['departments'] = {'toys': 'Toys'}
         name, report = self._callFUT(peopledir, elem)
         self.assertEqual(name, 'r1')
         self.assertEqual(report.title, 'Report One')
         self.assertEqual(report.link_title, 'One')
-        self.assertEqual(len(report), 4)
+        self.assertEqual(len(report), 5)
         self.failUnless(isinstance(report['departments'],
                         PeopleReportCategoryFilter))
         self.assertEqual(report['departments'].values, ('toys',))
@@ -534,6 +563,9 @@ class Test_parse_report(unittest.TestCase):
         self.failUnless(isinstance(report['is_staff'],
                         PeopleReportIsStaffFilter))
         self.failIf(report['is_staff'].include_staff)
+        self.failUnless(isinstance(report['mailinglist'],
+                        PeopleReportMailingList))
+        self.assertEqual(report['mailinglist'].short_address, 'alias')
         self.assertEqual(report.columns, ('name', 'email'))
 
     def test_no_such_category(self):
@@ -545,7 +577,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
     def test_no_category_values(self):
@@ -557,7 +590,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['categories']['office'] = {'nyc': 'NYC'}
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
@@ -570,7 +604,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['categories']['office'] = {'nyc': 'NYC'}
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
@@ -583,7 +618,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         elem = parse_xml(xml)
         peopledir = DummyPeopleDirectory()
         name, report = self._callFUT(peopledir, elem)
@@ -591,6 +627,20 @@ class Test_parse_report(unittest.TestCase):
         self.failUnless(isinstance(report['groups'], PeopleReportGroupFilter))
         self.assertEqual(report['groups'].values, ('g1',))
         self.assertEqual(report.columns, ('name',))
+
+    def test_duplicate_short_address(self):
+        from karl.utilities.peopleconf import ParseError
+        xml = """
+        <report name="r1">
+            <columns names="name"/>
+            <mailinglist short_address="duplicate"/>
+        </report>
+        """
+        ALIASES = {'duplicate': '/somewhere/else'}
+        elem = parse_xml(xml)
+        site = testing.DummyModel(list_aliases=ALIASES)
+        peopledir = site['people'] = DummyPeopleDirectory()
+        self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
     def test_no_columns(self):
         from karl.utilities.peopleconf import ParseError
@@ -601,8 +651,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
-        peopledir['categories']['office'] = {'nyc': 'NYC'}
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
     def test_bad_column(self):
@@ -614,7 +664,8 @@ class Test_parse_report(unittest.TestCase):
         </report>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['categories']['office'] = {'nyc': 'NYC'}
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
@@ -685,6 +736,7 @@ class Test_parse_reports(unittest.TestCase):
         self.assertEqual(items[1][1]['r2'].title, 'r2')
 
     def test_non_unique_report(self):
+        from karl.utilities.peopleconf import ParseError
         xml = """
         <report-group name="test">
             <report name="r1">
@@ -697,10 +749,10 @@ class Test_parse_reports(unittest.TestCase):
         """
         elem = parse_xml(xml)
         peopledir = DummyPeopleDirectory()
-        from karl.utilities.peopleconf import ParseError
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
     def test_non_unique_report_group(self):
+        from karl.utilities.peopleconf import ParseError
         xml = """
         <column name="c1">
             <report-group name="rg1">
@@ -717,10 +769,10 @@ class Test_parse_reports(unittest.TestCase):
         """
         elem = parse_xml(xml)
         peopledir = DummyPeopleDirectory()
-        from karl.utilities.peopleconf import ParseError
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
     def test_unrecognized(self):
+        from karl.utilities.peopleconf import ParseError
         xml = """
         <report-group name="test">
             <xml/>
@@ -728,7 +780,6 @@ class Test_parse_reports(unittest.TestCase):
         """
         elem = parse_xml(xml)
         peopledir = DummyPeopleDirectory()
-        from karl.utilities.peopleconf import ParseError
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
 
@@ -833,15 +884,86 @@ class Test_parse_section(unittest.TestCase):
         self.assertRaises(ParseError, self._callFUT, peopledir, elem)
 
 
+class Test_clear_mailinglist_aliases(unittest.TestCase):
+
+    def _callFUT(self, peopledir):
+        from karl.utilities.peopleconf import clear_mailinglist_aliases
+        return clear_mailinglist_aliases(peopledir)
+
+    def test_clears_list_aliases_under_people(self):
+        ALIASES = {'not_people': '/somewhere/else',
+                   'under_people': '/people/path/to/resport',
+                  }
+        site = testing.DummyModel(list_aliases=ALIASES)
+        peopledir = site['people'] = DummyPeopleDirectory()
+        self._callFUT(peopledir)
+        self.assertEqual(len(site.list_aliases), 1)
+        self.failIf('under_people' in site.list_aliases)
+        self.failUnless('not_people' in site.list_aliases)
+
+
+class Test_find_mailinglist_aliases(unittest.TestCase):
+
+    def _callFUT(self, peopledir):
+        from karl.utilities.peopleconf import find_mailinglist_aliases
+        return find_mailinglist_aliases(peopledir)
+
+    def test_wo_conflicts(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportMailingList
+        ALIASES = {'not_people': '/somewhere/else',
+                  }
+        site = testing.DummyModel(list_aliases=ALIASES)
+        peopledir = site['people'] = testing.DummyModel()
+        section = peopledir['section'] = testing.DummyModel()
+        report1 = section['report1'] = testing.DummyModel()
+        ml1 = report1['mailinglist'] = testing.DummyModel(short_address='one')
+        directlyProvides(ml1, IPeopleReportMailingList)
+        report2 = section['report2'] = testing.DummyModel()
+        report3 = section['report3'] = testing.DummyModel()
+        ml3 = report3['mailinglist'] = testing.DummyModel(short_address='three')
+        directlyProvides(ml3, IPeopleReportMailingList)
+        self._callFUT(peopledir)
+        self.assertEqual(len(site.list_aliases), 3)
+        self.assertEqual(site.list_aliases['not_people'], '/somewhere/else')
+        self.assertEqual(site.list_aliases['one'], '/people/section/report1')
+        self.assertEqual(site.list_aliases['three'], '/people/section/report3')
+
+    def test_w_conflicts_inside_people(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportMailingList
+        ALIASES = {'not_people': '/somewhere/else',
+                  }
+        site = testing.DummyModel(list_aliases=ALIASES)
+        peopledir = site['people'] = testing.DummyModel()
+        section = peopledir['section'] = testing.DummyModel()
+        report1 = section['report1'] = testing.DummyModel()
+        ml1 = report1['mailinglist'] = testing.DummyModel(
+                                                short_address='conflict')
+        directlyProvides(ml1, IPeopleReportMailingList)
+        report2 = section['report2'] = testing.DummyModel()
+        report3 = section['report3'] = testing.DummyModel()
+        ml3 = report3['mailinglist'] = testing.DummyModel(
+                                                short_address='conflict')
+        directlyProvides(ml3, IPeopleReportMailingList)
+        self.assertRaises(ValueError, self._callFUT, peopledir)
+
+    def test_w_conflicts_outside_people(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportMailingList
+        ALIASES = {'duplicate': '/somewhere/else',
+                  }
+        site = testing.DummyModel(list_aliases=ALIASES)
+        peopledir = site['people'] = testing.DummyModel()
+        section = peopledir['section'] = testing.DummyModel()
+        report1 = section['report1'] = testing.DummyModel()
+        ml1 = report1['mailinglist'] = testing.DummyModel(
+                                            short_address='duplicate')
+        directlyProvides(ml1, IPeopleReportMailingList)
+        self.assertRaises(ValueError, self._callFUT, peopledir)
+
+
 class Test_peopleconf(unittest.TestCase):
-
-    def setUp(self):
-        from repoze.bfg.testing import cleanUp
-        cleanUp()
-
-    def tearDown(self):
-        from repoze.bfg.testing import cleanUp
-        cleanUp()
 
     def _callFUT(self, peopledir, elem, **kw):
         from karl.utilities.peopleconf import peopleconf
@@ -880,7 +1002,8 @@ class Test_peopleconf(unittest.TestCase):
         </peopledirectory>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['existing'] = testing.DummyModel()
 
         self._callFUT(peopledir, elem)
@@ -923,7 +1046,8 @@ class Test_peopleconf(unittest.TestCase):
         </peopledirectory>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         # old-style
         del peopledir['categories']
         peopledir.categories = object()
@@ -949,7 +1073,8 @@ class Test_peopleconf(unittest.TestCase):
         </peopledirectory>
         """
         elem = parse_xml(xml)
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir['categories']['bogus'] = object()
 
         self._callFUT(peopledir, elem)
@@ -975,12 +1100,10 @@ class Test_peopleconf(unittest.TestCase):
         </peopledirectory>
         """
         elem = parse_xml(xml)
-        site = testing.DummyModel()
-        peopledir = DummyPeopleDirectory()
+        site = testing.DummyModel(list_aliases={})
+        peopledir = site['people'] = DummyPeopleDirectory()
         peopledir.catalog = DummyCatalog()
-        site['people'] = peopledir
-        profiles = testing.DummyModel()
-        site['profiles'] = profiles
+        profiles = site['profiles'] = testing.DummyModel()
         profile = profiles['dummy'] = testing.DummyModel()
         directlyProvides(profile, IProfile)
         self._callFUT(peopledir, elem, force_reindex=True)

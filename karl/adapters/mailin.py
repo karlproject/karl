@@ -19,7 +19,6 @@ import re
 
 from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import traverse
 from repoze.postoffice.message import decode_header
 from zope.component import getUtility
 from zope.interface import implements
@@ -30,6 +29,7 @@ from karl.utilities.interfaces import IMailinTextScrubber
 from karl.utils import find_communities
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
+from karl.utils import find_root
 from karl.utils import find_users
 
 REPORT_REPLY_REGX = re.compile(r'peopledir-'
@@ -43,6 +43,8 @@ REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
                          '-(?P<reply>\w+)@')
 
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
+
+ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
 
 class MailinDispatcher(object):
     implements(IMailinDispatcher)
@@ -69,6 +71,9 @@ class MailinDispatcher(object):
     def isReport(self, name):
         """ See IMailinDispatcher.
         """
+        root = find_root(self.context)
+        if name in root.list_aliases:
+            return True
         pd = find_peopledirectory(self.context)
         tokens = name.split('+')
         try:
@@ -128,6 +133,16 @@ class MailinDispatcher(object):
                 if not self.isReport(report):
                     info['error'] = 'invalid report: %s' % report
                 return info
+
+            match = ALIAS_REGX.search(email)
+            if match:
+                alias = match.group('alias')
+                path = self.context.list_aliases.get(alias)
+                if path is not None:
+                    elements = path.split('/')
+                    if elements[0:2] == ['', 'people']:
+                        info['report'] = '+'.join(elements[2:])
+                        return info
 
             match = REPLY_REGX.search(email)
             if match:

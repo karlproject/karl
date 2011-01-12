@@ -17,15 +17,8 @@
 
 import datetime
 
-from zope.interface import implements
-from zope.interface import providedBy
-from zope.interface.declarations import Declaration
-from zope.component import getUtilitiesFor
-from zope.component import queryAdapter
-from zope.event import notify
-
+from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
-
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
@@ -41,6 +34,12 @@ from repoze.lemonade.content import create_content
 from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
 from repoze.who.plugins.zodb.users import Users
+from zope.interface import implements
+from zope.interface import providedBy
+from zope.interface.declarations import Declaration
+from zope.component import getUtilitiesFor
+from zope.component import queryAdapter
+from zope.event import notify
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
@@ -276,6 +275,7 @@ class Site(Folder):
     __parent__ = None
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
+    list_aliases = None
 
     def __init__(self):
         super(Site, self).__init__()
@@ -293,6 +293,7 @@ class Site(Folder):
         self.tags = Tags(self)
         self.sessions = SessionDataManager(3600, 5)
         self.filestore = PersistentMapping()
+        self.list_aliases = OOBTree()
 
     def update_indexes(self):
         """ Ensure that we have indexes matching what the application needs.

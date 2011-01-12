@@ -481,6 +481,30 @@ class TestPeopleReportMailingList(unittest.TestCase):
         from karl.models.interfaces import IPeopleReportMailingList
         verifyObject(IPeopleReportMailingList, self._makeOne())
 
+    def test_short_address_not_overridden_uses_parent_name(self):
+        from repoze.bfg.testing import DummyModel
+        parent = DummyModel(__name__ = 'testing')
+        mlist = self._makeOne()
+        mlist.__parent__ = parent
+        self.assertEqual(mlist.short_address, 'testing')
+
+    def test_short_address_overridden(self):
+        from repoze.bfg.testing import DummyModel
+        parent = DummyModel(__name__ = 'testing')
+        mlist = self._makeOne()
+        mlist.__parent__ = parent
+        mlist.short_address = 'overridden'
+        self.assertEqual(mlist.short_address, 'overridden')
+
+    def test_short_address_overridden_then_deleted(self):
+        from repoze.bfg.testing import DummyModel
+        parent = DummyModel(__name__ = 'testing')
+        mlist = self._makeOne()
+        mlist.__parent__ = parent
+        mlist.short_address = 'overridden'
+        del mlist.short_address
+        self.assertEqual(mlist.short_address, 'testing')
+
 
 class TestPeopleReport(unittest.TestCase):
 

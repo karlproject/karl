@@ -27,6 +27,7 @@ from lxml import etree
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.security import effective_principals
 from repoze.bfg.security import has_permission
+from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import model_path_tuple
 from repoze.bfg.url import model_url
 from simplejson import JSONEncoder
@@ -62,10 +63,12 @@ from karl.utilities.peopleconf import dump_peopledir
 from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import convert_to_script
 
@@ -294,12 +297,16 @@ def report_view(context, request):
     opensearch_url = model_url(context, request, 'opensearch.xml')
 
     mailto = None
-    if 'mailinglist' in context:
+    mailinglist = context.get('mailinglist')
+    if mailinglist is not None:
         pd_path = model_path_tuple(peopledir)
         report_path = model_path_tuple(context)
         mail_name = '+'.join(report_path[len(pd_path):])
         system_email_domain = get_setting(context, "system_email_domain")
-        mailto = 'mailto:peopledir-%s@%s' % (mail_name, system_email_domain)
+        system_list_subdomain = get_setting(context, "system_list_subdomain",
+                                            system_email_domain)
+        mailto = 'mailto:%s@%s' % (mailinglist.short_address,
+                                   system_list_subdomain)
 
     return dict(
         api=api,
@@ -673,11 +680,18 @@ class EditBase(object):
     def handle_submit(self, converted):
         context = self.context
         request = self.request
+        self.before_edit()
         for name, field in self.schema:
             setattr(context, name, converted[name])
+        self.after_edit()
         location = model_url(context, request, 'admin.html')
         return HTTPFound(location=location)
 
+    def before_edit(self):
+        pass
+
+    def after_edit(self):
+        pass
 
 name_schema = [
     ('name', schemaish.String(validator=validator.Required())),
@@ -711,10 +725,18 @@ class AddBase(object):
         request = self.request
         name = converted['name']
         to_add = context[name] = self.factory()
+        self.before_edit()
         for field_name, field in self.schema:
             setattr(to_add, field_name, converted[field_name])
+        self.after_edit()
         location = model_url(to_add, request, 'admin.html')
         return HTTPFound(location=location)
+
+    def before_edit(self):
+        pass
+
+    def after_edit(self):
+        pass
 
 
 category_schema = [
@@ -890,12 +912,15 @@ class EditIsStaffReportFilterFormController(EditBase):
                   }
         return widgets
 
-mailing_list_schema = []
+
+mailing_list_schema = [
+    ('short_address', schemaish.String(),),
+]
 
 
 class AddReportMailingListFormController(AddBase):
     page_title = 'Add Report Mailing List'
-    schema = mailing_list_schema
+    schema = [] # don't expose 'short_address' on add.
     factory = PeopleReportMailingList
 
     def form_widgets(self, schema):
@@ -911,6 +936,28 @@ class AddReportMailingListFormController(AddBase):
 class EditReportMailingListFormController(EditBase):
     page_title = 'Edit Mailing List'
     schema = mailing_list_schema
+
+    def form_defaults(self):
+        return {'short_address': self.context.short_address}
+
+    def form_fields(self):
+        return [('short_address',
+                 schemaish.String(validator=UniqueShortAddress(self.context)),
+                ),
+               ]
+
+    def before_edit(self):
+        context = self.context
+        aliases = find_site(context).list_aliases
+        try:
+            del aliases[context.short_address]
+        except KeyError:
+            pass
+
+    def after_edit(self):
+        context = self.context
+        aliases = find_site(context).list_aliases
+        aliases[context.short_address] = model_path(context.__parent__)
 
 
 report_schema = [
