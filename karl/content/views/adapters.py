@@ -318,7 +318,7 @@ class BlogAlert(Alert):
         system_name = get_setting(self.context, "system_name", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
-        reply_to = "%s <%s+blog-%s@%s>" % (community.title.replace(',', ''),
+        reply_to = '"%s" <%s+blog-%s@%s>' % (community.title,
                                            community.__name__,
                                            docid_to_hex(blogentry.docid),
                                            system_email_domain)
@@ -328,8 +328,8 @@ class BlogAlert(Alert):
         body_template = get_template(self._template)
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
-        msg["From"] = "%s <%s>" % (from_name, self.mfrom)
-        msg["To"] = "%s <%s>" % (profile.title, profile.email)
+        msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
+        msg["To"] = '"%s" <%s>' % (profile.title, profile.email)
         msg["Reply-to"] = reply_to
         msg["Subject"] = self._subject
         body_text = body_template(
@@ -481,8 +481,8 @@ class NonBlogAlert(Alert):
         body_template = get_template(self._template)
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
-        msg["From"] = "%s <%s>" % (from_name, self.mfrom)
-        msg["To"] = "%s <%s>" % (community.title, profile.email)
+        msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
+        msg["To"] = '"%s" <%s>' % (community.title, profile.email)
         msg["Subject"] = self._subject
         body_text = body_template(
             context=self.context,

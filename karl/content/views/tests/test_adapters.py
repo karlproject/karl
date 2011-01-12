@@ -201,24 +201,8 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
-                        )
-
-    def test_community_name_has_commas(self):
-        from repoze.postoffice.message import Message
-        self.community.title = 'Dummy, Community'
-        request = testing.DummyRequest()
-        alert = self._makeOne(self.blogentry, self.profile, request)
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
-        self.assertEqual(1, len(alert.mto))
-        self.assertEqual("member@x.org", alert.mto[0])
-
-        self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Community <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
 
     def test_digest(self):
@@ -233,8 +217,8 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual( alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
 
     def test_digest_malformed_text(self):
@@ -250,8 +234,8 @@ class TestBlogEntryAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
 
 
@@ -346,8 +330,8 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
 
         messages, n = renderer.history
@@ -370,8 +354,8 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
         self.assertEqual(renderer.history, ([], 0))
 
@@ -393,8 +377,8 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
-                         u"Dummy Communit\xe0 <community+blog-7FFFFFFF"
-                          "@karl3.example.com>"
+                         u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
+                          '@karl3.example.com>'
                         )
 
         messages, n = renderer.history
@@ -476,11 +460,11 @@ class TestCalendarEventAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
-                         u'Dummy Communit\xe0 <member@x.org>')
+                         u'"Dummy Communit\xe0" <member@x.org>')
         self.assertEqual(alert.message["subject"],
                          u'[Dummy Communit\xe0] An Exciting Event!')
         self.assertEqual(alert.message["from"],
-                         u'title | karl3test <alerts@karl3.example.com>')
+                         u'"title | karl3test" <alerts@karl3.example.com>')
         self.assertEqual(
             alert.startDate, 'Wednesday, January 28, 2009 08:32 AM')
         self.assertEqual(
@@ -500,11 +484,11 @@ class TestCalendarEventAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
-                         u'Dummy Communit\xe0 <member@x.org>')
+                         u'"Dummy Communit\xe0" <member@x.org>')
         self.assertEqual(alert.message["subject"],
                          u'[Dummy Communit\xe0] An Exciting Event!')
         self.assertEqual(alert.message["from"],
-                         u'title | karl3test <alerts@karl3.example.com>')
+                         u'"title | karl3test" <alerts@karl3.example.com>')
 
 
 class TestCommunityFileAlert(unittest.TestCase):
@@ -565,11 +549,11 @@ class TestCommunityFileAlert(unittest.TestCase):
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["to"],
-                         u'Dummy Communit\xe0 <member@x.org>')
+                         u'"Dummy Communit\xe0" <member@x.org>')
         self.assertEqual(alert.message["subject"],
                          u'[Dummy Communit\xe0] An interesting file')
         self.assertEqual(alert.message["from"],
-                         u'title | karl3test <alerts@karl3.example.com>')
+                         u'"title | karl3test" <alerts@karl3.example.com>')
 
 
 class TestForumPortlet(unittest.TestCase):

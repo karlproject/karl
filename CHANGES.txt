@@ -12,6 +12,9 @@ After 3.53
 - Added fault tolerance in mailin for messages in unknown character encodings.
   (LP #698153)
 
+- Quote name parts of addresses in From, To and Reply-To headers in alerts.
+  (LP #702080)
+
 3.53 (2010-12-20)
 -----------------
 
