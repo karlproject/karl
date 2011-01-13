@@ -92,6 +92,7 @@ def profile_livesearch_result(context, request):
         email=context.email,
         type='profile',
         category='profile',
+        thumbnail=model_url(context, request, 'profile_thumbnail')
         )
 
 @implementer(ILiveSearchEntry)

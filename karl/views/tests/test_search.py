@@ -176,6 +176,8 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('foo', result['title'])
         self.assertEqual('x1234', result['extension'])
         self.assertEqual('foo@example.com', result['email'])
+        self.assertEqual('http://example.com/profile_thumbnail',
+                         result['thumbnail'])
         self.assertEqual('profile', result['type'])
         self.assertEqual('profile', result['category'])
 
