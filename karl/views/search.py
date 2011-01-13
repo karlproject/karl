@@ -247,16 +247,14 @@ def jquery_livesearch_view(context, request):
 
     records = []
 
-    result_type = request.params.get('type', None)
-    if result_type is None:
+    kind = request.params.get('kind', None)
+    if kind is None:
         listitems = get_listitems(IGroupSearchFactory)
     else:
-        # I'm assuming it's more efficient to ask the zca for the utility
-        # rather than get all listitems and find the one that matches
-        search_utility = queryUtility(IGroupSearchFactory, result_type)
+        search_utility = queryUtility(IGroupSearchFactory, kind)
         if search_utility is None:
-            # this means the client passed a search type we don't know about
-            listitems = ()
+            msg = "The LiveSearch kind %s is not known" % kind
+            return HTTPBadRequest(msg)
         else:
             # simulate a list item for the loop below
             listitems = (dict(component=search_utility),)
