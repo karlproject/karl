@@ -15,6 +15,10 @@ After 3.53
 - Quote name parts of addresses in From, To and Reply-To headers in alerts.
   (LP #702080)
 
+- The default layout provider now detects when context is not contained by a
+  community or intranet and returns the generic layout.  (LP #698879)
+
+
 3.53 (2010-12-20)
 -----------------
 

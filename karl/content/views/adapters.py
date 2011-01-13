@@ -49,6 +49,7 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IComment
+from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.content.interfaces import IForum
@@ -861,15 +862,20 @@ class DefaultLayoutProvider(object):
 
         elif find_interface(self.context, IIntranets):
             if find_interface(self.context, IForum):
-                layout = getattr(self, 'generic_layout')
+                layout = self.generic_layout
             elif ICalendarEvent.providedBy(self.context):
-                layout = getattr(self, 'generic_layout')
+                layout = self.generic_layout
             elif INetworkNewsMarker.providedBy(self.context):
-                layout = getattr(self, 'generic_layout')
+                layout = self.generic_layout
             elif find_interface(self.context, IReferencesFolder):
-                layout = getattr(self, 'generic_layout')
+                layout = self.generic_layout
             elif INetworkEventsMarker.providedBy(self.context):
-                layout = getattr(self, 'generic_layout')
+                layout = self.generic_layout
+
+        elif not find_interface(self.context, ICommunity):
+            # If we're not in a community or an intranet we need to use the
+            # generic layout.
+            layout = self.generic_layout
 
         return layout
 
