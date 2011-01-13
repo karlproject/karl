@@ -408,14 +408,14 @@
       </span>
       -->
       <div class="bc-header-toolbox">
-        <button class="ui-ls-menu">All Content</button><ul>
+        <button>All Content</button><ul>
           <li><a href="#">People</a></li>
           <li><a href="#">Pages</a></li>
           <li><a href="#">Posts</a></li>
           <li><a href="#">Files</a></li>
           <li><a href="#">Other</a></li>
           <li><a href="#">All Content</a></li>
-        </ul><input class="ui-ls-autocomplete"/><button class="ui-ls-gobtn">Search</button>
+        </ul><input class="bc-livesearch"/><button>Search</button>
       </div>
 
     </div>
