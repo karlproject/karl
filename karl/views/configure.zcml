@@ -1753,7 +1753,89 @@
     name="kaltura_create_session.json"
   />
 
+  <!-- livesearch entries -->
+  <adapter
+    for="repoze.lemonade.interfaces.IContent
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.generic_livesearch_result"
+    />
 
+  <adapter
+    for="karl.models.interfaces.IProfile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.profile_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.page_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IWikiPage
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.page_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.reference_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IBlogEntry
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.blogentry_livesearch_result"
+    />
+
+  <adapter
+    for="karl.models.interfaces.IComment
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.comment_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForum
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.forum_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForumTopic
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.forumtopic_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.file_livesearch_result"
+    />
+
+  <adapter
+    for="karl.models.interfaces.ICommunity
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.community_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.calendar_livesearch_result"
+    />
 
 </configure>
-

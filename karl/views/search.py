@@ -25,6 +25,7 @@ from karl.utils import coarse_datetime_repr
 from karl.utils import get_content_type_name
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.interfaces import ILiveSearchEntry
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
@@ -34,6 +35,7 @@ from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
 from webob.exc import HTTPBadRequest
 from webob import Response
+from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
@@ -226,34 +228,7 @@ def searchresults_view(context, request):
         batch_info=batch,
         )
 
-
-class LivesearchResults(list):
-
-    def __init__(self):
-        list.__init__(self)
-        self.set_header('')
-
-    def set_header(self, header, pre="", post=""):
-        self.header = header
-        self.pre = pre
-        self.post = post
-
-    def append_to(self, title, href, rowclass):
-        if self.header:
-            rowclass += ' hasheader'
-        self.append(dict(
-                rowclass = rowclass,
-                header = self.header,
-                title = title,
-                href = href,
-                pre = self.pre,
-                post = self.post,
-                ))
-        self.set_header('')
-
-
 def jquery_livesearch_view(context, request):
-    # Prefix search is with a wildcard at the end
     try:
         searchterm = request.params.get('val', None)
     except UnicodeDecodeError:
@@ -266,27 +241,29 @@ def jquery_livesearch_view(context, request):
         # make a friendly error message.  Important for the unit test.
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
+
+    # maybe do some * checking to verify that we don't have a
+    # prefix search < 3 chars
+
+    records = []
+
+    result_type = request.params.get('type', None)
+    if result_type is None:
+        listitems = get_listitems(IGroupSearchFactory)
     else:
-        searchterm = searchterm + '*'
+        # I'm assuming it's more efficient to ask the zca for the utility
+        # rather than get all listitems and find the one that matches
+        search_utility = queryUtility(IGroupSearchFactory, result_type)
+        if search_utility is None:
+            # this means the client passed a search type we don't know about
+            listitems = ()
+        else:
+            # simulate a list item for the loop below
+            listitems = (dict(component=search_utility),)
 
-    records = LivesearchResults()
-
-    records.set_header('',
-        pre = '<div class="header"></div>',
-        )
-    records.append_to(
-        rowclass = 'showall',
-        title = 'Show All',
-        href = model_url(context, request, 'searchresults.html',
-                    query = {'body':searchterm},
-                    ),
-            )
-
-    for listitem in get_listitems(IGroupSearchFactory):
+    for listitem in listitems:
         utility = listitem['component']
-
         factory = utility(context, request, searchterm)
-
         if factory is None:
             continue
 
@@ -295,36 +272,120 @@ def jquery_livesearch_view(context, request):
         except ParseError:
             continue
 
-        groupname = listitem['title']
+        for result in (resolver(x) for x in docids):
+            if result is None:
+                continue
+            record = queryMultiAdapter((result, request), ILiveSearchEntry)
+            assert record is not None, (
+                "Unexpected livesearch result: " + result.__class__.__name__)
+            records.append(record)
 
-        records.set_header(groupname,
-            pre = '<div class="header">%s</div>' % (groupname, ),
-            )
+    result = JSONEncoder().encode(records)
+    return Response(result, content_type="application/json")
 
-        results = filter(None, map(resolver, docids))
 
-        qs = {'body':searchterm, 'kind':groupname}
-        sr_href = model_url(context, request, 'searchresults.html', query=qs)
 
-        for result in results:
-            records.append_to(
-                rowclass = 'result',
-                title = getattr(result, 'title', '<No Title>'),
-                href = model_url(result, request),
-                )
+# XXX temporarily commented out - rob
+# will remove this when everything is working and wired up
 
-        if results:
-            records.append_to(
-                rowclass = 'showall',
-                title = 'Show All',
-                href = sr_href,
-                )
-        else:
-            records.append_to(
-                rowclass = 'noresult',
-                title = 'No Result',
-                href = sr_href,
-                )
+# class LivesearchResults(list):
 
-    result = JSONEncoder().encode(list(records))
-    return Response(result, content_type="application/x-json")
+#     def __init__(self):
+#         list.__init__(self)
+#         self.set_header('')
+
+#     def set_header(self, header, pre="", post=""):
+#         self.header = header
+#         self.pre = pre
+#         self.post = post
+
+#     def append_to(self, title, href, rowclass):
+#         if self.header:
+#             rowclass += ' hasheader'
+#         self.append(dict(
+#                 rowclass = rowclass,
+#                 header = self.header,
+#                 title = title,
+#                 href = href,
+#                 pre = self.pre,
+#                 post = self.post,
+#                 ))
+#         self.set_header('')
+
+
+# def jquery_livesearch_view(context, request):
+#     # Prefix search is with a wildcard at the end
+#     try:
+#         searchterm = request.params.get('val', None)
+#     except UnicodeDecodeError:
+#         # Probably windows client didn't set request encoding. Try again.
+#         request.charset = 'ISO-8859-1'
+#         searchterm = request.params.get('val', None)
+
+#     if searchterm is None:
+#         # The request forgot to send the key we use to do a search, so
+#         # make a friendly error message.  Important for the unit test.
+#         msg = "Client failed to send a 'val' parameter as the searchterm"
+#         return HTTPBadRequest(msg)
+#     else:
+#         searchterm = searchterm + '*'
+
+#     records = LivesearchResults()
+
+#     records.set_header('',
+#         pre = '<div class="header"></div>',
+#         )
+#     records.append_to(
+#         rowclass = 'showall',
+#         title = 'Show All',
+#         href = model_url(context, request, 'searchresults.html',
+#                     query = {'body':searchterm},
+#                     ),
+#             )
+
+#     for listitem in get_listitems(IGroupSearchFactory):
+#         utility = listitem['component']
+
+#         factory = utility(context, request, searchterm)
+
+#         if factory is None:
+#             continue
+
+#         try:
+#             num, docids, resolver = factory()
+#         except ParseError:
+#             continue
+
+#         groupname = listitem['title']
+
+#         records.set_header(groupname,
+#             pre = '<div class="header">%s</div>' % (groupname, ),
+#             )
+
+#         results = filter(None, map(resolver, docids))
+
+#         qs = {'body':searchterm, 'kind':groupname}
+#         sr_href = model_url(context, request, 'searchresults.html', query=qs)
+
+#         for result in results:
+#             records.append_to(
+#                 rowclass = 'result',
+#                 title = getattr(result, 'title', '<No Title>'),
+#                 href = model_url(result, request),
+#                 )
+
+#         if results:
+#             records.append_to(
+#                 rowclass = 'showall',
+#                 title = 'Show All',
+#                 href = sr_href,
+#                 )
+#         else:
+#             records.append_to(
+#                 rowclass = 'noresult',
+#                 title = 'No Result',
+#                 href = sr_href,
+#                 )
+
+#     result = JSONEncoder().encode(list(records))
+#     return Response(result, content_type="application/x-json")
