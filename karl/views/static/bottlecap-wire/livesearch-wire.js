@@ -34,35 +34,41 @@ $(function() {
     });
 });
 
+function renderDate(dateString) {
+    var d = new Date(dateString);
+    return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' +
+           d.getHours() + ':' + d.getMinutes();
+}
+
 function renderCompletions(ul, items) {
     var self = this,
-        currentCategory = "";
+        currentType = "";
     $.each(items, function(index, item) {
         // Change autocomplete behavior which overrides the
         // searchterm
         item.data_value = item.value;
         item.value = self.term;
-         if (item.category !== currentCategory) {
+         if (item.type !== currentType) {
             var li = $('<li class="bc-livesearch-autocomplete-category"></li>');
             li.append(
                 $('<span class="bc-livesearch-category-text"></span>')
-                    .text(item.category)
+                    .text(item.type)
             );
             li.append(
                 $('<span class="bc-livesearch-more"></span>')
                     .attr('href', '/search/more')
                     .text('more')
-                    .click((function(category) {
+                    .click((function(type) {
                         return function() {
                             $('<p>More link clicked for '
-                              + category + '</p>')
+                              + type + '</p>')
                                 .prependTo($('.bc-content-frame'));
                             return false;
                         };
-                    })(item.category))
+                    })(item.type))
             );
             ul.append(li);
-            currentCategory = item.category;
+            currentType = item.type;
         }
         renderItem(ul, item);
     });
@@ -72,20 +78,24 @@ function renderCompletions(ul, items) {
 }
 
 var renderDispatchTable = {
-    "profile":   renderPersonEntry,
-    "wikipage":  renderPageEntry,
-    "blogentry": renderPostEntry,
-    "file":      renderFileEntry,
-    "folder":    renderFileEntry
+    "profile":       renderPersonEntry,
+    "page":          renderPageEntry,
+    "reference":     renderPageEntry,
+    "blogentry":     renderPostEntry,
+    "forum":         renderForumEntry,
+    "forumtopic":    renderForumTopicEntry,
+    "comment":       renderCommentEntry,
+    "file":          renderFileEntry,
+    "calendarevent": renderCalendarEventEntry
 };
 
 function renderPersonEntry(item) {
     var entry = $('<a class="bc-livesearch-profile"></a>');
     entry.append($('<img>')
-                 .attr('src', item.icon));
+                 .attr('src', item.thumbnail));
     var wrapDiv = $('<div>');
     var userInfoDiv = $('<div class="user">')
-        .append($('<div>').text(item.label))
+        .append($('<div>').text(item.title))
         .append($('<div>').text(item.department));
     var contactDiv = $('<div class="contact">')
         .append($('<div>')
@@ -103,17 +113,18 @@ function renderPersonEntry(item) {
 }
 
 function renderGenericEntry(item) {
-    return $("<a></a>").text(item.label);
+    return $("<a></a>").text(item.title);
 }
 
 function renderPageEntry(item) {
     var entry = $('<a class="bc-livesearch-page">');
     entry
         .append($('<div>')
-                .append($('<span>').text(item.label))
+                .append($('<span>').text(item.title))
                 .append($('<span class="discreet">').text(
-                    ' - by ' + item.author + ' on ' + item.modified)))
-        .append($('<div>').text(item.community));
+                    ' - by ' + item.modified_by + ' on ' +
+                    renderDate(item.modified))))
+        .append($('<div>').text(item.community || ''));
     return entry;
 }
 
@@ -121,28 +132,79 @@ function renderPostEntry(item) {
     var entry = $('<a class="bc-livesearch-post">');
     entry
         .append($('<div>')
-                .append($('<span>').text(item.label))
+                .append($('<span>').text(item.title))
                 .append($('<span class="discreet">').text(
-                    ' - by ' + item.author + ' on ' + item.created)))
+                    ' - by ' + item.modified_by + ' on ' +
+                    renderDate(item.modified))))
         .append($('<div>').text(item.community));
+    return entry;
+}
+
+function renderForumEntry(item) {
+    var entry = $('<a class="bc-livesearch-forum">');
+    entry
+        .append($('<div>')
+                .append($('<span>').text(item.title))
+                .append($('<span class="discreet">').text(
+                    ' - by ' + item.creator + ' on ' +
+                    renderDate(item.created))));
+    return entry;
+}
+
+function renderForumTopicEntry(item) {
+    var entry = $('<a class="bc-livesearch-forumtopic">');
+    entry
+        .append($('<div>')
+                .append($('<span>').text(item.title))
+                .append($('<span class="discreet">').text(
+                    ' - by ' + item.creator + ' on ' +
+                    renderDate(item.created))))
+        .append($('<div>').append(item.forum));
+    return entry;
+}
+
+function renderCommentEntry(item) {
+    var entry = $('<a class="bc-livesearch-comment">');
+    entry
+        .append($('<div>')
+                .append($('<span>').text(item.title))
+                .append($('<span class="discreet">').text(
+                    ' - by ' + item.creator + ' on ' +
+                    renderDate(item.created))))
+        .append($('<div>').text(
+            item.blog || item.forum || ''
+        ));
     return entry;
 }
 
 function renderFileEntry(item) {
     var entry = $('<a class="bc-livesearch-file">');
     entry
-        .append($('<div>').text(item.label))
+        .append($('<div>').text(item.title))
         .append($('<div class="discreet">').text(
-            'by ' + item.author + ' on ' + item.modified));
+            'by ' + item.modified_by + ' on ' +
+            renderDate(item.modified)));
+    return entry;
+}
+
+function renderCalendarEventEntry(item) {
+    var entry = $('<a class="bc-livesearch-calendarevent">');
+    entry
+        .append($('<div>').text(item.title))
+        .append($('<div class="discreet">').text(
+            renderDate(item.start) + ' - ' +
+            renderDate(item.end) +
+            (item.location ? ' at ' + item.location : '')))
+        .append($('<div>').text(item.community || ''));
     return entry;
 }
 
 function renderItem(ul, item) {
     var li = $('<li>');
     // Render different items in different ways
-    // dispatch based on the type of the item
-    var type     = item.type,
-        renderFn = renderDispatchTable[type] || renderGenericEntry,
+    // dispatch based on the category of the item
+    var category = item.category,
+        renderFn = renderDispatchTable[category] || renderGenericEntry,
         entry    = renderFn(item);
     return $("<li></li>")
         .data("item.autocomplete", item)

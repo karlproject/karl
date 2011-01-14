@@ -169,7 +169,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
     def test_profile_adapter(self):
         context = testing.DummyModel(title='foo',
                                      extension='x1234',
-                                     email='foo@example.com')
+                                     email='foo@example.com',
+                                     department='science',
+                                     )
         request = testing.DummyRequest()
         from karl.views.adapters import profile_livesearch_result
         result = profile_livesearch_result(context, request)
@@ -178,6 +180,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('foo@example.com', result['email'])
         self.assertEqual('http://example.com/profile_thumbnail',
                          result['thumbnail'])
+        self.assertEqual('science', result['department'])
         self.assertEqual('profile', result['type'])
         self.assertEqual('profile', result['category'])
 

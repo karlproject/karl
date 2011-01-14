@@ -90,6 +90,7 @@ def profile_livesearch_result(context, request):
         context, request,
         extension=context.extension,
         email=context.email,
+        department=context.department,
         type='profile',
         category='profile',
         thumbnail=model_url(context, request, 'profile_thumbnail')
