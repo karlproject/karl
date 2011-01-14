@@ -68,8 +68,8 @@
   <lemonade:listitem
     component=".groupsearch.others_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Others"
-    title="Others"
+    name="Other"
+    title="Other"
     description="Others group"
     sort_key="50"
    />
