@@ -63,42 +63,11 @@ def make_app(global_config, **kw):
         filename = 'karl.includes:standalone.zcml'
         app = bfg_make_app(get_root, filename=filename, options=config)
 
-    #exercise(app) # experimental
     return app
 
-def exercise(app):
-    """
-    Simulate the first request to the application in order to prime the ZODB
-    cache.
-
-    Performing this operation during start up, it is hoped to delay user
-    requests being handed off to this worker by mod_wsgi until after the cache
-    is already primed.  Otherwise the first, slow, cache priming request would
-    fall to an unlucky user.
-    """
-    # Need to be logged in as somebody.  Use the first user we find that is a
-    # member of some group.
-    root, closer = get_root(app)
-    for profile in root['profiles'].values():
-        user = root.users.get_by_id(profile.__name__)
-        if user['groups']:
-            break
-
-    request = webob.Request.blank('/')
-    request.environ['repoze.who.identity'] = user
-    user['repoze.who.userid'] = user['id']
-    home, extra_path = get_user_home(root, request)
-    path = model_path(home, *extra_path)
-    request.path_info = path
-    response = request.get_response(app)
-    if response.status_int != 200:
-        logger = get_logger()
-        logger.warn('Status of %s when priming cache.  Response body:\n%s' %
-                    (response.status, response.body))
 
 def find_users(root):
     # Called by repoze.who
-    # XXX Should this really go here?
     if not 'site' in root:
         return Users()
     return root['site'].users
