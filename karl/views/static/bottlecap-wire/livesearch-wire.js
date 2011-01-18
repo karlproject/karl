@@ -90,25 +90,25 @@ var renderDispatchTable = {
 };
 
 function renderPersonEntry(item) {
-    var entry = $('<a class="bc-livesearch-profile"></a>');
-    entry.append($('<img>')
+    var entry = $('<a class="bc-livesearch-profile" />');
+    entry.append($('<img />')
                  .attr('src', item.thumbnail));
-    var wrapDiv = $('<div>');
-    var userInfoDiv = $('<div class="user">')
-        .append($('<div>').text(item.title))
-        .append($('<div>').text(item.department));
-    var contactDiv = $('<div class="contact">')
-        .append($('<div>')
-                .append($('<a>')
+    var wrapDiv = $('<div />');
+    var userInfoDiv = $('<div class="user" />')
+        .append($('<div />').text(item.title))
+        .append($('<div />').text(item.department));
+    var contactDiv = $('<div class="contact" />')
+        .append($('<div />')
+                .append($('<a />')
                         .attr('href', 'mailto:' + item.email)
                         .text(item.email)
                         .click(function() {
                             window.location = 'mailto:' + item.email;
                             return false;
                         })))
-        .append($('<div>').text(item.extension));
+        .append($('<div />').text(item.extension));
     wrapDiv.append(userInfoDiv).append(contactDiv);
-    entry.append(wrapDiv).append($('<div style="clear: both">'));
+    entry.append(wrapDiv).append($('<div style="clear: both" />'));
     return entry;
 }
 
@@ -117,90 +117,89 @@ function renderGenericEntry(item) {
 }
 
 function renderPageEntry(item) {
-    var entry = $('<a class="bc-livesearch-page">');
+    var entry = $('<a class="bc-livesearch-page" />');
     entry
-        .append($('<div>')
-                .append($('<span>').text(item.title))
-                .append($('<span class="discreet">').text(
+        .append($('<div />')
+                .append($('<span />').text(item.title))
+                .append($('<span class="discreet" />').text(
                     ' - by ' + item.modified_by + ' on ' +
                     renderDate(item.modified))))
-        .append($('<div>').text(item.community || ''));
+        .append($('<div />').text(item.community || ''));
     return entry;
 }
 
 function renderPostEntry(item) {
-    var entry = $('<a class="bc-livesearch-post">');
+    var entry = $('<a class="bc-livesearch-post" />');
     entry
-        .append($('<div>')
-                .append($('<span>').text(item.title))
-                .append($('<span class="discreet">').text(
+        .append($('<div />')
+                .append($('<span />').text(item.title))
+                .append($('<span class="discreet" />').text(
                     ' - by ' + item.modified_by + ' on ' +
                     renderDate(item.modified))))
-        .append($('<div>').text(item.community));
+        .append($('<div />').text(item.community));
     return entry;
 }
 
 function renderForumEntry(item) {
-    var entry = $('<a class="bc-livesearch-forum">');
+    var entry = $('<a class="bc-livesearch-forum" />');
     entry
-        .append($('<div>')
-                .append($('<span>').text(item.title))
-                .append($('<span class="discreet">').text(
+        .append($('<div />')
+                .append($('<span />').text(item.title))
+                .append($('<span class="discreet" />').text(
                     ' - by ' + item.creator + ' on ' +
                     renderDate(item.created))));
     return entry;
 }
 
 function renderForumTopicEntry(item) {
-    var entry = $('<a class="bc-livesearch-forumtopic">');
+    var entry = $('<a class="bc-livesearch-forumtopic" />');
     entry
-        .append($('<div>')
-                .append($('<span>').text(item.title))
-                .append($('<span class="discreet">').text(
+        .append($('<div />')
+                .append($('<span />').text(item.title))
+                .append($('<span class="discreet" />').text(
                     ' - by ' + item.creator + ' on ' +
                     renderDate(item.created))))
-        .append($('<div>').append(item.forum));
+        .append($('<div />').append(item.forum));
     return entry;
 }
 
 function renderCommentEntry(item) {
-    var entry = $('<a class="bc-livesearch-comment">');
+    var entry = $('<a class="bc-livesearch-comment" />');
     entry
-        .append($('<div>')
-                .append($('<span>').text(item.title))
-                .append($('<span class="discreet">').text(
+        .append($('<div />')
+                .append($('<span />').text(item.title))
+                .append($('<span class="discreet" />').text(
                     ' - by ' + item.creator + ' on ' +
                     renderDate(item.created))))
-        .append($('<div>').text(
+        .append($('<div />').text(
             item.blog || item.forum || ''
         ));
     return entry;
 }
 
 function renderFileEntry(item) {
-    var entry = $('<a class="bc-livesearch-file">');
+    var entry = $('<a class="bc-livesearch-file" />');
     entry
-        .append($('<div>').text(item.title))
-        .append($('<div class="discreet">').text(
+        .append($('<div />').text(item.title))
+        .append($('<div class="discreet" />').text(
             'by ' + item.modified_by + ' on ' +
             renderDate(item.modified)));
     return entry;
 }
 
 function renderCalendarEventEntry(item) {
-    var entry = $('<a class="bc-livesearch-calendarevent">');
+    var entry = $('<a class="bc-livesearch-calendarevent" />');
     entry
-        .append($('<div>').text(item.title))
-        .append($('<div class="discreet">').text(
+        .append($('<div />').text(item.title))
+        .append($('<div class="discreet" />').text(
             renderDate(item.start) + ' - ' +
             renderDate(item.end) +
             (item.location ? ' at ' + item.location : '')))
-        .append($('<div>').text(item.community || ''));
+        .append($('<div />').text(item.community || ''));
     return entry;
 }
 
 function renderItem(ul, item) {
-    var li = $('<li>');
     // Render different items in different ways
     // dispatch based on the category of the item
     var category = item.category,
