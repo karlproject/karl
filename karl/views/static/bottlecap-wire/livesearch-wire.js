@@ -30,6 +30,13 @@ $(function() {
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
         queryTransformFn: $.bottlecap.livesearch.prototype.globQueryTransform,
         errorFn: $.bottlecap.livesearch.prototype.displayError,
+        selectedFn: function(event, item) {
+            if (item.url) {
+                window.location = item.url;
+                return false;
+            }
+            return true;
+        },
         renderCompletions: renderCompletions
     });
 });
