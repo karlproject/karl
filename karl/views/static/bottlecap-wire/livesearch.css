@@ -71,6 +71,7 @@
 
 .ui-autocomplete-msgicon {
     display: inline-block;
+    float: left;
 }
 
 .ui-autocomplete-message {
@@ -97,7 +98,7 @@
 
 .bc-header {
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
-    width: 300px !important;
+    width: 310px !important;
 }
 .bc-header-toolbox {
     font-size: 10px;
@@ -112,11 +113,14 @@
 .bc-header-toolbox button {
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
     float: none;
-    margin: 0 1px 0 0;
     height: 28px !important;
-    *height: 26px !important;
+    line-height: 28px !important;
     font-size: 12px;
     font-family: Verdana,Arial,sans-serif;
+    margin-right: 0 !important;
+}
+.bc-header-toolbox button.bc-livesearch-btn-select {
+    width: 110px;
 }
 .bc-header-toolbox .ui-button .ui-button-text {
     line-height: 16px !important;
@@ -124,20 +128,23 @@
 .bc-header-toolbox input {
     font-size: 12px;
 }
-
+.bc-header-toolbox .ui-button-icon-only .ui-icon {
+    /* XXX this are problems in our themedstyles.css, it should be restricted there */
+    height: 16px !important;
+}
 .bc-header-toolbox .ui-ls-menu {
     -moz-border-radius: 4px 0 0 4px;
     border-radius: 4px 0 0 4px;
     border-color: #cecece;
 }
 
-.bc-header-toolbox .ui-ls-autocomplete {
+/*.bc-header-toolbox .ui-ls-autocomplete {*/
+.bc-header-toolbox .bc-livesearch-autocomplete {
     border-width: 1px 0;
     border-color: #cecece;
     border-style: solid;
-    *line-height: 14px;      /* XXX get rid of this ??? */
     padding: 0;
-    margin: 0 -3px 0 0;
+    width: 150px;
 }
 
 .bc-header-toolbox .ui-ls-gobtn {

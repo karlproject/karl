@@ -2798,7 +2798,7 @@ a.disabled img {
 }
 
 /* general styles */
-button,
+.main button,
 .normal_button,
 .primary_button {
     cursor: pointer;
@@ -2821,9 +2821,10 @@ button,
     height: 30px !important;
     padding: 0 !important;
 }
-button {
+.main button {
+    /* XXX XXX XXX Get rid of this! */
     line-height: 20px !important;
-    height: 20px !important;
+
 }
 .primary_button,
 .primary_button:visited {
