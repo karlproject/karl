@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-After 3.53
-----------
+3.54 (2011-01-19)
+-----------------
 
 - Made report-based distribution lists addressable using "pretty" aliases.
 
