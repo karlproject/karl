@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+- Fix people report picture views, broken by addition of report-based
+  e-mail distribution lists. (LP #705171)
+
 
 3.54 (2011-01-19)
 -----------------
