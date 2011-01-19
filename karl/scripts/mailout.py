@@ -14,26 +14,19 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
+""" Send queued outbound email.
 """
-Send queued outbound email.
-"""
-
-import optparse
 import logging
+import optparse
+
 from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
 
 from karl.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import run_daemon
-from karl.utilities.alerts import Alerts
-from karl.utilities.interfaces import IAlerts
-from zope.component import queryUtility
 
-import logging
 logging.basicConfig()
 
 def main():
