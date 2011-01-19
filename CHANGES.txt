@@ -1,8 +1,14 @@
 karl package Changelog
 ======================
 
+Unreleased
+-----------
+
 3.54 (2011-01-19)
 -----------------
+
+- Fix people report picture views, broken by addition of report-based
+  e-mail distribution lists. (LP #705171)
 
 - Made report-based distribution lists addressable using "pretty" aliases.
 

@@ -279,6 +279,18 @@ def section_column_view(context, request):
     return HTTPFound(location=context.__parent__)
 
 
+def _get_mailto(context, peopledir):
+    mailinglist = context.get('mailinglist')
+    if mailinglist is not None:
+        pd_path = model_path_tuple(peopledir)
+        report_path = model_path_tuple(context)
+        mail_name = '+'.join(report_path[len(pd_path):])
+        system_email_domain = get_setting(context, "system_email_domain")
+        system_list_subdomain = get_setting(context, "system_list_subdomain",
+                                            system_email_domain)
+        return 'mailto:%s@%s' % (mailinglist.short_address,
+                                 system_list_subdomain)
+
 def report_view(context, request):
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
@@ -296,18 +308,6 @@ def report_view(context, request):
     pictures_url = model_url(context, request, 'picture_view.html', **kw)
     opensearch_url = model_url(context, request, 'opensearch.xml')
 
-    mailto = None
-    mailinglist = context.get('mailinglist')
-    if mailinglist is not None:
-        pd_path = model_path_tuple(peopledir)
-        report_path = model_path_tuple(context)
-        mail_name = '+'.join(report_path[len(pd_path):])
-        system_email_domain = get_setting(context, "system_email_domain")
-        system_list_subdomain = get_setting(context, "system_list_subdomain",
-                                            system_email_domain)
-        mailto = 'mailto:%s@%s' % (mailinglist.short_address,
-                                   system_list_subdomain)
-
     return dict(
         api=api,
         peopledir=peopledir,
@@ -321,7 +321,7 @@ def report_view(context, request):
         qualifiers=qualifiers,
         opensearch_url=opensearch_url,
         actions=get_actions(context, request),
-        mailto=mailto,
+        mailto=_get_mailto(context, peopledir),
     )
 
 
@@ -414,6 +414,7 @@ def picture_view(context, request):
         qualifiers=qualifiers,
         batch_info=batch_info,
         rows=rows,
+        mailto=_get_mailto(context, peopledir),
         )
 
 

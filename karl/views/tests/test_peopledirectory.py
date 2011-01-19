@@ -801,13 +801,16 @@ class Test_picture_view(unittest.TestCase):
         from karl.views.peopledirectory import picture_view
         return picture_view(context, request)
 
-    def _register(self):
-        from karl.testing import registerCatalogSearch
-        registerCatalogSearch()
-        from karl.models.interfaces import ILetterManager
+    def _register(self, **kw):
         from zope.interface import Interface
+        from karl.models.interfaces import ILetterManager
+        from karl.testing import registerCatalogSearch
+        from karl.testing import registerSettings
+        registerSettings(**kw)
+        registerCatalogSearch()
         testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
+
 
     def test_unqualified_report(self):
         self._register()
@@ -827,6 +830,7 @@ class Test_picture_view(unittest.TestCase):
         self.assertEqual(info['tabular_url'],
             'http://example.com/people/s1/r1/')
         self.assertEqual(info['qualifiers'], [])
+        self.assertEqual(info['mailto'], None)
 
     def test_qualified_report(self):
         self._register()
@@ -844,6 +848,7 @@ class Test_picture_view(unittest.TestCase):
         self.assertEqual(info['tabular_url'],
             'http://example.com/people/s1/r1/?body=spock%27s+brain')
         self.assertEqual(info['qualifiers'], ['Search for "spock\'s brain"'])
+        self.assertEqual(info['mailto'], None)
 
     def test_bad_search_text(self):
         from zope.index.text.parsetree import ParseError
@@ -863,6 +868,29 @@ class Test_picture_view(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(report, request)
         self.assertEqual(len(list(info['rows'])), 0)
+        self.assertEqual(info['mailto'], None)
+
+    def test_report_with_mailinglist_wo_subdomain(self):
+        self._register()
+        pd, section, report = _makeReport()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        request = testing.DummyRequest()
+
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['mailto'],
+                         'mailto:alias@karl3.example.com')
+
+    def test_report_with_mailinglist_w_subdomain(self):
+        self._register(system_list_subdomain='lists.example.com')
+        pd, section, report = _makeReport()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        request = testing.DummyRequest()
+
+        info = self._callFUT(report, request)
+
+        self.assertEqual(info['mailto'],
+                         'mailto:alias@lists.example.com')
 
 
 class Test_get_search_qualifiers(unittest.TestCase):
