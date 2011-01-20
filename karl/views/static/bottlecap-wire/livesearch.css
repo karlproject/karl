@@ -52,29 +52,28 @@
     font-family: Verdana,Arial,sans-serif;
 }
 
-.ui-autocomplete-notification {
+.bc-livesearch-autocomplete-notification {
     padding: 0;
     margin: 0;
-    /**width: 190px;**/
-    width: 293px !important;
+    width: 287px !important;
     background-color: white;
     font-size: x-small;
     display: block;
     position: absolute;
 }
-.ui-autocomplete-notification {
+.bc-livesearch-autocomplete-notification {
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
     z-index: 99999 !important;
     text-align: left;
     font-family: Verdana,Arial,sans-serif;
 }
 
-.ui-autocomplete-msgicon {
+.bc-livesearch-autocomplete-msgicon {
     display: inline-block;
     float: left;
 }
 
-.ui-autocomplete-message {
+.bc-livesearch-autocomplete-message {
     display: inline-block;
 }
 
