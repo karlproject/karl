@@ -8,6 +8,7 @@ from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
+from karl.utilities.image import thumb_url
 from karl.utils import find_community
 from karl.utils import find_interface
 from karl.views.interfaces import IFooter
@@ -86,6 +87,15 @@ def generic_livesearch_result(context, request):
 
 @implementer(ILiveSearchEntry)
 def profile_livesearch_result(context, request):
+    photo = context.get('photo')
+    if photo is None:
+        # XXX cyclical import
+        # maybe we should move the livesearch adapters to a separate module?
+        from karl.views.api import TemplateAPI
+        api = TemplateAPI(context, request)
+        thumbnail = api.static_url + "/images/defaultUser.gif"
+    else:
+        thumbnail = thumb_url(photo, request, (85, 85))
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -93,7 +103,7 @@ def profile_livesearch_result(context, request):
         department=context.department,
         type='profile',
         category='profile',
-        thumbnail=model_url(context, request, 'profile_thumbnail')
+        thumbnail=thumbnail,
         )
 
 @implementer(ILiveSearchEntry)

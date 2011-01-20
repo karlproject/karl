@@ -166,7 +166,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('foo', result['title'])
         self.assertEqual('http://example.com/foo/', result['url'])
 
-    def test_profile_adapter(self):
+    def test_profile_adapter_defaultimg(self):
         context = testing.DummyModel(title='foo',
                                      extension='x1234',
                                      email='foo@example.com',
@@ -178,7 +178,29 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('foo', result['title'])
         self.assertEqual('x1234', result['extension'])
         self.assertEqual('foo@example.com', result['email'])
-        self.assertEqual('http://example.com/profile_thumbnail',
+        self.failUnless(result['thumbnail'].endswith('/images/defaultUser.gif'))
+        self.assertEqual('science', result['department'])
+        self.assertEqual('profile', result['type'])
+        self.assertEqual('profile', result['category'])
+
+    def test_profile_adapter_customimg(self):
+        from karl.content.interfaces import IImage
+        from zope.interface import alsoProvides
+        context = testing.DummyModel(title='foo',
+                                     extension='x1234',
+                                     email='foo@example.com',
+                                     department='science',
+                                     )
+        dummyphoto = testing.DummyModel(title='photo')
+        alsoProvides(dummyphoto, IImage)
+        context['photo'] = dummyphoto
+        request = testing.DummyRequest()
+        from karl.views.adapters import profile_livesearch_result
+        result = profile_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('x1234', result['extension'])
+        self.assertEqual('foo@example.com', result['email'])
+        self.assertEqual('http://example.com/photo/thumb/85x85.jpg',
                          result['thumbnail'])
         self.assertEqual('science', result['department'])
         self.assertEqual('profile', result['type'])
