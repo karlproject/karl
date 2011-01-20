@@ -6,6 +6,9 @@ Unreleased
 
 - Get rid of some deprecation warnings under Python 2.6.
 
+- Change default "People" tab link to '/people' since all instances now get a
+  People Directory by default.
+
 3.54 (2011-01-19)
 -----------------
 

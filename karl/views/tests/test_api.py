@@ -82,7 +82,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.people_url, 'http://example.com/profiles')
+        self.assertEqual(api.people_url, 'http://example.com/people')
 
     def test_status_message(self):
         context = testing.DummyModel()
@@ -258,7 +258,7 @@ class TemplateAPITests(unittest.TestCase):
             ))
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
-        
+
         settings.kaltura_client_session = 'false'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
@@ -275,7 +275,7 @@ class TemplateAPITests(unittest.TestCase):
             ))
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
-        
+
         settings.kaltura_client_session = 'true'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(

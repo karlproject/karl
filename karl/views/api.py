@@ -285,7 +285,7 @@ class TemplateAPI(object):
     def people_url(self):
         # Get a setting for what part is appended the the app_url for
         # this installation's people directory application.
-        people_path = get_setting(self.context, 'people_path', 'profiles')
+        people_path = get_setting(self.context, 'people_path', 'people')
         return self.app_url + "/" + people_path
 
     @property
