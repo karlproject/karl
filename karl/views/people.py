@@ -558,7 +558,7 @@ def _fix_website_validation_errors(form):
     for name in list(form.errors):
         if name.startswith('websites.'):
             error = form.errors[name]
-            errors.append(error.message)
+            errors.append(str(error))
             del form.errors[name]
     if errors:
         form.errors['websites'] = validatish.Invalid('\n'.join(errors))

@@ -944,7 +944,7 @@ def rename_or_merge_user_view(request, rename_user=rename_user):
                         out=rename_messages)
             api.status_message = rename_messages.getvalue()
         except ValueError, e:
-            api.error_message = e.message
+            api.error_message = str(e)
 
     return dict(
         api=api,

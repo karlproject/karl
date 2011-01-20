@@ -161,7 +161,7 @@ class TestEditProfileFormController(unittest.TestCase):
         response = controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
-            form.errors['websites'].message, "You're doing it wrong.")
+            str(form.errors['websites']), "You're doing it wrong.")
 
     def test__call__websites_suberror(self):
         self.request.form = form = DummyForm()
@@ -382,7 +382,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         response = controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
-            form.errors['websites'].message, "You're doing it wrong.")
+            str(form.errors['websites']), "You're doing it wrong.")
 
     def test__call__websites_suberror(self):
         self.request.form = form = DummyForm()
@@ -572,7 +572,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         response = controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
-            form.errors['websites'].message, "You're doing it wrong.")
+            str(form.errors['websites']), "You're doing it wrong.")
 
     def test__call__websites_suberror(self):
         self.request.form = form = DummyForm()
