@@ -87,6 +87,7 @@
         <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/external/jquery.cookie.js" type="text/javascript">//</script>
         <script src="${api.static_url}/bottlecap/sl/jquery.ajaxmanager-3.0.7.js" type="text/javascript">//</script>
         <script src="${api.static_url}/bottlecap/sl/jquery.caret-1.0.2.min.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/jquery.timeago-0.9.2.js" type="text/javascript">//</script>
         <script src="${api.static_url}/bottlecap/bc.livesearch/livesearch.js" type="text/javascript">//</script>
 
         <script src="${api.static_url}/bottlecap-wire/livesearch-wire.js" type="text/javascript">//</script>
