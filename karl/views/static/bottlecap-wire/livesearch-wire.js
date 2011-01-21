@@ -13,13 +13,22 @@ var appUrl = $("#karl-app-url").eq(0).attr('content');
 var livesearchUrl = appUrl + "/jquery_livesearch";
 var advancedSearchUrl = appUrl + "/searchresults.html";
 
+function getSearchValue() {
+    return $('.bc-livesearch-autocomplete').val();
+}
+
+function advancedSearchResultsUrl(query) {
+    return advancedSearchUrl + '?body=' + escape(query);
+}
+
 $(function() {
 
     $('.bc-livesearch').livesearch({
         urlFn: createUrlFn(livesearchUrl),
         search: function(event, ui) {
-            $('<p>Search for ' + ui.query + '</p>')
-                .prependTo($('.bc-content-frame'));
+            var searchText = getSearchValue();
+            window.location = (
+                advancedSearchResultsUrl(searchText));
         },
         menu: function(event, ui) {
             var text = ui.text;
@@ -75,11 +84,9 @@ function renderCompletions(ul, items) {
                     .text('more')
                     .click((function(type) {
                         return function() {
-                            var searchText = $('.bc-livesearch-autocomplete')
-                                                 .val();
-                            var searchUrl = (advancedSearchUrl +
-                                             "?body=" + escape(searchText));
-                            window.location = searchUrl;
+                            var searchText = getSearchValue();
+                            window.location = (
+                                advancedSearchResultsUrl(searchText));
                             return false;
                         };
                     })(item.type))
