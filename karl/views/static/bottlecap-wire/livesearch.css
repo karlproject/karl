@@ -13,7 +13,7 @@
 }
 */
 
-.ui-autocomplete-category {
+.bc-livesearch-autocomplete-category {
     font-weight: bold;
     padding: 6px 364px 0 0;
     margin: 4px 0 0 -102px;
@@ -23,29 +23,26 @@
     height: 0px;
 }
 
-.bc-header-toolbox .ui-menu { 
-    width: 100px; 
-    position: absolute; 
+.bc-livesearch-menu {
+    width: 100px;
+    position: absolute;
     margin-right:0;
     border-radius: 4px 0px 0px 4px;
     z-index: 99999;
     text-align: left;
 }
 
-.ui-ls-autocomplete-first {
+.bc-livesearch-autocomplete-first {
     border: none;
 }
 
-#ui-menu-1 {
+.bc-livesearch-autocomplete-results {
     width: 350px;
     padding-left: 104px;
     background: #ffffff url(images/livesearch_bg.gif) repeat-y top left;
     font-size: .7em;
     border-color: #a3a3a3;
     min-height: 55px;
-}
-#ui-menu-1 {
-    /* XXX this are problems in our themedstyles.css, it should be restricted there */
     z-index: 99999 !important;
     text-align: left;
     font-size: 12px;
@@ -60,8 +57,6 @@
     font-size: x-small;
     display: block;
     position: absolute;
-}
-.bc-livesearch-autocomplete-notification {
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
     z-index: 99999 !important;
     text-align: left;
@@ -179,25 +174,56 @@
 }
 
 
-.ui-ls-profile img {
-    float: left; 
+.bc-livesearch-profile img {
+    float: left;
     margin-right: 10px;
     height: 32px;
     width: 32px;
 }
 
-.ui-ls-profilelabel {
-    display: inline-block;
-    width: 250px;
+.bc-livesearch-profile .user {
+    float: left;
+    width: 100px;
 }
 
-.ui-ls-category-text {
+.bc-livesearch-profile .contact {
+    float: right;
+    width: 100px;
+    overflow: hidden;
+}
+
+.bc-livesearch-profile .contact a {
+    color: blue;
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bc-livesearch-profile .contact a:hover {
+    border: none;
+    text-decoration: underline;
+}
+
+.bc-livesearch-page .discreet,
+.bc-livesearch-blog .discreet,
+.bc-livesearch-comment .discreet,
+.bc-livesearch-file .discreet,
+.bc-livesearch-forum .discreet,
+.bc-livesearch-forumtopic .discreet,
+.bc-livesearch-forumtopic-comment .discreet,
+.bc-livesearch-calendarevent .discreet,
+.bc-livesearch-community .discreet {
+    font-size: 100%;
+}
+
+.bc-livesearch-category-text {
     position: absolute;
     left: 0;
     width: 91px;
 }
 
-.ui-ls-more {
+.bc-livesearch-more {
     color: #999999;
     display: block;
     position: absolute;
@@ -206,9 +232,18 @@
     left: 0;
 }
 
-.ui-ls-more:hover {
+.bc-livesearch-more:hover {
     cursor: pointer;
     text-decoration: underline;
+}
+
+.discreet {
+    font-size: 65%;
+    color: #999999;
+}
+
+.bc-livesearch.ui-autocomplete-loading {
+    background-image: url('pbar-ani.gif');
 }
 
 /* search results page */

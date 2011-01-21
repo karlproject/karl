@@ -41,11 +41,18 @@ $(function() {
     });
 });
 
-function renderDate(dateString) {
-    var d = new Date(dateString);
-    return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' +
-           d.getHours() + ':' + d.getMinutes();
+function renderDate(isoDateString) {
+    var d = new Date(isoDateString);
+    return $.timeago(d);
 }
+
+var typeLookupDisplay = {
+    profile: "People",
+    page: "Pages",
+    post: "Posts",
+    file: "Files",
+    other: "Other"
+};
 
 function renderCompletions(ul, items) {
     var self = this,
@@ -59,7 +66,7 @@ function renderCompletions(ul, items) {
             var li = $('<li class="bc-livesearch-autocomplete-category"></li>');
             li.append(
                 $('<span class="bc-livesearch-category-text"></span>')
-                    .text(item.type)
+                    .text(typeLookupDisplay[item.type] || "Other")
             );
             li.append(
                 $('<span class="bc-livesearch-more"></span>')
@@ -88,12 +95,13 @@ var renderDispatchTable = {
     "profile":       renderPersonEntry,
     "page":          renderPageEntry,
     "reference":     renderPageEntry,
-    "blogentry":     renderPostEntry,
+    "blogentry":     renderBlogEntry,
     "forum":         renderForumEntry,
     "forumtopic":    renderForumTopicEntry,
     "comment":       renderCommentEntry,
     "file":          renderFileEntry,
-    "calendarevent": renderCalendarEventEntry
+    "calendarevent": renderCalendarEventEntry,
+    "community":     renderCommunity
 };
 
 function renderPersonEntry(item) {
@@ -129,21 +137,21 @@ function renderPageEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.modified_by + ' on ' +
+                    ' - by ' + item.modified_by + ' ' +
                     renderDate(item.modified))))
-        .append($('<div />').text(item.community || ''));
+        .append($('<div class="discreet" />').text(item.community || ''));
     return entry;
 }
 
-function renderPostEntry(item) {
-    var entry = $('<a class="bc-livesearch-post" />');
+function renderBlogEntry(item) {
+    var entry = $('<a class="bc-livesearch-blog" />');
     entry
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.modified_by + ' on ' +
+                    ' - by ' + item.modified_by + ' ' +
                     renderDate(item.modified))))
-        .append($('<div />').text(item.community));
+        .append($('<div class="discreet" />').text(item.community));
     return entry;
 }
 
@@ -153,7 +161,7 @@ function renderForumEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' on ' +
+                    ' - by ' + item.creator + ' ' +
                     renderDate(item.created))));
     return entry;
 }
@@ -164,9 +172,9 @@ function renderForumTopicEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' on ' +
+                    ' - by ' + item.creator + ' ' +
                     renderDate(item.created))))
-        .append($('<div />').append(item.forum));
+        .append($('<div class="discreet" />').append(item.forum));
     return entry;
 }
 
@@ -176,11 +184,10 @@ function renderCommentEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' on ' +
+                    ' - by ' + item.creator + ' ' +
                     renderDate(item.created))))
-        .append($('<div />').text(
-            item.blog || item.forum || ''
-        ));
+        .append($('<div class="discreet" />').text(
+            item.blog || item.forum || item.community || ''));
     return entry;
 }
 
@@ -188,21 +195,41 @@ function renderFileEntry(item) {
     var entry = $('<a class="bc-livesearch-file" />');
     entry
         .append($('<div />').text(item.title))
-        .append($('<div class="discreet" />').text(
-            'by ' + item.modified_by + ' on ' +
-            renderDate(item.modified)));
+        .append(
+            $('<div />')
+                .append($('<span class="discreet" />').text(
+                    'by ' + item.modified_by + ' ' +
+                        renderDate(item.modified))));
     return entry;
+}
+
+function _renderCalendarDate(isoDateString) {
+    var d = new Date(isoDateString);
+    return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' +
+           d.getHours() + ':' + d.getMinutes();
 }
 
 function renderCalendarEventEntry(item) {
     var entry = $('<a class="bc-livesearch-calendarevent" />');
     entry
-        .append($('<div />').text(item.title))
+        .append($('<div />')
+                    .text(item.title)
+                .append($('<span class="discreet" />')
+                            .text(' - at ' + item.location)))
         .append($('<div class="discreet" />').text(
-            renderDate(item.start) + ' - ' +
-            renderDate(item.end) +
-            (item.location ? ' at ' + item.location : '')))
-        .append($('<div />').text(item.community || ''));
+            _renderCalendarDate(item.start) + ' -> ' +
+            _renderCalendarDate(item.end)))
+        .append($('<div class="discreet" />').text(item.community || ''));
+    return entry;
+}
+
+function renderCommunity(item) {
+    var entry = $('<a class="bc-livesearch-community" />');
+    entry
+        .append($('<div />').text(item.title)
+                    .append($('<span class="discreet" />')
+                                .text(" - " + item.num_members + " member" +
+                                      (item.num_members === 1 ? '' : 's'))));
     return entry;
 }
 
