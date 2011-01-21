@@ -460,6 +460,49 @@ class AlphaRemovedTests(AlphaBase):
         self.assertEqual(lm_klass.delta_called, [(model, -1)])
 
 
+class MLBase(object):
+    def _makeMailinglist(self, alias='alias'):
+        site = testing.DummyModel()
+        site.list_aliases = {}
+        people = site['people'] = testing.DummyModel()
+        section = people['section'] = testing.DummyModel()
+        report = section['report'] = testing.DummyModel()
+        mlist = report['mailinglist'] = testing.DummyModel(short_address=alias)
+        return site.list_aliases, mlist
+
+
+class Test_add_mailinglist(MLBase, unittest.TestCase):
+    def _callFUT(self, obj, event):
+        from karl.models.subscribers import add_mailinglist
+        return add_mailinglist(obj, event)
+
+    def test_event(self):
+        from repoze.bfg.traversal import model_path
+        aliases, mlist = self._makeMailinglist()
+        self.failIf(aliases)
+        self._callFUT(mlist, None)
+        self.assertEqual(aliases.items(),
+                         [('alias', model_path(mlist.__parent__))])
+
+
+class Test_remove_mailinglist(MLBase, unittest.TestCase):
+    def _callFUT(self, obj, event):
+        from karl.models.subscribers import remove_mailinglist
+        return remove_mailinglist(obj, event)
+
+    def test_event(self):
+        from repoze.bfg.traversal import model_path
+        aliases, mlist = self._makeMailinglist()
+        aliases[mlist.short_address] = model_path(mlist.__parent__)
+        self._callFUT(mlist, None)
+        self.failIf(aliases)
+
+    def test_event_alias_missing(self):
+        aliases, mlist = self._makeMailinglist()
+        self.failIf(aliases)
+        self._callFUT(mlist, None)
+
+
 class ProfileAddedTests(unittest.TestCase):
 
     def setUp(self):

@@ -9,6 +9,16 @@
            />
 
   <subscriber
+      for="karl.models.interfaces.IPeopleReportMailingList
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.add_mailinglist"/>
+
+  <subscriber
+      for="karl.models.interfaces.IPeopleReportMailingList
+           repoze.folder.interfaces.IObjectWillBeRemovedEvent"
+      handler=".subscribers.remove_mailinglist"/>
+
+  <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectWillBeRemovedEvent"
       handler=".subscribers.handle_content_removed"/>

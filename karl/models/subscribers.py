@@ -35,6 +35,7 @@ from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
 
@@ -161,6 +162,19 @@ def alpha_added(obj, event):
 def alpha_removed(obj, event):
     adapter = ILetterManager(obj)
     adapter.delta(-1)
+
+# Add / remove list aliases from the root 'list_aliases' index.
+
+def add_mailinglist(obj, event):
+    aliases = find_site(obj).list_aliases
+    aliases[obj.short_address] = model_path(obj.__parent__)
+
+def remove_mailinglist(obj, event):
+    aliases = find_site(obj).list_aliases
+    try:
+        del aliases[obj.short_address]
+    except KeyError:
+        pass
 
 # "Index" profile e-mails into the profiles folder.
 

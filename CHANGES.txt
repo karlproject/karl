@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+- Ensure that aliases for mailinglist objects are registered / deregistered
+  when the mailinglist is added / removed.  (LP #706018).
+
 - Get rid of some deprecation warnings under Python 2.6.
 
 - Change default "People" tab link to '/people' since all instances now get a
