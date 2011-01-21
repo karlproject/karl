@@ -9,13 +9,14 @@ function createUrlFn(urlPrefix, kind) {
     }
 }
 
+var appUrl = $("#karl-app-url").eq(0).attr('content');
+var livesearchUrl = appUrl + "/jquery_livesearch";
+var advancedSearchUrl = appUrl + "/searchresults.html";
+
 $(function() {
 
-    var app_url = $("#karl-app-url").eq(0).attr('content');
-    var livesearch_url = app_url + "/jquery_livesearch";
-
     $('.bc-livesearch').livesearch({
-        urlFn: createUrlFn(livesearch_url),
+        urlFn: createUrlFn(livesearchUrl),
         search: function(event, ui) {
             $('<p>Search for ' + ui.query + '</p>')
                 .prependTo($('.bc-content-frame'));
@@ -23,8 +24,8 @@ $(function() {
         menu: function(event, ui) {
             var text = ui.text;
             var urlFn = text === "All Content"
-                ? createUrlFn(livesearch_url)
-                : createUrlFn(livesearch_url, text);
+                ? createUrlFn(livesearchUrl)
+                : createUrlFn(livesearchUrl, text);
             $('.bc-livesearch').livesearch('option', 'urlFn', urlFn);
         },
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
@@ -74,9 +75,11 @@ function renderCompletions(ul, items) {
                     .text('more')
                     .click((function(type) {
                         return function() {
-                            $('<p>More link clicked for '
-                              + type + '</p>')
-                                .prependTo($('.bc-content-frame'));
+                            var searchText = $('.bc-livesearch-autocomplete')
+                                                 .val();
+                            var searchUrl = (advancedSearchUrl +
+                                             "?body=" + escape(searchText));
+                            window.location = searchUrl;
                             return false;
                         };
                     })(item.type))
