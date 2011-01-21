@@ -13,12 +13,32 @@ var appUrl = $("#karl-app-url").eq(0).attr('content');
 var livesearchUrl = appUrl + "/jquery_livesearch";
 var advancedSearchUrl = appUrl + "/searchresults.html";
 
+var typeLookupDisplay = {
+    profile: "People",
+    page: "Pages",
+    post: "Posts",
+    file: "Files",
+    other: "Other"
+};
+
+
 function getSearchValue() {
     return $('.bc-livesearch-autocomplete').val();
 }
 
-function advancedSearchResultsUrl(query) {
-    return advancedSearchUrl + '?body=' + escape(query);
+function advancedSearchResultsUrl(query, type) {
+    if (query.length >= 3) {
+        query += "*";
+    }
+    if (!type) {
+        // grab current filter and use that
+        type = $('.bc-livesearch-btn-select').text();
+    }
+    var typeQueryString = (type === "All Content")
+                              ? ''
+                              : "&kind=" + escape(type);
+    var queryString = '?body=' + escape(query) + typeQueryString;
+    return advancedSearchUrl + queryString;
 }
 
 $(function() {
@@ -26,7 +46,9 @@ $(function() {
     $('.bc-livesearch').livesearch({
         urlFn: createUrlFn(livesearchUrl),
         search: function(event, ui) {
-            var searchText = getSearchValue();
+            var searchText = $.trim(getSearchValue());
+            // in ie, the globbed character can be in the wrong place
+            // we'll always just grab it from the field and put it on the end
             window.location = (
                 advancedSearchResultsUrl(searchText));
         },
@@ -55,14 +77,6 @@ function renderDate(isoDateString) {
     return $.timeago(isoDateString);
 }
 
-var typeLookupDisplay = {
-    profile: "People",
-    page: "Pages",
-    post: "Posts",
-    file: "Files",
-    other: "Other"
-};
-
 function renderCompletions(ul, items) {
     var self = this,
         currentType = "";
@@ -83,9 +97,10 @@ function renderCompletions(ul, items) {
                     .text('more')
                     .click((function(type) {
                         return function() {
-                            var searchText = getSearchValue();
+                            var searchText = $.trim(getSearchValue());
+                            var searchType = typeLookupDisplay[type] || "All Content";
                             window.location = (
-                                advancedSearchResultsUrl(searchText));
+                                advancedSearchResultsUrl(searchText, searchType));
                             return false;
                         };
                     })(item.type))
@@ -120,7 +135,7 @@ function renderPersonEntry(item) {
     var wrapDiv = $('<div />');
     var userInfoDiv = $('<div class="user" />')
         .append($('<div />').text(item.title))
-        .append($('<div />').text(item.department));
+        .append($('<div class="discreet" />').text(item.department));
     var contactDiv = $('<div class="contact" />')
         .append($('<div />')
                 .append($('<a />')
