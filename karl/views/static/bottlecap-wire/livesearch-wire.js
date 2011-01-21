@@ -52,8 +52,7 @@ $(function() {
 });
 
 function renderDate(isoDateString) {
-    var d = new Date(isoDateString);
-    return $.timeago(d);
+    return $.timeago(isoDateString);
 }
 
 var typeLookupDisplay = {
@@ -214,9 +213,13 @@ function renderFileEntry(item) {
 }
 
 function _renderCalendarDate(isoDateString) {
-    var d = new Date(isoDateString);
+    var d = $.timeago.parse(isoDateString);
+    var minutes = "" + d.getMinutes();
+    if (minutes.length === 1) {
+        minutes = "0" + minutes;
+    }
     return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' +
-           d.getHours() + ':' + d.getMinutes();
+           d.getHours() + ':' + minutes;
 }
 
 function renderCalendarEventEntry(item) {
