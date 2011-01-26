@@ -3,9 +3,9 @@
 function createUrlFn(urlPrefix, kind) {
     return function(query) {
         return kind
-            ? urlPrefix + '?kind=' + escape(kind)
-                        + '&val='  + escape(query)
-            : urlPrefix + '?val='  + escape(query);
+            ? urlPrefix + '?kind=' + escape($.trim(kind))
+                        + '&val='  + escape($.trim(query))
+            : urlPrefix + '?val='  + escape($.trim(query));
     }
 }
 
@@ -32,7 +32,7 @@ function advancedSearchResultsUrl(query, type) {
     }
     if (!type) {
         // grab current filter and use that
-        type = $('.bc-livesearch-btn-select').text();
+        type = $.trim($('.bc-livesearch-btn-select').text());
     }
     var typeQueryString = (type === "All Content")
                               ? ''
@@ -53,7 +53,7 @@ $(function() {
                 advancedSearchResultsUrl(searchText));
         },
         menu: function(event, ui) {
-            var text = ui.text;
+            var text = $.trim(ui.text);
             var urlFn = text === "All Content"
                 ? createUrlFn(livesearchUrl)
                 : createUrlFn(livesearchUrl, text);
@@ -140,7 +140,7 @@ function renderPersonEntry(item) {
                         $('<span />').text(item.title))
                     .append(
                         $('<span class="discreet" />')
-                            .text("- " + item.department)))
+                            .text(" - " + item.department)))
             .append($('<div />')
                     .append(
                         $('<span class="extension"/>').text('x' + item.extension))
