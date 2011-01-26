@@ -130,24 +130,28 @@ var renderDispatchTable = {
 
 function renderPersonEntry(item) {
     var entry = $('<a class="bc-livesearch-profile" />');
-    entry.append($('<img />')
-                 .attr('src', item.thumbnail));
-    var wrapDiv = $('<div />');
-    var userInfoDiv = $('<div class="user" />')
-        .append($('<div />').text(item.title))
-        .append($('<div class="discreet" />').text(item.department));
-    var contactDiv = $('<div class="contact" />')
-        .append($('<div />')
-                .append($('<a />')
+    entry
+        .append($('<img />')
+                     .attr('src', item.thumbnail))
+        .append(
+            $('<div />')
+            .append($('<div />')
+                    .append(
+                        $('<span />').text(item.title))
+                    .append(
+                        $('<span class="discreet" />')
+                            .text("- " + item.department)))
+            .append($('<div />')
+                    .append(
+                        $('<span class="extension"/>').text('x' + item.extension))
+                    .append(
+                        $('<a class="email"/>')
                         .attr('href', 'mailto:' + item.email)
                         .text(item.email)
                         .click(function() {
-                            window.location = 'mailto:' + item.email;
+                            window.location = $(this).attr('href');
                             return false;
-                        })))
-        .append($('<div />').text(item.extension));
-    wrapDiv.append(userInfoDiv).append(contactDiv);
-    entry.append(wrapDiv).append($('<div style="clear: both" />'));
+                        }))));
     return entry;
 }
 

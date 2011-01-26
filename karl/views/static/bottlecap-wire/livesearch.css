@@ -126,22 +126,18 @@
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
     height: 16px !important;
 }
-.bc-header-toolbox .ui-ls-menu {
+
+.bc-header-toolbox .bc-livesearch-autocomplete {
     -moz-border-radius: 4px 0 0 4px;
     border-radius: 4px 0 0 4px;
     border-color: #cecece;
-}
-
-/*.bc-header-toolbox .ui-ls-autocomplete {*/
-.bc-header-toolbox .bc-livesearch-autocomplete {
     border-width: 1px 0;
-    border-color: #cecece;
     border-style: solid;
     padding: 0;
     width: 150px;
 }
 
-.bc-header-toolbox .ui-ls-gobtn {
+.bc-header-toolbox .bc-livesearch-btn-search {
     -moz-border-radius: 0 4px 4px 0;
     border-radius: 0 4px 4px 0;
     border-color: #cecece;
@@ -151,7 +147,7 @@
     margin: 2em;
 }
 
-.ui-menu .ui-menu-item a {
+.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a {
     border: 1px solid #ffffff;
 }
 
@@ -163,8 +159,8 @@
     background: #e1e1e1 url('images/ui-bg_glass_75_dadada_1x400.png') repeat-x scroll 50% 50%;
 }
 */
-.ui-menu .ui-menu-item a:hover,
-.ui-menu .ui-menu-item a.ui-state-hover {
+.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a:hover,
+.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a.ui-state-hover {
 /* override the jiggling efect of menu lines
  * ... belongs to the theme. This setting will crack all other components
  * that don't wish to override the theme in the same way.
@@ -181,39 +177,26 @@
     width: 32px;
 }
 
-.bc-livesearch-profile .user {
-    float: left;
-    width: 100px;
+.bc-livesearch-profile .extension {
+    margin-right: 2em;
 }
 
-.bc-livesearch-profile .contact {
-    float: right;
-    width: 100px;
-    overflow: hidden;
-}
-
-.bc-livesearch-profile .contact a {
+.ui-menu .ui-menu-item .bc-livesearch-profile a.email {
+    display: inline;
     color: blue;
     background: none;
     border: none;
     margin: 0;
     padding: 0;
+    text-decoration: none;
 }
 
-.bc-livesearch-profile .contact a:hover {
-    border: none;
+.ui-menu .ui-menu-item .bc-livesearch-profile a.email:hover {
     text-decoration: underline;
 }
 
-.bc-livesearch-page .discreet,
-.bc-livesearch-blog .discreet,
-.bc-livesearch-comment .discreet,
-.bc-livesearch-file .discreet,
-.bc-livesearch-forum .discreet,
-.bc-livesearch-forumtopic .discreet,
-.bc-livesearch-forumtopic-comment .discreet,
-.bc-livesearch-calendarevent .discreet,
-.bc-livesearch-community .discreet {
+.bc-header-toolbox .discreet {
+    color: #999;
     font-size: 100%;
 }
 
@@ -235,11 +218,6 @@
 .bc-livesearch-more:hover {
     cursor: pointer;
     text-decoration: underline;
-}
-
-.discreet {
-    font-size: 65%;
-    color: #999999;
 }
 
 .bc-livesearch.ui-autocomplete-loading {
@@ -265,12 +243,9 @@
     border-radius: 0 4px 4px 0;
 }
 
-.discreet {
+.sras-header .discreet {
     font-size: 65%;
     color: #999999;
-}
-
-.sras-header .discreet {
     display: block;
 }
 
