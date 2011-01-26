@@ -128,30 +128,41 @@ var renderDispatchTable = {
     "community":     renderCommunity
 };
 
+function _normalized(val) {
+    // the server can return None or null
+    // treat these values as empty
+    return !val || val === "None" || val === "null"
+           ? ''
+           : val;
+}
+
 function renderPersonEntry(item) {
     var entry = $('<a class="bc-livesearch-profile" />');
+    var titleDiv = $('<div />').append($('<span />').text(item.title));
+    if (_normalized(item.department)) {
+        titleDiv.append($('<span class="discreet" />').text(
+            " - " + item.department));
+    }
+    var contactDiv = $('<div />');
+    if (_normalized($.trim(item.extension))) {
+        contactDiv.append($('<span class="extension" />')
+                              .text('x' + item.extension));
+    }
+    if (_normalized(item.email)) {
+        contactDiv.append(
+            $('<a class="email" />')
+                .attr('href', 'mailto:' + item.email)
+                .text(item.email)
+                .click(function() {
+                    window.location = $(this).attr('href');
+                    return false;
+                }));
+    }
     entry
         .append($('<img />')
                      .attr('src', item.thumbnail))
-        .append(
-            $('<div />')
-            .append($('<div />')
-                    .append(
-                        $('<span />').text(item.title))
-                    .append(
-                        $('<span class="discreet" />')
-                            .text(" - " + item.department)))
-            .append($('<div />')
-                    .append(
-                        $('<span class="extension"/>').text('x' + item.extension))
-                    .append(
-                        $('<a class="email"/>')
-                        .attr('href', 'mailto:' + item.email)
-                        .text(item.email)
-                        .click(function() {
-                            window.location = $(this).attr('href');
-                            return false;
-                        }))));
+        .append(titleDiv)
+        .append(contactDiv);
     return entry;
 }
 
@@ -159,10 +170,12 @@ function renderGenericEntry(item) {
     return $("<a></a>").text(item.title);
 }
 
-function _author_text(author) {
-    return author && author !== "None"
-           ? ' - by ' + author + ' '
-           : ' - ';
+function _meta_text(author, date) {
+    // helper to generate the meta byline
+    var authorText = _normalized(author)
+                     ? ' - by ' + author + ' '
+                     : ' - ';
+    return authorText + renderDate(date);
 }
 
 function renderPageEntry(item) {
@@ -171,9 +184,9 @@ function renderPageEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.modified_by) +
-                    renderDate(item.modified))))
-        .append($('<div class="discreet" />').text(item.community || ''));
+                    _meta_text(item.modified_by, item.modified)))
+                .append($('<div class="discreet" />').text(
+                    _normalized(item.community))));
     return entry;
 }
 
@@ -183,9 +196,9 @@ function renderBlogEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.modified_by) +
-                    renderDate(item.modified))))
-        .append($('<div class="discreet" />').text(item.community));
+                    _meta_text(item.modified_by, item.modified)))
+        .append($('<div class="discreet" />').text(_normalized(
+            item.community))));
     return entry;
 }
 
@@ -195,8 +208,7 @@ function renderForumEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.creator) +
-                    renderDate(item.created))));
+                    _meta_text(item.creator, item.created))));
     return entry;
 }
 
@@ -206,8 +218,7 @@ function renderForumTopicEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.creator) +
-                    renderDate(item.created))))
+                    _meta_text(item.creator, item.created))))
         .append($('<div class="discreet" />').append(item.forum));
     return entry;
 }
@@ -218,22 +229,26 @@ function renderCommentEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.creator) +
-                    renderDate(item.created))))
+                    _meta_text(item.creator, item.created))))
         .append($('<div class="discreet" />').text(
-            item.blog || item.forum || item.community || ''));
+            _normalized(item.blog) ||
+            _normalized(item.forum) ||
+            _normalized(item.community)));
     return entry;
 }
 
 function renderFileEntry(item) {
     var entry = $('<a class="bc-livesearch-file" />');
+    var metaText = _normalized(item.modified_by)
+                   ? 'by ' + item.modified_by + ' '
+                   : '';
+    metaText += renderDate(item.modified);
     entry
         .append($('<div />').text(item.title))
         .append(
             $('<div />')
                 .append($('<span class="discreet" />').text(
-                    _author_text(item.modified_by) +
-                        renderDate(item.modified))));
+                    metaText)));
     return entry;
 }
 
@@ -249,15 +264,18 @@ function _renderCalendarDate(isoDateString) {
 
 function renderCalendarEventEntry(item) {
     var entry = $('<a class="bc-livesearch-calendarevent" />');
+    var titleDiv = $('<div />').text(item.title);
+    if (_normalized(item.location)) {
+        titleDiv.append($('<span class="discreet" />')
+                            .text(' - at ' + item.location))
+    }
     entry
-        .append($('<div />')
-                    .text(item.title)
-                .append($('<span class="discreet" />')
-                            .text(' - at ' + item.location)))
+        .append(titleDiv)
         .append($('<div class="discreet" />').text(
             _renderCalendarDate(item.start) + ' -> ' +
             _renderCalendarDate(item.end)))
-        .append($('<div class="discreet" />').text(item.community || ''));
+        .append($('<div class="discreet" />').text(
+            _normalized(item.community)));
     return entry;
 }
 

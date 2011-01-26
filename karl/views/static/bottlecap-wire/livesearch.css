@@ -195,9 +195,9 @@
     text-decoration: underline;
 }
 
-.bc-header-toolbox .discreet {
+.bc-livesearch-autocomplete-results .discreet {
     color: #999;
-    font-size: 100%;
+    font-size: 85%;
 }
 
 .bc-livesearch-category-text {
