@@ -159,13 +159,19 @@ function renderGenericEntry(item) {
     return $("<a></a>").text(item.title);
 }
 
+function _author_text(author) {
+    return author && author !== "None"
+           ? ' - by ' + author + ' '
+           : ' - ';
+}
+
 function renderPageEntry(item) {
     var entry = $('<a class="bc-livesearch-page" />');
     entry
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.modified_by + ' ' +
+                    _author_text(item.modified_by) +
                     renderDate(item.modified))))
         .append($('<div class="discreet" />').text(item.community || ''));
     return entry;
@@ -177,7 +183,7 @@ function renderBlogEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.modified_by + ' ' +
+                    _author_text(item.modified_by) +
                     renderDate(item.modified))))
         .append($('<div class="discreet" />').text(item.community));
     return entry;
@@ -189,7 +195,7 @@ function renderForumEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' ' +
+                    _author_text(item.creator) +
                     renderDate(item.created))));
     return entry;
 }
@@ -200,7 +206,7 @@ function renderForumTopicEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' ' +
+                    _author_text(item.creator) +
                     renderDate(item.created))))
         .append($('<div class="discreet" />').append(item.forum));
     return entry;
@@ -212,7 +218,7 @@ function renderCommentEntry(item) {
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    ' - by ' + item.creator + ' ' +
+                    _author_text(item.creator) +
                     renderDate(item.created))))
         .append($('<div class="discreet" />').text(
             item.blog || item.forum || item.community || ''));
@@ -226,7 +232,7 @@ function renderFileEntry(item) {
         .append(
             $('<div />')
                 .append($('<span class="discreet" />').text(
-                    'by ' + item.modified_by + ' ' +
+                    _author_text(item.modified_by) +
                         renderDate(item.modified))));
     return entry;
 }
