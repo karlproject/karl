@@ -147,10 +147,6 @@
     margin: 2em;
 }
 
-.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a {
-    border: 1px solid #ffffff;
-}
-
 /* XXX belongs to the theme
 .ui-menu .ui-menu-item a:hover,
 .ui-menu .ui-menu-item a.ui-state-hover {
@@ -159,8 +155,13 @@
     background: #e1e1e1 url('images/ui-bg_glass_75_dadada_1x400.png') repeat-x scroll 50% 50%;
 }
 */
-.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a:hover,
-.bc-header-toolbox .bc-livesearch-autocomplete .ui-menu .ui-menu-item a.ui-state-hover {
+
+.bc-livesearch-autocomplete-results .ui-menu-item a {
+    border: 1px solid #ffffff;
+}
+
+.bc-livesearch-autocomplete-results .ui-menu-item a:hover,
+.bc-livesearch-autocomplete-results .ui-menu-item a.ui-state-hover {
 /* override the jiggling efect of menu lines
  * ... belongs to the theme. This setting will crack all other components
  * that don't wish to override the theme in the same way.
