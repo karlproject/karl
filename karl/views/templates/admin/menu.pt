@@ -26,10 +26,10 @@
               <a href="rename_user.html">Rename or Merge Users</a>
           </div>
         </div>
-        <div class="generic-portlet">
+        <div class="generic-portlet" tal:condition="api.offices_url">
           <h3>Offices</h3>
           <div class="portlet-item">
-              <a href="/offices/view.html">Update offices</a>
+              <a href="${api.offices_url}">Update offices</a>
           </div>
         </div>
         <div class="generic-portlet">

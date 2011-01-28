@@ -37,6 +37,7 @@ from karl.utilities.rename_user import rename_user
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import find_site
+from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
@@ -69,6 +70,12 @@ class AdminTemplateAPI(TemplateAPI):
         else:
             self.quarantine_url = ('%s/mailin/quarantine' %
                                    request.application_url)
+
+        site = find_site(context)
+        if 'offices' in site:
+            self.offices_url = model_url(site['offices'], request)
+        else:
+            self.offices_url = None
 
 def _menu_macro():
     return get_template('templates/admin/menu.pt').macros['menu']

@@ -12,6 +12,9 @@ Unreleased
 - Change default "People" tab link to '/people' since all instances now get a
   People Directory by default.
 
+- Fix offices link in Admin UI to work when site is not rooted at '/'.  Also
+  only show link when there are offices.
+
 3.54 (2011-01-19)
 -----------------
 
