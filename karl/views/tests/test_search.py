@@ -56,7 +56,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          title='Dummy1', sort_key=1)
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             }
@@ -81,7 +80,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          title='Dummy2', sort_key=2)
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             }
@@ -110,7 +108,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             'kind': 'foo_kind',
@@ -140,7 +137,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             'kind': 'bad_kind',
@@ -158,7 +154,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          title='Dummy')
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             }
@@ -185,7 +180,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             'kind': 'foo_kind',
