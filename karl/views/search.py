@@ -247,6 +247,9 @@ def jquery_livesearch_view(context, request):
 
     records = []
 
+    # we return back 5 results for each type of search
+    results_per_type = 5
+
     kind = request.params.get('kind', None)
     if kind is None:
         listitems = get_listitems(IGroupSearchFactory)
@@ -258,12 +261,14 @@ def jquery_livesearch_view(context, request):
         else:
             # simulate a list item for the loop below
             listitems = (dict(component=search_utility),)
-
+            # we'll just have on type of results, so we return back 10 results
+            results_per_type = 10
     for listitem in listitems:
         utility = listitem['component']
         factory = utility(context, request, searchterm)
         if factory is None:
             continue
+        factory.limit = results_per_type
 
         try:
             num, docids, resolver = factory()
