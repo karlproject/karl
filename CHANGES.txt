@@ -4,6 +4,14 @@ karl package Changelog
 Unreleased
 -----------
 
+- Added 'karl.scripting.only_once' API, to permit cron-driven scripts to 
+  avoid running again if an earlier instance is still running.
+  The lockfile is named '<username>-<progname>', where '<username> is the
+  current user's login name, and '<progname>' is a string passed to
+  'only_once'.  By default, the lockfile is created in '/var/run/karl/';
+  this path can be overridden by setting 'lockdir' in the 'DEFAULT' section
+  of the configuration file.
+
 - Ensure that aliases for mailinglist objects are registered / deregistered
   when the mailinglist is added / removed.  (LP #706018).
 

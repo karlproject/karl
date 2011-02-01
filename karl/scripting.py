@@ -16,16 +16,21 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Support code for KARL scripts
 """
+import atexit
 import gc
 import os
 import sys
 import time
+import ConfigParser
+
 from paste.deploy import loadapp
 from ZODB.POSException import ConflictError
 from repoze.bfg.scripting import get_root
 from karl.log import get_logger
 
 _debug_object_refs = hasattr(sys, 'getobjects')
+
+LOCKDIR = '/var/run/karl/'
 
 #
 #   Replaceable shims for unit testing.
@@ -162,3 +167,19 @@ def _count_object_refs(): #pragma NO COVERAGE
     if gc.garbage:
         print "DEBUG: GARBAGE: %d/%d" % (
             len(gc.garbage), len(gc.get_objects()))
+
+
+def only_once(progname, config=None):
+    job_name = '%s-%s' % (os.getlogin(), progname)
+    lockdir = LOCKDIR
+    if config is not None:
+        cp = ConfigParser.ConfigParser()
+        cp.read(config)
+        lockdir = cp.get('DEFAULT', 'lockdir')
+    lockfile = os.path.join(lockdir, job_name)
+    if os.path.exists(lockfile):
+        print >>sys.stderr, '%s still running' % job_name
+        sys.exit(1)
+    atexit.register(os.remove, lockfile)
+    open(lockfile, 'w').write('%s running, PID=%d'
+                                  % (progname, os.getpid()))

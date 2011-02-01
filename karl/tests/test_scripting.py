@@ -142,6 +142,83 @@ class Test_run_daemon(unittest.TestCase):
         self.assertEqual(len(self.log.infos), 7, self.log.infos)
 
 
+class Test_only_once(unittest.TestCase):
+
+    def setUp(self):
+        import tempfile
+        self._tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self._tmpdir)
+
+    def _callFUT(self, progname, config=None, tempdir=None):
+        import subprocess
+        if tempdir is None:
+            tempdir = self._tmpdir
+        python_cmds = ('from karl import scripting as s; '
+                       's.LOCKDIR = "%s"; '
+                       's.only_once("%s", %r); '
+                       'print "OK"' % (tempdir, progname, config))
+        child = subprocess.Popen(['../../bin/py', '-c', python_cmds],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                )
+        stdout, stderr = child.communicate()
+        return child, stdout, stderr
+
+    def _makeConfig(self):
+        import os
+        config = os.path.join(self._tmpdir, 'testing.ini') 
+        f = open(config, 'w')
+        f.write('[DEFAULT]\nlockdir = %s\n' % self._tmpdir)
+        f.flush()
+        f.close()
+        return config
+
+    def test_lockfile_present_wo_config(self):
+        import os
+        job_name = '%s-testing' % os.getlogin()
+        filename = os.path.join(self._tmpdir, job_name) 
+        open(filename, 'w').write('testing')
+        child, stdout, stderr = self._callFUT('testing')
+        self.assertEqual(child.returncode, 1)
+        self.assertEqual(stdout, '')
+        self.assertEqual(stderr, '%s still running\n' % job_name)
+
+    def test_lockfile_present_w_config(self):
+        import os
+        job_name = '%s-testing' % os.getlogin()
+        filename = os.path.join(self._tmpdir, job_name) 
+        open(filename, 'w').write('testing')
+        config = self._makeConfig()
+        child, stdout, stderr = self._callFUT('testing', config, '/tmp')
+        self.assertEqual(child.returncode, 1)
+        self.assertEqual(stdout, '')
+        self.assertEqual(stderr, '%s still running\n' % job_name)
+
+    def test_lockfile_not_present_wo_config(self):
+        import os
+        job_name = '%s-testing' % os.getlogin()
+        filename = os.path.join(self._tmpdir, job_name) 
+        child, stdout, stderr = self._callFUT('testing')
+        self.assertEqual(child.returncode, 0)
+        self.assertEqual(stdout, 'OK\n')
+        self.assertEqual(stderr, '')
+        self.failIf(os.path.exists(filename))
+
+    def test_lockfile_not_present_w_config(self):
+        import os
+        job_name = '%s-testing' % os.getlogin()
+        filename = os.path.join(self._tmpdir, job_name) 
+        config = self._makeConfig()
+        child, stdout, stderr = self._callFUT('testing', config, '/tmp')
+        self.assertEqual(child.returncode, 0)
+        self.assertEqual(stdout, 'OK\n')
+        self.assertEqual(stderr, '')
+        self.failIf(os.path.exists(filename))
+
+
 class DummyTimeModule(object):
     def __init__(self):
         self.sleeps = []
