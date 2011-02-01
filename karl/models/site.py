@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import datetime
+import re
 
 from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
@@ -168,6 +169,8 @@ def get_textrepr(object, default):
         return tr
     return default
 
+_surrogates = re.compile(u'[\uD800-\uDFFFF]')
+
 def get_weighted_textrepr(object, default):
     # For use with experimental pgtextindex, which uses a list of strings,
     # in descending order by weight.
@@ -181,6 +184,14 @@ def get_weighted_textrepr(object, default):
     # If we wouldn't normally index it, then we can stop now
     if standard_repr is default:
         return default
+
+    # At least one version of 'pdftotext' has given us invalid Unicode by
+    # including lone characters in one of the "surrogate" character ranges.
+    # These characters must normally appear in pairs in order to be valid
+    # Unicode.  While zope.index.text has no problem with this, PostgreSQL
+    # chokes horribly on this text.  To get around this issue we just elide
+    # any characters in one of the surrogate ranges.
+    standard_repr = _surrogates.sub('', standard_repr)
 
     # Weight title most, description second, then whatever get_textrepr returns
     reprs = []

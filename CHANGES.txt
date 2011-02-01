@@ -15,6 +15,8 @@ Unreleased
 - Fix offices link in Admin UI to work when site is not rooted at '/'.  Also
   only show link when there are offices.
 
+- Fixed invalid Unicode returned by 'pdftotext' which was breaking pgtextindex.
+
 3.54 (2011-01-19)
 -----------------
 
