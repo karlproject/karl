@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Support code for KARL scripts
 """
-
 import gc
 import os
 import sys
@@ -27,6 +26,22 @@ from repoze.bfg.scripting import get_root
 from karl.log import get_logger
 
 _debug_object_refs = hasattr(sys, 'getobjects')
+
+#
+#   Replaceable shims for unit testing.
+#
+_TIME_TIME = None
+_TIME_SLEEP = None
+
+def _time_time():
+    if _TIME_TIME is not None:
+        return _TIME_TIME()
+    return time.time() #pragma NO COVERAGE
+
+def _time_sleep(interval):
+    if _TIME_SLEEP is not None:
+        return _TIME_SLEEP(interval)
+    return time.sleep() #pragma NO COVERAGE
 
 def get_default_config():
     """Get the default configuration file name.
@@ -42,7 +57,7 @@ def get_default_config():
     config = os.path.join(sandbox, 'etc', 'karl.ini')
     return os.path.abspath(os.path.normpath(config))
 
-def open_root(config, name='karl'):
+def open_root(config, name='karl'): #pragma NO COVERAGE
     """Open the database root object, given a Paste Deploy config file name.
 
     Returns (root, closer).  Call the closer function to close the database
@@ -60,12 +75,12 @@ def run_daemon(name, func, interval=300,
     if retryable is None:
         retryable = (ConflictError,)
 
-    if proceed == None:
+    if proceed == None: #pragma NO COVERAGE
         def proceed():
             return True
 
     while proceed():
-        start_trying = time.time()
+        start_trying = _time_time()
         tries = 0
         logger.info("Running %s", name)
         while True:
@@ -75,7 +90,7 @@ def run_daemon(name, func, interval=300,
                 logger.info("Finished %s", name)
                 break
             except retryable:
-                if time.time() - start_trying > retry_period:
+                if _time_time() - start_trying > retry_period:
                     logger.error("Retried for %d seconds, count = %d",
                                  retry_period, tries,
                                  exc_info=True)
@@ -83,18 +98,18 @@ def run_daemon(name, func, interval=300,
                 logger.info("Retrying in %d seconds, count = %d",
                             retry_interval, tries,
                             exc_info=True)
-                time.sleep(retry_interval)
+                _time_sleep(retry_interval)
             except:
                 logger.error("Error in daemon process", exc_info=True)
                 break
-        if _debug_object_refs: #pragma no cover
+        if _debug_object_refs: #pragma NO COVERAGE
             _count_object_refs()
         sys.stderr.flush()
         sys.stdout.flush()
-        time.sleep(interval)
+        _time_sleep(interval)
 
 _ref_counts = None
-def _count_object_refs():
+def _count_object_refs(): #pragma NO COVERAGE
     """
     This function is used for debugging leaking references between business
     function calls in the run_daemon function.  It relies on a cPython built

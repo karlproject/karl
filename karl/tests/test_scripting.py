@@ -1,22 +1,40 @@
 import unittest
 
-class TestRunDaemon(unittest.TestCase):
+
+class Test_get_default_config(unittest.TestCase):
+
+    def _callFUT(self):
+        from karl.scripting import get_default_config
+        return get_default_config()
+
+    def test_it(self):
+        import os
+        self.assertEqual(self._callFUT(),
+                         os.path.abspath(
+                            os.path.join(
+                                os.getcwd(), '../..', 'etc', 'karl.ini')))
+
+
+class Test_run_daemon(unittest.TestCase):
+
     def setUp(self):
-        from karl import scripting as mut
-        self._saved_time_module = mut.time
+        from karl import scripting
         self.time = DummyTimeModule()
-        mut.time = self.time
+        scripting._TIME_TIME = self.time.time
+        scripting._TIME_SLEEP = self.time.sleep
 
-        self._saved_get_logger = mut.get_logger
+        self._saved_get_logger = scripting.get_logger
         self.log = DummyLogger()
-        mut.get_logger = self.log
-
-        self.fut = mut.run_daemon
+        scripting.get_logger = lambda: self.log
 
     def tearDown(self):
-        from karl import scripting as mut
-        mut.time = self._saved_time_module
-        mut.get_logger = self._saved_get_logger
+        from karl import scripting
+        scripting._TIME_TIME = scripting._TIME_SLEEP = None
+        scripting.get_logger = self._saved_get_logger
+
+    def _callFUT(self, *args, **kw):
+        from karl.scripting import run_daemon
+        return run_daemon(*args, **kw)
 
     def test_run_once(self):
         class Script(DummyCallable):
@@ -26,7 +44,7 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.f1_called)
         self.assertEqual(self.time.sleeps, [300,])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
@@ -40,7 +58,7 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.f1_called)
         self.assertEqual(self.time.sleeps, [300, 300,])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
@@ -58,7 +76,7 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [300, 300])
         self.assertEqual(len(self.log.errors), 1, self.log.errors)
@@ -78,7 +96,7 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [60, 300])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
@@ -98,7 +116,7 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [60, 60, 300])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
@@ -118,10 +136,11 @@ class TestRunDaemon(unittest.TestCase):
         f = Script()
         def proceed():
             return not not f.iterations
-        self.fut('foo', f, proceed=proceed)
+        self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.ok)
         self.assertEqual(len(self.log.errors), 1, self.log.errors)
         self.assertEqual(len(self.log.infos), 7, self.log.infos)
+
 
 class DummyTimeModule(object):
     def __init__(self):
@@ -134,6 +153,7 @@ class DummyTimeModule(object):
     def sleep(self, t):
         self.sleeps.append(t)
 
+
 class DummyCallable(object):
     def __init__(self):
         self.iterations = list(self.steps)
@@ -141,6 +161,7 @@ class DummyCallable(object):
     def __call__(self):
         if self.iterations:
             return self.iterations.pop(0)(self)
+
 
 class DummyLogger(object):
     def __init__(self):
@@ -152,6 +173,3 @@ class DummyLogger(object):
 
     def info(self, *args, **kw):
         self.infos.append(args[0] % args[1:])
-
-    def __call__(self):
-        return self
