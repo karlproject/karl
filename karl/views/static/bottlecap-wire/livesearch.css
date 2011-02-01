@@ -58,7 +58,7 @@
     display: block;
     position: absolute;
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
-    z-index: 99999 !important;
+    z-index: 55555 !important;
     text-align: left;
     font-family: Verdana,Arial,sans-serif;
 }
