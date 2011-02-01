@@ -439,6 +439,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
         self.assertEqual('file', result['type'])
         self.assertEqual('file', result['category'])
+        self.assertEqual(None, result['community'])
 
     def test_community_adapter(self):
         from zope.interface import alsoProvides

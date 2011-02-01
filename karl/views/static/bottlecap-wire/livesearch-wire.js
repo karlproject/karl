@@ -239,16 +239,13 @@ function renderCommentEntry(item) {
 
 function renderFileEntry(item) {
     var entry = $('<a class="bc-livesearch-file" />');
-    var metaText = _normalized(item.modified_by)
-                   ? 'by ' + item.modified_by + ' '
-                   : '';
-    metaText += renderDate(item.modified);
     entry
-        .append($('<div />').text(item.title))
-        .append(
-            $('<div />')
+        .append($('<div />')
+                .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(
-                    metaText)));
+                    _meta_text(item.modified_by, item.modified))))
+        .append(
+            $('<div class="discreet" />').text(_normalized(item.community)));
     return entry;
 }
 

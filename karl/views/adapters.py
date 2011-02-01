@@ -180,6 +180,7 @@ def file_livesearch_result(context, request):
         context, request,
         modified_by=context.modified_by,
         modified=context.modified.isoformat(),
+        community=_community_title(context),
         type='file',
         category='file',
         )
