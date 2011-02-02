@@ -240,6 +240,8 @@ function renderCommentEntry(item) {
 function renderFileEntry(item) {
     var entry = $('<a class="bc-livesearch-file" />');
     entry
+        .append($('<img class="icon" />')
+                .attr('src', item.icon))
         .append($('<div />')
                 .append($('<span />').text(item.title))
                 .append($('<span class="discreet" />').text(

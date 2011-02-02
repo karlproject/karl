@@ -427,11 +427,21 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
 
     def test_file_adapter(self):
         from datetime import datetime
+        from karl.content.views.interfaces import IFileInfo
         context = testing.DummyModel(title='foo',
                                      modified_by='susan',
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
+        class FileDummyAdapter(object):
+            def __init__(self, context, request):
+                pass
+            mimeinfo = dict(small_icon_name='imgpath.png')
+
+        testing.registerAdapter(FileDummyAdapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                IFileInfo)
+
         from karl.views.adapters import file_livesearch_result
         result = file_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
@@ -440,6 +450,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('file', result['type'])
         self.assertEqual('file', result['category'])
         self.assertEqual(None, result['community'])
+        self.failUnless(result['icon'].endswith('/imgpath.png'))
 
     def test_community_adapter(self):
         from zope.interface import alsoProvides

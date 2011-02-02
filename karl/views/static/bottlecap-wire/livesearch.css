@@ -182,6 +182,13 @@
     margin-right: 2em;
 }
 
+.bc-livesearch-file img {
+    float: left;
+    margin-right: 5px;
+    height: 16px;
+    width: 16px;
+}
+
 .ui-menu .ui-menu-item .bc-livesearch-profile a.email {
     display: inline;
     color: blue;

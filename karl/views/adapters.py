@@ -4,6 +4,7 @@ from repoze.lemonade.listitem import get_listitems
 
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
+from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
@@ -174,12 +175,17 @@ def forumtopic_livesearch_result(context, request):
 
 @implementer(ILiveSearchEntry)
 def file_livesearch_result(context, request):
-    # XXX can add in url to icon representing type of file
-
+    fileinfo = getMultiAdapter((context, request), IFileInfo)
+    # XXX cyclical import
+    # maybe we should move the livesearch adapters to a separate module?
+    from karl.views.api import TemplateAPI
+    api = TemplateAPI(context, request)
+    icon = api.static_url + "/images/" + fileinfo.mimeinfo['small_icon_name']
     return livesearch_dict(
         context, request,
         modified_by=context.modified_by,
         modified=context.modified.isoformat(),
+        icon=icon,
         community=_community_title(context),
         type='file',
         category='file',
