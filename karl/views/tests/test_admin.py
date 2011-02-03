@@ -560,7 +560,7 @@ class TestSyslogView(unittest.TestCase):
         self.settings = settings = karltesting.DummySettings()
         testing.registerUtility(settings, ISettings)
         request = testing.DummyRequest()
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         batch_info = result['batch_info']
         entries = batch_info['entries']
         self.assertEqual(len(entries), 0)
@@ -569,7 +569,7 @@ class TestSyslogView(unittest.TestCase):
 
     def test_no_filter(self):
         request = testing.DummyRequest()
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         batch_info = result['batch_info']
         entries = batch_info['entries']
         self.assertEqual(len(entries), 4)
@@ -580,7 +580,7 @@ class TestSyslogView(unittest.TestCase):
         request = testing.DummyRequest(params={
             'instance': '_any',
         })
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['batch_info']['entries']), 4)
         self.assertEqual(result['instances'], ['org1', 'org2'])
         self.assertEqual(result['instance'], '_any')
@@ -591,7 +591,7 @@ class TestSyslogView(unittest.TestCase):
         request = testing.DummyRequest(params={
             'instance': 'org1',
         })
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['batch_info']['entries']), 2)
         self.assertEqual(result['instances'], ['org1', 'org2'])
         self.assertEqual(result['instance'], 'org1')
@@ -603,7 +603,7 @@ class TestSyslogView(unittest.TestCase):
         request = testing.DummyRequest(params={
             'instance': 'org3',
         })
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['batch_info']['entries']), 1)
         self.assertEqual(result['instances'], ['org1', 'org2', 'org3'])
         self.assertEqual(result['instance'], 'org3')
@@ -635,7 +635,7 @@ class TestLogsView(unittest.TestCase):
 
     def test_no_log(self):
         request = testing.DummyRequest()
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['logs']), 2)
         self.assertEqual(result['log'], None)
         self.assertEqual(len(result['lines']), 0)
@@ -644,7 +644,7 @@ class TestLogsView(unittest.TestCase):
         request = testing.DummyRequest(params={
             'log': self.logs[0]
         })
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(result['logs'], self.logs)
         self.assertEqual(result['log'], self.logs[0])
         self.assertEqual(len(result['lines']), 6)
@@ -652,7 +652,7 @@ class TestLogsView(unittest.TestCase):
     def test_one_log(self):
         del self.logs[1]
         request = testing.DummyRequest()
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['logs']), 1)
         self.assertEqual(result['log'], self.logs[0])
         self.assertEqual(len(result['lines']), 6)
@@ -662,7 +662,7 @@ class TestLogsView(unittest.TestCase):
             'log': self.logs[0]
         })
         self.logs[0] = 'foo'
-        result = self.fut(None, request)
+        result = self.fut(testing.DummyModel(), request)
         self.assertEqual(result['log'], None)
         self.assertEqual(len(result['lines']), 0)
 
@@ -691,7 +691,7 @@ class TestStatisticsView(unittest.TestCase):
 
     def test_it(self):
         request = testing.DummyRequest()
-        self.assertEqual(self.fut(None, request)['csv_files'],
+        self.assertEqual(self.fut(testing.DummyModel(), request)['csv_files'],
                          ['test_users1.csv'])
 
 class TestStatisticsCSVView(unittest.TestCase):
@@ -1333,7 +1333,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
             params = {}
         request = testing.DummyRequest(params=params)
         request.view_name = 'view'
-        request.context = None
+        request.context = testing.DummyModel()
         return fut(request)
 
     def test_it(self):
