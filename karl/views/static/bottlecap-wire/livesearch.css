@@ -52,7 +52,6 @@
 .bc-livesearch-autocomplete-notification {
     padding: 0;
     margin: 0;
-    width: 287px !important;
     background-color: white;
     font-size: x-small;
     display: block;
@@ -66,10 +65,26 @@
 .bc-livesearch-autocomplete-msgicon {
     display: inline-block;
     float: left;
+    width: 20px;
 }
 
-.bc-livesearch-autocomplete-message {
-    display: inline-block;
+.bc-livesearch-autocomplete-notification {
+    padding: 2px 0;
+}
+
+#searchbox .bc-livesearch-autocomplete-notification a.bc-livesearch-all-content,
+#searchbox .bc-livesearch-autocomplete-notification a.bc-livesearch-all-content:visited {
+    color: blue;
+    font-size: 1em;
+    text-decoration: none;
+    border: none;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+#searchbox .bc-livesearch-autocomplete-notification a.bc-livesearch-all-content:hover {
+    text-decoration: underline;
+    border: none;
 }
 
 /*

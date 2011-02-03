@@ -69,7 +69,8 @@ $(function() {
             }
             return true;
         },
-        renderCompletions: renderCompletions
+        renderCompletions: renderCompletions,
+        noresults: noResults
     });
     if ($.browser.msie && parseInt($.browser.version) == 7) {
         $('.bc-livesearch-btn-select').css('width', '110px');
@@ -116,6 +117,31 @@ function renderCompletions(ul, items) {
     // Set a class on the first item, to remove a border on
     // the first row
     ul.find('li:first').addClass('bc-livesearch-autocomplete-first');
+}
+
+function noResults(event, item) {
+    var el = item.el;
+    var displayer = el.errorDisplayer();
+    var query  = item.query.replace('*', '');
+    var msg = $('<span />').text('No results found. ');
+    var selectButtonText = el.selectButtonText;
+    var curFilter = $.trim(selectButtonText.text());
+    if (curFilter !== 'All Content') {
+        msg
+            .append('Try searching in ')
+            .append($('<a />')
+                    .attr('href', '#')
+                    .attr('class', 'bc-livesearch-all-content')
+                    .text('All Content')
+                    .click(function () {
+                        displayer.hide();
+                        selectButtonText.text('All Content');
+                        el.menuSelected(0, {item: selectButtonText});
+                        return false;
+                    }))
+            .append('.');
+    }
+    displayer.replaceWith(msg);
 }
 
 var renderDispatchTable = {
