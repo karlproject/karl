@@ -92,12 +92,12 @@
 
 .bc-header {
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
-    width: 310px !important;
+    width: 410px !important;
 }
 .bc-header-toolbox {
     font-size: 10px;
     /* XXX this are problems in our themedstyles.css, it should be restricted there */
-    text-align: left !important;
+    text-align: right !important;
 }
 
 .bc-header-toolbox .ui-widget {
@@ -112,9 +112,6 @@
     font-size: 12px;
     font-family: Verdana,Arial,sans-serif;
     margin-right: 0 !important;
-}
-.bc-header-toolbox button.bc-livesearch-btn-select {
-    width: 110px;
 }
 .bc-header-toolbox .ui-button .ui-button-text {
     line-height: 16px !important;
@@ -134,7 +131,7 @@
     border-width: 1px 0;
     border-style: solid;
     padding: 0;
-    width: 150px;
+    width: 250px;
 }
 
 .bc-header-toolbox .bc-livesearch-btn-search {
