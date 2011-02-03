@@ -282,7 +282,7 @@ class MailinRunner2(object):
             subject=message.get('Subject'),
             system_name=get_setting(self.root, 'system_name', 'KARL'),
             admin_email=get_setting(self.root, 'admin_email'),
-        ), 'utf-8')
+        ).encode('UTF-8'), 'UTF-8')
 
         self.queue.bounce(
             message, mailer.send, from_email,
