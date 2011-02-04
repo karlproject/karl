@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 -----------
 
-- Added 'karl.scripting.only_once' API, to permit cron-driven scripts to 
+- Added 'karl.scripting.only_once' API, to permit cron-driven scripts to
   avoid running again if an earlier instance is still running.
   The lockfile is named '<username>-<progname>', where '<username> is the
   current user's login name, and '<progname>' is a string passed to
@@ -24,6 +24,8 @@ Unreleased
   only show link when there are offices.
 
 - Fixed invalid Unicode returned by 'pdftotext' which was breaking pgtextindex.
+
+- Fixed the static view of the maintenance app to work when not rooted at '/'.
 
 3.54 (2011-01-19)
 -----------------

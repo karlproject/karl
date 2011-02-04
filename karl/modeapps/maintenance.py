@@ -1,12 +1,14 @@
 from repoze.bfg.configuration import Configurator
 
 def dummy_view(context, request):
-    return {}
+    return {
+        'static': request.application_url + "/static"
+    }
 
 def maintenance(global_config, **local_conf):
     config = Configurator()
     config.begin()
-    config.add_static_view('static', '../views/static')
+    config.add_static_view('static', 'karl.views:static')
     config.add_route(name='maintenance',
                     path='/*url',
                     view=dummy_view,

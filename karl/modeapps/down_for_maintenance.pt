@@ -2,17 +2,17 @@
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <title>Down For Scheduled Maintenance</title>
-    <link href="/static/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
-    <link href="/static/images/favicon.ico" rel="icon" type="image/vnd.microsoft.icon" />
-    <link href="/static/themedstyles.css" rel="stylesheet" type="text/css" />
-    <link href="/static/custom.css" rel="stylesheet" type="text/css" />
+    <link href="${static}/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+    <link href="${static}/images/favicon.ico" rel="icon" type="image/vnd.microsoft.icon" />
+    <link href="${static}/themedstyles.css" rel="stylesheet" type="text/css" />
+    <link href="${static}/custom.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
     // The time out value is set to be 60,000 milli-seconds (or 60 seconds)
     setTimeout(' document.location=document.location' ,60000);
     </script>
   </head>
   <body id="login-wrapper">
-    <img src="/static/images/login_gradient.gif" id="login-gradient" />
+    <img src="${static}/images/login_gradient.gif" id="login-gradient" />
     <div id="outer">
       <div id="inner">
         <h1 class="kscreentitle" style="margin-top: 50px">
