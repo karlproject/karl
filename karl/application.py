@@ -40,6 +40,7 @@ def make_app(global_config, **kw):
     # Coerce a value out of the [app:karl] section in the INI file
     jquery_dev_mode = config.get('jquery_dev_mode', False)
     config['jquery_dev_mode'] = asbool(jquery_dev_mode)
+    config['read_only'] = asbool(config.get('read_only', False))
 
     # Set up logging
     configure_log(**config)
@@ -72,3 +73,10 @@ def find_users(root):
         return Users()
     return root['site'].users
 
+
+def unconditional_veto(environ, status, headers):
+    """
+    Can be used in read-only mode to avoid attempting to commit any
+    transactions.
+    """
+    return True
