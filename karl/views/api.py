@@ -85,6 +85,7 @@ class TemplateAPI(object):
         settings = queryUtility(ISettings)
         self.js_devel_mode = settings and getattr(settings,
                                                   'js_devel_mode', None)
+        self.read_only = settings and getattr(settings, 'read_only', False)
         self.static_url = '%s/static/%s' % (app_url, _get_static_rev())
 
         # this data will be provided for the client javascript

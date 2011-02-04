@@ -324,7 +324,7 @@
     </metal:table>
 
 
-    <div metal:define-macro="rss_icon" class="rss-icon" 
+    <div metal:define-macro="rss_icon" class="rss-icon"
          tal:condition="feed_url|None">
       <a href="${feed_url}">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
@@ -790,6 +790,13 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       <div class="site-announcement portalMessage" id="site-announcement"
            tal:condition="api.site_announcement"
            tal:content="structure api.site_announcement">
+      </div>
+      <div class="site-announcement portalMessage" id="site-announcement"
+           tal:condition="api.read_only">
+           WARNING. This site is currently in 'read only' mode for
+           maintenance. You will be able to view anything in the site but no
+           changes will be saved. The site will return to normal operation
+           shortly. Thank you for your patience.
       </div>
     </metal:announcement>
 

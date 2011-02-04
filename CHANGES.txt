@@ -27,6 +27,8 @@ Unreleased
 
 - Fixed the static view of the maintenance app to work when not rooted at '/'.
 
+- Added support for 'read only' mode.
+
 3.54 (2011-01-19)
 -----------------
 
