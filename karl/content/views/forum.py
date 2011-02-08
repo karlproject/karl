@@ -573,7 +573,7 @@ class AddForumTopicFormController(object):
                                              converted['security_state'])
 
         # Tags and attachments
-        set_tags(context, request, converted['tags'])
+        set_tags(topic, request, converted['tags'])
         if support_attachments(topic):
             upload_attachments(converted['attachments'], topic['attachments'],
                                creator, request)
