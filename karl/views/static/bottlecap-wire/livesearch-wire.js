@@ -80,7 +80,7 @@ $(function() {
         noresults: noResults
     });
     if ($.browser.msie && parseInt($.browser.version) == 7) {
-        $('.bc-livesearch-btn-select').css('width', '110px');
+        $('.bc-livesearch-btn-select').css('width', '120px');
     }
 });
 
