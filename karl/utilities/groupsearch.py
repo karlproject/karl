@@ -2,16 +2,16 @@ from zope.interface import directlyProvides
 from zope.interface import implements
 
 from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import model_path
 
+from karl.content.interfaces import ICalendarEvent
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IGroupSearch
 from karl.models.interfaces import IPeople
 from karl.models.interfaces import IPosts
 from karl.models.interfaces import IFiles
 from karl.models.interfaces import IPages
-from karl.models.interfaces import IOthers
 
 from karl.views.batch import get_catalog_batch_grid
 
@@ -40,8 +40,13 @@ def files_group_search(context, request, term):
     return search
 
 @groupsearchfactory
-def others_group_search(context, request, term):
-    search = GroupSearch(context, request, [IOthers], term)
+def events_group_search(context, request, term):
+    search = GroupSearch(context, request, [ICalendarEvent], term)
+    return search
+
+@groupsearchfactory
+def communities_group_search(context, request, term):
+    search = GroupSearch(context, request, [ICommunity], term)
     return search
 
 class GroupSearch:

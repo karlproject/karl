@@ -197,7 +197,7 @@ def community_livesearch_result(context, request):
     return livesearch_dict(
         context, request,
         num_members=community_info.number_of_members,
-        type='other',
+        type='community',
         category='community',
         )
 
@@ -209,6 +209,6 @@ def calendar_livesearch_result(context, request):
         start=context.startDate.isoformat(),
         end=context.endDate.isoformat(),
         location=context.location,
-        type='other',
+        type='calendarevent',
         category='calendarevent',
         )

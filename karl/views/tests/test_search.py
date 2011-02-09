@@ -468,7 +468,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         result = community_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual(7, result['num_members'])
-        self.assertEqual('other', result['type'])
+        self.assertEqual('community', result['type'])
         self.assertEqual('community', result['category'])
 
     def test_calendar_adapter(self):
@@ -486,7 +486,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('1985-02-01T00:00:00', result['end'])
         self.assertEqual('mars', result['location'])
         self.assertEqual(None, result['community'])
-        self.assertEqual('other', result['type'])
+        self.assertEqual('calendarevent', result['type'])
         self.assertEqual('calendarevent', result['category'])
 
 

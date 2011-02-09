@@ -15,12 +15,18 @@ var advancedSearchUrl = appUrl + "/searchresults.html";
 
 var typeLookupDisplay = {
     profile: "People",
-    page: "Pages",
-    post: "Posts",
+    page: "Wikis",
+    post: "Blogs",
     file: "Files",
-    other: "Other"
+    community: "Communities",
+    calendarevent: "Events"
 };
 
+// mapping for what kind we ask the server
+var kindTable = {
+    Wikis: 'Pages',
+    Blogs: 'Posts'
+};
 
 function getSearchValue() {
     return $('.bc-livesearch-autocomplete').val();
@@ -34,9 +40,10 @@ function advancedSearchResultsUrl(query, type) {
         // grab current filter and use that
         type = $.trim($('.bc-livesearch-btn-select').text());
     }
+    type = escape(type);
     var typeQueryString = (type === "All Content")
                               ? ''
-                              : "&kind=" + escape(type);
+                              : "&kind=" + (kindTable[type] || type);
     var queryString = '?body=' + escape(query) + typeQueryString;
     return advancedSearchUrl + queryString;
 }
@@ -56,7 +63,7 @@ $(function() {
             var text = $.trim(ui.text);
             var urlFn = text === "All Content"
                 ? createUrlFn(livesearchUrl)
-                : createUrlFn(livesearchUrl, text);
+                : createUrlFn(livesearchUrl, kindTable[text] || text);
             $('.bc-livesearch').livesearch('option', 'urlFn', urlFn);
         },
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
@@ -93,7 +100,7 @@ function renderCompletions(ul, items) {
             var li = $('<li class="bc-livesearch-autocomplete-category"></li>');
             li.append(
                 $('<span class="bc-livesearch-category-text"></span>')
-                    .text(typeLookupDisplay[item.type] || "Other")
+                    .text(typeLookupDisplay[item.type] || item.type || "Unknown")
             );
             li.append(
                 $('<span class="bc-livesearch-more"></span>')
@@ -117,6 +124,23 @@ function renderCompletions(ul, items) {
     // Set a class on the first item, to remove a border on
     // the first row
     ul.find('li:first').addClass('bc-livesearch-autocomplete-first');
+
+    // groupings that have only one element need a little bit more spacing
+    // or the category label/more link on the left look cramped
+    var nElements = 0;
+    var prevElement = null;
+    ul.find('li').each(function() {
+        if ($(this).hasClass('bc-livesearch-autocomplete-category')) {
+            if (nElements === 1) {
+                prevElement.css('margin-bottom', '1em');
+            }
+            prevElement = null;
+            nElements = 0;
+        } else {
+            nElements += 1;
+            prevElement = $(this);
+        }
+    });
 }
 
 function noResults(event, item) {

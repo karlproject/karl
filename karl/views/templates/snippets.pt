@@ -411,10 +411,11 @@
       <div class="bc-header-toolbox">
         <button>All Content</button><ul>
           <li><a href="#">People</a></li>
-          <li><a href="#">Pages</a></li>
-          <li><a href="#">Posts</a></li>
+          <li><a href="#">Wikis</a></li>
+          <li><a href="#">Blogs</a></li>
           <li><a href="#">Files</a></li>
-          <li><a href="#">Other</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Communities</a></li>
           <li><a href="#">All Content</a></li>
         </ul><input class="bc-livesearch"/><button>Search</button>
       </div>
