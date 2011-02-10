@@ -41,7 +41,7 @@ function advancedSearchResultsUrl(query, type) {
         type = $.trim($('.bc-livesearch-btn-select').text());
     }
     type = escape(type);
-    var typeQueryString = (type === "All Content")
+    var typeQueryString = (type === "All%20Content")
                               ? ''
                               : "&kind=" + (kindTable[type] || type);
     var queryString = '?body=' + escape(query) + typeQueryString;
