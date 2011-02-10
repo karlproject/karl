@@ -195,7 +195,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         from simplejson import loads
         results = loads(response.body)
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(len(results), 10)
+        self.assertEqual(len(results), 20)
 
 
 class LiveSearchEntryAdapterTests(unittest.TestCase):

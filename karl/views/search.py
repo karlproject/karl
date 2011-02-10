@@ -261,8 +261,8 @@ def jquery_livesearch_view(context, request):
         else:
             # simulate a list item for the loop below
             listitems = (dict(component=search_utility),)
-            # we'll just have on type of results, so we return back 10 results
-            results_per_type = 10
+            # we'll just have on type of results, so we return back 20 results
+            results_per_type = 20
     for listitem in listitems:
         utility = listitem['component']
         factory = utility(context, request, searchterm)
