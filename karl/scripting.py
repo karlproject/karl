@@ -46,7 +46,7 @@ def _time_time():
 def _time_sleep(interval):
     if _TIME_SLEEP is not None:
         return _TIME_SLEEP(interval)
-    return time.sleep() #pragma NO COVERAGE
+    return time.sleep(interval) #pragma NO COVERAGE
 
 def get_default_config():
     """Get the default configuration file name.
