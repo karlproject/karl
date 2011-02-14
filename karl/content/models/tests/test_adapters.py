@@ -42,21 +42,21 @@ class FlexibleTextIndexDataTests(unittest.TestCase):
     def test___call___defaults_no_matching_attrs(self):
         context = testing.DummyModel()
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), '')
+        self.assertEqual(adapter(), ())
 
     def test___call___defaults_skips_empty_attrs(self):
         context = testing.DummyModel(title = '',
                                      text = 'b',
                                     )
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), 'b')
+        self.assertEqual(adapter(), ('b',))
 
     def test___call___defaults_some_matching_attrs(self):
         context = testing.DummyModel(title = 'a',
                                      text = 'b',
                                     )
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), 'a ' * 10 + 'b')
+        self.assertEqual(adapter(), ('a','b'))
 
     def test___call___defaults_all_matching_attrs(self):
         context = testing.DummyModel(title = 'a',
@@ -64,7 +64,7 @@ class FlexibleTextIndexDataTests(unittest.TestCase):
                                      text = 'c',
                                     )
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), 'a ' * 10 + 'b c')
+        self.assertEqual(adapter(), ('a', 'b',  'c'))
 
     def test___call___derived(self):
         context = testing.DummyModel(title = 'a',
@@ -72,10 +72,10 @@ class FlexibleTextIndexDataTests(unittest.TestCase):
                                      text = 'c',
                                     )
         class Derived(self._getTargetClass()):
-            ATTR_WEIGHT_CLEANER = [('description', 2, None)]
+            weighted_attrs_cleaners = [('description', None)]
         context = testing.DummyModel(description='b')
         adapter = Derived(context)
-        self.assertEqual(adapter(), 'b b')
+        self.assertEqual(adapter(), ('b',))
 
     def test___call___derived_w_extractor(self):
         context = testing.DummyModel(title = 'a',
@@ -83,12 +83,12 @@ class FlexibleTextIndexDataTests(unittest.TestCase):
                                      text = 'c',
                                     )
         class Derived(self._getTargetClass()):
-            ATTR_WEIGHT_CLEANER = [(lambda x: 'z', 3, None),
-                                   ('description', 2, None),
-                                  ]
+            weighted_attrs_cleaners = [(lambda x: 'z', None),
+                                       ('description', None),
+                                       ]
         context = testing.DummyModel(description='b')
         adapter = Derived(context)
-        self.assertEqual(adapter(), 'z z z b b')
+        self.assertEqual(adapter(), ('z', 'b'))
 
     def test___call___derived_w_cleaner(self):
         context = testing.DummyModel(title = 'a',
@@ -96,11 +96,10 @@ class FlexibleTextIndexDataTests(unittest.TestCase):
                                      text = 'c',
                                     )
         class Derived(self._getTargetClass()):
-            ATTR_WEIGHT_CLEANER = [('title', 2, lambda x: 'y'),
-                                  ]
+            weighted_attrs_cleaners = [('title', lambda x: 'y'),]
         context = testing.DummyModel(title='a')
         adapter = Derived(context)
-        self.assertEqual(adapter(), 'y y')
+        self.assertEqual(adapter(), ('y',))
 
 class Test_makeFlexibleTextIndexData(unittest.TestCase):
 
@@ -108,23 +107,22 @@ class Test_makeFlexibleTextIndexData(unittest.TestCase):
         from karl.content.models.adapters import makeFlexibleTextIndexData
         return makeFlexibleTextIndexData(attr_weights)
 
-    def test_no_attr_weights_raises(self):
-        self.assertRaises(ValueError, self._callFUT, ())
-
     def test_w_attr_weights(self):
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import ITextIndexData
-        factory = self._callFUT([('title', 2, None),
-                                 ('description', 1, None),
+        def cleaner(s):
+            return s.replace('x', 'y')
+        factory = self._callFUT([('title', None),
+                                 ('description', cleaner),
                                 ])
         context = testing.DummyModel()
         adapter = factory(context)
         verifyObject(ITextIndexData, adapter)
-        self.assertEqual(adapter(), '')
+        self.assertEqual(adapter(), ())
         context.title = 'a'
-        self.assertEqual(adapter(), 'a a')
-        context.description = 'b'
-        self.assertEqual(adapter(), 'a a b')
+        self.assertEqual(adapter(), ('a',))
+        context.description = 'x y z'
+        self.assertEqual(adapter(), ('a', 'y y z'))
 
 class TestTitleAndDescriptionIndexData(unittest.TestCase):
     def setUp(self):
@@ -157,7 +155,7 @@ class TestTitleAndDescriptionIndexData(unittest.TestCase):
         context.description = ''
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, 'thetitle ' * 9 + 'thetitle')
+        self.assertEqual(data, ('thetitle', ''))
 
     def test_w_description(self):
         context = testing.DummyModel()
@@ -165,7 +163,7 @@ class TestTitleAndDescriptionIndexData(unittest.TestCase):
         context.description = 'Hi!'
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, 'thetitle ' * 10 + 'Hi!')
+        self.assertEqual(data, ('thetitle', 'Hi!'))
 
 class TestTitleAndTextIndexData(unittest.TestCase):
     def setUp(self):
@@ -198,7 +196,7 @@ class TestTitleAndTextIndexData(unittest.TestCase):
                                     )
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, 'thetitle ' * 9 + 'thetitle')
+        self.assertEqual(data, ('thetitle', ''))
 
     def test_w_text(self):
         context = testing.DummyModel(title = 'thetitle',
@@ -206,7 +204,7 @@ class TestTitleAndTextIndexData(unittest.TestCase):
                                     )
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, 'thetitle ' * 10 + '\n\nHi!\n\n')
+        self.assertEqual(data, ('thetitle', '\n\nHi!\n\n'))
 
 class TestFileTextIndexData(unittest.TestCase):
     def setUp(self):
@@ -238,7 +236,7 @@ class TestFileTextIndexData(unittest.TestCase):
         context.title = 'Some Title'
         context.mimetype = 'nonexistent'
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), 'Some Title ' * 9 + 'Some Title')
+        self.assertEqual(adapter(), ('Some Title', ''))
 
     def test_with_converter(self):
         from karl.utilities.converters.interfaces import IConverter
@@ -249,7 +247,7 @@ class TestFileTextIndexData(unittest.TestCase):
         context.mimetype = 'mimetype'
         context.blobfile = DummyBlobFile()
         adapter = self._makeOne(context)
-        self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+        self.assertEqual(adapter(), ('Some Title', 'stuff'))
 
     def test_cache_with_converter(self):
         from karl.utilities.converters.interfaces import IConverter
@@ -261,9 +259,9 @@ class TestFileTextIndexData(unittest.TestCase):
         context.blobfile = DummyBlobFile()
         adapter = self._makeOne(context)
         self.assertEqual(converter.called, 0)
-        self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+        self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1)
-        self.assertEqual(adapter(), 'Some Title ' * 10 + 'stuff')
+        self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1) # Didn't call converter again
 
 class TestCalendarEventCategoryData(unittest.TestCase):

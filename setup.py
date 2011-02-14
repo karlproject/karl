@@ -49,6 +49,7 @@ requires = [
     'repoze.mailin',
     'repoze.mailin.monitor',
     'repoze.monty',
+    'repoze.pgtextindex',
     'repoze.postoffice',
     'repoze.retry',
     'repoze.sendmail',
@@ -63,7 +64,7 @@ requires = [
     'ZODB3',
     # Testing dependencies
     'coverage',
-    'nose',        
+    'nose',
     'twill',
     'zope.testing', # fwd compat when not directly relied on by BFG
     # Not really a code depdencency, but used by most buildouts

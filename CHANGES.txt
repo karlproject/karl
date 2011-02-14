@@ -29,6 +29,10 @@ Unreleased
 
 - Added support for 'read only' mode.
 
+- Added support for contextual summaries in search when using
+  repoze.pgtextindex. Had to refactor how text representations are generated
+  for both pgtextindex and Zope text index in the process. (LP #707671)
+
 3.54 (2011-01-19)
 -----------------
 

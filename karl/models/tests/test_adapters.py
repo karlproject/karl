@@ -43,7 +43,7 @@ class TestDeprecatedCatalogSearch(unittest.TestCase):
         try:
             adapter = self._getTargetClass()(context, request)
         finally:
-            warnings.filters[:] = old_filters 
+            warnings.filters[:] = old_filters
         assert __warningregistry__
         del __warningregistry__
         return adapter
@@ -983,6 +983,35 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
             self.assertEqual(sentmessage['Reply-To'],
                             'alias@lists.example.com')
         self.assertEqual(_called_with, [{'testing': True}])
+
+
+class TestPGTextIndexContextualSummarizer(unittest.TestCase):
+
+    def test_it(self):
+        from karl.models.adapters import PGTextIndexContextualSummarizer as cut
+        class DummyIndex(object):
+            def get_contextual_summary(myself, raw_text, query, **options):
+                self.assertEqual(raw_text, 'raw text')
+                self.assertEqual(query, 'query')
+                self.assertEqual(options, {'MaxFragments': 3})
+                return 'summary'
+        document = testing.DummyModel(text='raw text')
+        instance = cut(DummyIndex())
+        def dummy_text_repr(self, doc, default):
+            return (doc.text,)
+        cut.get_textrepr = dummy_text_repr
+        summary = instance(document, 'query')
+        self.assertEqual(summary, '... summary ...')
+
+
+class TestZopeTextIndexContextualSummarizer(unittest.TestCase):
+
+    def test_it(self):
+        from karl.models.adapters import ZopeTextIndexContextualSummarizer
+        instance = ZopeTextIndexContextualSummarizer(None)
+        document = testing.DummyModel(description='description')
+        self.assertEqual(instance(document, None), 'description')
+        self.assertEqual(instance(object, None), '')
 
 
 class DummyTags:

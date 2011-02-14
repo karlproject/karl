@@ -142,6 +142,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_none_kind(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context.catalog = {}
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
@@ -164,6 +165,7 @@ class SearchResultsViewTests(unittest.TestCase):
         testing.registerUtility(
             search_factory, IGroupSearchFactory, name='People')
         context = testing.DummyModel()
+        context.catalog = {}
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'People'}))
         from karl.models.interfaces import ICatalogSearch
@@ -177,6 +179,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_community_search(self):
         context = testing.DummyModel()
         context.title = 'Citizens'
+        context.catalog = {}
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides

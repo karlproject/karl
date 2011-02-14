@@ -229,6 +229,12 @@
   />
 
   <adapter
+    for="repoze.pgtextindex.index.PGTextIndex"
+    provides=".interfaces.IContextualSummarizer"
+    factory=".adapters.PGTextIndexContextualSummarizer"
+    />
+
+  <adapter
     for=".interfaces.IPeopleReport"
     provides="karl.models.interfaces.ICatalogSearch"
     factory=".adapters.PeopleDirectoryCatalogSearch"

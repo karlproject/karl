@@ -37,17 +37,16 @@ class FlexibleTextIndexData(object):
 
     implements(ITextIndexData)
 
-    ATTR_WEIGHT_CLEANER = [('title', 10, None),
-                           ('description', 1, None),
-                           ('text', 1, None),
-                          ]
+    weighted_attrs_cleaners = (('title', None),
+                               ('description', None),
+                               ('text', None),)
 
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
         parts = []
-        for attr, weight, cleaner in self.ATTR_WEIGHT_CLEANER:
+        for attr, cleaner in self.weighted_attrs_cleaners:
             if callable(attr):
                 value = attr(self.context)
             else:
@@ -55,14 +54,16 @@ class FlexibleTextIndexData(object):
             if value is not None:
                 if cleaner is not None:
                     value = cleaner(value)
-                parts.extend([value] * weight)
-        return ' '.join(filter(None, parts))
+                parts.append(value)
+        # Want to remove empty attributes from the front of the list, but
+        # leave empty attributes at the tail in order to preserve weight.
+        while parts and not parts[0]:
+            del parts[0]
+        return tuple(parts)
 
 def makeFlexibleTextIndexData(attr_weights):
-    if not attr_weights:
-        raise ValueError('Must have at least one (attr, weight).')
     class Derived(FlexibleTextIndexData):
-        ATTR_WEIGHT_CLEANER = attr_weights
+        weighted_attrs_cleaners = attr_weights
     return Derived
 
 def extract_text_from_html(text):
@@ -71,13 +72,13 @@ def extract_text_from_html(text):
     return html2text(convert_entities(text))
 
 TitleAndDescriptionIndexData = makeFlexibleTextIndexData(
-                                [('title', 10, None),
-                                 ('description', 1, None),
+                                [('title', None),
+                                 ('description', None),
                                 ])
 
 TitleAndTextIndexData = makeFlexibleTextIndexData(
-                                [('title', 10, None),
-                                 ('text', 1, extract_text_from_html),
+                                [('title', None),
+                                 ('text', extract_text_from_html),
                                 ])
 
 def _extract_and_cache_file_data(context):
@@ -131,8 +132,8 @@ def _extract_file_data(context):
     return datum
 
 FileTextIndexData = makeFlexibleTextIndexData(
-                                [('title', 10, None),
-                                 (_extract_and_cache_file_data, 1, None),
+                                [('title', None),
+                                 (_extract_and_cache_file_data, None),
                                 ])
 
 class CalendarEventCategoryData(object):

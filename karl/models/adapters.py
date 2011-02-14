@@ -38,6 +38,7 @@ from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityInfo
+from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IPeopleReportCategoryFilter
@@ -46,6 +47,8 @@ from karl.models.interfaces import IPeopleReportGroupFilter
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import IToolFactory
+from karl.models.site import get_weighted_textrepr
+
 from karl.utils import find_catalog
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
@@ -571,3 +574,36 @@ class PeopleReportMailinHandler(object):
             profile = resolver(docid)
             if profile is not None:
                 yield profile.email
+
+
+class PGTextIndexContextualSummarizer(object):
+    implements(IContextualSummarizer)
+
+    get_textrepr = staticmethod(get_weighted_textrepr)
+
+    def __init__(self, index):
+        self.index = index
+
+    def __call__(self, document, query):
+        doc_text = ' '.join(self.get_textrepr(document, []))
+        summary = self.index.get_contextual_summary(
+            doc_text, query, MaxFragments=3)
+        pieces = [summary]
+        if summary[:10] != doc_text[:10]:
+            pieces.insert(0, '...')
+        if summary[-10:] != doc_text[-10:]:
+            pieces.append('...')
+        return ' '.join(pieces)
+
+class ZopeTextIndexContextualSummarizer(object):
+    implements(IContextualSummarizer)
+
+    def __init__(self, index):
+        self.index = index
+
+    def __call__(self, document, query):
+        try:
+            return getattr(document, 'description')
+        except AttributeError:
+            return ''
+

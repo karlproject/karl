@@ -17,11 +17,14 @@
 
 """Site and community search views"""
 
+from karl.models.adapters import ZopeTextIndexContextualSummarizer
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
 from karl.utils import coarse_datetime_repr
+from karl.utils import find_catalog
 from karl.utils import get_content_type_name
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
@@ -34,6 +37,7 @@ from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
 from webob.exc import HTTPBadRequest
 from webob import Response
+from zope.component import queryAdapter
 from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
@@ -169,6 +173,13 @@ def get_batch(context, request):
     return batch, terms
 
 
+def get_contextual_summarizer(context):
+    catalog = find_catalog(context)
+    index = catalog.get('texts')
+    return queryAdapter(index, IContextualSummarizer,
+                        default=ZopeTextIndexContextualSummarizer(index))
+
+
 def searchresults_view(context, request):
     # We can get here from either the LiveSearch or advanced search
     # screens
@@ -196,12 +207,11 @@ def searchresults_view(context, request):
 
     if batch:
         # Flatten the batch into data for use in the ZPT.
+        summarizer = get_contextual_summarizer(context)
+        text_term = request.params.get('body')
         results = []
         for result in batch['entries']:
-            try:
-                description = result.description[0:300]
-            except AttributeError:
-                description = ''
+            description = summarizer(result, text_term)
             result = {
                 'title': getattr(result, 'title', '<No Title>'),
                 'description': description,
