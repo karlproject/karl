@@ -418,6 +418,9 @@
           <li><a title="Search Community Names" href="#">Communities</a></li>
           <li><a title="Search All Content" href="#">All Content</a></li>
         </ul><input class="bc-livesearch"/><button>Search</button>
+        <span class="advancedSearch">
+          <a href="${api.app_url}/advancedsearch.html">advanced search</a>
+        </span>
       </div>
 
     </div>
