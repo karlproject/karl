@@ -9,6 +9,9 @@
 .ui-grid-content {
     vertical-align: top;
     overflow: auto;
+    overflow: -moz-scrollbars-vertical;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .ui-grid-footer {

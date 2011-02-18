@@ -607,8 +607,26 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         sortColumn: '',
         sortDirection: '',
 
-        initialState: null
+        initialState: null,
+
+        allocateWidthForScrollbar: false,  // if set to true, the space for
+            // scrollbar will be reserved next to the rightest column
+        scrollbarWidth: 15
+            // only effective of allocateWidthForScrollbar is true
     }),
+
+    _create: function() {
+        // null out the scrollbar width if it is not allowed
+        if (! this.options.allocateWidthForScrollbar) {
+            this.options.scrollbarWidth = 0; // no scrollbar - no width
+        }
+        $.ui.grid.prototype._create.call(this, arguments);
+        
+        // Set the width of the content div
+        // this is needed for sake of IE7, who otherwise
+        // place a scrollbar outside the box
+        this.contentDiv.width(this.options.width);
+    },
 
     _generateColumns: function() {
 
@@ -641,6 +659,11 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             column_widths.push(width);
             totalWidth += width;
         });
+        // we have to subsctract the scrollbar width, as we
+        // have created a placeholder column
+        if (this.options.scrollbarWidth > 0) {
+            totalWidth -= this.options.scrollbarWidth;   // this was the last added width.
+        }
         
         // set width on all cells
         // XXX This would probably work bad with infinite scrolling!
@@ -667,7 +690,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         // set the width of the whole table
         this.content.parent()     // this.content is the <tbody>, parent is the <table>.
-            .width(totalWidth)
+            .width(totalWidth + this.options.scrollbarWidth)
             //.css('overflow', 'hidden')
             // table-layout is essential for column width
             .css('table-layout', 'fixed');
@@ -677,8 +700,6 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
     _addColumns: function(columns) {
 
         this.columns = columns;
-        //// XXX XXX there is no placeholder column now
-        //var totalWidth = 25;
         var totalWidth = 0;
         this.columns_by_id = {};
         
@@ -730,14 +751,16 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             //column.gridResizable();
         };
         
-        //This column is the last and only used to serve as placeholder for a non-existant scrollbar
-        // XXX XXX temporary disabled, as currently we don't use features it allows,
-        // and it causes a layout artifact on FF.
-        //$('<td class="ui-grid-column-header ui-state-default"><div></div></td>').width(25).appendTo(this.columnsContainer);
+        //This column is the last and only used to serve as placeholder for a scrollbar
+        if (this.options.scrollbarWidth > 0) {
+            $('<td class="ui-state-default ui-grid-column-scrollbar"><div></div></td>')
+                .width(this.options.scrollbarWidth)
+                .appendTo(this.columnsContainer);
+        }
         
         //Update the total width of the wrapper of the column headers
         var header_table = this.columnsContainer.parent().parent();
-        header_table.width(totalWidth);
+        header_table.width(totalWidth + this.options.scrollbarWidth);
 
         // Send event that columns are setup
         this.element.trigger('karlgrid_columns_set');
@@ -801,9 +824,16 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         var row = $.ui.grid.prototype._addRow.call(this, item, dontAdd);
 
+        if (this.options.scrollbarWidth > 0) {
+            $('<td class="ui-grid-column ui-state-active"><div>&nbsp;</div></td>')
+                .width(this.options.scrollbarWidth)
+                .appendTo(row);
+        }
+
+
         // Calculate the oddity of the newly added row. We do the
         // following check after the row has already been added.
-        var oddity = (this.content.find('tr').length % 2 == 1)
+        var oddity = (this.content.find('tr').length % 2 == 1);
 
         // Add class based on oddity and options
         if (oddity && this.options.oddRowClass) {

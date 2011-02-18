@@ -48,6 +48,8 @@
                 pagination: true,
                 sortColumn: grid_data.sortColumn,
                 sortDirection: grid_data.sortDirection,
+                scrollbarWidth: grid_data.scrollbarWidth,
+                allocateWidthForScrollbar: grid_data.allocateWidthForScrollbar,
                 initialState: grid_data
             });
         });

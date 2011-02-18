@@ -459,12 +459,14 @@ def get_report_query(report, request):
     return kw
 
 
+GRID_WIDTH = 880   
+SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
 def get_grid_data(context, request, start=0, limit=12,
-        sort_on=None, reverse=False, width=880):
+        sort_on=None, reverse=False, width=GRID_WIDTH):
     """Gets the data for the jquery report grid.
     """
     columns = [COLUMNS[colid] for colid in context.columns]
-    columns_jsdata = get_column_jsdata(columns, width)
+    columns_jsdata = get_column_jsdata(columns, width - SCROLLBAR_WIDTH)
     if sort_on is None:
         sort_on = columns[0].id
     sort_index = COLUMNS[sort_on].sort_index
@@ -500,6 +502,8 @@ def get_grid_data(context, request, start=0, limit=12,
         width=width,
         sortColumn=sort_on,
         sortDirection=(reverse and 'desc' or 'asc'),
+        allocateWidthForScrollbar=True,
+        scrollbarWidth=SCROLLBAR_WIDTH,
         )
     return payload
 
