@@ -284,6 +284,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
                 title=title, text=text, creator=creator)
             topic['comments'] = testing.DummyModel()
             topic['attachments'] = testing.DummyModel()
+            topic.get_attachments = lambda : None 
             return topic
         registerContentFactory(factory, IForumTopic)
         registerContentFactory(DummyFile, ICommunityFile)

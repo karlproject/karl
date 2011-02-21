@@ -58,6 +58,7 @@ from karl.utils import find_profiles
 from karl.utils import support_attachments
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
+from karl.utilities.image import relocate_temp_images
 
 from karl.views.api import TemplateAPI
 
@@ -571,6 +572,9 @@ class AddForumTopicFormController(object):
             if 'security_state' in converted:
                 workflow.transition_to_state(topic, request,
                                              converted['security_state'])
+
+        # send the temp images to their final place
+        relocate_temp_images(topic, request)
 
         # Tags and attachments
         set_tags(topic, request, converted['tags'])

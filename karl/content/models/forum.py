@@ -62,6 +62,9 @@ class ForumTopic(Folder):
         self['comments'] = CommentsFolder()
         self['attachments'] = AttachmentsFolder()
 
+    def get_attachments(self):
+        return self['attachments']
+
 class ForumsToolFactory(ToolFactory):
     implements(IToolFactory)
     name = 'forums'
