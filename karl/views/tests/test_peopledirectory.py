@@ -20,6 +20,7 @@
 import unittest
 
 from repoze.bfg import testing
+from simplejson import JSONDecoder
 
 
 class Test_admin_contents(unittest.TestCase):
@@ -714,7 +715,7 @@ class Test_jquery_grid_view(unittest.TestCase):
         response = self._callFUT(report, request)
 
         self.assertEqual(response.content_type, 'application/x-json')
-        payload = eval(response.body)
+        payload = JSONDecoder().decode(response.body)
         self.assertEqual(payload['records'], [])
         self.assertEqual(payload['batchSize'], 10)
         self.failUnless(payload.get('columns'))
@@ -968,7 +969,9 @@ class Test_get_grid_data(unittest.TestCase):
             'width': 100,
             'batchSize': 10,
             'totalRecords': 0,
-            'columns': [{'width': 100, 'id': 'name', 'label': 'Name'}],
+            'scrollbarWidth': 15,
+            'allocateWidthForScrollbar': True,
+            'columns': [{'width': 85, 'id': 'name', 'label': 'Name'}],
             })
 
     def test_non_empty(self):
