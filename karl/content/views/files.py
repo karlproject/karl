@@ -95,7 +95,7 @@ from karl.views.utils import check_upload_size
 from karl.views.forms.filestore import get_filestore
 
 def show_folder_view(context, request):
-
+    
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
 
@@ -802,3 +802,80 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     )
 
     return payload
+
+
+class ErrorResponse(Exception):
+    pass
+
+def ajax_file_upload_view(context, request):
+
+    try:
+        params = request.params
+
+        assert 'chunk' not in params, 'XXX Chunks are not yet supported'
+        assert 'chunks' not in params, 'XXX Chunks are not yet supported'
+
+        creator = authenticated_userid(request)
+
+        f = params['file']
+
+        fileobj = create_content(ICommunityFile,
+                              title=f.filename,   # XXX use filename as title, for now
+                              stream=f.file,
+                              mimetype=get_upload_mimetype(f),
+                              filename=f.filename,
+                              creator=creator,
+                              )
+        check_upload_size(context, fileobj, 'file')
+
+        # For file objects, OSI's policy is to store the upload file's
+        # filename as the objectid, instead of basing __name__ on the
+        # title field).
+
+        filename = basename_of_filepath(f.filename)
+        fileobj.filename = filename
+        name = make_name(context, filename, raise_error=False)
+        if not name:
+            msg = 'The filename must not be empty'
+            raise ErrorResponse(msg)
+        # Is there a key in context with that filename?
+
+        # XXX we should override the file, or we should create a unique name?
+        # XXX an error would be very unhandy here, because of upload
+        # XXX multiplicity
+        #if name in context:
+        #    msg = 'Filename %s already exists in this folder' % filename
+        #    raise ErrorResponse(msg)
+
+        # XXX
+        if name in context:
+            del context[name]
+        # XXX Just overwrite the file, now
+        context[name] = fileobj
+
+        # XXX What to do with the workflow?
+        workflow = get_workflow(ICommunityFolder, 'security', context)
+        if workflow is not None:
+            workflow.initialize(fileobj)
+            #if 'security_state' in XXXconverted:
+            #    workflow.transition_to_state(fileobj, request,
+             #                                params['security_state'])
+
+        # Tags, attachments, alerts
+        #set_tags(fileobj, request, paramsXXX['tags'])
+        #if params.get('sendalert'):
+        #    alerts = queryUtility(IAlerts, default=Alerts())
+        #    alerts.emit(fileobj, request)
+
+        payload = dict(
+            result = 'OK',
+        )
+
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            error = str(exc),
+        )
+
+    result = JSONEncoder().encode(payload)
+    return Response(result, content_type="application/x-json")

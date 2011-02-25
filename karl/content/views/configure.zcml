@@ -1119,5 +1119,21 @@
     />
 
 
+  <!-- Ajax file upload -->
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.ajax_file_upload_view"
+    permission="view"
+    name="upload_file.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.ajax_file_upload_view"
+    permission="view"
+    name="upload_file.json"
+  />
+
+
+
 </configure>
 

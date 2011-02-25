@@ -1115,10 +1115,20 @@ $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
         //    .filter(':first')
         //    .focus();
         // XXX Always focus on the dialog itself
-        uiDialog.focus()
+        uiDialog.focus();
 
         this._trigger('open');
         this._isOpen = true;
+    },
+
+    // allow to use position on the dialog directly.
+    // like: el.karldialog('position', {...});
+    // Why is this good? Because, it seems the 'position' option
+    // has a different semantics from the newest option plugin.
+    // This allows positioning with the same parameters as the
+    // option plugin, but without a need to look up the dialog object.
+    position: function(param) {
+        return this.uiDialog.position(param);
     }
 
 
@@ -2080,6 +2090,7 @@ $(document).ready(function() {
             $(this).css("background-color","transparent");
         }
     );
+
 }); // END document ready handler
 
 // For debugging and development.
