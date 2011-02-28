@@ -15,8 +15,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mimetypes
 from simplejson import JSONEncoder
+from simplejson import JSONDecoder
+import datetime
+import transaction
 
 import formish
 import schemaish
@@ -86,6 +88,7 @@ from karl.security.workflow import get_security_states
 from karl.utils import find_community
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
+from karl.utils import find_tempfolder
 
 from karl.views.tags import set_tags
 from karl.views.batch import get_container_batch
@@ -805,77 +808,133 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
 
 class ErrorResponse(Exception):
-    pass
+    
+    def __init__(self, txt, client_id=None):
+        self.client_id = client_id
+        super(ErrorResponse, self).__init__(txt)
+
+
 
 def ajax_file_upload_view(context, request):
 
     try:
         params = request.params
 
-        assert 'chunk' not in params, 'XXX Chunks are not yet supported'
-        assert 'chunks' not in params, 'XXX Chunks are not yet supported'
+        # flash borkes if there are no chunks :(
+        assert 'chunk' not in params or params['chunk'] == '0', 'XXX Chunks are not yet supported'
+        assert 'chunks' not in params or params['chunks'] == '1', 'XXX Chunks are not yet supported'
 
         creator = authenticated_userid(request)
 
         f = params['file']
+        filename = basename_of_filepath(f.filename)
+        client_id = params['client_id']
 
         fileobj = create_content(ICommunityFile,
-                              title=f.filename,   # XXX use filename as title, for now
+                              title=filename,   # XXX use filename as title, for now
                               stream=f.file,
                               mimetype=get_upload_mimetype(f),
-                              filename=f.filename,
+                              filename=filename,
                               creator=creator,
                               )
         check_upload_size(context, fileobj, 'file')
 
-        # For file objects, OSI's policy is to store the upload file's
-        # filename as the objectid, instead of basing __name__ on the
-        # title field).
-
-        filename = basename_of_filepath(f.filename)
-        fileobj.filename = filename
-        name = make_name(context, filename, raise_error=False)
-        if not name:
-            msg = 'The filename must not be empty'
-            raise ErrorResponse(msg)
-        # Is there a key in context with that filename?
-
-        # XXX we should override the file, or we should create a unique name?
-        # XXX an error would be very unhandy here, because of upload
-        # XXX multiplicity
-        #if name in context:
-        #    msg = 'Filename %s already exists in this folder' % filename
-        #    raise ErrorResponse(msg)
-
-        # XXX
-        if name in context:
-            del context[name]
-        # XXX Just overwrite the file, now
-        context[name] = fileobj
-
-        # XXX What to do with the workflow?
-        workflow = get_workflow(ICommunityFolder, 'security', context)
-        if workflow is not None:
-            workflow.initialize(fileobj)
-            #if 'security_state' in XXXconverted:
-            #    workflow.transition_to_state(fileobj, request,
-             #                                params['security_state'])
-
-        # Tags, attachments, alerts
-        #set_tags(fileobj, request, paramsXXX['tags'])
-        #if params.get('sendalert'):
-        #    alerts = queryUtility(IAlerts, default=Alerts())
-        #    alerts.emit(fileobj, request)
+        # Store the image in the temp folder.
+        fileobj.modified = datetime.datetime.now()
+        tempfolder = find_tempfolder(context)
+        tempfolder.add_document(fileobj)
+        # This has a role in security: store the original parent.
+        # If the transaction is finalized on a different parent,
+        # we will doom it.
+        fileobj.__transaction_parent__ = context
+        fileobj.__client_file_id__ = client_id
+        # Return the temp id in the response.
+        split_url = model_url(fileobj, request).split('/')
+        assert split_url[-1] == ''
+        temp_id = split_url[-2]
 
         payload = dict(
             result = 'OK',
+            temp_id = temp_id,
+            filename = filename,
         )
+
+        if 'end_batch' in params:
+            # The client marks this as the last file in the batch.
+            # We finalize the transaction by moving all files to the folder.
+            end_batch = JSONDecoder().decode(params['end_batch'])
+            last_fileobj = fileobj
+            # append the last file to the process queue
+            end_batch.append(dict(temp_id=temp_id, client_id=client_id))
+
+            # Iterate on all the files in the just finishing batch.
+            for client_file in end_batch:
+                temp_id = client_file['temp_id']
+                client_id = client_file['client_id']
+                fileobj = tempfolder[temp_id]
+
+                # batch security protection
+                # to avoid attacks or malformed end_batch parameters
+                if fileobj.__client_file_id__ != client_id:
+                    msg = 'Inconsistent client file id'
+                    raise ErrorResponse(msg)
+                del fileobj.__client_file_id__
+                if fileobj.__transaction_parent__ != context:
+                    msg = 'Inconsistent batch transaction'
+                    raise ErrorResponse(msg, client_id=client_id)
+                del fileobj.__transaction_parent__
+                if fileobj.creator != last_fileobj.creator:
+                    msg = 'Inconsistent ownership'
+                    raise ErrorResponse(msg, client_id=client_id)
+
+                # For file objects, OSI's policy is to store the upload file's
+                # filename as the objectid, instead of basing __name__ on the
+                # title field).
+                fileobj.filename = filename
+                # XXX create a unique name, now
+                name = make_unique_name(context, filename)
+                if not name:
+                    msg = 'The filename must not be empty'
+                    raise ErrorResponse(msg, client_id=client_id)
+                # Is there a key in context with that filename?
+
+                # XXX Should we override the file, or raise an error,
+                # XXX instead of just always creating the file with a unique name?
+                #if name in context:
+                #    msg = 'Filename %s already exists in this folder' % filename
+                #   raise ErrorResponse(msg, client_id=client_id)
+
+                del tempfolder[temp_id]
+                context[name] = fileobj
+
+                # XXX What to do with the workflow?
+                workflow = get_workflow(ICommunityFolder, 'security', context)
+                if workflow is not None:
+                    workflow.initialize(fileobj)
+                    #if 'security_state' in XXXconverted:
+                    #    workflow.transition_to_state(fileobj, request,
+                    #                                params['security_state'])
+
+                # Tags, attachments
+                #set_tags(fileobj, request, paramsXXX['tags'])
+
+                # Alerts
+                #if params.get('sendalert'):
+                #    alerts = queryUtility(IAlerts, default=Alerts())
+                #    alerts.emit(fileobj, request)
+
+            payload['batch_completed'] = 'True';
 
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
         payload = dict(
             error = str(exc),
+            client_id = exc.client_id,
         )
+        transaction.doom()
+    finally:
+        tempfolder = find_tempfolder(context)
+        tempfolder.cleanup()
 
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")

@@ -21,6 +21,7 @@
     <!-- additional stuff needed from jquery-ui (currently not in karl js bundle) -->
     <script src="${api.static_url}/jquery-ui/1.8.2/development-bundle/ui/jquery.ui.progressbar.js" type="text/javascript">//</script>
     <link rel="stylesheet" href="${api.static_url}/jquery-ui/1.8.2/development-bundle/themes/base/jquery.ui.progressbar.css" type="text/css"/>
+    <script src="${api.static_url}/karl-plugins/karl-multifileupload/json2.js" type="text/javascript">//</script>
     <!-- karl custom code for file upload --> 
     <script src="${api.static_url}/karl-plugins/karl-multifileupload/karl.multifileupload.js" type="text/javascript">//</script>
     <link rel="stylesheet" href="${api.static_url}/karl-plugins/karl-multifileupload/karl.multifileupload.css" type="text/css"/>
@@ -34,7 +35,7 @@
             $('.view-show-folder-actions #menubar-3')
                 .karlmultifileupload({
                   plupload_src: static_url + '/plupload',
-                  upload_url: here_url + 'upload_file.json'
+                  upload_url: here_url + '/upload_file.json'
                 })
                 .click(function() {
                     $(this)
@@ -44,7 +45,7 @@
                 })
                 .bind('refresh.multifileupload', function() {
                     // update the grid
-                    $('#filegrid').data('karlgrid')._update({refresh: true});
+                    $('#filegrid').data('karlgrid')._update({columns: false, refresh: true});
                 });
         });
         //]]>
