@@ -19,6 +19,7 @@ from simplejson import JSONEncoder
 from simplejson import JSONDecoder
 import datetime
 import transaction
+from karl.log import get_logger
 
 import formish
 import schemaish
@@ -96,6 +97,8 @@ from karl.views.batch import get_container_batch
 from karl.views.utils import check_upload_size
 
 from karl.views.forms.filestore import get_filestore
+
+log = get_logger()
 
 def show_folder_view(context, request):
     
@@ -814,63 +817,134 @@ class ErrorResponse(Exception):
         super(ErrorResponse, self).__init__(txt)
 
 
+def make_temp_id(client_id):
+    """Generate a unique tempdir id from the guaranteed unique client id"""
+    temp_id = 'PLUPLOAD-' + client_id
+    return temp_id
 
 def ajax_file_upload_view(context, request):
 
+    filename = "<>"
     try:
         params = request.params
 
-        # flash borkes if there are no chunks :(
-        assert 'chunk' not in params or params['chunk'] == '0', 'XXX Chunks are not yet supported'
-        assert 'chunks' not in params or params['chunks'] == '1', 'XXX Chunks are not yet supported'
+        f = params.get('file', None)
+        client_id = params.get('client_id', None)
+        if f is None or client_id is None:
+            msg = 'Wrong parameters, `file` and `client_id` are mandatory' 
+            raise ErrorResponse(msg)
 
-        creator = authenticated_userid(request)
+        # XXX Handling of chunk uploads.
+        # Even if we do not want chunks, we need to support it. :(
+        #
+        # The chunks can be disabled from the client by _not_ setting chunk_size.
+        # However some uploader runtimes (most notably Flash, which is the main
+        # target of the development because it does work on IE), either break with
+        # error if chunking is disabled, or they ignore the chunk_size parameter
+        # and use the chunking size they decide, nevertheless.
+        chunks = int(params.get('chunks', '1'))
+        chunk = int(params.get('chunk', '0'))
 
-        f = params['file']
+        is_first_chunk = chunk == 0
+        is_last_chunk = chunk == chunks - 1
+
+        if chunk < 0 or chunk >= chunks:
+            msg = 'Chunking inconsistence, `chunk` out of range' 
+            raise ErrorResponse(msg)
+
+        end_batch = params.get('end_batch', None)
+
         filename = basename_of_filepath(f.filename)
-        client_id = params['client_id']
-
-        fileobj = create_content(ICommunityFile,
-                              title=filename,   # XXX use filename as title, for now
-                              stream=f.file,
-                              mimetype=get_upload_mimetype(f),
-                              filename=filename,
-                              creator=creator,
-                              )
-        check_upload_size(context, fileobj, 'file')
-
-        # Store the image in the temp folder.
-        fileobj.modified = datetime.datetime.now()
+        creator = authenticated_userid(request)
         tempfolder = find_tempfolder(context)
-        tempfolder.add_document(fileobj)
-        # This has a role in security: store the original parent.
-        # If the transaction is finalized on a different parent,
-        # we will doom it.
-        fileobj.__transaction_parent__ = context
-        fileobj.__client_file_id__ = client_id
-        # Return the temp id in the response.
-        split_url = model_url(fileobj, request).split('/')
-        assert split_url[-1] == ''
-        temp_id = split_url[-2]
+        # XXX We need to use the unique id from the client, as there is no way
+        # to pass back the id we generate to the second chunk
+        # (the flash runtime does not support this)
+        temp_id = make_temp_id(client_id) 
+
+        if is_first_chunk:
+            # First chunk. Create the content object.
+
+            fileobj = create_content(ICommunityFile,
+                                  title=filename,   # XXX use filename as title, for now
+                                  stream=f.file,
+                                  mimetype=get_upload_mimetype(f),
+                                  filename=filename,
+                                  creator=creator,
+                                  )
+
+            # For file objects, OSI's policy is to store the upload file's
+            # filename as the objectid, instead of basing __name__ on the
+            # title field).
+            fileobj.filename = filename
+
+            # Store the image in the temp folder.
+            fileobj.modified = datetime.datetime.now()
+            tempfolder[temp_id] = fileobj
+
+            # Add metadata to the newly created object
+            # This also has a role in security: 
+            # We store the original parent and creator.
+            # If the transaction is finalized on a different parent, or creator,
+            # we will doom it.
+            fileobj.__transaction_parent__ = context
+            fileobj.__client_file_id__ = client_id
+            # Store the chunk info too
+            fileobj.__chunks__ = chunks
+            fileobj.__chunk__ = 0
+
+        else:
+            # Followup chunks (`chunk` > 0)
+
+            fileobj = tempfolder[temp_id]
+
+            # chunk security protection
+            # to avoid attacks or malformed client_id parameters
+            if fileobj.__client_file_id__ != client_id:
+                msg = 'Inconsistent client file id'
+                raise ErrorResponse(msg)
+            if fileobj.__transaction_parent__ != context:
+                msg = 'Inconsistent batch transaction'
+                raise ErrorResponse(msg, client_id=client_id)
+            if fileobj.creator != creator:
+                msg = 'Inconsistent ownership'
+                raise ErrorResponse(msg, client_id=client_id)
+
+            # chunk consistency check
+            fileobj.__chunk__ += 1
+            if fileobj.__chunk__ != chunk:
+                msg = 'Chunking inconsistence, wrong chunk order'
+                raise ErrorResponse(msg, client_id=client_id)
+
+            # Append the file to the existing file
+            bufsize = 8192
+            blobf = fileobj.blobfile.open('a')
+            while True:
+                buf = f.file.read(bufsize)
+                if not buf:
+                    break
+                blobf.write(buf)
+            # Need to set the size
+            fileobj.size = blobf.tell()
+            # Close the file
+            blobf.close()
 
         payload = dict(
             result = 'OK',
-            temp_id = temp_id,
             filename = filename,
         )
 
-        if 'end_batch' in params:
+        if is_last_chunk and end_batch is not None:
             # The client marks this as the last file in the batch.
             # We finalize the transaction by moving all files to the folder.
-            end_batch = JSONDecoder().decode(params['end_batch'])
+            end_batch = JSONDecoder().decode(end_batch)
             last_fileobj = fileobj
             # append the last file to the process queue
-            end_batch.append(dict(temp_id=temp_id, client_id=client_id))
+            end_batch.append(client_id)
 
             # Iterate on all the files in the just finishing batch.
-            for client_file in end_batch:
-                temp_id = client_file['temp_id']
-                client_id = client_file['client_id']
+            for client_id in end_batch:
+                temp_id = make_temp_id(client_id) 
                 fileobj = tempfolder[temp_id]
 
                 # batch security protection
@@ -878,19 +952,23 @@ def ajax_file_upload_view(context, request):
                 if fileobj.__client_file_id__ != client_id:
                     msg = 'Inconsistent client file id'
                     raise ErrorResponse(msg)
-                del fileobj.__client_file_id__
                 if fileobj.__transaction_parent__ != context:
                     msg = 'Inconsistent batch transaction'
                     raise ErrorResponse(msg, client_id=client_id)
-                del fileobj.__transaction_parent__
                 if fileobj.creator != last_fileobj.creator:
                     msg = 'Inconsistent ownership'
                     raise ErrorResponse(msg, client_id=client_id)
 
-                # For file objects, OSI's policy is to store the upload file's
-                # filename as the objectid, instead of basing __name__ on the
-                # title field).
-                fileobj.filename = filename
+                # we are final, so remove all metadata
+                del fileobj.__transaction_parent__
+                del fileobj.__client_file_id__
+                del fileobj.__chunks__
+                del fileobj.__chunk__
+
+                check_upload_size(context, fileobj, 'file')
+
+                filename = fileobj.filename
+
                 # XXX create a unique name, now
                 name = make_unique_name(context, filename)
                 if not name:
@@ -923,7 +1001,7 @@ def ajax_file_upload_view(context, request):
                 #    alerts = queryUtility(IAlerts, default=Alerts())
                 #    alerts.emit(fileobj, request)
 
-            payload['batch_completed'] = 'True';
+            payload['batch_completed'] = True;
 
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
@@ -931,10 +1009,13 @@ def ajax_file_upload_view(context, request):
             error = str(exc),
             client_id = exc.client_id,
         )
+        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' % 
+            (client_id, filename, str(exc)))
         transaction.doom()
     finally:
         tempfolder = find_tempfolder(context)
         tempfolder.cleanup()
 
     result = JSONEncoder().encode(payload)
-    return Response(result, content_type="application/x-json")
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
