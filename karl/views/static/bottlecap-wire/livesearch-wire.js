@@ -33,9 +33,6 @@ function getSearchValue() {
 }
 
 function advancedSearchResultsUrl(query, type) {
-    if (query.length >= 3) {
-        query += "*";
-    }
     if (!type) {
         // grab current filter and use that
         type = $.trim($('.bc-livesearch-btn-select').text());
