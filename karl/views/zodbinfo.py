@@ -22,7 +22,13 @@ class ConnectionInfo:
 
     def __init__(self, conn):
         self.connection = conn
-        opened = conn._opened
+
+        _missing = object()
+        opened = getattr(conn, 'opened', _missing)
+        if opened is _missing:
+            # Older ZODB
+            opened = getattr(conn, '_opened', None)
+
         if opened:
             self.opened = time.ctime(opened)
         else:
