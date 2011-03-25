@@ -17,6 +17,12 @@
 
 import mimetypes
 from simplejson import JSONEncoder
+import datetime
+import transaction
+from karl.log import get_logger
+from cStringIO import StringIO
+
+
 
 import formish
 import schemaish
@@ -93,6 +99,8 @@ from karl.views.batch import get_container_batch
 from karl.views.utils import check_upload_size
 
 from karl.views.forms.filestore import get_filestore
+
+log = get_logger()
 
 def show_folder_view(context, request):
 
@@ -802,3 +810,111 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     )
 
     return payload
+
+
+# --
+# XXX Experimental feature, used to testing new file upload.
+# --
+
+class ErrorResponse(Exception):
+    
+    def __init__(self, txt, client_id=None):
+        self.client_id = client_id
+        super(ErrorResponse, self).__init__(txt)
+
+def new_ajax_file_upload_view(context, request):
+
+    filename = "<>"
+    try:
+        params = request.params
+        
+        binfile = request.str_POST.get('binfile', None)
+        filename = params.get('filename', None)
+        if binfile is None or filename is None:
+            msg = 'Wrong parameters, `binfile` is mandatory' 
+            raise ErrorResponse(msg)
+
+        creator = authenticated_userid(request)
+
+        # Try to guess a more sensible mime type from the filename.
+        # XXX Ahhhh, this is not good... any chance the browser could tell us?
+        guessed_type, _dummy = mimetypes.guess_type(filename)
+        if guessed_type:
+            mimetype = guessed_type
+        else:
+            mimetype = 'application/binary'
+
+        bintxt = binfile
+        # XXX Hmmmm...
+        stream = StringIO(bintxt)
+
+        print "XXXXX", filename, mimetype, len(binfile), len(bintxt), repr(bintxt[:50])
+
+        fileobj = create_content(ICommunityFile,
+                              title=filename,   # XXX use filename as title, for now
+                              stream=stream,
+                              mimetype=mimetype,
+                              filename=filename,
+                              creator=creator,
+                              )
+
+        # For file objects, OSI's policy is to store the upload file's
+        # filename as the objectid, instead of basing __name__ on the
+        # title field).
+        fileobj.filename = filename
+
+        # Store the image in the temp folder.
+        fileobj.modified = datetime.datetime.now()
+
+        check_upload_size(context, fileobj, 'file')
+
+        filename = fileobj.filename
+
+        # create a name
+        name = make_name(context, filename, raise_error=False)
+        if not name:
+            msg = 'The filename must not be empty'
+            raise ErrorResponse(msg)
+        # Is there a key in context with that filename?
+        if name in context:
+            status = "modified"
+            del context[name]
+        else:
+            status = "added"
+
+        context[name] = fileobj
+
+        # XXX What to do with the workflow?
+        workflow = get_workflow(ICommunityFolder, 'security', context)
+        if workflow is not None:
+            workflow.initialize(fileobj)
+            #if 'security_state' in XXXconverted:
+            #    workflow.transition_to_state(fileobj, request,
+            #                                params['security_state'])
+
+        # Tags, attachments
+        #set_tags(fileobj, request, paramsXXX['tags'])
+
+        # Alerts
+        #if params.get('sendalert'):
+        #    alerts = queryUtility(IAlerts, default=Alerts())
+        #    alerts.emit(fileobj, request)
+
+        payload = dict(
+            result = 'OK',
+            filename = filename,
+            status = status, #  added or modified
+        )
+
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            error = str(exc),
+        )
+        log.error('new_ajax_file_upload_view at filename="%s": %s' % 
+            (filename, str(exc)))
+        transaction.doom()
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
