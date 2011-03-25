@@ -67,6 +67,7 @@ from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IRandomId
 
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 
@@ -587,17 +588,18 @@ class AcceptInvitationFormController(object):
 
         r = queryMultiAdapter((self.context, self.request),
                               IInvitationBoilerplate)
-        if r is not None:
-            if r.terms_and_conditions:
-                fields.append(
-                    ('terms_and_conditions',
-                     schemaish.Boolean(validator=validator.Equal(True)))
-                )
-            if r.privacy_statement:
-                fields.append(
-                    ('accept_privacy_policy',
-                     schemaish.Boolean(validator=validator.Equal(True)))
-                )
+        if r is None:
+            r = DefaultInvitationBoilerplate(self.context)
+        if r.terms_and_conditions:
+            fields.append(
+                ('terms_and_conditions',
+                 schemaish.Boolean(validator=validator.Equal(True)))
+            )
+        if r.privacy_statement:
+            fields.append(
+                ('accept_privacy_policy',
+                 schemaish.Boolean(validator=validator.Equal(True)))
+            )
         return fields
 
     def form_widgets(self, fields):
@@ -619,19 +621,20 @@ class AcceptInvitationFormController(object):
 
         r = queryMultiAdapter((self.context, self.request),
                               IInvitationBoilerplate)
-        if r is not None:
-            terms_text = r.terms_and_conditions
-            if terms_text:
-                widgets['terms_and_conditions'] = (
-                    karlwidgets.AcceptFieldWidget(
-                        terms_text, 'the %s Terms and Conditions' % system_name
-                    ))
-            privacy_text = r.privacy_statement
-            if privacy_text:
-                widgets['accept_privacy_policy'] = (
-                    karlwidgets.AcceptFieldWidget(
-                        privacy_text, 'the %s Privacy Policy' % system_name
-                    ))
+        if r is None:
+            r = DefaultInvitationBoilerplate(self.context)
+        terms_text = r.terms_and_conditions
+        if terms_text:
+            widgets['terms_and_conditions'] = (
+                karlwidgets.AcceptFieldWidget(
+                    terms_text, 'the %s Terms and Conditions' % system_name
+                ))
+        privacy_text = r.privacy_statement
+        if privacy_text:
+            widgets['accept_privacy_policy'] = (
+                karlwidgets.AcceptFieldWidget(
+                    privacy_text, 'the %s Privacy Policy' % system_name
+                ))
         return widgets
 
     def handle_cancel(self):
@@ -917,3 +920,15 @@ def jquery_member_search_view(context, request):
     return Response(result, content_type="application/x-json")
 
 
+class DefaultInvitationBoilerplate(object):
+    terms_and_conditions = ''
+    privacy_statement = ''
+
+    def __init__(self, context):
+        site = find_site(context)
+        legal = site.get('legal')
+        if legal is not None:
+            self.terms_and_conditions = legal.text
+        privacy = site.get('privacy')
+        if privacy is not None:
+            self.privacy_statement = privacy.text

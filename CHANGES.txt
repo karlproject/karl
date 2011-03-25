@@ -29,6 +29,10 @@ Unreleased
 
 - Added support for 'read only' mode.
 
+- Added default InvitationBoilerplate to allow Terms and Conditions and
+  Privacy Policy to be set up without using a customization policy.
+
+
 3.54 (2011-01-19)
 -----------------
 

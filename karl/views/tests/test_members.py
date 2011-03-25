@@ -206,13 +206,25 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.failUnless(fields)
         self.assertEqual(len(fields), 16)
 
-    def test_form_fields_w_tos_and_privacy_statement(self):
+    def test_form_fields_w_tos_and_privacy_statement_adapter(self):
         from karl.views.interfaces import IInvitationBoilerplate
         from zope.interface import Interface
         from repoze.bfg.testing import registerAdapter
         registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
                         IInvitationBoilerplate)
         context = self._makeContext()
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        fields = controller.form_fields()
+        self.failUnless(fields)
+        self.assertEqual(len(fields), 18)
+        self.assertEqual(fields[-2][0], "terms_and_conditions")
+        self.assertEqual(fields[-1][0], "accept_privacy_policy")
+
+    def test_form_fields_w_tos_and_privacy_statement_default(self):
+        context = self._makeContext()
+        context['legal'] = DummyContent(text='Blah blah blah.')
+        context['privacy'] = DummyContent(text='Blah blah blah.')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
