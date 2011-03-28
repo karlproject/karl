@@ -824,11 +824,12 @@ class ErrorResponse(Exception):
 
 def new_ajax_file_upload_view(context, request):
 
+    from base64 import decodestring
     filename = "<>"
     try:
         params = request.params
         
-        binfile = request.str_POST.get('binfile', None)
+        binfile = decodestring(request.str_POST.get('binfile', None))
         filename = params.get('filename', None)
         if binfile is None or filename is None:
             msg = 'Wrong parameters, `binfile` is mandatory' 
