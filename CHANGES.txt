@@ -29,6 +29,9 @@ Unreleased
 
 - Added support for 'read only' mode.
 
+- Refactored logout view to not rely on repoze.who redirecting form plugin, in
+  order to be able to generate the url to redirect to at runtime.  (LP #745215)
+
 - Added default InvitationBoilerplate to allow Terms and Conditions and
   Privacy Policy to be set up without using a customization policy.
 

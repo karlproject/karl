@@ -20,10 +20,11 @@ from urllib import urlencode
 from urlparse import urljoin
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
-from webob.exc import HTTPUnauthorized
 
 from karl.utils import find_profiles
+from karl.utils import find_site
 from karl.views.api import TemplateAPI
 
 def _fixup_came_from(request, came_from):
@@ -58,7 +59,7 @@ def login_view(context, request):
             credentials['max_age'] = int(max_age)
 
         # authenticate
-        authenticators = filter(None, 
+        authenticators = filter(None,
                                 [plugins.get(name)
                                    for name in ['zodb', 'zodb_impersonate']])
         userid = None
@@ -76,7 +77,7 @@ def login_view(context, request):
         if not userid:
             challenge_qs['reason'] = reason
             return HTTPFound(location='%s/login.html?%s'
-                             % (request.application_url, 
+                             % (request.application_url,
                                 urlencode(challenge_qs, doseq=True)))
 
         # else, remember
@@ -116,9 +117,17 @@ def login_view(context, request):
     return response
 
 def logout_view(context, request, reason='Logged out'):
-    unauthorized = HTTPUnauthorized()
-    unauthorized.headerlist.append(
-        ('X-Authorization-Failure-Reason', reason))
-    return unauthorized
+    site = find_site(context)
+    site_url = model_url(site, request)
+    login_url = model_url(site, request, 'login.html', query={
+        'reason': reason, 'came_from': site_url})
+
+    redirect = HTTPFound(location=login_url)
+    plugins = request.environ.get('repoze.who.plugins', {})
+    auth_tkt = plugins.get('auth_tkt')
+    if auth_tkt is not None:
+        forget_headers = auth_tkt.forget(request.environ, {})
+        redirect.headers.update(forget_headers)
+    return redirect
 
 

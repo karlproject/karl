@@ -368,20 +368,30 @@ class TestLogoutView(unittest.TestCase):
 
     def test_w_default_reason(self):
         request = testing.DummyRequest()
+        plugin = DummyAuthenticationPlugin()
+        request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
         context = testing.DummyModel()
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertEqual(response.status, '302 Found')
         headers = dict(response.headers)
-        self.assertEqual(headers['X-Authorization-Failure-Reason'],
-                         'Logged out')
+        self.assertEqual(
+            headers['Location'],
+            'http://example.com/login.html?reason=Logged+out'
+            '&came_from=http%3A%2F%2Fexample.com%2F')
+        self.assertEqual(plugin._forget_called,
+                         (request.environ, {}))
 
     def test_w_explicit_reason(self):
         request = testing.DummyRequest()
         context = testing.DummyModel()
         response = self._callFUT(context, request, reason='testing')
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertEqual(response.status, '302 Found')
         headers = dict(response.headers)
-        self.assertEqual(headers['X-Authorization-Failure-Reason'], 'testing')
+        self.assertEqual(
+            headers['Location'],
+            'http://example.com/login.html?reason=testing'
+            '&came_from=http%3A%2F%2Fexample.com%2F')
+
 
 class DummyAuthenticationPlugin(object):
     _auth_called = _remember_called = _forget_called = _userid = None
