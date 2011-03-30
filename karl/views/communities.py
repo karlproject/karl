@@ -146,7 +146,7 @@ def _show_communities_view_helper(context,
             'letters': letter_info,
             'community_tabs': classes,
             'actions': actions,
-            'my_communities': my_communities, 
+            'my_communities': my_communities,
             'preferred_communities': preferred_communities,
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
@@ -240,7 +240,8 @@ def jquery_set_preferred_view(context, request):
     communities = request.params.getall('preferred[]')
     set_preferred_communities(communities_folder, request, communities)
     updated_communities = get_my_communities(communities_folder, request)
-    return { 'my_communities': updated_communities,
+    return { 'api': TemplateAPI(context, request),
+             'my_communities': updated_communities,
              'preferred': communities,
              'show_all': False,
              'profile': None,
@@ -252,7 +253,8 @@ def jquery_clear_preferred_view(context, request):
     communities_folder = find_communities(context)
     set_preferred_communities(communities_folder, request, None)
     updated_communities = get_my_communities(communities_folder, request)
-    return { 'my_communities': updated_communities,
+    return { 'api': TemplateAPI(context, request),
+             'my_communities': updated_communities,
              'preferred': None,
              'show_all': False,
              'profile': None,
@@ -264,7 +266,8 @@ def jquery_list_preferred_view(context, request):
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder, request)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'my_communities': communities,
+    return { 'api': TemplateAPI(context, request),
+             'my_communities': communities,
              'preferred': preferred,
              'show_all': False,
              'profile': None,
@@ -278,7 +281,8 @@ def jquery_edit_preferred_view(context, request):
                                      request,
                                      ignore_preferred=True)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'my_communities': communities,
+    return { 'api': TemplateAPI(context, request),
+             'my_communities': communities,
              'preferred': preferred }
 
 def jquery_list_my_communities_view(context, request):
@@ -289,7 +293,8 @@ def jquery_list_my_communities_view(context, request):
                                      request,
                                      ignore_preferred=True)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'my_communities': communities,
+    return { 'api': TemplateAPI(context, request),
+             'my_communities': communities,
              'preferred': preferred,
              'show_all': True,
              'profile': None,

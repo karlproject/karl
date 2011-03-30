@@ -13,25 +13,25 @@
   <a tal:condition="preferred is None and not show_all"
      class="primary_button"
      title="Personalize the list of communities that appear on this list"
-     href="/jquery_edit_preferred.html">
+     href="${api.app_url}/jquery_edit_preferred.html">
      <span>Set preferred</span>
   </a>
   <a tal:condition="preferred is not None"
      class="primary_button"
      title="Edit your personalized list of communities"
-     href="/jquery_edit_preferred.html">
+     href="${api.app_url}/jquery_edit_preferred.html">
      <span>Edit preferred</span>
   </a>
   <a tal:condition="preferred is not None and not show_all"
      class="primary_button"
      title="Show all of your communities now"
-     href="/jquery_list_my_communities.html">
+     href="${api.app_url}/jquery_list_my_communities.html">
      <span>Show all</span>
   </a>
   <a tal:condition="preferred is not None and show_all"
      class="primary_button"
      title="Show the list of preferred communities"
-     href="/jquery_list_preferred.html">
+     href="${api.app_url}/jquery_list_preferred.html">
      <span>Show preferred</span>
   </a>
 </div>

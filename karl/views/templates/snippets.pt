@@ -265,19 +265,19 @@
           <a tal:condition="preferred_communities is None"
              class="primary_button"
              title="Personalize the list of communities that appear on this list"
-             href="/jquery_edit_preferred.html">
+             href="${api.app_url}/jquery_edit_preferred.html">
              <span>Set preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
              class="primary_button"
              title="Edit your personalized list of communities"
-             href="/jquery_edit_preferred.html">
+             href="${api.app_url}/jquery_edit_preferred.html">
              <span>Edit preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
              class="primary_button"
              title="Show all of your communities now"
-             href="/jquery_list_my_communities.html">
+             href="${api.app_url}/jquery_list_my_communities.html">
              <span>Show all</span>
           </a>
         </div>
@@ -391,7 +391,7 @@
           </div>
           <div tal:condition="group.results" class="spotlight-grouplink">
             <a class="spotlight-option"
-               href="/searchresults.html?body=&amp;kind=${group.name}&amp;offset:int=0">Show All</a>
+               href="${api.app_url}/searchresults.html?body=&amp;kind=${group.name}&amp;offset:int=0">Show All</a>
           </div>
           <div tal:condition="not group.results" class="spotlight-item">
             <div style="margin-bottom: 10px;">No Results</div>
@@ -668,10 +668,10 @@
 
       <ul class="tagUsersList">
        <li tal:repeat="user users">
-        <a href="/profiles/${user['login']}">${user['fullname']}</a>
+        <a href="${api.app_url}/profiles/${user['login']}">${user['fullname']}</a>
          <tal:if tal:condition="user['also']">
           also tagged this item:
-          <a style="padding-right: 5px" href="/showtag/${also}"
+          <a style="padding-right: 5px" href="${api.app_url}/showtag/${also}"
              tal:repeat="also user['also']">${also}</a>
          </tal:if>
        </li>

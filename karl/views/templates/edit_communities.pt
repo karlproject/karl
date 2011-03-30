@@ -26,17 +26,17 @@
   <div class="portlet-buttons">
     <a class="primary_button"
        title="Set the personalized list of communities"
-       href="/jquery_set_preferred.html">
+       href="${api.app_url}/jquery_set_preferred.html">
        <span>Update</span>
     </a>
     <a class="primary_button"
        title="Reset portlet to show all communities"
-       href="/jquery_clear_preferred.html">
+       href="${api.app_url}/jquery_clear_preferred.html">
        <span>Clear preferred</span>
     </a>
     <a class="primary_button"
        title="Cancel and return to list of communities"
-       href="/jquery_list_preferred.html">
+       href="${api.app_url}/jquery_list_preferred.html">
        <span>Cancel</span>
     </a>
   </div>

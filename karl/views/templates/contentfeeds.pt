@@ -90,7 +90,7 @@
                         {% if (i==0) { %}
                          <strong>Tags:</strong>&nbsp;
                         {% } %}
-                        <a href="/showtag/{%= item.tags[i] %}">{%= item.tags[i] %}</a>
+                        <a href="${api.app_url}/showtag/{%= item.tags[i] %}">{%= item.tags[i] %}</a>
                         {% if (i==item.tags.length) { %}
                           ,
                         {% } %}
@@ -139,7 +139,7 @@
       <a href="{%= item.profile_url %}">{%= item.author %}</a>
         tagged {%= item.content_type %} <a href="{%= item.url %}">{%= item.title %}</a>
         in Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>
-        as <a href="/showtag/{%= item.tagname %}">{%= item.tagname %}</a>.
+        as <a href="${api.app_url}/showtag/{%= item.tagname %}">{%= item.tagname %}</a>.
     </script>
 
     <script type="text/tmpl" id="tagged_community">
