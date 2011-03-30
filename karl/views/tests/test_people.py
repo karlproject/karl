@@ -1591,7 +1591,10 @@ class TestDeactivateProfileView(unittest.TestCase):
 
         response = self._callFUT(context, request)
 
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location,
+            'http://example.com/login.html?reason=User+removed&'
+            'came_from=http%3A%2F%2Fexample.com%2F')
         self.assertEqual(users.removed_users, ['userid'])
         self.assertEqual(workflow.transitioned, [{
             'to_state': 'inactive', 'content': context,

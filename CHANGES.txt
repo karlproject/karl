@@ -35,6 +35,9 @@ Unreleased
 - Added default InvitationBoilerplate to allow Terms and Conditions and
   Privacy Policy to be set up without using a customization policy.
 
+- Make sure templates always use ${api.app_url} in specifying hrefs.  Allows
+  Karl to be mountable at places other than '/' at a particular domain.
+
 
 3.54 (2011-01-19)
 -----------------
