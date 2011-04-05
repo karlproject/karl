@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 -----------
 
+3.56 (2011-04-04)
+-----------------
+
 - Added 'karl.scripting.only_once' API, to permit cron-driven scripts to
   avoid running again if an earlier instance is still running.
   The lockfile is named '<username>-<progname>', where '<username> is the
