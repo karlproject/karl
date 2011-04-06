@@ -834,19 +834,27 @@ def new_ajax_file_upload_view(context, request):
         if binfile is None or filename is None:
             msg = 'Wrong parameters, `binfile` is mandatory' 
             raise ErrorResponse(msg)
+        mimetype = params.get('mimetype', None)
+        # XXX mimetype is supposed to be mandatory at some point
+        #if mimetype is None:
+        #    msg = 'Wrong parameters, `mimetype` is mandatory' 
+        #    raise ErrorResponse(msg)
+        #
+        # ... but for now...
+        if mimetype is None:
+            mimetype = 'application/binary'
 
         creator = authenticated_userid(request)
 
         # Try to guess a more sensible mime type from the filename.
         # XXX Ahhhh, this is not good... any chance the browser could tell us?
-        guessed_type, _dummy = mimetypes.guess_type(filename)
-        if guessed_type:
-            mimetype = guessed_type
-        else:
-            mimetype = 'application/binary'
+        ##guessed_type, _dummy = mimetypes.guess_type(filename)
+        ##if guessed_type:
+        ##    mimetype = guessed_type
+        ##else:
+        ##    mimetype = 'application/binary'
 
         bintxt = decodestring(binfile)
-        # XXX Hmmmm...
         stream = StringIO(bintxt)
 
         print "XXXXX", filename, mimetype, len(binfile), len(bintxt), repr(bintxt[:50])
