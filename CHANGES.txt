@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 -----------
 
+- Changed text scrubber to only use In-Reply-To header when deciding whether or
+  not to scrub text following the Outlook Express message separator as
+  opposed to any separator that it knows about.  (LP #757689)
+
 3.55 (2011-04-04)
 -----------------
 
