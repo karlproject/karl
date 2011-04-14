@@ -35,6 +35,7 @@ from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
+from zope.interface import implementedBy
 
 from webob import Response
 from webob.exc import HTTPFound
@@ -909,10 +910,15 @@ def new_ajax_file_upload_view(context, request):
         #    alerts = queryUtility(IAlerts, default=Alerts())
         #    alerts.emit(fileobj, request)
 
+        # Return the client our timestamp on the file.
+        # This is needed so that the client does not pull this file again.
+        lastremote = fileobj.modified.isoformat()
+
         payload = dict(
             result = 'OK',
             filename = filename,
             status = status, #  added or modified
+            lastremote = lastremote,
         )
 
     except ErrorResponse, exc:
@@ -922,6 +928,56 @@ def new_ajax_file_upload_view(context, request):
         )
         log.error('new_ajax_file_upload_view at filename="%s": %s' % 
             (filename, str(exc)))
+        transaction.doom()
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+
+
+def new_ajax_file_query_view(context, request):
+    # Query the newest changes
+    try:
+        params = request.params
+        
+        timestamp_from = params.get('timestampfrom', None)
+        if timestamp_from is None:
+            msg = 'Wrong parameters, `timestampfrom` is mandatory' 
+            raise ErrorResponse(msg)
+        # timestampfrom = "" means we want all files changed since infinite past
+        
+        # XXX This should be done from catalog, but now let's just do it
+        # quick-and-dirty.
+        # Also: we do not go into folders yet...
+        changed_files = []
+        for name, fileobj in context.items():
+            if ICommunityFile in implementedBy(fileobj.__class__):
+                # A file.
+                current_stamp = fileobj.modified.isoformat()
+                if not timestamp_from or current_stamp > timestamp_from:
+                    print "Changed file:", name
+                    changed_files.append(dict(
+                        fileName = name,
+                        currentRemote = current_stamp,
+                        ))
+
+        now = datetime.datetime.now()
+        timestamp_to = now.isoformat()
+
+        payload = dict(
+            result = 'OK',
+            changed = changed_files,
+            timestamp_from = timestamp_from,
+            timestamp_to = timestamp_to,
+        )
+
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            error = str(exc),
+        )
+        log.error('new_ajax_file_query_view: %s' % 
+            (str(exc), ))
         transaction.doom()
 
     result = JSONEncoder().encode(payload)
