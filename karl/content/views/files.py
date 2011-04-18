@@ -953,6 +953,11 @@ def new_ajax_file_query_view(context, request):
         for name, fileobj in context.items():
             if ICommunityFile in implementedBy(fileobj.__class__):
                 # A file.
+
+                if name.startswith('.'):
+                    # skip dotfiles
+                    continue
+
                 current_stamp = fileobj.modified.isoformat()
                 if not timestamp_from or current_stamp > timestamp_from:
                     print "Changed file:", name
