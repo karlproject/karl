@@ -8,6 +8,11 @@ Unreleased
   not to scrub text following the Outlook Express message separator as
   opposed to any separator that it knows about.  (LP #757689)
 
+- The `error_monitor_status.txt` view can now accept a request parameter,
+  subsystem, which limits the status report to only the subsystem(s) specified.
+  The parameter may be included more than once:
+  `https://url.of/karl/error_monitor_status.txt?subsystem=mailin&subsystem=mailout`.
+
 3.55 (2011-04-04)
 -----------------
 

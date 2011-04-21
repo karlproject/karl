@@ -1278,9 +1278,13 @@ class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
 class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
 
-    def call_fut(self):
+    def call_fut(self, params=None):
+        from webob.multidict import MultiDict
         from karl.views.admin import error_monitor_status_view
         request = testing.DummyRequest()
+        request.params = MultiDict()
+        if params is not None:
+            request.params.update(params)
         return error_monitor_status_view(self.site, request)
 
     def test_all_ok(self):
@@ -1290,6 +1294,12 @@ class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
                                "red: OK\n"
                                "head: OK\n"
                                "postoffice quarantine: OK\n")
+
+    def test_blonde_ok(self):
+        self.queue._msgs = []
+        body = self.call_fut((('subsystem', 'blonde'),
+                              ('subsystem', 'brunette'))).body
+        self.assertEqual(body, "blonde: OK\n")
 
     def test_bad_head(self):
         self.queue._msgs = []

@@ -792,23 +792,30 @@ def error_monitor_status_view(context, request):
     """
     error_monitor_dir = get_setting(context, 'error_monitor_dir')
     subsystems = get_setting(context, 'error_monitor_subsystems')
+    subsystems = subsystems + ['postoffice quarantine']
+
+    req_subsystems = request.params.getall('subsystem')
+    if req_subsystems:
+        subsystems = filter(lambda x: x in subsystems, req_subsystems)
 
     buf = StringIO()
     for subsystem in subsystems:
-        if _get_error_monitor_state(error_monitor_dir, subsystem):
+        # Special case postoffice quarantine
+        if subsystem == 'postoffice quarantine':
+            use_postoffice = not not get_setting(
+                context, 'postoffice.zodb_uri', False)
+            if  use_postoffice:
+                queue, closer = _get_postoffice_queue(request.context)
+                if queue.count_quarantined_messages() == 0:
+                    print >>buf, 'postoffice quarantine: OK'
+                else:
+                    print >>buf, 'postoffice quarantine: ERROR'
+
+        # Normal case
+        elif _get_error_monitor_state(error_monitor_dir, subsystem):
             print >>buf, '%s: ERROR' % subsystem
         else:
             print >>buf, '%s: OK' % subsystem
-
-    # Tack on mailin quarantine status while we're at it
-    use_postoffice = not not get_setting(
-        context, 'postoffice.zodb_uri', False)
-    if  use_postoffice:
-        queue, closer = _get_postoffice_queue(request.context)
-        if queue.count_quarantined_messages() == 0:
-            print >>buf, 'postoffice quarantine: OK'
-        else:
-            print >>buf, 'postoffice quarantine: ERROR'
 
     return Response(buf.getvalue(), content_type='text/plain')
 
