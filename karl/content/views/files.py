@@ -829,7 +829,7 @@ def new_ajax_file_upload_view(context, request):
     filename = "<>"
     try:
         params = request.params
-        
+
         binfile = request.str_POST.get('binfile', None)
         filename = params.get('filename', None)
         if binfile is None or filename is None:
@@ -858,7 +858,9 @@ def new_ajax_file_upload_view(context, request):
         bintxt = decodestring(binfile)
         stream = StringIO(bintxt)
 
-        print "XXXXX", filename, mimetype, len(binfile), len(bintxt), repr(bintxt[:50])
+        # We must get rid of the path section of the filename
+        filename = basename_of_filepath(filename)
+
 
         fileobj = create_content(ICommunityFile,
                               title=filename,   # XXX use filename as title, for now
@@ -878,52 +880,77 @@ def new_ajax_file_upload_view(context, request):
 
         check_upload_size(context, fileobj, 'file')
 
-        filename = fileobj.filename
+        assert filename == fileobj.filename
 
         # create a name
         name = make_name(context, filename, raise_error=False)
         if not name:
             msg = 'The filename must not be empty'
             raise ErrorResponse(msg)
+
+
         # Is there a key in context with that filename?
         if name in context:
-            status = "modified"
-            del context[name]
+            # Let's check if the filename is the same as what we have here.
+            if context[name].filename == filename:
+                # Ok, the file is modified.
+                status = "modified"
+                del context[name]
+            else:
+                # We have a different file that would convert to the same
+                # karl content id. We will give an error for this file.
+                print "Ignoring duplicate file with same id", name, \
+                    'current:', filename, 'old:', context[name].filename
+                status = 'conflict'
         else:
             status = "added"
-
-        context[name] = fileobj
-
-        # XXX What to do with the workflow?
-        workflow = get_workflow(ICommunityFolder, 'security', context)
-        if workflow is not None:
-            workflow.initialize(fileobj)
-            #if 'security_state' in XXXconverted:
-            #    workflow.transition_to_state(fileobj, request,
-            #                                params['security_state'])
-
-        # Tags, attachments
-        #set_tags(fileobj, request, paramsXXX['tags'])
-
-        # Alerts
-        #if params.get('sendalert'):
-        #    alerts = queryUtility(IAlerts, default=Alerts())
-        #    alerts.emit(fileobj, request)
 
         # Return the client our timestamp on the file.
         # This is needed so that the client does not pull this file again.
         lastremote = fileobj.modified.isoformat()
 
+        # the path is the id now
+        # the client needs to know the real id for download
+        serverPath = name
+
+        if status == 'conflict':
+            result = 'CONFLICT'
+        else:
+            assert status in "added", "modified"
+            result = 'OK'
+
+            context[name] = fileobj
+
+            print "Uploading file", status, name, filename, mimetype, len(binfile), len(bintxt), repr(bintxt[:50])
+
+            # XXX What to do with the workflow?
+            workflow = get_workflow(ICommunityFolder, 'security', context)
+            if workflow is not None:
+                workflow.initialize(fileobj)
+                #if 'security_state' in XXXconverted:
+                #    workflow.transition_to_state(fileobj, request,
+                #                                params['security_state'])
+
+            # Tags, attachments
+            #set_tags(fileobj, request, paramsXXX['tags'])
+
+            # Alerts
+            #if params.get('sendalert'):
+            #    alerts = queryUtility(IAlerts, default=Alerts())
+            #    alerts.emit(fileobj, request)
+
         payload = dict(
-            result = 'OK',
+            result = result, # OK or CONFLICT
             filename = filename,
-            status = status, #  added or modified
+            status = status, #  added or modified or conflict
             lastremote = lastremote,
+            serverPath = serverPath,
         )
 
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
         payload = dict(
+            result = 'ERROR',
             error = str(exc),
         )
         log.error('new_ajax_file_upload_view at filename="%s": %s' % 
@@ -950,20 +977,32 @@ def new_ajax_file_query_view(context, request):
         # quick-and-dirty.
         # Also: we do not go into folders yet...
         changed_files = []
-        for name, fileobj in context.items():
+        for id, fileobj in context.items():
             if ICommunityFile in implementedBy(fileobj.__class__):
                 # A file.
 
-                if name.startswith('.'):
+                # We use the real filename as saved in the object.
+                filename = fileobj.filename
+                # Make sure filename is sane and does not contain the local path
+                if '/' in filename or '\\' in filename:
+                    continue
+                ###filename = basename_of_filepath(filename)
+
+                if filename.startswith('.'):
                     # skip dotfiles
                     continue
 
+                # the path is the id now
+                # the client needs to know the real id for download
+                serverPath = id
+
                 current_stamp = fileobj.modified.isoformat()
                 if not timestamp_from or current_stamp > timestamp_from:
-                    print "Changed file:", name
+                    print "File query detects changed file:", filename, "server id:", id
                     changed_files.append(dict(
-                        fileName = name,
+                        fileName = filename,
                         currentRemote = current_stamp,
+                        serverPath = serverPath,
                         ))
 
         now = datetime.datetime.now()
