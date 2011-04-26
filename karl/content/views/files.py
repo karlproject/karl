@@ -916,7 +916,7 @@ def new_ajax_file_upload_view(context, request):
         if status == 'conflict':
             result = 'CONFLICT'
         else:
-            assert status in "added", "modified"
+            assert status in ("added", "modified")
             result = 'OK'
 
             context[name] = fileobj
