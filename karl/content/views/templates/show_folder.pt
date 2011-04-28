@@ -3,9 +3,8 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="layout.macros['master']">
 
-  <span metal:fill-slot="extra-headers" tal:omit-tag=""
-        tal:condition="feed_url|None">
-    <link rel="alternate" type="application/atom+xml" 
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml" 
 	  title="${api.page_title}" href="${feed_url}"
 	  />
     <!-- XXX dependencies for the karl.multifileupload are inserted here for now
