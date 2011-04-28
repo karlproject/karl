@@ -45,6 +45,13 @@ function advancedSearchResultsUrl(query, type) {
     return advancedSearchUrl + queryString;
 }
 
+function ajaxError(xhr, status, exc) {
+    var errDisplayer = this.errorDisplayer();
+    if (errDisplayer) {
+        errDisplayer.show('We encountered an error. Please try your search again ... and contact a KARL admin if the problem persists.');
+    }
+}
+
 $(function() {
 
     $('.bc-livesearch').livesearch({
@@ -66,6 +73,7 @@ $(function() {
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
         queryTransformFn: $.bottlecap.livesearch.prototype.globQueryTransform,
         errorFn: $.bottlecap.livesearch.prototype.displayError,
+        ajaxErrorFn: ajaxError,
         selectedFn: function(event, item) {
             if (item.url) {
                 window.location = item.url;
