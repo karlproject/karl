@@ -1,335 +1,350 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:tal="http://xml.zope.org/namespaces/tal"
-  xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="layout.macros['master']">
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="layout.macros['master']">
 
-  <div metal:fill-slot="content">
+<div metal:fill-slot="content">
 
-  <div class="bc-content-frame">
+<style>
+    .sras-discreet {
+        xfont-size: 65%;
+        color: #999999;
+    }
 
-      <style>
-      .discreet {
-          font-size: 65%;
-          color: #999999;
-      }
+    /* search results page */
+    .sras-header {
+        text-align: center;
+        padding-bottom: 1em;
+    }
 
-      /* search results page */
-      .sras-header {
-          text-align: center;
-          padding-bottom: 1em;
-      }
+    .sras-header input {
+        border: 1px solid #cecece;
+        border-right: none;
+        padding: 3px 0 4px 3px;
+        -moz-border-radius: 4px 0 0 4px;
+        border-radius: 4px 0 0 4px;
+    }
 
-      .sras-header input {
-          border: 1px solid #cecece;
-          border-right: none;
-          padding: 3px 0 4px 3px;
-          -moz-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
-      }
+    .sras-header button {
+        -moz-border-radius: 0 4px 4px 0;
+        border-radius: 0 4px 4px 0;
+    }
 
-      .sras-header button {
-          -moz-border-radius: 0 4px 4px 0;
-          border-radius: 0 4px 4px 0;
-      }
+    .sras-header .sras-discreet {
+        display: block;
+    }
 
-      .sras-header .discreet {
-          display: block;
-      }
+    #sras-content {
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        width: 85%;
+        overflow: hidden;
+    }
 
-      #sras-content {
-          font-size: 13px;
-          font-family: Arial, sans-serif;
-          width: 85%;
-          overflow: hidden;
-      }
+    .sras-searchknobs {
+        width: 150px;
+        float: left;
+        border-right: 1px solid #A3A3A3;
+        padding-bottom: 9999px;
+        margin-bottom: -9999px;
+    }
 
-      .sras-searchknobs {
-          width: 150px;
-          float: left;
-          border-right: 1px solid #A3A3A3;
-          padding-bottom: 9999px;
-          margin-bottom: -9999px;
-      }
+    .sras-searchknobgroup {
+        border-bottom: solid #A3A3A3 1px;
+        padding: 1em 0;
+    }
 
-      .sras-searchknobgroup {
-          border-bottom: solid #A3A3A3 1px;
-          padding: 1em 0;
-      }
-      .sras-searchknobs a,
-      .sras-searchknobs a:visited {
-          text-decoration: none;
-          color: #3A74A9;
-      }
+    .sras-searchknobs a,
+    .sras-searchknobs a:visited {
+        text-decoration: none;
+        color: #3A74A9;
+    }
 
-      .sras-searchknobs .sras-searchcontent a {
-          padding-left: 5px;
-          line-height: 2em;
-      }
+    .sras-searchknobs .sras-searchcontent a {
+        padding-left: 5px;
+        line-height: 2em;
+    }
 
-      .sras-searchknobs p {
-          margin-top: 0.1em;
-          margin-bottom: 0.1em;
-      }
+    .sras-searchknobs p {
+        margin-top: 0.1em;
+        margin-bottom: 0.1em;
+    }
 
-      .sras-searchknobgroup.last {
-          border-bottom: none;
-      }
+    .sras-searchknobgroup.last {
+        border-bottom: none;
+    }
 
-      .sras-searchknobgroup label {
-          display: block;
-          font-weight: bold;
-          margin: 10px 0 3px;
-      }
+    .sras-searchknobgroup label {
+        display: block;
+        font-weight: bold;
+        margin: 10px 0 3px;
+    }
 
-      .sras-searchknobgroup input {
-          font-size: 0.8em;
-          border: 1px solid #cecece;
-          border-right: none;
-          width: 120px;
-          -moz-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
-          padding: 1px 0 2px 2px;
-      }
+    .sras-searchknobgroup input {
+        font-size: 0.8em;
+        border: 1px solid #cecece;
+        border-right: none;
+        width: 120px;
+        -moz-border-radius: 4px 0 0 4px;
+        border-radius: 4px 0 0 4px;
+        padding: 1px 0 2px 2px;
+    }
 
-      .sras-searchknobgroup button {
-          font-size: 0.6em;
-          padding: 0;
-          margin-left: -0.5em;
-          -moz-border-radius: 0 4px 4px 0;
-          border-radius: 0 4px 4px 0;
-      }
+    .sras-searchknobgroup button {
+        font-size: 0.6em;
+        padding: 0;
+        margin-left: -0.5em;
+        -moz-border-radius: 0 4px 4px 0;
+        border-radius: 0 4px 4px 0;
+    }
 
-      .sras-searchknobgroup ul {
-          margin: 0;
-          padding: 0;
-      }
+    .sras-searchknobgroup ul {
+        margin: 0;
+        padding: 0;
+    }
 
-      .sras-searchknobgroup li {
-          display: block;
-      }
+    .sras-searchknobgroup li {
+        display: block;
+    }
 
-      #sras-results {
-          margin-left: 170px;
-      }
+    #sras-results {
+        margin-left: 170px;
+    }
 
-      .sras-result {
-          margin-bottom: 1em;
-      }
+    .sras-result {
+        margin-bottom: 1em;
+    }
 
-      .sras-result-title,
-      .sras-result-title:visited {
-          font-size: 123%;
-          font-weight: bold;
-          color: #3A74A9;
-      }
+    .sras-result-title,
+    .sras-result-title:visited {
+        font-size: 123%;
+        font-weight: bold;
+        color: #3A74A9;
+    }
 
-      .sras-summary {
-          margin: 0.2em 0;
-      }
+    .sras-summary {
+        margin: 0.2em 0;
+    }
 
-      .sras-highlight {
-          font-weight: bold;
-      }
+    .sras-highlight {
+        font-weight: bold;
+    }
 
-      .sras-details,
-      .sras-details a {
-          color: gray;
-      }
+    .sras-details,
+    .sras-details a {
+        color: gray;
+    }
 
-      .sras-details img {
-          width: 12px;
-          height: 12px;
-      }
+    .sras-details img {
+        width: 12px;
+        height: 12px;
+    }
 
-      #sras-pagination {
-          margin: 2em 0 0 170px;
-          background-color: lightgray;
-          text-align: right;
-          padding: 0.4em
-      }
-      </style>
+    #sras-pagination {
+        margin: 2em 0 0 170px;
+        background-color: lightgray;
+        text-align: right;
+        padding: 0.4em
+    }
+</style>
 
-    <form method="GET" action=""
-          tal:attributes="action request.url">
+<form method="GET" action=""
+      tal:attributes="action request.url">
     <div class="sras-header">
-      <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
-             tal:attributes="value request.params.get('body', '')" />
-      <input type="submit" style="font-size: 0.6em; padding:0; margin-left: -0.5em" class="ui-ls-gobtn" value="Search" />
-      <span class="discreet">About 1,927 results (0.17 seconds)</span>
+        <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
+               tal:attributes="value request.params.get('body', '')"/>
+        <input type="submit" style="font-size: 0.6em; padding:0; margin-left: -0.5em" class="ui-ls-gobtn"
+               value="Search"/>
+        <span class="sras-discreet">About 1,927 results (0.17 seconds)</span>
     </div>
-      
+
     <div id="sras-content">
         <div class="sras-searchknobs">
 
-	    <!-- Left hand column of search knobs -->
+            <!-- Left hand column of search knobs -->
 
-	    <div class="sras-searchknobgroup sras-searchcontent">
-	      <p><strong>All Content</strong></p>
-	      <ul>
-                <li><img src="${api.static_url}/images/blog.png" alt="Blog" /><a href="#">Blog Entry</a></li>
-                <li><img src="${api.static_url}/images/quill.png" alt="Blog Comment" /><a href="#">Blog Comment</a></li>
-                <li><img src="${api.static_url}/images/building.png" alt="Community" /><a href="#">Community</a></li>
-                <li><img src="${api.static_url}/images/calendar-select.png" alt="Event" /><a href="#">Event</a></li>
-                <li><img src="${api.static_url}/images/blue-document-text.png" alt="File" /><a href="#">File</a></li>
-                <li><img src="${api.static_url}/images/newspaper.png" alt="News" /><a href="#">News Item</a></li>
-                <li><img src="${api.static_url}/images/user.png" alt="Profile" /><a href="#">Profile</a></li>
-                <li><img src="${api.static_url}/images/blog-blue.png" alt="Wiki" /><a href="#">Wiki Page</a></li>
-	      </ul>
-	    </div>
-
-	    <div class="sras-searchknobgroup">
-	      <ul>
-                <li><a href="#">Any time</a></li>
-                <li><a href="#">Past hour</a></li>
-                <li><a href="#">Past day</a></li>
-                <li><strong>Past week</strong></li>
-                <li><a href="#">Past month</a></li>
-                <li><a href="#">Past year</a></li>
-	      </ul>
-	    </div>
-
-	    <div class="sras-searchknobgroup last">
-	      <label>Author</label>
-	      <input value="Paul Everitt" size="20" />
-	      <button class="ui-ls-gobtn">Search</button>
-	      <label>Tag</label>
-              <input value="justonetag" size="20" />
-              <button class="ui-ls-gobtn">Search</button>
+            <div class="sras-searchknobgroup sras-searchcontent">
+                <p><strong>All Content</strong></p>
+                <ul>
+                    <li><img src="${api.static_url}/images/blog.png" alt="Blog"/><a href="#">Blog Entry</a></li>
+                    <li><img src="${api.static_url}/images/quill.png" alt="Blog Comment"/><a href="#">Blog Comment</a>
+                    </li>
+                    <li><img src="${api.static_url}/images/building.png" alt="Community"/><a href="#">Community</a></li>
+                    <li><img src="${api.static_url}/images/calendar-select.png" alt="Event"/><a href="#">Event</a></li>
+                    <li><img src="${api.static_url}/images/blue-document-text.png" alt="File"/><a href="#">File</a></li>
+                    <li><img src="${api.static_url}/images/newspaper.png" alt="News"/><a href="#">News Item</a></li>
+                    <li><img src="${api.static_url}/images/user.png" alt="Profile"/><a href="#">Profile</a></li>
+                    <li><img src="${api.static_url}/images/blog-blue.png" alt="Wiki"/><a href="#">Wiki Page</a></li>
+                </ul>
             </div>
 
+            <div class="sras-searchknobgroup">
+                <ul>
+                    <li><a href="#">Any time</a></li>
+                    <li><a href="#">Past hour</a></li>
+                    <li><a href="#">Past day</a></li>
+                    <li><strong>Past week</strong></li>
+                    <li><a href="#">Past month</a></li>
+                    <li><a href="#">Past year</a></li>
+                </ul>
+            </div>
+
+            <div class="sras-searchknobgroup last">
+                <label>Author</label>
+                <input value="Paul Everitt" size="20"/>
+                <button class="ui-ls-gobtn">Search</button>
+                <label>Tag</label>
+                <input value="justonetag" size="20"/>
+                <button class="ui-ls-gobtn">Search</button>
+            </div>
+
+        </div>
+
+
+        <div id="sras-results">
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/blog-blue.png" alt="Wiki"/>
+                    Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/blog.png" alt="Blog"/>
+                    Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/calendar-select.png" alt="Event"/>
+                    Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/blue-document-text.png" alt="File"/>
+                    File in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/blog-blue.png" alt="Wiki"/>
+                    Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/blog.png" alt="Blog"/>
+                    Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+            <div class="sras-result">
+                <a class="sras-result-title" href="#">Some Document in a Community</a>
+
+                <p class="sras-summary">
+                    Lots of stuff here about the contextual summary
+                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                    stuff that will go on and on. Even more stuff, fills up
+                    an entire screen before it decides to wrap to a new
+                    line.
+                </p>
+
+                <div class="sras-details">
+                    <img src="${api.static_url}/images/calendar-select.png" alt="Event"/>
+                    Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                    modified <em>8 minutes ago</em>
+                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="sras-pagination">
+            pagination box
         </div>
 
     </div>
 
-	<div id="sras-results">
-	      
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/blog-blue.png" alt="Wiki" />
-                Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/blog.png" alt="Blog" />
-                Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/calendar-select.png" alt="Event" />
-                Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/blue-document-text.png" alt="File" />
-                File in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/blog-blue.png" alt="Wiki" />
-                Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/blog.png" alt="Blog" />
-                Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-        
-        <div class="sras-result">
-            <a class="sras-result-title" href="#">Some Document in a Community</a>
-            <p class="sras-summary">
-                Lots of stuff here about the contextual summary
-                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                stuff that will go on and on.  Even more stuff, fills up
-                an entire screen before it decides to wrap to a new
-                line.
-            </p>
-            <div class="sras-details">
-                <img src="${api.static_url}/images/calendar-select.png" alt="Event" />
-                Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                modified <em>8 minutes ago</em>
-                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-            </div>
-        </div>
-
-     </div>
-	  
-     <div id="sras-pagination">
-       pagination box
-     </div>
-	
-  </form>
-  </div>
+</form>
 
 </div>
 
