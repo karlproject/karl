@@ -1,43 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Search Results for "Somesearch"</title>
-  <script src="../jquery-1.4.4.min.js"></script>
-  <link href="../jquery-ui-1.9m3.custom.css" rel="stylesheet" />
-  <link href="../jquery.ui.selectmenu.css" rel="stylesheet" />
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="layout.macros['master']">
 
-
-  <link href="demo.css" rel="stylesheet" />
-  <script src="../jquery-ui-1.9m3.custom.min.js"></script>
-  <script src="../jquery.ajaxmanager-3.0.7.js"></script>
-  <script src="../jquery.cookie.js"></script>
-  <script src="../jquery.caret-1.0.2.min.js"></script>
-  <script src="livesearch.js"></script>
-  <script src="demo.js"></script>
-</head>
-<body>
-
-  <div class="bc-header">
-
-    <div class="bc-header-toolbox">
-      <button class="ui-ls-menu">All Content</button><ul>
-        <li><a href="#">People</a></li>
-        <li><a href="#">Pages</a></li>
-        <li><a href="#">Posts</a></li>
-        <li><a href="#">Files</a></li>
-        <li><a href="#">Other</a></li>
-        <li><a href="#">All Content</a></li>
-      </ul><input class="ui-ls-autocomplete" /><button class="ui-ls-gobtn">Search</button>
-    </div>
-
-    <h1>Bottlecap</h1>
-
-  </div>
+  <div metal:fill-slot="content">
 
   <div class="bc-content-frame">
+    <form method="GET" action=""
+          tal:attributes="action request.url">
     <div class="sras-header">
-      <input id="ls-current-searchterm" size="50" value="Somesearch"/>
-	  <button style="font-size: 0.6em; padding:0; margin-left: -0.5em" class="ui-ls-gobtn">Search</button>
+      <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
+             tal:attributes="value request.params.get('body', '')" />
+      <input type="submit" style="font-size: 0.6em; padding:0; margin-left: -0.5em" class="ui-ls-gobtn" value="Search" />
       <span class="discreet">About 1,927 results (0.17 seconds)</span>
     </div>
       
@@ -211,7 +185,9 @@
        pagination box
      </div>
 	
+  </form>
+  </div>
+
 </div>
 
-</body>
 </html>
