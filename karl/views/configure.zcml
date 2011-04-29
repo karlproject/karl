@@ -69,6 +69,13 @@
     name="searchresults.html"
   />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.searchresults_view"
+    renderer="templates/newsearchresults.pt"
+    permission="view"
+    name="newsearchresults.html"
+  />
 
   <!-- Start global tagging related views -->
 

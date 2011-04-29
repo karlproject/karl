@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Search Results for "Somesearch"</title>
+  <script src="../jquery-1.4.4.min.js"></script>
+  <link href="../jquery-ui-1.9m3.custom.css" rel="stylesheet" />
+  <link href="../jquery.ui.selectmenu.css" rel="stylesheet" />
+
+
+  <link href="demo.css" rel="stylesheet" />
+  <script src="../jquery-ui-1.9m3.custom.min.js"></script>
+  <script src="../jquery.ajaxmanager-3.0.7.js"></script>
+  <script src="../jquery.cookie.js"></script>
+  <script src="../jquery.caret-1.0.2.min.js"></script>
+  <script src="livesearch.js"></script>
+  <script src="demo.js"></script>
+</head>
+<body>
+
+  <div class="bc-header">
+
+    <div class="bc-header-toolbox">
+      <button class="ui-ls-menu">All Content</button><ul>
+        <li><a href="#">People</a></li>
+        <li><a href="#">Pages</a></li>
+        <li><a href="#">Posts</a></li>
+        <li><a href="#">Files</a></li>
+        <li><a href="#">Other</a></li>
+        <li><a href="#">All Content</a></li>
+      </ul><input class="ui-ls-autocomplete" /><button class="ui-ls-gobtn">Search</button>
+    </div>
+
+    <h1>Bottlecap</h1>
+
+  </div>
+
+  <div class="bc-content-frame">
+    <div class="sras-header">
+      <input id="ls-current-searchterm" size="50" value="Somesearch"/>
+	  <button style="font-size: 0.6em; padding:0; margin-left: -0.5em" class="ui-ls-gobtn">Search</button>
+      <span class="discreet">About 1,927 results (0.17 seconds)</span>
+    </div>
+      
+    <div id="sras-content">
+        <div class="sras-searchknobs">
+
+	    <!-- Left hand column of search knobs -->
+
+	    <div class="sras-searchknobgroup content">
+	      <p><strong>All Content</strong></p>
+	      <ul>
+                <li><img src="icons/blog.png" alt="Blog" /><a href="#">Blog Entry</a></li>
+                <li><img src="icons/quill.png" alt="Blog Comment" /><a href="#">Blog Comment</a></li>
+                <li><img src="icons/building.png" alt="Community" /><a href="#">Community</a></li>
+                <li><img src="icons/calendar-select.png" alt="Event" /><a href="#">Event</a></li>
+                <li><img src="icons/blue-document-text.png" alt="File" /><a href="#">File</a></li>
+                <li><img src="icons/newspaper.png" alt="News" /><a href="#">News Item</a></li>
+                <li><img src="icons/user.png" alt="Profile" /><a href="#">Profile</a></li>
+                <li><img src="icons/blog-blue.png" alt="Wiki" /><a href="#">Wiki Page</a></li>
+	      </ul>
+	    </div>
+
+	    <div class="sras-searchknobgroup">
+	      <ul>
+                <li><a href="#">Any time</a></li>
+                <li><a href="#">Past hour</a></li>
+                <li><a href="#">Past day</a></li>
+                <li><strong>Past week</strong></li>
+                <li><a href="#">Past month</a></li>
+                <li><a href="#">Past year</a></li>
+	      </ul>
+	    </div>
+
+	    <div class="sras-searchknobgroup last">
+	      <label>Author</label>
+	      <input value="Paul Everitt" size="20" />
+	      <button class="ui-ls-gobtn">Search</button>
+	      <label>Tag</label>
+              <input value="justonetag" size="20" />
+              <button class="ui-ls-gobtn">Search</button>
+            </div>
+
+        </div>
+
+    </div>
+
+	<div id="sras-results">
+	      
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/blog-blue.png" alt="Wiki" />
+                Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/blog.png" alt="Blog" />
+                Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/calendar-select.png" alt="Event" />
+                Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/blue-document-text.png" alt="File" />
+                File in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/blog-blue.png" alt="Wiki" />
+                Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/blog.png" alt="Blog" />
+                Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+        
+        <div class="sras-result">
+            <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <p class="sras-summary">
+                Lots of stuff here about the contextual summary
+                of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
+                stuff that will go on and on.  Even more stuff, fills up
+                an entire screen before it decides to wrap to a new
+                line.
+            </p>
+            <div class="sras-details">
+                <img src="icons/calendar-select.png" alt="Event" />
+                Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
+                modified <em>8 minutes ago</em>
+                by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+            </div>
+        </div>
+
+     </div>
+	  
+     <div id="sras-pagination">
+       pagination box
+     </div>
+	
+</div>
+
+</body>
+</html>
