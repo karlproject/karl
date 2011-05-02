@@ -3,6 +3,19 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="layout.macros['master']">
 
+<head>
+  <metal:slot metal:fill-slot="extra-headers">
+    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+    <script language="javascript" type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+          $("abbr.timeago").timeago();
+      });
+      //]]>
+    </script>
+  </metal:slot>
+</head>
+
 <div metal:fill-slot="content">
 
 <form method="GET" action=""
@@ -64,144 +77,38 @@ $(document).ready(function(){
 
 
         <div id="sras-results">
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
+            <div class="sras-result" tal:repeat="r results">
+                <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
 
                 <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
+                    ${r['description']}
                 </p>
 
                 <div class="sras-details">
-                    <img src="${api.static_url}/images/blog-blue.png" alt="Wiki" height="12" width="12"/>
-                    Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
+                    <img src="${api.static_url}/images/${r['icon']}"
+                         alt="${r['type']}" height="12" width="12"/>
+                    ${r['type']} in
+                    <a class="sras-searchfooterlinks"
+                       href="${r['community_url']}">${r['community_title']}</a>
+                    modified
+                    <em><abbr class="timeago" title="${r['timeago']}">
+                      ${r['timeago']}</abbr></em> by
+                    <a class="sras-searchfooterlinks"
+                       href="${r['author_url']}">${r['author_name']}</a>
                 </div>
             </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/blog.png" alt="Blog" height="12" width="12"/>
-                    Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/calendar-select.png" alt="Event" height="12" width="12"/>
-                    Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/blue-document-text.png" alt="File" height="12" width="12"/>
-                    File in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/blog-blue.png" alt="Wiki" height="12" width="12"/>
-                    Wiki in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/blog.png" alt="Blog" height="12" width="12"/>
-                    Blog in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
-            <div class="sras-result">
-                <a class="sras-result-title" href="#">Some Document in a Community</a>
-
-                <p class="sras-summary">
-                    Lots of stuff here about the contextual summary
-                    of <span class="sras-highlight">somesearch</span>es, stuff that will wrap,
-                    stuff that will go on and on. Even more stuff, fills up
-                    an entire screen before it decides to wrap to a new
-                    line.
-                </p>
-
-                <div class="sras-details">
-                    <img src="${api.static_url}/images/calendar-select.png" alt="Event" height="12" width="12"/>
-                    Event in <a class="sras-searchfooterlinks" href="#">Some Community Name</a>
-                    modified <em>8 minutes ago</em>
-                    by <a class="sras-searchfooterlinks" href="#">Paul Everitt</a>
-                </div>
-            </div>
-
         </div>
 
         <div id="sras-pagination">
-            pagination box
+            <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+            <table tal:condition="batch_info['batching_required']" width="100%">
+              <tr class="ui-grid-footer">
+                <th class="ui-widget-header">
+                  <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+                  </div>
+                </th>
+              </tr>
+            </table>
         </div>
 
     </div>

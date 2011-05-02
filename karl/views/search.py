@@ -22,7 +22,9 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
 from karl.utils import coarse_datetime_repr
-from karl.utils import get_content_type_name
+from karl.utils import find_community
+from karl.utils import find_profiles
+from karl.utils import get_content_type_name_and_icon
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.interfaces import ILiveSearchEntry
@@ -196,6 +198,7 @@ def searchresults_view(context, request):
         if not terms:
             error = 'No Search Parameters Supplied.'
 
+    profiles = find_profiles(context)
     if batch:
         # Flatten the batch into data for use in the ZPT.
         results = []
@@ -204,11 +207,20 @@ def searchresults_view(context, request):
                 description = result.description[0:300]
             except AttributeError:
                 description = ''
+            type_name, icon = get_content_type_name_and_icon(result)
+            author = profiles[result.creator]
+            result_community = find_community(result)
             result = {
                 'title': getattr(result, 'title', '<No Title>'),
                 'description': description,
                 'url': model_url(result, request),
-                'type': get_content_type_name(result),
+                'type': type_name,
+                'icon': icon,
+                'timeago': result.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'author_name': author.title,
+                'author_url': model_url(author, request),
+                'community_title': result_community.title,
+                'community_url': model_url(result_community, request),
                 }
             results.append(result)
         total = batch['total']

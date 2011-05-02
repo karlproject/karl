@@ -529,6 +529,8 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_none_kind(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
@@ -551,6 +553,8 @@ class SearchResultsViewTests(unittest.TestCase):
         testing.registerUtility(
             search_factory, IGroupSearchFactory, name='People')
         context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'People'}))
         from karl.models.interfaces import ICatalogSearch
@@ -564,6 +568,8 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_community_search(self):
         context = testing.DummyModel()
         context.title = 'Citizens'
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -810,8 +816,14 @@ class DummyGroupSearchFactory:
 
 class IDummyContent(Interface):
     taggedValue('name', 'dummy')
+    taggedValue('icon', 'dummy.png')
 
 class DummyContent(testing.DummyModel):
-    implements(IDummyContent)
+    from karl.models.interfaces import ICommunity
+    implements(IDummyContent, ICommunity)
+    import datetime
+    title = 'Dummy Content'
+    creator = 'tweedle dee'
+    modified = datetime.datetime(2010, 5, 12, 2, 42)
 
 dummycontent = DummyContent()
