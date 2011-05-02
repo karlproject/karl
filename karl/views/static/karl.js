@@ -719,7 +719,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
             var column = $('<td class="ui-grid-column-header ui-state-default">' +
                            '  <div style="position: relative;">' + // inner div is needed for relativizing position
-                           '    <a href="#">' +
+                           '    <a href="javascript://return false;">' +
                            '      <span class="ui-grid-column-header-text">' + column_meta.label + '</span>' +
                            '    </a>' +
                            '    <span class="ui-grid-visual-sorting-indicator' + sortDirectionClass + '"></span>' +
@@ -773,11 +773,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         // Click on column header toggles sorting
         if (el.is('.ui-grid-column-header, .ui-grid-column-header *')) {
-            var header = el.hasClass('ui-grid-column-header') ? el : el.parents('.ui-grid-column-header');
-            var data = header.data('grid-column-header');
-            this.sortDirection = this.sortDirection == 'desc' ? 'asc' : 'desc';
-            this.sortColumn = data.id;
-            this._update ({columns: false, refresh: true});
+            return this._onClickHeader(el);
         }
         
         // Handle click on pagination buttons
@@ -792,32 +788,50 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         }
         
         return false;
-
     },
 
+    _onClickHeader: function(el) {
+        // Header clicked: toggle sorting
+        var header = el.hasClass('ui-grid-column-header') ? el : el.parents('.ui-grid-column-header');
+        var data = header.data('grid-column-header');
+        this.sortDirection = this.sortDirection == 'desc' ? 'asc' : 'desc';
+        this.sortColumn = data.id;
+        this._update ({columns: false, refresh: true});
+        // prevent default
+        return false;
+    },
 
     _makeRowsSelectable: function() {
-        
+        // We don't really make the row selectable, rather use
+        // this method to set up our click handler.
+        var self = this;
         var table = this.content.parent().parent();
         table.bind('mousedown', function(event) {
-            var filter = 'tr';
-            var item;
-            $(event.target).parents().andSelf().each(function() {
-                if ($('tr', table).index(this) != -1) item = this;
-            });
+            return self._onClickRow($(event.target));
+        });
+    },
+            
+    _onClickRow: function(target) {
+        // Clicking on a row follows the first link in it.
+        var filter = 'tr';
+        var item;
 
-            if (!item)
-                return;
+        // find out the row that has been clicked
+        var table = this.content.parent().parent();
+        target.parents().andSelf().each(function() {
+            if ($('tr', table).index(this) != -1) item = this;
+        });
 
-            // follow the link in it
+        if (item) {
+            // follow the (first) link in it
             var links = $('a', item);
             if (links.length > 0) {
                 window.location = links[0].href;
             }
+        }
 
-            event.preventDefault();
-        });
-        
+        // prevent default
+        return false;
     },
 
     _addRow: function(item, dontAdd) {
@@ -1060,11 +1074,223 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 }));
 
 
+$.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
+
+    options: $.extend({}, $.ui.karlgrid.prototype.options, {
+        selectionColumnId: 'sel'  // the column id of the column that does the selection
+    }),
+
+
+    _create: function() {
+        var self = this;
+        $.ui.karlgrid.prototype._create.call(this, arguments);
+
+        // create dialogs
+        this.dialogDeleteConfirm = $(
+            '<div class="ui-grid-dialog-content">' +
+                '<p>Please confirm permanent and irreversible deletion of all selected items</p>' + 
+            '</div>'
+        );
+        this.dialogDeleteConfirm
+            .appendTo('body')
+            .hide()
+            .karldialog({
+                width: 400,
+                buttons: {
+                    Cancel: function() {
+                        $(this).karldialog('close');
+                    },
+                    'Delete all items': function() {
+                        $(this).karldialog('close');
+                    }
+		},
+                open: function() {
+                },
+                close: function() {
+                }
+            });
+
+        this.menuMove = $(
+            '<ul>' +
+                '<input></input>' +
+                '<li><a>folder1</a></li>' + 
+                '<li><a>folder2</a></li>' + 
+                '<li><a>folder2/subfolderA</a></li>' + 
+                '<li><a>folder2/subfolderB</a></li>' + 
+            '</ul>'
+        );
+        this.menuMoveKeyStub = this.menuMove.find('input')
+            .css('position', 'absolute')
+            .css('left', '-2000px');
+        this.menuMove
+            .appendTo('body')
+            .hide()
+            .width(250)
+            .menu({
+                //disabled: true
+                input: this.menuMoveKeyStub,
+                select: function() {
+                    self.menuMove.hide();
+                    self._onMoveSelected();
+                }
+            });
+
+    },
+
+    _addColumns: function(columns) {
+        var self = this;
+        $.ui.karlgrid.prototype._addColumns.call(this, columns);
+        // Add the checbox in the 'sel' column.
+        var sel_column = this.columnsContainer
+            .find('.ui-grid-column-header')
+            .filter(function(index) {
+                return columns[index].id == self.options.selectionColumnId;
+            })
+            .html('');
+        this.cb_globalselect = $('<input type="checkbox" class="ui-grid-globalselector">')
+            .change(function() {
+                self._onGlobalSelect($(this).attr('checked'));
+            })
+            .appendTo(sel_column);
+    },
+
+    _doUpdate: function(state, o) {
+        $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
+        // If the grid is updated, we need to uncheck the global selector.
+        this.cb_globalselect.removeAttr('checked'); 
+    },
+
+    _onGlobalSelect: function(checked) {
+        // the global selector changed.
+        //
+        // XXX change all checkboxes
+        // this is crude at this point, all checkboxes are selected
+        // so we currently suppose that there are no more cb
+        // other than the ones in the first col
+        this.content.find('input[type="checkbox"]').each(function() {
+            var target = $(this);
+            if (checked) {
+                target.attr('checked', 'checked');
+            } else {
+                target.removeAttr('checked'); 
+            }
+            // XXX Selection here. Now we just do nothing except toggle.
+        });
+    },
+
+    _onClickRow: function(target) {
+        // Clicking on a checkbox toggles selection in that row
+        // (only 1 checkbox per row is supported)
+        // Clicking on the rest of the row follows the first link in it. (as normally)
+
+        var is_selection = target.is('input[type="checkbox"]');
+
+        if (! is_selection) {
+            // not a checkbox. Do as the supertype wants to.
+            return $.ui.karlgrid.prototype._onClickRow.call(this, target);
+        }
+
+        // Let the checkbox toggle.
+        var selected = target.attr('checked'); 
+
+        var new_selected = ! selected;
+
+        if (new_selected) {
+            target.attr('checked', 'checked');
+        } else {
+            target.removeAttr('checked'); 
+        }
+
+        // XXX Selection here. Now we just do nothing.
+
+        // prevent default.
+        return false;
+    },
+
+    _onClickHeader: function(target) {
+        // Header clicked: toggle sorting
+        var header = target.hasClass('ui-grid-column-header') ? target : target.parents('.ui-grid-column-header');
+        var data = header.data('grid-column-header');
+
+        // The id of the selection column is 'sel'.
+        var is_selection = data.id == this.options.selectionColumnId;
+        if (! is_selection) {
+            // not a checkbox. Do as the supertype wants to.
+            return $.ui.karlgrid.prototype._onClickHeader.call(this, target);
+        }
+
+        // make sure that the user clicked the checkbox itself.
+        if (! target.is('input[type="checkbox"]')) {
+            // if we clicked in the header but outside the checkbox,
+            // prevent default.
+            return false;
+        }
+
+        // Let's read the checkbox selection.
+        var selected = target.attr('checked');
+        var new_selected = ! selected;
+
+        // XXX Selection here. Now we just do nothing.
+
+
+        // Do not prevent the default: this lets the browser to
+        // toggle the checkbox.
+        return true;
+    },
+
+    _generateFooter: function() {
+        var self = this;
+        $.ui.karlgrid.prototype._generateFooter.call(this);
+        var positioner = $('<span class="ui-grid-footer-button-positioner"></span>')
+            .appendTo(this.footer);
+        this.button_delete = $('<a>Delete</a>')
+            .button({
+                icons: {primary: 'ui-icon-trash'}
+            })
+            .click(function() {
+                self._onDeleteClicked();
+                return false;
+            })
+            .appendTo(positioner);
+        this.button_move = $('<a>Move</a>')
+            .button({
+                icons: {primary: 'ui-icon-folder-open'}
+            })
+            .click(function() {
+                self._onMoveClicked();
+                return false;
+            })
+            .appendTo(positioner);
+    },
+
+    _onDeleteClicked: function() {
+        console.log('grid DELETE clicked');
+        this.dialogDeleteConfirm.karldialog('open');
+    },
+
+    _onMoveClicked: function() {
+        console.log('grid MOVE clicked');
+        //this.menuMove.menu('options', 'disabled', false);
+        //this.menuMove.menu('activate', this.menuMove.find('li')[0]);
+        this.menuMove.show();
+        this.menuMove.position({my: 'left bottom', at: 'left top', of: this.button_move, collision: 'fit'});
+        this.menuMoveKeyStub.focus();
+    },
+
+    _onMoveSelected: function() {
+        console.log('grid MOVE target selected');
+    }
+
+}));
+
+
 $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
 
     options: $.extend({}, $.ui.dialog.prototype.options, {
         autoOpen: false,
         modal: true,
+        draggable: false,
+        resizable: false,
         bgiframe: true,    // XXX bgiFrame is currently needed for modal
         hide: 'fold'
     }),

@@ -243,6 +243,33 @@
     padding-right: 6px;
 }
 
+/* move/delete buttons in the grid footer */
+
+.ui-grid-footer .ui-button {
+    margin-top: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+.ui-grid-footer .ui-button .ui-button-text {
+    line-height: 9px;
+}
+.ui-grid-footer .ui-widget.ui-button .ui-button-text {
+    /* reset back the font size to what we set in the grid */
+    font-size: 1em;
+}
+
+/*
+.ui-grid-footer-button-positioner {
+    margin-left: 4px;
+}
+*/
+
+/* global selector in the grid column header */
+
+input.ui-grid-globalselector {
+    margin-left: 9px;
+}
+
 /* autobox2 customization */
 
 ul.autobox-list {

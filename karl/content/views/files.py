@@ -726,8 +726,9 @@ class EditFileFormController(object):
 
 
 grid_folder_columns = [
+    {"id": "sel", "label": '', "width": 32},
     {"id": "mimetype", "label": "Type", "width": 64},
-    {"id": "title", "label": "Title", "width": 666 - (64 + 128)},
+    {"id": "title", "label": "Title", "width": 666 - (32 + 128 + 64)},
     {"id": "modified_date", "label": "Last Modified", "width": 128},
 ]
 
@@ -787,6 +788,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     records = []
     for entry in entries:
         records.append([
+            '<input type="checkbox">',
             '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
                 api.static_url,
                 entry.mimeinfo['small_icon_name'],

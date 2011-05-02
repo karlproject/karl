@@ -36,8 +36,12 @@ def main(argv=sys.argv):
         raise RuntimeError, 'jsconcat accepts no parameters.'
     static_dir = module_path(karl.views, 'static')
 
-    jquery_dir = os.path.join(static_dir, 'jquery')  
-    ui_dir = os.path.join(static_dir, 'jquery-ui', '1.8.2' , 'js')  
+    #jquery_dir = os.path.join(static_dir, 'jquery')  
+    jquery_dir = os.path.join(static_dir, 'bottlecap', 'sl')  
+
+    #ui_dir = os.path.join(static_dir, 'jquery-ui', '1.8.2' , 'js')  
+    ui_dir = os.path.join(static_dir, 'bottlecap', 'sl', 'min')  
+
     plugins_dir = os.path.join(static_dir, 'jquery-plugins')
     bgiframe_dir = os.path.join(static_dir, 'jquery-ui', 'bgiframe_2.1.1')
     grid_dir = os.path.join(static_dir, 'jquery-ui', 'grid', 'ui')
@@ -58,9 +62,13 @@ def main(argv=sys.argv):
     karl_ui_js = os.path.join(packed_dir, 'karl-ui.js')
     f = file(karl_ui_js, 'w')
     for fname in itertools.chain(
-            filesindir(jquery_dir, 'jquery-1.4.2.min.js'),
+            #filesindir(jquery_dir, 'jquery-1.4.2.min.js'),
+            filesindir(jquery_dir, 'jquery-1.4.4.min.js'),
+            
             filesindir(bgiframe_dir, 'jquery.bgiframe.js'),
-            filesindir(ui_dir, 'jquery-ui-1.8.2.custom.min.js'),
+
+            filesindir(ui_dir, 'jquery-ui-1.9m3.min.js'),
+
             filesindir(grid_dir, 'ui.grid.js', 'ui.gridmodel.js'),
             filesindir(autobox_dir, 'jquery.templating.js', 'jquery.ui.autobox.ext.js', 'jquery.ui.autobox.js'),
             filesindir(multistatusbox_dir, 'karl.multistatusbox.js'),
