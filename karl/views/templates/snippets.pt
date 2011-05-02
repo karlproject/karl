@@ -164,8 +164,9 @@
 
       <!--
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/1.8.2/css/smoothness/jquery-ui-1.8.2.custom.css" type="text/css"/>
-      -->
       <link rel="stylesheet" href="${api.static_url}/bottlecap/sl/min/jquery-ui-1.9m3.smoothness.min.css" type="text/css"/>
+      -->
+      <link rel="stylesheet" href="${api.static_url}/packed/jquery-ui-1.9m3.smoothness.min.css" type="text/css"/>
 
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/autobox2/jquery.ui.autobox.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/karl-plugins/karl-multistatusbox/karl.multistatusbox.css" type="text/css"/>
