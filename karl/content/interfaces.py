@@ -46,6 +46,7 @@ class IBlogEntry(ICommunityContent, IPosts):
     """
     taggedValue('name', 'Blog Entry')
     taggedValue('search_option', True)
+    taggedValue('icon', 'blog.png')
 
 class IEventContainer(IFolder):
     """A folder that supports storage of calendar events"""
@@ -60,6 +61,7 @@ class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""
     taggedValue('name', 'Event')
     taggedValue('search_option', True)
+    taggedValue('icon', 'calendar-select.png')
 
     title = Attribute(u'Event title')
     startDate = Attribute(u'DateTime object with value from form')
@@ -89,6 +91,7 @@ class INewsItem(ICommunityContent, IFolder):
     # types to search in the advanced search.
     taggedValue('name', 'News Item')
     taggedValue('search_option', True)
+    taggedValue('icon', 'newspaper.png')
 
     title = Attribute(u'Title of news item.')
     text = Attribute(u'Body of news item.')
@@ -127,6 +130,7 @@ class IWikiPage(IFolder, ICommunityContent, IPages):
     """
     taggedValue('name', 'Wiki Page')
     taggedValue('search_option', True)
+    taggedValue('icon', 'wiki.png')
     text = Attribute(u'Text -- includes wiki markup.')
 
 class IPage(ICommunityContent, IPages):
@@ -173,6 +177,7 @@ class ICommunityFile(ICommunityContent, IFiles):
     """A file in a community"""
     taggedValue('name', 'File')
     taggedValue('search_option', True)
+    taggedValue('icon', 'blue-document-text.png')
 
     blobfile = Attribute(u'Optional file attachment')
     mimetype = Attribute(u'Content type')

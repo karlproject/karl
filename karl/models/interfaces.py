@@ -107,6 +107,7 @@ class IComment(IFolder, ICommunityContent, IPosts):
     """ A container holding a comment and any attachments """
     taggedValue('name', 'Comment')
     taggedValue('search_option', True)
+    taggedValue('icon', 'quill.png')
 
 class IAttachmentsFolder(IFolder):
     """ A container for attachments (implemented as File objects) """
@@ -219,6 +220,7 @@ class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """
     taggedValue('name', 'Community')
     taggedValue('search_option', True)
+    taggedValue('icon', 'building.png')
 
     description = Attribute(u'Description -- plain text summary')
     text = Attribute(u'Text -- includes wiki markup.')
@@ -536,7 +538,7 @@ class ISiteEvents(Interface):
 
     def newer(latest_gen, latest_index, principals=None, created_by=None):
         """ Yield items newer than (`latest_gen`, `latest_index`).
-        
+
         Implemented as a method on the layer to work around lack of generator
         expressions in Python 2.5.x.
 
@@ -550,7 +552,7 @@ class ISiteEvents(Interface):
 
     def older(earliest_gen, earliest_index, principals=None, created_by=None):
         """ Yield items older than (`earliest_gen`, `earliest_index`).
-        
+
         Implemented as a method on the layer to work around lack of generator
         expressions in Python 2.5.x.
 
