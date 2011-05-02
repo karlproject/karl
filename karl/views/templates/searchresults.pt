@@ -34,17 +34,14 @@
             <!-- Left hand column of search knobs -->
 
             <div class="sras-searchknobgroup sras-searchcontent">
-                <p><strong>All Content</strong></p>
                 <ul>
-                    <li><img src="${api.static_url}/images/blog.png" alt="Blog"/><a href="#">Blog Entry</a></li>
-                    <li><img src="${api.static_url}/images/quill.png" alt="Blog Comment"/><a href="#">Blog Comment</a>
+                    <li tal:repeat="o type_knob">
+                        <img src="${api.static_url}/images/${o['icon']}"
+                             alt="${o['name']}" tal:condition="o['icon']"/>
+                        <a href="${o['url']}" tal:omit-tag="o['selected']">
+                            <strong tal:omit-tag="not o['selected']">
+                              ${o['name']}</strong></a>
                     </li>
-                    <li><img src="${api.static_url}/images/building.png" alt="Community"/><a href="#">Community</a></li>
-                    <li><img src="${api.static_url}/images/calendar-select.png" alt="Event"/><a href="#">Event</a></li>
-                    <li><img src="${api.static_url}/images/blue-document-text.png" alt="File"/><a href="#">File</a></li>
-                    <li><img src="${api.static_url}/images/newspaper.png" alt="News"/><a href="#">News Item</a></li>
-                    <li><img src="${api.static_url}/images/user.png" alt="Profile"/><a href="#">Profile</a></li>
-                    <li><img src="${api.static_url}/images/wiki.png" alt="Wiki"/><a href="#">Wiki Page</a></li>
                 </ul>
             </div>
 

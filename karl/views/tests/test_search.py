@@ -601,6 +601,26 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(len(result['results']), 0)
         self.assertEqual(result['error'], "Error: 'the' is nonsense")
 
+    def test_known_type(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        request = testing.DummyRequest(params=MultiDict(
+            {'body':'yo',
+             'types': 'karl_content_interfaces_IBlogEntry'}))
+        from zope.interface import Interface
+        from karl.content.interfaces import IBlogEntry
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        registerContentFactory(DummyContent, IBlogEntry)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo', 'Blog Entry'])
+        self.assertEqual(len(result['results']), 1)
+
 class GetBatchTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

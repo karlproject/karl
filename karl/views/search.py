@@ -189,6 +189,32 @@ def searchresults_view(context, request):
     batch = None
     terms = ()
     error = None
+    params = request.params
+
+    type_knob = []
+    selected_type = params.get('types')
+    for t in get_content_types():
+        if t.queryTaggedValue('search_option', False):
+            id = interface_id(t)
+            query = params.copy()
+            query['types'] = id
+            type_knob.append({
+                'name': t.getTaggedValue('name'),
+                'icon': t.getTaggedValue('icon'),
+                'url': model_url(context, request, request.view_name,
+                                 query=query),
+                'selected': id == selected_type,
+            })
+    type_knob.sort(key=lambda o: o['name'])
+    query = params.copy()
+    if 'types' in query:
+        del query['types']
+    type_knob.insert(0, {
+        'name': 'All Content',
+        'icon': None,
+        'url': model_url(context, request, request.view_name, query=query),
+        'selected': not selected_type,
+    })
 
     try:
         batch, terms = get_batch(context, request)
@@ -238,6 +264,7 @@ def searchresults_view(context, request):
         results=results,
         total=total,
         batch_info=batch,
+        type_knob=type_knob,
         )
 
 def jquery_livesearch_view(context, request):
