@@ -44,7 +44,7 @@
                     <li><img src="${api.static_url}/images/blue-document-text.png" alt="File"/><a href="#">File</a></li>
                     <li><img src="${api.static_url}/images/newspaper.png" alt="News"/><a href="#">News Item</a></li>
                     <li><img src="${api.static_url}/images/user.png" alt="Profile"/><a href="#">Profile</a></li>
-                    <li><img src="${api.static_url}/images/blog-blue.png" alt="Wiki"/><a href="#">Wiki Page</a></li>
+                    <li><img src="${api.static_url}/images/wiki.png" alt="Wiki"/><a href="#">Wiki Page</a></li>
                 </ul>
             </div>
 
