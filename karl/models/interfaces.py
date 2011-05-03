@@ -137,6 +137,7 @@ class IProfiles(IFolder):
 class IProfile(IFolder, IPeople):
     """ User profile """
     taggedValue('name', 'Profile')
+    taggedValue('icon', 'user.png')
 
     firstname = Attribute(u"User's first name.")
     lastname = Attribute(u"User's last name.")
