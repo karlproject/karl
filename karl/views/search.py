@@ -294,6 +294,7 @@ def searchresults_view(context, request):
         batch_info=batch,
         type_knob=type_knob,
         since_knob=since_knob,
+        params=params,
         )
 
 def jquery_livesearch_view(context, request):
