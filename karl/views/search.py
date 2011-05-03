@@ -41,6 +41,7 @@ from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
+from dateutil.relativedelta import relativedelta
 
 
 def advancedsearch_view(context, request):
@@ -134,6 +135,13 @@ def make_query(context, request):
         query['creation_date'] = (begin, end)
         terms.append(year)
 
+    since = params.get('since')
+    if since:
+        option = since_options[since]
+        since = datetime.datetime.now() - option['delta']
+        query['creation_date'] = (coarse_datetime_repr(since), None)
+        terms.append(option['name'])
+
     return query, terms
 
 
@@ -216,6 +224,20 @@ def searchresults_view(context, request):
         'selected': not selected_type,
     })
 
+    since_knob = []
+    selected_since = params.get('since')
+    for id in since_order:
+        option = since_options[id].copy()
+        query = params.copy()
+        if id is not None:
+            query['since'] = id
+        elif 'since' in query:
+            del query['since']
+        option['url'] = model_url(context, request, request.view_name,
+                                  query=query)
+        option['selected'] = id == selected_since
+        since_knob.append(option)
+
     try:
         batch, terms = get_batch(context, request)
     except ParseError, e:
@@ -265,6 +287,7 @@ def searchresults_view(context, request):
         total=total,
         batch_info=batch,
         type_knob=type_knob,
+        since_knob=since_knob,
         )
 
 def jquery_livesearch_view(context, request):
@@ -324,3 +347,35 @@ def jquery_livesearch_view(context, request):
 
     result = JSONEncoder().encode(records)
     return Response(result, content_type="application/json")
+
+
+since_options = {
+    None: {
+        'name': 'Any time',
+        'delta': None,
+    },
+    'hour': {
+        'name': 'Past hour',
+        'delta': relativedelta(hours=1),
+    },
+    'day': {
+        'name': 'Past day',
+        'delta': relativedelta(days=1),
+    },
+    'week': {
+        'name': 'Past week',
+        'delta': relativedelta(weeks=1),
+    },
+    'month': {
+        'name': 'Past month',
+        'delta': relativedelta(months=1),
+    },
+    'year': {
+        'name': 'Past year',
+        'delta': relativedelta(years=1),
+    },
+}
+
+since_order = (
+    None, 'hour', 'day', 'week', 'month', 'year',
+)

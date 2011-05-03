@@ -47,12 +47,11 @@
 
             <div class="sras-searchknobgroup">
                 <ul>
-                    <li><a href="#">Any time</a></li>
-                    <li><a href="#">Past hour</a></li>
-                    <li><a href="#">Past day</a></li>
-                    <li><strong>Past week</strong></li>
-                    <li><a href="#">Past month</a></li>
-                    <li><a href="#">Past year</a></li>
+                    <li tal:repeat="o since_knob">
+                        <a href="${o['url']}" tal:omit-tag="o['selected']">
+                            <strong tal:omit-tag="not o['selected']">
+                                ${o['name']}</strong></a>
+                    </li>
                 </ul>
             </div>
 

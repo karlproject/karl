@@ -38,6 +38,7 @@ requires = [
     'icalendar',
     'lxml',
     'markdown2',
+    'python-dateutil',
     'PILwoTk',
     'repoze.bfg >= 1.2a6',
     'repoze.bfg.formish',
@@ -63,7 +64,7 @@ requires = [
     'ZODB3',
     # Testing dependencies
     'coverage',
-    'nose',        
+    'nose',
     'twill',
     'zope.testing', # fwd compat when not directly relied on by BFG
     # Not really a code depdencency, but used by most buildouts
