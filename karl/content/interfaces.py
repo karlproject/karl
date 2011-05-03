@@ -143,6 +143,7 @@ class IPage(ICommunityContent, IPages):
 class ICommunityFolder(ICommunityContent, IFolder):
     """A folder in a community"""
     taggedValue('name', 'Folder')
+    taggedValue('icon', 'folder.png')
 
 class ICommunityRootFolder(IFolder):
     """The root folder under the Files tab in a community"""
