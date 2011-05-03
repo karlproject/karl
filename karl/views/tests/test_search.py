@@ -796,32 +796,6 @@ class MakeQueryTests(unittest.TestCase):
         self.assertEqual(terms, [1990])
 
 
-class AdvancedSearchViewTests(unittest.TestCase):
-
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def test_advancedsearch_view(self):
-        from karl.models.interfaces import IComment
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyContent, IComment)
-
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        from karl.views.search import advancedsearch_view
-        result = advancedsearch_view(context, request)
-        self.assertEqual(
-            result['post_url'], 'http://example.com/searchresults.html')
-        self.assertEqual(result['type_choices'], [
-            ('Comment', 'karl_models_interfaces_IComment'),
-            ])
-        self.assertFalse('2006' in result['year_choices'])
-        self.assertTrue('2007' in result['year_choices'])
-
-
 class DummySearch:
     def __init__(self, context):
         pass

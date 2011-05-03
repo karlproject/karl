@@ -357,7 +357,7 @@
     </metal:table>
 
 
-    <div metal:define-macro="rss_icon" class="rss-icon" 
+    <div metal:define-macro="rss_icon" class="rss-icon"
          tal:condition="feed_url|None">
       <a href="${feed_url}">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
@@ -395,19 +395,7 @@
     </div>
 
     <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header">
-      <!--
-      <form action="${api.app_url}/searchresults.html"
-                    method="get" id="ff" name="ff">
-        <fieldset>
-          <input id="livesearch-input" name="body"
-                 type="text" autocomplete="off"/>
-          <a id="livesearch-button" class="primary_button" href="javascript: document.ff.submit()">Search</a>
-        </fieldset>
-      </form>
-      <span class="advancedSearch">
-        <a href="${api.app_url}/advancedsearch.html">advanced search</a>
-      </span>
-      -->
+
       <div class="bc-header-toolbox">
         <button>All Content</button><ul>
           <li><a title="Search Profiles" href="#">People</a></li>
@@ -418,9 +406,6 @@
           <li><a title="Search Community Names" href="#">Communities</a></li>
           <li><a title="Search All Content" href="#">All Content</a></li>
         </ul><input class="bc-livesearch"/><button>Search</button>
-        <span class="advancedSearch">
-          <a href="${api.app_url}/advancedsearch.html">advanced search</a>
-        </span>
       </div>
 
     </div>

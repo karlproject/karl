@@ -1420,17 +1420,6 @@ a.rightFloatLink {
   text-decoration: none;
 }
 
-/** =ADVANCED SEARCH
------------------------------------------------ */
-#advancedsearch-view fieldset > label {
-  display: block;
-}
-#advancedsearch-view input#title {
-  width: auto;
-  font-size: 1.3em;
-  font-family: inherit;
-}
-
 /** =LOGIN
 ----------------------------------------------- */
 html,

@@ -87,8 +87,6 @@ class ICalendarCategory(Interface):
 class INewsItem(ICommunityContent, IFolder):
     """ A news item.
     """
-    # These tagged values mean this content type should appear in the list of
-    # types to search in the advanced search.
     taggedValue('name', 'News Item')
     taggedValue('search_option', True)
     taggedValue('icon', 'newspaper.png')

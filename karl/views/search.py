@@ -45,31 +45,6 @@ from dateutil.relativedelta import relativedelta
 import time
 
 
-def advancedsearch_view(context, request):
-
-    page_title = 'Advanced Search'
-    api = TemplateAPI(context, request, page_title)
-
-    type_choices = []
-    for t in get_content_types():
-        if t.queryTaggedValue('search_option', False):
-            # this content type should be on the list of types to search
-            iid = interface_id(t)
-            name = t.queryTaggedValue('name', iid)
-            type_choices.append((name, iid))
-    type_choices.sort()
-
-    this_year = datetime.datetime.now().year
-    year_choices = [str(i) for i in range(2007, this_year+1)]
-
-    return dict(
-        api=api,
-        post_url=model_url(context, request, "searchresults.html"),
-        type_choices=type_choices,
-        year_choices=year_choices,
-        )
-
-
 def interface_id(t):
     return '%s_%s' % (t.__module__.replace('.', '_'), t.__name__)
 
@@ -183,9 +158,6 @@ def get_batch(context, request):
 
 
 def searchresults_view(context, request):
-    # We can get here from either the LiveSearch or advanced search
-    # screens
-
     page_title = 'Search Results'
     api = TemplateAPI(context, request, page_title)
     if ICommunity.providedBy(context):
@@ -239,15 +211,16 @@ def searchresults_view(context, request):
         option['selected'] = id == selected_since
         since_knob.append(option)
 
+    start_time = time.time()
     try:
-        start_time = time.time()
         batch, terms = get_batch(context, request)
-        elapsed = time.time() - start_time
     except ParseError, e:
         error = 'Error: %s' % e
     else:
         if not terms:
             error = 'No Search Parameters Supplied.'
+    finally:
+        elapsed = time.time() - start_time
 
     profiles = find_profiles(context)
     if batch:
