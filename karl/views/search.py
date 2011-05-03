@@ -250,26 +250,32 @@ def searchresults_view(context, request):
     if batch:
         # Flatten the batch into data for use in the ZPT.
         results = []
-        for result in batch['entries']:
+        for doc in batch['entries']:
             try:
-                description = result.description[0:300]
+                description = doc.description[0:300]
             except AttributeError:
                 description = ''
-            type_name, icon = get_content_type_name_and_icon(result)
-            author = profiles[result.creator]
-            result_community = find_community(result)
+            type_name, icon = get_content_type_name_and_icon(doc)
+            author = profiles[doc.creator]
             result = {
-                'title': getattr(result, 'title', '<No Title>'),
+                'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
-                'url': model_url(result, request),
+                'url': model_url(doc, request),
                 'type': type_name,
                 'icon': icon,
-                'timeago': result.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'author_name': author.title,
                 'author_url': model_url(author, request),
-                'community_title': result_community.title,
-                'community_url': model_url(result_community, request),
+            }
+            result_community = find_community(doc)
+            if result_community is not None:
+                result['community'] = {
+                    'title': result_community.title,
+                    'url': model_url(result_community, request),
                 }
+            else:
+                result['community'] = None
+
             results.append(result)
         total = batch['total']
     else:

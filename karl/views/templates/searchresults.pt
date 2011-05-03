@@ -83,9 +83,15 @@ $(document).ready(function(){
                 <div class="sras-details">
                     <img src="${api.static_url}/images/${r['icon']}"
                          alt="${r['type']}" height="12" width="12"/>
-                    ${r['type']} in
-                    <a class="sras-searchfooterlinks"
-                       href="${r['community_url']}">${r['community_title']}</a>
+                    ${r['type']}
+
+                    <tal:block condition="r['community'] is not None"
+                               omit-tag="">
+                        in <a class="sras-searchfooterlinks"
+                           href="${r['community']['url']}">
+                           ${r['community']['title']}</a>
+                    </tal:block>
+
                     modified
                     <em><abbr class="timeago" title="${r['timeago']}">
                       ${r['timeago']}</abbr></em> by

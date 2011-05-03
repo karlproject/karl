@@ -547,7 +547,7 @@ class SearchResultsViewTests(unittest.TestCase):
         from karl.models.interfaces import IGroupSearchFactory
         from repoze.lemonade.testing import registerContentFactory
         from zope.interface import Interface
-        content = DummyContent()
+        content = DummyCommunityContent()
         def search_factory(*arg, **kw):
             return DummySearchFactory(content)
         testing.registerUtility(
@@ -859,11 +859,14 @@ class IDummyContent(Interface):
     taggedValue('icon', 'dummy.png')
 
 class DummyContent(testing.DummyModel):
-    from karl.models.interfaces import ICommunity
-    implements(IDummyContent, ICommunity)
+    implements(IDummyContent)
     import datetime
     title = 'Dummy Content'
     creator = 'tweedle dee'
     modified = datetime.datetime(2010, 5, 12, 2, 42)
+
+class DummyCommunityContent(DummyContent):
+    from karl.models.interfaces import ICommunity
+    implements(ICommunity)
 
 dummycontent = DummyContent()
