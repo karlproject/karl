@@ -30,7 +30,9 @@
                tal:attributes="value request.params.get('body', '')"/>
         <input id="sras-searchbutton" type="submit"
                value="Search"/>
-        <span class="sras-discreet">About 1,927 results (0.17 seconds)</span>
+        <span class="sras-discreet">
+            About ${batch_info['total']} results (${elapsed} seconds)
+        </span>
     </div>
 </form>
 

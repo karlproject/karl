@@ -42,6 +42,7 @@ from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
 from dateutil.relativedelta import relativedelta
+import time
 
 
 def advancedsearch_view(context, request):
@@ -119,7 +120,7 @@ def make_query(context, request):
     else:
         query['interfaces'] = [IContent]
 
-    tags = params.getall('tags')
+    tags = filter(None, params.getall('tags'))
     if tags:
         query['tags'] = {
             'query': tags,
@@ -239,7 +240,9 @@ def searchresults_view(context, request):
         since_knob.append(option)
 
     try:
+        start_time = time.time()
         batch, terms = get_batch(context, request)
+        elapsed = time.time() - start_time
     except ParseError, e:
         error = 'Error: %s' % e
     else:
@@ -295,6 +298,7 @@ def searchresults_view(context, request):
         type_knob=type_knob,
         since_knob=since_knob,
         params=params,
+        elapsed='%0.2f' % elapsed
         )
 
 def jquery_livesearch_view(context, request):
