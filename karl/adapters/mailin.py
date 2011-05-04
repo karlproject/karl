@@ -97,42 +97,51 @@ class MailinDispatcher(object):
         if profile is not None:
             return profile.__name__
 
-    def getMessageTarget(self, message):
-        """Return a mapping describing the target of a message.
+    def getMessageTargets(self, message):
+        """Return a mapping describing the target(s) of a message.
 
-        The mapping will contain 'community', 'tool', and 'in_reply_to'.
-        It will also contain 'to' for debugging purposes.  It will
-        contain 'error' if the target can not be identified.
+        The mapping will contain 'targets', which in turn is a sequence of
+        target mappings containing 'report', 'community', 'tool',
+        'in_reply_to'. Each target mapping will also contain 'to' for
+        debugging purposes and will contain 'error' if the to address lookied
+        like it should have matched but a target couldn't be found.  The top
+        level mapping will contain 'error' if no targets could be found.
         """
-        info = {
-            'report': None,
-            'community': None,
-            'tool': self.default_tool,
-            'in_reply_to': None,
-            }
-
+        targets = []
         to = self.getAddrList(message, 'To')
-        info['to'] = to
-        cc = self.getAddrList(message, 'Cc')
+        to = to + self.getAddrList(message, 'Cc')
+        info = {
+            'to': to,
+            'targets': targets,
+        }
 
-        for realname, email in to + cc:
+        for realname, email in to:
+            target = {
+                'report': None,
+                'community': None,
+                'tool': self.default_tool,
+                'in_reply_to': None,
+                'to': (realname, email),
+            }
 
             match = REPORT_REPLY_REGX.search(email)
             if match:
                 report = match.group('report')
-                info['report'] = report
-                info['in_reply_to'] = match.group('reply')
+                target['report'] = report
+                target['in_reply_to'] = match.group('reply')
                 if not self.isReport(report):
-                    info['error'] = 'invalid report: %s' % report
-                return info
+                    target['error'] = 'invalid report: %s' % report
+                targets.append(target)
+                continue
 
             match = REPORT_REGX.search(email)
             if match:
                 report = match.group('report')
-                info['report'] = report
+                target['report'] = report
                 if not self.isReport(report):
-                    info['error'] = 'invalid report: %s' % report
-                return info
+                    target['error'] = 'invalid report: %s' % report
+                targets.append(target)
+                continue
 
             match = ALIAS_REGX.search(email)
             if match:
@@ -141,34 +150,40 @@ class MailinDispatcher(object):
                 if path is not None:
                     elements = path.split('/')
                     if elements[0:2] == ['', 'people']:
-                        info['report'] = '+'.join(elements[2:])
-                        return info
+                        target['report'] = '+'.join(elements[2:])
+                        targets.append(target)
+                        continue
 
             match = REPLY_REGX.search(email)
             if match:
                 community = match.group('community')
-                info['community'] = community
-                info['tool'] = match.group('tool')
-                info['in_reply_to'] = match.group('reply')
+                target['community'] = community
+                target['tool'] = match.group('tool')
+                target['in_reply_to'] = match.group('reply')
                 if not self.isCommunity(community):
-                    info['error'] = 'invalid community: %s' % community
-                return info
+                    target['error'] = 'invalid community: %s' % community
+                targets.append(target)
+                continue
 
             match = TOOL_REGX.search(email)
             if match:
                 community = match.group('community')
-                info['community'] = community
-                info['tool'] = match.group('tool')
+                target['community'] = community
+                target['tool'] = match.group('tool')
                 if not self.isCommunity(community):
-                    info['error'] = 'invalid community: %s' % community
-                return info
+                    target['error'] = 'invalid community: %s' % community
+                targets.append(target)
+                continue
 
             community = self.getCommunityId(email)
             if community is not None:
-                info['community'] = community
-                return info
+                target['community'] = community
+                targets.append(target)
+                continue
 
-        info['error'] = 'no community specified'
+        good_targets = [target for target in targets if 'error' not in target]
+        if not good_targets:
+            info['error'] = 'no community or distribution list specified'
         return info
 
     def getMessageAuthorAndSubject(self, message):
@@ -248,31 +263,32 @@ class MailinDispatcher(object):
 
         Uses ACL security policy to test.
         """
-        report_name = info.get('report')
-        if report_name is not None:
-            pd = find_peopledirectory(self.context)
-            target = find_model(pd, report_name.split('+'))
-            permission = "email"
-        else:
-            communities = find_communities(self.context)
-            community = communities[info['community']]
-            target = community[info['tool']]
-            permission = "create"   # XXX In theory could depend on target
         users = find_users(self.context)
-        user = users.get_by_id(info['author'])
-        if user is not None:
-            user = dict(user)
-            user['repoze.who.userid'] = info['author']
+        for target in info['targets']:
+            if 'error' in target:
+                continue
+            report_name = target.get('report')
+            if report_name is not None:
+                pd = find_peopledirectory(self.context)
+                context = find_model(pd, report_name.split('+'))
+                permission = "email"
+            else:
+                communities = find_communities(self.context)
+                community = communities[target['community']]
+                context = community[target['tool']]
+                permission = "create"   # XXX In theory could depend on target
+            user = users.get_by_id(info['author'])
+            if user is not None:
+                user = dict(user)
+                user['repoze.who.userid'] = info['author']
 
-        # BFG Security API always assumes http request, so we fabricate a fake
-        # request.
-        request = webob.Request.blank('/')
-        request.environ['repoze.who.identity'] = user
+            # BFG Security API always assumes http request, so we fabricate a
+            # fake request.
+            request = webob.Request.blank('/')
+            request.environ['repoze.who.identity'] = user
 
-        info = {}
-        if not has_permission(permission, target, request):
-            info['error'] = 'Permission Denied'
-        return info
+            if not has_permission(permission, context, request):
+                target['error'] = 'Permission Denied'
 
     def crackHeaders(self, message):
         """ See IMailinDispatcher.
@@ -281,7 +297,7 @@ class MailinDispatcher(object):
         # This is important for allowing moderators to see all email
         # addressed to their community, even if some email can't be
         # posted for other reasons.
-        info = self.getMessageTarget(message)
+        info = self.getMessageTargets(message)
         if info.get('error'):
             return info
 
@@ -292,8 +308,9 @@ class MailinDispatcher(object):
             return info
 
         # Check that author has permission to create content in the target
-        info.update(self.checkPermission(info))
-        if info.get('error'):
+        self.checkPermission(info)
+        good_targets = [t for t in info['targets'] if 'error' not in t]
+        if not good_targets:
             return info
 
         # Finally, look for issues that a moderator can choose to ignore.

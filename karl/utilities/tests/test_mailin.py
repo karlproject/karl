@@ -238,10 +238,11 @@ class MailinRunner2Tests(unittest.TestCase):
     def test_one_message_reply_no_attachments(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerModels
-        info = {'report': None,
-                'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
+        info = {'targets': [{'report': None,
+                            'community': 'testing',
+                            'tool': 'random',
+                            'in_reply_to': '7FFFFFFF', # token for docid 0
+                            }],
                 'author': 'phreddy',
                 'subject': 'Feedback'
                }
@@ -273,10 +274,11 @@ class MailinRunner2Tests(unittest.TestCase):
     def test_process_message_reply_w_attachment(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerModels
-        info = {'report': None,
-                'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
+        info = {'targets': [{'report': None,
+                             'community': 'testing',
+                             'tool': 'random',
+                             'in_reply_to': '7FFFFFFF', # token for docid 0
+                             }],
                 'author': 'phreddy',
                 'subject': 'Feedback'
                }
@@ -309,9 +311,9 @@ class MailinRunner2Tests(unittest.TestCase):
         from zope.interface import directlyProvides
         from repoze.bfg.testing import DummyModel
         from karl.models.interfaces import IPeopleDirectory
-        INFO = {'report': 'section+testing',
-                'community': None,
-                'tool': None,
+        INFO = {'targets': [{'report': 'section+testing',
+                             'community': None,
+                             'tool': None,}],
                 'author': 'phreddy',
                 'subject': 'Feedback'
                }
@@ -337,12 +339,32 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.mailer), 0)
 
     def test_bounce_message(self):
-        info = {'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
-                'author': 'phreddy',
+        info = {'targets': [{'community': 'testing',
+                             'tool': 'random',
+                             'in_reply_to': '7FFFFFFF', # token for docid 0
+                             'author': 'phreddy',
+                             }],
                 'subject': 'Feedback',
                 'error': 'Not witty enough',
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        self._makeOne()()
+        self.assertEqual(self.queue.bounced, [
+            (message, None, 'Not witty enough', None)])
+        self.assertEqual(len(self.mailer), 1)
+
+    def test_bounce_message_for_target(self):
+        info = {'targets': [{'community': 'testing',
+                             'tool': 'random',
+                             'in_reply_to': '7FFFFFFF', # token for docid 0
+                             'author': 'phreddy',
+                             'error': 'Not witty enough',
+                             }],
+                'subject': 'Feedback',
                }
         text = 'This entry stinks!'
         attachments = ()
@@ -376,10 +398,11 @@ class MailinRunner2Tests(unittest.TestCase):
     def test_quarantine_message(self):
         from repoze.bfg.testing import DummyModel
         from repoze.bfg.testing import registerModels
-        info = {'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
-                'author': 'phreddy',
+        info = {'targets': [{'community': 'testing',
+                             'tool': 'random',
+                             'in_reply_to': '7FFFFFFF', # token for docid 0
+                             'author': 'phreddy',
+                             }],
                 'subject': 'Feedback',
                 'exception': 'Not witty enough',
                }

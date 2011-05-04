@@ -156,27 +156,31 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         self.assertEqual(mailin.getAuthor('extant@example.com'), 'extant')
 
-    def test_getMessageTarget_no_To(self):
+    def test_getMessageTargets_no_To(self):
         mailin = self._makeOne()
         message = DummyMessage()
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
-        self.assertEqual(info['error'], 'no community specified')
+        self.assertEqual(info['error'],
+                         'no community or distribution list specified')
 
-    def test_getMessageTarget_reply_invalid_community(self):
+    def test_getMessageTargets_reply_invalid_community(self):
         context = self._makeRoot()
         context['communities'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('nonesuch+tool-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
-        self.assertEqual(info['error'], 'invalid community: nonesuch')
-        self.assertEqual(info['report'], None)
-        self.assertEqual(info['community'], 'nonesuch')
-        self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
+        self.assertEqual(info['error'],
+                         'no community or distribution list specified')
+        self.assertEqual(len(info['targets']), 1)
+        target = info['targets'][0]
+        self.assertEqual(target['report'], None)
+        self.assertEqual(target['community'], 'nonesuch')
+        self.assertEqual(target['tool'], 'tool')
+        self.assertEqual(target['in_reply_to'], '12345')
 
     def test_getMessageTarget_reply_invalid_to_addr(self):
         context = self._makeRoot()
@@ -185,13 +189,11 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('undisclosed-recipients:;',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
-        self.assertEqual(info['report'], None)
-        self.assertEqual(info['error'], 'no community specified')
-        self.assertEqual(info['community'], None)
-        self.assertEqual(info['tool'], None)
-        self.assertEqual(info['in_reply_to'], None)
+        self.assertEqual(info['error'],
+                         'no community or distribution list specified')
+        self.assertEqual(len(info['targets']), 0)
 
     def test_getMessageTarget_reply_ok(self):
         context = self._makeRoot()
@@ -201,9 +203,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('testing+tool-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
@@ -217,9 +222,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('with-hyphen+tool-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'with-hyphen')
         self.assertEqual(info['tool'], 'tool')
@@ -233,9 +241,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('with-.dot+tool-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['community'], 'with-.dot')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
@@ -247,8 +258,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('nonesuch+tool@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
+        self.failUnless(info['error'])
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['error'], 'invalid community: nonesuch')
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'nonesuch')
@@ -263,9 +278,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('testing+tool@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
@@ -279,9 +297,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('with-hyphen+tool@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'with-hyphen')
         self.assertEqual(info['tool'], 'tool')
@@ -295,9 +316,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('with-.dot+tool@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['community'], 'with-.dot')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], None)
@@ -310,13 +334,11 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('nonesuch@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
-        self.assertEqual(info['error'], 'no community specified')
-        self.assertEqual(info['report'], None)
-        self.assertEqual(info['community'], None)
-        self.assertEqual(info['tool'], 'default')
-        self.assertEqual(info['in_reply_to'], None)
+        self.assertEqual(info['error'],
+                         'no community or distribution list specified')
+        self.assertEqual(len(info['targets']), 0)
 
     def test_getMessageTarget_report_reply_invalid_report(self):
         from zope.interface import directlyProvides
@@ -329,8 +351,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('peopledir-section+nonesuch-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
+        self.failUnless(info['error'])
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['error'], 'invalid report: section+nonesuch')
         self.assertEqual(info['report'], 'section+nonesuch')
         self.assertEqual(info['community'], None)
@@ -349,9 +375,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('peopledir-section+extant-12345@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], 'section+extant')
         self.assertEqual(info['community'], None)
         self.assertEqual(info['tool'], None)
@@ -368,8 +397,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('peopledir-section+nonesuch@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
+        self.failUnless(info['error'])
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['error'], 'invalid report: section+nonesuch')
         self.assertEqual(info['report'], 'section+nonesuch')
         self.assertEqual(info['community'], None)
@@ -388,9 +421,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('peopledir-section+extant@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], 'section+extant')
         self.assertEqual(info['community'], None)
         self.assertEqual(info['tool'], None)
@@ -410,9 +446,12 @@ class MailinDispatcherTests(unittest.TestCase):
         message = DummyMessage()
         message.to = ('alias@example.com',)
 
-        info = mailin.getMessageTarget(message)
+        info = mailin.getMessageTargets(message)
 
         self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['report'], 'section+extant')
         self.assertEqual(info['community'], None)
         self.assertEqual(info['tool'], None)
@@ -496,12 +535,18 @@ class MailinDispatcherTests(unittest.TestCase):
         userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
-                'community': 'testcommunity',
-                'tool': 'testtool',
-                'report': None,
-               }
-        self.assertEqual(mailin.checkPermission(info),
-                         {'error': 'Permission Denied'})
+                'targets': [{
+                    'community': 'testcommunity',
+                    'tool': 'testtool',
+                    'report': None,
+                    }, {
+                    'error': 'Some other previous error',
+                    }],
+                }
+        mailin.checkPermission(info)
+        self.assertEqual(info['targets'][0]['error'], 'Permission Denied')
+        self.assertEqual(info['targets'][1]['error'],
+                         'Some other previous error')
 
     def test_checkPermission_community_hit(self):
         from karl.testing import DummyUsers
@@ -515,11 +560,14 @@ class MailinDispatcherTests(unittest.TestCase):
         userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
-                'community': 'testcommunity',
-                'tool': 'testtool',
-                'report': None,
+                'targets': [{
+                    'community': 'testcommunity',
+                    'tool': 'testtool',
+                    'report': None,
+                }]
                }
-        self.assertEqual(mailin.checkPermission(info), {})
+        mailin.checkPermission(info)
+        self.failIf('error' in info['targets'][0])
 
     def test_checkPermission_report_miss(self):
         from zope.interface import directlyProvides
@@ -536,12 +584,14 @@ class MailinDispatcherTests(unittest.TestCase):
         userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
-                'community': None,
-                'tool': None,
-                'report': 'section+report',
+                'targets': [{
+                    'community': None,
+                    'tool': None,
+                    'report': 'section+report',
+                }]
                }
-        self.assertEqual(mailin.checkPermission(info),
-                         {'error': 'Permission Denied'})
+        mailin.checkPermission(info)
+        self.assertEqual(info['targets'][0]['error'], 'Permission Denied')
 
     def test_checkPermission_report_hit(self):
         from zope.interface import directlyProvides
@@ -558,17 +608,21 @@ class MailinDispatcherTests(unittest.TestCase):
         userinfo = users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
-                'community': None,
-                'tool': None,
-                'report': 'section+report',
+                'targets': [{
+                    'community': None,
+                    'tool': None,
+                    'report': 'section+report',
+                }]
                }
-        self.assertEqual(mailin.checkPermission(info), {})
+        mailin.checkPermission(info)
+        self.failIf('error' in info['targets'][0])
 
     def test_crackHeaders_no_To(self):
         mailin = self._makeOne()
         message = DummyMessage()
         info = mailin.crackHeaders(message)
-        self.assertEqual(info['error'], 'no community specified')
+        self.assertEqual(info['error'],
+                         'no community or distribution list specified')
 
     def test_crackHeaders_no_From(self):
         context = self._makeRoot()
@@ -580,6 +634,9 @@ class MailinDispatcherTests(unittest.TestCase):
 
         info = mailin.crackHeaders(message)
         self.assertEqual(info['error'], 'missing From:')
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
@@ -605,11 +662,14 @@ class MailinDispatcherTests(unittest.TestCase):
 
         info = mailin.crackHeaders(message)
         self.failIf(info.get('error'))
+        self.assertEqual(info['author'], 'extant')
+        self.assertEqual(info['subject'], 'subject')
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
     def test_crackHeaders_default_community_in_CC(self):
         from karl.testing import DummyUsers
@@ -633,11 +693,14 @@ class MailinDispatcherTests(unittest.TestCase):
 
         info = mailin.crackHeaders(message)
         self.failIf(info.get('error'))
+        self.assertEqual(info['author'], 'extant')
+        self.assertEqual(info['subject'], 'subject')
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
-        self.assertEqual(info['author'], 'extant')
-        self.assertEqual(info['subject'], 'subject')
 
     def test_crackHeaders_permission_denied(self):
         from repoze.bfg.testing import registerDummySecurityPolicy
@@ -661,7 +724,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.subject = 'subject'
 
         info = mailin.crackHeaders(message)
-        self.assertEqual(info.get('error'), 'Permission Denied')
+        self.assertEqual(info['targets'][0]['error'], 'Permission Denied')
 
     def test_crackPayload_empty(self):
         mailin = self._makeOne()

@@ -230,34 +230,44 @@ class MailinRunner2(object):
                 return False
             else:
                 text, attachments = self.dispatcher.crackPayload(message)
-                self.process_message(message, info, text, attachments)
-                extra = ['%s:%s' % (x, info.get(x))
+                success = False
+                for target in info['targets']:
+                    error = target.get('error')
+                    if error:
+                        self.bounce_message(message, error)
+                        log.info('Bounced %s %s %s' % (
+                            message_id, error, repr(info)))
+                        continue
+                    self.process_message(message, info, target, text,
+                                         attachments)
+                    extra = ['%s:%s' % (x, info.get(x))
                             for x in ('community', 'in_reply_to', 'tool',
                                       'author') if info.get(x) is not None]
-                log.info('Processed %s %s', message_id, ','.join(extra))
-                return True
+                    log.info('Processed %s %s', message_id, ','.join(extra))
+                    success = True
+                return success
         except:
             error_msg = self.quarantine_message(message)
             log.error('Quarantined %s %s', message_id, error_msg)
             return False
 
-    def process_message(self, message, info, text, attachments):
-        report_name = info.get('report')
+    def process_message(self, message, info, target, text, attachments):
+        report_name = target.get('report')
         if report_name is not None:
             pd = find_peopledirectory(self.root)
-            target = find_model(pd, report_name.split('+'))
+            context = find_model(pd, report_name.split('+'))
         else:
-            community = find_communities(self.root)[info['community']]
-            target = tool = community[info['tool']]
+            community = find_communities(self.root)[target['community']]
+            context = tool = community[target['tool']]
 
-            if info['in_reply_to'] is not None:
-                docid = int(hex_to_docid(info['in_reply_to']))
-                catalog = find_catalog(target)
+            if target['in_reply_to'] is not None:
+                docid = int(hex_to_docid(target['in_reply_to']))
+                catalog = find_catalog(context)
                 path = catalog.document_map.address_for_docid(docid)
                 item = find_model(self.root, path)
-                target = item
+                context = item
 
-        IMailinHandler(target).handle(message, info, text, attachments)
+        IMailinHandler(context).handle(message, info, text, attachments)
 
     def bounce_message(self, message, error):
         mailer = getUtility(IMailDelivery)
