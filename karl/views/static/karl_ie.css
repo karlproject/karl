@@ -4,6 +4,10 @@
 img { 
     -ms-interpolation-mode:bicubic;
 }
+/* using bicubic for the login gradient causes a style issue */
+img#login-gradient {
+    -ms-interpolation-mode:nearest-neighbor;
+}
 .community_view #crightcol,
 * html .community_view #cleftcol .ccontent,
 * html #center,
