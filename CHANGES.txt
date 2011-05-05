@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.57 (2011-05-05)
+-----------------
 
 - In mailin, multiple recipients are now allowed for single messages.
   (LP #773426)
