@@ -210,6 +210,7 @@ class IForum(IFolder, IPosts):
 class IForumTopic(ICommunityContent, IPosts):
     """ A topic in a forum """
     taggedValue('name', 'Forum Topic')
+    taggedValue('search_option', True)
 
     text = Attribute(u"Form post content.")
 

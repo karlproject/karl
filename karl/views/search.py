@@ -181,7 +181,7 @@ def searchresults_view(context, request):
             query['types'] = id
             type_knob.append({
                 'name': t.getTaggedValue('name'),
-                'icon': t.getTaggedValue('icon'),
+                'icon': t.queryTaggedValue('icon', 'blue-document.png'),
                 'url': model_url(context, request, request.view_name,
                                  query=query),
                 'selected': id == selected_type,
