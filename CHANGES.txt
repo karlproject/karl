@@ -9,6 +9,9 @@ Unreleased
 
 - Error monitor now shows referer for Karl exceptions.
 
+- Stats view now raises NotFound if var/stats/stats.csv is not found.
+  (LP #777363)
+
 3.56 (2011-04-28)
 -----------------
 
