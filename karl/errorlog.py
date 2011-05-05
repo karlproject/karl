@@ -3,6 +3,7 @@ import traceback
 from karl.log import get_logger
 import webob
 
+
 def error_log_middleware(app):
     """
     Logs exceptions to Karl syslog.
@@ -14,12 +15,15 @@ def error_log_middleware(app):
         try:
             return app(environ, start_response)
         except:
-            msg = 'Exception when processing %s' % webob.Request(environ).url
-            tb = traceback.format_exc()
-            get_logger().error('\n'.join((msg, tb)))
+            request = webob.Request(environ)
+            msg = ['Exception when processing %s' % request.url]
+            msg.append('Referer: %s' % request.referer)
+            msg.append(traceback.format_exc())
+            get_logger().error('\n'.join(msg))
             raise
 
     return middleware
+
 
 def make_middleware(app, global_config, **config):
     """
