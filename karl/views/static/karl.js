@@ -1077,18 +1077,18 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
     options: $.extend({}, $.ui.karlgrid.prototype.options, {
-        selectionColumnId: 'sel'  // the column id of the column that does the selection
+        selectionColumnId: 'sel',  // the column id of the column that does the selection
+        folderMenuIndent: 16       // indentation for subfolder levels in pixel
     }),
 
 
     _create: function() {
         var self = this;
-        $.ui.karlgrid.prototype._create.call(this, arguments);
 
         // create dialogs
         this.dialogDeleteConfirm = $(
             '<div class="ui-grid-dialog-content">' +
-                '<p>Please confirm permanent and irreversible deletion of all selected items</p>' + 
+                '<p>Are you sure you want to delete the selected files and/or folders?</p>' + 
             '</div>'
         );
         this.dialogDeleteConfirm
@@ -1100,7 +1100,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                     Cancel: function() {
                         $(this).karldialog('close');
                     },
-                    'Delete all items': function() {
+                    'Delete': function() {
                         $(this).karldialog('close');
                     }
 		},
@@ -1110,13 +1110,36 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 }
             });
 
+
+        this.dialogMoveConfirm = $(
+            '<div class="ui-grid-dialog-content">' +
+                '<p>Are you sure you want to move these files/folders to "<span></span>"?</p>' + 
+            '</div>'
+        );
+        this.dialogMoveFolderName = this.dialogMoveConfirm.find('span');
+        this.dialogMoveConfirm
+            .appendTo('body')
+            .hide()
+            .karldialog({
+                width: 400,
+                buttons: {
+                    Cancel: function() {
+                        $(this).karldialog('close');
+                    },
+                    'Move': function() {
+                        $(this).karldialog('close');
+                    }
+		},
+                open: function() {
+                },
+                close: function() {
+                }
+            });
+
+        // create menu for move
         this.menuMove = $(
             '<ul>' +
                 '<input></input>' +
-                '<li><a>folder1</a></li>' + 
-                '<li><a>folder2</a></li>' + 
-                '<li><a>folder2/subfolderA</a></li>' + 
-                '<li><a>folder2/subfolderB</a></li>' + 
             '</ul>'
         );
         this.menuMoveKeyStub = this.menuMove.find('input')
@@ -1129,12 +1152,42 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             .menu({
                 //disabled: true
                 input: this.menuMoveKeyStub,
-                select: function() {
+                select: function(evt, selection) {
                     self.menuMove.hide();
-                    self._onMoveSelected();
+                    var selected = selection.item.data('folder');
+                    self._onMoveSelected(selected);
                 }
             });
 
+        $.ui.karlgrid.prototype._create.call(this, arguments);
+    },
+
+    setTargetFolders: function(folders) {
+        // We assume that folders are sorted,
+        // otherwise the containment stucture would not work nicely
+        var self = this;
+        this.menuMove.find('li').remove();
+        $.each(folders, function(index, folder) {
+            if (! folder || folder.charAt(0) != '/') {
+                throw new Error('Fatal error: folder name must start with a "/"');
+            }
+            if (folder && folder.charAt(folder.length - 1) == '/') {
+                throw new Error('Fatal error: folder name must not end with a "/"');
+            }
+            // The folder is like /f1/f2/f3
+            // we want to produce leafFolder = f3, level = 2 from this.
+            var level = folder.match(/\//g).length - 1;
+            var leafFolder = folder.substring(folder.lastIndexOf('/') + 1);
+            // create the item
+            var item = $('<li><a></a></li>')
+                .css('textAlign', 'left')
+                .data('folder', folder)
+                .appendTo(self.menuMove);
+            item.find('a')
+                .text(leafFolder)
+                .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
+        });
+        this.menuMove.menu('refresh');
     },
 
     _addColumns: function(columns) {
@@ -1158,6 +1211,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
         // If the grid is updated, we need to uncheck the global selector.
         this.cb_globalselect.removeAttr('checked'); 
+        // set target folders
+        this.setTargetFolders(['/folder1', '/folder2', '/folder2/subfolderA', '/folder2/subfolderB']);
     },
 
     _onGlobalSelect: function(checked) {
@@ -1252,7 +1307,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 return false;
             })
             .appendTo(positioner);
-        this.button_move = $('<a>Move</a>')
+        this.button_move = $('<a>Move To</a>')
             .button({
                 icons: {primary: 'ui-icon-folder-open'}
             })
@@ -1270,15 +1325,15 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
     _onMoveClicked: function() {
         console.log('grid MOVE clicked');
-        //this.menuMove.menu('options', 'disabled', false);
-        //this.menuMove.menu('activate', this.menuMove.find('li')[0]);
         this.menuMove.show();
         this.menuMove.position({my: 'left bottom', at: 'left top', of: this.button_move, collision: 'fit'});
         this.menuMoveKeyStub.focus();
     },
 
-    _onMoveSelected: function() {
+    _onMoveSelected: function(selected) {
         console.log('grid MOVE target selected');
+        this.dialogMoveFolderName.text(selected);
+        this.dialogMoveConfirm.karldialog('open');
     }
 
 }));

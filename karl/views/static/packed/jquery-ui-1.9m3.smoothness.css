@@ -1,0 +1,7 @@
+
+/* XXX A temporary composition. This needs to be adjusted to the composition done in the
+ * livesearch-resources branch, which is due to be merged into the trunk before this branch. */
+
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3.unthemed.css");
+@import url("../jquery-ui/1.8.2/development-bundle/themes/smoothness/jquery.ui.theme.css");
+
