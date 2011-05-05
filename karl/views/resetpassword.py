@@ -169,20 +169,19 @@ def reset_sent_view(context, request):
         )
 
 
-min_pw_length = get_setting(None, 'min_pw_length')
-login_field = schemaish.String(validator=validator.Required())
-password_field = schemaish.String(
-    validator=validator.All(
-        validator.Required(),
-        karlvalidators.PasswordLength(min_pw_length)),
-    title='New Password')
-
 class ResetConfirmFormController(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
     def form_fields(self):
+        min_pw_length = get_setting(None, 'min_pw_length')
+        login_field = schemaish.String(validator=validator.Required())
+        password_field = schemaish.String(
+            validator=validator.All(
+                validator.Required(),
+                karlvalidators.PasswordLength(min_pw_length)),
+            title='New Password')
         fields = [('login', login_field),
                   ('password', password_field),
                   ]
