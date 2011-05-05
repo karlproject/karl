@@ -12,6 +12,8 @@ Unreleased
 - Stats view now raises NotFound if var/stats/stats.csv is not found.
   (LP #777363)
 
+- Fixed error in reset password form.  (LP #774110)
+
 3.56 (2011-04-28)
 -----------------
 
