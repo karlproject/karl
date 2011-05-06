@@ -613,6 +613,8 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             // scrollbar will be reserved next to the rightest column
         scrollbarWidth: 15
             // only effective of allocateWidthForScrollbar is true
+
+
     }),
 
     _create: function() {
@@ -978,11 +980,32 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
     },
 
     _initialUpdate: function() {		
+        // Override the options for the grid model. The model bundles the ajax
+        // call including the parsing of the received data into a dictionary.
+        // In order to convert the records from list-format to dictionary-format, 
+        // it does not pass the entire
+        // response data as-is, to _doUpdate. 
+        // In order to do this, we need to modify the parse function of the
+        // grid model - foolishly, this is not easy. (So why is it an option
+        // then, at all??)
+        //
+        // we need to enable this to be overwritten...
+        if (! this._grid_model_parse) {
+            this._grid_model_parse = $.ui.grid.model.defaults.parse;
+        }
+
+        // overwrite this, after created originally
+        this.gridmodel = $.ui.grid.model({
+            url: this.options.url,
+            parse: this._grid_model_parse
+        });
+        //
         var initialState = this.options.initialState;
         if (initialState) {
             // Initial state: use it to load content
             // Need to convert each record from a flat list to a keyed dict
-	    initialState = $.ui.grid.model.defaults.parse(initialState);
+            //initialState = $.ui.grid.model.defaults.parse(initialState);
+            initialState = this._grid_model_parse(initialState);
             // load them to the table
             this._doUpdate(initialState, {columns: true});
         } else {
@@ -1171,13 +1194,21 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             if (! folder || folder.charAt(0) != '/') {
                 throw new Error('Fatal error: folder name must start with a "/"');
             }
-            if (folder && folder.charAt(folder.length - 1) == '/') {
-                throw new Error('Fatal error: folder name must not end with a "/"');
+            var level;
+            var leafFolder;
+            if (folder == '/') {
+                // special case, handle differently.
+                level = 0;
+                leafFolder = '/ (community home)';
+            } else {
+                if (folder && folder.charAt(folder.length - 1) == '/') {
+                    throw new Error('Fatal error: folder name must not end with a "/"');
+                }
+                // The folder is like /f1/f2/f3
+                // we want to produce leafFolder = f3, level = 2 from this.
+                level = folder.match(/\//g).length - 1;
+                leafFolder = folder.substring(folder.lastIndexOf('/') + 1);
             }
-            // The folder is like /f1/f2/f3
-            // we want to produce leafFolder = f3, level = 2 from this.
-            var level = folder.match(/\//g).length - 1;
-            var leafFolder = folder.substring(folder.lastIndexOf('/') + 1);
             // create the item
             var item = $('<li><a></a></li>')
                 .css('textAlign', 'left')
@@ -1200,19 +1231,42 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 return columns[index].id == self.options.selectionColumnId;
             })
             .html('');
-        this.cb_globalselect = $('<input type="checkbox" class="ui-grid-globalselector">')
+        this.cb_globalselect = $('<input type="checkbox" class="ui-grid-globalselector" title="Select/Unselect all items">')
             .change(function() {
                 self._onGlobalSelect($(this).attr('checked'));
             })
             .appendTo(sel_column);
     },
 
+    _initialUpdate: function() {		
+        var self = this;
+        // manually include the additional fields we need.
+        var oldparse = $.ui.grid.model.defaults.parse;
+        this._grid_model_parse = function(response) {
+            var d = oldparse(response);
+            // add the data needed for the reorganization
+            // as it will be needed for each _doUpdate
+            d.targetFolders = response.targetFolders;
+            // Also:
+            // overwrite the 'sel' field in all records.
+            // This means that the server needs not send over
+            // the values, only an empty string.
+            $.each(d.records, function(index, record) {
+                record[self.options.selectionColumnId] =
+                    '<input type="checkbox" title="Select item">';
+            });
+            return d;
+        };
+        // call it
+        $.ui.karlgrid.prototype._initialUpdate.call(this);
+    },
+       
     _doUpdate: function(state, o) {
         $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
         // If the grid is updated, we need to uncheck the global selector.
         this.cb_globalselect.removeAttr('checked'); 
         // set target folders
-        this.setTargetFolders(['/folder1', '/folder2', '/folder2/subfolderA', '/folder2/subfolderB']);
+        this.setTargetFolders(state.targetFolders);
     },
 
     _onGlobalSelect: function(checked) {

@@ -788,7 +788,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     records = []
     for entry in entries:
         records.append([
-            '<input type="checkbox">',
+            '',       # MUST be left empty for the select column.
             '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
                 api.static_url,
                 entry.mimeinfo['small_icon_name'],
@@ -801,12 +801,30 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
             entry.modified,
             ])
 
+    # We also send, in each case, the list of possible target folders.
+    # They are needed for the grid reorganize (Move To) feature.
+    # Since we need this when the grid content is loaded (or each time
+    # it is reloaded), it is an obvious choice to factorize this information
+    # together with the container batch, each time.
+    #
+    # The client expects a list of folder paths here, starting with a /,
+    # such as:
+    #      /
+    #      /folder1
+    #      /folder1/folderA
+    #      ... etc ...
+    # The current folder should _not_ be in the list.
+    
+    # XXX
+    target_folders = ['/', '/folder1', '/folder2', '/folder2/subfolderA', '/folder2/subfolderB']
+
     payload = dict(
         columns = grid_folder_columns,
         records = records,
         totalRecords = info['total'],
         sortColumn = sort_on,
         sortDirection = reverse and 'desc' or 'asc',
+        targetFolders = target_folders,
     )
 
     return payload
