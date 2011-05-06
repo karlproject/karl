@@ -3417,6 +3417,7 @@ ul.menu li {
 
 #sras-content {
     font-size: 12px;
+    overflow: hidden;
 }
 
 .sras-searchknobs {
