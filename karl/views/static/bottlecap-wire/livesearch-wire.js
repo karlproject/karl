@@ -28,19 +28,29 @@ var kindTable = {
     Blogs: 'Posts'
 };
 
+// mapping from kind to type
+var kindToType = {
+    People: 'karl_models_interfaces_IProfile',
+    Wikis: 'karl_content_interfaces_IWikiPage',
+    Blogs: 'karl_content_interfaces_IBlogEntry',
+    Files: 'karl_content_interfaces_ICommunityFile',
+    Events: 'karl_content_interfaces_ICalendarEvent',
+    Communities: 'karl_models_interfaces_ICommunity',
+};
+
 function getSearchValue() {
     return $('.bc-livesearch-autocomplete').val();
 }
 
-function advancedSearchResultsUrl(query, type) {
-    if (!type) {
+function advancedSearchResultsUrl(query, kind) {
+    if (!kind) {
         // grab current filter and use that
-        type = $.trim($('.bc-livesearch-btn-select').text());
+        kind = $.trim($('.bc-livesearch-btn-select').text());
     }
-    type = escape(type);
-    var typeQueryString = (type === "All%20Content")
+    kind = escape(kind);
+    var typeQueryString = (kind === "All%20Content")
                               ? ''
-                              : "&kind=" + (kindTable[type] || type);
+                              : "&types=" + (kindToType[kind]);
     var queryString = '?body=' + escape(query) + typeQueryString;
     return advancedSearchUrl + queryString;
 }
