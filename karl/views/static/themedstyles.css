@@ -506,6 +506,7 @@ a.chparent:hover {
 #site-announcement {
   float: left;
   margin-left: 15px;
+  width: 870px;
 }
 .ie-announcement {
     float: left;
