@@ -1100,6 +1100,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
     options: $.extend({}, $.ui.karlgrid.prototype.options, {
+        delete_url: 'delete_files.json',  // url relative to the context
         selectionColumnId: 'sel',  // the column id of the column that does the selection
         folderMenuIndent: 16       // indentation for subfolder levels in pixel
     }),
@@ -1125,6 +1126,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                     },
                     'Delete': function() {
                         $(this).karldialog('close');
+                        self._onDeleteConfirmed();
                     }
 		},
                 open: function() {
@@ -1221,6 +1223,27 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         this.menuMove.menu('refresh');
     },
 
+    getSelectedFiles: function() {
+        // Returns the list of selected files
+        var self = this;
+        var filenames = [];
+        this.content.find('input.ui-grid-selector[type="checkbox"]:checked')
+            .each(function(index, cb) {
+                var data = $(cb).parents('.ui-grid-row').data('karlfilegrid-rowdata');
+                // we saved the name of the file and retrieve it now
+                filenames.push(data._name);
+            });
+            return filenames;
+    },
+
+    _enableDisableButtons: function() {
+        // Enable or disable the buttons based on the number of selections
+        var selected = this.getSelectedFiles().length > 0;
+        console.log('XXXSELECTIO', selected);
+        this.button_delete.button('option', 'disabled', ! selected);
+        this.button_move.button('option', 'disabled', ! selected);
+    },
+
     _addColumns: function(columns) {
         var self = this;
         $.ui.karlgrid.prototype._addColumns.call(this, columns);
@@ -1238,6 +1261,13 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             .appendTo(sel_column);
     },
 
+    _addRow: function(item, dontAdd) {
+        var row = $.ui.karlgrid.prototype._addRow.call(this, item, dontAdd);
+        // annotate the data on the row
+        row.data('karlfilegrid-rowdata', item);
+        return row;
+    },
+
     _initialUpdate: function() {		
         var self = this;
         // manually include the additional fields we need.
@@ -1252,8 +1282,11 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             // This means that the server needs not send over
             // the values, only an empty string.
             $.each(d.records, function(index, record) {
+                // In the selector column, the server _must_ send the original filename (id)
+                // We remember this and replace the column with a rendered checkbox
+                record._name = record[self.options.selectionColumnId];
                 record[self.options.selectionColumnId] =
-                    '<input type="checkbox" title="Select item">';
+                    '<input type="checkbox" class="ui-grid-selector" title="Select item">';
             });
             return d;
         };
@@ -1265,26 +1298,25 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
         // If the grid is updated, we need to uncheck the global selector.
         this.cb_globalselect.removeAttr('checked'); 
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
         // set target folders
         this.setTargetFolders(state.targetFolders);
     },
 
     _onGlobalSelect: function(checked) {
         // the global selector changed.
-        //
-        // XXX change all checkboxes
-        // this is crude at this point, all checkboxes are selected
-        // so we currently suppose that there are no more cb
-        // other than the ones in the first col
-        this.content.find('input[type="checkbox"]').each(function() {
+        // change all checkboxes
+        this.content.find('input.ui-grid-selector[type="checkbox"]').each(function() {
             var target = $(this);
             if (checked) {
                 target.attr('checked', 'checked');
             } else {
                 target.removeAttr('checked'); 
             }
-            // XXX Selection here. Now we just do nothing except toggle.
         });
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
     },
 
     _onClickRow: function(target) {
@@ -1310,7 +1342,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             target.removeAttr('checked'); 
         }
 
-        // XXX Selection here. Now we just do nothing.
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
 
         // prevent default.
         return false;
@@ -1329,18 +1362,15 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         }
 
         // make sure that the user clicked the checkbox itself.
-        if (! target.is('input[type="checkbox"]')) {
+        if (! target.is('input.ui-grid-globalselector[type="checkbox"]')) {
             // if we clicked in the header but outside the checkbox,
             // prevent default.
             return false;
         }
 
         // Let's read the checkbox selection.
-        var selected = target.attr('checked');
-        var new_selected = ! selected;
-
-        // XXX Selection here. Now we just do nothing.
-
+        // var selected = target.attr('checked');
+        // var new_selected = ! selected;
 
         // Do not prevent the default: this lets the browser to
         // toggle the checkbox.
@@ -1357,7 +1387,9 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 icons: {primary: 'ui-icon-trash'}
             })
             .click(function() {
-                self._onDeleteClicked();
+                if (! $(this).button('option', 'disabled')) {
+                    self._onDeleteClicked();
+                }
                 return false;
             })
             .appendTo(positioner);
@@ -1366,15 +1398,54 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 icons: {primary: 'ui-icon-folder-open'}
             })
             .click(function() {
-                self._onMoveClicked();
+                if (! $(this).button('option', 'disabled')) {
+                    self._onMoveClicked();
+                }
                 return false;
             })
             .appendTo(positioner);
     },
 
     _onDeleteClicked: function() {
-        console.log('grid DELETE clicked');
         this.dialogDeleteConfirm.karldialog('open');
+    },
+
+    _onDeleteConfirmed: function() {
+        var self = this;
+        var filenames = this.getSelectedFiles();
+        $.ajax({
+            url: this.options.delete_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                file: filenames
+            },
+            success: function(data, textStatus, jqXHR) {
+                if (data.result == 'OK') {
+                    self._onDeleteSuccess(data);
+                } else {
+                    self._onDeleteError(data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                self._onDeleteError({result: 'ERROR', error: 'Unknown server error:' + textStatus});
+            }
+        });
+    },
+
+    _onDeleteSuccess: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        var message = '' + data.deleted + ' file(s) succesfully deleted';
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+        this._update ({columns: false, refresh: true});
+    },
+
+    _onDeleteError: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        // XXX TODO: this should be error....
+        // maybe, use the multistatusbox?
+        var message = 'Deletion failed: ' + data.error;
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
     },
 
     _onMoveClicked: function() {

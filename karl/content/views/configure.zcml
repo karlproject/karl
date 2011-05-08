@@ -1119,6 +1119,22 @@
     />
 
 
+  <!-- Ajax file reorganize -->
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.ajax_file_reorganize_delete_view"
+    permission="view"
+    name="delete_files.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.ajax_file_reorganize_delete_view"
+    permission="view"
+    name="delete_files.json"
+  />
+
+
+
   <!-- Ajax file upload -->
   <view
     for="karl.content.interfaces.ICommunityFolder"

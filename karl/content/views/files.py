@@ -788,7 +788,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     records = []
     for entry in entries:
         records.append([
-            '',       # MUST be left empty for the select column.
+            entry.name,       # MUST hold the file name (id) for the select column.
             '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
                 api.static_url,
                 entry.mimeinfo['small_icon_name'],
@@ -829,13 +829,60 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
     return payload
 
+# --
+# Reorganize (Delete and Move To)
+# --
 
 class ErrorResponse(Exception):
     
-    def __init__(self, txt, client_id=None):
-        self.client_id = client_id
+    def __init__(self, txt, **kw):
+        self.__dict__.update(kw)
         super(ErrorResponse, self).__init__(txt)
 
+
+def ajax_file_reorganize_delete_view(context, request):
+
+    try:
+        params = request.params
+        filenames = params.getall('file[]')
+        deleted = 0
+        for filename in filenames:
+            if filename not in context:
+                # already deleted, ignore
+                pass
+            else:
+                try:
+                    del context[filename]
+                except Exception, exc:
+                    msg = str(exc) 
+                    raise ErrorResponse(msg, filename=filename)
+                else:
+                    deleted += 1
+        payload = dict(
+            result = 'OK',
+            deleted = len(filenames),
+        )
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            result = 'ERROR',
+            error = str(exc),
+            filename = exc.filename,
+        )
+        log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' % 
+            (exc.filename, str(exc)))
+        transaction.doom()
+    finally:
+        pass
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+
+
+# --
+# Multi Upload
+# --
 
 def make_temp_id(client_id):
     """Generate a unique tempdir id from the guaranteed unique client id"""
