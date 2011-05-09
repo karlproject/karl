@@ -9,6 +9,9 @@ Unreleased
   for both pgtextindex and Zope text index in the process. Merged from branch,
   'rossi-contextual-summaries'. (LP #707671)
 
+- Fixed bug in distribution lists where the mail recipients were not being
+  passed as a list.  (LP #780000)
+
 3.57 (2011-05-05)
 -----------------
 

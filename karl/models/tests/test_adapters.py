@@ -953,7 +953,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         self.assertEqual(len(md._sent), 2)
         for index, (frm, to, sentmessage) in enumerate(md._sent):
             self.assertEqual(frm, message['From'])
-            self.assertEqual(to, 'profile_%d@example.com' % index)
+            self.assertEqual(to, ['profile_%d@example.com' % index])
             self.failIf('Message-Id' in sentmessage)
             self.assertEqual(sentmessage['Reply-To'],
                             'alias@karl3.example.com')
@@ -978,7 +978,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         self.assertEqual(len(md._sent), 2)
         for index, (frm, to, sentmessage) in enumerate(md._sent):
             self.assertEqual(frm, message['From'])
-            self.assertEqual(to, 'profile_%d@example.com' % index)
+            self.assertEqual(to, ['profile_%d@example.com' % index])
             self.failIf('Message-Id' in sentmessage)
             self.assertEqual(sentmessage['Reply-To'],
                             'alias@lists.example.com')
