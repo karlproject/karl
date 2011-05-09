@@ -1423,7 +1423,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 file: filenames
             },
             success: function(data, textStatus, jqXHR) {
-                if (data.result == 'OK') {
+                if (data && data.result == 'OK') {
                     self._onDeleteSuccess(data);
                 } else {
                     self._onDeleteError(data);
@@ -1475,7 +1475,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 target_folder: targetFolder
             },
             success: function(data, textStatus, jqXHR) {
-                if (data.result == 'OK') {
+                if (data && data.result == 'OK') {
                     self._onMoveSuccess(data);
                 } else {
                     self._onMoveError(data);
@@ -1489,7 +1489,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
     _onMoveSuccess: function(data) {
         // XXX let's reuse the statusbox that the tagbox already activated
-        var message = '' + data.moved + ' file(s) succesfully moved to <a href="' +
+        var message = 'Moved ' +data.moved + ' selected files/folders to <a href="' +
                 data.targetFolderUrl + '">' + data.targetFolder + '</a>';
         $('.statusbox').karlstatusbox('clearAndAppend', message);
         this._update ({columns: false, refresh: true});

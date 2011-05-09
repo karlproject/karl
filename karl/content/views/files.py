@@ -893,8 +893,9 @@ def traverse_file_folder(context, folder):
     assert folder.startswith('/')
     assert folder == '/' or not folder.endswith('/')
     c = community['files']
-    for segment in folder.split('/')[1:]:
-        c = c[segment]
+    if folder != '/':
+        for segment in folder.split('/')[1:]:
+            c = c[segment]
     return c
         
 def get_target_folders(context):
@@ -964,16 +965,19 @@ def ajax_file_reorganize_moveto_view(context, request):
 
         moved = 0
         for filename in filenames:
-            print "MOVETO", filename
             try:
                 fileobj = context[filename]
+                if fileobj == target_context:
+                    msg = 'Cannot move a folder into itself'
+                    raise ErrorResponse(msg, filename=filename)
                 del context[filename]
-                target_context[filename] = fileobj
+                # We make sure there is a unique name in the new folder
+                target_filename = make_unique_name(target_context, filename)
+                target_context[target_filename] = fileobj
             except KeyError:
                 msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
-
 
         payload = dict(
             result = 'OK',
