@@ -258,10 +258,20 @@ class IToolFactory(Interface):
         """ Returns the tab URL for the tool """
 
 class ITextIndexData(Interface):
-    """ An adapter which returns a string representing data useable
-    for text indexing"""
+    """ An adapter which returns a string or tuple representing data useable
+    for text indexing. Weighted results can be returned as a tuple. If a tuple
+    is returned, tuple contains text strings in descending order of weight. """
     def __call__():
         """ Return text data """
+
+class IContextualSummarizer(Interface):
+    """ An adapter which returns a contextual summary for a document suitable
+    for displaying in search results. """
+    def __call__(document, query):
+        """ 'document' is the content object from which to create a contextual
+        summary. The query is the query used to find the document.  A good
+        contextual summarizer will provide a summary which highlights the
+        user's search terms. """
 
 class IVirtualData(Interface):
     """ An adapter which returns a hashable object representing
@@ -538,7 +548,7 @@ class ISiteEvents(Interface):
 
     def newer(latest_gen, latest_index, principals=None, created_by=None):
         """ Yield items newer than (`latest_gen`, `latest_index`).
-        
+
         Implemented as a method on the layer to work around lack of generator
         expressions in Python 2.5.x.
 
@@ -552,7 +562,7 @@ class ISiteEvents(Interface):
 
     def older(earliest_gen, earliest_index, principals=None, created_by=None):
         """ Yield items older than (`earliest_gen`, `earliest_index`).
-        
+
         Implemented as a method on the layer to work around lack of generator
         expressions in Python 2.5.x.
 

@@ -27,7 +27,7 @@
         <div class="klisting_header">
           <a href="${result['url']}">${result['title']}</a>
         </div>
-        <p>${result['description']}</p>
+        <p tal:content="structure result['description']">Description</p>
         <p class="kbyline">${result['type']} | ${result['url']}</p>
       </div>
     </div>

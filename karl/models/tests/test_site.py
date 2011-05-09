@@ -199,7 +199,7 @@ class TestGetTextRepr(unittest.TestCase):
         context.title = 'title'
         context.description = 'description'
         textrepr = self._callFUT(context, None)
-        self.assertEqual(textrepr, 'title description')
+        self.assertEqual(textrepr, 'title ' * 10 + 'description')
 
     def test_with_adapter(self):
         context = testing.DummyModel()
@@ -220,6 +220,23 @@ class TestGetTextRepr(unittest.TestCase):
         textrepr = self._callFUT(context, 'default')
         self.assertEqual(textrepr, 'default')
 
+    def test_no_content(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, IContent)
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
+
+    def test_no_title(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        context.description = 'description'
+        directlyProvides(context, IContent)
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'description')
+
     def test_exclude_calendar_layer(self):
         from repoze.lemonade.content import IContent
         from karl.content.interfaces import ICalendarLayer
@@ -231,6 +248,56 @@ class TestGetTextRepr(unittest.TestCase):
         context.description = 'description'
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, None)
+
+
+class TestGetWeightedTextRepr(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, default):
+        from karl.models.site import get_weighted_textrepr as fut
+        return fut(object, default)
+
+    def test_no_adapter(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, IContent)
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr, ('title', 'description'))
+
+    def test_with_adapter(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import ITextIndexData
+        class DummyAdapter:
+            def __init__(self, context):
+                self.context = context
+            def __call__(self):
+                return 'stuff'
+        testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr, ('stuff',))
+
+    def test_not_content(self):
+        context = testing.DummyModel()
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
+
+    def test_no_content(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, IContent)
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
+
 
 class _TestGetDate(object):
 

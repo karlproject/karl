@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added support for contextual summaries in search when using
+  repoze.pgtextindex. Had to refactor how text representations are generated
+  for both pgtextindex and Zope text index in the process. Merged from branch,
+  'rossi-contextual-summaries'. (LP #707671)
+
 3.57 (2011-05-05)
 -----------------
 
@@ -65,7 +70,6 @@ Unreleased
 
 - Make sure templates always use ${api.app_url} in specifying hrefs.  Allows
   Karl to be mountable at places other than '/' at a particular domain.
-
 
 3.54 (2011-01-19)
 -----------------

@@ -44,6 +44,7 @@ from zope.event import notify
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
+from karl.content.models.adapters import FlexibleTextIndexData
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import IIndexFactory
@@ -153,37 +154,42 @@ def get_interfaces(object, default):
 def get_path(object, default):
     return model_path(object)
 
-def get_textrepr(object, default):
+def _get_texts(object, default):
     adapter = queryAdapter(object, ITextIndexData)
-    if adapter is not None:
-        text = adapter()
-        return text
-    elif (IContent.providedBy(object) and
-          not (ICalendarLayer.providedBy(object) or
-               ICalendarCategory.providedBy(object))):
-        fmt = "%s %s"
-        tr = fmt % (
-            getattr(object, 'title', ''),
-            getattr(object, 'description', ''),
-            )
-        return tr
-    return default
+    if adapter is None:
+        if (not IContent.providedBy(object) or
+            ICalendarLayer.providedBy(object) or
+            ICalendarCategory.providedBy(object)):
+            return default
+        adapter = FlexibleTextIndexData(object)
+    texts = adapter()
+    if not texts:
+        return default
+    return texts
 
-_surrogates = re.compile(u'[\uD800-\uDFFFF]')
+def get_textrepr(object, default):
+    """ Used for standard repoze.catalog text index. """
+    texts = _get_texts(object, default)
+    if texts is default:
+        return default
+    if isinstance(texts, basestring):
+        return texts
+    if len(texts) == 1:
+        return texts[0]
+    parts = [texts[0]] * 10
+    parts.extend(texts[1:])
+    return ' '.join(parts)
+
+_surrogates = re.compile(u'[\uD800-\uDFFF]')
 
 def get_weighted_textrepr(object, default):
-    # For use with experimental pgtextindex, which uses a list of strings,
-    # in descending order by weight.
-
-    # The so called 'standard' repr already has a weight of sorts applied to
-    # it, accomplished by repeating the elements that are supposed to be more
-    # heavily weighted.  For the purposes of supporting both types of text
-    # indexes, this double weighting is fine.
-    standard_repr = get_textrepr(object, default)
-
-    # If we wouldn't normally index it, then we can stop now
-    if standard_repr is default:
+    """ Used for repoze.pgtextindex. """
+    texts = _get_texts(object, default)
+    if texts is default:
         return default
+
+    if isinstance(texts, basestring):
+        texts = (texts,)
 
     # At least one version of 'pdftotext' has given us invalid Unicode by
     # including lone characters in one of the "surrogate" character ranges.
@@ -191,18 +197,9 @@ def get_weighted_textrepr(object, default):
     # Unicode.  While zope.index.text has no problem with this, PostgreSQL
     # chokes horribly on this text.  To get around this issue we just elide
     # any characters in one of the surrogate ranges.
-    standard_repr = _surrogates.sub('', standard_repr)
+    texts = tuple([_surrogates.sub('', text) for text in texts])
 
-    # Weight title most, description second, then whatever get_textrepr returns
-    reprs = []
-    for attr in ('title', 'description'):
-        value = getattr(object, attr, '')
-        if not isinstance(value, basestring):
-            value = ''
-        reprs.append(value)
-    reprs.append(standard_repr)
-
-    return reprs
+    return texts
 
 def _get_date_or_datetime(object, attr, default):
     d = getattr(object, attr, None)
