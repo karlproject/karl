@@ -38,6 +38,7 @@ from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.traversal import find_interface
+from repoze.bfg.traversal import model_path
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -76,6 +77,9 @@ from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 
 from karl.content.interfaces import IReferencesFolder
+
+from karl.models.interfaces import ICatalogSearch
+from karl.utils import find_catalog
 
 # This import is BBB for karl.evolve.zodb.evolve15
 from karl.content.views.utils import ie_types
@@ -815,8 +819,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     #      ... etc ...
     # The current folder should _not_ be in the list.
     
-    # XXX
-    target_folders = ['/', '/folder1', '/folder2', '/folder2/subfolderA', '/folder2/subfolderB']
+    target_folders = get_target_folders(context)
 
     payload = dict(
         columns = grid_folder_columns,
@@ -860,7 +863,7 @@ def ajax_file_reorganize_delete_view(context, request):
                     deleted += 1
         payload = dict(
             result = 'OK',
-            deleted = len(filenames),
+            deleted = deleted,
         )
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
@@ -870,6 +873,122 @@ def ajax_file_reorganize_delete_view(context, request):
             filename = exc.filename,
         )
         log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' % 
+            (exc.filename, str(exc)))
+        transaction.doom()
+    finally:
+        pass
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+
+
+# XXX this should probably get moved to utils
+
+def traverse_file_folder(context, folder):
+    # Return the context folder specified in the "folder" parameter
+    # "folder" contains an absolute path to the target, relative
+    # to the community.
+    community = find_community(context)
+    assert folder.startswith('/')
+    assert folder == '/' or not folder.endswith('/')
+    c = community['files']
+    for segment in folder.split('/')[1:]:
+        c = c[segment]
+    return c
+        
+def get_target_folders(context):
+    # Return the target folders for this community.
+    # Exclude the current folder of context.
+    #
+    # The client expects a list of folder paths here, starting with a /,
+    # such as:
+    #      /
+    #      /folder1
+    #      /folder1/folderA
+    #      ... etc ...
+    # The current folder should _not_ be in the list.
+    #
+    community = find_community(context)
+    catalog = find_catalog(context)
+    root_path = model_path(community['files'])
+    context_path = model_path(context)
+    assert context_path.startswith(root_path)
+
+    query = ICatalogSearch(context)
+    total, docids, resolver = query(
+        path = root_path, 
+        interfaces = (ICommunityFolder, ),
+        )
+    target_paths = [catalog.document_map.address_for_docid(docid) for docid in docids]
+    # sorting is important for the client visualization
+    target_paths.sort()
+    # always insert the root folder that was not returned by this search 
+    target_paths.insert(0, root_path)
+
+    # Process all the results
+    target_folders = []
+    for path in target_paths:
+        # Is this the current folder? - if yes, exclude from the results
+        if path == context_path:
+            continue
+        # Now, only take the part after the community/files, ie, the path segments
+        # after the root folder.
+        assert path.startswith(root_path)
+        # Just take the part after community/files
+        target_folder = path[len(root_path):]
+        # Correct the root folder from '' to '/'
+        if not target_folder:
+            target_folder = '/'
+        target_folders.append(target_folder)
+
+    return target_folders
+
+def ajax_file_reorganize_moveto_view(context, request):
+
+    try:
+        params = request.params
+        filenames = params.getall('file[]')
+        target_folder = params.get('target_folder', None)
+        if target_folder is None:
+            msg = 'Wrong parameters, `target_folder` is mandatory' 
+            raise ErrorResponse(msg, filename="*")
+
+        # find the target folder
+        try:
+            target_context = traverse_file_folder(context, target_folder)
+        except KeyError:
+            msg = 'Cannot find target folder "%s"' % (target_folder, )
+            raise ErrorResponse(msg, filename="*")
+        target_folder_url = model_url(target_context, request)
+
+        moved = 0
+        for filename in filenames:
+            print "MOVETO", filename
+            try:
+                fileobj = context[filename]
+                del context[filename]
+                target_context[filename] = fileobj
+            except KeyError:
+                msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
+                raise ErrorResponse(msg, filename=filename)
+            moved += 1
+
+
+        payload = dict(
+            result = 'OK',
+            moved = moved,
+            targetFolder = target_folder,
+            targetFolderUrl = target_folder_url,
+        )
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            result = 'ERROR',
+            error = str(exc),
+            filename = exc.filename,
+        )
+        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' % 
             (exc.filename, str(exc)))
         transaction.doom()
     finally:

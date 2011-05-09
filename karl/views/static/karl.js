@@ -1101,6 +1101,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
     options: $.extend({}, $.ui.karlgrid.prototype.options, {
         delete_url: 'delete_files.json',  // url relative to the context
+        moveto_url: 'move_files.json',  // url relative to the context
         selectionColumnId: 'sel',  // the column id of the column that does the selection
         folderMenuIndent: 16       // indentation for subfolder levels in pixel
     }),
@@ -1153,6 +1154,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                     },
                     'Move': function() {
                         $(this).karldialog('close');
+                        var targetFolder = self.dialogMoveFolderName.text();
+                        self._onMoveConfirmed(targetFolder);
                     }
 		},
                 open: function() {
@@ -1239,7 +1242,6 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     _enableDisableButtons: function() {
         // Enable or disable the buttons based on the number of selections
         var selected = this.getSelectedFiles().length > 0;
-        console.log('XXXSELECTIO', selected);
         this.button_delete.button('option', 'disabled', ! selected);
         this.button_move.button('option', 'disabled', ! selected);
     },
@@ -1428,7 +1430,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                self._onDeleteError({result: 'ERROR', error: 'Unknown server error:' + textStatus});
+                self._onDeleteError({result: 'ERROR', error: 'Unknown server error: ' + textStatus});
             }
         });
     },
@@ -1459,6 +1461,46 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         console.log('grid MOVE target selected');
         this.dialogMoveFolderName.text(selected);
         this.dialogMoveConfirm.karldialog('open');
+    },
+
+    _onMoveConfirmed: function(targetFolder) {
+        var self = this;
+        var filenames = this.getSelectedFiles();
+        $.ajax({
+            url: this.options.moveto_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                file: filenames,
+                target_folder: targetFolder
+            },
+            success: function(data, textStatus, jqXHR) {
+                if (data.result == 'OK') {
+                    self._onMoveSuccess(data);
+                } else {
+                    self._onMoveError(data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                self._onMoveError({result: 'ERROR', error: 'Unknown server error: ' + textStatus});
+            }
+        });
+    },
+
+    _onMoveSuccess: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        var message = '' + data.moved + ' file(s) succesfully moved to <a href="' +
+                data.targetFolderUrl + '">' + data.targetFolder + '</a>';
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+        this._update ({columns: false, refresh: true});
+    },
+
+    _onMoveError: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        // XXX TODO: this should be error....
+        // maybe, use the multistatusbox?
+        var message = 'Move To failed: ' + data.error;
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
     }
 
 }));
