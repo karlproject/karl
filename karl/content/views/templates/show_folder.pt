@@ -46,7 +46,7 @@
                 })
                 .bind('refresh.multifileupload', function() {
                     // update the grid
-                    $('#filegrid').data('karlgrid')._update({columns: false, refresh: true});
+                    $('#filegrid').data('karlfilegrid')._update({columns: false, refresh: true});
                 });
         });
         //]]>
