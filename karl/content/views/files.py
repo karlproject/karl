@@ -1022,7 +1022,7 @@ def ajax_file_upload_view(context, request):
         client_id = params.get('client_id', None)
         if f is None or client_id is None:
             msg = 'Wrong parameters, `file` and `client_id` are mandatory' 
-            raise ErrorResponse(msg)
+            raise ErrorResponse(msg, client_id='')
 
         # XXX Handling of chunk uploads.
         # Even if we do not want chunks, we need to support it. :(
@@ -1040,7 +1040,7 @@ def ajax_file_upload_view(context, request):
 
         if chunk < 0 or chunk >= chunks:
             msg = 'Chunking inconsistence, `chunk` out of range' 
-            raise ErrorResponse(msg)
+            raise ErrorResponse(msg, client_id='')
 
         end_batch = params.get('end_batch', None)
 
@@ -1092,7 +1092,7 @@ def ajax_file_upload_view(context, request):
             # to avoid attacks or malformed client_id parameters
             if fileobj.__client_file_id__ != client_id:
                 msg = 'Inconsistent client file id'
-                raise ErrorResponse(msg)
+                raise ErrorResponse(msg, client_id='')
             if fileobj.__transaction_parent__ != context:
                 msg = 'Inconsistent batch transaction'
                 raise ErrorResponse(msg, client_id=client_id)
@@ -1141,7 +1141,7 @@ def ajax_file_upload_view(context, request):
                 # to avoid attacks or malformed end_batch parameters
                 if fileobj.__client_file_id__ != client_id:
                     msg = 'Inconsistent client file id'
-                    raise ErrorResponse(msg)
+                    raise ErrorResponse(msg, client_id='')
                 if fileobj.__transaction_parent__ != context:
                     msg = 'Inconsistent batch transaction'
                     raise ErrorResponse(msg, client_id=client_id)
