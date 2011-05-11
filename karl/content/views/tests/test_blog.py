@@ -915,6 +915,8 @@ class Test_show_mailin_trace_blog(unittest.TestCase):
         self._save_os = blog.os
         blog.os = self
 
+        self._exists = False
+
     def tearDown(self):
         testing.tearDown()
 
@@ -928,11 +930,21 @@ class Test_show_mailin_trace_blog(unittest.TestCase):
     def getmtime(self, path):
         return 1305120461.649806
 
-    def test_it(self):
+    def exists(self, path):
+        return self._exists
+
+    def test_it_exists(self):
         from karl.content.views.blog import show_mailin_trace_blog
+        self._exists = True
         request = testing.DummyRequest()
         response = show_mailin_trace_blog(None, request)
         self.assertEqual(response['timestamp'], 'Wed May 11 09:27:41 2011')
+
+    def test_it_does_not_exist(self):
+        from karl.content.views.blog import show_mailin_trace_blog
+        request = testing.DummyRequest()
+        response = show_mailin_trace_blog(None, request)
+        self.assertEqual(response['timestamp'], None)
 
 class DummyComment(testing.DummyModel):
     creator = u'dummy'

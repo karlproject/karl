@@ -9,8 +9,12 @@
 
         <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-        <div class="kbody">
+        <div class="kbody" tal:condition="timestamp is not None">
             The last mailin trace message was detected at: ${timestamp}
+        </div>
+
+        <div class="kbody" tal:condition="timestamp is None">
+            No mailin trace message has been received.
         </div>
 
 

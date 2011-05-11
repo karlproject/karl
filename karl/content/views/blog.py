@@ -153,9 +153,11 @@ def show_blog_view(context, request):
 
 def show_mailin_trace_blog(context, request):
     path = get_setting(context, 'mailin_trace_file')
-    timestamp = os.path.getmtime(path)
-    timestamp = datetime.datetime.fromtimestamp(timestamp)
-    formatted_timestamp = timestamp.ctime()
+    formatted_timestamp = None
+    if os.path.exists(path):
+        timestamp = os.path.getmtime(path)
+        timestamp = datetime.datetime.fromtimestamp(timestamp)
+        formatted_timestamp = timestamp.ctime()
     return dict(
         api=TemplateAPI(context, request),
         system_email_domain=get_setting(context, 'system_email_domain'),
