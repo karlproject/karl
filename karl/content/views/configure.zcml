@@ -5,7 +5,15 @@
     for="karl.content.interfaces.IBlog"
     view=".blog.show_blog_view"
     permission="view"
+    renderer="templates/show_blog.pt"
   />
+
+  <view
+    for="karl.content.models.blog.MailinTraceBlog"
+    view=".blog.show_mailin_trace_blog"
+    permission="view"
+    renderer="templates/show_mailin_trace_blog.pt"
+    />
 
   <view
     for="karl.content.interfaces.IBlog"
@@ -59,6 +67,7 @@
     for="karl.content.interfaces.IBlogEntry"
     view=".blog.show_blogentry_view"
     permission="view"
+    renderer="templates/show_blogentry.pt"
   />
 
   <formish:form

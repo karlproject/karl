@@ -64,21 +64,189 @@ class ShowBlogViewTests(unittest.TestCase):
         entry['comments'] = testing.DummyModel()
         entry['comments']['1'] = DummyComment()
         context['e1'] = entry
-        renderer = testing.registerDummyRenderer('templates/show_blog.pt')
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
         testing.registerAdapter(dummy_byline_info, (Interface, Interface),
                                 IBylineInfo)
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.entries), 1)
-        self.assertEqual(renderer.entries[0]['title'], 'Dummy Entry')
-        self.assertEqual(renderer.entries[0]['creator_href'],
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['entries']), 1)
+        self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
+        self.assertEqual(response['entries'][0]['creator_href'],
                          'http://example.com/e1/')
-        self.assertEqual(renderer.entries[0]['href'],
+        self.assertEqual(response['entries'][0]['href'],
                          'http://example.com/e1/')
-        self.assertEqual(renderer.entries[0]['creator_title'],
+        self.assertEqual(response['entries'][0]['creator_title'],
+                         'Dummy Creator')
+
+    def test_it_no_year_or_month(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from karl.testing import DummyProfile
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
+        directlyProvides(context, ISite)
+        context.catalog = {'creation_date': DummyCreationDateIndex()}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['dummy'] = DummyProfile(title='Dummy Creator')
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest()
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+        from datetime import datetime
+        entry = testing.DummyModel(
+            creator='dummy', title='Dummy Entry',
+            description='Some words',
+            created=datetime(2009, 4, 15))
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlogEntry
+        directlyProvides(entry, IBlogEntry)
+        entry['comments'] = testing.DummyModel()
+        entry['comments']['1'] = DummyComment()
+        context['e1'] = entry
+        def dummy_byline_info(context, request):
+            return context
+        from zope.interface import Interface
+        from karl.content.views.interfaces import IBylineInfo
+        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                IBylineInfo)
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['entries']), 1)
+        self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
+        self.assertEqual(response['entries'][0]['creator_href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['creator_title'],
+                         'Dummy Creator')
+
+    def test_it_no_comments(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from karl.testing import DummyProfile
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
+        directlyProvides(context, ISite)
+        context.catalog = {'creation_date': DummyCreationDateIndex()}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['dummy'] = DummyProfile(title='Dummy Creator')
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict({'year': 2009, 'month': 4}))
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+        from datetime import datetime
+        entry = testing.DummyModel(
+            creator='dummy', title='Dummy Entry',
+            description='Some words',
+            created=datetime(2009, 4, 15))
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlogEntry
+        directlyProvides(entry, IBlogEntry)
+        entry['comments'] = testing.DummyModel()
+        context['e1'] = entry
+        def dummy_byline_info(context, request):
+            return context
+        from zope.interface import Interface
+        from karl.content.views.interfaces import IBylineInfo
+        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                IBylineInfo)
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['entries']), 1)
+        self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
+        self.assertEqual(response['entries'][0]['creator_href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['creator_title'],
+                         'Dummy Creator')
+
+    def test_it_two_comments(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from karl.testing import DummyProfile
+        from repoze.workflow.testing import registerDummyWorkflow
+        registerDummyWorkflow('security')
+        directlyProvides(context, ISite)
+        context.catalog = {'creation_date': DummyCreationDateIndex()}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['dummy'] = DummyProfile(title='Dummy Creator')
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict({'year': 2009, 'month': 4}))
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+        from datetime import datetime
+        entry = testing.DummyModel(
+            creator='dummy', title='Dummy Entry',
+            description='Some words',
+            created=datetime(2009, 4, 15))
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlogEntry
+        directlyProvides(entry, IBlogEntry)
+        entry['comments'] = testing.DummyModel()
+        entry['comments']['1'] = DummyComment()
+        entry['comments']['2'] = DummyComment()
+        context['e1'] = entry
+        def dummy_byline_info(context, request):
+            return context
+        from zope.interface import Interface
+        from karl.content.views.interfaces import IBylineInfo
+        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                IBylineInfo)
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['entries']), 1)
+        self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
+        self.assertEqual(response['entries'][0]['creator_href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['creator_title'],
+                         'Dummy Creator')
+
+    def test_it_no_workflow(self):
+        context = testing.DummyModel()
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from karl.testing import DummyProfile
+        directlyProvides(context, ISite)
+        context.catalog = {'creation_date': DummyCreationDateIndex()}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['dummy'] = DummyProfile(title='Dummy Creator')
+        from webob.multidict import MultiDict
+        request = testing.DummyRequest(
+            params=MultiDict({'year': 2009, 'month': 4}))
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(dummy, IKarlDates)
+        from datetime import datetime
+        entry = testing.DummyModel(
+            creator='dummy', title='Dummy Entry',
+            description='Some words',
+            created=datetime(2009, 4, 15))
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlogEntry
+        directlyProvides(entry, IBlogEntry)
+        entry['comments'] = testing.DummyModel()
+        entry['comments']['1'] = DummyComment()
+        context['e1'] = entry
+        def dummy_byline_info(context, request):
+            return context
+        from zope.interface import Interface
+        from karl.content.views.interfaces import IBylineInfo
+        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                IBylineInfo)
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['entries']), 1)
+        self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
+        self.assertEqual(response['entries'][0]['creator_href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['href'],
+                         'http://example.com/e1/')
+        self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
 class ShowBlogEntryViewTests(unittest.TestCase):
@@ -126,15 +294,14 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         self._register()
         from karl.utilities.interfaces import IKarlDates
         testing.registerUtility(dummy, IKarlDates)
-        renderer = testing.registerDummyRenderer('templates/show_blogentry.pt')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.comments), 1)
-        c0 = renderer.comments[0]
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['comments']), 1)
+        c0 = response['comments'][0]
         self.assertEqual(c0['text'], 'sometext')
 
-        self.assertEqual(d1, renderer.comments[0]['date'])
+        self.assertEqual(d1, response['comments'][0]['date'])
         self.assertEqual(c0['author_name'], 'Dummy Profile')
-        self.assertEqual(renderer.comments[0]['edit_url'],
+        self.assertEqual(response['comments'][0]['edit_url'],
                          'http://example.com/blogentry/comments/1/edit.html')
 
 
@@ -158,10 +325,9 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         self._register()
         testing.registerDummySecurityPolicy(permissive=False)
 
-        renderer = testing.registerDummyRenderer('templates/show_blogentry.pt')
-        self._callFUT(context, request)
+        response = self._callFUT(context, request)
 
-        self.assertEqual(renderer.comments[0]['edit_url'], None)
+        self.assertEqual(response['comments'][0]['edit_url'], None)
 
     def test_comment_ordering(self):
         context = DummyBlogEntry()
@@ -188,11 +354,10 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         self._register()
         from karl.utilities.interfaces import IKarlDates
         testing.registerUtility(dummy, IKarlDates)
-        renderer = testing.registerDummyRenderer('templates/show_blogentry.pt')
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.comments), 2)
-        self.assertEqual('before', renderer.comments[0]['text'])
-        self.assertEqual('sometext', renderer.comments[1]['text'])
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['comments']), 2)
+        self.assertEqual('before', response['comments'][0]['text'])
+        self.assertEqual('sometext', response['comments'][1]['text'])
 
 
 class Test_redirect_to_add_form(unittest.TestCase):
@@ -738,6 +903,36 @@ class Test_upload_attachments(unittest.TestCase):
         request = testing.DummyRequest()
         self._callFUT(attachments, folder, 'chris', request)
         self.failIf('a' in folder)
+
+class Test_show_mailin_trace_blog(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+        testing.registerSettings(mailin_trace_file='foo/bar')
+
+        from karl.content.views import blog
+        self._save_os = blog.os
+        blog.os = self
+
+    def tearDown(self):
+        testing.tearDown()
+
+        from karl.content.views import blog
+        blog.os = self._save_os
+
+    @property
+    def path(self):
+        return self
+
+    def getmtime(self, path):
+        return 1305120461.649806
+
+    def test_it(self):
+        from karl.content.views.blog import show_mailin_trace_blog
+        request = testing.DummyRequest()
+        response = show_mailin_trace_blog(None, request)
+        self.assertEqual(response['timestamp'], 'Wed May 11 09:27:41 2011')
 
 class DummyComment(testing.DummyModel):
     creator = u'dummy'

@@ -33,6 +33,8 @@ _marker = object()
 
 def _reindex(ob):
     catalog = find_catalog(ob)
+    if catalog is None:
+        return # Will be true for a mailin test trace
 
     # XXX reindexing the 'path' index can be removed once we've
     # removed the last ACLChecker spelled in catalog queries from the

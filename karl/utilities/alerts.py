@@ -49,6 +49,8 @@ class Alerts(object):
     def emit(self, context, request):
         # Get community in which event occurred and alert members
         community = find_community(context)
+        if community is None:
+            return # Will be true for a mailin test trace
         profiles = find_profiles(context)
         all_names = community.member_names | community.moderator_names
         for profile in [profiles[name] for name in all_names]:

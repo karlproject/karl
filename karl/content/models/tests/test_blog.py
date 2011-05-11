@@ -39,6 +39,11 @@ class BlogTests(unittest.TestCase):
         verifyObject(IBlog, self._makeOne())
 
 class BlogEntryTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.blog import BlogEntry
@@ -101,6 +106,48 @@ class TestBlogToolFactory(unittest.TestCase):
         factory.remove(context, request)
         self.failIf(factory.is_present(context, request))
 
+class TestMailinTracerBlog(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        from karl.content.models import blog
+        self._save_os = blog.os
+        blog.os = self
+        self._utime_called = None
+
+        testing.registerSettings(mailin_trace_file='trace_file')
+
+    def tearDown(self):
+        cleanUp()
+
+        from karl.content.models import blog
+        blog.os = self._save_os
+
+    def utime(self, path, time):
+        self.assertEqual(self._utime_called, None)
+        self._utime_called = (path, time)
+
+    def _getTargetClass(self):
+        from karl.content.models.blog import MailinTraceBlog as cut
+        return cut
+
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def test_class_conforms_to_IBlog(self):
+        from zope.interface.verify import verifyClass
+        from karl.content.interfaces import IBlog
+        verifyClass(IBlog, self._getTargetClass())
+
+    def test_instance_conforms_to_IBlog(self):
+        from zope.interface.verify import verifyObject
+        from karl.content.interfaces import IBlog
+        verifyObject(IBlog, self._makeOne())
+
+    def test_it(self):
+        tool = self._makeOne()
+        tool['foo'] = 'bar'
+        self.assertEqual(self._utime_called, ('trace_file', None))
 
 class DummyContent:
     pass

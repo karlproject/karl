@@ -12,6 +12,12 @@ Unreleased
 - Fixed bug in distribution lists where the mail recipients were not being
   passed as a list.  (LP #780000)
 
+- Added a mailin trace tool.  It looks like a regular blog tool but instead of
+  saving a blog entry that is added to it, it updates the timestamp on a file
+  in the filesystem. By sending a special tracer email to this tool at regular
+  intervals, the health of the mailin system can be monitored by monitoring the
+  timestamp on this external file.  (LP #770428)
+
 3.57 (2011-05-05)
 -----------------
 

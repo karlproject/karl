@@ -15,9 +15,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+import transaction
 
 from zope.interface import implements
 
+from repoze.bfg.settings import get_settings
 from repoze.lemonade.content import create_content
 from repoze.folder import Folder
 
@@ -67,3 +70,32 @@ class BlogToolFactory(ToolFactory):
         del context['blog']
 
 blog_tool_factory = BlogToolFactory()
+
+
+class MailinTraceBlog(Folder):
+    """
+    This tool can be used in place of a Blog in a specially set up test
+    community for testing mailin. When a message is picked up by mailin that
+    is destined for this tool, mailin will then try to add a BlogEntry to this
+    tool as though it were a regular blog. Rather than storing the passed in
+    blog entry the way that a regular blog would, this tool updates the
+    timestamp on a file in the filesystem.  The timestamp on that file can then
+    be monitored externally.  Assuming an external process which is sending
+    email messages to this tool at regular intervals, if the timestamp fails
+    to update for a period of time one can presume that something is broken
+    in mailin and a developer can be alerted to investigate.
+    """
+    implements(IBlog)
+    title = u'Mailin Trace Blog'
+
+    def __setitem__(self, name, value):
+##        super(MailinTraceBlog, self).__setitem__(name, value)
+        path = get_settings()['mailin_trace_file']
+        if not os.path.exists(path):
+            folder, fname = os.path.split(path)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            open(path, 'w').close()
+        os.utime(path, None)
+
+

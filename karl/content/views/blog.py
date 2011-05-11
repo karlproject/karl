@@ -17,6 +17,7 @@
 
 import calendar
 import datetime
+import os
 
 import formish
 import schemaish
@@ -140,8 +141,7 @@ def show_blog_view(context, request):
     else:
         security_states = get_security_states(workflow, None, request)
 
-    return render_template_to_response(
-        'templates/show_blog.pt',
+    return dict(
         api=api,
         actions=actions,
         entries=entries,
@@ -150,6 +150,17 @@ def show_blog_view(context, request):
         batch_info = batch,
         security_states=security_states,
         )
+
+def show_mailin_trace_blog(context, request):
+    path = get_setting(context, 'mailin_trace_file')
+    timestamp = os.path.getmtime(path)
+    timestamp = datetime.datetime.fromtimestamp(timestamp)
+    formatted_timestamp = timestamp.ctime()
+    return dict(
+        api=TemplateAPI(context, request),
+        system_email_domain=get_setting(context, 'system_email_domain'),
+        timestamp=formatted_timestamp,
+    )
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
@@ -256,8 +267,7 @@ def show_blogentry_view(context, request):
             enable_imagedrawer_upload = True,
             )
 
-    return render_template_to_response(
-        'templates/show_blogentry.pt',
+    return dict(
         api=api,
         actions=actions,
         comments=comments,
