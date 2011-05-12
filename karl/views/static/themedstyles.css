@@ -3439,7 +3439,8 @@ ul.menu li {
     color: #3A74A9;
 }
 
-.sras-searchknobs .sras-searchcontent a {
+.sras-searchknobs .sras-searchcontent a,
+.sras-searchknobs .sras-searchcontent strong {
     padding-left: 5px;
     line-height: 2em;
 }
@@ -3498,7 +3499,7 @@ ul.menu li {
 
 #sras-pagination {
     margin: 2em 0 0 170px;
-    background-color: lightgray;
+    background-color: #d3d3d3;
     text-align: right;
     padding: 0.4em
 }
@@ -3511,4 +3512,8 @@ ul.menu li {
 
 #sras-searchbutton {
     padding: 0.2em;
+}
+
+.ui-grid-pagination .ui-icon {
+    text-indent: 9999px
 }
