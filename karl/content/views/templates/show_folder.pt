@@ -16,7 +16,18 @@
     <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
     -->
     <!-- Load plupload and all it's runtimes and finally the jQuery UI queue widget -->
+    <!--
     <script type="text/javascript" src="${api.static_url}/plupload/js/plupload.full.min.js"></script>
+    -->
+    <!-- Load source versions of the plupload script files -->
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.js"></script>
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.gears.js"></script>
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.silverlight.js"></script>
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.flash.js"></script>
+    <!--script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.browserplus.js"></script-->
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.html4.js"></script>
+    <script type="text/javascript" src="${api.static_url}/plupload/src/javascript/plupload.html5.js"></script>
+
     <script type="text/javascript" src="${api.static_url}/plupload/js/jquery.ui.plupload.min.js"></script>
     <link rel="stylesheet" href="${api.static_url}/plupload/examples/css/jquery.ui.plupload.css" type="text/css"/>
     <!-- additional stuff needed from jquery-ui (currently not in karl js bundle) -->

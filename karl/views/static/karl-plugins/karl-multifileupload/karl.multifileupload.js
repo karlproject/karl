@@ -23,10 +23,12 @@ $.widget('karl.karlmultifileupload', {
         this.refreshNeeded = false;
         this.reset_batch();
 
-        var runtimes = 'html5,browserplus,gears,flash,silverlight';
+        var runtimes = 'html5,gears,flash,silverlight';
+        ////var runtimes = 'html5,browserplus,gears,flash,silverlight';
         if ($.browser.webkit) {
             // XXX html5, silverlight... borken on Safari/Chrome :(
-            runtimes = 'flash,browserplus,gears';
+            //runtimes = 'flash,browserplus,gears';
+            runtimes = 'flash,gears';
         }
 
         if ($.browser.msie) {
@@ -150,6 +152,7 @@ $.widget('karl.karlmultifileupload', {
                 // Signal that we will need a refresh
                 self.refreshNeeded = true;
         });
+        /*
         this.uploader.bind('FilesAdded', function(up, files) {
             // XXX this is a bug in plupload??? ... appears with an extension .screenflow on html5... ???
             $.each(files, function(index) {
@@ -162,6 +165,7 @@ $.widget('karl.karlmultifileupload', {
                 }
             });
         });
+        */
     },
 
     destroy: function() {

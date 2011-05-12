@@ -6,6 +6,10 @@
  *
  * License: http://www.plupload.com/license
  * Contributing: http://www.plupload.com/contributing
+ *
+ * 2011 Balazs Ree:
+ * - make an unknown extension _not_ result in an error
+ *   on file adding
  */
 
 // JSLint defined globals
@@ -992,15 +996,16 @@
 						file.status = plupload.QUEUED;
 
 						// Invalid file extension
-						if (extensionsRegExp && !extensionsRegExp.test(file.name)) {
-							up.trigger('Error', {
-								code : plupload.FILE_EXTENSION_ERROR,
-								message : plupload.translate('File extension error.'),
-								file : file
-							});
+						//if (extensionsRegExp && !extensionsRegExp.test(file.name)) {
 
-							continue;
-						}
+						//	up.trigger('Error', {
+						//		code : plupload.FILE_EXTENSION_ERROR,
+						//		message : plupload.translate('File extension error.'),
+						//		file : file
+						//	});
+
+						//	continue;
+						//}
 
 						// Invalid file size
 						if (file.size !== undef && file.size > settings.max_file_size) {

@@ -1036,9 +1036,10 @@ def ajax_file_upload_view(context, request):
         chunk = int(params.get('chunk', '0'))
 
         is_first_chunk = chunk == 0
-        is_last_chunk = chunk == chunks - 1
+        is_last_chunk = chunk >= chunks - 1
 
-        if chunk < 0 or chunk >= chunks:
+        # (we allow chunks==0 chunk==0 as this happens with 0-length files)
+        if chunk < 0 or chunks > 0 and chunk >= chunks:
             msg = 'Chunking inconsistence, `chunk` out of range' 
             raise ErrorResponse(msg, client_id='')
 
