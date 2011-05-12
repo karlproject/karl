@@ -3445,6 +3445,10 @@ ul.menu li {
     line-height: 2em;
 }
 
+.sras-searchknobs .sras-searchcontent a:hover {
+    text-decoration: underline;
+}
+
 .sras-searchknobs p {
     margin-top: 0.1em;
     margin-bottom: 0.1em;
