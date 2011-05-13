@@ -35,7 +35,7 @@ var kindToType = {
     Blogs: 'karl_content_interfaces_IBlogEntry',
     Files: 'karl_content_interfaces_ICommunityFile',
     Events: 'karl_content_interfaces_ICalendarEvent',
-    Communities: 'karl_models_interfaces_ICommunity',
+    Communities: 'karl_models_interfaces_ICommunity'
 };
 
 function getSearchValue() {
