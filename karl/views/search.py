@@ -232,7 +232,6 @@ def searchresults_view(context, request):
             except AttributeError:
                 description = ''
             type_name, icon = get_content_type_name_and_icon(doc)
-            author = profiles[doc.creator]
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
@@ -240,9 +239,9 @@ def searchresults_view(context, request):
                 'type': type_name,
                 'icon': icon,
                 'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'author_name': author.title,
-                'author_url': model_url(author, request),
+                'author': None,
             }
+
             result_community = find_community(doc)
             if result_community is not None:
                 result['community'] = {
@@ -252,8 +251,18 @@ def searchresults_view(context, request):
             else:
                 result['community'] = None
 
+            if hasattr(doc, 'creator'):
+                author = profiles.get(doc.creator)
+                if author is not None:
+                    result['author'] = {
+                        'name': author.title,
+                        'url': model_url(author, request),
+                    }
+
             results.append(result)
+
         total = batch['total']
+
     else:
         batch = {'batching_required': False}
         results = ()

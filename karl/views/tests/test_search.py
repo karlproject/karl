@@ -542,6 +542,43 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
 
+    def test_creator_not_found(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
+
+    def test_no_creator(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        class LocalDummyContent(testing.DummyModel):
+            implements(IDummyContent)
+            import datetime
+            title = 'Dummy Content'
+            modified = datetime.datetime(2010, 5, 12, 2, 42)
+        class LocalDummySearch(DummySearch):
+            content = LocalDummyContent()
+        testing.registerAdapter(LocalDummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
+
     def test_known_kind(self):
         from webob.multidict import MultiDict
         from karl.models.interfaces import IGroupSearchFactory
@@ -795,12 +832,29 @@ class MakeQueryTests(unittest.TestCase):
             {'creation_date': (6311520, 6626483), 'interfaces': [IContent]})
         self.assertEqual(terms, [1990])
 
+class IDummyContent(Interface):
+    taggedValue('name', 'dummy')
+    taggedValue('icon', 'dummy.png')
+
+class DummyContent(testing.DummyModel):
+    implements(IDummyContent)
+    import datetime
+    title = 'Dummy Content'
+    creator = 'tweedle dee'
+    modified = datetime.datetime(2010, 5, 12, 2, 42)
+
+class DummyCommunityContent(DummyContent):
+    from karl.models.interfaces import ICommunity
+    implements(ICommunity)
+
+dummycontent = DummyContent()
 
 class DummySearch:
+    content = dummycontent
     def __init__(self, context):
         pass
     def __call__(self, **kw):
-        return 1, [1], lambda x: dummycontent
+        return 1, [1], lambda x: self.content
 
 class DummyEmptySearch:
     def __init__(self, context):
@@ -827,20 +881,3 @@ class DummyGroupSearchFactory:
         self.resolver = resolver
     def __call__(self):
         return self.limit, range(self.limit), self.resolver
-
-class IDummyContent(Interface):
-    taggedValue('name', 'dummy')
-    taggedValue('icon', 'dummy.png')
-
-class DummyContent(testing.DummyModel):
-    implements(IDummyContent)
-    import datetime
-    title = 'Dummy Content'
-    creator = 'tweedle dee'
-    modified = datetime.datetime(2010, 5, 12, 2, 42)
-
-class DummyCommunityContent(DummyContent):
-    from karl.models.interfaces import ICommunity
-    implements(ICommunity)
-
-dummycontent = DummyContent()

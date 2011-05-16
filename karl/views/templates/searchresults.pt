@@ -118,9 +118,14 @@ $(document).ready(function(){
 
                 modified
                 <em><abbr class="timeago" title="${r['timeago']}">
-                  ${r['timeago']}</abbr></em> by
-                <a class="sras-searchfooterlinks"
-                   href="${r['author_url']}">${r['author_name']}</a>
+                  ${r['timeago']}</abbr></em>
+
+                <tal:block condition="r['author'] is not None"
+                           omit-tag="">
+                    by <a class="sras-searchfooterlinks"
+                          href="${r['author']['url']}">
+                          ${r['author']['name']}</a>
+                </tal:block>
             </div>
         </div>
     </div>
