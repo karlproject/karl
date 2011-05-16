@@ -408,7 +408,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/profiles/phred/')
         self.assertEqual(entry['tagusers_count'], '1 person')
-        self.assertEqual(entry['type'], 'Profile')
+        self.assertEqual(entry['type'], 'Person')
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/profiles/phred/'
                          'tagusers.html?tag=tag1&docid=1')
@@ -454,7 +454,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['title'], 'title')
         self.assertEqual(entry['href'], 'http://example.com/profiles/phred/')
         self.assertEqual(entry['tagusers_count'], '2 people')
-        self.assertEqual(entry['type'], 'Profile')
+        self.assertEqual(entry['type'], 'Person')
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/profiles/phred/'
                          'tagusers.html?tag=tag1&docid=1')
@@ -1133,7 +1133,7 @@ class ManageTagsViewTests(unittest.TestCase):
         self.assertEqual(len(result['my_tags']), 2)
         self.assertEqual(result['my_tags'][0], 'tag1')
         self.assertEqual(result['my_tags'][1], 'tag2')
-        
+
 
 
 class AjaxViewTests(unittest.TestCase):
