@@ -546,6 +546,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_creator_not_found(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context.catalog = {}
         context['profiles'] = profiles = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
@@ -561,6 +562,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_no_creator(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context.catalog = {}
         context['profiles'] = profiles = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
@@ -644,6 +646,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_known_type(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context.catalog = {}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(params=MultiDict(
@@ -664,6 +667,7 @@ class SearchResultsViewTests(unittest.TestCase):
     def test_known_since(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
+        context.catalog = {}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(

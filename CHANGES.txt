@@ -24,6 +24,9 @@ Unreleased
 - Updated the 'Add Page' view to properly relocate temporary images uploaded
   via ImageDrawer.  (LP #782388)
 
+- Implemented better live search and search results pages.  (Merged from
+  ree-livesearch-resources branch.)
+
 3.57 (2011-05-05)
 -----------------
 

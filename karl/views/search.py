@@ -265,7 +265,7 @@ def searchresults_view(context, request):
         text_term = request.params.get('body')
         results = []
         for doc in batch['entries']:
-            description = summarizer(result, text_term)
+            description = summarizer(doc, text_term)
             type_name, icon = get_content_type_name_and_icon(doc)
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
