@@ -711,6 +711,25 @@ class TestThumbnailView(unittest.TestCase):
         image = PIL.Image.open(StringIO(response.body))
         self.assertEqual(image.size, (137, 200))
 
+    def test_it_no_subpath(self):
+        import PIL.Image
+        from cStringIO import StringIO
+        context = self._get_context()
+        request = testing.DummyRequest()
+
+        from repoze.bfg.exceptions import NotFound
+        self.assertRaises(NotFound, self._callFUT, context, request)
+
+    def test_it_bad_subpath(self):
+        import PIL.Image
+        from cStringIO import StringIO
+        context = self._get_context()
+        request = testing.DummyRequest()
+        request.subpath = ('fooxbar.jpg',)
+
+        from repoze.bfg.exceptions import NotFound
+        self.assertRaises(NotFound, self._callFUT, context, request)
+
 class TestEditFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()

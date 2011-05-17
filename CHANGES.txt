@@ -18,13 +18,16 @@ Unreleased
   intervals, the health of the mailin system can be monitored by monitoring the
   timestamp on this external file.  (LP #770428)
 
+- Thumbnail view now raises NotFound if it can't extract a thumbnail size from
+  the subpath.  (LP #777365)
+
 3.57 (2011-05-05)
 -----------------
 
 - In mailin, multiple recipients are now allowed for single messages.
   (LP #773426)
 
-- Error monitor now shows referer for Karl exceptions.
+- Error monitor now shows referer for Karl exceptions. (LP #777365)
 
 - Stats view now raises NotFound if var/stats/stats.csv is not found.
   (LP #777363)

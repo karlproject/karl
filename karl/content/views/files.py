@@ -41,6 +41,7 @@ from webob import Response
 from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.exceptions import NotFound
 from repoze.bfg.traversal import find_interface
 
 from repoze.bfg.security import authenticated_userid
@@ -535,8 +536,13 @@ def download_file_view(context, request):
 
 def thumbnail_view(context, request):
     assert IImage.providedBy(context), "Context must be an image."
+    if not request.subpath:
+        raise NotFound
     filename = request.subpath[0] # <width>x<length>.jpg
-    size = map(int, filename[:-4].split('x'))
+    try:
+        size = map(int, filename[:-4].split('x'))
+    except:
+        raise NotFound
     thumb = context.thumbnail(tuple(size))
 
     # XXX Allow browser caching be setting Last-modified and Expires
@@ -819,7 +825,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 # --
 
 class ErrorResponse(Exception):
-    
+
     def __init__(self, txt, client_id=None):
         self.client_id = client_id
         super(ErrorResponse, self).__init__(txt)
@@ -833,12 +839,12 @@ def new_ajax_file_upload_view(context, request):
         binfile = request.str_POST.get('binfile', None)
         filename = params.get('filename', None)
         if binfile is None or filename is None:
-            msg = 'Wrong parameters, `binfile` is mandatory' 
+            msg = 'Wrong parameters, `binfile` is mandatory'
             raise ErrorResponse(msg)
         mimetype = params.get('mimetype', None)
         # XXX mimetype is supposed to be mandatory at some point
         #if mimetype is None:
-        #    msg = 'Wrong parameters, `mimetype` is mandatory' 
+        #    msg = 'Wrong parameters, `mimetype` is mandatory'
         #    raise ErrorResponse(msg)
         #
         # ... but for now...
@@ -953,7 +959,7 @@ def new_ajax_file_upload_view(context, request):
             result = 'ERROR',
             error = str(exc),
         )
-        log.error('new_ajax_file_upload_view at filename="%s": %s' % 
+        log.error('new_ajax_file_upload_view at filename="%s": %s' %
             (filename, str(exc)))
         transaction.doom()
 
@@ -966,13 +972,13 @@ def new_ajax_file_query_view(context, request):
     # Query the newest changes
     try:
         params = request.params
-        
+
         timestamp_from = params.get('timestampfrom', None)
         if timestamp_from is None:
-            msg = 'Wrong parameters, `timestampfrom` is mandatory' 
+            msg = 'Wrong parameters, `timestampfrom` is mandatory'
             raise ErrorResponse(msg)
         # timestampfrom = "" means we want all files changed since infinite past
-        
+
         # XXX This should be done from catalog, but now let's just do it
         # quick-and-dirty.
         # Also: we do not go into folders yet...
@@ -1020,7 +1026,7 @@ def new_ajax_file_query_view(context, request):
         payload = dict(
             error = str(exc),
         )
-        log.error('new_ajax_file_query_view: %s' % 
+        log.error('new_ajax_file_query_view: %s' %
             (str(exc), ))
         transaction.doom()
 
