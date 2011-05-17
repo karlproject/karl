@@ -1164,29 +1164,6 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 }
             });
 
-        // create menu for move
-        this.menuMove = $(
-            '<ul>' +
-                '<input></input>' +
-            '</ul>'
-        );
-        this.menuMoveKeyStub = this.menuMove.find('input')
-            .css('position', 'absolute')
-            .css('left', '-2000px');
-        this.menuMove
-            .appendTo('body')
-            .hide()
-            .width(250)
-            .menu({
-                //disabled: true
-                input: this.menuMoveKeyStub,
-                select: function(evt, selection) {
-                    self.menuMove.hide();
-                    var selected = selection.item.data('folder');
-                    self._onMoveSelected(selected);
-                }
-            });
-
         $.ui.karlgrid.prototype._create.call(this, arguments);
     },
 
@@ -1406,6 +1383,54 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 return false;
             })
             .appendTo(positioner);
+
+        // create menu for move
+        this.menuMove = $('<ul></ul>')
+            .insertAfter(this.button_move)
+            .hide()
+            .width(250)
+            .css('position', 'absolute')
+            .menu({
+                select: function(evt, selection) {
+                    self.menuMove.hide();
+                    var selected = selection.item;
+                    if (selected) {
+                        var folder_info = selected.data('folder');
+                        self._onMoveSelected(folder_info);
+                    }
+                }
+            });
+            ////.popup();
+        // XXX escape from the menu needs to be done manually,
+        // this will arrive in jquery-ui 1.9 when this will not
+        // be needed any longer (or it will simply break)
+        this.menuMove.bind("keydown", function(event) {
+            if (self.menuMove.menu('option', 'disabled')) {
+                return;
+            }
+            switch (event.keyCode) {
+                case $.ui.keyCode.ESCAPE:
+                    self.menuMove.hide();
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    break;
+            }
+        });
+        $('body').bind("mousedown", function(event) {
+            if (self.menuMove.menu('option', 'disabled') 
+                // escape if the menu is disabled
+                || self.menuMove.is(':hidden')
+                // or if the menu is hidden
+                || $(event.target).is('.ui-grid-footer .ui-menu *')) {
+                // or if we are not outside the menu
+                return;
+            }
+            self.menuMove.hide();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        });
+
+
     },
 
     _onDeleteClicked: function() {
@@ -1451,14 +1476,12 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     },
 
     _onMoveClicked: function() {
-        console.log('grid MOVE clicked');
         this.menuMove.show();
         this.menuMove.position({my: 'left bottom', at: 'left top', of: this.button_move, collision: 'fit'});
-        this.menuMoveKeyStub.focus();
+        this.menuMove.focus();
     },
 
     _onMoveSelected: function(selected) {
-        console.log('grid MOVE target selected');
         this.dialogMoveFolderName.text(selected);
         this.dialogMoveConfirm.karldialog('open');
     },

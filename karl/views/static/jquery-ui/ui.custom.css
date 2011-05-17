@@ -258,11 +258,12 @@
     font-size: 1em;
 }
 
-/*
 .ui-grid-footer-button-positioner {
+    float: left;
+    /*
     margin-left: 4px;
+    */
 }
-*/
 
 /* global selector in the grid column header */
 
