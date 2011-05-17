@@ -8,6 +8,10 @@
  *   http://www.gnu.org/licenses/gpl.html
  *
  * Copyright 2007 Yehuda Katz, Rein Henrichs
+ *
+ * 2011 Balazs Ree <ree@greenfinity.hu>
+ * - Fix reserved identifiers that broke YUI compressor
+ *
  */
 
 (function($) {
@@ -20,9 +24,9 @@
   if (window.console) {
       log = console.log;
   } else {
-      log = function() {};
+      log =  function () {};
   }
-  var MiniRM = function(opt) {
+  var MiniRM = function (opt) {
     this.chainedGetJSON = opt.jsonhandler || $.getJSON;
     this.maxActive = opt.maxActive || 1;
     this.maxQueue = opt.maxQueue || 1;
@@ -30,9 +34,9 @@
     this.queue = [];
   };
   $.extend(MiniRM.prototype, {
-      getJSON: function(url, query, handler) {
+      getJSON: function (url, query, handler) {
         var self = this;
-        var wrappedHandler = function(json) {
+        var wrappedHandler = function (json) {
             self.active -= 1;
             self.log ('MiniRM IN', url, query);
             handler(json);
@@ -56,15 +60,15 @@
             this.log ('MiniRM PUSH', url, query);
         }
       },
-      log: function(msg, url, query) {
+      log: function (msg, url, query) {
         //log (msg, 'ACT=' + this.active, 'QUE=' + this.queue.length, url + "?" + query);
       }
   });
   var miniRM = new MiniRM({});
 
-  $.ui.autobox.ext.ajax = function(opt) {
+  $.ui.autobox.ext.ajax = function (opt) {
     var ajax = opt.ajax;
-    return { getList: function(input, hash) {
+    return { getList: function (input, hash) {
       var val = input.val();
       var minQueryLength = this.options.minQueryLength;
       var minQueryNotice = this.options.minQueryNotice; 
@@ -74,37 +78,37 @@
       }
 
       // filter words by short/long
-      var words = val.replace(/\s+/, " ").split(" "), short = [], long = [];
+      var words = val.replace(/\s+/, " ").split(" "), _short = [], _long = [];
       for (i = 0, j = words.length; i < j; i++) {
         var word = words[i];
         if (word == "") continue;
-        tooShort(word, minQueryLength) ? short.push(word) : long.push(word);        
+        tooShort(word, minQueryLength) ? _short.push(word) : _long.push(word);        
       }
-      val = long.join(" ");
+      val = _long.join(" ");
 
       // only send request if we have a long word
-      if (long.length > 0) {
-        miniRM.getJSON(ajax, "val=" + val, function(json) {
+      if (_long.length > 0) {
+        miniRM.getJSON(ajax, "val=" + val, function (json) {
           if (hash) { 
-            if (short.length > 0 && minQueryNotice) { 
+            if (_short.length > 0 && minQueryNotice) { 
               json.unshift(minQueryNotice); 
             }
-            json = $(json).filter(function(){ return !hash[this.text]; });
+            json = $(json).filter(function (){ return !hash[this.text]; });
             input.trigger("updateList", [json]);
           }
         });
         
       // only short words - show notice
-      } else if (short.length > 0 && minQueryNotice) {
+      } else if (_short.length > 0 && minQueryNotice) {
         input.trigger("updateList", [[minQueryNotice]]);
       }
 
     }};
   };
 
-  $.ui.autobox.ext.templateText = function(opt) {
+  $.ui.autobox.ext.templateText = function (opt) {
     var template = $.makeTemplate(opt.templateText, "<%", "%>");
-    return { template: function(obj) { return template(obj); } };
+    return { template: function (obj) { return template(obj); } };
   };
 
 })(jQuery);

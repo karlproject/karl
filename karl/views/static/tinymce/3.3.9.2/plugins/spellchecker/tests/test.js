@@ -66,7 +66,7 @@ module("tiny.spellchecker", {
  
     handle_ajax: function(request, ajax_heartbeat) {
 
-        log(request.urlParts);
+        //log(request.urlParts);
         if (request.urlParts.file == 'tinymce_spellcheck') {
          
             // Return the example response from the server.

@@ -56,7 +56,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          title='Dummy1', sort_key=1)
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             }
@@ -64,12 +63,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         from simplejson import loads
         results = loads(response.body)
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['rowclass'], 'showall')
-        self.assertEqual(results[0]['header'], '')
-        self.assertEqual(results[0]['title'], 'Show All')
-        self.assertEqual(results[1]['header'], 'Dummy1')
-        self.assertEqual(results[1]['title'], 'No Result')
+        self.assertEqual(len(results), 0)
 
     def test_with_parameter_withresults(self):
         def dummy_factory1(context, request, term):
@@ -86,21 +80,414 @@ class JQueryLivesearchViewTests(unittest.TestCase):
                          title='Dummy2', sort_key=2)
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        dummycontent = testing.DummyModel()
         request.params = {
             'val': 'somesearch',
             }
+        def dummy_adapter(context, request):
+            return dict(title=context.title)
+        from karl.views.interfaces import ILiveSearchEntry
+        testing.registerAdapter(dummy_adapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                ILiveSearchEntry)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '200 OK')
         from simplejson import loads
         results = loads(response.body)
-        self.assertEqual(len(results), 3)
-        self.assertEqual(results[0]['rowclass'], 'showall')
-        self.assertEqual(results[0]['header'], '')
-        self.assertEqual(results[0]['title'], 'Show All')
-        self.assertEqual(results[1]['header'], 'Dummy2')
-        self.assertEqual(results[1]['title'], 'yo')
-        self.assertEqual(response.content_type, 'application/x-json')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], 'yo')
+        self.assertEqual(response.content_type, 'application/json')
+
+    def test_with_parameter_withresults_withkind(self):
+        def dummy_factory(context, request, term):
+            def results():
+                return 1, [1], lambda x: testing.DummyModel(title='yo')
+            return results
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory,
+                         'foo_kind', title='Dummy')
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        request.params = {
+            'val': 'somesearch',
+            'kind': 'foo_kind',
+            }
+        def dummy_adapter(context, request):
+            return dict(title=context.title)
+        from karl.views.interfaces import ILiveSearchEntry
+        testing.registerAdapter(dummy_adapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                ILiveSearchEntry)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '200 OK')
+        from simplejson import loads
+        results = loads(response.body)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], 'yo')
+        self.assertEqual(response.content_type, 'application/json')
+
+    def test_with_parameter_withresults_withbadkind(self):
+        def dummy_factory(context, request, term):
+            def results():
+                return 1, [1], lambda x: testing.DummyModel(title='yo')
+            return results
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory,
+                         'foo_kind', title='Dummy')
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        request.params = {
+            'val': 'somesearch',
+            'kind': 'bad_kind',
+            }
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '400 Bad Request')
+
+    def test_numresults_nokind(self):
+        def dummy_factory(context, request, term):
+            return DummyGroupSearchFactory(
+                lambda x: testing.DummyModel(title='yo'))
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory, 'dummy',
+                         title='Dummy')
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        request.params = {
+            'val': 'somesearch',
+            }
+        def dummy_adapter(context, request):
+            return dict(title=context.title)
+        from karl.views.interfaces import ILiveSearchEntry
+        testing.registerAdapter(dummy_adapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                ILiveSearchEntry)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '200 OK')
+        from simplejson import loads
+        results = loads(response.body)
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(len(results), 5)
+
+    def test_numresults_withkind(self):
+        def dummy_factory(context, request, term):
+            return DummyGroupSearchFactory(
+                lambda x: testing.DummyModel(title='yo'))
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        registerListItem(IGroupSearchFactory, dummy_factory,
+                         'foo_kind', title='Dummy')
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        request.params = {
+            'val': 'somesearch',
+            'kind': 'foo_kind',
+            }
+        def dummy_adapter(context, request):
+            return dict(title=context.title)
+        from karl.views.interfaces import ILiveSearchEntry
+        testing.registerAdapter(dummy_adapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                ILiveSearchEntry)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '200 OK')
+        from simplejson import loads
+        results = loads(response.body)
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(len(results), 20)
+
+
+class LiveSearchEntryAdapterTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_generic_adapter(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import generic_livesearch_result
+        result = generic_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('http://example.com/foo/', result['url'])
+
+    def test_profile_adapter_defaultimg(self):
+        context = testing.DummyModel(title='foo',
+                                     extension='x1234',
+                                     email='foo@example.com',
+                                     department='science',
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import profile_livesearch_result
+        result = profile_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('x1234', result['extension'])
+        self.assertEqual('foo@example.com', result['email'])
+        self.failUnless(result['thumbnail'].endswith('/images/defaultUser.gif'))
+        self.assertEqual('science', result['department'])
+        self.assertEqual('profile', result['type'])
+        self.assertEqual('profile', result['category'])
+
+    def test_profile_adapter_customimg(self):
+        from karl.content.interfaces import IImage
+        from zope.interface import alsoProvides
+        context = testing.DummyModel(title='foo',
+                                     extension='x1234',
+                                     email='foo@example.com',
+                                     department='science',
+                                     )
+        dummyphoto = testing.DummyModel(title='photo')
+        alsoProvides(dummyphoto, IImage)
+        context['photo'] = dummyphoto
+        request = testing.DummyRequest()
+        from karl.views.adapters import profile_livesearch_result
+        result = profile_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('x1234', result['extension'])
+        self.assertEqual('foo@example.com', result['email'])
+        self.assertEqual('http://example.com/photo/thumb/85x85.jpg',
+                         result['thumbnail'])
+        self.assertEqual('science', result['department'])
+        self.assertEqual('profile', result['type'])
+        self.assertEqual('profile', result['category'])
+
+    def test_page_adapter_withnocommunity(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     modified_by='johnny',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import page_livesearch_result
+        result = page_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('johnny', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual(None, result['community'])
+        self.assertEqual('page', result['type'])
+        self.assertEqual('page', result['category'])
+
+    def test_page_adapter_withcommunity(self):
+        from datetime import datetime
+        from karl.models.interfaces import ICommunity
+        from zope.interface import alsoProvides
+        root = testing.DummyModel(title='nice community')
+        alsoProvides(root, ICommunity)
+        context = testing.DummyModel(__name__='foo',
+                                     __parent__=root,
+                                     title='foo',
+                                     modified_by='johnny',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import page_livesearch_result
+        result = page_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('johnny', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual('nice community', result['community'])
+        self.assertEqual('page', result['type'])
+        self.assertEqual('page', result['category'])
+
+    def test_page_adapter_withoffice(self):
+        from datetime import datetime
+        from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import IIntranets
+        from zope.interface import alsoProvides
+        root = testing.DummyModel(title='nice office')
+        alsoProvides(root, ICommunity)
+        alsoProvides(root, IIntranets)
+        context = testing.DummyModel(__name__='foo',
+                                     __parent__=root,
+                                     title='foo',
+                                     modified_by='johnny',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import page_livesearch_result
+        result = page_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('johnny', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual(None, result['community'])
+        self.assertEqual('page', result['type'])
+        self.assertEqual('page', result['category'])
+
+    def test_reference_adapter(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     modified_by='biff',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import reference_livesearch_result
+        result = reference_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('biff', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual('page', result['type'])
+        self.assertEqual('reference', result['category'])
+
+    def test_blogentry_adapter(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     modified_by='marty',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import blogentry_livesearch_result
+        result = blogentry_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('marty', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual(None, result['community'])
+        self.assertEqual('post', result['type'])
+        self.assertEqual('blogentry', result['category'])
+
+    def test_comment_adapter_noparents(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     creator='michael',
+                                     created=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import comment_livesearch_result
+        result = comment_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('michael', result['creator'])
+        self.assertEqual('1985-01-01T00:00:00', result['created'])
+        self.assertEqual(None, result['community'])
+        self.assertEqual(None, result['forum'])
+        self.assertEqual(None, result['blog'])
+        self.assertEqual('post', result['type'])
+        self.assertEqual('comment', result['category'])
+
+    def test_comment_adapter_withparents(self):
+        from zope.interface import alsoProvides
+        from datetime import datetime
+        from karl.content.interfaces import IForum
+        from karl.content.interfaces import IBlogEntry
+        from karl.models.interfaces import ICommunity
+        root = testing.DummyModel(title='object title')
+        # cheat here and have the object implement all the interfaces we expect
+        alsoProvides(root, IForum)
+        alsoProvides(root, ICommunity)
+        alsoProvides(root, IBlogEntry)
+        context = testing.DummyModel(__parent__=root,
+                                     title='foo',
+                                     creator='michael',
+                                     created=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import comment_livesearch_result
+        result = comment_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('michael', result['creator'])
+        self.assertEqual('1985-01-01T00:00:00', result['created'])
+        self.assertEqual('object title', result['community'])
+        self.assertEqual('object title', result['forum'])
+        self.assertEqual('object title', result['blog'])
+        self.assertEqual('post', result['type'])
+        self.assertEqual('comment', result['category'])
+
+    def test_forum_adapter(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     creator='sarah',
+                                     created=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import forum_livesearch_result
+        result = forum_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('sarah', result['creator'])
+        self.assertEqual('1985-01-01T00:00:00', result['created'])
+        self.assertEqual('post', result['type'])
+        self.assertEqual('forum', result['category'])
+
+    def test_forumtopic_adapter(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     creator='sarah',
+                                     created=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import forumtopic_livesearch_result
+        result = forumtopic_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('sarah', result['creator'])
+        self.assertEqual('1985-01-01T00:00:00', result['created'])
+        self.assertEqual(None, result['forum'])
+        self.assertEqual('post', result['type'])
+        self.assertEqual('forumtopic', result['category'])
+
+    def test_file_adapter(self):
+        from datetime import datetime
+        from karl.content.views.interfaces import IFileInfo
+        context = testing.DummyModel(title='foo',
+                                     modified_by='susan',
+                                     modified=datetime(1985, 1, 1),
+                                     )
+        request = testing.DummyRequest()
+        class FileDummyAdapter(object):
+            def __init__(self, context, request):
+                pass
+            mimeinfo = dict(small_icon_name='imgpath.png')
+
+        testing.registerAdapter(FileDummyAdapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                IFileInfo)
+
+        from karl.views.adapters import file_livesearch_result
+        result = file_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('susan', result['modified_by'])
+        self.assertEqual('1985-01-01T00:00:00', result['modified'])
+        self.assertEqual('file', result['type'])
+        self.assertEqual('file', result['category'])
+        self.assertEqual(None, result['community'])
+        self.failUnless(result['icon'].endswith('/imgpath.png'))
+
+    def test_community_adapter(self):
+        from zope.interface import alsoProvides
+        from karl.models.interfaces import ICommunityInfo
+        context = testing.DummyModel(title='foo',
+                                     number_of_members=7,
+                                     )
+        def dummy_communityinfo_adapter(context, request):
+            return context
+        testing.registerAdapter(dummy_communityinfo_adapter,
+                                (testing.DummyModel, testing.DummyRequest),
+                                ICommunityInfo)
+        request = testing.DummyRequest()
+        from karl.views.adapters import community_livesearch_result
+        result = community_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual(7, result['num_members'])
+        self.assertEqual('community', result['type'])
+        self.assertEqual('community', result['category'])
+
+    def test_calendar_adapter(self):
+        from datetime import datetime
+        context = testing.DummyModel(title='foo',
+                                     startDate=datetime(1985, 1, 1),
+                                     endDate=datetime(1985, 2, 1),
+                                     location='mars',
+                                     )
+        request = testing.DummyRequest()
+        from karl.views.adapters import calendar_livesearch_result
+        result = calendar_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('1985-01-01T00:00:00', result['start'])
+        self.assertEqual('1985-02-01T00:00:00', result['end'])
+        self.assertEqual('mars', result['location'])
+        self.assertEqual(None, result['community'])
+        self.assertEqual('calendarevent', result['type'])
+        self.assertEqual('calendarevent', result['category'])
 
 
 class SearchResultsViewTests(unittest.TestCase):
@@ -143,6 +530,8 @@ class SearchResultsViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
         context.catalog = {}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
@@ -154,18 +543,57 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
 
+    def test_creator_not_found(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
+
+    def test_no_creator(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        class LocalDummyContent(testing.DummyModel):
+            implements(IDummyContent)
+            import datetime
+            title = 'Dummy Content'
+            modified = datetime.datetime(2010, 5, 12, 2, 42)
+        class LocalDummySearch(DummySearch):
+            content = LocalDummyContent()
+        testing.registerAdapter(LocalDummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo'])
+        self.assertEqual(len(result['results']), 1)
+
     def test_known_kind(self):
         from webob.multidict import MultiDict
         from karl.models.interfaces import IGroupSearchFactory
         from repoze.lemonade.testing import registerContentFactory
         from zope.interface import Interface
-        content = DummyContent()
+        content = DummyCommunityContent()
         def search_factory(*arg, **kw):
             return DummySearchFactory(content)
         testing.registerUtility(
             search_factory, IGroupSearchFactory, name='People')
         context = testing.DummyModel()
         context.catalog = {}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'People'}))
         from karl.models.interfaces import ICatalogSearch
@@ -180,6 +608,8 @@ class SearchResultsViewTests(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'Citizens'
         context.catalog = {}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -210,6 +640,46 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(len(result['terms']), 0)
         self.assertEqual(len(result['results']), 0)
         self.assertEqual(result['error'], "Error: 'the' is nonsense")
+
+    def test_known_type(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        request = testing.DummyRequest(params=MultiDict(
+            {'body':'yo',
+             'types': 'karl_content_interfaces_IBlogEntry'}))
+        from zope.interface import Interface
+        from karl.content.interfaces import IBlogEntry
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        registerContentFactory(DummyContent, IBlogEntry)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo', 'Blog Entry'])
+        self.assertEqual(len(result['results']), 1)
+
+    def test_known_since(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        request = testing.DummyRequest(
+            params=MultiDict({'body':'yo', 'since': 'week'}))
+        from zope.interface import Interface
+        from karl.content.interfaces import IBlogEntry
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        registerContentFactory(DummyContent, IBlogEntry)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.assertEqual(result['terms'], ['yo', 'Past week'])
+        self.assertEqual(len(result['results']), 1)
+
 
 class GetBatchTests(unittest.TestCase):
     def setUp(self):
@@ -365,38 +835,29 @@ class MakeQueryTests(unittest.TestCase):
             {'creation_date': (6311520, 6626483), 'interfaces': [IContent]})
         self.assertEqual(terms, [1990])
 
+class IDummyContent(Interface):
+    taggedValue('name', 'dummy')
+    taggedValue('icon', 'dummy.png')
 
-class AdvancedSearchViewTests(unittest.TestCase):
+class DummyContent(testing.DummyModel):
+    implements(IDummyContent)
+    import datetime
+    title = 'Dummy Content'
+    creator = 'tweedle dee'
+    modified = datetime.datetime(2010, 5, 12, 2, 42)
 
-    def setUp(self):
-        cleanUp()
+class DummyCommunityContent(DummyContent):
+    from karl.models.interfaces import ICommunity
+    implements(ICommunity)
 
-    def tearDown(self):
-        cleanUp()
-
-    def test_advancedsearch_view(self):
-        from karl.models.interfaces import IComment
-        from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(DummyContent, IComment)
-
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        from karl.views.search import advancedsearch_view
-        result = advancedsearch_view(context, request)
-        self.assertEqual(
-            result['post_url'], 'http://example.com/searchresults.html')
-        self.assertEqual(result['type_choices'], [
-            ('Comment', 'karl_models_interfaces_IComment'),
-            ])
-        self.assertFalse('2006' in result['year_choices'])
-        self.assertTrue('2007' in result['year_choices'])
-
+dummycontent = DummyContent()
 
 class DummySearch:
+    content = dummycontent
     def __init__(self, context):
         pass
     def __call__(self, **kw):
-        return 1, [1], lambda x: dummycontent
+        return 1, [1], lambda x: self.content
 
 class DummyEmptySearch:
     def __init__(self, context):
@@ -417,11 +878,9 @@ class DummySearchFactory:
     def get_batch(self):
         return {'entries':[self.content], 'total':1}
 
-class IDummyContent(Interface):
-    taggedValue('name', 'dummy')
-
-class DummyContent(testing.DummyModel):
-    implements(IDummyContent)
-
-dummycontent = DummyContent()
-
+class DummyGroupSearchFactory:
+    limit = 5
+    def __init__(self, resolver):
+        self.resolver = resolver
+    def __call__(self):
+        return self.limit, range(self.limit), self.resolver

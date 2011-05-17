@@ -55,20 +55,11 @@
 
   <view
     for="karl.models.interfaces.ISite"
-    view=".search.advancedsearch_view"
-    renderer="templates/advancedsearch.pt"
-    permission="view"
-    name="advancedsearch.html"
-  />
-
-  <view
-    for="karl.models.interfaces.ISite"
     view=".search.searchresults_view"
     renderer="templates/searchresults.pt"
     permission="view"
     name="searchresults.html"
   />
-
 
   <!-- Start global tagging related views -->
 
@@ -234,12 +225,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Group"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -255,12 +246,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Group"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -276,12 +267,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Group"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -297,20 +288,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Category"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditCategoryFormController"
      name="edit.html"
@@ -318,18 +309,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Category"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-  
+
   </formish:form>
 
   <formish:form
@@ -339,20 +330,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Category Item"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditCategoryItemFormController"
      name="edit.html"
@@ -360,18 +351,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Category Item"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
 
   <formish:form
@@ -381,18 +372,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Section"
        />
-    
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
 
   <formish:form
@@ -402,18 +393,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Section"
        />
-    
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
 
   <formish:form
@@ -423,20 +414,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Section Column"
        />
-     
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditSectionColumnFormController"
      name="edit.html"
@@ -444,18 +435,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Section Column"
        />
-     
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-  
+
   </formish:form>
 
   <formish:form
@@ -465,12 +456,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Redirector"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -486,12 +477,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Redirector"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -507,12 +498,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Report"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -528,12 +519,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Report"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -549,12 +540,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Report"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -570,12 +561,12 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Report"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
@@ -591,18 +582,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Category Report Filter"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
 
   <formish:form
@@ -612,20 +603,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Group Report Filter"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditReportFilterFormController"
      name="edit.html"
@@ -633,18 +624,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Report Filter"
        />
-     
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-  
+
   </formish:form>
 
   <formish:form
@@ -654,20 +645,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add IsStaff Report Filter"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditIsStaffReportFilterFormController"
      name="edit.html"
@@ -675,18 +666,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit IsStaff Report Filter"
        />
-     
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-  
+
   </formish:form>
 
   <formish:form
@@ -696,20 +687,20 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="add">
-     
+
      <formish:action
        name="submit"
        title="Add Mailing List"
        />
-       
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-       
+
   </formish:form>
-  
+
   <formish:form
      controller=".peopledirectory.EditReportMailingListFormController"
      name="edit.html"
@@ -717,18 +708,18 @@
      permission="administer"
      renderer="forms/templates/formish_form.pt"
      form_id="edit">
-     
+
      <formish:action
        name="submit"
        title="Edit Mailing List"
        />
-     
+
      <formish:action
        name="cancel"
        title="Cancel"
        validate="false"
        />
-  
+
   </formish:form>
 
   <formish:form
@@ -1389,7 +1380,7 @@
     renderer="templates/people_contents.pt"
     name="moveup.html"
     />
-    
+
   <view
     for="karl.models.interfaces.IPeopleCategories"
     view=".peopledirectory.admin_contents_movedown_view"
@@ -1753,7 +1744,89 @@
     name="kaltura_create_session.json"
   />
 
+  <!-- livesearch entries -->
+  <adapter
+    for="repoze.lemonade.interfaces.IContent
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.generic_livesearch_result"
+    />
 
+  <adapter
+    for="karl.models.interfaces.IProfile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.profile_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.page_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IWikiPage
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.page_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.reference_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IBlogEntry
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.blogentry_livesearch_result"
+    />
+
+  <adapter
+    for="karl.models.interfaces.IComment
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.comment_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForum
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.forum_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForumTopic
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.forumtopic_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.file_livesearch_result"
+    />
+
+  <adapter
+    for="karl.models.interfaces.ICommunity
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.community_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.calendar_livesearch_result"
+    />
 
 </configure>
-

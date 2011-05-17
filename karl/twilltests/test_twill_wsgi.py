@@ -99,7 +99,7 @@ class TestKarlTwill:
         # copied from twilltests/calendar/calendar-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # run calendar tests
             "runfile '${test_path}/calendar/calendar-view.twill'",
             "runfile '${test_path}/calendar/create-event.twill'",
@@ -116,10 +116,10 @@ class TestKarlTwill:
         # copied from twilltests/community/community-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # Make community
             "runfile '${test_path}/community/make_community.twill'",
-            
+
             # optional tests which we run to test functionality of
             # new community.
             # you can comment out if needed
@@ -137,9 +137,9 @@ class TestKarlTwill:
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # Tests for files suite
-            
+
             "runfile '${test_path}/files/files_view.twill'",
             "runfile '${test_path}/files/files_aved.twill'",
             "runfile '${test_path}/files/files_index.twill'"
@@ -153,15 +153,15 @@ class TestKarlTwill:
         # copied from twilltests/profiles/profiles-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # Profile tests
-            
+
             # Test to see what profiles we can see
             #user_view
-            
+
             # Login as admin before add/edit/delete user
             "login 'admin'",
-            
+
             # Add, edit, and delete user account
             "runfile '${test_path}/profiles/user_add.twill'",
             #user_edit
@@ -176,29 +176,27 @@ class TestKarlTwill:
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # Search tests
-            
+
             # Test searching for a blog entry
             "runfile '${test_path}/search/search_blog_entry.twill'",
-            
+
             # Test searching for a calendar entry
             "runfile '${test_path}/search/search_calendar_entry.twill'",
-            
+
             # Test searching for a community
             "runfile '${test_path}/search/search_community.twill'",
-            
+
             # Test searching for a file
             "runfile '${test_path}/search/search_file.twill'",
-            
+
             # Test searching for a user
             "runfile '${test_path}/search/search_user.twill'",
-            
+
             # Test searching for wiki
             "runfile '${test_path}/search/search_wiki_entry.twill'",
-            
-            # Check the advanced search page
-            "runfile '${test_path}/search/advanced_search.twill'",
+
             ]
 
         for comm in mytwilltests:
@@ -210,24 +208,24 @@ class TestKarlTwill:
         # copied from twilltests/files/files-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # Tag suite
-            
+
             # tag a community
             "runfile '${test_path}/tagging/tag_community.twill'",
-            
+
             # tag a blog entry
             #"runfile '${test_path}/tagging/tag_blog_entry.twill'",
-            
+
             # tag a calendar entry
             "runfile '${test_path}/tagging/tag_calendar_entry.twill'",
-            
+
             # tag a file
             "runfile '${test_path}/tagging/tag_file.twill'",
-            
+
             # tag a user
             "runfile '${test_path}/tagging/tag_user.twill'",
-            
+
             # tag a wiki
             "runfile '${test_path}/tagging/tag_wiki_entry.twill'",
             ]
@@ -241,7 +239,7 @@ class TestKarlTwill:
         # copied from twilltests/wiki/wiki-tests.tsuite
         mytwilltests = [
             "login 'admin'",
-            
+
             # run wiki tests
             "runfile '${test_path}/wiki/wiki_view.twill'",
             "runfile '${test_path}/wiki/wikipage_aved.twill'",

@@ -26,8 +26,12 @@ from karl.models.interfaces import IProfile
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import get_content_type_name
+from karl.utils import find_community
+from karl.utils import find_profiles
+from karl.utils import get_content_type_name_and_icon
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.interfaces import ILiveSearchEntry
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
@@ -38,34 +42,12 @@ from simplejson import JSONEncoder
 from webob.exc import HTTPBadRequest
 from webob import Response
 from zope.component import queryAdapter
+from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.index.text.parsetree import ParseError
 import datetime
-
-
-def advancedsearch_view(context, request):
-
-    page_title = 'Advanced Search'
-    api = TemplateAPI(context, request, page_title)
-
-    type_choices = []
-    for t in get_content_types():
-        if t.queryTaggedValue('search_option', False):
-            # this content type should be on the list of types to search
-            iid = interface_id(t)
-            name = t.queryTaggedValue('name', iid)
-            type_choices.append((name, iid))
-    type_choices.sort()
-
-    this_year = datetime.datetime.now().year
-    year_choices = [str(i) for i in range(2007, this_year+1)]
-
-    return dict(
-        api=api,
-        post_url=model_url(context, request, "searchresults.html"),
-        type_choices=type_choices,
-        year_choices=year_choices,
-        )
+from dateutil.relativedelta import relativedelta
+import time
 
 
 def interface_id(t):
@@ -118,7 +100,7 @@ def make_query(context, request):
     else:
         query['interfaces'] = [IContent]
 
-    tags = params.getall('tags')
+    tags = filter(None, params.getall('tags'))
     if tags:
         query['tags'] = {
             'query': tags,
@@ -133,6 +115,13 @@ def make_query(context, request):
         end = coarse_datetime_repr(datetime.datetime(year, 12, 31, 12, 59, 59))
         query['creation_date'] = (begin, end)
         terms.append(year)
+
+    since = params.get('since')
+    if since:
+        option = since_options[since]
+        since = datetime.datetime.now() - option['delta']
+        query['creation_date'] = (coarse_datetime_repr(since), None)
+        terms.append(option['name'])
 
     return query, terms
 
@@ -181,9 +170,6 @@ def get_contextual_summarizer(context):
 
 
 def searchresults_view(context, request):
-    # We can get here from either the LiveSearch or advanced search
-    # screens
-
     page_title = 'Search Results'
     api = TemplateAPI(context, request, page_title)
     if ICommunity.providedBy(context):
@@ -196,7 +182,72 @@ def searchresults_view(context, request):
     batch = None
     terms = ()
     error = None
+    params = request.params
 
+    type_knob = []
+    selected_type = params.get('types')
+    for t in get_content_types():
+        if t.queryTaggedValue('search_option', False):
+            id = interface_id(t)
+            query = params.copy()
+            query['types'] = id
+            type_name = t.getTaggedValue('name')
+            type_knob.append({
+                'name': type_name,
+                'display_text': facet_display_text.get(type_name, type_name),
+                'icon': t.queryTaggedValue('icon', 'blue-document.png'),
+                'url': model_url(context, request, request.view_name,
+                                 query=query),
+                'selected': id == selected_type,
+            })
+    def key_func(option):
+        """
+        OSF has a particular order they want the type facets to appear in.
+        Which is sort of odd, since we use tagged values to decide which facets
+        to show.  This func will cause the facets we're expecting to see to
+        sort in the order specified by OSF.  Any unexpected facets will sort
+        at the end.
+        """
+        facet_order = {
+            'Person': 0,
+            'Wiki Page': 1,
+            'Blog Entry': 2,
+            'Comment': 3,
+            'Forum Topic': 4,
+            'News Item': 5,
+            'File': 6,
+            'Event': 7,
+            'Community': 8,
+        }
+        return facet_order.get(option['name'], 100)
+
+    type_knob.sort(key=key_func)
+    query = params.copy()
+    if 'types' in query:
+        del query['types']
+    type_knob.insert(0, {
+        'name': 'All Content',
+        'display_text': 'All Content',
+        'icon': None,
+        'url': model_url(context, request, request.view_name, query=query),
+        'selected': not selected_type,
+    })
+
+    since_knob = []
+    selected_since = params.get('since')
+    for id in since_order:
+        option = since_options[id].copy()
+        query = params.copy()
+        if id is not None:
+            query['since'] = id
+        elif 'since' in query:
+            del query['since']
+        option['url'] = model_url(context, request, request.view_name,
+                                  query=query)
+        option['selected'] = id == selected_since
+        since_knob.append(option)
+
+    start_time = time.time()
     try:
         batch, terms = get_batch(context, request)
     except ParseError, e:
@@ -204,22 +255,49 @@ def searchresults_view(context, request):
     else:
         if not terms:
             error = 'No Search Parameters Supplied.'
+    finally:
+        elapsed = time.time() - start_time
 
+    profiles = find_profiles(context)
     if batch:
         # Flatten the batch into data for use in the ZPT.
         summarizer = get_contextual_summarizer(context)
         text_term = request.params.get('body')
         results = []
-        for result in batch['entries']:
+        for doc in batch['entries']:
             description = summarizer(result, text_term)
+            type_name, icon = get_content_type_name_and_icon(doc)
             result = {
-                'title': getattr(result, 'title', '<No Title>'),
+                'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
-                'url': model_url(result, request),
-                'type': get_content_type_name(result),
+                'url': model_url(doc, request),
+                'type': type_name,
+                'icon': icon,
+                'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'author': None,
+            }
+
+            result_community = find_community(doc)
+            if result_community is not None:
+                result['community'] = {
+                    'title': result_community.title,
+                    'url': model_url(result_community, request),
                 }
+            else:
+                result['community'] = None
+
+            if hasattr(doc, 'creator'):
+                author = profiles.get(doc.creator)
+                if author is not None:
+                    result['author'] = {
+                        'name': author.title,
+                        'url': model_url(author, request),
+                    }
+
             results.append(result)
+
         total = batch['total']
+
     else:
         batch = {'batching_required': False}
         results = ()
@@ -234,36 +312,13 @@ def searchresults_view(context, request):
         results=results,
         total=total,
         batch_info=batch,
+        type_knob=type_knob,
+        since_knob=since_knob,
+        params=params,
+        elapsed='%0.2f' % elapsed
         )
 
-
-class LivesearchResults(list):
-
-    def __init__(self):
-        list.__init__(self)
-        self.set_header('')
-
-    def set_header(self, header, pre="", post=""):
-        self.header = header
-        self.pre = pre
-        self.post = post
-
-    def append_to(self, title, href, rowclass):
-        if self.header:
-            rowclass += ' hasheader'
-        self.append(dict(
-                rowclass = rowclass,
-                header = self.header,
-                title = title,
-                href = href,
-                pre = self.pre,
-                post = self.post,
-                ))
-        self.set_header('')
-
-
 def jquery_livesearch_view(context, request):
-    # Prefix search is with a wildcard at the end
     try:
         searchterm = request.params.get('val', None)
     except UnicodeDecodeError:
@@ -276,65 +331,91 @@ def jquery_livesearch_view(context, request):
         # make a friendly error message.  Important for the unit test.
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
+
+    # maybe do some * checking to verify that we don't have a
+    # prefix search < 3 chars
+
+    records = []
+
+    # we return back 5 results for each type of search
+    results_per_type = 5
+
+    kind = request.params.get('kind', None)
+    if kind is None:
+        listitems = get_listitems(IGroupSearchFactory)
     else:
-        searchterm = searchterm + '*'
-
-    records = LivesearchResults()
-
-    records.set_header('',
-        pre = '<div class="header"></div>',
-        )
-    records.append_to(
-        rowclass = 'showall',
-        title = 'Show All',
-        href = model_url(context, request, 'searchresults.html',
-                    query = {'body':searchterm},
-                    ),
-            )
-
-    for listitem in get_listitems(IGroupSearchFactory):
+        search_utility = queryUtility(IGroupSearchFactory, kind)
+        if search_utility is None:
+            msg = "The LiveSearch kind %s is not known" % kind
+            return HTTPBadRequest(msg)
+        else:
+            # simulate a list item for the loop below
+            listitems = (dict(component=search_utility),)
+            # we'll just have on type of results, so we return back 20 results
+            results_per_type = 20
+    for listitem in listitems:
         utility = listitem['component']
-
         factory = utility(context, request, searchterm)
-
         if factory is None:
             continue
+        factory.limit = results_per_type
 
         try:
             num, docids, resolver = factory()
         except ParseError:
             continue
 
-        groupname = listitem['title']
+        for result in (resolver(x) for x in docids):
+            if result is None:
+                continue
+            record = queryMultiAdapter((result, request), ILiveSearchEntry)
+            assert record is not None, (
+                "Unexpected livesearch result: " + result.__class__.__name__)
+            records.append(record)
 
-        records.set_header(groupname,
-            pre = '<div class="header">%s</div>' % (groupname, ),
-            )
+    result = JSONEncoder().encode(records)
+    return Response(result, content_type="application/json")
 
-        results = filter(None, map(resolver, docids))
 
-        qs = {'body':searchterm, 'kind':groupname}
-        sr_href = model_url(context, request, 'searchresults.html', query=qs)
+since_options = {
+    None: {
+        'name': 'Any time',
+        'delta': None,
+    },
+    'hour': {
+        'name': 'Past hour',
+        'delta': relativedelta(hours=1),
+    },
+    'day': {
+        'name': 'Past day',
+        'delta': relativedelta(days=1),
+    },
+    'week': {
+        'name': 'Past week',
+        'delta': relativedelta(weeks=1),
+    },
+    'month': {
+        'name': 'Past month',
+        'delta': relativedelta(months=1),
+    },
+    'year': {
+        'name': 'Past year',
+        'delta': relativedelta(years=1),
+    },
+}
 
-        for result in results:
-            records.append_to(
-                rowclass = 'result',
-                title = getattr(result, 'title', '<No Title>'),
-                href = model_url(result, request),
-                )
+since_order = (
+    None, 'hour', 'day', 'week', 'month', 'year',
+)
 
-        if results:
-            records.append_to(
-                rowclass = 'showall',
-                title = 'Show All',
-                href = sr_href,
-                )
-        else:
-            records.append_to(
-                rowclass = 'noresult',
-                title = 'No Result',
-                href = sr_href,
-                )
-
-    result = JSONEncoder().encode(list(records))
-    return Response(result, content_type="application/x-json")
+facet_display_text = {
+    'Person': u'People',
+    'Wiki Page': u'Wikis',
+    'Blog Entry': u'Blogs',
+    'Comment': u'Comments',
+    'Forum Topic': u'Forums',
+    'News Item': u'News Items',
+    'File': u'Files',
+    'Event': u'Events',
+    'Community': u'Communities',
+}

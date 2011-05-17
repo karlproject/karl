@@ -77,3 +77,9 @@ class IIntranetPortlet(Interface):
     title = Attribute('The title of the portlet')
     href = Attribute('URL to get to the container being summarized')
     entries = Attribute('Up to five of the entries')
+
+
+class ILiveSearchEntry(Interface):
+    """ Adaptation from a search result to provide a result dictionary
+
+    the adaptation itself generates the dictionary"""

@@ -66,13 +66,21 @@
    />
 
   <lemonade:listitem
-    component=".groupsearch.others_group_search"
+    component=".groupsearch.communities_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Others"
-    title="Others"
-    description="Others group"
+    name="Communities"
+    title="Communities"
+    description="Communities group"
     sort_key="50"
    />
 
-</configure>
+  <lemonade:listitem
+    component=".groupsearch.events_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="Events"
+    title="Events"
+    description="Events group"
+    sort_key="60"
+   />
 
+</configure>

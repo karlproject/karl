@@ -108,6 +108,7 @@ class IComment(IFolder, ICommunityContent, IPosts):
     """ A container holding a comment and any attachments """
     taggedValue('name', 'Comment')
     taggedValue('search_option', True)
+    taggedValue('icon', 'quill.png')
 
 class IAttachmentsFolder(IFolder):
     """ A container for attachments (implemented as File objects) """
@@ -136,7 +137,9 @@ class IProfiles(IFolder):
 
 class IProfile(IFolder, IPeople):
     """ User profile """
-    taggedValue('name', 'Profile')
+    taggedValue('name', 'Person')
+    taggedValue('search_option', True)
+    taggedValue('icon', 'user.png')
 
     firstname = Attribute(u"User's first name.")
     lastname = Attribute(u"User's last name.")
@@ -220,6 +223,7 @@ class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """
     taggedValue('name', 'Community')
     taggedValue('search_option', True)
+    taggedValue('icon', 'building.png')
 
     description = Attribute(u'Description -- plain text summary')
     text = Attribute(u'Text -- includes wiki markup.')

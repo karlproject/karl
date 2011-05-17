@@ -309,7 +309,7 @@ $.widget('karl.karlcontentfeeds_polling', {
         this.infoButton = this.element.find(this.options.selectInfoButton);
         this.detailsInfo = this.element.find(this.options.selectDetailsInfo);
         this.error = this.element.find(this.options.selectError);
-        this.errorDetail = this.element.find(this.options.selectErrorDetail);
+        this.errorDetails = this.element.find(this.options.selectErrorDetails);
         this.closeButton = this.element.find(this.options.selectCloseButton);
         this.indicator = this.element.find(this.options.selectIndicator);
 
@@ -381,7 +381,7 @@ $.widget('karl.karlcontentfeeds_polling', {
         this.indicator.addClass(newstate);
         // if it's an error, also update the error message
         if (newstate == 'error') {
-            this.errorDetail.text(d.errormsg);
+            this.errorDetails.text(d.errormsg);
         }
 
         if (d && d.notify) {

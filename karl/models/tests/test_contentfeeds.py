@@ -384,7 +384,7 @@ class SiteEventsTests(unittest.TestCase):
         stack.push(foo='bar')
         stack.push(foo='baz')
         stack.push(foo='qux')
-        
+
         found = [dict(x) for g, i, x in stack]
 
         self.assertEqual(found[0], {'foo': 'qux'})
@@ -763,7 +763,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['userid'], 'phred')
         self.assertEqual(info['context_name'], 'J. Phred Bloggs')
         self.assertEqual(info['context_url'], '/profiles/phred')
-        self.assertEqual(info['content_type'], 'Profile')
+        self.assertEqual(info['content_type'], 'Person')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
         self.assertEqual(info['title'], 'J. Phred Bloggs')
@@ -1025,7 +1025,7 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['userid'], 'phred')
         self.assertEqual(info['context_name'], 'J. Phred Bloggs')
         self.assertEqual(info['context_url'], '/profiles/phred')
-        self.assertEqual(info['content_type'], 'Profile')
+        self.assertEqual(info['content_type'], 'Person')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
         self.assertEqual(info['title'], 'J. Phred Bloggs')
@@ -1172,7 +1172,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         site, community, profile = self._makeSite()
         site.catalog.document_map._map[community.docid
                                       ] = '/communities/testing'
-        # WAAA:  set up thread-locals 
+        # WAAA:  set up thread-locals
         manager.push({'request': DummyRequest(context=community),
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=community.docid,
@@ -1223,7 +1223,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         site.catalog.document_map._map[profile.docid] = '/profiles/phred'
-        # WAAA:  set up thread-locals 
+        # WAAA:  set up thread-locals
         manager.push({'request': DummyRequest(context=profile),
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=profile.docid,
@@ -1241,7 +1241,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['userid'], 'phred')
         self.assertEqual(info['context_name'], 'J. Phred Bloggs')
         self.assertEqual(info['context_url'], '/profiles/phred')
-        self.assertEqual(info['content_type'], 'Profile')
+        self.assertEqual(info['content_type'], 'Person')
         self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'], '/profiles/phred')
         self.assertEqual(info['title'], 'J. Phred Bloggs')
@@ -1279,7 +1279,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
                                     docid=31415)
         site.catalog.document_map._map[content.docid
                                       ] = '/communities/testing/content'
-        # WAAA:  set up thread-locals 
+        # WAAA:  set up thread-locals
         manager.push({'request': DummyRequest(context=content),
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=content.docid,
