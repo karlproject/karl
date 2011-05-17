@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.58 (2011-05-17)
+-----------------
 
 - Added support for contextual summaries in search when using
   repoze.pgtextindex. Had to refactor how text representations are generated
