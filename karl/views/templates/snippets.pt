@@ -340,6 +340,8 @@
             // bind the widget
             $("#filegrid").karlfilegrid({
                 url: here_url + "jquery_grid_list",
+                delete_url: here_url + "delete_files.json",
+                moveto_url: here_url + "move_files.json",
                 limit: 10,
                 height: 'auto',
                 width: 666,
