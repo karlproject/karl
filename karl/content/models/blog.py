@@ -89,7 +89,6 @@ class MailinTraceBlog(Folder):
     title = u'Mailin Trace Blog'
 
     def __setitem__(self, name, value):
-##        super(MailinTraceBlog, self).__setitem__(name, value)
         path = get_settings()['mailin_trace_file']
         if not os.path.exists(path):
             folder, fname = os.path.split(path)

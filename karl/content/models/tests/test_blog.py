@@ -114,6 +114,7 @@ class TestMailinTracerBlog(unittest.TestCase):
         self._save_os = blog.os
         blog.os = self
         self._utime_called = None
+        self._exists = set()
 
         testing.registerSettings(mailin_trace_file='trace_file')
 
@@ -122,6 +123,19 @@ class TestMailinTracerBlog(unittest.TestCase):
 
         from karl.content.models import blog
         blog.os = self._save_os
+
+    @property
+    def path(self):
+        return self
+
+    def exists(self, path):
+        return path in self._exists
+
+    def split(self, path):
+        return self._save_os.path.split(path)
+
+    def makedirs(self, path):
+        pass
 
     def utime(self, path, time):
         self.assertEqual(self._utime_called, None)
@@ -144,7 +158,13 @@ class TestMailinTracerBlog(unittest.TestCase):
         from karl.content.interfaces import IBlog
         verifyObject(IBlog, self._makeOne())
 
-    def test_it(self):
+    def test_it_file_exists(self):
+        self._exists.add('trace_file')
+        tool = self._makeOne()
+        tool['foo'] = 'bar'
+        self.assertEqual(self._utime_called, ('trace_file', None))
+
+    def test_it_file_does_not_exist(self):
         tool = self._makeOne()
         tool['foo'] = 'bar'
         self.assertEqual(self._utime_called, ('trace_file', None))
