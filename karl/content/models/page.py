@@ -41,4 +41,8 @@ class Page(Folder):
         # We might choose to make this more article-ish in KARL3
         self['attachments'] = AttachmentsFolder()
 
+    def get_attachments(self):
+        return self['attachments']
+
+
 # No tool factory because these are stored in folders

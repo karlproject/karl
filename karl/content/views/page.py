@@ -54,6 +54,9 @@ from karl.content.views.utils import upload_attachments
 
 from karl.utils import get_layout_provider
 
+from karl.utilities.image import relocate_temp_images
+
+
 tags_field = schemaish.Sequence(schemaish.String())
 text_field = schemaish.String()
 attachments_field = schemaish.Sequence(
@@ -138,6 +141,7 @@ class AddPageFormController(object):
         attachments_folder = page['attachments']
         upload_attachments(converted['attachments'], attachments_folder,
                            creator, request)
+        relocate_temp_images(page, request)
 
         # update ordering if in ordered container
         if hasattr(context, 'ordering'):

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -96,7 +96,7 @@ class TestAddPageFormController(unittest.TestCase):
 
         # register dummy IPage content factory
         def factory(title, text, description, creator):
-            page = DummyModel(title=title, text=text,
+            page = DummyPage(title=title, text=text,
                               description=description,
                               creator=creator)
             page['attachments'] = DummyModel()
@@ -264,7 +264,7 @@ class ShowPageViewTests(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-        
+
     def _callFUT(self, context, request):
         from karl.content.views.page import show_page_view
         return show_page_view(context, request)
@@ -290,7 +290,10 @@ class ShowPageViewTests(unittest.TestCase):
 
 class DummyOrdering(object):
     names_added = []
-    
+
     def add(self, name):
         self.names_added.append(name)
-        
+
+class DummyPage(DummyModel):
+    def get_attachments(self):
+        return self['attachments']

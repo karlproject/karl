@@ -21,6 +21,9 @@ Unreleased
 - Thumbnail view now raises NotFound if it can't extract a thumbnail size from
   the subpath.  (LP #777365)
 
+- Updated the 'Add Page' view to properly relocate temporary images uploaded
+  via ImageDrawer.  (LP #782388)
+
 3.57 (2011-05-05)
 -----------------
 
