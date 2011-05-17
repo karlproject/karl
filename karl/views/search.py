@@ -186,7 +186,28 @@ def searchresults_view(context, request):
                                  query=query),
                 'selected': id == selected_type,
             })
-    type_knob.sort(key=lambda o: o['name'])
+    def key_func(option):
+        """
+        OSF has a particular order they want the type facets to appear in.
+        Which is sort of odd, since we use tagged values to decide which facets
+        to show.  This func will cause the facets we're expecting to see to
+        sort in the order specified by OSF.  Any unexpected facets will sort
+        at the end.
+        """
+        facet_order = {
+            'Person': 0,
+            'Wiki Page': 1,
+            'Blog Entry': 2,
+            'Comment': 3,
+            'Forum Topic': 4,
+            'News Item': 5,
+            'File': 6,
+            'Event': 7,
+            'Community': 8,
+        }
+        return facet_order.get(option['name'], 100)
+
+    type_knob.sort(key=key_func)
     query = params.copy()
     if 'types' in query:
         del query['types']
