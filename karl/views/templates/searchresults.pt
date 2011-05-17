@@ -45,10 +45,10 @@
             <ul>
                 <li tal:repeat="o type_knob">
                     <img src="${api.static_url}/images/${o['icon']}"
-                         alt="${o['name']}" tal:condition="o['icon']"/>
+                         alt="${o['display_text']}" tal:condition="o['icon']"/>
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
-                          ${o['name']}</strong></a>
+                          ${o['display_text']}</strong></a>
                 </li>
             </ul>
         </div>

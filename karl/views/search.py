@@ -179,8 +179,10 @@ def searchresults_view(context, request):
             id = interface_id(t)
             query = params.copy()
             query['types'] = id
+            type_name = t.getTaggedValue('name')
             type_knob.append({
-                'name': t.getTaggedValue('name'),
+                'name': type_name,
+                'display_text': facet_display_text.get(type_name, type_name),
                 'icon': t.queryTaggedValue('icon', 'blue-document.png'),
                 'url': model_url(context, request, request.view_name,
                                  query=query),
@@ -213,6 +215,7 @@ def searchresults_view(context, request):
         del query['types']
     type_knob.insert(0, {
         'name': 'All Content',
+        'display_text': 'All Content',
         'icon': None,
         'url': model_url(context, request, request.view_name, query=query),
         'selected': not selected_type,
@@ -393,3 +396,15 @@ since_options = {
 since_order = (
     None, 'hour', 'day', 'week', 'month', 'year',
 )
+
+facet_display_text = {
+    'Person': u'People',
+    'Wiki Page': u'Wikis',
+    'Blog Entry': u'Blogs',
+    'Comment': u'Comments',
+    'Forum Topic': u'Forums',
+    'News Item': u'News Items',
+    'File': u'Files',
+    'Event': u'Events',
+    'Community': u'Communities',
+}
