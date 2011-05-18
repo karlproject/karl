@@ -31,7 +31,7 @@
         <input id="sras-searchbutton" type="submit"
                value="Search"/>
         <span class="sras-discreet">
-            About ${batch_info['total']} results (${elapsed} seconds)
+            About ${total} results (${elapsed} seconds)
         </span>
     </div>
 </form>
@@ -97,6 +97,7 @@ $(document).ready(function(){
 
 
     <div id="sras-results">
+        <div class="search-error" tal:condition="error">${error}</div>
         <div class="sras-result" tal:repeat="r results">
             <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
 
