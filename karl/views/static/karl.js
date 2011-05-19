@@ -1444,6 +1444,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             url: this.options.delete_url,
             type: 'POST',
             dataType: 'json',
+            timeout: 20000,
             data: {
                 file: filenames
             },
@@ -1493,6 +1494,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             url: this.options.moveto_url,
             type: 'POST',
             dataType: 'json',
+            timeout: 20000,
             data: {
                 file: filenames,
                 target_folder: targetFolder
