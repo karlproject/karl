@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Implemented better live search and search results pages.  (Merged from
+  ree-livesearch-resources branch.)
+
 3.58 (2011-05-17)
 -----------------
 

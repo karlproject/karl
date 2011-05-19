@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -208,7 +208,7 @@ def user_added_content(added, event):
             return
         if info['content_type'] == 'Community':
             info['flavor'] = 'added_edited_community'
-        elif info['content_type'] == 'Profile':
+        elif info['content_type'] == 'Person':
             info['flavor'] = 'added_edited_profile'
         else:
             info['flavor'] = 'added_edited_other'
@@ -231,7 +231,7 @@ def user_modified_content(modified, event):
             return
         if info['content_type'] == 'Community':
             info['flavor'] = 'added_edited_community'
-        elif info['content_type'] == 'Profile':
+        elif info['content_type'] == 'Person':
             info['flavor'] = 'added_edited_profile'
         else:
             info['flavor'] = 'added_edited_other'
@@ -263,7 +263,7 @@ def user_tagged_content(event):
             return
         if info['content_type'] == 'Community':
             info['flavor'] = 'tagged_community'
-        elif info['content_type'] == 'Profile':
+        elif info['content_type'] == 'Person':
             info['flavor'] = 'tagged_profile'
         else:
             info['flavor'] = 'tagged_other'

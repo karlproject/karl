@@ -103,6 +103,11 @@ def get_content_type_name(resource):
     content_iface = get_content_type(resource)
     return content_iface.getTaggedValue('name')
 
+def get_content_type_name_and_icon(resource):
+    content_iface = get_content_type(resource)
+    return (content_iface.getTaggedValue('name'),
+            content_iface.queryTaggedValue('icon', 'blue-document.png'))
+
 def debugsearch(context, **kw):
     searcher = ICatalogSearch(context)
     kw['use_cache'] = False

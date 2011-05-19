@@ -127,6 +127,14 @@ class TestUtilFunctions(unittest.TestCase):
         self.assertEqual(root['TEMP'], tempfolder)
 
 class TestDebugSearch(unittest.TestCase):
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
     def _callFUT(self, context, **kw):
         from karl.utils import debugsearch
         return debugsearch(context, **kw)
@@ -141,6 +149,88 @@ class TestDebugSearch(unittest.TestCase):
         context = testing.DummyModel()
         result = self._callFUT(context)
         self.assertEqual(result, (1, [None]))
+
+class TestGetContentTypeNameAndIcon(unittest.TestCase):
+    def setUp(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def tearDown(self):
+        from zope.testing.cleanup import cleanUp
+        cleanUp()
+
+    def _callFUT(self, context):
+        from karl.utils import get_content_type_name_and_icon as fut
+        return fut(context)
+
+    def test_blog_entry(self):
+        from karl.content.interfaces import IBlogEntry as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context), ('Blog Entry', 'blog.png'))
+
+    def test_calendar_event(self):
+        from karl.content.interfaces import ICalendarEvent as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('Event', 'calendar-select.png'))
+
+    def test_news_item(self):
+        from karl.content.interfaces import INewsItem as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('News Item', 'newspaper.png'))
+
+    def test_wiki_page(self):
+        from karl.content.interfaces import IWikiPage as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('Wiki Page', 'wiki.png'))
+
+    def test_file(self):
+        from karl.content.interfaces import ICommunityFile as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('File', 'blue-document-text.png'))
+
+    def test_comment(self):
+        from karl.models.interfaces import IComment as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('Comment', 'quill.png'))
+
+    def test_community(self):
+        from karl.models.interfaces import ICommunity as ctype
+        from zope.interface import directlyProvides
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(testing.DummyModel, ctype)
+        context = testing.DummyModel()
+        directlyProvides(context, ctype)
+        self.assertEqual(self._callFUT(context),
+                         ('Community', 'building.png'))
 
 class TestGetSession(unittest.TestCase):
     def _callFUT(self, context, request):

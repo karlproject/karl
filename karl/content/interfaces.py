@@ -46,6 +46,7 @@ class IBlogEntry(ICommunityContent, IPosts):
     """
     taggedValue('name', 'Blog Entry')
     taggedValue('search_option', True)
+    taggedValue('icon', 'blog.png')
 
 class IEventContainer(IFolder):
     """A folder that supports storage of calendar events"""
@@ -60,6 +61,7 @@ class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""
     taggedValue('name', 'Event')
     taggedValue('search_option', True)
+    taggedValue('icon', 'calendar-select.png')
 
     title = Attribute(u'Event title')
     startDate = Attribute(u'DateTime object with value from form')
@@ -85,10 +87,9 @@ class ICalendarCategory(Interface):
 class INewsItem(ICommunityContent, IFolder):
     """ A news item.
     """
-    # These tagged values mean this content type should appear in the list of
-    # types to search in the advanced search.
     taggedValue('name', 'News Item')
     taggedValue('search_option', True)
+    taggedValue('icon', 'newspaper.png')
 
     title = Attribute(u'Title of news item.')
     text = Attribute(u'Body of news item.')
@@ -127,6 +128,7 @@ class IWikiPage(IFolder, ICommunityContent, IPages):
     """
     taggedValue('name', 'Wiki Page')
     taggedValue('search_option', True)
+    taggedValue('icon', 'wiki.png')
     text = Attribute(u'Text -- includes wiki markup.')
 
 class IPage(ICommunityContent, IPages):
@@ -139,6 +141,7 @@ class IPage(ICommunityContent, IPages):
 class ICommunityFolder(ICommunityContent, IFolder):
     """A folder in a community"""
     taggedValue('name', 'Folder')
+    taggedValue('icon', 'folder.png')
 
 class ICommunityRootFolder(IFolder):
     """The root folder under the Files tab in a community"""
@@ -173,6 +176,7 @@ class ICommunityFile(ICommunityContent, IFiles):
     """A file in a community"""
     taggedValue('name', 'File')
     taggedValue('search_option', True)
+    taggedValue('icon', 'blue-document-text.png')
 
     blobfile = Attribute(u'Optional file attachment')
     mimetype = Attribute(u'Content type')
@@ -206,6 +210,7 @@ class IForum(IFolder, IPosts):
 class IForumTopic(ICommunityContent, IPosts):
     """ A topic in a forum """
     taggedValue('name', 'Forum Topic')
+    taggedValue('search_option', True)
 
     text = Attribute(u"Form post content.")
 

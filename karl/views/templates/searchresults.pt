@@ -1,47 +1,150 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:tal="http://xml.zope.org/namespaces/tal"
-  xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="layout.macros['master']">
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="layout.macros['master']">
 
-  <div metal:fill-slot="content">
+<head>
+  <metal:slot metal:fill-slot="extra-headers">
+    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+    <script language="javascript" type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+          $("abbr.timeago").timeago();
+      });
+      //]]>
+    </script>
+  </metal:slot>
+</head>
 
-    <h1 class="kscreentitle">Search Results</h1>
+<div metal:fill-slot="content">
 
-    <div class="search-error" tal:condition="error">${error}</div>
-
-    <p tal:condition="terms">
-        Your search for
-        <span tal:repeat="term terms">
-            <strong tal:content="term">term</strong>
-            <span tal:condition="not repeat['term'].end">and</span>
+<form method="GET" action=""
+      tal:attributes="action request.url">
+    <div class="sras-header">
+        <tal:block repeat="name params" omit-tag="">
+            <input type="hidden" name="${name}"
+                   tal:condition="name != 'body'"
+                   value="${params[name]}"/>
+        </tal:block>
+        <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
+               tal:attributes="value request.params.get('body', '')"/>
+        <input id="sras-searchbutton" type="submit"
+               value="Search"/>
+        <span class="sras-discreet">
+            About ${total} results (${elapsed} seconds)
         </span>
-        <span tal:condition="community">
-            in community <strong>${community}</strong>
-        </span>
-        returned ${total}
-        match<span tal:condition="total != 1" tal:omit-tag="">es</span>.
-    </p>
+    </div>
+</form>
 
-    <div tal:repeat="result results">
-      <div style="margin-bottom: 25px;">
-        <div class="klisting_header">
-          <a href="${result['url']}">${result['title']}</a>
+<div id="sras-content">
+    <div class="sras-searchknobs">
+
+        <!-- Left hand column of search knobs -->
+
+        <div class="sras-searchknobgroup sras-searchcontent">
+            <ul>
+                <li tal:repeat="o type_knob">
+                    <img src="${api.static_url}/images/${o['icon']}"
+                         alt="${o['display_text']}" tal:condition="o['icon']"/>
+                    <a href="${o['url']}" tal:omit-tag="o['selected']">
+                        <strong tal:omit-tag="not o['selected']">
+                          ${o['display_text']}</strong></a>
+                </li>
+            </ul>
         </div>
-        <p tal:content="structure result['description']">Description</p>
-        <p class="kbyline">${result['type']} | ${result['url']}</p>
-      </div>
+
+        <div class="sras-searchknobgroup">
+            <ul>
+                <li tal:repeat="o since_knob">
+                    <a href="${o['url']}" tal:omit-tag="o['selected']">
+                        <strong tal:omit-tag="not o['selected']">
+                            ${o['name']}</strong></a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sras-searchknobgroup last">
+            <form method="GET">
+                <tal:block repeat="name params" omit-tag="">
+                    <input type="hidden" name="${name}"
+                           tal:condition="name != 'creator'"
+                           value="${params[name]}"/>
+                </tal:block>
+                <label>Author</label>
+                <input style="width: 130px" size="20"
+                       name="creator" value="${params.get('creator', '')}"/>
+                <input id="sras-authorknob" type="submit" value="Search" />
+            </form>
+            <form method="GET">
+                <tal:block repeat="name params" omit-tag="">
+                    <input type="hidden" name="${name}"
+                           tal:condition="name != 'tags'"
+                           value="${params[name]}"/>
+                </tal:block>
+                <label>Tag</label>
+                <input style="width: 130px" size="20"
+                       name="tags" value="${params.get('tags', '')}"/>
+                <input id="sras-tagknob" type="submit" value="Search" />
+            </form>
+        </div>
+
+    </div>
+    <script type="text/javascript">
+$(document).ready(function(){
+    $('#sras-searchbutton, #sras-authorknob, #sras-tagknob').button();
+ });
+    </script>
+
+
+    <div id="sras-results">
+        <div class="search-error" tal:condition="error">${error}</div>
+        <div class="sras-result" tal:repeat="r results">
+            <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
+
+            <p class="sras-summary">
+                ${r['description']}
+            </p>
+
+            <div class="sras-details">
+                <img src="${api.static_url}/images/${r['icon']}"
+                     alt="${r['type']}" height="12" width="12"/>
+                ${r['type']}
+
+                <tal:block condition="r['community'] is not None"
+                           omit-tag="">
+                    in <a class="sras-searchfooterlinks"
+                       href="${r['community']['url']}">
+                       ${r['community']['title']}</a>
+                </tal:block>
+
+                modified
+                <em><abbr class="timeago" title="${r['timeago']}">
+                  ${r['timeago']}</abbr></em>
+
+                <tal:block condition="r['author'] is not None"
+                           omit-tag="">
+                    by <a class="sras-searchfooterlinks"
+                          href="${r['author']['url']}">
+                          ${r['author']['name']}</a>
+                </tal:block>
+            </div>
+        </div>
     </div>
 
-    <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
-    <table tal:condition="batch_info['batching_required']" width="100%">
-      <tr class="ui-grid-footer">
-        <th class="ui-widget-header">
-          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
-          </div>
-        </th>
-      </tr>
-    </table>
+    <div id="sras-pagination">
+        <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+        <table tal:condition="batch_info['batching_required']" width="100%">
+          <tr class="ui-grid-footer">
+            <th class="ui-widget-header">
+              <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+              </div>
+            </th>
+          </tr>
+        </table>
+    </div>
 
-  </div>
+</div>
+
+</div>
 
 </html>
