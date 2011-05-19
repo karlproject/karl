@@ -101,8 +101,8 @@ $(document).ready(function(){
         <div class="sras-result" tal:repeat="r results">
             <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
 
-            <p class="sras-summary">
-                ${r['description']}
+            <p class="sras-summary" tal:content="structure r['description']">
+                Contextual summary.
             </p>
 
             <div class="sras-details">
