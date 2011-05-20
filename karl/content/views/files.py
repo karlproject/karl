@@ -817,9 +817,11 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     #      /folder1
     #      /folder1/folderA
     #      ... etc ...
-    # The current folder should _not_ be in the list.
+    #
+    # The current folder should also be in the list.
     
     target_folders = get_target_folders(context)
+    current_folder = get_current_folder(context)
 
     payload = dict(
         columns = grid_folder_columns,
@@ -828,6 +830,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sortColumn = sort_on,
         sortDirection = reverse and 'desc' or 'asc',
         targetFolders = target_folders,
+        currentFolder = current_folder,
     )
 
     return payload
@@ -900,7 +903,6 @@ def traverse_file_folder(context, folder):
         
 def get_target_folders(context):
     # Return the target folders for this community.
-    # Exclude the current folder of context.
     #
     # The client expects a list of folder paths here, starting with a /,
     # such as:
@@ -908,13 +910,12 @@ def get_target_folders(context):
     #      /folder1
     #      /folder1/folderA
     #      ... etc ...
-    # The current folder should _not_ be in the list.
+    #
+    # The current folder should also be in the list.
     #
     community = find_community(context)
     catalog = find_catalog(context)
     root_path = model_path(community['files'])
-    context_path = model_path(context)
-    assert context_path.startswith(root_path)
 
     query = ICatalogSearch(context)
     total, docids, resolver = query(
@@ -930,9 +931,6 @@ def get_target_folders(context):
     # Process all the results
     target_folders = []
     for path in target_paths:
-        # Is this the current folder? - if yes, exclude from the results
-        if path == context_path:
-            continue
         # Now, only take the part after the community/files, ie, the path segments
         # after the root folder.
         assert path.startswith(root_path)
@@ -944,6 +942,22 @@ def get_target_folders(context):
         target_folders.append(target_folder)
 
     return target_folders
+
+def get_current_folder(context):
+    # Calculate the current folder in the same format as the results
+    # from get_target_folders (relative to community)
+    community = find_community(context)
+    root_path = model_path(community['files'])
+
+    context_path = model_path(context)
+    assert context_path.startswith(root_path)
+    current_folder = context_path[len(root_path):]
+
+    # Correct the root folder from '' to '/'
+    if not current_folder:
+        current_folder = '/'
+
+    return current_folder
 
 def ajax_file_reorganize_moveto_view(context, request):
 

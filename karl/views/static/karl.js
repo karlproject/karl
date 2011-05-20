@@ -1167,7 +1167,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         $.ui.karlgrid.prototype._create.call(this, arguments);
     },
 
-    setTargetFolders: function(folders) {
+    setTargetFolders: function(folders, current_folder) {
         // We assume that folders are sorted,
         // otherwise the containment stucture would not work nicely
         var self = this;
@@ -1192,11 +1192,22 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 leafFolder = folder.substring(folder.lastIndexOf('/') + 1);
             }
             // create the item
-            var item = $('<li><a></a></li>')
+            var item = $('<li></li>')
                 .css('textAlign', 'left')
                 .data('folder', folder)
                 .appendTo(self.menuMove);
-            item.find('a')
+
+            // create the label. If this is not the current folder, it will be an <a>.
+            // If this is the target folder, it will be a <span>. Also in this case
+            // it needs the appear in the results, but it should not be selectable.           
+            var label;
+            if (folder != current_folder) {
+                label = $('<a></a>');
+            } else {
+                label = $('<span></span>');
+            }
+            label
+                .appendTo(item)
                 .text(leafFolder)
                 .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
         });
@@ -1256,6 +1267,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             // add the data needed for the reorganization
             // as it will be needed for each _doUpdate
             d.targetFolders = response.targetFolders;
+            d.currentFolder = response.currentFolder;
             // Also:
             // overwrite the 'sel' field in all records.
             // This means that the server needs not send over
@@ -1280,7 +1292,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         // enable or disable the reorganize buttons
         this._enableDisableButtons();
         // set target folders
-        this.setTargetFolders(state.targetFolders);
+        this.setTargetFolders(state.targetFolders, state.currentFolder);
     },
 
     _onGlobalSelect: function(checked) {
