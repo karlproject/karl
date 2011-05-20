@@ -265,6 +265,14 @@
     */
 }
 
+
+/* make sure Move To menu stands on top */
+
+.ui-grid-footer-button-positioner .ui-menu {
+    z-index: 99999;
+}
+
+
 /* global selector in the grid column header */
 
 input.ui-grid-globalselector {
