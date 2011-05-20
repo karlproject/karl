@@ -1035,7 +1035,7 @@ def ajax_file_upload_view(context, request):
         f = params.get('file', None)
         client_id = params.get('client_id', None)
         if f is None or client_id is None:
-            msg = 'Wrong parameters, `file` and `client_id` are mandatory' 
+            msg = 'Wrong parameters, `file` is mandatory' 
             raise ErrorResponse(msg, client_id='')
 
         # XXX Handling of chunk uploads.

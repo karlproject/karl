@@ -23,20 +23,20 @@ $.widget('karl.karlmultifileupload', {
         this.refreshNeeded = false;
         this.reset_batch();
 
-        var runtimes = 'html5,gears,flash,silverlight';
-        ////var runtimes = 'html5,browserplus,gears,flash,silverlight';
+        var runtimes = 'html5,gears,flash,silverlight,html4';
+        // (browserplus javascript is not included currently = hence we do not enable it)
+        ////var runtimes = 'html5,browserplus,gears,flash,silverlight,html4';
         if ($.browser.webkit) {
             // XXX html5, silverlight... borken on Safari/Chrome :(
             //runtimes = 'flash,browserplus,gears';
-            runtimes = 'flash,gears';
+            runtimes = 'flash,gears,html4';
         }
 
-        if ($.browser.msie) {
-            // XXX Be on the safe side for the demo.
-            // Theoretically, all should / could work, but I have not tested
-            // anything else than flash on IE.
-            runtimes = 'flash';
-        }
+        //if ($.browser.msie) {
+        //    // Theoretically, all should / could work, but I have not tested
+        //    // anything else than flash and html4 on IE.
+        //    runtimes = 'flash,html4';
+        //}
 
         this.dialogSnippet = $(
             '<div class="karl-multifileupload-dialog-content">' +
@@ -125,7 +125,7 @@ $.widget('karl.karlmultifileupload', {
             .click(function() {
                 self.close();
             });
-        this.uploader.bind('UploadFile', function(up, file) {
+        this.uploader.bind('BeforeUpload', function(up, file) {
             // Extend form parameters dynamically
             var multipart_params = up.settings.multipart_params;
             // The batch ends when this is the last chunk of the last file
