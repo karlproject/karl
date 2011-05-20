@@ -55,9 +55,15 @@ function advancedSearchResultsUrl(query, kind) {
     return advancedSearchUrl + queryString;
 }
 
+// while waiting for data to return, if a search is triggered, like if
+// the user presses return or clicks on the search button, the ajax
+// query gets cancelled and triggers an error. We use this flag to
+// suppress displaying the error in that situation
+var shouldDisplayError = true;
+
 function ajaxError(xhr, status, exc) {
     var errDisplayer = this.errorDisplayer();
-    if (errDisplayer) {
+    if (errDisplayer && shouldDisplayError) {
         errDisplayer.show('We encountered an error. Please try your search again ... and contact a KARL admin if the problem persists.');
     }
 }
@@ -70,6 +76,11 @@ $(function() {
             var searchText = $.trim(getSearchValue());
             // in ie, the globbed character can be in the wrong place
             // we'll always just grab it from the field and put it on the end
+
+            // suppress error displaying when searching
+            // we don't have to worry about toggling it back
+            // because we are loading a new page
+            shouldDisplayError = false;
             window.location = (
                 advancedSearchResultsUrl(searchText));
         },
