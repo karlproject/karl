@@ -318,7 +318,7 @@ def searchresults_view(context, request):
         batch_info=batch,
         type_knob=type_knob,
         since_knob=since_knob,
-        params=request.params,
+        params=params,
         elapsed='%0.2f' % elapsed
         )
 
