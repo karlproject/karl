@@ -182,7 +182,11 @@ def searchresults_view(context, request):
     batch = None
     terms = ()
     error = None
-    params = request.params
+    params = request.params.copy()
+    if 'batch_start' in params:
+        del params['batch_start']
+    if 'batch_size' in params:
+        del params['batch_size']
 
     type_knob = []
     selected_type = params.get('types')
@@ -262,7 +266,7 @@ def searchresults_view(context, request):
     if batch:
         # Flatten the batch into data for use in the ZPT.
         summarizer = get_contextual_summarizer(context)
-        text_term = request.params.get('body')
+        text_term = params.get('body')
         results = []
         for doc in batch['entries']:
             description = summarizer(doc, text_term)
@@ -314,7 +318,7 @@ def searchresults_view(context, request):
         batch_info=batch,
         type_knob=type_knob,
         since_knob=since_knob,
-        params=params,
+        params=request.params,
         elapsed='%0.2f' % elapsed
         )
 

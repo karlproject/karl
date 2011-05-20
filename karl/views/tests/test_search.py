@@ -543,6 +543,26 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
 
+    def test_with_batch(self):
+        from webob.multidict import MultiDict
+        context = testing.DummyModel()
+        context.catalog = {}
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        request = testing.DummyRequest(
+            params=MultiDict({'body':'yo', 'batch_start': '20',
+                              'batch_size': '20'})
+        )
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        result = self._callFUT(context, request)
+        self.failIf('batch' in result['type_knob'][0]['url'])
+        self.failIf('batch' in result['since_knob'][0]['url'])
+
     def test_creator_not_found(self):
         from webob.multidict import MultiDict
         context = testing.DummyModel()

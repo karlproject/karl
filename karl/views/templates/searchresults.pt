@@ -131,9 +131,9 @@ $(document).ready(function(){
         </div>
     </div>
 
-    <div id="sras-pagination">
+    <div id="sras-pagination" tal:condition="batch_info['batching_required']">
         <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
-        <table tal:condition="batch_info['batching_required']" width="100%">
+        <table width="100%">
           <tr class="ui-grid-footer">
             <th class="ui-widget-header">
               <div metal:use-macro="api.snippets.macros['gridstyle_batching']">

@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Pagination is now reset when clicking on a facet in the search results page.
+  (LP #785360)
+
 3.59 (2011-05-19)
 -----------------
 
