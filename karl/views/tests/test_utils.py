@@ -82,6 +82,94 @@ class TestMakeName(unittest.TestCase):
         self.assertEqual(make_name(context, u"\u0081\u0082"), "-81-82-")
         self.assertEqual(make_name(context, u'foo\u008ab\u00c3ll'), "foosball")
 
+class TestMakeUniqueName(unittest.TestCase):
+
+    def _make_context(self):
+        class C(dict):
+            # ... this is actually only used by the code for exception formatting ...
+            __name__ = 'thename'
+        return C()
+
+    def test_make_name(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        self.assertEqual(make_unique_name(context, "foo.bar"), "foo.bar")
+        self.assertEqual(make_unique_name(context, "Harry 'Bigfoot' Henderson"),
+                         "harry-bigfoot-henderson")
+        self.assertEqual(make_unique_name(context, "Which one?"), "which-one")
+        self.assertEqual(make_unique_name(context, "One/Two/Three"), "one-two-three")
+        self.assertEqual(make_unique_name(context, "Genesis 1:1"), "genesis-1-1")
+        self.assertEqual(make_unique_name(context, "'My Life'"), "-my-life-")
+
+    def test_empty_name(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        self.assertEqual(make_unique_name(context, '$@?%'), '-1')
+
+        name = make_unique_name(context, '$@?%')
+        self.assertEqual(name, '-1')
+        for i in range(2, 101):
+            context[name] = testing.DummyModel()
+            name = make_unique_name(context, '$@?%')
+            self.assertEqual(name, '-%i' % (i, ))
+
+    def test_unicode(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        self.assertEqual(make_unique_name(context, u'what?'), "what")
+        self.assertEqual(make_unique_name(context, u"\u0fff"), "-fff-")
+        self.assertEqual(make_unique_name(context, u"\u0081\u0082"), "-81-82-")
+        self.assertEqual(make_unique_name(context, u'foo\u008ab\u00c3ll'), "foosball")
+        
+    def test_make_unique_name(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        name = make_unique_name(context, 'foo.bar')
+        self.assertEqual(name, 'foo.bar')
+        for i in range(1, 20):
+            context[name] = testing.DummyModel()
+            name = make_unique_name(context, 'foo.bar')
+            self.assertEqual(name, 'foo-%i.bar' % (i, ))
+
+        name = make_unique_name(context, 'something.else.bar')
+        self.assertEqual(name, 'something.else.bar')
+        for i in range(1, 20):
+            context[name] = testing.DummyModel()
+            name = make_unique_name(context, 'something.else.bar')
+            self.assertEqual(name, 'something.else-%i.bar' % (i, ))
+
+    def test_make_unique_name_noextension(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        name = make_unique_name(context, 'opensociety')
+        self.assertEqual(name, 'opensociety')
+        for i in range(1, 20):
+            context[name] = testing.DummyModel()
+            name = make_unique_name(context, 'opensociety')
+            self.assertEqual(name, 'opensociety-%i' % (i, ))
+
+    def test_make_unique_name_numbers(self):
+        from karl.views.utils import make_unique_name
+        context = self._make_context()
+        name = make_unique_name(context, '123-456.78')
+        self.assertEqual(name, '123-456.78')
+        for i in range(1, 20):
+            context[name] = testing.DummyModel()
+            name = make_unique_name(context, '123-456.78')
+            self.assertEqual(name, '123-456-%i.78' % (i, ))
+  
+    def test_make_unique_name_and_postfix(self):
+        from karl.views.utils import make_unique_name_and_postfix
+        context = self._make_context()
+        name, postfix = make_unique_name_and_postfix(context, 'foo.bar')
+        self.assertEqual(name, 'foo.bar')
+        self.assertEqual(postfix, '')
+        for i in range(1, 20):
+            context[name] = testing.DummyModel()
+            name, postfix = make_unique_name_and_postfix(context, 'foo.bar')
+            self.assertEqual(name, 'foo-%i.bar' % (i, ))
+            self.assertEqual(postfix, '%i' % (i, ))
+
 
 class TestBasenameOfFilepath(unittest.TestCase):
     def test_it(self):

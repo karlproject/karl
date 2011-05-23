@@ -144,7 +144,20 @@ def make_unique_name(context, title):
     Try until an empty name is found (or be debunked by a
     conflict error).
     """
+    unique_name, postfix = make_unique_name_and_postfix(context, title)
+    return unique_name
+
+def make_unique_name_and_postfix(context, title):
+    """Make a correct __name__ that is unique in the context.
+    Also return the postfix that can be used to modulate the
+    title and filename of the file objects.
+
+    Try until an empty name is found (or be debunked by a
+    conflict error).
+    """
+
     postfix = ''
+    dashpostfix = ''
     counter = 1
     if '.' in title:
         base, ext = title.rsplit('.', 1)
@@ -155,12 +168,16 @@ def make_unique_name(context, title):
 
     while True:
         try:
-            return make_name(context, base + postfix + ext)
+            unique_name = make_name(context, base + dashpostfix + ext)
+            break
         except ValueError:
-            postfix = '-%i' % (counter, )
+            postfix = '%i' % (counter, )
+            dashpostfix = '-' + postfix
             counter += 1
             # This could actually cause all our
             # processes hang forever :)
+            
+    return unique_name, postfix
 
 def basename_of_filepath(title):
     """
