@@ -912,6 +912,7 @@ def get_target_folders(context):
     #      ... etc ...
     #
     # The current folder should also be in the list.
+    # The returned items contain the path and the title of the folder.
     #
     community = find_community(context)
     catalog = find_catalog(context)
@@ -922,24 +923,34 @@ def get_target_folders(context):
         path = root_path, 
         interfaces = (ICommunityFolder, ),
         )
-    target_paths = [catalog.document_map.address_for_docid(docid) for docid in docids]
+    target_items = [
+        dict(
+            path = catalog.document_map.address_for_docid(docid),
+            title = resolver(docid).title,    # XXX rather use metadata here??
+            ) for docid in docids]
     # sorting is important for the client visualization
-    target_paths.sort()
+    target_items.sort(key=lambda item: item['path'])
     # always insert the root folder that was not returned by this search 
-    target_paths.insert(0, root_path)
+    target_items.insert(0, dict(
+        path = root_path,
+        title = 'Community home',
+        ))
 
     # Process all the results
     target_folders = []
-    for path in target_paths:
+    for item in target_items:
         # Now, only take the part after the community/files, ie, the path segments
         # after the root folder.
-        assert path.startswith(root_path)
+        assert item['path'].startswith(root_path)
         # Just take the part after community/files
-        target_folder = path[len(root_path):]
-        # Correct the root folder from '' to '/'
-        if not target_folder:
-            target_folder = '/'
-        target_folders.append(target_folder)
+        target_path = item['path'][len(root_path):]
+        # Correct the root folder path from '' to '/'
+        if not target_path:
+            target_path = '/'
+        target_folders.append(dict(
+            path = target_path,
+            title = item['title'],
+            ))
 
     return target_folders
 
@@ -998,6 +1009,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             moved = moved,
             targetFolder = target_folder,
             targetFolderUrl = target_folder_url,
+            targetFolderTitle = target_context.title,
         )
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.

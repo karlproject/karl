@@ -1154,8 +1154,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                     },
                     'Move': function() {
                         $(this).karldialog('close');
-                        var targetFolder = self.dialogMoveFolderName.text();
-                        self._onMoveConfirmed(targetFolder);
+                        var selected = self.dialogMoveFolderName.data('folder');
+                        self._onMoveConfirmed(selected);
                     }
 		},
                 open: function() {
@@ -1173,23 +1173,22 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         var self = this;
         this.menuMove.find('li').remove();
         $.each(folders, function(index, folder) {
-            if (! folder || folder.charAt(0) != '/') {
-                throw new Error('Fatal error: folder name must start with a "/"');
+            var folder_path = folder.path;
+            var folder_title = folder.title;
+            if (! folder_path || folder_path.charAt(0) != '/') {
+                throw new Error('Fatal error: folder path must start with a "/"');
             }
             var level;
-            var leafFolder;
-            if (folder == '/') {
+            if (folder_path == '/') {
                 // special case, handle differently.
                 level = 0;
-                leafFolder = '/ (community home)';
             } else {
-                if (folder && folder.charAt(folder.length - 1) == '/') {
-                    throw new Error('Fatal error: folder name must not end with a "/"');
+                if (folder_path && folder_path.charAt(folder_path.length - 1) == '/') {
+                    throw new Error('Fatal error: folder path must not end with a "/"');
                 }
-                // The folder is like /f1/f2/f3
+                // The folder path is like /f1/f2/f3
                 // we want to produce leafFolder = f3, level = 2 from this.
-                level = folder.match(/\//g).length - 1;
-                leafFolder = folder.substring(folder.lastIndexOf('/') + 1);
+                level = folder_path.match(/\//g).length - 1;
             }
             // create the item
             var item = $('<li></li>')
@@ -1201,14 +1200,14 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             // If this is the target folder, it will be a <span>. Also in this case
             // it needs the appear in the results, but it should not be selectable.           
             var label;
-            if (folder != current_folder) {
+            if (folder_path != current_folder) {
                 label = $('<a></a>');
             } else {
                 label = $('<span></span>');
             }
             label
                 .appendTo(item)
-                .text(leafFolder)
+                .text(folder_title)
                 .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
         });
         this.menuMove.menu('refresh');
@@ -1495,11 +1494,13 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     },
 
     _onMoveSelected: function(selected) {
-        this.dialogMoveFolderName.text(selected);
+        this.dialogMoveFolderName
+            .text(selected.title)
+            .data('folder', selected);
         this.dialogMoveConfirm.karldialog('open');
     },
 
-    _onMoveConfirmed: function(targetFolder) {
+    _onMoveConfirmed: function(selected) {
         var self = this;
         var filenames = this.getSelectedFiles();
         $.ajax({
@@ -1509,7 +1510,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             timeout: 20000,
             data: {
                 file: filenames,
-                target_folder: targetFolder
+                target_folder: selected.path
             },
             success: function(data, textStatus, jqXHR) {
                 if (data && data.result == 'OK') {
@@ -1527,7 +1528,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     _onMoveSuccess: function(data) {
         // XXX let's reuse the statusbox that the tagbox already activated
         var message = 'Moved ' +data.moved + ' selected files/folders to <a href="' +
-                data.targetFolderUrl + '">' + data.targetFolder + '</a>';
+                data.targetFolderUrl + '">' + data.targetFolderTitle + '</a>';
         $('.statusbox').karlstatusbox('clearAndAppend', message);
         this._update ({columns: false, refresh: true});
     },

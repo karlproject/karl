@@ -271,6 +271,12 @@
 .ui-grid-footer-button-positioner .ui-menu {
     z-index: 99999;
 }
+/* non-selectable items (span) should stand just like the (a) */
+.ui-grid-footer-button-positioner .ui-menu span {
+    padding: 0.2em 0.4em;
+    font-weight: normal;
+    color: #b0b0b0;
+}
 
 
 /* global selector in the grid column header */
