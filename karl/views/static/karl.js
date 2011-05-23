@@ -1243,11 +1243,13 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 return columns[index].id == self.options.selectionColumnId;
             })
             .html('');
-        this.cb_globalselect = $('<input type="checkbox" class="ui-grid-globalselector" title="Select/Unselect all items">')
+        var globalselect_wrapper = $('<div class="ui-grid-globalselector"></div>')
+            .appendTo(sel_column);
+        this.cb_globalselect = $('<input type="checkbox" title="Select/Unselect all items">')
             .change(function() {
                 self._onGlobalSelect($(this).attr('checked'));
             })
-            .appendTo(sel_column);
+            .appendTo(globalselect_wrapper);
     },
 
     _addRow: function(item, dontAdd) {
@@ -1352,7 +1354,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         }
 
         // make sure that the user clicked the checkbox itself.
-        if (! target.is('input.ui-grid-globalselector[type="checkbox"]')) {
+        if (! target.is('.ui-grid-globalselector input[type="checkbox"]')) {
             // if we clicked in the header but outside the checkbox,
             // prevent default.
             return false;
