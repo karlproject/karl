@@ -18,6 +18,7 @@
 from simplejson import JSONEncoder
 from simplejson import JSONDecoder
 import datetime
+from os.path import splitext
 import transaction
 from karl.log import get_logger
 
@@ -53,6 +54,7 @@ from karl.utilities.interfaces import IAlerts
 
 from karl.views.utils import make_name
 from karl.views.utils import make_unique_name
+from karl.views.utils import make_unique_name_and_postfix
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
@@ -970,6 +972,35 @@ def get_current_folder(context):
 
     return current_folder
 
+def make_unique_file_in_folder(context, fileobj):
+    # create a unique name of the -1, -2, ... style
+    # also change title and filename properties as needed
+    filename = fileobj.filename
+    # Remember if the title is unchanged, that is, it is set
+    # to the same as the filename (which is the case by uploaded
+    # files that have no way to specify a title)
+    is_title_changed = filename != fileobj.title
+    # create a unique name of the -1, -2, ... style
+    name, postfix = make_unique_name_and_postfix(context, filename)
+    # If we applied a -1, ... postfix to the name, then we also want to
+    # modulate the title and the stored filename with it.
+    if postfix:
+        base, ext = splitext(filename)
+        fileobj.filename = "%s-%s%s" % (base, postfix, ext)
+        # Depending if the title has changed, we apply two possible schemes
+        if is_title_changed:
+            # Someone has changed the title, so we apply the
+            # postfix to the title, separated with a dash and whitespaces
+            fileobj.title = "%s - %s" % (fileobj.title, postfix)
+        else:
+            # Otherwise, we use the filename for the title. This will make
+            # foo-1.bar, foo-2.bar titles which, in case they are still
+            # the same as the filename, is a better solution.
+            fileobj.title = fileobj.filename
+    # return the name to be used as key
+    # like: context[name] = fileobj
+    return name
+ 
 def ajax_file_reorganize_moveto_view(context, request):
 
     try:
@@ -996,8 +1027,11 @@ def ajax_file_reorganize_moveto_view(context, request):
                     msg = 'Cannot move a folder into itself'
                     raise ErrorResponse(msg, filename=filename)
                 del context[filename]
-                # We make sure there is a unique name in the new folder
-                target_filename = make_unique_name(target_context, filename)
+
+                # create a unique name of the -1, -2, ... style
+                # also change title and filename properties as needed
+                target_filename = make_unique_file_in_folder(target_context, fileobj)
+
                 target_context[target_filename] = fileobj
             except KeyError:
                 msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
@@ -1083,10 +1117,10 @@ def ajax_file_upload_view(context, request):
             # First chunk. Create the content object.
 
             fileobj = create_content(ICommunityFile,
-                                  title=filename,   # XXX use filename as title, for now
+                                  title=filename,   # may be overwritten later
                                   stream=f.file,
                                   mimetype=get_upload_mimetype(f),
-                                  filename=filename,
+                                  filename=filename, # may be overwritten in the end
                                   creator=creator,
                                   )
 
@@ -1184,21 +1218,11 @@ def ajax_file_upload_view(context, request):
 
                 check_upload_size(context, fileobj, 'file')
 
-                filename = fileobj.filename
-
-                # XXX create a unique name, now
-                name = make_unique_name(context, filename)
-                if not name:
-                    msg = 'The filename must not be empty'
-                    raise ErrorResponse(msg, client_id=client_id)
-                # Is there a key in context with that filename?
-
-                # XXX Should we override the file, or raise an error,
-                # XXX instead of just always creating the file with a unique name?
-                #if name in context:
-                #    msg = 'Filename %s already exists in this folder' % filename
-                #   raise ErrorResponse(msg, client_id=client_id)
-
+                # create a unique name of the -1, -2, ... style
+                # also change title and filename properties as needed
+                name = make_unique_file_in_folder(context, fileobj)
+   
+                # Move the file to its permanent location
                 del tempfolder[temp_id]
                 context[name] = fileobj
 

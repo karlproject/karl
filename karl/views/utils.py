@@ -19,6 +19,7 @@
 import os
 import re
 from cStringIO import StringIO
+from os.path import splitext
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.threadlocal import get_current_request
@@ -159,12 +160,8 @@ def make_unique_name_and_postfix(context, title):
     postfix = ''
     dashpostfix = ''
     counter = 1
-    if '.' in title:
-        base, ext = title.rsplit('.', 1)
-        ext = '.' + ext
-    else:
-        base = title
-        ext = ''
+
+    base, ext = splitext(title)
 
     while True:
         try:
