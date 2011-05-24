@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Livesearch result text overflow fix (LP #785450)
+
+- Trigger search on paste - rejuice from latest bottlecap (LP #785789)
+
 3.60 (2011-05-20)
 -----------------
 
