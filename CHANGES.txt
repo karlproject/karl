@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.61 (2011-05-26)
+-----------------
 
 - Livesearch result text overflow fix (LP #785450)
 
