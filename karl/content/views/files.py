@@ -972,27 +972,41 @@ def get_current_folder(context):
 
     return current_folder
 
-def make_unique_file_in_folder(context, fileobj):
+def make_unique_file_in_folder(context, fileobj, orig_name=None):
     # create a unique name of the -1, -2, ... style
     # also change title and filename properties as needed
-    filename = fileobj.filename
-    # Remember if the title is unchanged, that is, it is set
-    # to the same as the filename (which is the case by uploaded
-    # files that have no way to specify a title)
-    is_title_changed = filename != fileobj.title
+
+    # This method works for both folders and files. In case of
+    # files we use the filename as reference. In case of folders,
+    # there is no filename, so we have to use the name.
+    filename = getattr(fileobj, 'filename', None)
+    if filename is not None:
+        has_filename = True
+        # Remember if the title is unchanged, that is, it is set
+        # to the same as the filename (which is the case by uploaded
+        # files that have no way to specify a title)
+        is_title_changed = filename != fileobj.title
+    else:
+        has_filename = False
+        filename = orig_name
+        is_title_changed = True
+    assert filename
+
     # create a unique name of the -1, -2, ... style
     name, postfix = make_unique_name_and_postfix(context, filename)
     # If we applied a -1, ... postfix to the name, then we also want to
     # modulate the title and the stored filename with it.
     if postfix:
         base, ext = splitext(filename)
-        fileobj.filename = "%s-%s%s" % (base, postfix, ext)
+        if has_filename:
+            fileobj.filename = "%s-%s%s" % (base, postfix, ext)
         # Depending if the title has changed, we apply two possible schemes
         if is_title_changed:
             # Someone has changed the title, so we apply the
             # postfix to the title, separated with a dash and whitespaces
             fileobj.title = "%s - %s" % (fileobj.title, postfix)
         else:
+            assert has_filename
             # Otherwise, we use the filename for the title. This will make
             # foo-1.bar, foo-2.bar titles which, in case they are still
             # the same as the filename, is a better solution.
@@ -1030,7 +1044,7 @@ def ajax_file_reorganize_moveto_view(context, request):
 
                 # create a unique name of the -1, -2, ... style
                 # also change title and filename properties as needed
-                target_filename = make_unique_file_in_folder(target_context, fileobj)
+                target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
 
                 target_context[target_filename] = fileobj
             except KeyError:
