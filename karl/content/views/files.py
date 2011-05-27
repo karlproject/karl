@@ -902,6 +902,15 @@ def traverse_file_folder(context, folder):
         for segment in folder.split('/')[1:]:
             c = c[segment]
     return c
+
+def get_file_folder_path(context):
+    # Return the absolute path to the fileobjext in context, relative
+    # to the community.
+    community = find_community(context)
+    context_path = model_path(context)
+    root_path = model_path(community['files'])
+    assert context_path.startswith(root_path)
+    return context_path[len(root_path):]
         
 def get_target_folders(context):
     # Return the target folders for this community.
@@ -1037,7 +1046,9 @@ def ajax_file_reorganize_moveto_view(context, request):
         for filename in filenames:
             try:
                 fileobj = context[filename]
-                if fileobj == target_context:
+                file_path = get_file_folder_path(fileobj)
+
+                if target_folder.startswith(file_path):
                     msg = 'Cannot move a folder into itself'
                     raise ErrorResponse(msg, filename=filename)
                 del context[filename]
