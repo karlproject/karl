@@ -1156,6 +1156,21 @@
   />
 
 
+    <view
+      for="karl.content.interfaces.IWiki"
+      view=".agility.show_agility_view"
+      permission="view"
+      name="agility.html"
+    />
+
+    <view
+      for="karl.content.interfaces.IWiki"
+      view=".agility.get_agility_data"
+      permission="view"
+      name="get_agility_data.json"
+      renderer="json"
+      />
+
 
 
 </configure>
