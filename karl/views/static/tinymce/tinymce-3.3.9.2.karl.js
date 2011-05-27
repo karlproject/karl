@@ -46,5 +46,16 @@
 *     @depends 3.3.9.2/plugins/kaltura/editor_plugin_src.js
 *     @depends 3.3.9.2/plugins/kaltura/langs/en.js
 *
+* Advlist plugin:
+*     @depends 3.3.9.2/plugins/advlist/editor_plugin_src.js
+*
+* Lists plugin:
+*     @depends 3.3.9.2/plugins/lists/editor_plugin_src.js
+*
+* Print plugin:
+*     @depends 3.3.9.2/plugins/print/editor_plugin_src.js
+*
+* Table plugin:
+*     @depends 3.3.9.2/plugins/table/editor_plugin_src.js
+*
 */
-
