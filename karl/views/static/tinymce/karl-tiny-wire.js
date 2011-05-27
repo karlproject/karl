@@ -1,4 +1,3 @@
-
 (function($){
 
 //
@@ -10,7 +9,7 @@ $(document).ready(function() {
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
     var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
-    var plugins = 'paste,embedmedia,spellchecker,imagedrawer';
+    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advlist,lists,print,table';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
     }
@@ -18,8 +17,7 @@ $(document).ready(function() {
         plugins += ',kaltura';
     }
 
-     
-    // Url that contains the context prefix 
+    // Url that contains the context prefix
     var here_url = $('#karl-here-url')[0].content;
     // the root url of the tinymce tree
     var tinymce_url = $('#karl-static-url')[0].content + '/tinymce/3.3.9.2';
@@ -52,9 +50,11 @@ $(document).ready(function() {
         paste_unindented_list_class : "unindentedList",
         paste_convert_headers_to_strong : true,
         theme_advanced_toolbar_location: 'top',
-        theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, kaltura, addwickedlink, delwickedlink, spellchecker',
-        theme_advanced_buttons2: '',
-        theme_advanced_buttons3: '',
+        theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, spellchecker, print',
+        theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, anchor, addwickedlink, delwickedlink, |, code',
+        theme_advanced_buttons3: 'tablecontrols',
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
         plugins: plugins,
         extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         relative_urls : false,
@@ -76,7 +76,7 @@ $(document).ready(function() {
         kaltura_player_uiconf_id: kaltura_data.player_uiconf_id,
         kaltura_player_cache_st: kaltura_data.player_cache_st,
         kaltura_session_url: kaltura_data.session_url
-    });  
+    });
 
 });
 
