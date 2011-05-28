@@ -247,3 +247,9 @@ input.editor-checkbox {
 .cell-effort-driven {
     text-align: center;
 }
+
+.slick-columnpicker * {
+    font-size: 8px;
+    text-align: left;
+    font-weight: normal;
+}

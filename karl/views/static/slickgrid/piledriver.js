@@ -13,24 +13,27 @@ function renderBenefits(row, cell, value, columnDef, dataContext) {
 
 function renderProject(row, cell, value, columnDef, dataContext) {
     // Title and Description
-    console.log(dataContext);
     var title = dataContext.title;
     var description = dataContext.description;
     this_cell = $('<div>');
-    this_cell.append($('<div class="ag-projtitle">' + title + '</div>'));
+    var kd = window._karl_client_data;
+    var url = kd.wiki_url + dataContext.name;
+    var hyperlink = '<a target="_newpage" href="' + url + '">' + title + '</a>';
+    this_cell.append($('<div class="ag-projtitle">' + hyperlink + '</div>'));
     this_cell.append($('<div class="ag-projdesc">' + description + '</div>'));
     return this_cell.html();
 }
 
 
 var columns = [
-    {id:"eval_date", name:"Eval Date", field:"eval_date", width:60,
-        resizable:false, selectable:false, focusable:false },
-    {id:"title", name:"Project", field:"title", width:430, minWidth:400,
-        cssClass:"cell-title", sortable:true, editor:LongTextCellEditor,
+    {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
+        sortable:true, editor:AgilityCellEditor},
+    {id:"title", name:"Project", field:"title", width:395, minWidth:350,
+        cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
-    {id:"benefits", name:"Benefits", field:"benefits", sortable:true,
-        width: 350, minWidth: 100, formatter:renderBenefits, editor:LongTextCellEditor}
+    {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
+        width: 340, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+    {id:"sow", name:"SOW", field:"sow", width: 40, editor:AgilityCellEditor}
 ];
 
 var options = {
@@ -96,6 +99,7 @@ $(function() {
 
     grid.setSelectionModel(new Slick.CellSelectionModel());
 
+    var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
 
     grid.onSort.subscribe(function(e, args) {
         sortdir = args.sortAsc ? 1 : -1;
@@ -106,20 +110,21 @@ $(function() {
 
     // wire up model events to drive the grid
     grid.onCellChange.subscribe(function(e, args) {
-        var item = args.item;
+
         var kd = window._karl_client_data;
         var url = kd.wiki_url + "set_agility_data.json";
         $.ajax({
                     type: "POST",
                     url: url,
                     dataType: 'json',
-                    data: JSON.stringify(item),
+                    data: JSON.stringify(args.item),
                     contentType: "application/json; charset=utf-8",
                     error: function (jqxhr, status, errorThrown) {
                         console.log("Error: " + errorThrown);
                     },
                     success: function (data) {
                         console.log("Saved");
+                        dataView.updateItem(args.item.id, args.item);
                     }});
     });
 
@@ -163,19 +168,103 @@ $(function() {
     );
     loadSampleData();
 
-    $('#add-new-item').submit(function (evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        var rand_id = Math.round(Math.random() * 999);
-        var item = {
-            id: "id_" + rand_id,
-            num: rand_id,
-            title: $('#ani-title').val(),
-            who:  $('#ani-who').val(),
-            sow: $('#ani-sow').val()
-        };
-        items.push(item);
-        reloadGrid(items);
-        return false;
-    });
+
 });
+
+function AgilityCellEditor(args) {
+    var $input;
+    var defaultValue;
+    var scope = this;
+
+    this.xinit = function() {
+        $input = $("<INPUT type=text class='editor-text' />")
+                .appendTo(args.container)
+                .bind("keydown.nav", function(e) {
+            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+                e.stopImmediatePropagation();
+            }
+        })
+                .focus()
+                .select();
+    };
+
+    this.init = function() {
+        $input = $("<INPUT type=text class='editor-text' />")
+                .appendTo(args.container)
+                .bind("keydown.nav", function(e) {
+            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+                e.stopImmediatePropagation();
+            }
+        })
+                .focus()
+                .select();
+    };
+
+    this.destroy = function() {
+        $input.remove();
+    };
+
+    this.focus = function() {
+        $input.focus();
+    };
+
+    this.getValue = function() {
+        return $input.val();
+    };
+
+    this.setValue = function(val) {
+        $input.val(val);
+    };
+
+    this.loadValue = function(item) {
+        var field = args.column.field;
+        if (field == "title") {
+            var t = item.title;
+            var d = item.description;
+            defaultValue = t + "||" + d;
+        } else if (field == "benefits") {
+            defaultValue = item.benefits.join("||");
+        } else {
+            defaultValue = item[args.column.field] || "";
+        }
+        $input.val(defaultValue);
+        $input[0].defaultValue = defaultValue;
+        $input.select();
+    };
+
+    this.serializeValue = function() {
+        return $input.val();
+    };
+
+    this.applyValue = function(item, state) {
+        var field = args.column.field;
+        if (field == "title") {
+            args.item.title = state.split("||")[0];
+            args.item.description = state.split("||")[1];
+        } else if (field == "benefits") {
+            args.item.benefits = state.split("||");
+        } else {
+            item[args.column.field] = state;
+        }
+
+    };
+
+    this.isValueChanged = function() {
+        return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+    };
+
+    this.validate = function() {
+        if (args.column.validator) {
+            var validationResults = args.column.validator($input.val());
+            if (!validationResults.valid)
+                return validationResults;
+        }
+
+        return {
+            valid: true,
+            msg: null
+        };
+    };
+
+    this.init();
+}

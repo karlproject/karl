@@ -5,6 +5,7 @@
 
 <span metal:fill-slot="extra-headers" tal:omit-tag="">
       <link rel="stylesheet" href="${api.static_url}/slickgrid/slick.grid.css" type="text/css"/>
+      <link rel="stylesheet" href="${api.static_url}/slickgrid/controls/slick.columnpicker.css" type="text/css" />
       <link rel="stylesheet" href="${api.static_url}/slickgrid/piledriver.css" type="text/css"/>
   </span>
 
@@ -39,6 +40,7 @@
     <script src="${api.static_url}/slickgrid/plugins/slick.cellrangeselector.js"></script>
     <script src="${api.static_url}/slickgrid/plugins/slick.cellselectionmodel.js"></script>
     <script src="${api.static_url}/slickgrid/slick.grid.js"></script>
+    <script src="${api.static_url}/slickgrid/controls/slick.columnpicker.js"></script>
     <script src="${api.static_url}/slickgrid/slick.groupitemmetadataprovider.js"></script>
     <script src="${api.static_url}/slickgrid/slick.dataview.js"></script>
 

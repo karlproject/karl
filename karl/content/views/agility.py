@@ -27,20 +27,12 @@ from karl.views.utils import convert_to_script
 
 from karl.content.views.atom import WikiAtomFeed
 
-_sample_eval_dates = ["07-Jun", "14-Jun", "21-Jun", "28-Jun"]
-_sample_sows = ["35", "36", "37"]
-_sample_benefits = ["First Benefit", "Another good reason", "Slam Dunk"]
-_sample_descriptions = [
-        "This project is neat.  It has text that might span multiple lines",
-        "Another project is neat.  It has text spans multiple lines",
-        "My project is great.  It has text that might span multiple lines",
-        ]
-
 def set_agility_data(context, request):
     item = json.loads(request.body)
 
     context[item['name']].title = item['title']
-
+    context[item['name']].agility = item
+    print "Saved"
     return 99
 
 def get_agility_data(context, request):
@@ -50,27 +42,33 @@ def get_agility_data(context, request):
         "sows": {
             "35": "SOW35: May-Jul 2011",
             "36": "SOW36: Aug-Sep 2011",
-            "37": "SOW37: Oct-Nov 2011"
+            "37": "SOW37: Oct-Nov 2011",
+            "999": "Not Assigned"
         }
     }
     entries = WikiAtomFeed(context, request)._entry_models
-    counter = 0
     for entry in entries:
-        counter = counter + 1
-        this_eval_date = choice(_sample_eval_dates)
-        this_sow = choice(_sample_sows)
-        this_desc = choice(_sample_descriptions)
+        if hasattr(entry, "agility"):
+            this_desc = entry.agility["description"]
+            this_eval_date = entry.agility["eval_date"]
+            this_sow = entry.agility["sow"]
+            this_benefits = entry.agility["benefits"]
+        else:
+            this_desc = "No description."
+            this_eval_date = "None"
+            this_sow = "999"
+            this_benefits = ["No Benefits Listed",]
         item = {
-                                "id": "id_" + str(counter),
+                                "id": "id_" + entry.__name__,
                                 "name": entry.__name__,
-                                "num": counter,
                                 "sow": this_sow,
                                 "title": entry.title,
                                 "who": "Paul",
-                                "benefits": _sample_benefits,
+                                "benefits": this_benefits,
                                 "description": this_desc,
                                 "eval_date": this_eval_date
                             }
+
         response["items"].append(item)
     
     return response
