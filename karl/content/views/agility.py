@@ -15,6 +15,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import json
+from random import choice
+
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import model_url
 
@@ -24,26 +27,49 @@ from karl.views.utils import convert_to_script
 
 from karl.content.views.atom import WikiAtomFeed
 
+_sample_eval_dates = ["07-Jun", "14-Jun", "21-Jun", "28-Jun"]
+_sample_sows = ["35", "36", "37"]
+_sample_benefits = ["First Benefit", "Another good reason", "Slam Dunk"]
+_sample_descriptions = [
+        "This project is neat.  It has text that might span multiple lines",
+        "Another project is neat.  It has text spans multiple lines",
+        "My project is great.  It has text that might span multiple lines",
+        ]
+
+def set_agility_data(context, request):
+    item = json.loads(request.body)
+
+    context[item['name']].title = item['title']
+
+    return 99
+
 def get_agility_data(context, request):
 
     response = {
         "items": [],
-        "timeslots": {
-                    "0": "January 1",
-                    "1": "January 8",
-                    "2": "February 1"
-                }
+        "sows": {
+            "35": "SOW35: May-Jul 2011",
+            "36": "SOW36: Aug-Sep 2011",
+            "37": "SOW37: Oct-Nov 2011"
+        }
     }
     entries = WikiAtomFeed(context, request)._entry_models
     counter = 0
     for entry in entries:
         counter = counter + 1
+        this_eval_date = choice(_sample_eval_dates)
+        this_sow = choice(_sample_sows)
+        this_desc = choice(_sample_descriptions)
         item = {
                                 "id": "id_" + str(counter),
+                                "name": entry.__name__,
                                 "num": counter,
-                                "timeslot": 0,
+                                "sow": this_sow,
                                 "title": entry.title,
-                                "who": "Paul"
+                                "who": "Paul",
+                                "benefits": _sample_benefits,
+                                "description": this_desc,
+                                "eval_date": this_eval_date
                             }
         response["items"].append(item)
     
@@ -69,56 +95,3 @@ def show_agility_view(context, request):
         head_data=client_json_data,
         backto=backto,
         )
-
-_sample_data = {"items":
-                    [
-                                {
-                                "id": "id_0",
-                                "num": 0,
-                                "timeslot": 0,
-                                "title": "Task 0",
-                                "who": "Paul"
-                            },
-                                {
-                                    "id": "id_1",
-                                    "num": 1,
-                                    "timeslot": 1,
-                                    "title": "Task 1",
-                                    "who": "Chris"
-                                },
-                                {
-                                    "id": "id_2",
-                                    "num": 2,
-                                    "timeslot": 2,
-                                    "title": "Task 2",
-                                    "who": "Robert"
-                                },
-                                {
-                                    "id": "id_3",
-                                    "num": 3,
-                                    "timeslot": 0,
-                                    "title": "Task 3",
-                                    "who": "Paul"
-                                },
-                                {
-                                    "id": "id_4",
-                                    "num": 4,
-                                    "timeslot": 0,
-                                    "title": "Simply Task 4",
-                                    "who": "Robert"
-                                },
-                                {
-                                    "id": "id_5",
-                                    "num": 5,
-                                    "timeslot": 0,
-                                    "title": "Another Task 5",
-                                    "who": "Chris"
-                                }
-
-                    ],
-                "timeslots": {
-                    "0": "January 1",
-                    "1": "January 8",
-                    "2": "February 1"
-                }
-}

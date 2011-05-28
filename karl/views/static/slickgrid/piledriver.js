@@ -1,15 +1,36 @@
 var dataView;
 var grid;
-var timeslots;
+var sows;
 var items;
 
+function renderBenefits(row, cell, value, columnDef, dataContext) {
+    var this_ul = $('<ul></ul>');
+    $.each(value, function (index, item) {
+        this_ul.append($('<li>' + item + '</li>'));
+    });
+    return this_ul.html();
+}
+
+function renderProject(row, cell, value, columnDef, dataContext) {
+    // Title and Description
+    console.log(dataContext);
+    var title = dataContext.title;
+    var description = dataContext.description;
+    this_cell = $('<div>');
+    this_cell.append($('<div class="ag-projtitle">' + title + '</div>'));
+    this_cell.append($('<div class="ag-projdesc">' + description + '</div>'));
+    return this_cell.html();
+}
+
+
 var columns = [
-    {id:"sel", name:"#", field:"num", cssClass:"cell-selection", width:40,
+    {id:"eval_date", name:"Eval Date", field:"eval_date", width:60,
         resizable:false, selectable:false, focusable:false },
-    {id:"title", name:"Title", field:"title", width:400, minWidth:200,
-        cssClass:"cell-title", sortable:true, editor:LongTextCellEditor},
-    {id:"who", name:"Who", field:"who", sortable:true,
-        width: 140, minWidth: 100}
+    {id:"title", name:"Project", field:"title", width:430, minWidth:400,
+        cssClass:"cell-title", sortable:true, editor:LongTextCellEditor,
+        formatter: renderProject},
+    {id:"benefits", name:"Benefits", field:"benefits", sortable:true,
+        width: 350, minWidth: 100, formatter:renderBenefits, editor:LongTextCellEditor}
 ];
 
 var options = {
@@ -18,6 +39,8 @@ var options = {
     editable: true,
     enableAddRow: true,
     asyncEditorLoading: false,
+    rowHeight: 80,
+    autoHeight: true,
     autoEdit: false
 };
 
@@ -55,7 +78,7 @@ function loadSampleData() {
                 },
                 cache: false,
                 success: function (data) {
-                    timeslots = data.timeslots;
+                    sows = data.sows;
                     reloadGrid(data.items);
                 }});
 }
@@ -82,6 +105,24 @@ $(function() {
     });
 
     // wire up model events to drive the grid
+    grid.onCellChange.subscribe(function(e, args) {
+        var item = args.item;
+        var kd = window._karl_client_data;
+        var url = kd.wiki_url + "set_agility_data.json";
+        $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: 'json',
+                    data: JSON.stringify(item),
+                    contentType: "application/json; charset=utf-8",
+                    error: function (jqxhr, status, errorThrown) {
+                        console.log("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        console.log("Saved");
+                    }});
+    });
+
     dataView.onRowCountChanged.subscribe(function(e, args) {
         grid.updateRowCount();
         grid.render();
@@ -110,11 +151,11 @@ $(function() {
     // $("#gridContainer").resizable();
     dataView.setFilter(myFilter);
     dataView.groupBy(
-            "timeslot",
+            "sow",
             function (g) {
-                var timeslot = "Timeslot:  " + timeslots[g.value];
+                var sow = sows[g.value];
                 var counter = "  <span style='color:green'>(" + g.count + " items)</span>";
-                return timeslot + counter;
+                return sow + counter;
             },
             function (a, b) {
                 return a.value - b.value;
@@ -131,7 +172,7 @@ $(function() {
             num: rand_id,
             title: $('#ani-title').val(),
             who:  $('#ani-who').val(),
-            timeslot: $('#ani-timeslot').val()
+            sow: $('#ani-sow').val()
         };
         items.push(item);
         reloadGrid(items);

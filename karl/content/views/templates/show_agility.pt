@@ -16,7 +16,7 @@
 
 
 <div style="position:relative">
-    <div class="ag-gridframe" style="width:600px;">
+    <div class="ag-gridframe">
         <div class="grid-header" style="height: 2.8em; width:100%">
             <div style="float:right; padding: 0.2em">
                 <label>Title Filter:</label>
@@ -24,7 +24,7 @@
             </div>
             <label>Agility</label>
         </div>
-        <div id="myGrid" style="width:100%;height:350px;"></div>
+        <div id="myGrid" style="width:100%"></div>
     </div>
 </div>
 

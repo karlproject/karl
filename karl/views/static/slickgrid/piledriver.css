@@ -1,22 +1,26 @@
 @import url('examples/slick-default-theme.css');
 
+.ag-gridframe {
+    width: 850px;
+}
+
 .ag-gridframe * {
     font-family: arial;
     font-size: 8pt;
 }
 
-h2 {
+.ag-gridframe h2 {
     font-size: 10pt;
     border-bottom: 1px dotted gray;
 }
 
-ul {
+.ag-gridframe ul {
     margin-left: 0;
     padding: 0;
     cursor: default;
 }
 
-li {
+.ag-gridframe li {
     background: url("images/arrow_right_spearmint.png") no-repeat center left;
     padding: 0 0 0 14px;
 
@@ -231,9 +235,14 @@ input.editor-checkbox {
 }
 
 
-.cell-title {
+.ag-projtitle {
     font-weight: bold;
 }
+
+.ag-projdesc {
+    font-style: italic;
+}
+
 
 .cell-effort-driven {
     text-align: center;

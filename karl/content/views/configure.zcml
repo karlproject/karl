@@ -1171,6 +1171,13 @@
       renderer="json"
       />
 
+    <view
+      for="karl.content.interfaces.IWiki"
+      view=".agility.set_agility_data"
+      permission="view"
+      name="set_agility_data.json"
+      renderer="json"
+      />
 
 
 </configure>
