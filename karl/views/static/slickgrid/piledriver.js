@@ -24,16 +24,22 @@ function renderProject(row, cell, value, columnDef, dataContext) {
     return this_cell.html();
 }
 
+function sumTotalsFormatter(totals, columnDef) {
+    var str = "Est: " + totals.sum[columnDef.field];
+    return str.slice(0, 9);
+}
+
 
 var columns = [
     {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
         sortable:true, editor:AgilityCellEditor},
-    {id:"title", name:"Project", field:"title", width:395, minWidth:350,
+    {id:"title", name:"Project", field:"title", width:350, minWidth:300,
         cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
     {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
-        width: 340, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
-    {id:"sow", name:"SOW", field:"sow", width: 40, editor:AgilityCellEditor}
+        width: 360, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+    {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
+        width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter}
 ];
 
 var options = {
@@ -70,12 +76,13 @@ function reloadGrid(data) {
     dataView.endUpdate();
 }
 
-function assignGrouping (dataView, config) {
+function assignGrouping(dataView, config) {
     // The definition of what to group by is now defined server-side,
     // so we have to setup the grouping *after* fetching data.
 
     var group_by = config.group_by;
     var this_vocab = config.vocabularies[group_by];
+
     dataView.groupBy(
             group_by,
             function (g) {
@@ -87,6 +94,11 @@ function assignGrouping (dataView, config) {
                 return a.value - b.value;
             }
     );
+
+    dataView.setAggregators([
+        new SumAggregator("estimated")
+    ], false);
+
 }
 
 function loadSampleData() {
@@ -100,8 +112,8 @@ function loadSampleData() {
                 },
                 cache: false,
                 success: function (data) {
-                    assignGrouping(dataView, data.config);
                     reloadGrid(data.items);
+                    assignGrouping(dataView, data.config);
                 }});
 }
 
@@ -275,4 +287,35 @@ function AgilityCellEditor(args) {
     };
 
     this.init();
+}
+
+
+function SumAggregator(field) {
+    var count;
+    var nonNullCount;
+    var sum;
+
+    this.init = function() {
+        count = 0;
+        nonNullCount = 0;
+        sum = 0;
+    };
+
+    this.accumulate = function(item) {
+        var val = item[field];
+        count++;
+        if (val != null && val != NaN) {
+            nonNullCount++;
+            sum += 1 * val;
+        }
+    };
+
+    this.storeResult = function(groupTotals) {
+        if (!groupTotals.sum) {
+            groupTotals.sum = {};
+        }
+        if (nonNullCount != 0) {
+            groupTotals.sum[field] = sum;
+        }
+    };
 }

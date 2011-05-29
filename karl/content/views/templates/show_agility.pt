@@ -11,8 +11,6 @@
 
 <div metal:fill-slot="content">
 
-    <a metal:use-macro="api.snippets.macros['backto_link']"/>
-
     <div class="kbody">
 
 
@@ -23,7 +21,9 @@
                 <label>Title Filter:</label>
                 <input type="text" id="txtSearch" size="30" />
             </div>
-            <label>Agility</label>
+            <label>
+                <a style="color: black" href="${backto['href']}">KARL Core Team Wiki</a> /
+                <a style="color: black" href="${backto['href']}agility.html">Agility</a></label>
         </div>
         <div id="myGrid" style="width:100%"></div>
     </div>

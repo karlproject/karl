@@ -45,7 +45,7 @@ def get_agility_config(wiki):
     }
     config = {
         'vocabularies': vocabularies,
-        'group_by': "sow"}
+        'group_by': "category"}
 
     return config
 
@@ -66,16 +66,20 @@ def get_agility_data(context, request):
         }
     entries = WikiAtomFeed(context, request)._entry_models
     for entry in entries:
+        # For now, if data haven't been assigned yet to the .agility
+        # JSON pile, make up some values for the purposes of testing.
+        this_desc = "No description."
+        this_eval_date = "None"
+        this_sow = "999"
+        this_benefits = ["No Benefits Listed", ]
+        this_category = 0
+        this_estimated = 1.4
         if hasattr(entry, "agility"):
             this_desc = entry.agility["description"]
             this_eval_date = entry.agility["eval_date"]
             this_sow = entry.agility["sow"]
             this_benefits = entry.agility["benefits"]
-        else:
-            this_desc = "No description."
-            this_eval_date = "None"
-            this_sow = "999"
-            this_benefits = ["No Benefits Listed", ]
+            #this_category = entry.agility["category"]
         item = {
             "id": "id_" + entry.__name__,
             "name": entry.__name__,
@@ -84,7 +88,9 @@ def get_agility_data(context, request):
             "who": "Paul",
             "benefits": this_benefits,
             "description": this_desc,
-            "eval_date": this_eval_date
+            "eval_date": this_eval_date,
+            "category": this_category,
+            "estimated": this_estimated
         }
 
         response["items"].append(item)
