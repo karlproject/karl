@@ -27,6 +27,29 @@ from karl.views.utils import convert_to_script
 
 from karl.content.views.atom import WikiAtomFeed
 
+def get_agility_config(wiki):
+    """At some point this will be persistent"""
+    vocabularies = {
+        "category": {
+            "0": "Search",
+            "1": "Files",
+            "2": "Hosting",
+            "3": "Versioning"
+        },
+        "sow": {
+            "35": "SOW35: May-Jul 2011",
+            "36": "SOW36: Aug-Sep 2011",
+            "37": "SOW37: Oct-Nov 2011",
+            "999": "Not Assigned"
+        }
+    }
+    config = {
+        'vocabularies': vocabularies,
+        'group_by': "sow"}
+
+    return config
+
+
 def set_agility_data(context, request):
     item = json.loads(request.body)
 
@@ -35,17 +58,12 @@ def set_agility_data(context, request):
     print "Saved"
     return 99
 
-def get_agility_data(context, request):
 
+def get_agility_data(context, request):
     response = {
         "items": [],
-        "sows": {
-            "35": "SOW35: May-Jul 2011",
-            "36": "SOW36: Aug-Sep 2011",
-            "37": "SOW37: Oct-Nov 2011",
-            "999": "Not Assigned"
+        "config": get_agility_config(None),
         }
-    }
     entries = WikiAtomFeed(context, request)._entry_models
     for entry in entries:
         if hasattr(entry, "agility"):
@@ -57,20 +75,20 @@ def get_agility_data(context, request):
             this_desc = "No description."
             this_eval_date = "None"
             this_sow = "999"
-            this_benefits = ["No Benefits Listed",]
+            this_benefits = ["No Benefits Listed", ]
         item = {
-                                "id": "id_" + entry.__name__,
-                                "name": entry.__name__,
-                                "sow": this_sow,
-                                "title": entry.title,
-                                "who": "Paul",
-                                "benefits": this_benefits,
-                                "description": this_desc,
-                                "eval_date": this_eval_date
-                            }
+            "id": "id_" + entry.__name__,
+            "name": entry.__name__,
+            "sow": this_sow,
+            "title": entry.title,
+            "who": "Paul",
+            "benefits": this_benefits,
+            "description": this_desc,
+            "eval_date": this_eval_date
+        }
 
         response["items"].append(item)
-    
+
     return response
 
 
@@ -83,7 +101,7 @@ def show_agility_view(context, request):
     api = TemplateAPI(context, request, "Agility")
 
     client_json_data = convert_to_script(dict(
-        wiki_url = backto["href"]
+        wiki_url=backto["href"]
     ))
 
     feed_url = model_url(context, request, "atom.xml")

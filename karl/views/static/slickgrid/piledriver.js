@@ -70,6 +70,25 @@ function reloadGrid(data) {
     dataView.endUpdate();
 }
 
+function assignGrouping (dataView, config) {
+    // The definition of what to group by is now defined server-side,
+    // so we have to setup the grouping *after* fetching data.
+
+    var group_by = config.group_by;
+    var this_vocab = config.vocabularies[group_by];
+    dataView.groupBy(
+            group_by,
+            function (g) {
+                var sow = this_vocab[g.value];
+                var counter = "  <span style='color:green'>(" + g.count + " items)</span>";
+                return sow + counter;
+            },
+            function (a, b) {
+                return a.value - b.value;
+            }
+    );
+}
+
 function loadSampleData() {
     var kd = window._karl_client_data;
     var url = kd.wiki_url + "/get_agility_data.json";
@@ -81,7 +100,7 @@ function loadSampleData() {
                 },
                 cache: false,
                 success: function (data) {
-                    sows = data.sows;
+                    assignGrouping(dataView, data.config);
                     reloadGrid(data.items);
                 }});
 }
@@ -155,17 +174,6 @@ $(function() {
     // initialize the model after all the events have been hooked up
     // $("#gridContainer").resizable();
     dataView.setFilter(myFilter);
-    dataView.groupBy(
-            "sow",
-            function (g) {
-                var sow = sows[g.value];
-                var counter = "  <span style='color:green'>(" + g.count + " items)</span>";
-                return sow + counter;
-            },
-            function (a, b) {
-                return a.value - b.value;
-            }
-    );
     loadSampleData();
 
 
