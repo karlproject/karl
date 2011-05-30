@@ -65,6 +65,9 @@ function AgilityCellEditor(args) {
             args.item.description = state.split("||")[1];
         } else if (field == "benefits") {
             args.item.benefits = state.split("||");
+        } else if (field == "category") {
+            args.item.category = parseInt(state);
+            console.log(args.item.category);
         } else {
             item[args.column.field] = state;
         }

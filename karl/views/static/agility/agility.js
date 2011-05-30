@@ -22,19 +22,25 @@ function renderProject(row, cell, value, columnDef, dataContext) {
     return this_cell.html();
 }
 
+function renderSelectorHandle (row, cell, value, columnDef, dataContext) {
+    return "#";
+}
 
 var columns = [
-    {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
+    {id:"sel", name:"#", behavior:"select", width:30,
+        cannotTriggerInsert:true, resizable:false,
+        selectable:false, formatter: renderSelectorHandle},
+    {id:"eval_date", name:"Eval Date", field:"eval_date", width:70,
         sortable:true, editor:AgilityCellEditor},
-    {id:"title", name:"Project", field:"title", width:380, minWidth:300,
+    {id:"title", name:"Project", field:"title", width:350, minWidth:300,
         cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
     {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
-        width: 410, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+        width: 370, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
     {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
         width: 70, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter},
     {id:"category", name:"Category", field:"category",
-        width: 60, editor:AgilityCellEditor}
+        width: 80, editor:AgilityCellEditor}
 
 ];
 
@@ -118,7 +124,8 @@ $(function() {
                 groupItemMetadataProvider: groupItemMetadataProvider
             });
     grid = new Slick.Grid("#ag-grid", dataView, columns, options);
-    updateColumns();
+    var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
+    //updateColumns();
 
     // register the group item metadata provider to add expand/collapse group handlers
     grid.registerPlugin(groupItemMetadataProvider);
@@ -132,10 +139,21 @@ $(function() {
         dataView.sort(comparer, args.sortAsc);
     });
 
+    grid.onSelectedRowsChanged.subscribe(function(e) {
+        selectedRowIds = [];
+        var rows = grid.getSelectedRows();
+        for (var i = 0, l = rows.length; i < l; i++) {
+            var item = dataView.getItem(rows[i]);
+            if (item) selectedRowIds.push(item.id);
+        };
+
+    });
+    
+
     // wire up model events to drive the grid
     grid.onCellChange.subscribe(function(e, args) {
 
-        var url = "../set_agility_data.json";
+        var url = "../wiki/set_agility_data.json";
         $.ajax({
                     type: "POST",
                     url: url,

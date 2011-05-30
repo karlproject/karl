@@ -51,6 +51,13 @@ body {
     line-height: 24px;
 }
 
+.slick-columnpicker {
+    background-color: white;
+    padding: 10px;
+    border: solid gray 1px;
+    font-family: arial;
+    font-size: 12px;
+}
 .grid-header label, .grid-header a {
     display: inline-block;
     font-weight: bold;
@@ -243,12 +250,6 @@ input.editor-checkbox {
 
 .cell-effort-driven {
     text-align: center;
-}
-
-.slick-columnpicker * {
-    font-size: 8px;
-    text-align: left;
-    font-weight: normal;
 }
 
 #ag-setup-frame {

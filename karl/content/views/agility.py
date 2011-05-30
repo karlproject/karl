@@ -55,6 +55,7 @@ def set_agility_data(context, request):
 
     context[item['name']].title = item['title']
     context[item['name']].agility = item
+    print item
     print "Saved"
     return 99
 
@@ -79,7 +80,7 @@ def get_agility_data(context, request):
             this_eval_date = entry.agility["eval_date"]
             this_sow = entry.agility["sow"]
             this_benefits = entry.agility["benefits"]
-            #this_category = entry.agility["category"]
+            this_category = entry.agility.get("category", 0)
         item = {
             "id": "id_" + entry.__name__,
             "name": entry.__name__,
@@ -112,7 +113,7 @@ def show_agility_view(context, request):
 
     feed_url = model_url(context, request, "atom.xml")
     return render_template_to_response(
-        'templates/show_agility.pt',
+        'templates/show_agility2.pt',
         api=api,
         head_data=client_json_data,
         backto=backto,
