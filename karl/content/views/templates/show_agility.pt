@@ -92,12 +92,14 @@
     <!-- Next, include JS stuff -->
 
     <script src="${api.static_url}/slickgrid/lib/jquery.event.drag-2.0.min.js"></script>
+    <script src="${api.static_url}/slickgrid/lib/jquery.event.drop-2.0.min.js"></script>
 
     <script src="${api.static_url}/slickgrid/slick.core.js"></script>
     <script src="${api.static_url}/slickgrid/slick.editors.js"></script>
     <script src="${api.static_url}/slickgrid/plugins/slick.cellrangedecorator.js"></script>
     <script src="${api.static_url}/slickgrid/plugins/slick.cellrangeselector.js"></script>
     <script src="${api.static_url}/slickgrid/plugins/slick.cellselectionmodel.js"></script>
+    <script src="${api.static_url}/slickgrid/plugins/slick.rowselectionmodel.js"></script>
     <script src="${api.static_url}/slickgrid/slick.grid.js"></script>
     <script src="${api.static_url}/slickgrid/slick.groupitemmetadataprovider.js"></script>
     <script src="${api.static_url}/slickgrid/slick.dataview.js"></script>
