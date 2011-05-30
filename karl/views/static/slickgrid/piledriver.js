@@ -34,6 +34,7 @@ var columns = [
         width: 375, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
     {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
         width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter}
+
 ];
 
 var options = {
@@ -96,7 +97,7 @@ function assignGrouping(dataView, config) {
 
 function loadSampleData() {
     var kd = window._karl_client_data;
-    var url = kd.wiki_url + "/get_agility_data.json";
+    var url = kd.wiki_url + "get_agility_data.json";
     $.ajax({
                 url: url,
                 dataType: 'json',
@@ -117,6 +118,7 @@ $(function() {
                 groupItemMetadataProvider: groupItemMetadataProvider
             });
     grid = new Slick.Grid("#ag-grid", dataView, columns, options);
+    updateColumns();
 
     // register the group item metadata provider to add expand/collapse group handlers
     grid.registerPlugin(groupItemMetadataProvider);

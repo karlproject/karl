@@ -36,21 +36,45 @@
 
                                 <form action="#" id="ag-setup-columns">
                                     <div>
-                                        <input name="column" type="checkbox" value="project"></input>
+                                        <input id="columnpicker" type="checkbox" value="eval_date"
+                                               checked="checked"></input>
+                                        <label>Eval Date</label>
+                                    </div>
+                                    <div>
+                                        <input id="columnpicker" type="checkbox" value="title"
+                                               checked="checked"></input>
                                         <label>Project</label>
                                     </div>
                                     <div>
-                                        <input name="column" type="checkbox" value="sow"></input>
+                                        <input id="columnpicker" type="checkbox" value="benefits"
+                                               checked="checked"></input>
+                                        <label>Benefits</label>
+                                    </div>
+                                    <div>
+                                        <input id="columnpicker" type="checkbox" value="sow"></input>
                                         <label>SOW</label>
                                     </div>
                                     <div>
-                                        <input name="column" type="checkbox" value="estimated"></input>
+                                        <input id="columnpicker" type="checkbox" value="estimated"
+                                               checked="checked"></input>
                                         <label>Estimated</label>
                                     </div>
                                 </form>
+
                             </td>
-                            <td valign="top"><h2>Group By</h2></td>
-                            <td valign="top"><h2>Series By</h2></td>
+                            <td valign="top">
+                                <h2>Group By</h2>
+
+                                <p id="ag-setup-groupbyitems">
+                                </p>
+                            </td>
+                            <td valign="top">
+                                <h2>Series By</h2>
+
+                                <p id="ag-setup-seriesbyitems">
+                                </p>
+
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -61,8 +85,9 @@
             </div>
         </div>
 
-
     </div>
+
+    <!-- Next, include JS stuff -->
 
     <script src="${api.static_url}/slickgrid/lib/jquery.event.drag-2.0.min.js"></script>
 
