@@ -10,23 +10,56 @@
 
 <div metal:fill-slot="content">
 
-    <div class="kbody">
+<div class="kbody">
 
 
-<div style="position:relative">
-    <div class="ag-gridframe">
-        <div class="grid-header" style="height: 2.8em; width:100%">
-            <div style="float:right; padding: 0.2em">
-                <label>Title Filter:</label>
-                <input type="text" id="txtSearch" size="30" />
+    <div style="position:relative">
+        <div class="ag-gridframe">
+            <div class="grid-header" style="height: 3.4em; width:100%">
+                <div style="float:right; padding: 0.2em">
+                    <label>Title Filter:</label>
+                    <input type="text" id="txtSearch" size="30"/>
+                    <button id="ag-setup-btn">Setup</button>
+                </div>
+                <label>
+                    <a style="color: black" href="${backto['href']}">KARL Core Team Wiki</a> /
+                    <a style="color: black" href="${backto['href']}agility.html">Agility</a></label>
             </div>
-            <label>
-                <a style="color: black" href="${backto['href']}">KARL Core Team Wiki</a> /
-                <a style="color: black" href="${backto['href']}agility.html">Agility</a></label>
+            <div id="ag-grid" style="width:100%"></div>
+            <div id="ag-setup-frame" style="display: none; width: 100%">
+                <div id="ag-setup-content">
+                    <table width="95%" border="0" cellpadding="6">
+                        <tbody>
+                        <tr>
+                            <td valign="top">
+                                <h2>Columns</h2>
+
+                                <form action="#" id="ag-setup-columns">
+                                    <div>
+                                        <input name="column" type="checkbox" value="project"></input>
+                                        <label>Project</label>
+                                    </div>
+                                    <div>
+                                        <input name="column" type="checkbox" value="sow"></input>
+                                        <label>SOW</label>
+                                    </div>
+                                    <div>
+                                        <input name="column" type="checkbox" value="estimated"></input>
+                                        <label>Estimated</label>
+                                    </div>
+                                </form>
+                            </td>
+                            <td valign="top"><h2>Group By</h2></td>
+                            <td valign="top"><h2>Series By</h2></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p style="text-align: right">
+                        <button id="ag-setup-close">Close</button>
+                    </p>
+                </div>
+            </div>
         </div>
-        <div id="myGrid" style="width:100%"></div>
-    </div>
-</div>
 
 
     </div>

@@ -23,11 +23,6 @@ function renderProject(row, cell, value, columnDef, dataContext) {
     return this_cell.html();
 }
 
-function sumTotalsFormatter(totals, columnDef) {
-    var str = "Est: " + totals.sum[columnDef.field];
-    return str.slice(0, 9);
-}
-
 
 var columns = [
     {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
@@ -55,7 +50,7 @@ var sortcol = "title";
 var sortdir = 1;
 var searchString = "";
 
-function myFilter(item) {
+function titleFilter(item) {
     if (searchString != "" && item["title"].indexOf(searchString) == -1)
         return false;
 
@@ -121,7 +116,7 @@ $(function() {
     dataView = new Slick.Data.DataView({
                 groupItemMetadataProvider: groupItemMetadataProvider
             });
-    grid = new Slick.Grid("#myGrid", dataView, columns, options);
+    grid = new Slick.Grid("#ag-grid", dataView, columns, options);
 
     // register the group item metadata provider to add expand/collapse group handlers
     grid.registerPlugin(groupItemMetadataProvider);
@@ -181,8 +176,19 @@ $(function() {
 
     // initialize the model after all the events have been hooked up
     // $("#gridContainer").resizable();
-    dataView.setFilter(myFilter);
+    dataView.setFilter(titleFilter);
     loadSampleData();
 
+    $('#ag-setup-btn').button();
+    $('#ag-setup-btn').click(function () {
+        $('#ag-grid').css('display', 'none');
+        $('#ag-setup-frame').css('display', 'block');
+    })
+
+    $('#ag-setup-close').button();
+    $('#ag-setup-close').click(function () {
+        $('#ag-grid').css('display', 'block');
+        $('#ag-setup-frame').css('display', 'none');
+    })
 
 });
