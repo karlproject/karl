@@ -61,6 +61,9 @@ from karl.models.interfaces import IUserRemovedGroup
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
 from karl.utils import coarse_datetime_repr
+from karl.utils import find_catalog
+from karl.utils import find_tags
+from karl.utils import find_users
 
 class UserEvent(object):
     def __init__(self, site, id, login, groups, old_groups=None):
@@ -180,11 +183,33 @@ def get_textrepr(object, default):
     parts.extend(texts[1:])
     return ' '.join(parts)
 
+try:
+    from repoze.pgtextindex.interfaces import IWeightedText
+except ImportError:
+    WeightedText = None
+else:
+    class WeightedText(unicode):
+        implements(IWeightedText)
+
+def get_object_tags(obj):
+    path = model_path(obj)
+    catalog = find_catalog(obj)
+    docid = catalog.document_map.docid_for_address(path)
+    tags = find_tags(obj)
+    return tags.getTags(items=(docid,))
+
+def is_created_by_staff(obj):
+    creator = getattr(obj, 'creator', None)
+    if not creator:
+        return False
+    users = find_users(obj)
+    return users.member_of_group(creator, 'group.KarlStaff')
+
 _surrogates = re.compile(u'[\uD800-\uDFFF]')
 
-def get_weighted_textrepr(object, default):
+def get_weighted_textrepr(obj, default):
     """ Used for repoze.pgtextindex. """
-    texts = _get_texts(object, default)
+    texts = _get_texts(obj, default)
     if texts is default:
         return default
 
@@ -197,9 +222,33 @@ def get_weighted_textrepr(object, default):
     # Unicode.  While zope.index.text has no problem with this, PostgreSQL
     # chokes horribly on this text.  To get around this issue we just elide
     # any characters in one of the surrogate ranges.
-    texts = tuple([_surrogates.sub('', text) for text in texts])
+    texts = [_surrogates.sub('', text) for text in texts]
 
-    return texts
+    if WeightedText is None:
+        # Old version of repoze.pgtextindex.
+        return texts
+
+    tags = get_object_tags(obj)
+
+    # Give the last text the D (default) weight.
+    weighted = WeightedText(texts[-1])
+
+    # Weight C indexes the rest of the texts.
+    weighted.C = '\n'.join(texts[:-1])
+
+    # Determine the coefficient.
+    if is_created_by_staff(obj):
+        weighted.coefficient = 10.0
+    else:
+        weighted.coefficient = 1.0
+
+    # Weight B indexes the tags (voice of the people).
+    if tags:
+        weighted.B = ' '.join(tags)
+
+    # TODO: Weight A indexes the keywords (voice of the organization).
+
+    return weighted
 
 def _get_date_or_datetime(object, attr, default):
     d = getattr(object, attr, None)
