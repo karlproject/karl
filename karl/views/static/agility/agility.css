@@ -1,0 +1,381 @@
+@import url('../slickgrid/examples/slick-default-theme.css');
+
+body {
+    margin: 0;
+    background: #ffffe0; /*#F1EFE2; */
+};
+
+.ag-gridframe {
+    font-family: arial;
+    width: 850px;
+}
+
+#ag-grid * {
+    font-size: 8pt;
+}
+
+.ag-gridframe h2 {
+    font-size: 10pt;
+    border-bottom: 1px dotted gray;
+}
+
+.ag-gridframe ul {
+    margin-left: 0;
+    padding: 0;
+    cursor: default;
+}
+
+.ag-gridframe li {
+    background: url("images/arrow_right_spearmint.png") no-repeat center left;
+    padding: 0 0 0 14px;
+
+    list-style: none;
+    margin: 0;
+}
+
+#ag-grid {
+    background: white;
+    outline: 0;
+    border: 1px solid gray;
+}
+
+.grid-header {
+    border: 1px solid gray;
+    border-bottom: 0;
+    background-color: #87cefa;
+    color: black;
+    height: 24px;
+    line-height: 24px;
+}
+
+.grid-header label, .grid-header a {
+    display: inline-block;
+    font-weight: bold;
+    margin: auto auto auto 6px;
+    font-size: 1.2em;
+}
+
+.grid-header .ui-icon {
+    margin: 4px 4px auto 6px;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.grid-header .ui-icon.ui-state-hover {
+    background-color: white;
+}
+
+.grid-header #txtSearch {
+    margin: 0 4px 0 4px;
+    padding: 2px 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border: 1px solid silver;
+}
+
+.options-panel {
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border: 1px solid silver;
+    background: #f0f0f0;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: 320px;
+    position: absolute;
+    top: 0px;
+    left: 650px;
+}
+
+/* Individual cell styles */
+.slick-cell.task-name {
+    font-weight: bold;
+    text-align: right;
+}
+
+.slick-cell.task-percent {
+    text-align: right;
+}
+
+.slick-cell.cell-move-handle {
+    font-weight: bold;
+    text-align: right;
+    border-right: solid gray;
+
+    background: #efefef;
+    cursor: move;
+}
+
+.cell-move-handle:hover {
+    background: #b6b9bd;
+}
+
+.slick-row.selected .cell-move-handle {
+    background: #D5DC8D;
+}
+
+.slick-row .cell-actions {
+    text-align: left;
+}
+
+.slick-row.complete {
+    background-color: #DFD;
+    color: #555;
+}
+
+.percent-complete-bar {
+    display: inline-block;
+    height: 6px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+/* TextCellEditor, DateCellEditor */
+input.editor-text {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+    background: transparent;
+    outline: 0;
+    padding: 0;
+
+}
+
+.ui-datepicker-trigger {
+    margin-top: 2px;
+    padding: 0;
+    vertical-align: top;
+}
+
+/* PercentCompleteCellEditor */
+input.editor-percentcomplete {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+    background: transparent;
+    outline: 0;
+    padding: 0;
+
+    float: left;
+}
+
+.editor-percentcomplete-picker {
+    position: relative;
+    display: inline-block;
+    width: 16px;
+    height: 100%;
+    background: url("images/pencil.gif") no-repeat center center;
+    overflow: visible;
+    z-index: 1000;
+    float: right;
+}
+
+.editor-percentcomplete-helper {
+    border: 0 solid gray;
+    position: absolute;
+    top: -2px;
+    left: -9px;
+    background: url("images/editor-helper-bg.gif") no-repeat top left;
+    padding-left: 9px;
+
+    width: 120px;
+    height: 140px;
+    display: none;
+    overflow: visible;
+}
+
+.editor-percentcomplete-wrapper {
+    background: beige;
+    padding: 20px 8px;
+
+    width: 100%;
+    height: 98px;
+    border: 1px solid gray;
+    border-left: 0;
+}
+
+.editor-percentcomplete-buttons {
+    float: right;
+}
+
+.editor-percentcomplete-buttons button {
+    width: 80px;
+}
+
+.editor-percentcomplete-slider {
+    float: left;
+}
+
+.editor-percentcomplete-picker:hover .editor-percentcomplete-helper {
+    display: block;
+}
+
+.editor-percentcomplete-helper:hover {
+    display: block;
+}
+
+/* YesNoSelectCellEditor */
+select.editor-yesno {
+    width: 100%;
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* YesNoCheckboxCellEditor */
+input.editor-checkbox {
+    margin: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+}
+
+.ag-projtitle {
+    font-weight: bold;
+}
+
+.ag-projdesc {
+    font-style: italic;
+}
+
+.cell-effort-driven {
+    text-align: center;
+}
+
+.slick-columnpicker * {
+    font-size: 8px;
+    text-align: left;
+    font-weight: normal;
+}
+
+#ag-setup-frame {
+    border: solid gray 1px;
+}
+
+#ag-setup-content {
+    margin: 1.2em;
+}
+
+#ag-setup-content * {
+    font-family: sans-serif;
+}
+
+#ag-setup-content h2 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#ag-setup-content label {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.cell-selection {
+    background: url("images/drag-handle.png") no-repeat center center;
+    vertical-align: middle;
+}
+
+
+#ka-globalmenu {
+    background-color: #b0c4de;
+    border-bottom: solid 1px gray;
+    padding: 0.2em;
+    padding-left: 1em;
+}
+
+#ka-globalmenu ul {
+    margin: 0;
+    list-style: none;
+    display: inline;
+    padding-left: 0;
+}
+
+#ka-globalmenu li {
+    display: inline;
+    padding-right: 0.2em;
+}
+
+#ka-globalmenu a {
+    color: black;
+}
+.ka-currentapp {
+    text-decoration:none;
+}
+
+/* Let's have a consistent set of font sizes and styles.
+Everything in the app should be set against one of the
+following. */
+#ka-app-bg, #ka-globalmenu, #ka-header-searchbox {
+    font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+    font-size: 0.8em;
+}
+#ka-header a{
+    font-size: 1.4em;
+    font-family: 'Georgia', arial, serif;
+}
+
+#ka-header-menu a {
+    font-size: 0.8em;
+    color: black;
+    font-weight: lighter;
+}
+
+/* /end consistent text style assignments */
+
+#ka-header {
+    padding: 0.4em;
+    border-bottom: solid 2px gray;
+    background-color: #e0ffff;
+    height: 2.4em;
+}
+
+#ka-header-searchbox {
+    margin-right: 3em;
+}
+#ka-header-searchbox label {
+    font-size: 0.8em;
+}
+
+#ka-header-logo img {
+    vertical-align: top;
+    height: 24px;
+}
+
+#ka-header a {
+    text-decoration: none;
+    padding-left: 0.2em;
+}
+
+#ka-narrowsearch {
+    text-transform: capitalize;
+}
+#ka-header-appname {
+    color: black;
+    font-weight: lighter;
+    text-transform: capitalize;
+}
+
+#ka-header-logoframe {
+    margin-top: 0.4em;
+}
+#ka-header-menu {
+    margin-top: 0.2em;
+    float: right;
+}
+
+#ka-profilepanel {
+    float: right;
+}
+#ka-app-bg {
+    margin: 2em;
+}
+
+.ka-form label {
+    display: inline-block;
+    min-width: 28em;
+}
+
+.ka-panel {
+    display: none;
+}
