@@ -27,13 +27,15 @@ function renderProject(row, cell, value, columnDef, dataContext) {
 var columns = [
     {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
         sortable:true, editor:AgilityCellEditor},
-    {id:"title", name:"Project", field:"title", width:350, minWidth:300,
+    {id:"title", name:"Project", field:"title", width:340, minWidth:300,
         cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
     {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
-        width: 375, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+        width: 325, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
     {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
-        width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter}
+        width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter},
+    {id:"category", name:"Category", field:"category",
+        width: 60, editor:AgilityCellEditor}
 
 ];
 
@@ -181,7 +183,10 @@ $(function() {
     dataView.setFilter(titleFilter);
     loadSampleData();
 
-    $('#ag-setup-btn').button();
+    $('#ag-edit-btn').button().css("font-size", "10px");
+
+
+    $('#ag-setup-btn').button().css("font-size", "10px");
     $('#ag-setup-btn').click(function () {
         $('#ag-grid').css('display', 'none');
         $('#ag-setup-frame').css('display', 'block');

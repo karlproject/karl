@@ -24,6 +24,8 @@
                 <label>
                     <a style="color: black" href="${backto['href']}">KARL Core Team Wiki</a> /
                     <a style="color: black" href="${backto['href']}agility.html">Agility</a></label>
+                <button id="ag-edit-btn">Edit</button>
+
             </div>
             <div id="ag-grid" style="width:100%"></div>
             <div id="ag-setup-frame" style="display: none; width: 100%">
