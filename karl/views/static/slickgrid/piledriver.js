@@ -1,6 +1,5 @@
 var dataView;
 var grid;
-var sows;
 var items;
 
 function renderBenefits(row, cell, value, columnDef, dataContext) {
@@ -37,7 +36,7 @@ var columns = [
         cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
     {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
-        width: 360, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+        width: 375, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
     {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
         width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter}
 ];
@@ -46,7 +45,6 @@ var options = {
     enableColumnReorder: false,
     enableCellNavigation: true,
     editable: true,
-    enableAddRow: true,
     asyncEditorLoading: false,
     rowHeight: 80,
     autoHeight: true,
@@ -130,8 +128,6 @@ $(function() {
 
     grid.setSelectionModel(new Slick.CellSelectionModel());
 
-    var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
-
     grid.onSort.subscribe(function(e, args) {
         sortdir = args.sortAsc ? 1 : -1;
         sortcol = args.sortCol.field;
@@ -190,132 +186,3 @@ $(function() {
 
 
 });
-
-function AgilityCellEditor(args) {
-    var $input;
-    var defaultValue;
-    var scope = this;
-
-    this.xinit = function() {
-        $input = $("<INPUT type=text class='editor-text' />")
-                .appendTo(args.container)
-                .bind("keydown.nav", function(e) {
-            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
-                e.stopImmediatePropagation();
-            }
-        })
-                .focus()
-                .select();
-    };
-
-    this.init = function() {
-        $input = $("<INPUT type=text class='editor-text' />")
-                .appendTo(args.container)
-                .bind("keydown.nav", function(e) {
-            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
-                e.stopImmediatePropagation();
-            }
-        })
-                .focus()
-                .select();
-    };
-
-    this.destroy = function() {
-        $input.remove();
-    };
-
-    this.focus = function() {
-        $input.focus();
-    };
-
-    this.getValue = function() {
-        return $input.val();
-    };
-
-    this.setValue = function(val) {
-        $input.val(val);
-    };
-
-    this.loadValue = function(item) {
-        var field = args.column.field;
-        if (field == "title") {
-            var t = item.title;
-            var d = item.description;
-            defaultValue = t + "||" + d;
-        } else if (field == "benefits") {
-            defaultValue = item.benefits.join("||");
-        } else {
-            defaultValue = item[args.column.field] || "";
-        }
-        $input.val(defaultValue);
-        $input[0].defaultValue = defaultValue;
-        $input.select();
-    };
-
-    this.serializeValue = function() {
-        return $input.val();
-    };
-
-    this.applyValue = function(item, state) {
-        var field = args.column.field;
-        if (field == "title") {
-            args.item.title = state.split("||")[0];
-            args.item.description = state.split("||")[1];
-        } else if (field == "benefits") {
-            args.item.benefits = state.split("||");
-        } else {
-            item[args.column.field] = state;
-        }
-
-    };
-
-    this.isValueChanged = function() {
-        return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function() {
-        if (args.column.validator) {
-            var validationResults = args.column.validator($input.val());
-            if (!validationResults.valid)
-                return validationResults;
-        }
-
-        return {
-            valid: true,
-            msg: null
-        };
-    };
-
-    this.init();
-}
-
-
-function SumAggregator(field) {
-    var count;
-    var nonNullCount;
-    var sum;
-
-    this.init = function() {
-        count = 0;
-        nonNullCount = 0;
-        sum = 0;
-    };
-
-    this.accumulate = function(item) {
-        var val = item[field];
-        count++;
-        if (val != null && val != NaN) {
-            nonNullCount++;
-            sum += 1 * val;
-        }
-    };
-
-    this.storeResult = function(groupTotals) {
-        if (!groupTotals.sum) {
-            groupTotals.sum = {};
-        }
-        if (nonNullCount != 0) {
-            groupTotals.sum[field] = sum;
-        }
-    };
-}
