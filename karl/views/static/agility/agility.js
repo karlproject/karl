@@ -15,8 +15,7 @@ function renderProject(row, cell, value, columnDef, dataContext) {
     var title = dataContext.title;
     var description = dataContext.description;
     this_cell = $('<div>');
-    var kd = window._karl_client_data;
-    var url = kd.wiki_url + dataContext.name;
+    var url = "../" + dataContext.name;
     var hyperlink = '<a target="_newpage" href="' + url + '">' + title + '</a>';
     this_cell.append($('<div class="ag-projtitle">' + hyperlink + '</div>'));
     this_cell.append($('<div class="ag-projdesc">' + description + '</div>'));
@@ -27,13 +26,13 @@ function renderProject(row, cell, value, columnDef, dataContext) {
 var columns = [
     {id:"eval_date", name:"Eval Date", field:"eval_date", width:65,
         sortable:true, editor:AgilityCellEditor},
-    {id:"title", name:"Project", field:"title", width:340, minWidth:300,
+    {id:"title", name:"Project", field:"title", width:380, minWidth:300,
         cssClass:"cell-title", sortable:true, editor:AgilityCellEditor,
         formatter: renderProject},
     {id:"benefits", name:"Benefits", field:"benefits", sortable:false,
-        width: 325, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
+        width: 410, minWidth: 100, formatter:renderBenefits, editor:AgilityCellEditor},
     {id:"estimated", name:"Estimated", field:"estimated", sortable:true,
-        width: 60, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter},
+        width: 70, editor:AgilityCellEditor, groupTotalsFormatter: sumTotalsFormatter},
     {id:"category", name:"Category", field:"category",
         width: 60, editor:AgilityCellEditor}
 
@@ -108,7 +107,7 @@ function loadSampleData() {
                 cache: false,
                 success: function (data) {
                     reloadGrid(data.items);
-                    //assignGrouping(dataView, data.config);
+                    assignGrouping(dataView, data.config);
                 }});
 }
 
@@ -136,8 +135,7 @@ $(function() {
     // wire up model events to drive the grid
     grid.onCellChange.subscribe(function(e, args) {
 
-        var kd = window._karl_client_data;
-        var url = kd.wiki_url + "set_agility_data.json";
+        var url = "../set_agility_data.json";
         $.ajax({
                     type: "POST",
                     url: url,

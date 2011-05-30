@@ -26,7 +26,7 @@ body {
 }
 
 .ag-gridframe li {
-    background: url("images/arrow_right_spearmint.png") no-repeat center left;
+    background: url("../slickgrid/images/arrow_right_spearmint.png") no-repeat center left;
     padding: 0 0 0 14px;
 
     list-style: none;
@@ -39,6 +39,9 @@ body {
     border: 1px solid gray;
 }
 
+#ag-setup-frame {
+    background-color: white;
+}
 .grid-header {
     border: 1px solid gray;
     border-bottom: 0;
