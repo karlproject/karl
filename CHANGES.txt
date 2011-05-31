@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed merge bug that made repoze.pgtextindex mandatory for building Karl.
+  repoze.pgtextindex (and psycopg2) are now optional again.
+
 3.61 (2011-05-26)
 -----------------
 

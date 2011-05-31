@@ -576,6 +576,14 @@ class PeopleReportMailinHandler(object):
                 yield profile.email
 
 
+# Dodge to allow developer builds that don't require Postgres
+try:
+    from repoze.pgtextindex.index import PGTextIndex
+except ImportError:
+    class PGTextIndex(object):
+        pass
+
+
 class PGTextIndexContextualSummarizer(object):
     implements(IContextualSummarizer)
 

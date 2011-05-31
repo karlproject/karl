@@ -229,7 +229,7 @@
   />
 
   <adapter
-    for="repoze.pgtextindex.index.PGTextIndex"
+    for=".adapters.PGTextIndex"
     provides=".interfaces.IContextualSummarizer"
     factory=".adapters.PGTextIndexContextualSummarizer"
     />
