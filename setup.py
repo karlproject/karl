@@ -50,7 +50,6 @@ requires = [
     'repoze.mailin',
     'repoze.mailin.monitor',
     'repoze.monty',
-    'repoze.pgtextindex',
     'repoze.postoffice',
     'repoze.retry',
     'repoze.sendmail',
