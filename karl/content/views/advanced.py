@@ -4,6 +4,7 @@ import schemaish
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
+from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 
@@ -11,6 +12,8 @@ from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import IReferencesFolder
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
+from karl.events import ObjectModifiedEvent
+from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import IIntranets
 from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
@@ -21,6 +24,12 @@ marker_field = schemaish.String(
     title='Marker',
     description='Customize what flavor of folder this is by choosing one of '
     'the following markers.')
+
+keywords_field = schemaish.Sequence(
+    schemaish.String(),
+    title='Search Keywords',
+    description='This document will be shown first for searches for any of '
+    'these keywords')
 
 marker_options = [
     ('', 'No Marker'),
@@ -33,6 +42,8 @@ marker_widget = widgets.VerticalRadioChoice(
     options=marker_options,
     none_option=None,
 )
+
+keywords_widget = widgets.SequenceTextAreaWidget(cols=20)
 
 
 class AdvancedFormController(object):
@@ -61,19 +72,23 @@ class AdvancedFormController(object):
             else:
                 defaults['marker'] = ''
 
+        defaults['keywords'] = getattr(context, 'keywords', [])
         return defaults
 
     def form_fields(self):
         fields = []
         if self.use_folder_options:
             fields.append(('marker', marker_field))
+        fields.append(('keywords', keywords_field))
+
         return fields
 
     def form_widgets(self, fields):
-        widgets = {}
+        form_widgets = {}
         if self.use_folder_options:
-            widgets['marker'] = marker_widget
-        return widgets
+            form_widgets['marker'] = marker_widget
+        form_widgets['keywords'] = keywords_widget
+        return form_widgets
 
     def __call__(self):
         api = TemplateAPI(self.context, self.request, self.page_title)
@@ -86,6 +101,8 @@ class AdvancedFormController(object):
 
     def handle_submit(self, params):
         context = self.context
+        objectEventNotify(ObjectWillBeModifiedEvent(context))
+
         if self.use_folder_options:
             noLongerProvides(context, IReferencesFolder)
             noLongerProvides(context, INetworkNewsMarker)
@@ -98,5 +115,10 @@ class AdvancedFormController(object):
             elif marker == 'network_events':
                 alsoProvides(context, INetworkEventsMarker)
 
+        keywords = params.get('keywords')
+        if keywords is not None:
+            context.keywords = keywords
+
+        objectEventNotify(ObjectModifiedEvent(context))
         return HTTPFound(location=model_url(self.context, self.request,
                     query={'status_message': 'Advanced settings changed.'}))

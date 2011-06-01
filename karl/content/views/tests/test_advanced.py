@@ -21,7 +21,17 @@ class TestAdvancedFormController(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {})
+        self.assertEqual(form.form_defaults(), {
+            'keywords': [],
+        })
+
+    def test_form_defaults_w_keywords(self):
+        context = testing.DummyModel(keywords=['foo', 'bar'])
+        request = testing.DummyRequest()
+        form = self._make_one(context, request)
+        self.assertEqual(form.form_defaults(), {
+            'keywords': ['foo', 'bar'],
+        })
 
     def test_form_defaults_is_intranet_folder(self):
         from karl.models.interfaces import IIntranets
@@ -30,7 +40,10 @@ class TestAdvancedFormController(unittest.TestCase):
             __provides__=(IIntranets, ICommunityFolder))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {'marker': ''})
+        self.assertEqual(form.form_defaults(), {
+            'marker': '',
+            'keywords': [],
+        })
 
     def test_form_defaults_is_references_folder(self):
         from karl.models.interfaces import IIntranets
@@ -40,7 +53,10 @@ class TestAdvancedFormController(unittest.TestCase):
             __provides__=(IIntranets, ICommunityFolder, IReferencesFolder))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {'marker': 'reference_manual'})
+        self.assertEqual(form.form_defaults(), {
+            'marker': 'reference_manual',
+            'keywords': [],
+        })
 
     def test_form_defaults_is_network_news(self):
         from karl.models.interfaces import IIntranets
@@ -50,7 +66,10 @@ class TestAdvancedFormController(unittest.TestCase):
             __provides__=(IIntranets, ICommunityFolder, INetworkNewsMarker))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {'marker': 'network_news'})
+        self.assertEqual(form.form_defaults(), {
+            'marker': 'network_news',
+            'keywords': [],
+        })
 
     def test_form_defaults_is_network_events(self):
         from karl.models.interfaces import IIntranets
@@ -60,39 +79,56 @@ class TestAdvancedFormController(unittest.TestCase):
             __provides__=(IIntranets, ICommunityFolder, INetworkEventsMarker))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {'marker': 'network_events'})
+        self.assertEqual(form.form_defaults(), {
+            'marker': 'network_events',
+            'keywords': [],
+        })
 
     def test_form_fields(self):
+        from karl.content.views.advanced import keywords_field
         context = testing.DummyModel()
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_fields(), [])
+        self.assertEqual(form.form_fields(), [
+            ('keywords', keywords_field),
+        ])
 
     def test_form_fields_is_intranet_folder(self):
         from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.advanced import marker_field
+        from karl.content.views.advanced import keywords_field
+
         context = testing.DummyModel(
             __provides__=(IIntranets, ICommunityFolder))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_fields(), [('marker', marker_field)])
+        self.assertEqual(form.form_fields(), [
+            ('marker', marker_field),
+            ('keywords', keywords_field),
+        ])
 
     def test_form_widgets(self):
+        from karl.content.views.advanced import keywords_widget
         context = testing.DummyModel()
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_widgets(None), {})
+        self.assertEqual(form.form_widgets(None), {
+            'keywords': keywords_widget})
 
     def test_form_widgets_is_intranet_folder(self):
         from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.advanced import marker_widget
+        from karl.content.views.advanced import keywords_widget
         context = testing.DummyModel(
             __provides__=(IIntranets, ICommunityFolder))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
-        self.assertEqual(form.form_widgets(None), {'marker': marker_widget})
+        self.assertEqual(form.form_widgets(None), {
+            'marker': marker_widget,
+            'keywords': keywords_widget,
+        })
 
     def test___call__(self):
         context = testing.DummyModel()
@@ -117,6 +153,16 @@ class TestAdvancedFormController(unittest.TestCase):
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({})
+        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.location,
+            'http://example.com/?status_message=Advanced+settings+changed.')
+
+    def test_handle_set_keywords(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        form = self._make_one(context, request)
+        response = form.handle_submit({'keywords': ['foo', 'bar']})
+        self.assertEqual(context.keywords, ['foo', 'bar'])
         self.assertEqual(response.status_int, 302)
         self.assertEqual(response.location,
             'http://example.com/?status_message=Advanced+settings+changed.')

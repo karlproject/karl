@@ -501,6 +501,20 @@ class TestFileUpload2(unittest.TestCase):
         result = widget.urlfactory(None)
         self.assertEqual(result, '1')
 
+class TestSequenceTextAreaWidget(unittest.TestCase):
+    def _makeOne(self):
+        from karl.views.forms.widgets import SequenceTextAreaWidget as cut
+        return cut()
+
+    def test_to_request_data(self):
+        fut = self._makeOne().to_request_data
+        self.assertEqual(fut(None, [u'foo', u'bar']), [u'foo\nbar'])
+
+    def test_from_request_data(self):
+        fut = self._makeOne().from_request_data
+        self.assertEqual(fut(None, [u'foo bar', u'baz']),
+                         [u'foo', u'bar', u'baz'])
+
 class Test_get_filestore(unittest.TestCase):
     def _callFUT(self, context, request, form_id):
         from karl.views.forms.filestore import get_filestore

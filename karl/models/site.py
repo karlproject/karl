@@ -247,6 +247,9 @@ def get_weighted_textrepr(obj, default):
         weighted.B = ' '.join(tags)
 
     # TODO: Weight A indexes the keywords (voice of the organization).
+    keywords = getattr(obj, 'keywords', None)
+    if keywords:
+        weighted.A = ' '.join(keywords)
 
     return weighted
 

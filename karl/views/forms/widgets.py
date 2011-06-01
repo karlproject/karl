@@ -33,7 +33,7 @@ class RichTextWidget(Widget):
         # possibly also content between them will be stripped when a correctly saved
         # document is opened.
         #
-        # XXX May be a recently introduced bug in chameleon? OR the usage of structure 
+        # XXX May be a recently introduced bug in chameleon? OR the usage of structure
         # in the formish widget was broken since the beginning?
 
         string_data = cgi.escape(string_data)
@@ -304,3 +304,13 @@ class DateTime(Widget):
 class VerticalRadioChoice(formish.RadioChoice):
     template = 'field.VerticalRadioChoice'
 
+class SequenceTextAreaWidget(formish.TextArea):
+
+    def from_request_data(self, field, request_data):
+        data = []
+        for datum in request_data:
+            data.extend(datum.split())
+        return data
+
+    def to_request_data(self, field, data):
+        return ['\n'.join(data)]
