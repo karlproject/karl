@@ -111,7 +111,7 @@
 }
 #filegrid .ui-grid-pagination .ui-icon {
     left: 5px;
-    background-image: url("/static/images/ui-icons_3a74a9_256x240.png");
+    background-image: url("../images/ui-icons_3a74a9_256x240.png");
 }
 #filegrid .ui-icon-circle-arrow-w {
     background-position: -96px -49px;
@@ -182,7 +182,7 @@
 }
 /* alternate row coloring */
 .ui-grid-row.even .ui-grid-column {
-    background: #fbf9ee url(/static/jquery-ui/grid/themes/base/images/fbf9ee_40x100_textures_02_glass_55.png) 0 50% repeat-x;
+    background: #fbf9ee url(grid/themes/base/images/fbf9ee_40x100_textures_02_glass_55.png) 0 50% repeat-x;
 }
 #filegrid .ui-grid-row.even .ui-grid-column {
     background: #f0f2f4;
@@ -190,10 +190,10 @@
 /* override selections on top of alternate colors,
  * and this time also apply correct absolute url. */
 .ui-grid-row-hover td {
-    background: #e6e6e6 url(/static/jquery-ui/grid/themes/base/images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
+    background: #e6e6e6 url(grid/themes/base/images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
 }
 .ui-grid-row-selected td {
-    background: #dadada url(/static/jquery-ui/grid/themes/base/images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
+    background: #dadada url(grid/themes/base/images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x !important;
 }
 
 
@@ -204,7 +204,7 @@
     cursor: pointer;
 }
 #filegrid .ui-grid-column-header {
-    background: url(/static/images/grid_header.png) repeat-x left bottom;
+    background: url(../images/grid_header.png) repeat-x left bottom;
     border-top: 1px solid #E7E8E9;
     border-right: 1px solid #e3e3e3;
     border-bottom: none;
@@ -225,7 +225,7 @@
     right: 8px;
 }
 #filegrid .ui-grid-column-header .ui-grid-visual-sorting-indicator {
-    background-image: url("/static/images/ui-icons_3a74a9_256x240.png");
+    background-image: url("../images/ui-icons_3a74a9_256x240.png");
 }
 #filegrid .ui-icon-carat-1-n {
     background-position: 1px -49px;
@@ -303,7 +303,7 @@ li.bit-box {
   padding: 1px 15px 2px 5px !important;
 }
 li.bit-box a.closebutton {
-  background: url('/static/jquery-ui/autobox2/close.gif') !important;
+  background: url('autobox2/close.gif') !important;
 }
 
 ul.autobox-list li.active {
@@ -372,7 +372,7 @@ ul.livesearch-list li.notice {
   padding: 4px 0;
 }
 ul.livesearch-list li.notice a {
-  background: url('/static/images/livesearch_info.png') 5px center no-repeat;
+  background: url('../images/livesearch_info.png') 5px center no-repeat;
   color: #555;
   cursor: default;
 }
@@ -482,7 +482,7 @@ ul.autobox-hldr li.autobox-input input {
     display: block;
     width: 7px; height: 7px;
     font-size: 1px;
-    background: url('/static/jquery-ui/autobox2/close.gif');
+    background: url('autobox2/close.gif');
     float: right;
     margin-top: 4px;
 }
