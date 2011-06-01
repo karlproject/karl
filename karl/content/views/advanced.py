@@ -78,10 +78,7 @@ class AdvancedFormController(object):
     def __call__(self):
         api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
-        if layout_provider is None:
-            layout = api.community_layout
-        else:
-            layout = layout_provider('community')
+        layout = layout_provider('community')
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
