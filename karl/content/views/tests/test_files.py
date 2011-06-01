@@ -18,6 +18,7 @@
 import unittest
 
 from zope.interface import Interface
+from zope.interface import taggedValue
 from repoze.bfg.testing import cleanUp
 
 from repoze.bfg import testing
@@ -61,17 +62,29 @@ class TestShowFolderView(unittest.TestCase):
             registerUtility(policy, IAuthenticationPolicy)
             registerUtility(policy, IAuthorizationPolicy)
 
-    def test_notcommunityrootfolder(self):
-        self._register()
+    def _make_community(self):
+        # Register dummy catalog search
+        # (the folder view needs it for the reorganize widget)
+        from karl.models.interfaces import ICatalogSearch
+        testing.registerAdapter(DummySearch, (Interface, ),
+                                ICatalogSearch)
 
+        # factorize a fake community
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
+        community = testing.DummyModel(title='thecommunity')
+        directlyProvides(community, ICommunity)
+        community.catalog = MyDummyCatalog()
+        return community
+
+    def test_notcommunityrootfolder(self):
+        self._register()
+        community = self._make_community()
         folder = testing.DummyModel(title='parent')
-        folder.catalog = {'modified_date': DummyModifiedDateIndex()}
+        community['files'] = folder
         context = testing.DummyModel(title='thetitle')
         folder['child'] = context
         request = testing.DummyRequest()
-        directlyProvides(context, ICommunity)
         response = self._callFUT(context, request)
         actions = response['actions']
         self.assertEqual(len(actions), 4)
@@ -81,12 +94,12 @@ class TestShowFolderView(unittest.TestCase):
         self.assertEqual(actions[3][1], 'delete.html')
 
     def test_communityrootfolder(self):
-        self._register()
-
         from karl.content.interfaces import ICommunityRootFolder
         from zope.interface import directlyProvides
+        self._register()
+        community = self._make_community()
         context = testing.DummyModel(title='thetitle')
-        context.catalog = {'modified_date': DummyModifiedDateIndex()}
+        community['files'] = context
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
         response = self._callFUT(context, request)
@@ -96,45 +109,40 @@ class TestShowFolderView(unittest.TestCase):
         self.assertEqual(actions[1][1], 'add_file.html')
 
     def test_read_only(self):
-        root = testing.DummyModel(title='root')
-        root['context'] = context = testing.DummyModel(title='thetitle')
-        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        root = self._make_community()
+        root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view',),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
 
     def test_editable(self):
-        root = testing.DummyModel(title='root')
-        root['context'] = context = testing.DummyModel(title='thetitle')
-        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        root = self._make_community()
+        root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html')])
 
     def test_deletable(self):
-        root = testing.DummyModel(title='root')
-        root['context'] = context = testing.DummyModel(title='thetitle')
-        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        root = self._make_community()
+        root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Delete', 'delete.html')])
 
     def test_delete_is_for_children_not_container(self):
-        root = testing.DummyModel(title='root')
-        root['context'] = context = testing.DummyModel(title='thetitle')
-        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        root = self._make_community()
+        root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
 
     def test_creatable(self):
-        root = testing.DummyModel(title='root')
-        root['context'] = context = testing.DummyModel(title='thetitle')
-        root.catalog = {'modified_date': DummyModifiedDateIndex()}
+        root = self._make_community()
+        root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view', 'create'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -1387,3 +1395,27 @@ class DummySecurityPolicy:
 
     def principals_allowed_by_permission(self, context, permission):
         return self.effective_principals(None)
+
+
+class IDummyContent(Interface):
+    taggedValue('name', 'dummy')
+
+class DummyContent(testing.DummyModel):
+    implements(IDummyContent)
+    title = 'THE TITLE'
+
+dummycontent = DummyContent()
+
+class DummySearch:
+    def __init__(self, context):
+        pass
+    def __call__(self, **kw):
+        return 1, [1], lambda x: dummycontent
+
+class MyDummyCatalog(dict):    
+    def __init__(self):
+        self['modified_date'] = DummyModifiedDateIndex()
+        class DocumentMap(object):
+            def address_for_docid(self, id):
+                return '/files/foo/bar'
+        self.document_map = DocumentMap()

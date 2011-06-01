@@ -243,6 +243,48 @@
     padding-right: 6px;
 }
 
+/* move/delete buttons in the grid footer */
+
+#filegrid .ui-grid-footer .ui-button {
+    margin-top: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+#filegrid .ui-grid-footer .ui-button .ui-button-text {
+    line-height: 9px;
+}
+#filegrid .ui-grid-footer .ui-widget.ui-button .ui-button-text {
+    /* reset back the font size to what we set in the grid */
+    font-size: 1em;
+}
+
+#filegrid .ui-grid-footer-button-positioner {
+    float: left;
+    /*
+    margin-left: 4px;
+    */
+}
+
+
+/* make sure Move To menu stands on top */
+
+#filegrid .ui-grid-footer-button-positioner .ui-menu {
+    z-index: 99999;
+}
+/* non-selectable items (span) should stand just like the (a) */
+#filegrid .ui-grid-footer-button-positioner .ui-menu span {
+    padding: 0.2em 0.4em;
+    font-weight: normal;
+    color: #b0b0b0;
+}
+
+
+/* global selector in the grid column header */
+
+div.ui-grid-globalselector {
+    padding: 2px 5px 3px;
+}
+
 /* autobox2 customization */
 
 ul.autobox-list {

@@ -25,7 +25,7 @@
 *     @depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.dialog.js
 *     @depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.menu.js
 *     @depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.position.js        
-*         @ NOT depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.progressbar.js
+*     @depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.progressbar.js
 *     @depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.slider.js
 *         @ NOT depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.spinner.js
 *         @ NOT depends ../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.tabs.js

@@ -13,7 +13,7 @@
 @import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.datepicker.css");
 @import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.dialog.css");
 @import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.menu.css");
-/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.progressbar.css");*/
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.progressbar.css");
 /*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.resizable.css");*/
 /*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.selectable.css");*/
 @import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.slider.css");

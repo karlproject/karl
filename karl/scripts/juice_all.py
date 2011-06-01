@@ -47,6 +47,9 @@ def main(argv=sys.argv):
     run_juicer(os.path.join(static_dir, 'karl-ui.js')) 
     run_juicer(os.path.join(static_dir, 'karl-ui.css'))  
 
+    run_juicer(os.path.join(static_dir, 'karl-multifileupload.js')) 
+    run_juicer(os.path.join(static_dir, 'karl-multifileupload.css'))  
+
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.js')) 
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.css')) 
 

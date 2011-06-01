@@ -615,6 +615,8 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             // scrollbar will be reserved next to the rightest column
         scrollbarWidth: 15
             // only effective of allocateWidthForScrollbar is true
+
+
     }),
 
     _create: function() {
@@ -721,7 +723,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
             var column = $('<td class="ui-grid-column-header ui-state-default">' +
                            '  <div style="position: relative;">' + // inner div is needed for relativizing position
-                           '    <a href="#">' +
+                           '    <a href="javascript://return false;">' +
                            '      <span class="ui-grid-column-header-text">' + column_meta.label + '</span>' +
                            '    </a>' +
                            '    <span class="ui-grid-visual-sorting-indicator' + sortDirectionClass + '"></span>' +
@@ -775,11 +777,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         // Click on column header toggles sorting
         if (el.is('.ui-grid-column-header, .ui-grid-column-header *')) {
-            var header = el.hasClass('ui-grid-column-header') ? el : el.parents('.ui-grid-column-header');
-            var data = header.data('grid-column-header');
-            this.sortDirection = this.sortDirection == 'desc' ? 'asc' : 'desc';
-            this.sortColumn = data.id;
-            this._update ({columns: false, refresh: true});
+            return this._onClickHeader(el);
         }
         
         // Handle click on pagination buttons
@@ -794,32 +792,50 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         }
         
         return false;
-
     },
 
+    _onClickHeader: function(el) {
+        // Header clicked: toggle sorting
+        var header = el.hasClass('ui-grid-column-header') ? el : el.parents('.ui-grid-column-header');
+        var data = header.data('grid-column-header');
+        this.sortDirection = this.sortDirection == 'desc' ? 'asc' : 'desc';
+        this.sortColumn = data.id;
+        this._update ({columns: false, refresh: true});
+        // prevent default
+        return false;
+    },
 
     _makeRowsSelectable: function() {
-        
+        // We don't really make the row selectable, rather use
+        // this method to set up our click handler.
+        var self = this;
         var table = this.content.parent().parent();
         table.bind('mousedown', function(event) {
-            var filter = 'tr';
-            var item;
-            $(event.target).parents().andSelf().each(function() {
-                if ($('tr', table).index(this) != -1) item = this;
-            });
+            return self._onClickRow($(event.target));
+        });
+    },
+            
+    _onClickRow: function(target) {
+        // Clicking on a row follows the first link in it.
+        var filter = 'tr';
+        var item;
 
-            if (!item)
-                return;
+        // find out the row that has been clicked
+        var table = this.content.parent().parent();
+        target.parents().andSelf().each(function() {
+            if ($('tr', table).index(this) != -1) item = this;
+        });
 
-            // follow the link in it
+        if (item) {
+            // follow the (first) link in it
             var links = $('a', item);
             if (links.length > 0) {
                 window.location = links[0].href;
             }
+        }
 
-            event.preventDefault();
-        });
-        
+        // prevent default
+        return false;
     },
 
     _addRow: function(item, dontAdd) {
@@ -966,11 +982,32 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
     },
 
     _initialUpdate: function() {		
+        // Override the options for the grid model. The model bundles the ajax
+        // call including the parsing of the received data into a dictionary.
+        // In order to convert the records from list-format to dictionary-format, 
+        // it does not pass the entire
+        // response data as-is, to _doUpdate. 
+        // In order to do this, we need to modify the parse function of the
+        // grid model - foolishly, this is not easy. (So why is it an option
+        // then, at all??)
+        //
+        // we need to enable this to be overwritten...
+        if (! this._grid_model_parse) {
+            this._grid_model_parse = $.ui.grid.model.defaults.parse;
+        }
+
+        // overwrite this, after created originally
+        this.gridmodel = $.ui.grid.model({
+            url: this.options.url,
+            parse: this._grid_model_parse
+        });
+        //
         var initialState = this.options.initialState;
         if (initialState) {
             // Initial state: use it to load content
             // Need to convert each record from a flat list to a keyed dict
-	    initialState = $.ui.grid.model.defaults.parse(initialState);
+            //initialState = $.ui.grid.model.defaults.parse(initialState);
+            initialState = this._grid_model_parse(initialState);
             // load them to the table
             this._doUpdate(initialState, {columns: true});
         } else {
@@ -1062,11 +1099,462 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 }));
 
 
+$.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
+
+    options: $.extend({}, $.ui.karlgrid.prototype.options, {
+        delete_url: 'delete_files.json',  // url relative to the context
+        moveto_url: 'move_files.json',  // url relative to the context
+        selectionColumnId: 'sel',  // the column id of the column that does the selection
+        folderMenuIndent: 16       // indentation for subfolder levels in pixel
+    }),
+
+
+    _create: function() {
+        var self = this;
+
+        // create dialogs
+        this.dialogDeleteConfirm = $(
+            '<div class="ui-grid-dialog-content">' +
+                '<p>Are you sure you want to delete the selected files and/or folders?</p>' + 
+            '</div>'
+        );
+        this.dialogDeleteConfirm
+            .appendTo('body')
+            .hide()
+            .karldialog({
+                width: 400,
+                buttons: {
+                    Cancel: function() {
+                        $(this).karldialog('close');
+                    },
+                    'Delete': function() {
+                        $(this).karldialog('close');
+                        self._onDeleteConfirmed();
+                    }
+		},
+                open: function() {
+                },
+                close: function() {
+                }
+            });
+
+
+        this.dialogMoveConfirm = $(
+            '<div class="ui-grid-dialog-content">' +
+                '<p>Are you sure you want to move these files/folders to "<span></span>"?</p>' + 
+            '</div>'
+        );
+        this.dialogMoveFolderName = this.dialogMoveConfirm.find('span');
+        this.dialogMoveConfirm
+            .appendTo('body')
+            .hide()
+            .karldialog({
+                width: 400,
+                buttons: {
+                    Cancel: function() {
+                        $(this).karldialog('close');
+                    },
+                    'Move': function() {
+                        $(this).karldialog('close');
+                        var selected = self.dialogMoveFolderName.data('folder');
+                        self._onMoveConfirmed(selected);
+                    }
+		},
+                open: function() {
+                },
+                close: function() {
+                }
+            });
+
+        $.ui.karlgrid.prototype._create.call(this, arguments);
+    },
+
+    setTargetFolders: function(folders, current_folder) {
+        // We assume that folders are sorted,
+        // otherwise the containment stucture would not work nicely
+        var self = this;
+        this.menuMove.find('li').remove();
+        $.each(folders, function(index, folder) {
+            var folder_path = folder.path;
+            var folder_title = folder.title;
+            if (! folder_path || folder_path.charAt(0) != '/') {
+                throw new Error('Fatal error: folder path must start with a "/"');
+            }
+            var level;
+            if (folder_path == '/') {
+                // special case, handle differently.
+                level = 0;
+            } else {
+                if (folder_path && folder_path.charAt(folder_path.length - 1) == '/') {
+                    throw new Error('Fatal error: folder path must not end with a "/"');
+                }
+                // The folder path is like /f1/f2/f3
+                // we want to produce leafFolder = f3, level = 2 from this.
+                level = folder_path.match(/\//g).length - 1;
+            }
+            // create the item
+            var item = $('<li></li>')
+                .css('textAlign', 'left')
+                .data('folder', folder)
+                .appendTo(self.menuMove);
+
+            // create the label. If this is not the current folder, it will be an <a>.
+            // If this is the target folder, it will be a <span>. Also in this case
+            // it needs the appear in the results, but it should not be selectable.           
+            var label;
+            if (folder_path != current_folder) {
+                label = $('<a></a>');
+            } else {
+                label = $('<span></span>');
+            }
+            label
+                .appendTo(item)
+                .text(folder_title)
+                .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
+        });
+        this.menuMove.menu('refresh');
+    },
+
+    getSelectedFiles: function() {
+        // Returns the list of selected files
+        var self = this;
+        var filenames = [];
+        this.content.find('input.ui-grid-selector[type="checkbox"]:checked')
+            .each(function(index, cb) {
+                var data = $(cb).parents('.ui-grid-row').data('karlfilegrid-rowdata');
+                // we saved the name of the file and retrieve it now
+                filenames.push(data._name);
+            });
+            return filenames;
+    },
+
+    _enableDisableButtons: function() {
+        // Enable or disable the buttons based on the number of selections
+        var selected = this.getSelectedFiles().length > 0;
+        this.button_delete.button('option', 'disabled', ! selected);
+        this.button_move.button('option', 'disabled', ! selected);
+    },
+
+    _addColumns: function(columns) {
+        var self = this;
+        $.ui.karlgrid.prototype._addColumns.call(this, columns);
+        // Add the checbox in the 'sel' column.
+        var sel_column = this.columnsContainer
+            .find('.ui-grid-column-header')
+            .filter(function(index) {
+                return columns[index].id == self.options.selectionColumnId;
+            })
+            .html('');
+        var globalselect_wrapper = $('<div class="ui-grid-globalselector"></div>')
+            .appendTo(sel_column);
+        this.cb_globalselect = $('<input type="checkbox" title="Select/Unselect all items">')
+            .change(function() {
+                self._onGlobalSelect($(this).attr('checked'));
+            })
+            .appendTo(globalselect_wrapper);
+    },
+
+    _addRow: function(item, dontAdd) {
+        var row = $.ui.karlgrid.prototype._addRow.call(this, item, dontAdd);
+        // annotate the data on the row
+        row.data('karlfilegrid-rowdata', item);
+        return row;
+    },
+
+    _initialUpdate: function() {		
+        var self = this;
+        // manually include the additional fields we need.
+        var oldparse = $.ui.grid.model.defaults.parse;
+        this._grid_model_parse = function(response) {
+            var d = oldparse(response);
+            // add the data needed for the reorganization
+            // as it will be needed for each _doUpdate
+            d.targetFolders = response.targetFolders;
+            d.currentFolder = response.currentFolder;
+            // Also:
+            // overwrite the 'sel' field in all records.
+            // This means that the server needs not send over
+            // the values, only an empty string.
+            $.each(d.records, function(index, record) {
+                // In the selector column, the server _must_ send the original filename (id)
+                // We remember this and replace the column with a rendered checkbox
+                record._name = record[self.options.selectionColumnId];
+                record[self.options.selectionColumnId] =
+                    '<input type="checkbox" class="ui-grid-selector" title="Select item">';
+            });
+            return d;
+        };
+        // call it
+        $.ui.karlgrid.prototype._initialUpdate.call(this);
+    },
+       
+    _doUpdate: function(state, o) {
+        $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
+        // If the grid is updated, we need to uncheck the global selector.
+        this.cb_globalselect.removeAttr('checked'); 
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
+        // set target folders
+        this.setTargetFolders(state.targetFolders, state.currentFolder);
+    },
+
+    _onGlobalSelect: function(checked) {
+        // the global selector changed.
+        // change all checkboxes
+        this.content.find('input.ui-grid-selector[type="checkbox"]').each(function() {
+            var target = $(this);
+            if (checked) {
+                target.attr('checked', 'checked');
+            } else {
+                target.removeAttr('checked'); 
+            }
+        });
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
+    },
+
+    _onClickRow: function(target) {
+        // Clicking on a checkbox toggles selection in that row
+        // (only 1 checkbox per row is supported)
+        // Clicking on the rest of the row follows the first link in it. (as normally)
+
+        var is_selection = target.is('input[type="checkbox"]');
+
+        if (! is_selection) {
+            // not a checkbox. Do as the supertype wants to.
+            return $.ui.karlgrid.prototype._onClickRow.call(this, target);
+        }
+
+        // Let the checkbox toggle.
+        var selected = target.attr('checked'); 
+
+        var new_selected = ! selected;
+
+        if (new_selected) {
+            target.attr('checked', 'checked');
+        } else {
+            target.removeAttr('checked'); 
+        }
+
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
+
+        // prevent default.
+        return false;
+    },
+
+    _onClickHeader: function(target) {
+        // Header clicked: toggle sorting
+        var header = target.hasClass('ui-grid-column-header') ? target : target.parents('.ui-grid-column-header');
+        var data = header.data('grid-column-header');
+
+        // The id of the selection column is 'sel'.
+        var is_selection = data.id == this.options.selectionColumnId;
+        if (! is_selection) {
+            // not a checkbox. Do as the supertype wants to.
+            return $.ui.karlgrid.prototype._onClickHeader.call(this, target);
+        }
+
+        // make sure that the user clicked the checkbox itself.
+        if (! target.is('.ui-grid-globalselector input[type="checkbox"]')) {
+            // if we clicked in the header but outside the checkbox,
+            // prevent default.
+            return false;
+        }
+
+        // Let's read the checkbox selection.
+        // var selected = target.attr('checked');
+        // var new_selected = ! selected;
+
+        // Do not prevent the default: this lets the browser to
+        // toggle the checkbox.
+        return true;
+    },
+
+    _generateFooter: function() {
+        var self = this;
+        $.ui.karlgrid.prototype._generateFooter.call(this);
+        var positioner = $('<span class="ui-grid-footer-button-positioner"></span>')
+            .appendTo(this.footer);
+        this.button_delete = $('<a>Delete</a>')
+            .button({
+                icons: {primary: 'ui-icon-trash'}
+            })
+            .click(function() {
+                if (! $(this).button('option', 'disabled')) {
+                    self._onDeleteClicked();
+                }
+                return false;
+            })
+            .appendTo(positioner);
+        this.button_move = $('<a>Move To</a>')
+            .button({
+                icons: {primary: 'ui-icon-folder-open'}
+            })
+            .click(function() {
+                if (! $(this).button('option', 'disabled')) {
+                    self._onMoveClicked();
+                }
+                return false;
+            })
+            .appendTo(positioner);
+
+        // create menu for move
+        this.menuMove = $('<ul></ul>')
+            .insertAfter(this.button_move)
+            .hide()
+            .width(250)
+            .css('position', 'absolute')
+            .menu({
+                select: function(evt, selection) {
+                    self.menuMove.hide();
+                    var selected = selection.item;
+                    if (selected) {
+                        var folder_info = selected.data('folder');
+                        self._onMoveSelected(folder_info);
+                    }
+                }
+            });
+            ////.popup();
+        // XXX escape from the menu needs to be done manually,
+        // this will arrive in jquery-ui 1.9 when this will not
+        // be needed any longer (or it will simply break)
+        this.menuMove.bind("keydown", function(event) {
+            if (self.menuMove.menu('option', 'disabled')) {
+                return;
+            }
+            switch (event.keyCode) {
+                case $.ui.keyCode.ESCAPE:
+                    self.menuMove.hide();
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    break;
+            }
+        });
+        $('body').bind("mousedown", function(event) {
+            if (self.menuMove.menu('option', 'disabled') 
+                // escape if the menu is disabled
+                || self.menuMove.is(':hidden')
+                // or if the menu is hidden
+                || $(event.target).is('.ui-grid-footer .ui-menu *')) {
+                // or if we are not outside the menu
+                return;
+            }
+            self.menuMove.hide();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        });
+
+
+    },
+
+    _onDeleteClicked: function() {
+        this.dialogDeleteConfirm.karldialog('open');
+    },
+
+    _onDeleteConfirmed: function() {
+        var self = this;
+        var filenames = this.getSelectedFiles();
+        $.ajax({
+            url: this.options.delete_url,
+            type: 'POST',
+            dataType: 'json',
+            timeout: 20000,
+            data: {
+                file: filenames
+            },
+            success: function(data, textStatus, jqXHR) {
+                if (data && data.result == 'OK') {
+                    self._onDeleteSuccess(data);
+                } else {
+                    self._onDeleteError(data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                self._onDeleteError({result: 'ERROR', error: 'Unknown server error: ' + textStatus});
+            }
+        });
+    },
+
+    _onDeleteSuccess: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        var message = '' + data.deleted + ' file(s) succesfully deleted';
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+        this._update ({columns: false, refresh: true});
+    },
+
+    _onDeleteError: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        // XXX TODO: this should be error....
+        // maybe, use the multistatusbox?
+        var message = 'Deletion failed: ' + data.error;
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+    },
+
+    _onMoveClicked: function() {
+        this.menuMove.show();
+        this.menuMove.position({my: 'left bottom', at: 'left top', of: this.button_move, collision: 'fit'});
+        this.menuMove.focus();
+    },
+
+    _onMoveSelected: function(selected) {
+        this.dialogMoveFolderName
+            .text(selected.title)
+            .data('folder', selected);
+        this.dialogMoveConfirm.karldialog('open');
+    },
+
+    _onMoveConfirmed: function(selected) {
+        var self = this;
+        var filenames = this.getSelectedFiles();
+        $.ajax({
+            url: this.options.moveto_url,
+            type: 'POST',
+            dataType: 'json',
+            timeout: 20000,
+            data: {
+                file: filenames,
+                target_folder: selected.path
+            },
+            success: function(data, textStatus, jqXHR) {
+                if (data && data.result == 'OK') {
+                    self._onMoveSuccess(data);
+                } else {
+                    self._onMoveError(data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                self._onMoveError({result: 'ERROR', error: 'Unknown server error: ' + textStatus});
+            }
+        });
+    },
+
+    _onMoveSuccess: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        var message = 'Moved ' +data.moved + ' selected files/folders to <a href="' +
+                data.targetFolderUrl + '">' + data.targetFolderTitle + '</a>';
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+        this._update ({columns: false, refresh: true});
+    },
+
+    _onMoveError: function(data) {
+        // XXX let's reuse the statusbox that the tagbox already activated
+        // XXX TODO: this should be error....
+        // maybe, use the multistatusbox?
+        var message = 'Move To failed: ' + data.error;
+        $('.statusbox').karlstatusbox('clearAndAppend', message);
+    }
+
+}));
+
+
 $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
 
     options: $.extend({}, $.ui.dialog.prototype.options, {
         autoOpen: false,
         modal: true,
+        draggable: false,
+        resizable: false,
         bgiframe: true,    // XXX bgiFrame is currently needed for modal
         hide: 'fold'
     }),
@@ -1117,10 +1605,20 @@ $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
         //    .filter(':first')
         //    .focus();
         // XXX Always focus on the dialog itself
-        uiDialog.focus()
+        uiDialog.focus();
 
         this._trigger('open');
         this._isOpen = true;
+    },
+
+    // allow to use position on the dialog directly.
+    // like: el.karldialog('position', {...});
+    // Why is this good? Because, it seems the 'position' option
+    // has a different semantics from the newest option plugin.
+    // This allows positioning with the same parameters as the
+    // option plugin, but without a need to look up the dialog object.
+    position: function(param) {
+        return this.uiDialog.position(param);
     }
 
 
@@ -2085,6 +2583,7 @@ $(document).ready(function() {
             $(this).css("background-color","transparent");
         }
     );
+
 }); // END document ready handler
 
 // For debugging and development.

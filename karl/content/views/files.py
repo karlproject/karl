@@ -15,13 +15,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mimetypes
 from simplejson import JSONEncoder
 import datetime
 import transaction
-from karl.log import get_logger
 from cStringIO import StringIO
-
+from simplejson import JSONDecoder
+from os.path import splitext
+from karl.log import get_logger
 
 
 import formish
@@ -43,6 +43,7 @@ from webob.exc import HTTPFound
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.traversal import find_interface
+from repoze.bfg.traversal import model_path
 
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
@@ -57,6 +58,7 @@ from karl.utilities.interfaces import IAlerts
 
 from karl.views.utils import make_name
 from karl.views.utils import make_unique_name
+from karl.views.utils import make_unique_name_and_postfix
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import convert_to_script
 from karl.views.tags import get_tags_client_data
@@ -83,6 +85,9 @@ from karl.content.views.interfaces import INetworkEventsMarker
 from karl.content.interfaces import IReferencesFolder
 from base64 import decodestring
 
+from karl.models.interfaces import ICatalogSearch
+from karl.utils import find_catalog
+
 # This import is BBB for karl.evolve.zodb.evolve15
 from karl.content.views.utils import ie_types
 
@@ -95,6 +100,7 @@ from karl.security.workflow import get_security_states
 from karl.utils import find_community
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
+from karl.utils import find_tempfolder
 
 from karl.views.tags import set_tags
 from karl.views.batch import get_container_batch
@@ -106,7 +112,7 @@ from karl.views.forms.filestore import get_filestore
 log = get_logger()
 
 def show_folder_view(context, request):
-
+    
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
 
@@ -736,8 +742,9 @@ class EditFileFormController(object):
 
 
 grid_folder_columns = [
+    {"id": "sel", "label": '', "width": 32},
     {"id": "mimetype", "label": "Type", "width": 64},
-    {"id": "title", "label": "Title", "width": 666 - (64 + 128)},
+    {"id": "title", "label": "Title", "width": 666 - (32 + 128 + 64)},
     {"id": "modified_date", "label": "Last Modified", "width": 128},
 ]
 
@@ -797,6 +804,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     records = []
     for entry in entries:
         records.append([
+            entry.name,       # MUST hold the file name (id) for the select column.
             '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
                 api.static_url,
                 entry.mimeinfo['small_icon_name'],
@@ -809,15 +817,485 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
             entry.modified,
             ])
 
+    # We also send, in each case, the list of possible target folders.
+    # They are needed for the grid reorganize (Move To) feature.
+    # Since we need this when the grid content is loaded (or each time
+    # it is reloaded), it is an obvious choice to factorize this information
+    # together with the container batch, each time.
+    #
+    # The client expects a list of folder paths here, starting with a /,
+    # such as:
+    #      /
+    #      /folder1
+    #      /folder1/folderA
+    #      ... etc ...
+    #
+    # The current folder should also be in the list.
+    
+    target_folders = get_target_folders(context)
+    current_folder = get_current_folder(context)
+
     payload = dict(
         columns = grid_folder_columns,
         records = records,
         totalRecords = info['total'],
         sortColumn = sort_on,
         sortDirection = reverse and 'desc' or 'asc',
+        targetFolders = target_folders,
+        currentFolder = current_folder,
     )
 
     return payload
+
+
+# --
+# Reorganize (Delete and Move To)
+# --
+
+class ErrorResponse(Exception):
+    
+    def __init__(self, txt, **kw):
+        self.__dict__.update(kw)
+        super(ErrorResponse, self).__init__(txt)
+
+
+def ajax_file_reorganize_delete_view(context, request):
+
+    try:
+        params = request.params
+        filenames = params.getall('file[]')
+        deleted = 0
+        for filename in filenames:
+            if filename not in context:
+                # already deleted, ignore
+                pass
+            else:
+                try:
+                    del context[filename]
+                except Exception, exc:
+                    msg = str(exc) 
+                    raise ErrorResponse(msg, filename=filename)
+                else:
+                    deleted += 1
+        payload = dict(
+            result = 'OK',
+            deleted = deleted,
+        )
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            result = 'ERROR',
+            error = str(exc),
+            filename = exc.filename,
+        )
+        log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' % 
+            (exc.filename, str(exc)))
+        transaction.doom()
+    finally:
+        pass
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+
+
+# XXX this should probably get moved to utils
+
+def traverse_file_folder(context, folder):
+    # Return the context folder specified in the "folder" parameter
+    # "folder" contains an absolute path to the target, relative
+    # to the community.
+    community = find_community(context)
+    assert folder.startswith('/')
+    assert folder == '/' or not folder.endswith('/')
+    c = community['files']
+    if folder != '/':
+        for segment in folder.split('/')[1:]:
+            c = c[segment]
+    return c
+
+def get_file_folder_path(context):
+    # Return the absolute path to the fileobjext in context, relative
+    # to the community.
+    community = find_community(context)
+    context_path = model_path(context)
+    root_path = model_path(community['files'])
+    assert context_path.startswith(root_path)
+    return context_path[len(root_path):]
+        
+def get_target_folders(context):
+    # Return the target folders for this community.
+    #
+    # The client expects a list of folder paths here, starting with a /,
+    # such as:
+    #      /
+    #      /folder1
+    #      /folder1/folderA
+    #      ... etc ...
+    #
+    # The current folder should also be in the list.
+    # The returned items contain the path and the title of the folder.
+    #
+    community = find_community(context)
+    catalog = find_catalog(context)
+    root_path = model_path(community['files'])
+
+    query = ICatalogSearch(context)
+    total, docids, resolver = query(
+        path = root_path, 
+        interfaces = (ICommunityFolder, ),
+        )
+    target_items = [
+        dict(
+            path = catalog.document_map.address_for_docid(docid),
+            title = resolver(docid).title,    # XXX rather use metadata here??
+            ) for docid in docids]
+    # sorting is important for the client visualization
+    target_items.sort(key=lambda item: item['path'])
+    # always insert the root folder that was not returned by this search 
+    target_items.insert(0, dict(
+        path = root_path,
+        title = 'Community home',
+        ))
+
+    # Process all the results
+    target_folders = []
+    for item in target_items:
+        # Now, only take the part after the community/files, ie, the path segments
+        # after the root folder.
+        assert item['path'].startswith(root_path)
+        # Just take the part after community/files
+        target_path = item['path'][len(root_path):]
+        # Correct the root folder path from '' to '/'
+        if not target_path:
+            target_path = '/'
+        target_folders.append(dict(
+            path = target_path,
+            title = item['title'],
+            ))
+
+    return target_folders
+
+def get_current_folder(context):
+    # Calculate the current folder in the same format as the results
+    # from get_target_folders (relative to community)
+    community = find_community(context)
+    root_path = model_path(community['files'])
+
+    context_path = model_path(context)
+    assert context_path.startswith(root_path)
+    current_folder = context_path[len(root_path):]
+
+    # Correct the root folder from '' to '/'
+    if not current_folder:
+        current_folder = '/'
+
+    return current_folder
+
+def make_unique_file_in_folder(context, fileobj, orig_name=None):
+    # create a unique name of the -1, -2, ... style
+    # also change title and filename properties as needed
+
+    # This method works for both folders and files. In case of
+    # files we use the filename as reference. In case of folders,
+    # there is no filename, so we have to use the name.
+    filename = getattr(fileobj, 'filename', None)
+    if filename is not None:
+        has_filename = True
+        # Remember if the title is unchanged, that is, it is set
+        # to the same as the filename (which is the case by uploaded
+        # files that have no way to specify a title)
+        is_title_changed = filename != fileobj.title
+    else:
+        has_filename = False
+        filename = orig_name
+        is_title_changed = True
+    assert filename
+
+    # create a unique name of the -1, -2, ... style
+    name, postfix = make_unique_name_and_postfix(context, filename)
+    # If we applied a -1, ... postfix to the name, then we also want to
+    # modulate the title and the stored filename with it.
+    if postfix:
+        base, ext = splitext(filename)
+        if has_filename:
+            fileobj.filename = "%s-%s%s" % (base, postfix, ext)
+        # Depending if the title has changed, we apply two possible schemes
+        if is_title_changed:
+            # Someone has changed the title, so we apply the
+            # postfix to the title, separated with a dash and whitespaces
+            fileobj.title = "%s - %s" % (fileobj.title, postfix)
+        else:
+            assert has_filename
+            # Otherwise, we use the filename for the title. This will make
+            # foo-1.bar, foo-2.bar titles which, in case they are still
+            # the same as the filename, is a better solution.
+            fileobj.title = fileobj.filename
+    # return the name to be used as key
+    # like: context[name] = fileobj
+    return name
+ 
+def ajax_file_reorganize_moveto_view(context, request):
+
+    try:
+        params = request.params
+        filenames = params.getall('file[]')
+        target_folder = params.get('target_folder', None)
+        if target_folder is None:
+            msg = 'Wrong parameters, `target_folder` is mandatory' 
+            raise ErrorResponse(msg, filename="*")
+
+        # find the target folder
+        try:
+            target_context = traverse_file_folder(context, target_folder)
+        except KeyError:
+            msg = 'Cannot find target folder "%s"' % (target_folder, )
+            raise ErrorResponse(msg, filename="*")
+        target_folder_url = model_url(target_context, request)
+
+        moved = 0
+        for filename in filenames:
+            try:
+                fileobj = context[filename]
+                file_path = get_file_folder_path(fileobj)
+
+                if target_folder.startswith(file_path):
+                    msg = 'Cannot move a folder into itself'
+                    raise ErrorResponse(msg, filename=filename)
+                del context[filename]
+
+                # create a unique name of the -1, -2, ... style
+                # also change title and filename properties as needed
+                target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
+
+                target_context[target_filename] = fileobj
+            except KeyError:
+                msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
+                raise ErrorResponse(msg, filename=filename)
+            moved += 1
+
+        payload = dict(
+            result = 'OK',
+            moved = moved,
+            targetFolder = target_folder,
+            targetFolderUrl = target_folder_url,
+            targetFolderTitle = target_context.title,
+        )
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            result = 'ERROR',
+            error = str(exc),
+            filename = exc.filename,
+        )
+        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' % 
+            (exc.filename, str(exc)))
+        transaction.doom()
+    finally:
+        pass
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+
+
+# --
+# Multi Upload
+# --
+
+def make_temp_id(client_id):
+    """Generate a unique tempdir id from the guaranteed unique client id"""
+    temp_id = 'PLUPLOAD-' + client_id
+    return temp_id
+
+def ajax_file_upload_view(context, request):
+
+    filename = "<>"
+    try:
+        params = request.params
+
+        f = params.get('file', None)
+        client_id = params.get('client_id', None)
+        if f is None or client_id is None:
+            msg = 'Wrong parameters, `file` is mandatory' 
+            raise ErrorResponse(msg, client_id='')
+
+        # XXX Handling of chunk uploads.
+        # Even if we do not want chunks, we need to support it. :(
+        #
+        # The chunks can be disabled from the client by _not_ setting chunk_size.
+        # However some uploader runtimes (most notably Flash, which is the main
+        # target of the development because it does work on IE), either break with
+        # error if chunking is disabled, or they ignore the chunk_size parameter
+        # and use the chunking size they decide, nevertheless.
+        chunks = int(params.get('chunks', '1'))
+        chunk = int(params.get('chunk', '0'))
+
+        is_first_chunk = chunk == 0
+        is_last_chunk = chunk >= chunks - 1
+
+        # (we allow chunks==0 chunk==0 as this happens with 0-length files)
+        if chunk < 0 or chunks > 0 and chunk >= chunks:
+            msg = 'Chunking inconsistence, `chunk` out of range' 
+            raise ErrorResponse(msg, client_id='')
+
+        end_batch = params.get('end_batch', None)
+
+        filename = basename_of_filepath(f.filename)
+        creator = authenticated_userid(request)
+        tempfolder = find_tempfolder(context)
+        # XXX We need to use the unique id from the client, as there is no way
+        # to pass back the id we generate to the second chunk
+        # (the flash runtime does not support this)
+        temp_id = make_temp_id(client_id) 
+
+        if is_first_chunk:
+            # First chunk. Create the content object.
+
+            fileobj = create_content(ICommunityFile,
+                                  title=filename,   # may be overwritten later
+                                  stream=f.file,
+                                  mimetype=get_upload_mimetype(f),
+                                  filename=filename, # may be overwritten in the end
+                                  creator=creator,
+                                  )
+
+            # For file objects, OSI's policy is to store the upload file's
+            # filename as the objectid, instead of basing __name__ on the
+            # title field).
+            fileobj.filename = filename
+
+            # Store the image in the temp folder.
+            fileobj.modified = datetime.datetime.now()
+            tempfolder[temp_id] = fileobj
+
+            # Add metadata to the newly created object
+            # This also has a role in security: 
+            # We store the original parent and creator.
+            # If the transaction is finalized on a different parent, or creator,
+            # we will doom it.
+            fileobj.__transaction_parent__ = context
+            fileobj.__client_file_id__ = client_id
+            # Store the chunk info too
+            fileobj.__chunks__ = chunks
+            fileobj.__chunk__ = 0
+
+        else:
+            # Followup chunks (`chunk` > 0)
+
+            fileobj = tempfolder[temp_id]
+
+            # chunk security protection
+            # to avoid attacks or malformed client_id parameters
+            if fileobj.__client_file_id__ != client_id:
+                msg = 'Inconsistent client file id'
+                raise ErrorResponse(msg, client_id='')
+            if fileobj.__transaction_parent__ != context:
+                msg = 'Inconsistent batch transaction'
+                raise ErrorResponse(msg, client_id=client_id)
+            if fileobj.creator != creator:
+                msg = 'Inconsistent ownership'
+                raise ErrorResponse(msg, client_id=client_id)
+
+            # chunk consistency check
+            fileobj.__chunk__ += 1
+            if fileobj.__chunk__ != chunk:
+                msg = 'Chunking inconsistence, wrong chunk order'
+                raise ErrorResponse(msg, client_id=client_id)
+
+            # Append the file to the existing file
+            bufsize = 8192
+            blobf = fileobj.blobfile.open('a')
+            while True:
+                buf = f.file.read(bufsize)
+                if not buf:
+                    break
+                blobf.write(buf)
+            # Need to set the size
+            fileobj.size = blobf.tell()
+            # Close the file
+            blobf.close()
+
+        payload = dict(
+            result = 'OK',
+            filename = filename,
+        )
+
+        if is_last_chunk and end_batch is not None:
+            # The client marks this as the last file in the batch.
+            # We finalize the transaction by moving all files to the folder.
+            end_batch = JSONDecoder().decode(end_batch)
+            last_fileobj = fileobj
+            # append the last file to the process queue
+            end_batch.append(client_id)
+
+            # Iterate on all the files in the just finishing batch.
+            for client_id in end_batch:
+                temp_id = make_temp_id(client_id) 
+                fileobj = tempfolder[temp_id]
+
+                # batch security protection
+                # to avoid attacks or malformed end_batch parameters
+                if fileobj.__client_file_id__ != client_id:
+                    msg = 'Inconsistent client file id'
+                    raise ErrorResponse(msg, client_id='')
+                if fileobj.__transaction_parent__ != context:
+                    msg = 'Inconsistent batch transaction'
+                    raise ErrorResponse(msg, client_id=client_id)
+                if fileobj.creator != last_fileobj.creator:
+                    msg = 'Inconsistent ownership'
+                    raise ErrorResponse(msg, client_id=client_id)
+
+                # we are final, so remove all metadata
+                del fileobj.__transaction_parent__
+                del fileobj.__client_file_id__
+                del fileobj.__chunks__
+                del fileobj.__chunk__
+
+                check_upload_size(context, fileobj, 'file')
+
+                # create a unique name of the -1, -2, ... style
+                # also change title and filename properties as needed
+                name = make_unique_file_in_folder(context, fileobj)
+   
+                # Move the file to its permanent location
+                del tempfolder[temp_id]
+                context[name] = fileobj
+
+                # XXX What to do with the workflow?
+                workflow = get_workflow(ICommunityFolder, 'security', context)
+                if workflow is not None:
+                    workflow.initialize(fileobj)
+                    #if 'security_state' in XXXconverted:
+                    #    workflow.transition_to_state(fileobj, request,
+                    #                                params['security_state'])
+
+                # Tags, attachments
+                #set_tags(fileobj, request, paramsXXX['tags'])
+
+                # Alerts
+                #if params.get('sendalert'):
+                #    alerts = queryUtility(IAlerts, default=Alerts())
+                #    alerts.emit(fileobj, request)
+
+            payload['batch_completed'] = True;
+
+    except ErrorResponse, exc:
+        # this error will be sent back and its text displayed on the client.
+        payload = dict(
+            error = str(exc),
+            client_id = exc.client_id,
+        )
+        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' % 
+            (client_id, filename, str(exc)))
+        transaction.doom()
+    finally:
+        tempfolder = find_tempfolder(context)
+        tempfolder.cleanup()
+
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
 
 
 # --
