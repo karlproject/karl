@@ -75,9 +75,30 @@ class GroupSearch:
         # path filtering
         criteria = {}
         criteria['sort_index'] = 'texts'
-        criteria['texts'] = self.term
+        criteria['texts'] = WeightedQuery(self.term)
         criteria['interfaces'] = {'query':self.interfaces, 'operator':'or'}
         criteria['allowed'] = {'query':principals, 'operator':'or'}
         return criteria
-    
 
+
+try:
+    from repoze.pgtextindex.interfaces import IWeightedQuery
+
+    class WeightedQuery(unicode):
+        implements(IWeightedQuery)
+
+        weight_factor = 32.0
+
+        A = 1.0
+        B = A / weight_factor
+        C = B / weight_factor
+        D = C / weight_factor
+
+        @property
+        def text(self):
+            return self
+
+
+except ImportError:
+    def WeightedQuery(text):
+        return text

@@ -238,7 +238,7 @@ def get_weighted_textrepr(obj, default):
 
     # Determine the coefficient.
     if is_created_by_staff(obj):
-        weighted.coefficient = 10.0
+        weighted.coefficient = 25.0
     else:
         weighted.coefficient = 1.0
 
@@ -246,7 +246,7 @@ def get_weighted_textrepr(obj, default):
     if tags:
         weighted.B = ' '.join(tags)
 
-    # TODO: Weight A indexes the keywords (voice of the organization).
+    # Weight A indexes the keywords (voice of the organization).
     keywords = getattr(obj, 'keywords', None)
     if keywords:
         weighted.A = ' '.join(keywords)
