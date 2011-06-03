@@ -740,13 +740,22 @@ class EditFileFormController(object):
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
 
-
+# The columns in the grid in the file tool
 grid_folder_columns = [
     {"id": "sel", "label": '', "width": 32},
     {"id": "mimetype", "label": "Type", "width": 64},
     {"id": "title", "label": "Title", "width": 666 - (32 + 128 + 64)},
     {"id": "modified_date", "label": "Last Modified", "width": 128},
 ]
+
+# in the folders that are out of the file tool, thus have no "sel" (selection) column
+grid_folder_columns_nofiletool = [
+    {"id": "mimetype", "label": "Type", "width": 64},
+    {"id": "title", "label": "Title", "width": 666 - (128 + 64)},
+    {"id": "modified_date", "label": "Last Modified", "width": 128},
+]
+
+
 
 def jquery_grid_folder_view(context, request):
 
@@ -791,32 +800,6 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
     ##columns = request.params.get('columns', '').capitalize() == 'True'
 
-    # Now get the data that goes with this, then adapt into FileInfo
-    info = get_container_batch(context, request,
-        batch_start=start,
-        batch_size=limit,
-        sort_index=sort_on,
-        reverse=reverse,
-        )
-    entries = [getMultiAdapter((item, request), IFileInfo)
-        for item in info['entries']]
-
-    records = []
-    for entry in entries:
-        records.append([
-            entry.name,       # MUST hold the file name (id) for the select column.
-            '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
-                api.static_url,
-                entry.mimeinfo['small_icon_name'],
-                entry.mimeinfo['title'],
-                ),
-            '%s<a href="%s" style="display: none;"/>' % (
-                entry.title,
-                entry.url,
-                ),
-            entry.modified,
-            ])
-
     # We also send, in each case, the list of possible target folders.
     # They are needed for the grid reorganize (Move To) feature.
     # Since we need this when the grid content is loaded (or each time
@@ -835,8 +818,48 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
 
+    if target_folders is None:
+        assert current_folder is None
+        # Use the column layout without a selection column
+        folder_columns = grid_folder_columns_nofiletool
+        has_selection_column = False
+    else:
+        assert current_folder is not None
+        # Use the column layout without a selection column
+        folder_columns = grid_folder_columns
+        has_selection_column = True
+
+
+    # Now get the data that goes with this, then adapt into FileInfo
+    info = get_container_batch(context, request,
+        batch_start=start,
+        batch_size=limit,
+        sort_index=sort_on,
+        reverse=reverse,
+        )
+    entries = [getMultiAdapter((item, request), IFileInfo)
+        for item in info['entries']]
+
+    records = []
+    for entry in entries:
+        record = [
+            '<img src="%s/images/%s" alt="icon" title="%s"/>' % (
+                api.static_url,
+                entry.mimeinfo['small_icon_name'],
+                entry.mimeinfo['title'],
+                ),
+            '%s<a href="%s" style="display: none;"/>' % (
+                entry.title,
+                entry.url,
+                ),
+            entry.modified,
+            ]
+        if has_selection_column:
+            record.insert(0, entry.name)      # MUST hold the file name (id) for the select column.
+        records.append(record)
+
     payload = dict(
-        columns = grid_folder_columns,
+        columns = folder_columns,
         records = records,
         totalRecords = info['total'],
         sortColumn = sort_on,
