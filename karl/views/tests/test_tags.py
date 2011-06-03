@@ -988,6 +988,12 @@ class ManageTagsViewTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
 
+        self.context = context = testing.DummyModel()
+        context.catalog = DummyCatalog()
+        context['path'] = testing.DummyModel()
+        context['path']['to'] = testing.DummyModel()
+        context['path']['to']['item'] = testing.DummyModel()
+
     def tearDown(self):
         testing.cleanUp()
 
@@ -996,7 +1002,7 @@ class ManageTagsViewTests(unittest.TestCase):
         return manage_tags_view(context, request)
 
     def test_not_submitted(self):
-        context = testing.DummyModel()
+        context = self.context
         context.__name__ = 'phred'
         tags = context.tags = DummyTags()
         def _getTags(items=None, users=None, community=None):
@@ -1014,7 +1020,7 @@ class ManageTagsViewTests(unittest.TestCase):
         self.assertEqual(result['my_tags'][1], 'tag2')
 
     def test_submitted_rename(self):
-        context = testing.DummyModel()
+        context = self.context
         context.__name__ = 'phred'
         tags = context.tags = DummyTags()
         class DummyTag:
@@ -1059,7 +1065,7 @@ class ManageTagsViewTests(unittest.TestCase):
     def test_submitted_rename_no_old_tag_in_request(self):
         # dont blow up when no "old_tags" exists in request.POST
         # (https://bugs.launchpad.net/karl3/+bug/558743)
-        context = testing.DummyModel()
+        context = self.context
         context.__name__ = 'phred'
         tags = context.tags = DummyTags()
         def _getTags(items=None, users=None, community=None):
@@ -1075,7 +1081,7 @@ class ManageTagsViewTests(unittest.TestCase):
         self.assertEqual(result['my_tags'][1], 'tag2')
 
     def test_submitted_delete(self):
-        context = testing.DummyModel()
+        context = self.context
         context.__name__ = 'phred'
         tags = context.tags = DummyTags()
         class DummyTag:
@@ -1109,7 +1115,7 @@ class ManageTagsViewTests(unittest.TestCase):
         tags.getTags = _getTags
         request = testing.DummyRequest()
         request.POST['form.delete'] = 'Remove tag'
-        request.POST['old_tag'] = 'foo'
+        request.POST['todelete'] = 'foo'
 
         self._callFUT(context, request)
 
@@ -1119,7 +1125,7 @@ class ManageTagsViewTests(unittest.TestCase):
     def test_submitted_delete_no_old_tag_in_request(self):
         # dont blow up when no "old_tags" exists in request.POST
         # (https://bugs.launchpad.net/karl3/+bug/558743)
-        context = testing.DummyModel()
+        context = self.context
         context.__name__ = 'phred'
         tags = context.tags = DummyTags()
         def _getTags(items=None, users=None, community=None):
@@ -1245,6 +1251,9 @@ class DummyDocumentMap:
 
 class DummyCatalog:
     document_map = DummyDocumentMap()
+
+    def reindex_doc(self, docid, doc):
+        pass
 
 class DummyTags:
     getTags_called_with = getItems_called_with = getUsers_called_with = None
