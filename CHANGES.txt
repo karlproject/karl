@@ -1,9 +1,11 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.63 (2011-06-03)
+-----------------
 
+- Fix for grid error when viewing it not within a files section. This fixes an
+  error on the top level reference manuals page.
 
 3.62 (2011-06-02)
 -----------------
