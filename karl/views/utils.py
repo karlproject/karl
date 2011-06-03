@@ -20,6 +20,8 @@ import os
 import re
 from cStringIO import StringIO
 
+from zope.interface import alsoProvides
+
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.threadlocal import get_current_request
 from repoze.bfg.traversal import traverse
@@ -32,6 +34,7 @@ from karl.utils import find_users
 from karl.utils import get_setting
 
 from karl.content.interfaces import ICommunityFile
+from karl.content.interfaces import IPhoto
 
 from karl.views.forms.filestore import get_filestore
 
@@ -297,6 +300,7 @@ def handle_photo_upload(context, form):
             )
         if 'photo' in context:
             del context['photo']
+        alsoProvides(photo, IPhoto)
         context['photo'] = photo
         check_upload_size(context, photo, 'photo')
 

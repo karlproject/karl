@@ -44,6 +44,7 @@ from zope.event import notify
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
+from karl.content.interfaces import IPhoto
 from karl.content.models.adapters import FlexibleTextIndexData
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
@@ -159,6 +160,9 @@ def get_path(object, default):
     return model_path(object)
 
 def _get_texts(object, default):
+    if IPhoto.providedBy(object):
+        return default
+
     adapter = queryAdapter(object, ITextIndexData)
     if adapter is None:
         if (not IContent.providedBy(object) or
