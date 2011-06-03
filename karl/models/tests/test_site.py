@@ -321,9 +321,13 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
         self.context = context = testing.DummyModel()
         context.catalog = DummyCatalog()
 
+        class DummyTag(object):
+            def __init__(self, name):
+                self.name = name
+
         class DummyTags(object):
-            def getTags(myself, items):
-                return self.tags
+            def getTagObjects(myself, items):
+                return [DummyTag(tag) for tag in self.tags]
 
         context.tags = DummyTags()
         context.users = DummyUsers()

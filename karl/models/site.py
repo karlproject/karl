@@ -197,7 +197,7 @@ def get_object_tags(obj):
     catalog = find_catalog(obj)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(obj)
-    return tags.getTags(items=(docid,))
+    return [tag.name for tag in tags.getTagObjects(items=(docid,))]
 
 def is_created_by_staff(obj):
     creator = getattr(obj, 'creator', None)
