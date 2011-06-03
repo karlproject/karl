@@ -23,14 +23,25 @@ class TestAdvancedFormController(unittest.TestCase):
         form = self._make_one(context, request)
         self.assertEqual(form.form_defaults(), {
             'keywords': [],
+            'weight': 0,
         })
 
     def test_form_defaults_w_keywords(self):
-        context = testing.DummyModel(keywords=['foo', 'bar'])
+        context = testing.DummyModel(search_keywords=['foo', 'bar'])
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_defaults(), {
             'keywords': ['foo', 'bar'],
+            'weight': 0,
+        })
+
+    def test_form_defaults_w_weight(self):
+        context = testing.DummyModel(search_weight=2)
+        request = testing.DummyRequest()
+        form = self._make_one(context, request)
+        self.assertEqual(form.form_defaults(), {
+            'keywords': [],
+            'weight': 2,
         })
 
     def test_form_defaults_is_intranet_folder(self):
@@ -43,6 +54,7 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_defaults(), {
             'marker': '',
             'keywords': [],
+            'weight': 0,
         })
 
     def test_form_defaults_is_references_folder(self):
@@ -56,6 +68,7 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_defaults(), {
             'marker': 'reference_manual',
             'keywords': [],
+            'weight': 0,
         })
 
     def test_form_defaults_is_network_news(self):
@@ -69,6 +82,7 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_defaults(), {
             'marker': 'network_news',
             'keywords': [],
+            'weight': 0,
         })
 
     def test_form_defaults_is_network_events(self):
@@ -82,15 +96,18 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_defaults(), {
             'marker': 'network_events',
             'keywords': [],
+            'weight': 0,
         })
 
     def test_form_fields(self):
         from karl.content.views.advanced import keywords_field
+        from karl.content.views.advanced import weight_field
         context = testing.DummyModel()
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_fields(), [
             ('keywords', keywords_field),
+            ('weight', weight_field),
         ])
 
     def test_form_fields_is_intranet_folder(self):
@@ -98,6 +115,7 @@ class TestAdvancedFormController(unittest.TestCase):
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.advanced import marker_field
         from karl.content.views.advanced import keywords_field
+        from karl.content.views.advanced import weight_field
 
         context = testing.DummyModel(
             __provides__=(IIntranets, ICommunityFolder))
@@ -106,21 +124,26 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_fields(), [
             ('marker', marker_field),
             ('keywords', keywords_field),
+            ('weight', weight_field),
         ])
 
     def test_form_widgets(self):
         from karl.content.views.advanced import keywords_widget
+        from karl.content.views.advanced import weight_widget
         context = testing.DummyModel()
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_widgets(None), {
-            'keywords': keywords_widget})
+            'keywords': keywords_widget,
+            'weight': weight_widget,
+        })
 
     def test_form_widgets_is_intranet_folder(self):
         from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.advanced import marker_widget
         from karl.content.views.advanced import keywords_widget
+        from karl.content.views.advanced import weight_widget
         context = testing.DummyModel(
             __provides__=(IIntranets, ICommunityFolder))
         request = testing.DummyRequest()
@@ -128,6 +151,7 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(form.form_widgets(None), {
             'marker': marker_widget,
             'keywords': keywords_widget,
+            'weight': weight_widget,
         })
 
     def test___call__(self):
@@ -162,7 +186,17 @@ class TestAdvancedFormController(unittest.TestCase):
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({'keywords': ['foo', 'bar']})
-        self.assertEqual(context.keywords, ['foo', 'bar'])
+        self.assertEqual(context.search_keywords, ['foo', 'bar'])
+        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.location,
+            'http://example.com/?status_message=Advanced+settings+changed.')
+
+    def test_handle_set_weight(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        form = self._make_one(context, request)
+        response = form.handle_submit({'weight': 2})
+        self.assertEqual(context.search_weight, 2)
         self.assertEqual(response.status_int, 302)
         self.assertEqual(response.location,
             'http://example.com/?status_message=Advanced+settings+changed.')

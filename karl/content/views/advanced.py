@@ -31,6 +31,11 @@ keywords_field = schemaish.Sequence(
     description='This document will be shown first for searches for any of '
     'these keywords')
 
+weight_field = schemaish.Integer(
+    title='Search Weight',
+    description='Modify the relative importance of this document in search '
+    'results.')
+
 marker_options = [
     ('', 'No Marker'),
     ('reference_manual', 'Reference Manual'),
@@ -44,6 +49,18 @@ marker_widget = widgets.VerticalRadioChoice(
 )
 
 keywords_widget = widgets.SequenceTextAreaWidget(cols=20)
+
+weight_options = [
+    (-1, 'Less important'), # I bet no one ever uses this one.
+    (0, 'Normal'),
+    (1, 'More important'),
+    (2, 'Much more important'),
+]
+
+weight_widget = formish.SelectChoice(
+    options=weight_options,
+    none_option=None,
+)
 
 
 class AdvancedFormController(object):
@@ -72,7 +89,8 @@ class AdvancedFormController(object):
             else:
                 defaults['marker'] = ''
 
-        defaults['keywords'] = getattr(context, 'keywords', [])
+        defaults['keywords'] = getattr(context, 'search_keywords', [])
+        defaults['weight'] = getattr(context, 'search_weight', 0)
         return defaults
 
     def form_fields(self):
@@ -80,7 +98,7 @@ class AdvancedFormController(object):
         if self.use_folder_options:
             fields.append(('marker', marker_field))
         fields.append(('keywords', keywords_field))
-
+        fields.append(('weight', weight_field))
         return fields
 
     def form_widgets(self, fields):
@@ -88,6 +106,7 @@ class AdvancedFormController(object):
         if self.use_folder_options:
             form_widgets['marker'] = marker_widget
         form_widgets['keywords'] = keywords_widget
+        form_widgets['weight'] = weight_widget
         return form_widgets
 
     def __call__(self):
@@ -117,7 +136,11 @@ class AdvancedFormController(object):
 
         keywords = params.get('keywords')
         if keywords is not None:
-            context.keywords = keywords
+            context.search_keywords = keywords
+
+        weight = params.get('weight')
+        if weight is not None:
+            context.search_weight = weight
 
         objectEventNotify(ObjectModifiedEvent(context))
         return HTTPFound(location=model_url(self.context, self.request,

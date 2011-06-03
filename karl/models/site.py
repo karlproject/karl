@@ -60,6 +60,7 @@ from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
+from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_tags
@@ -228,28 +229,27 @@ def get_weighted_textrepr(obj, default):
         # Old version of repoze.pgtextindex.
         return texts
 
-    tags = get_object_tags(obj)
-
     # Give the last text the D (default) weight.
     weighted = WeightedText(texts[-1])
 
     # Weight C indexes the rest of the texts.
     weighted.C = '\n'.join(texts[:-1])
 
-    # Determine the coefficient.
-    if is_created_by_staff(obj):
-        weighted.coefficient = 25.0
-    else:
-        weighted.coefficient = 1.0
-
     # Weight B indexes the tags (voice of the people).
+    tags = get_object_tags(obj)
     if tags:
         weighted.B = ' '.join(tags)
 
     # Weight A indexes the keywords (voice of the organization).
-    keywords = getattr(obj, 'keywords', None)
+    keywords = getattr(obj, 'search_keywords', None)
     if keywords:
         weighted.A = ' '.join(keywords)
+
+    # Determine the coefficient.
+    weight = getattr(obj, 'search_weight', 0)
+    weighted.coefficient = WeightedQuery.weight_factor ** weight
+    if is_created_by_staff(obj):
+        weighted.coefficient *= 25.0
 
     return weighted
 
