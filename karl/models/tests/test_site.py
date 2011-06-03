@@ -250,12 +250,19 @@ class TestGetTextRepr(unittest.TestCase):
         self.assertEqual(textrepr, None)
 
 
-class TestGetWeightedTextRepr(unittest.TestCase):
+class TestGetWeightedTextReprOldPgtextIndex(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
+        from karl.models import site
+        self._save_WeightedText = site.WeightedText
+        site.WeightedText = None
+
     def tearDown(self):
         cleanUp()
+
+        from karl.models import site
+        site.WeightedText = self._save_WeightedText
 
     def _callFUT(self, object, default):
         from karl.models.site import get_weighted_textrepr as fut
@@ -269,7 +276,7 @@ class TestGetWeightedTextRepr(unittest.TestCase):
         context.title = 'title'
         context.description = 'description'
         textrepr = self._callFUT(context, None)
-        self.assertEqual(textrepr, ('title', 'description'))
+        self.assertEqual(textrepr, ['title', 'description'])
 
     def test_with_adapter(self):
         context = testing.DummyModel()
@@ -281,7 +288,7 @@ class TestGetWeightedTextRepr(unittest.TestCase):
                 return 'stuff'
         testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
-        self.assertEqual(textrepr, ('stuff',))
+        self.assertEqual(textrepr, ['stuff',])
 
     def test_not_content(self):
         context = testing.DummyModel()
@@ -298,6 +305,132 @@ class TestGetWeightedTextRepr(unittest.TestCase):
         textrepr = self._callFUT(context, 'default')
         self.assertEqual(textrepr, 'default')
 
+class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
+    tags = []
+
+    def setUp(self):
+        cleanUp()
+
+        class DummyWeightedText(unicode):
+            pass
+
+        from karl.models import site
+        self._save_WeightedText = site.WeightedText
+        site.WeightedText = DummyWeightedText
+
+        self.context = context = testing.DummyModel()
+        context.catalog = DummyCatalog()
+
+        class DummyTags(object):
+            def getTags(myself, items):
+                return self.tags
+
+        context.tags = DummyTags()
+        context.users = DummyUsers()
+
+    def tearDown(self):
+        cleanUp()
+
+        from karl.models import site
+        site.WeightedText = self._save_WeightedText
+
+    def _callFUT(self, object, default):
+        from karl.models.site import get_weighted_textrepr as fut
+        return fut(object, default)
+
+    def test_no_adapter(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = self.context
+        directlyProvides(context, IContent)
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.C, 'title')
+        self.assertEqual(textrepr, 'description')
+        self.assertEqual(textrepr.coefficient, 1.0)
+
+    def test_w_tags(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = self.context
+        directlyProvides(context, IContent)
+        context.title = 'title'
+        context.description = 'description'
+        self.tags = ['foo', 'bar']
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.B, 'foo bar')
+        self.assertEqual(textrepr.C, 'title')
+        self.assertEqual(textrepr, 'description')
+
+    def test_w_keywords(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = self.context
+        directlyProvides(context, IContent)
+        context.title = 'title'
+        context.description = 'description'
+        context.search_keywords = ['foo', 'bar']
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.A, 'foo bar')
+        self.assertEqual(textrepr.C, 'title')
+        self.assertEqual(textrepr, 'description')
+
+    def test_w_weight(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        from karl.utilities.groupsearch import WeightedQuery
+        context = self.context
+        context.description = 'foo'
+        directlyProvides(context, IContent)
+        def fut():
+            return self._callFUT(context, None).coefficient
+        wf = WeightedQuery.weight_factor
+        context.search_weight = -1
+        self.assertEqual(fut(), wf ** -1)
+        context.search_weight = 0
+        self.assertEqual(fut(), wf ** 0)
+        context.search_weight = 1
+        self.assertEqual(fut(), wf ** 1)
+        context.search_weight = 2
+        self.assertEqual(fut(), wf ** 2)
+
+    def test_staff(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = self.context
+        directlyProvides(context, IContent)
+        context.description = 'description'
+        context.creator = 'chris'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.coefficient, 25.0)
+
+    def test_with_adapter(self):
+        context = self.context
+        from karl.models.interfaces import ITextIndexData
+        class DummyAdapter:
+            def __init__(self, context):
+                self.context = context
+            def __call__(self):
+                return 'stuff'
+        testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr, 'stuff')
+
+    def test_not_content(self):
+        context = self.context
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
+
+    def test_no_content(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        context = self.context
+        directlyProvides(context, IContent)
+        textrepr = self._callFUT(context, 'default')
+        self.assertEqual(textrepr, 'default')
 
 class _TestGetDate(object):
 
@@ -519,3 +652,14 @@ class TestGetVirtual(unittest.TestCase):
 class DummyCache(dict):
     generation = None
 
+class DummyCatalog(object):
+    @property
+    def document_map(self):
+        return self
+
+    def docid_for_address(self, addr):
+        return 1
+
+class DummyUsers(object):
+    def member_of_group(self, userid, group):
+        return True

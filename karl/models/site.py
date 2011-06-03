@@ -186,9 +186,9 @@ def get_textrepr(object, default):
 
 try:
     from repoze.pgtextindex.interfaces import IWeightedText
-except ImportError:
+except ImportError: #pragma NO COVERAGE
     WeightedText = None
-else:
+else: #pragma NO COVERAGE
     class WeightedText(unicode):
         implements(IWeightedText)
 
