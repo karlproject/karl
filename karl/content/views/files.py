@@ -901,14 +901,17 @@ def ajax_file_reorganize_delete_view(context, request):
 
 # XXX this should probably get moved to utils
 
+def find_root_folder(context):
+    community = find_community(context)
+    return community['files']
+
 def traverse_file_folder(context, folder):
     # Return the context folder specified in the "folder" parameter
     # "folder" contains an absolute path to the target, relative
     # to the community.
-    community = find_community(context)
     assert folder.startswith('/')
     assert folder == '/' or not folder.endswith('/')
-    c = community['files']
+    c = find_root_folder(context)
     if folder != '/':
         for segment in folder.split('/')[1:]:
             c = c[segment]
@@ -917,9 +920,8 @@ def traverse_file_folder(context, folder):
 def get_file_folder_path(context):
     # Return the absolute path to the fileobjext in context, relative
     # to the community.
-    community = find_community(context)
     context_path = model_path(context)
-    root_path = model_path(community['files'])
+    root_path = model_path(find_root_folder(context))
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
         
@@ -936,9 +938,19 @@ def get_target_folders(context):
     # The current folder should also be in the list.
     # The returned items contain the path and the title of the folder.
     #
-    community = find_community(context)
     catalog = find_catalog(context)
-    root_path = model_path(community['files'])
+    root_folder = find_root_folder(context)
+    root_path = model_path(root_folder)
+
+    # Check if we are in the files section
+    # for example, we are in /offices/nyc/referencemanuals which is a folder but
+    # not inside the files tool /offices/nyc/files.
+    # In this case we will return None as a velue, and the client should
+    # detect this value and disable the reorganize features.
+    context_path = model_path(context)
+    if not context_path.startswith(root_path):
+        return None
+
 
     query = ICatalogSearch(context)
     total, docids, resolver = query(
@@ -952,7 +964,8 @@ def get_target_folders(context):
             ) for docid in docids]
     # sorting is important for the client visualization
     target_items.sort(key=lambda item: item['path'])
-    # always insert the root folder that was not returned by this search 
+
+    # always insert the root folder that was not returned by this search
     target_items.insert(0, dict(
         path = root_path,
         title = 'Community home',
@@ -979,11 +992,15 @@ def get_target_folders(context):
 def get_current_folder(context):
     # Calculate the current folder in the same format as the results
     # from get_target_folders (relative to community)
-    community = find_community(context)
-    root_path = model_path(community['files'])
+    root_path = model_path(find_root_folder(context))
 
     context_path = model_path(context)
-    assert context_path.startswith(root_path)
+    
+    if not context_path.startswith(root_path):
+        # we are not in the files tool, there will be no reorganize
+        # feature.
+        return None
+
     current_folder = context_path[len(root_path):]
 
     # Correct the root folder from '' to '/'

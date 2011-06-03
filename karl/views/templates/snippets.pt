@@ -324,8 +324,17 @@
             }
             // get global page data
             var here_url = $("#karl-here-url")[0].content;
+            // Which widget to create?
+            var widget;
+            if (filegrid_data.targetFolders === null) {
+                // widget without the reorganize (delete + move) feature
+                widget = 'karlgrid';
+            } else {
+                // reorganize enabled
+                widget = 'karlfilegrid';
+            }
             // bind the widget
-            $("#filegrid").karlfilegrid({
+            $("#filegrid")[widget]({
                 url: here_url + "jquery_grid_list",
                 delete_url: here_url + "delete_files.json",
                 moveto_url: here_url + "move_files.json",
