@@ -43,6 +43,7 @@
   </formish:form>
 
   <formish:form
+     for="karl.content.interfaces.IBlogEntry"
      controller=".blog.EditBlogEntryFormController"
      name="edit.html"
      permission="edit"

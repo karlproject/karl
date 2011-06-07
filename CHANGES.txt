@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- The edit blog entry form is now only associated with the IBlogEntry content
+  type. (LP #715897)
 
 3.63 (2011-06-03)
 -----------------
