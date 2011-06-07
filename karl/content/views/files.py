@@ -1206,6 +1206,11 @@ def ajax_file_upload_view(context, request):
             fileobj.filename = filename
 
             # Store the image in the temp folder.
+            if temp_id in tempfolder:
+                # It _may_ happen that we have the same object: but only, if
+                # the client retries the same file that it thinks it had failed earlier.
+                # To avoid the error, we simply overwrite in this case.
+                del tempfolder[temp_id] 
             fileobj.modified = datetime.datetime.now()
             tempfolder[temp_id] = fileobj
 
@@ -1272,7 +1277,12 @@ def ajax_file_upload_view(context, request):
             # Iterate on all the files in the just finishing batch.
             for client_id in end_batch:
                 temp_id = make_temp_id(client_id) 
-                fileobj = tempfolder[temp_id]
+                try:
+                    fileobj = tempfolder[temp_id]
+                except:
+                    msg = 'Inconsistent transaction, lost a file (temp_id=%r) ' % (temp_id, ) 
+                    raise ErrorResponse(msg, client_id=client_id)
+
 
                 # batch security protection
                 # to avoid attacks or malformed end_batch parameters
@@ -1341,12 +1351,6 @@ def ajax_file_upload_view(context, request):
 # --
 # XXX Experimental feature, used to testing new file upload.
 # --
-
-class ErrorResponse(Exception):
-
-    def __init__(self, txt, client_id=None):
-        self.client_id = client_id
-        super(ErrorResponse, self).__init__(txt)
 
 def new_ajax_file_upload_view(context, request):
 
