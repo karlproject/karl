@@ -16,6 +16,7 @@ $.widget('karl.karlmultifileupload', {
     options: {
         plupload_src: '',
         upload_url: ''
+        // close: function(evt, data) {} // data is like: {refreshNeeded:..., runtime:...}
     },
 
     _create: function() {
@@ -63,7 +64,7 @@ $.widget('karl.karlmultifileupload', {
                         self.uploader.refresh();
                     }
                 },
-                close: function() {
+                close: function(evt) {
                     // XXX The flash uploader throws js error on IE, when
                     // hidden and shown again. So, we just throw it out...
                     // ... and recreate it if re-opened.
@@ -79,13 +80,13 @@ $.widget('karl.karlmultifileupload', {
                             $(self.uploader.id + '_flash').remove();
                         }, 10);
                     }
-                    // Do we need a refresh of anything on the page?
-                    if (self.refreshNeeded) {
-                        // trigger the event
-                        self.element.trigger('refresh.multifileupload');
-                        // clear the flag
-                        self.refreshNeeded = false;
-                    }
+                    // trigger the close event (with or without refresh)
+                    self._trigger('close', evt, {
+                        refreshNeeded: self.refreshNeeded,
+                        runtime: self.uploader.runtime
+                    });
+                    // clear the flag
+                    self.refreshNeeded = false;
                 }
             });
 
