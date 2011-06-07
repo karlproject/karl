@@ -88,10 +88,12 @@ def admin_contents(context, request):
             return HTTPFound(location=model_url(context, request,
                                                 'admin.html')
                             )
+    actions = get_admin_actions(context, request)
+    del actions[0]  # Get rid of "Edit" action--doesn't make sense here.
+    actions += get_actions(context, request)
     return dict(api=api,
                 peopledir=peopledir,
-                actions=get_admin_actions(context, request) +
-                        get_actions(context, request),
+                actions=actions,
                 has_categories=peopledir is context,
                )
 

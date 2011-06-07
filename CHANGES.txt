@@ -7,6 +7,9 @@ Unreleased
 - The edit blog entry form is now only associated with the IBlogEntry content
   type. (LP #715897)
 
+- Removed nonsensical 'Edit' button from the root people directory admin view.
+  (LP #715897)
+
 3.63 (2011-06-03)
 -----------------
 
