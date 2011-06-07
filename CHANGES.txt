@@ -10,6 +10,10 @@ Unreleased
 - Removed nonsensical 'Edit' button from the root people directory admin view.
   (LP #715897)
 
+- In the advanced and live searches, set the unicode_errors policy to 'ignore'
+  in order to work around broken web browsers that send request strings in
+  character encodings other than UTF-8. (LP #788234)
+
 3.63 (2011-06-03)
 -----------------
 

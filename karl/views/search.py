@@ -170,6 +170,7 @@ def get_contextual_summarizer(context):
 
 
 def searchresults_view(context, request):
+    request.unicode_errors = 'ignore'
     page_title = 'Search Results'
     api = TemplateAPI(context, request, page_title)
     if ICommunity.providedBy(context):
@@ -323,6 +324,7 @@ def searchresults_view(context, request):
         )
 
 def jquery_livesearch_view(context, request):
+    request.unicode_errors = 'ignore'
     try:
         searchterm = request.params.get('val', None)
     except UnicodeDecodeError:
