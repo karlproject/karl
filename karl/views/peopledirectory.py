@@ -82,7 +82,7 @@ def admin_contents(context, request):
         else:
             selected = request.POST['selected']
             if isinstance(selected, basestring):
-               selected = [selected]
+                selected = [selected]
             for name in selected:
                 del context[name]
             return HTTPFound(location=model_url(context, request,
@@ -459,7 +459,7 @@ def get_report_query(report, request):
     return kw
 
 
-GRID_WIDTH = 880   
+GRID_WIDTH = 880
 SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
 def get_grid_data(context, request, start=0, limit=12,
         sort_on=None, reverse=False, width=GRID_WIDTH):
