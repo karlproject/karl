@@ -250,14 +250,12 @@ def show_page_view(context, request):
         }
 
     actions = []
-    if has_permission('create', context, request):
-        actions.append(
-            ('Edit', 'edit.html')
-            )
+    if has_permission('edit', context, request):
+        actions.append(('Edit', 'edit.html'))
     if has_permission('delete', context, request):
-        actions.append(
-            ('Delete', 'delete.html'),
-        )
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     page_title = context.title
     api = TemplateAPI(context, request, page_title)

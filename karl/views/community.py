@@ -69,6 +69,7 @@ from karl.views.tags import set_tags
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
 
+from karl.security.policy import ADMINISTER
 from karl.security.policy import DELETE_COMMUNITY
 from karl.security.policy import MODERATE
 from karl.security.workflow import get_security_states
@@ -115,6 +116,9 @@ def show_community_view(context, request):
 
     if has_permission(DELETE_COMMUNITY, context, request):
         actions.append(('Delete', 'delete.html'))
+
+    if has_permission(ADMINISTER, context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     recent_items = []
     recent_items_batch = get_recent_items_batch(context, request)

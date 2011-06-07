@@ -131,17 +131,14 @@ def show_folder_view(context, request):
         if has_permission('delete', context.__parent__, request):
             actions.append(('Delete', 'delete.html'))
 
-        in_intranets = find_interface(context, IIntranets) is not None
-        if has_permission('administer', context, request) and in_intranets:
-            # admins see an Advanced action that puts markers on a
-            # folder.
-            actions.append(
-                ('Advanced','advanced.html'),
-                )
         backto = {
             'href': model_url(context.__parent__, request),
             'title': context.__parent__.title,
             }
+
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
+
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
@@ -469,13 +466,12 @@ def show_file_view(context, request):
         )
 
     actions = []
-    if has_permission('create', context, request):
-        actions.append(
-            ('Edit', 'edit.html'),
-            )
-        actions.append(
-            ('Delete', 'delete.html'),
-            )
+    if has_permission('edit', context, request):
+        actions.append(('Edit', 'edit.html'))
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     # If we are in an attachments folder, the backto skips the
     # attachments folder and goes up to the grandparent

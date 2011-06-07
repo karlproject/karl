@@ -101,6 +101,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                          [('Edit', 'edit.html'),
                           ('Join', 'join.html'),
                           ('Delete', 'delete.html'),
+                          ('Advanced', 'advanced.html'),
                          ])
         self.assertEqual(info['feed_url'],
                          model_url(context, request, "atom.xml"))
@@ -117,6 +118,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
                           ('Delete', 'delete.html'),
+                          ('Advanced', 'advanced.html'),
                          ])
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):

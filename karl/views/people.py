@@ -573,6 +573,8 @@ def get_profile_actions(profile, request):
     if same_user:
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
+    if has_permission('administer', profile, request):
+        actions.append(('Advanced', 'advanced.html'))
     return actions
 
 def show_profile_view(context, request):

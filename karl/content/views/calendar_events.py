@@ -610,13 +610,13 @@ def show_calendarevent_view(context, request):
     page_title = context.title
 
     actions = []
-    if has_permission('create', context, request):
-        actions.append(
-            ('Edit', 'edit.html'),
-            )
-        actions.append(
-            ('Delete', 'delete.html'),
-            )
+    if has_permission('edit', context, request):
+        actions.append(('Edit', 'edit.html'))
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
+
     api = TemplateAPI(context, request, page_title)
 
     container  = context.__parent__

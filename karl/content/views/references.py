@@ -176,9 +176,12 @@ def reference_outline_view(context, request):
         addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
+    if has_permission('edit', context, request):
         actions.append(('Edit', 'edit.html'))
-        if has_permission('delete', context, request):
-            actions.append(('Delete', 'delete.html'))
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
@@ -220,9 +223,12 @@ def reference_viewall_view(context, request):
         addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
+    if has_permission('edit', context, request):
         actions.append(('Edit', 'edit.html'))
-        if has_permission('delete', context, request):
-            actions.append(('Delete', 'delete.html'))
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     page_title = context.title
     api = TemplateAPI(context, request, page_title)

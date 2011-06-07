@@ -202,6 +202,11 @@ def show_blogentry_view(context, request):
         else:
             newc['delete_url'] = None
 
+        if has_permission('administer', comment, request):
+            newc['advanced_url'] = model_url(comment, request, 'advanced.html')
+        else:
+            newc['advanced_url'] = None
+
         # Display portrait
         photo = profile.get('photo')
         if photo is not None:
@@ -231,6 +236,8 @@ def show_blogentry_view(context, request):
         actions.append(('Edit', 'edit.html'))
     if has_permission('edit', context, request):
         actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Administer', 'advanced.html'))
 
     api.is_taggable = True
 
