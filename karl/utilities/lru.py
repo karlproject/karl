@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -28,50 +28,60 @@ class LRUCache(object):
         self.clear()
 
     def clear(self):
-        size = self.size
-        if size < 1:
-            raise ValueError('size must be >1')
-        self.clock = []
-        for i in xrange(0, size):
-            self.clock.append({'key':_marker, 'ref':False})
-        self.hand = 0
-        self.data = {}
+        lock = self.lock
+        lock.acquire()
+        try:
+            size = self.size
+            if size < 1:
+                raise ValueError('size must be >1')
+            self.clock = []
+            for i in xrange(0, size):
+                self.clock.append({'key':_marker, 'ref':False})
+            self.hand = 0
+            self.data = {}
+        finally:
+            lock.release()
 
     def get(self, key, default=None):
+        lock = self.lock
+        lock.acquire()
         try:
-            datum = self.data[key]
-        except KeyError:
-            return default
-        pos, val = datum
-        self.clock[pos]['ref'] = True
-        hand = pos + 1
-        if hand > self.maxpos:
-            hand = 0
-        self.hand = hand
-        return val
+            try:
+                datum = self.data[key]
+            except KeyError:
+                return default
+            pos, val = datum
+            self.clock[pos]['ref'] = True
+            hand = pos + 1
+            if hand > self.maxpos:
+                hand = 0
+            self.hand = hand
+            return val
+        finally:
+            lock.release()
 
     def __setitem__(self, key, val, _marker=_marker):
-        hand = self.hand
-        maxpos = self.maxpos
-        clock = self.clock
-        data = self.data
         lock = self.lock
+        lock.acquire()
+        try:
+            hand = self.hand
+            maxpos = self.maxpos
+            clock = self.clock
+            data = self.data
 
-        end = hand - 1
-        if end < 0:
-            end = maxpos
+            end = hand - 1
+            if end < 0:
+                end = maxpos
 
-        while 1:
-            current = clock[hand]
-            ref = current['ref']
-            if ref is True:
-                current['ref'] = False
-                hand = hand + 1
-                if hand > maxpos:
-                    hand = 0
-            elif ref is False or hand == end:
-                lock.acquire()
-                try:
+            while 1:
+                current = clock[hand]
+                ref = current['ref']
+                if ref is True:
+                    current['ref'] = False
+                    hand = hand + 1
+                    if hand > maxpos:
+                        hand = 0
+                elif ref is False or hand == end:
                     oldkey = current['key']
                     if oldkey is not _marker:
                         try:
@@ -85,7 +95,7 @@ class LRUCache(object):
                     if hand > maxpos:
                         hand = 0
                     self.hand = hand
-                finally:
-                    lock.release()
-                break
-        
+                    break
+        finally:
+            lock.release()
+
