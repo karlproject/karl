@@ -1174,7 +1174,20 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         // otherwise the containment stucture would not work nicely
         var self = this;
         this.menuMove.find('li').remove();
-        $.each(folders, function(index, folder) {
+        function countSlashes(s) {
+            var n = 0;
+            for (var i = 1; i < s.length; i++) {
+                if (s.charAt(i) === "/") {
+                    n++;
+                }
+            }
+            return n;
+        }
+        // XXX
+        // ie chokes on a large number of folders, so we are limiting it for now
+        var limit = ($.browser.msie ? Math.min(folders.length, 400) : folders.length);
+        for (var i = 0; i < limit; i++) {
+            var folder = folders[i];
             var folder_path = folder.path;
             var folder_title = folder.title;
             if (! folder_path || folder_path.charAt(0) != '/') {
@@ -1190,7 +1203,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 }
                 // The folder path is like /f1/f2/f3
                 // we want to produce leafFolder = f3, level = 2 from this.
-                level = folder_path.match(/\//g).length - 1;
+                //level = folder_path.match(/\//g).length - 1;
+                level = countSlashes(folder_path);
             }
             // create the item
             var item = $('<li></li>')
@@ -1211,7 +1225,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 .appendTo(item)
                 .text(folder_title)
                 .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
-        });
+        }
         this.menuMove.menu('refresh');
     },
 

@@ -19,6 +19,8 @@ Unreleased
 - Added error logging for OSErrors encountered when trying to run spellcheck.
   (LP #794279)
 
+- Workaround for slow script execution on ie in files tool
+  (LP #792544)
 
 3.63 (2011-06-03)
 -----------------
