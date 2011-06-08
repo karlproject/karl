@@ -61,11 +61,12 @@
 
 /* SplitButton */
 .karlSkin .mceSplitButton {width:32px; height:20px; direction:ltr}
-.karlSkin .mceSplitButton a, .karlSkin .mceSplitButton span {height:20px; display:block}
+.karlSkin .mceSplitButton a {height:20px; display:block}
+.karlSkin .mceSplitButton span.mceAction {height:20px; display:block} /* Setting this width on span.mceOpen breaks the icon on IE8.*/
 .karlSkin .mceSplitButton a.mceAction {width:20px; border:1px solid #F0F0EE; border-right:0;}
 .karlSkin .mceSplitButton span.mceAction {width:20px; background:url(../../img/icons.gif) 20px 20px;}
-.karlSkin .mceSplitButton a.mceOpen {width:9px; border:1px solid #F0F0EE;}
-.karlSkin .mceSplitButton span.mceOpen {width:9px; background:url(../../img/icons.gif) -741px 0;}
+.karlSkin .mceSplitButton a.mceOpen {width:9px; border:1px solid #F0F0EE; background:url(../../img/icons.gif) -741px 0;}
+.karlSkin .mceSplitButton span.mceOpen {width:9px; /* background:url(../../img/icons.gif) -741px 0; */}
 .karlSkin table.mceSplitButtonEnabled:hover a.mceAction, .karlSkin .mceSplitButtonHover a.mceAction, .karlSkin .mceSplitButtonSelected a.mceAction {border:1px solid #0A246A; border-right:0; background-color:#B2BBD0}
 .karlSkin table.mceSplitButtonEnabled:hover a.mceOpen, .karlSkin .mceSplitButtonHover a.mceOpen, .karlSkin .mceSplitButtonSelected a.mceOpen {border:1px solid #0A246A;}
 .karlSkin table.mceSplitButtonEnabled:hover span.mceOpen, .karlSkin .mceSplitButtonHover span.mceOpen, .karlSkin .mceSplitButtonSelected span.mceOpen {background-color:#B2BBD0}
