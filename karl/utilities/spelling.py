@@ -15,12 +15,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import logging
 import os
 import signal
 import subprocess
 import re
 from zope.interface import implements
 from karl.utilities.interfaces import ISpellChecker
+
+log = logging.getLogger(__name__)
+
 
 class SpellChecker:
     implements(ISpellChecker)
@@ -38,7 +42,7 @@ class SpellChecker:
         msg = self._subprocess.stdout.readline()
 
     def _spawn_aspell(self, aspell_executable, language):
-        args = [aspell_executable, 
+        args = [aspell_executable,
                 '--encoding=UTF-8',
                 '--lang=%s' % language,
                 '--pipe']
@@ -49,10 +53,11 @@ class SpellChecker:
                                                 stdin=subprocess.PIPE,
                                                 stdout=subprocess.PIPE,
                                                )
-        except OSError:            
+        except OSError:
             msg = 'Spell checker could not be started'
+            log.error(msg, exc_info=True)
             raise SpellCheckError(msg)
-        
+
     def __del__(self):
         if self._subprocess:
             self.kill()
@@ -65,7 +70,7 @@ class SpellChecker:
         result = self.find_words_and_suggestions(list_of_words, max_words)
         misspellings = result.keys()
         return misspellings
-    
+
     def suggestions_for_word(self, word, max_suggestions=None):
         ''' Check spelling of a single word and return a list of
         possible suggestions for the word.  If max_suggestions is not
@@ -82,25 +87,25 @@ class SpellChecker:
         the keys are the possibly misspelled words and the values are lists
         of suggestions.  If max_words is not None, no more than max_words
         will be given to aspell.
-        
-        Part of this routine was derived from Kupu, which can be found at 
-        http://plone.org/products/kupu under BSD license.  Copyright (c) 
+
+        Part of this routine was derived from Kupu, which can be found at
+        http://plone.org/products/kupu under BSD license.  Copyright (c)
         2003-2005, Kupu Contributors, All Rights Reserved.
         '''
         result = {}
 
         if max_words is not None:
             list_of_words = list_of_words[:max_words]
-        
+
         words = [word.strip() for word in list_of_words]
-        if '' in list_of_words:    
+        if '' in list_of_words:
             list_of_words.remove('')
 
         if not list_of_words:
             return result # nothing to do
 
         line = ' '.join(set(list_of_words))
-        
+
         try:
             self._writeline(line)
             while True:
@@ -125,18 +130,17 @@ class SpellChecker:
             pass
 
         return result
-     
+
     def _writeline(self, chars):
         if isinstance(chars, unicode):
             chars = chars.encode('utf-8')
         self._subprocess.stdin.write(chars)
         self._subprocess.stdin.write('\n')
         self._subprocess.stdin.flush()
-    
+
     def kill(self):
         os.kill(self._subprocess.pid, signal.SIGTERM)
 
 
 class SpellCheckError(Exception):
     pass
-    

@@ -18,11 +18,13 @@ $(document).ready(function() {
         plugins += ',kaltura';
     }
 
-     
-    // Url that contains the context prefix 
+
+    // Url that contains the context prefix
     var here_url = $('#karl-here-url')[0].content;
     // the root url of the tinymce tree
     var tinymce_url = $('#karl-static-url')[0].content + '/tinymce/3.3.9.2';
+    // The root url of Karl
+    var app_url = $("#karl-app-url").eq(0).attr('content');
 
     // initialize the editor widget(s)
     $('.mceEditor').tinysafe({
@@ -59,7 +61,7 @@ $(document).ready(function() {
         extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         relative_urls : false,
         forced_root_block : 'p',
-        spellchecker_rpc_url: "/tinymce_spellcheck",
+        spellchecker_rpc_url: app_url + "/tinymce_spellcheck",
         spellchecker_languages : "+English=en",
         // options for imagedrawer
         imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
@@ -76,7 +78,7 @@ $(document).ready(function() {
         kaltura_player_uiconf_id: kaltura_data.player_uiconf_id,
         kaltura_player_cache_st: kaltura_data.player_cache_st,
         kaltura_session_url: kaltura_data.session_url
-    });  
+    });
 
 });
 
