@@ -153,20 +153,21 @@ $.widget('karl.karlmultifileupload', {
                 // Signal that we will need a refresh
                 self.refreshNeeded = true;
         });
-        /*
         this.uploader.bind('FilesAdded', function(up, files) {
-            // XXX this is a bug in plupload??? ... appears with an extension .screenflow on html5... ???
-            $.each(files, function(index) {
-                if (this.size === 0) {
-                    // XXX This file has to be removed from the queue, else all is borked...
-                    log('XXX extension problem', this);
-                    self.plupload_widget.removeFile(this.id);
-                    var error_html = "<strong>Unkown error while adding: " + this.name + "</strong><br>";
-                    self.plupload_widget._notify('error', error_html); 
-                }
-            });
+            // XXX this is a bug in plupload???
+            // It only happens with the flash backend.
+            if (self.uploader.runtime == 'flash') {
+                $.each(files, function(index) {
+                    if (this.size === 0) {
+                        // XXX This file has to be removed from the queue, else all is borked...
+                        log('Zero-sized file problem, ignoring', this);
+                        self.plupload_widget.removeFile(this.id);
+                        var error_html = "<strong>Cannot upload a zero-sized file: " + this.name + "</strong><br>";
+                        self.plupload_widget._notify('error', error_html); 
+                    }
+                });
+            }
         });
-        */
     },
 
     destroy: function() {
