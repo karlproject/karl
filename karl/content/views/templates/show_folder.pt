@@ -44,16 +44,16 @@
                     return false;
                 })
                 .bind('karlmultifileuploadclose', function(evt, data) {
-                    //if (data.runtime == 'flash' && $.browser.msie) {
-                    //  var ua = $.browser.version;
-                    //  var ieversion = ua.substring(0, ua.indexOf('.'));	
-                    //  if (ieversion <= '7') {
-                    //    // IE7 has problems when we close the dialog, because
-                    //    // it cannot suffer hiding / showing the flash component.
-                    //    document.location.reload();
-                    //    return;
-                    //  }
-                    //}
+                    if (data.runtime == 'flash' && $.browser.msie) {
+                      var ua = $.browser.version;
+                      var ieversion = ua.substring(0, ua.indexOf('.'));	
+                      if (ieversion <= '7') {
+                        // IE7 has problems when we close the dialog, because
+                        // it cannot suffer hiding / showing the flash component.
+                        document.location.reload();
+                        return;
+                      }
+                    }
                     if (data.refreshNeeded) {
                       // update the grid
                       $('#filegrid').data('karlfilegrid')._update({columns: false, refresh: true});
