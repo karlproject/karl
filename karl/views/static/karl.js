@@ -1418,7 +1418,10 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             .insertAfter(this.button_move)
             .hide()
             .width(250)
+            .css('max-height', '325px')
             .css('position', 'absolute')
+            .css('overflow-x', 'hidden')
+            .css('overflow-y', 'auto')
             .menu({
                 select: function(evt, selection) {
                     self.menuMove.hide();
@@ -1450,6 +1453,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 // escape if the menu is disabled
                 || self.menuMove.is(':hidden')
                 // or if the menu is hidden
+                || $(event.target).is('.ui-grid-footer .ui-menu')
                 || $(event.target).is('.ui-grid-footer .ui-menu *')) {
                 // or if we are not outside the menu
                 return;
