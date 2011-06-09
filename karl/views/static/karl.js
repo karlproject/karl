@@ -1169,7 +1169,36 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         $.ui.karlgrid.prototype._create.call(this, arguments);
     },
 
-    setTargetFolders: function(folders, current_folder) {
+    setTargetFolders: function(state, callback) {
+        var self = this;
+        // set target folders
+        // XXX do this in async.
+        if (this.moveToLoading) {
+            // loading already - ignore
+            log('Ignored MoveTo menu update, because the previous update is still in progress');
+            // enable or disable the reorganize buttons
+            this._enableDisableButtons();
+            return;
+        }
+        this.moveToLoading = true;
+        this.button_move.button('option', 'icons', {primary: 'ui-icon-arrowrefresh-1-e'});
+        // enable or disable the reorganize buttons
+        this._enableDisableButtons();
+        setTimeout(function() {
+            self._do_setTargetFolders(state);
+            self.moveToLoading = false;
+            self.button_move.button('option', 'icons', {primary: 'ui-icon-folder-open'});
+            self._enableDisableButtons();
+            // finish deferred click
+            if (callback) {
+                callback.call(this);
+            }
+        }, 10);
+    },
+
+    _do_setTargetFolders: function(state) {
+        var folders = state.targetFolders;
+        var current_folder = state.currentFolder;
         // We assume that folders are sorted,
         // otherwise the containment stucture would not work nicely
         var self = this;
@@ -1183,6 +1212,9 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             }
             return n;
         }
+
+        window.startTime = (new Date()).valueOf();
+
         // XXX
         // ie chokes on a large number of folders, so we are limiting it for now
         var limit = ($.browser.msie ? Math.min(folders.length, 400) : folders.length);
@@ -1226,7 +1258,12 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 .text(folder_title)
                 .css('marginLeft', '' + (level * self.options.folderMenuIndent) + 'px');
         }
+        window.midTime = (new Date()).valueOf();
         this.menuMove.menu('refresh');
+
+        window.endTime = (new Date()).valueOf();
+        window.movetoLoadingTime = 'MoveTo menu loading: ' + (window.midTime - window.startTime) + ' + ' + (window.endTime - window.midTime);
+        ////alert(window.movetoLoadingTime);
     },
 
     getSelectedFiles: function() {
@@ -1246,7 +1283,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         // Enable or disable the buttons based on the number of selections
         var selected = this.getSelectedFiles().length > 0;
         this.button_delete.button('option', 'disabled', ! selected);
-        this.button_move.button('option', 'disabled', ! selected);
+        var enabled = (selected && ! this.moveToLoading)
+        this.button_move.button('option', 'disabled', ! enabled);
     },
 
     _addColumns: function(columns) {
@@ -1298,18 +1336,27 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             });
             return d;
         };
+        // mark that we are in the initial load (but only if we have initiel state)
+        this.deferredLoad = this.options.initialState;
         // call it
         $.ui.karlgrid.prototype._initialUpdate.call(this);
+        this.deferredLoad = false;
     },
        
     _doUpdate: function(state, o) {
+        var self = this;
         $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
         // If the grid is updated, we need to uncheck the global selector.
         this.cb_globalselect.removeAttr('checked'); 
-        // enable or disable the reorganize buttons
-        this._enableDisableButtons();
-        // set target folders
-        this.setTargetFolders(state.targetFolders, state.currentFolder);
+        if (this.deferredLoad) {
+            // will load at button click
+            this.doDeferredLoadState = state;
+            // enable or disable the reorganize buttons
+            this._enableDisableButtons();
+        } else {
+            // just do it now in async
+            this.setTargetFolders(state);
+        }
     },
 
     _onGlobalSelect: function(checked) {
@@ -1407,7 +1454,16 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             })
             .click(function() {
                 if (! $(this).button('option', 'disabled')) {
-                    self._onMoveClicked();
+                    // is the load deferred?
+                    var state = self.doDeferredLoadState;
+                    if (state) {
+                        self.doDeferredLoadState = false;
+                        self.setTargetFolders(state, function() {
+                            self._onMoveClicked();
+                        });
+                    } else {
+                        self._onMoveClicked();
+                    }
                 }
                 return false;
             })
