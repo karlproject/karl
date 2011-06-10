@@ -1181,7 +1181,8 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             return;
         }
         this.moveToLoading = true;
-        this.button_move.button('option', 'icons', {primary: 'ui-icon-arrowrefresh-1-e'});
+        //this.button_move.button('option', 'icons', {primary: 'ui-icon-arrowrefresh-1-e'});
+        this.button_move.button('option', 'icons', {primary: 'karl-icon-loading'});
         // enable or disable the reorganize buttons
         this._enableDisableButtons();
         setTimeout(function() {
