@@ -4,6 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
+- Improved ranking of search results.  Merged from branches/rossi_docrank.
 
 3.64 (2011-06-09)
 -----------------
