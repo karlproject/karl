@@ -199,6 +199,9 @@ class IImage(Interface):
         Returns instance of PIL.Image.
         """
 
+class IPhoto(IImage):
+    """ A photograph. """
+
 class IForumsFolder(IFolder):
     """ A folder that contains forums """
     taggedValue('name', 'Forums')

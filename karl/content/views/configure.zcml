@@ -358,13 +358,6 @@
     renderer="templates/show_folder.pt"
   />
 
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    view=".files.advanced_folder_view"
-    name="advanced.html"
-    permission="create"
-  />
-
   <formish:form
      controller=".files.EditFolderFormController"
      for="karl.content.interfaces.ICommunityFolder"
@@ -1225,6 +1218,25 @@
       renderer="json"
       />
 
+  <formish:form
+     controller=".advanced.AdvancedFormController"
+     name="advanced.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
 
 </configure>
 

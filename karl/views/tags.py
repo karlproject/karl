@@ -81,6 +81,7 @@ def add_tags(context, request, values):
             new = list(tags.getTags(items=(docid,), users=(username,)))
             new.extend(values)
             tags.update(item=docid, user=username, tags=new)
+            catalog.reindex_doc(docid, context)
 
 def del_tags(context, request, values):
     """ Delete the specified tags.
@@ -92,6 +93,7 @@ def del_tags(context, request, values):
     tags = find_tags(context)
     for tag in values:
         tags.delete(item=docid, user=username, tag=tag)
+        catalog.reindex_doc(docid, context)
 
 def set_tags(context, request, values):
     """ Set the specified tags, previously removing any existing tags.
@@ -105,6 +107,7 @@ def set_tags(context, request, values):
     tags = find_tags(context)
     if tags is not None: # testing
         tags.update(item=docid, user=username, tags=values)
+        catalog.reindex_doc(docid, context)
 
 
 def jquery_tag_search_view(context, request):
@@ -478,6 +481,12 @@ def manage_tags_view(context, request):
     old = ''
     new = ''
 
+    catalog = find_catalog(context)
+    address_for_docid = catalog.document_map.address_for_docid
+    def get_doc(docid):
+        path = address_for_docid(docid)
+        return find_model(context, path)
+
     if 'form.rename' in request.POST and 'old_tag' in request.POST:
         old_tag = request.POST['old_tag']
         new_tag = request.POST['new_tag']
@@ -498,11 +507,13 @@ def manage_tags_view(context, request):
             for docid in docids:
                 tagger.update(item=docid, user=userid,
                               tags=to_update.get(docid, []))
+                catalog.reindex_doc(docid, get_doc(docid))
 
-    if 'form.delete' in request.POST and 'old_tag' in request.POST:
-        old_tag = request.POST['old_tag']
+    if 'form.delete' in request.POST and 'todelete' in request.POST:
+        old_tag = request.POST['todelete']
         for docid in tagger.getItems(tags=[old_tag], users=[userid]):
             tagger.delete(item=docid, user=userid, tag=old_tag)
+            catalog.reindex_doc(docid, get_doc(docid))
 
     if tagger is None:
         tags = ()

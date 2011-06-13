@@ -535,6 +535,10 @@
             <a class="k3_delete_comment"
                href="${comment['delete_url']}">delete</a>
           </tal:ifeditable>
+          <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
+            | <a class="k3_edit_comment"
+                 href="${comment['advanced_url']}">advanced</a>
+          </tal:ifadmin>
         </div>
 
         <span class="portraid">

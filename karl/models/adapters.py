@@ -593,7 +593,9 @@ class PGTextIndexContextualSummarizer(object):
         self.index = index
 
     def __call__(self, document, query):
-        doc_text = ' '.join(self.get_textrepr(document, []))
+        doc_text = self.get_textrepr(document, [])
+        if type(doc_text) in (list, tuple):
+            doc_text = ' '.join(doc_text)
         summary = self.index.get_contextual_summary(
             doc_text, query, MaxFragments=3)
         pieces = [summary]

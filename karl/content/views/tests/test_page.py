@@ -284,7 +284,7 @@ class ShowPageViewTests(unittest.TestCase):
         renderer = registerDummyRenderer(self.template_fn)
         self._callFUT(context, request)
         self.assertEqual(renderer.api.page_title, 'dummytitle')
-        self.assertEqual(len(renderer.actions), 2)
+        self.assertEqual(len(renderer.actions), 3)
         self.assertEqual(renderer.actions[0][1], 'edit.html')
         self.assertEqual(renderer.actions[1][1], 'delete.html')
 

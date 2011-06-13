@@ -85,6 +85,8 @@ def show_comment_view(context, request):
         actions.append(('Edit', 'edit.html'))
     if has_permission('delete', context, request):
         actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
 
     byline_info = getMultiAdapter((context, request), IBylineInfo)
     container = find_interface(context, IBlogEntry)

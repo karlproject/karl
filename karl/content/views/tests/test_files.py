@@ -87,7 +87,7 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         actions = response['actions']
-        self.assertEqual(len(actions), 4)
+        self.assertEqual(len(actions), 5)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
         self.assertEqual(actions[2][1], 'edit.html')
@@ -104,7 +104,7 @@ class TestShowFolderView(unittest.TestCase):
         directlyProvides(context, ICommunityRootFolder)
         response = self._callFUT(context, request)
         actions = response['actions']
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 3)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
@@ -618,7 +618,7 @@ class TestShowFileView(unittest.TestCase):
 
         self._callFUT(context, request)
         actions = renderer.actions
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 3)
         self.assertEqual(actions[0][1], 'edit.html')
         self.assertEqual(actions[1][1], 'delete.html')
 

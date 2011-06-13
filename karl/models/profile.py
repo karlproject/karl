@@ -190,4 +190,4 @@ def profile_textindexdata(profile):
                     v = v.decode('latin1')
             text.append(unicode(v))
     text = '\n'.join(text)
-    return lambda: text
+    return lambda: (profile.title, text)

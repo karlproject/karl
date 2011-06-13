@@ -23,6 +23,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
+from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import get_content_type_name
@@ -73,7 +74,7 @@ def make_query(context, request):
     terms = []
     body = params.get('body')
     if body:
-        query['texts'] = body
+        query['texts'] = WeightedQuery(body)
         query['sort_index'] = 'texts'
         terms.append(body)
 

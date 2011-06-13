@@ -44,6 +44,7 @@ from zope.event import notify
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
+from karl.content.interfaces import IPhoto
 from karl.content.models.adapters import FlexibleTextIndexData
 from karl.models.catalog import CachingCatalog
 from karl.models.interfaces import ICommunities
@@ -60,6 +61,7 @@ from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
+from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_tags
@@ -158,6 +160,9 @@ def get_path(object, default):
     return model_path(object)
 
 def _get_texts(object, default):
+    if IPhoto.providedBy(object):
+        return default
+
     adapter = queryAdapter(object, ITextIndexData)
     if adapter is None:
         if (not IContent.providedBy(object) or
@@ -185,9 +190,9 @@ def get_textrepr(object, default):
 
 try:
     from repoze.pgtextindex.interfaces import IWeightedText
-except ImportError:
+except ImportError: #pragma NO COVERAGE
     WeightedText = None
-else:
+else: #pragma NO COVERAGE
     class WeightedText(unicode):
         implements(IWeightedText)
 
@@ -196,7 +201,7 @@ def get_object_tags(obj):
     catalog = find_catalog(obj)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(obj)
-    return tags.getTags(items=(docid,))
+    return [tag.name for tag in tags.getTagObjects(items=(docid,))]
 
 def is_created_by_staff(obj):
     creator = getattr(obj, 'creator', None)
@@ -228,25 +233,27 @@ def get_weighted_textrepr(obj, default):
         # Old version of repoze.pgtextindex.
         return texts
 
-    tags = get_object_tags(obj)
-
     # Give the last text the D (default) weight.
     weighted = WeightedText(texts[-1])
 
     # Weight C indexes the rest of the texts.
     weighted.C = '\n'.join(texts[:-1])
 
-    # Determine the coefficient.
-    if is_created_by_staff(obj):
-        weighted.coefficient = 10.0
-    else:
-        weighted.coefficient = 1.0
-
     # Weight B indexes the tags (voice of the people).
+    tags = get_object_tags(obj)
     if tags:
         weighted.B = ' '.join(tags)
 
-    # TODO: Weight A indexes the keywords (voice of the organization).
+    # Weight A indexes the keywords (voice of the organization).
+    keywords = getattr(obj, 'search_keywords', None)
+    if keywords:
+        weighted.A = ' '.join(keywords)
+
+    # Determine the coefficient.
+    weight = getattr(obj, 'search_weight', 0)
+    weighted.coefficient = WeightedQuery.weight_factor ** weight
+    if is_created_by_staff(obj):
+        weighted.coefficient *= 25.0
 
     return weighted
 

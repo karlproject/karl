@@ -208,8 +208,9 @@ class Test_profile_textindexdata(unittest.TestCase):
         return profile_textindexdata(profile)
 
     def test_no_attrs(self):
-        callable = self._callFUT(object())
-        self.assertEqual(callable(), '')
+        from repoze.bfg.testing import DummyModel
+        callable = self._callFUT(DummyModel(title='title'))
+        self.assertEqual(callable(), ('title', ''))
 
     def test_w_all_attrs(self):
         from repoze.bfg.testing import DummyModel
@@ -233,29 +234,33 @@ class Test_profile_textindexdata(unittest.TestCase):
         ]
         ATTR_VALUES = [x.upper() for x in ATTR_NAMES]
         mapping = dict(zip(ATTR_NAMES, ATTR_VALUES))
+        mapping['title'] = 'TITLE'
         profile = DummyModel(**mapping)
         callable = self._callFUT(profile)
-        self.assertEqual(callable(), '\n'.join(ATTR_VALUES))
+        self.assertEqual(callable(), ('TITLE', '\n'.join(ATTR_VALUES)))
 
     def test_w_extra_attrs(self):
         from repoze.bfg.testing import DummyModel
-        profile = DummyModel(firstname='Phred',
+        profile = DummyModel(title='Phred Phlyntstone',
+                             firstname='Phred',
                              lastname='Phlyntstone',
                              town='Bedrock',
                             )
         callable = self._callFUT(profile)
-        self.assertEqual(callable(), 'Phred\nPhlyntstone')
+        self.assertEqual(callable(),
+                         ('Phred Phlyntstone', 'Phred\nPhlyntstone'))
 
     def test_w_UTF8_attrs(self):
         from repoze.bfg.testing import DummyModel
         FIRSTNAME = u'Phr\xE9d'
-        profile = DummyModel(firstname=FIRSTNAME.encode('UTF8'))
+        profile = DummyModel(title='title', firstname=FIRSTNAME.encode('UTF8'))
         callable = self._callFUT(profile)
-        self.assertEqual(callable(), FIRSTNAME)
+        self.assertEqual(callable(), ('title', FIRSTNAME))
 
     def test_w_latin1_attrs(self):
         from repoze.bfg.testing import DummyModel
         FIRSTNAME = u'Phr\xE9d'
-        profile = DummyModel(firstname=FIRSTNAME.encode('latin1'))
+        profile = DummyModel(title='title',
+                             firstname=FIRSTNAME.encode('latin1'))
         callable = self._callFUT(profile)
-        self.assertEqual(callable(), FIRSTNAME)
+        self.assertEqual(callable(), ('title', FIRSTNAME))
