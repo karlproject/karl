@@ -6,6 +6,9 @@ Unreleased
 
 - Improved ranking of search results.  Merged from branches/rossi_docrank.
 
+- Pulled 'custom.css' out of the resources that are juiced. It is included
+  in each page separately so that customization packages can override.
+
 3.64 (2011-06-09)
 -----------------
 
