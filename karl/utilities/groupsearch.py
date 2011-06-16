@@ -81,24 +81,14 @@ class GroupSearch:
         return criteria
 
 
-try:
-    from repoze.pgtextindex.interfaces import IWeightedQuery
+class WeightedQuery(unicode):
+    weight_factor = 32.0
 
-    class WeightedQuery(unicode):
-        implements(IWeightedQuery)
+    A = 1.0
+    B = A / weight_factor
+    C = B / weight_factor
+    D = C / weight_factor
 
-        weight_factor = 32.0
-
-        A = 1.0
-        B = A / weight_factor
-        C = B / weight_factor
-        D = C / weight_factor
-
-        @property
-        def text(self):
-            return self
-
-
-except ImportError:
-    def WeightedQuery(text):
-        return text
+    @property
+    def text(self):
+        return self
