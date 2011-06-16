@@ -4,6 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed error in displaying forum topics with comments. (LP #798125)
 
 3.65 (2011-06-15)
 -----------------

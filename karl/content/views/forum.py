@@ -391,10 +391,18 @@ def show_forum_topic_view(context, request):
         newc['id'] = comment.__name__
         if has_permission('edit', comment, request):
             newc['edit_url'] = model_url(comment, request, 'edit.html')
-            newc['delete_url'] = model_url(comment, request, 'delete.html')
         else:
             newc['edit_url'] = None
+
+        if has_permission('delete', comment, request):
+            newc['delete_url'] = model_url(comment, request, 'delete.html')
+        else:
             newc['delete_url'] = None
+
+        if has_permission('administer', comment, request):
+            newc['advanced_url'] = model_url(comment, request, 'advanced.html')
+        else:
+            newc['advanced_url'] = None
 
         # Display portrait
         photo = profile.get('photo')
