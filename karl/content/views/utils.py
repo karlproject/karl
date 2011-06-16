@@ -19,8 +19,6 @@ import re
 from itertools import islice
 import mimetypes
 
-from lxml.etree import XMLSyntaxError
-from lxml.html import document_fromstring
 from repoze.bfg.interfaces import IView
 from repoze.bfg.security import has_permission
 from repoze.bfg.threadlocal import get_current_registry
@@ -34,6 +32,7 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.adapters import DefaultShowSendalert
+from karl.utilities.converters.html import html2text
 from karl.utils import get_setting
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import make_unique_name
@@ -130,17 +129,8 @@ def _crack_words(text):
 
 def _crack_html_words(htmlstring):
     # Yield words from markup.
-    try:
-        d = document_fromstring(htmlstring)
-    except XMLSyntaxError:
-        return
-    for element in d.iter():
-        text = element.text or ''
-        for word in _crack_words(text):
-            yield word
-        tail = element.tail or ''
-        for word in _crack_words(tail):
-            yield word
+    for word in _crack_words(html2text(htmlstring)):
+        yield word
 
 def extract_description(htmlstring):
     """ Get a summary-style description from the HTML in text field """

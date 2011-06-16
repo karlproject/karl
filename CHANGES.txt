@@ -6,6 +6,9 @@ Unreleased
 
 - Fixed error in displaying forum topics with comments. (LP #798125)
 
+- Improved text from html extraction used for extracting descriptions from
+  document text.  Weird Microsoft html is now removed.  (LP #794103)
+
 3.65 (2011-06-15)
 -----------------
 
