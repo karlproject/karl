@@ -11,6 +11,8 @@ Unreleased
 
 - Fixed error in search results page when search term is blank.  (LP #798727)
 
+- Made the html to text converter more tolerant of malformed html.
+
 3.65 (2011-06-15)
 -----------------
 
