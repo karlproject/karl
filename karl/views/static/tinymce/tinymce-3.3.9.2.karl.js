@@ -58,4 +58,8 @@
 * Table plugin:
 *     @depends 3.3.9.2/plugins/table/editor_plugin_src.js
 *
+* Tiny Autosave plugin:
+*     @depends 3.3.9.2/plugins/tinyautosave/editor_plugin_src.js
+*     @depends 3.3.9.2/plugins/tinyautosave/langs/en.js
+*
 */

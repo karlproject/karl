@@ -9,7 +9,7 @@ $(document).ready(function() {
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
     var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
-    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advlist,lists,print,table';
+    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advlist,lists,print,table,tinyautosave';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
     }
@@ -51,7 +51,7 @@ $(document).ready(function() {
         paste_convert_headers_to_strong : true,
         theme_advanced_toolbar_location: 'top',
         theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, spellchecker, print',
-        theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, anchor, addwickedlink, delwickedlink, |, code',
+        theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, anchor, addwickedlink, delwickedlink, |, code, |, tinyautosave',
         theme_advanced_buttons3: '',
         theme_advanced_toolbar_location : "top",
         theme_advanced_toolbar_align : "left",
