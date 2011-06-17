@@ -34,6 +34,7 @@ from repoze.bfg.traversal import quote_path_segment
 from repoze.bfg.location import lineage
 from repoze.bfg.traversal import model_path
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.security import has_permission
 from repoze.bfg.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
@@ -105,6 +106,8 @@ class TemplateAPI(object):
         self.page_title = page_title
         self.system_name = get_setting(context, 'system_name', 'KARL')
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
+        self.can_administer = has_permission('administer', context, request)
+        self.can_email = has_permission('email', context, request)
         site = find_site(context)
         self.admin_url = model_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')

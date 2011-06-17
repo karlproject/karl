@@ -3,8 +3,9 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal">
   <body>
     <metal:menu define-macro="menu">
-      <div id="admin-ui-menu" >
-        <div class="generic-portlet">
+      <div id="admin-ui-menu">
+        <div class="generic-portlet"
+             tal:condition="api.can_administer">
           <h3>Content Actions</h3>
           <div class="portlet-item">
               <a href="${api.app_url}/move_content.html">
@@ -17,7 +18,8 @@
               </a>
           </div>
         </div>
-        <div class="generic-portlet">
+        <div class="generic-portlet"
+             tal:condition="api.can_administer">
           <h3>People</h3>
           <div class="portlet-item">
               <a href="upload_users_csv.html">Upload users (CSV File)</a>
@@ -26,13 +28,15 @@
               <a href="rename_user.html">Rename or Merge Users</a>
           </div>
         </div>
-        <div class="generic-portlet" tal:condition="api.offices_url">
+        <div class="generic-portlet"
+             tal:condition="api.offices_url and api.can_administer">
           <h3>Offices</h3>
           <div class="portlet-item">
               <a href="${api.offices_url}">Update offices</a>
           </div>
         </div>
-        <div class="generic-portlet">
+        <div class="generic-portlet"
+             tal:condition="api.can_administer">
           <h3>Announce</h3>
           <div class="portlet-item">
               <a href="${api.app_url}/site_announcement.html">
@@ -40,7 +44,8 @@
               </a>
           </div>
         </div>
-        <div class="generic-portlet">
+        <div class="generic-portlet"
+             tal:condition="api.can_email">
           <h3>Email</h3>
           <div class="portlet-item">
               <a href="${api.app_url}/email_users.html">
@@ -54,10 +59,11 @@
           </div>
         </div>
         <div class="generic-portlet"
-             tal:condition="api.statistics_view_enabled or
+             tal:condition="api.can_administer and
+                            (api.statistics_view_enabled or
                             api.syslog_view_enabled or
                             api.error_monitoring or
-                            api.has_logs">
+                            api.has_logs)">
           <h3>Logs / Analytics</h3>
           <div class="portlet-item" tal:condition="api.statistics_view_enabled">
             <a href="${api.app_url}/statistics.html">Statistics</a>

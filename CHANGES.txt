@@ -9,6 +9,8 @@ Unreleased
 - Improved text from html extraction used for extracting descriptions from
   document text.  Weird Microsoft html is now removed.  (LP #794103)
 
+- Fixed error in search results page when search term is blank.  (LP #798727)
+
 3.65 (2011-06-15)
 -----------------
 

@@ -1575,7 +1575,7 @@
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.EmailUsersView"
     renderer="templates/admin/email_users.pt"
-    permission="administer"
+    permission="email"
     name="email_users.html"
     />
 
