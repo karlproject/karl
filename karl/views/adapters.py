@@ -6,6 +6,7 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
+from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
@@ -14,6 +15,7 @@ from karl.utils import find_community
 from karl.utils import find_interface
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
+from karl.views.interfaces import ISearchResultsMacro
 from karl.views.interfaces import IToolAddables
 from zope.component import getMultiAdapter
 from zope.interface import implementer
@@ -202,6 +204,20 @@ def community_livesearch_result(context, request):
         )
 
 @implementer(ILiveSearchEntry)
+def intranet_livesearch_result(context, request):
+    return livesearch_dict(
+        context, request,
+        address=context.address,
+        city=context.city,
+        state=context.state,
+        zipcode=context.zipcode,
+        telephone=context.telephone,
+        country=context.country,
+        type='community',
+        category='office',
+        )
+
+@implementer(ILiveSearchEntry)
 def calendar_livesearch_result(context, request):
     return livesearch_dict(
         context, request,
@@ -212,3 +228,12 @@ def calendar_livesearch_result(context, request):
         type='calendarevent',
         category='calendarevent',
         )
+
+# lookups to control which search results macro to use
+@implementer(ISearchResultsMacro)
+def searchresultsmacro_office(context):
+    return 'searchresults_office'
+
+@implementer(ISearchResultsMacro)
+def searchresultsmacro_generic(context):
+    return 'searchresults_generic'

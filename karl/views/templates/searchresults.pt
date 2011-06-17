@@ -97,38 +97,13 @@ $(document).ready(function(){
 
 
     <div id="sras-results">
-        <div class="search-error" tal:condition="error">${error}</div>
-        <div class="sras-result" tal:repeat="r results">
-            <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
-
-            <p class="sras-summary" tal:content="structure r['description']">
-                Contextual summary.
-            </p>
-
-            <div class="sras-details">
-                <img src="${api.static_url}/images/${r['icon']}"
-                     alt="${r['type']}" height="12" width="12"/>
-                ${r['type']}
-
-                <tal:block condition="r['community'] is not None"
-                           omit-tag="">
-                    in <a class="sras-searchfooterlinks"
-                       href="${r['community']['url']}">
-                       ${r['community']['title']}</a>
-                </tal:block>
-
-                modified
-                <em><abbr class="timeago" title="${r['timeago']}">
-                  ${r['timeago']}</abbr></em>
-
-                <tal:block condition="r['author'] is not None"
-                           omit-tag="">
-                    by <a class="sras-searchfooterlinks"
-                          href="${r['author']['url']}">
-                          ${r['author']['name']}</a>
-                </tal:block>
-            </div>
-        </div>
+      <div class="search-error" tal:condition="error">${error}</div>
+      <tal:loop repeat="r results">
+        <tal:var define="doc r['doc']">
+          <metal:searchresult use-macro="api.snippets.macros[r['macro']]">
+          </metal:searchresult>
+        </tal:var>
+      </tal:loop>
     </div>
 
     <div id="sras-pagination" tal:condition="batch_info['batching_required']">

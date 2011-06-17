@@ -204,7 +204,8 @@ var renderDispatchTable = {
     "comment":       renderCommentEntry,
     "file":          renderFileEntry,
     "calendarevent": renderCalendarEventEntry,
-    "community":     renderCommunity
+    "community":     renderCommunity,
+    "office":        renderOffice
 };
 
 function _normalized(val) {
@@ -364,6 +365,19 @@ function renderCommunity(item) {
                     .append($('<span class="discreet" />')
                                 .text(" - " + item.num_members + " member" +
                                       (item.num_members === 1 ? '' : 's'))));
+    return entry;
+}
+
+function renderOffice(item) {
+    var entry = $('<a class="bc-livesearch-office" />');
+    entry
+        .append($('<div />')
+                .text(item.title + ' Office')
+                .append($('<span class="discreet telephone" />')
+                        .text(item.telephone))
+                .append($('<div class="discreet" />').text(item.address))
+                .append($('<div class="discreet" />').text(item.city + (item.state ? ', ' + item.state : '')))
+                .append($('<div class="discreet" />').text(item.zipcode + ' ' + item.country)))
     return entry;
 }
 

@@ -1829,4 +1829,23 @@
     factory=".adapters.calendar_livesearch_result"
     />
 
+  <adapter
+    for="karl.content.interfaces.IIntranet
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.intranet_livesearch_result"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IIntranet"
+    provides=".interfaces.ISearchResultsMacro"
+    factory=".adapters.searchresultsmacro_office"
+    />
+
+  <adapter
+    for="*"
+    provides=".interfaces.ISearchResultsMacro"
+    factory=".adapters.searchresultsmacro_generic"
+    />
+
 </configure>

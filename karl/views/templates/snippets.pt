@@ -838,6 +838,52 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       </div>
     </metal:announcement>
 
+    <div class="sras-result" metal:define-macro="searchresults_generic">
+      <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
+
+      <p class="sras-summary" tal:content="structure r['description']">
+        Contextual summary.
+      </p>
+
+      <div class="sras-details">
+        <img src="${api.static_url}/images/${r['icon']}"
+             alt="${r['type']}" height="12" width="12"/>
+        ${r['type']}
+
+        <tal:block condition="r['community'] is not None"
+                   omit-tag="">
+          in <a class="sras-searchfooterlinks"
+          href="${r['community']['url']}">
+          ${r['community']['title']}</a>
+        </tal:block>
+
+        modified
+        <em><abbr class="timeago" title="${r['timeago']}">
+        ${r['timeago']}</abbr></em>
+
+        <tal:block condition="r['author'] is not None"
+                   omit-tag="">
+          by <a class="sras-searchfooterlinks"
+          href="${r['author']['url']}">
+          ${r['author']['name']}</a>
+        </tal:block>
+      </div>
+
+    </div>
+
+    <div class="sras-result" metal:define-macro="searchresults_office">
+      <a class="sras-result-title" href="${r['url']}">${r['title']} Office</a>
+      <p class="sras-summary">
+        <div>${doc.telephone}</div>
+        <div>${doc.address}</div>
+        <div>
+          ${doc.city}
+          <span tal:condition="doc.state" tal:replace="string:, ${doc.state}" />
+        </div>
+        <div>${doc.zipcode}</div>
+      </p>
+    </div>
+
     <ul id="header-menu" metal:define-macro="header-menu">
         <li>
           <a href="${api.app_url}/contentfeeds.html">Feeds</a>

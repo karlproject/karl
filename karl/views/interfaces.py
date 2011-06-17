@@ -83,3 +83,8 @@ class ILiveSearchEntry(Interface):
     """ Adaptation from a search result to provide a result dictionary
 
     the adaptation itself generates the dictionary"""
+
+class ISearchResultsMacro(Interface):
+    """ Lookup which macro to use for displaying advanced search results
+
+    adaptation itself generates the macro name"""
