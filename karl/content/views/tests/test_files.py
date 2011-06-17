@@ -1286,6 +1286,1155 @@ class TestAdvancedFolderView(unittest.TestCase):
         self.failUnless(INetworkEventsMarker.providedBy(context))
 
 
+class TestAjaxFileUploadView(unittest.TestCase):
+    "Multiupload"
+
+    def setUp(self):
+        cleanUp()
+
+        from karl.content.views import files as module_under_test
+        self._saved_transaction_module = module_under_test.transaction
+        self.transaction = DummyTransactionModule()
+        module_under_test.transaction = self.transaction
+
+        from repoze.lemonade.testing import registerContentFactory
+        from karl.content.interfaces import ICommunityFile
+        from karl.content.models.files import CommunityFile
+        registerContentFactory(CommunityFile, ICommunityFile)
+
+        from zope.interface import Interface
+        from repoze.workflow.testing import registerDummyWorkflow
+        self.workflow = DummyWorkflow()
+        registerDummyWorkflow('security', self.workflow, Interface)
+
+    def tearDown(self):
+        cleanUp()
+
+        from karl.content.views import files as module_under_test
+        module_under_test.transaction = self._saved_transaction_module
+
+    def _make_context(self):
+        context = testing.DummyModel()
+        ###context.get_attachments = lambda: context
+        return context
+
+    def _call_fut(self, context, request):
+        from karl.content.views.files import ajax_file_upload_view
+        return ajax_file_upload_view(
+            context, request,
+        )
+
+    def test_upload_ok(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file = context['testfile.txt']
+        self.assertEqual(file.title, 'testfile.txt')
+        self.assertEqual(file.mimetype, 'text/plain')
+        self.assertEqual(file.filename, 'testfile.txt')
+        self.assertEqual(file.creator, 'chris')
+        self.assertEqual(file.size, 1000)
+        self.assertEqual(len(file.blobfile.open().read()), 1000)
+        self.assertEqual(self.workflow.initialized_list, [file,])
+
+    def test_image_ok(self):
+        # An image is somewhat special, so it's worth to test it.
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyImageUpload(),
+                'client_id': 'ABCDEF',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'test.jpg'})
+
+        file = context['test.jpg']
+        self.assertEqual(file.title, 'test.jpg')
+        self.assertEqual(file.mimetype, 'image/jpeg')
+        self.assertEqual(file.filename, 'test.jpg')
+        self.assertEqual(file.creator, 'chris')
+        self.assertEqual(file.size, 244)
+        self.assertEqual(len(file.blobfile.open().read()), 244)
+        self.assertEqual(self.workflow.initialized_list, [file ,])
+
+    def test_mandatory_parameters(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                ## NO 'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                ## NO 'client_id': 'ABCDEF',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+    def test_multiple(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+
+        file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
+        self.assertEqual(file1.title, 'f1.txt')
+        self.assertEqual(file1.mimetype, 'text/plain')
+        self.assertEqual(file1.filename, 'f1.txt')
+        self.assertEqual(file1.creator, 'chris')
+        self.assertEqual(file1.size, 1000)
+        self.assertEqual(len(file1.blobfile.open().read()), 1000)
+        self.assertEqual(self.workflow.initialized_list, [])
+
+        self.failUnless(hasattr(file1, '__client_file_id__'))
+        self.failUnless(hasattr(file1, '__transaction_parent__'))
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f2.txt'),
+                'client_id': 'ABCDEF2',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f2.txt'})
+
+        file2 = context['TEMP']['PLUPLOAD-ABCDEF2']
+        self.assertEqual(file2.title, 'f2.txt')
+        self.assertEqual(file2.mimetype, 'text/plain')
+        self.assertEqual(file2.filename, 'f2.txt')
+        self.assertEqual(file2.creator, 'chris')
+        self.assertEqual(file2.size, 1000)
+        self.assertEqual(len(file2.blobfile.open().read()), 1000)
+        self.assertEqual(self.workflow.initialized_list, [])
+
+        self.failUnless(hasattr(file2, '__client_file_id__'))
+        self.failUnless(hasattr(file2, '__transaction_parent__'))
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f3.txt'),
+                'client_id': 'ABCDEF3',
+                'end_batch': '["ABCDEF1", "ABCDEF2"]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'f3.txt'})
+
+        self.assertEqual(context['f1.txt'], file1)
+
+        self.assertEqual(context['f2.txt'], file2)
+
+        file3 = context['f3.txt']
+        self.assertEqual(file3.title, 'f3.txt')
+        self.assertEqual(file3.mimetype, 'text/plain')
+        self.assertEqual(file3.filename, 'f3.txt')
+        self.assertEqual(file3.creator, 'chris')
+        self.assertEqual(file3.size, 1000)
+        self.assertEqual(len(file3.blobfile.open().read()), 1000)
+
+        self.assertEqual(self.workflow.initialized_list, [file1, file2, file3])
+        self.assertEqual(list(context['TEMP'].keys()), [])
+
+        # security guards all removed
+        self.failUnless(not hasattr(file1, '__client_file_id__'))
+        self.failUnless(not hasattr(file1, '__transaction_parent__'))
+        self.failUnless(not hasattr(file2, '__client_file_id__'))
+        self.failUnless(not hasattr(file2, '__transaction_parent__'))
+        self.failUnless(not hasattr(file3, '__client_file_id__'))
+        self.failUnless(not hasattr(file3, '__transaction_parent__'))
+
+    def test_tolerate_doomed_retried_batch(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
+
+        # this batch is now doomed and client retries - with the same id.
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
+        # - it just overwrites the object: this is ok. (It is for sure from the same client.)
+
+    def test_security_assertions(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+
+        file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
+
+        # client id mismatch: bad. Smells like bad intention.
+        self.assertEqual(file1.__client_file_id__, 'ABCDEF1')
+        file1.__client_file_id__ = 'h4x3r'
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f2.txt'),
+                'client_id': 'ABCDEF2',
+                'end_batch': '["ABCDEF1"]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Inconsistent client file id'}) 
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+        # Another one
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f3.txt'),
+                'client_id': 'ABCDEF3',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f3.txt'})
+
+        file1 = context['TEMP']['PLUPLOAD-ABCDEF3']
+
+        # parent changes during the transaction: very bad.
+        self.assertEqual(file1.__transaction_parent__, context)
+        file1.__transaction_parent__ = 'h4x3r'
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f4.txt'),
+                'client_id': 'ABCDEF4',
+                'end_batch': '["ABCDEF3"]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'ABCDEF3', u'error': u'Inconsistent batch transaction'}) 
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+        # Another one
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f5.txt'),
+                'client_id': 'ABCDEF5',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f5.txt'})
+
+        file1 = context['TEMP']['PLUPLOAD-ABCDEF5']
+
+        # the security credentials change during the batch: very very bad.
+        testing.registerDummySecurityPolicy('paul')
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f6.txt'),
+                'client_id': 'ABCDEF6',
+                'end_batch': '["ABCDEF5"]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'ABCDEF5', u'error': u'Inconsistent ownership'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+    def test_chunks_onechunk(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '1',
+                'chunk': '0',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file = context['testfile.txt']
+        self.assertEqual(file.title, 'testfile.txt')
+        self.assertEqual(file.mimetype, 'text/plain')
+        self.assertEqual(file.filename, 'testfile.txt')
+        self.assertEqual(file.creator, 'chris')
+        self.assertEqual(file.size, 1000)
+        self.assertEqual(len(file.blobfile.open().read()), 1000)
+        self.assertEqual(self.workflow.initialized_list, [file,])
+
+    def test_chunks(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '3',
+                'chunk': '0',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file1 = context['TEMP']['PLUPLOAD-ABCDEF']
+        self.assertEqual(file1.title, 'testfile.txt')
+        self.assertEqual(file1.mimetype, 'text/plain')
+        self.assertEqual(file1.filename, 'testfile.txt')
+        self.assertEqual(file1.creator, 'chris')
+        self.assertEqual(file1.size, 1000)
+        self.assertEqual(len(file1.blobfile.open().read()), 1000)
+        self.assertEqual(self.workflow.initialized_list, [])
+
+        self.failUnless(hasattr(file1, '__chunks__'))
+        self.failUnless(hasattr(file1, '__chunk__'))
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '3',
+                'chunk': '1',
+            }
+        )
+
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'testfile.txt'})
+
+        self.assertEqual(file1.size, 2000)
+        self.assertEqual(len(file1.blobfile.open().read()), 2000)
+        self.assertEqual(self.workflow.initialized_list, [])
+
+        self.failUnless(hasattr(file1, '__chunks__'))
+        self.failUnless(hasattr(file1, '__chunk__'))
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '3',
+                'chunk': '2',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        self.assertEqual(context['testfile.txt'], file1)
+
+        self.assertEqual(file1.size, 3000)
+        self.assertEqual(len(file1.blobfile.open().read()), 3000)
+        self.assertEqual(self.workflow.initialized_list, [file1])
+
+        # check that the chunk info is removed
+        self.failUnless(not hasattr(file1, '__chunks__'))
+        self.failUnless(not hasattr(file1, '__chunk__'))
+
+    def test_chunking_parameters(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '1',
+                'chunk': '-1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Chunking inconsistency, `chunk` out of range'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'chunks': '2',
+                'chunk': '2',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Chunking inconsistency, `chunk` out of range'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+    def test_chunking_inconsistency(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+                'chunks': '3',
+                'chunk': '0',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+                'chunks': '3',
+                'chunk': '2',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'ABCDEF1', u'error': u'Chunking inconsistency, wrong chunk order'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+    def test_lost_tempfile(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f1.txt'),
+                'client_id': 'ABCDEF1',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+
+        #file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
+        # now the file is lost somehow:
+        del context['TEMP']['PLUPLOAD-ABCDEF1']
+
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(filename='f2.txt'),
+                'client_id': 'ABCDEF2',
+                'end_batch': '["ABCDEF1"]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'client_id': u'ABCDEF1',
+            u'error': u"Inconsistent transaction, lost a file (temp_id=u'PLUPLOAD-ABCDEF1') "})
+
+    def test_unique_filenames(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(),
+                'client_id': 'ABCDEF',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file = context['testfile.txt']
+        self.assertEqual(file.title, 'testfile.txt')
+        self.assertEqual(file.mimetype, 'text/plain')
+        self.assertEqual(file.filename, 'testfile.txt')
+        self.assertEqual(file.creator, 'chris')
+        self.assertEqual(file.size, 1000)
+        self.assertEqual(len(file.blobfile.open().read()), 1000)
+
+
+        # another one, same filename
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(IMAGE_DATA=2000 * '1'),
+                'client_id': 'ABCDEF2',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file2 = context['testfile-1.txt']
+        self.assertEqual(file2.title, 'testfile-1.txt')
+        self.assertEqual(file.mimetype, 'text/plain')
+        self.assertEqual(file2.filename, 'testfile-1.txt')
+        self.assertEqual(file2.creator, 'chris')
+        self.assertEqual(file2.size, 2000)
+        self.assertEqual(len(file2.blobfile.open().read()), 2000)
+
+        # another one, same filename
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(IMAGE_DATA=3000 * '2'),
+                'client_id': 'ABCDEF3',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file3 = context['testfile-2.txt']
+        self.assertEqual(file3.title, 'testfile-2.txt')
+        self.assertEqual(file3.filename, 'testfile-2.txt')
+        self.assertEqual(file3.size, 3000)
+        self.assertEqual(len(file3.blobfile.open().read()), 3000)
+
+
+        # another one, same filename
+        request = testing.DummyRequest(
+            params={
+                'file': DummyUpload(IMAGE_DATA=4000 * '3'),
+                'client_id': 'ABCDEF4',
+                'end_batch': '[]',
+            }
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+
+        file4 = context['testfile-3.txt']
+        self.assertEqual(file4.title, 'testfile-3.txt')
+        self.assertEqual(file4.filename, 'testfile-3.txt')
+        self.assertEqual(file4.size, 4000)
+        self.assertEqual(len(file4.blobfile.open().read()), 4000)
+
+        self.assertEqual(self.workflow.initialized_list, [file, file2, file3, file4])
+
+
+class FakeParams(dict):
+    # this is a dict, so we just stub getall on it.
+    def getall(self, key):
+        return self.get(key)
+
+class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
+    "Grid reorganize - delete"
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _call_fut(self, context, request):
+        from karl.content.views.files import ajax_file_reorganize_delete_view
+        return ajax_file_reorganize_delete_view(context, request)
+
+    def _make_context(self):
+        context = testing.DummyModel()
+        ###context.get_attachments = lambda: context
+        return context
+
+    def test_delete_one(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+
+        context['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+            })
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'deleted': 1, u'result': u'OK'})
+        self.assertEqual(context.keys(), [])
+
+    def test_delete_zero(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': [],
+            })
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'deleted': 0, u'result': u'OK'})
+        self.assertEqual(context.keys(), [])
+
+
+    def test_delete_multiple(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+
+        context['f1.txt'] = testing.DummyModel(title='a file')
+        context['f2.txt'] = testing.DummyModel(title='a file')
+        context['f3.txt'] = testing.DummyModel(title='a file')
+        context['f4.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
+            })
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'deleted': 3, u'result': u'OK'})
+        self.assertEqual(context.keys(), ['f4.txt'])
+
+
+    def test_tolerates_missing(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
+
+        context['f1.txt'] = testing.DummyModel(title='a file')
+        context['f2.txt'] = testing.DummyModel(title='a file')
+        # There is no f3.txt.
+        context['f4.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
+            })
+        )
+        response = self._call_fut(context, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'deleted': 2, u'result': u'OK'})
+        self.assertEqual(context.keys(), ['f4.txt'])
+
+
+class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
+    "Grid reorganize - move to"
+
+    def setUp(self):
+        cleanUp()
+
+        from karl.content.views import files as module_under_test
+        self._saved_transaction_module = module_under_test.transaction
+        self.transaction = DummyTransactionModule()
+        module_under_test.transaction = self.transaction
+
+    def tearDown(self):
+        cleanUp()
+
+        from karl.content.views import files as module_under_test
+        module_under_test.transaction = self._saved_transaction_module
+
+    def _call_fut(self, context, request):
+        from karl.content.views.files import ajax_file_reorganize_moveto_view
+        return ajax_file_reorganize_moveto_view(context, request)
+
+    def _make_community(self):
+        # factorize a fake community
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel(title='thecommunity')
+        directlyProvides(community, ICommunity)
+
+        folder = testing.DummyModel(title='parent')
+        community['files'] = folder
+
+        return community
+
+
+    def test_move_one(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 1, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(folder2.keys(), ['f1.txt'])
+
+
+    def test_move_zero(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': [],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 0, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), ['f1.txt'])
+        self.assertEqual(folder2.keys(), [])
+
+
+    def test_move_multiple(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+        folder1['f2.txt'] = testing.DummyModel(title='a file')
+        folder1['f3.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 3, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f2.txt', 'f3.txt']))
+
+
+    def test_mandatory_parameters(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                ## NO 'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data,{u'error': u'Wrong parameters, `target_folder` is mandatory', 
+                u'result': u'ERROR', u'filename': u'*'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_missing_file(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'error': u'Cannot move to target folder <a href="http://example.com/files/folder2/">/folder2</a>', 
+                u'result': u'ERROR', u'filename': u'f2.txt'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_same_target(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder1',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+
+        # This actually works.
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder1/', 
+            u'moved': 1, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder1'})
+
+        self.assertEqual(folder1.keys(), ['f1.txt'])
+        self.assertEqual(folder2.keys(), [])
+
+
+    def test_move_folder(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['folder1a'] = testing.DummyModel(title='a folder')
+        folder1['folder1a']['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['folder1a'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 1, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(folder2.keys(), ['folder1a'])
+        self.assertEqual(folder2['folder1a'].keys(), ['f1.txt'])
+
+
+    def test_move_folder_to_itself(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['folder1a'] = testing.DummyModel(title='a folder')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['folder1a'],
+                'target_folder': '/folder1/folder1a',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+
+        self.assertEqual(data, {u'error': u'Cannot move a folder into itself', 
+                u'result': u'ERROR', u'filename': u'folder1a'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_move_folder_to_itself_deeply(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['folder1a'] = testing.DummyModel(title='a folder')
+        folder1['folder1a']['folder1aa'] = testing.DummyModel(title='a folder')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['folder1a'],
+                'target_folder': '/folder1/folder1a/folder1aa',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+
+        self.assertEqual(data, {u'error': u'Cannot move a folder into itself', 
+                u'result': u'ERROR', u'filename': u'folder1a'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_canonical_names(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        file = folder1['NAME.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['NAME.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 1, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(folder2.keys(), ['name.txt'])       # filename canonized. (eg small caps...)
+
+
+    def test_unique_names(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        file1 = folder1['f1.txt'] = testing.DummyModel(title='a file')
+        file2 = folder1['f2.txt'] = testing.DummyModel(title='a file')
+        file3 = folder1['f3.txt'] = testing.DummyModel(title='a file')
+
+        # ... but some files exist already in the target
+        folder2['f1.txt'] = testing.DummyModel(title='a file')
+        folder2['f1-1.txt'] = testing.DummyModel(title='a file')
+        folder2['f1-2.txt'] = testing.DummyModel(title='a file')
+        folder2['f2.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 3, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt', 'f1-2.txt', 'f1-3.txt', 
+                'f2.txt', 'f2-1.txt',
+                'f3.txt']))
+        self.assertEqual(file1, folder2['f1-3.txt'])
+        self.assertEqual(file2, folder2['f2-1.txt'])
+        self.assertEqual(file3, folder2['f3.txt'])
+
+
+    def test_unique_names_changes_properties(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        file1 = folder1['f1.txt'] = testing.DummyModel(title='f1.txt', filename='f1.txt')
+        file2 = folder1['f2.txt'] = testing.DummyModel(title='SOMEONE CHANGED ME', filename='f2.txt')
+
+        # ... but some files exist already in the target
+        folder2['f1.txt'] = testing.DummyModel(title='a file')
+        folder2['f2.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt', 'f2.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
+            u'moved': 2, u'result': u'OK', 
+            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+
+        self.assertEqual(folder1.keys(), [])
+        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt',
+                'f2.txt', 'f2-1.txt']))
+        self.assertEqual(file1, folder2['f1-1.txt'])
+        self.assertEqual(file2, folder2['f2-1.txt'])
+
+        # names are mangled if the title has not changed
+        self.assertEqual(file1.title, 'f1-1.txt')
+        self.assertEqual(file1.filename, 'f1-1.txt')
+        
+        # title is mangled differently, in case someone has changed it from the upload original
+        self.assertEqual(file2.title, 'SOMEONE CHANGED ME - 1')
+        self.assertEqual(file2.filename, 'f2-1.txt')
+
+
+
+# An 1x1px png (should be jpeg, in fact)
+import binascii
+IMAGE_DATA = binascii.unhexlify(
+            '89504e470d0a1a0a0000000d49484452000000010000000108060000001f' +
+            '15c4890000000467414d410000b18f0bfc610500000006624b474400ff00' +
+            'ff00ffa0bda793000000097048597300000b1200000b1201d2dd7efc0000' +
+            '000976704167000000010000000100c7955fed0000000d4944415408d763' +
+            'd8b861db7d00072402f7f7d926c80000002574455874646174653a637265' +
+            '61746500323031302d30352d31385432303a30343a34322b30323a3030e1' +
+            '1f35f60000002574455874646174653a6d6f6469667900323031302d3035' +
+            '2d31385432303a30343a34322b30323a303090428d4a0000000049454e44' +
+            'ae426082')
+
+class DummyUpload(object):
+    filename = 'testfile.txt'
+    type = 'text/plain'
+    IMAGE_DATA = 1000 * '0'
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+        from cStringIO import StringIO
+        self._file = StringIO(self.IMAGE_DATA)
+
+    @property
+    def file(self):
+        return self._file
+
+class DummyImageUpload(DummyUpload):
+    filename = 'test.jpg'
+    type = 'image/jpeg'
+    IMAGE_DATA = IMAGE_DATA
+
+class DummyTransactionModule(object):
+    doomed = False
+
+    def doom(self):
+        self.doomed = True
+
+
 from zope.interface import implements
 
 class DummyBlobFile:
@@ -1333,12 +2482,14 @@ class DummyWorkflow:
         ]):
         self.transitioned = []
         self._state_info = state_info
+        self.initialized_list = []
 
     def state_info(self, context, request):
         return self._state_info
 
     def initialize(self, content):
         self.initialized = True
+        self.initialized_list.append(content)
 
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):

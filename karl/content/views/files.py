@@ -1153,7 +1153,7 @@ def ajax_file_upload_view(context, request):
         f = params.get('file', None)
         client_id = params.get('client_id', None)
         if f is None or client_id is None:
-            msg = 'Wrong parameters, `file` is mandatory' 
+            msg = 'Wrong parameters, `file` and `client_id` are mandatory' 
             raise ErrorResponse(msg, client_id='')
 
         # XXX Handling of chunk uploads.
@@ -1172,7 +1172,7 @@ def ajax_file_upload_view(context, request):
 
         # (we allow chunks==0 chunk==0 as this happens with 0-length files)
         if chunk < 0 or chunks > 0 and chunk >= chunks:
-            msg = 'Chunking inconsistence, `chunk` out of range' 
+            msg = 'Chunking inconsistency, `chunk` out of range' 
             raise ErrorResponse(msg, client_id='')
 
         end_batch = params.get('end_batch', None)
@@ -1241,7 +1241,7 @@ def ajax_file_upload_view(context, request):
             # chunk consistency check
             fileobj.__chunk__ += 1
             if fileobj.__chunk__ != chunk:
-                msg = 'Chunking inconsistence, wrong chunk order'
+                msg = 'Chunking inconsistency, wrong chunk order'
                 raise ErrorResponse(msg, client_id=client_id)
 
             # Append the file to the existing file
