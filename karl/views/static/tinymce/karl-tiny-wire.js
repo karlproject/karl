@@ -52,7 +52,7 @@ $(document).ready(function() {
         theme_advanced_toolbar_location: 'top',
         theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, spellchecker, print',
         theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, anchor, addwickedlink, delwickedlink, |, code',
-        theme_advanced_buttons3: 'tablecontrols',
+        theme_advanced_buttons3: '',
         theme_advanced_toolbar_location : "top",
         theme_advanced_toolbar_align : "left",
         plugins: plugins,
