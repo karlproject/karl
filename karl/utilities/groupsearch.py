@@ -81,7 +81,16 @@ class GroupSearch:
         return criteria
 
 
+try:
+    from repoze.pgtextindex.interfaces import IWeightedQuery
+except ImportError: # pragma NO COVERAGE
+    IWeightedQuery = None
+
+
 class WeightedQuery(unicode):
+    if IWeightedQuery is not None:
+        implements(IWeightedQuery)
+
     weight_factor = 32.0
 
     A = 1.0
