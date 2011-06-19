@@ -13,6 +13,9 @@ Unreleased
 
 - Made the html to text converter more tolerant of malformed html.
 
+- The custom weights (1, 1/32, 1/32**2, and 1/32**3) were not being applied
+  to text queries. Fixed.
+
 3.65 (2011-06-15)
 -----------------
 
