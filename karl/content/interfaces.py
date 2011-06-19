@@ -62,6 +62,7 @@ class ICalendarEvent(ICommunityContent, IOthers):
     taggedValue('name', 'Event')
     taggedValue('search_option', True)
     taggedValue('icon', 'calendar-select.png')
+    taggedValue('marker', 'Event')
 
     title = Attribute(u'Event title')
     startDate = Attribute(u'DateTime object with value from form')

@@ -75,8 +75,11 @@ class GroupSearch:
         # path filtering
         criteria = {}
         criteria['sort_index'] = 'texts'
-        criteria['texts'] = WeightedQuery(self.term)
+        q = WeightedQuery(self.term)
+        if len(self.interfaces) == 1:
+            q.marker = self.interfaces[0].queryTaggedValue('marker')
         criteria['interfaces'] = {'query':self.interfaces, 'operator':'or'}
+        criteria['texts'] = q
         criteria['allowed'] = {'query':principals, 'operator':'or'}
         return criteria
 
@@ -97,6 +100,8 @@ class WeightedQuery(unicode):
     B = A / weight_factor
     C = B / weight_factor
     D = C / weight_factor
+
+    marker = None
 
     @property
     def text(self):

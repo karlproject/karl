@@ -255,6 +255,13 @@ def get_weighted_textrepr(obj, default):
     if is_created_by_staff(obj):
         weighted.coefficient *= 25.0
 
+    # Index a marker if one is provided by the object's interfaces.
+    for iface in get_interfaces(obj, ()):
+        marker = iface.queryTaggedValue('marker')
+        if marker:
+            weighted.marker = marker
+            break
+
     return weighted
 
 def _get_date_or_datetime(object, attr, default):

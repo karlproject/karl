@@ -47,18 +47,22 @@ class IGroupSearch(Interface):
 class IPeople(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'People')
+    taggedValue('marker', 'People')
 
 class IPosts(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Posts')
+    taggedValue('marker', 'Posts')
 
 class IPages(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Pages')
+    taggedValue('marker', 'Pages')
 
 class IFiles(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Files')
+    taggedValue('marker', 'Files')
 
 class IOthers(Interface):
     """Grouping for LiveSearch and other purposes"""
@@ -224,6 +228,7 @@ class ICommunity(IFolder, IContent, IOthers):
     taggedValue('name', 'Community')
     taggedValue('search_option', True)
     taggedValue('icon', 'building.png')
+    taggedValue('marker', 'Community')
 
     description = Attribute(u'Description -- plain text summary')
     text = Attribute(u'Text -- includes wiki markup.')

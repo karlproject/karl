@@ -50,6 +50,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import time
 
+import logging
+log = logging.getLogger(__name__)
+
 
 def interface_id(t):
     return '%s_%s' % (t.__module__.replace('.', '_'), t.__name__)
@@ -363,6 +366,7 @@ def jquery_livesearch_view(context, request):
             listitems = (dict(component=search_utility),)
             # we'll just have on type of results, so we return back 20 results
             results_per_type = 20
+    start_time = time.time()
     for listitem in listitems:
         utility = listitem['component']
         factory = utility(context, request, searchterm)
@@ -382,6 +386,9 @@ def jquery_livesearch_view(context, request):
             assert record is not None, (
                 "Unexpected livesearch result: " + result.__class__.__name__)
             records.append(record)
+    end_time = time.time()
+    log.debug('livesearch: %0.3fs for "%s", kind=%s',
+        end_time - start_time, searchterm, kind)
 
     result = JSONEncoder().encode(records)
     return Response(result, content_type="application/json")
