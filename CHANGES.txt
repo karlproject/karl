@@ -19,6 +19,8 @@ Unreleased
 - The custom weights (1, 1/32, 1/32**2, and 1/32**3) were not being applied
   to text queries. Fixed.
 
+- Added the 'Precedence: bulk' header to content alert emails. (LP #785272)
+
 3.65 (2011-06-15)
 -----------------
 

@@ -333,6 +333,7 @@ class BlogAlert(Alert):
         msg["To"] = '"%s" <%s>' % (profile.title, profile.email)
         msg["Reply-to"] = reply_to
         msg["Subject"] = self._subject
+        msg["Precedence"] = 'bulk'
         body_text = body_template(
             context=self.context,
             community=community,
@@ -485,6 +486,7 @@ class NonBlogAlert(Alert):
         msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
         msg["To"] = '"%s" <%s>' % (community.title, profile.email)
         msg["Subject"] = self._subject
+        msg["Precedence"] = 'bulk'
         body_text = body_template(
             context=self.context,
             community=community,

@@ -202,6 +202,7 @@ class TestBlogEntryAlert(unittest.TestCase):
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
                           '@karl3.example.com>'
                         )
+        self.assertEqual(alert.message['Precedence'], 'bulk')
 
     def test_digest(self):
         from repoze.postoffice.message import Message
@@ -325,6 +326,7 @@ class TestBlogCommentAlert(unittest.TestCase):
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
                           '@karl3.example.com>'
                         )
+        self.assertEqual(alert.message['Precedence'], 'bulk')
 
         messages, n = renderer.history
         self.assertEqual(n, 1)
@@ -456,6 +458,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         self.assertEqual(
             alert.endDate, 'Wednesday, January 28, 2009 08:32 AM')
         self.assertEqual(alert.attendees, 'alice; bob')
+        self.assertEqual(alert.message['Precedence'], 'bulk')
 
     def test_digest(self):
         from repoze.postoffice.message import Message
@@ -536,6 +539,7 @@ class TestCommunityFileAlert(unittest.TestCase):
                          u'[Dummy Communit\xe0] An interesting file')
         self.assertEqual(alert.message["from"],
                          u'"title | karl3test" <alerts@karl3.example.com>')
+        self.assertEqual(alert.message['Precedence'], 'bulk')
 
 
 class TestForumPortlet(unittest.TestCase):
