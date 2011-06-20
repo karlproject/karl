@@ -63,7 +63,7 @@ class Alerts(object):
     def _send_immediately(self, context, profile, request):
         mailer = getUtility(IMailDelivery)
         alert = getMultiAdapter((context, profile, request), IAlert)
-        mailer.send(alert.mfrom, alert.mto, alert.message)
+        mailer.send(alert.mto, alert.message)
 
     def _queue_digest(self, context, profile, request):
         alert = getMultiAdapter((context, profile, request), IAlert)
@@ -132,7 +132,7 @@ class Alerts(object):
                 for attachment in attachments:
                     msg.attach(attachment)
 
-                mailer.send(sent_from, [profile.email,], msg)
+                mailer.send([profile.email,], msg)
                 del profile._pending_alerts[:]
                 transaction.manager.commit()
 

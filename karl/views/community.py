@@ -525,7 +525,7 @@ def join_community_view(context, request):
 
         recipients = [p.email for p in moderators]
         mailer = getUtility(IMailDelivery)
-        mailer.send(profile.email, recipients, mail)
+        mailer.send(recipients, mail)
 
         status_message = "Your request has been sent to the moderators."
         location = model_url(context, request,

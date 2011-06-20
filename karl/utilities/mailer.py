@@ -27,24 +27,39 @@ def mail_delivery_factory(os=os): # accepts 'os' for unit test purposes
     if settings is None or suppress_mail:
         return FakeMailDelivery()
 
-    queue_path = getattr(settings, "mail_queue_path", None)
-    if queue_path is None:
-        # Default to var/mail_queue
-        # we assume that the console script lives in the 'bin' dir of a
-        # sandbox or buildout, and that the mail_queue directory lives in
-        # the 'var' directory of the sandbox or buildout
-        exe = sys.executable
-        sandbox = os.path.dirname(os.path.dirname(os.path.abspath(exe)))
-        queue_path = os.path.join(
-            os.path.join(sandbox, "var"), "mail_queue"
-        )
-    queue_path = os.path.abspath(os.path.normpath(
-        os.path.expanduser(queue_path)))
-
-    md = QueuedMailDelivery(queue_path)
+    md = KarlMailDelivery(settings)
     if getattr(settings, "mail_white_list", None):
         md = WhiteListMailDelivery(md)
     return md
+
+
+class KarlMailDelivery(QueuedMailDelivery):
+    """
+    Uses queued mail delivery from repoze.sendmail, but provides the envelope
+    from address from Karl configuration.
+    """
+
+    def __init__(self, settings):
+        self.mfrom = settings.envelope_from_addr
+        queue_path = getattr(settings, "mail_queue_path", None)
+        if queue_path is None:
+            # Default to var/mail_queue
+            # we assume that the console script lives in the 'bin' dir of a
+            # sandbox or buildout, and that the mail_queue directory lives in
+            # the 'var' directory of the sandbox or buildout
+            exe = sys.executable
+            sandbox = os.path.dirname(os.path.dirname(os.path.abspath(exe)))
+            queue_path = os.path.join(
+                os.path.join(sandbox, "var"), "mail_queue"
+            )
+            queue_path = os.path.abspath(os.path.normpath(
+                os.path.expanduser(queue_path)))
+
+        QueuedMailDelivery.__init__(self, queue_path)
+
+    def send(self, mto, msg):
+        QueuedMailDelivery.send(self, self.mfrom, mto, msg)
+
 
 class FakeMailDelivery:
     implements(IMailDelivery)
@@ -52,9 +67,8 @@ class FakeMailDelivery:
     def __init__(self, quiet=True):
         self.quiet = quiet
 
-    def send(self, mfrom, mto, msg):
+    def send(self, mto, msg):
         if not self.quiet: #pragma NO COVERAGE
-            print 'From:', mfrom
             print 'To:', mto
             print 'Message:', msg
 
@@ -79,12 +93,12 @@ class WhiteListMailDelivery(object):
         self.md.queuePath = value
     queuePath = property(_get_queuePath, _set_queuePath)
 
-    def send(self, fromaddr, toaddrs, message):
+    def send(self, toaddrs, message):
         if self.white_list is not None:
             toaddrs = [addr for addr in toaddrs
                 if self._normalize(addr) in self.white_list]
         if toaddrs:
-            self.md.send(fromaddr, toaddrs, message)
+            self.md.send(toaddrs, message)
 
     @staticmethod
     def _normalize(addr):
@@ -92,7 +106,3 @@ class WhiteListMailDelivery(object):
             addr = addr[addr.index('<') + 1:addr.rindex('>')]
         return unicode(addr.strip()).lower()
 
-# Make an instance available as registerable component
-# (If for some reason we find config data isn't set yet or we think it might
-# change during run time, register the factory instead.)
-#mailer = mail_delivery_factory()

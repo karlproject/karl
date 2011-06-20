@@ -18,8 +18,14 @@ class TestPopulate(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
+        import os
+        os.environ['SUPPRESS_MAIL'] = 'true'
+
     def tearDown(self):
         cleanUp()
+
+        import os
+        del os.environ['SUPPRESS_MAIL']
 
     def _registerComponents(self):
         # Install a bit of configuration that make_app() usually

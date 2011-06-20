@@ -363,6 +363,7 @@ class DummyAlerts(object):
         self.emissions.append((context, url))
 
 class DummySettings:
+    envelope_from_addr = 'karl@example.org'
     def __init__(self, **kw):
         for k, v in kw.items():
             setattr(self, k, v)

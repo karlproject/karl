@@ -194,8 +194,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         from repoze.postoffice.message import Message
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -210,8 +208,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         alert.digest = True
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -227,8 +223,6 @@ class TestBlogEntryAlert(unittest.TestCase):
         request = testing.DummyRequest()
         alert = self._makeOne(self.blogentry, self.profile, request)
         alert.digest = True
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -323,8 +317,6 @@ class TestBlogCommentAlert(unittest.TestCase):
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -347,8 +339,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
         alert.digest = True
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -370,8 +360,6 @@ class TestBlogCommentAlert(unittest.TestCase):
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
-        self.assertEqual("community@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -453,8 +441,6 @@ class TestCalendarEventAlert(unittest.TestCase):
 
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
-        self.assertEqual("alerts@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -477,8 +463,6 @@ class TestCalendarEventAlert(unittest.TestCase):
         request = testing.DummyRequest()
         alert = self._makeOne(self.event, self.profile, request)
         alert.digest = True
-        self.assertEqual("alerts@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
@@ -542,8 +526,6 @@ class TestCommunityFileAlert(unittest.TestCase):
         request = testing.DummyRequest()
         alert = self._makeOne(self.f, self.profile, request)
         alert.digest = True
-        self.assertEqual("alerts@karl3.example.com",
-                         alert.mfrom)
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 

@@ -157,7 +157,7 @@ def request_password_reset(user, profile, request):
 
     recipients = [profile.email]
     mailer = getUtility(IMailDelivery)
-    mailer.send(admin_email, recipients, mail)
+    mailer.send(recipients, mail)
 
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'

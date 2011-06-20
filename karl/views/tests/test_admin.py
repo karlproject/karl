@@ -501,7 +501,6 @@ class TestEmailUsersView(unittest.TestCase):
                          'http://example.com/admin.html'
                          '?status_message=Sent+message+to+2+users.')
         self.assertEqual(len(self.mailer), 2)
-        self.assertEqual(self.mailer[0].mfrom, 'barney@example.com')
 
         msg = self.mailer[0].msg
         self.assertEqual(msg['Subject'], 'Exciting news!')
@@ -524,7 +523,6 @@ class TestEmailUsersView(unittest.TestCase):
                          'http://example.com/admin.html'
                          '?status_message=Sent+message+to+1+users.')
         self.assertEqual(len(self.mailer), 1)
-        self.assertEqual(self.mailer[0].mfrom, 'admin@example.com')
 
         msg = self.mailer[0].msg
         self.assertEqual(msg['Subject'], 'Exciting news!')

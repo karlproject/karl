@@ -13,6 +13,9 @@ Unreleased
 
 - Made the html to text converter more tolerant of malformed html.
 
+- Refactored outgoing email to use Karl configuration for the envelope from
+  address. (LP #785267)
+
 - The custom weights (1, 1/32, 1/32**2, and 1/32**3) were not being applied
   to text queries. Fixed.
 

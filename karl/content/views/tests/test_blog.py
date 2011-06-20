@@ -533,8 +533,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/communities/community/blog/foo/')
         self.assertEqual(3, len(self.mailer))
-        for x in self.mailer:
-            self.assertEqual(x.mfrom, 'community@karl3.example.com')
         recipients = reduce(lambda x,y: x+y, [x.mto for x in self.mailer])
         recipients.sort()
         self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
@@ -590,8 +588,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/communities/community/blog/foo/')
         self.assertEqual(3, len(self.mailer))
-        for x in self.mailer:
-            self.assertEqual(x.mfrom, 'community@karl3.example.com')
         recipients = reduce(lambda x,y: x+y, [x.mto for x in self.mailer])
         recipients.sort()
         self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)

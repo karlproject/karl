@@ -105,7 +105,7 @@ class TestWhiteListMailDelivery(unittest.TestCase):
     def test_no_whitelist(self):
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["b", "c"], "message")
+        delivery.send(["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b", "c"], sender.calls[0]["toaddrs"])
 
@@ -113,7 +113,7 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self._set_whitelist(["b"])
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["b", "c"], "message")
+        delivery.send(["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b",], sender.calls[0]["toaddrs"])
 
@@ -121,14 +121,14 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self._set_whitelist(["d"])
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["b", "c"], "message")
+        delivery.send(["b", "c"], "message")
         self.assertEqual(0, len(sender.calls))
 
     def test_all_recipients(self):
         self._set_whitelist(["b", "c"])
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["b", "c"], "message")
+        delivery.send(["b", "c"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(["b", "c"], sender.calls[0]["toaddrs"])
 
@@ -136,7 +136,7 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["b@example.com", "C@EXAMPLE.COM"], "message")
+        delivery.send(["b@example.com", "C@EXAMPLE.COM"], "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(
             ["b@example.com", "C@EXAMPLE.COM"], sender.calls[0]["toaddrs"])
@@ -145,8 +145,8 @@ class TestWhiteListMailDelivery(unittest.TestCase):
         self._set_whitelist(["B@EXAMPLE.COM", 'c@example.com'])
         delivery, sender = self._makeOne()
 
-        delivery.send("a", ["Fred <b@example.com>",
-                            "Bill <C@EXAMPLE.COM>"], "message")
+        delivery.send(["Fred <b@example.com>", "Bill <C@EXAMPLE.COM>"],
+                      "message")
         self.assertEqual(1, len(sender.calls))
         self.assertEqual(
             ["Fred <b@example.com>", "Bill <C@EXAMPLE.COM>"],
@@ -158,14 +158,14 @@ class DummyMailDelivery(object):
     def __init__(self):
         self.calls = []
 
-    def send(self, fromaddr, toaddrs, message):
+    def send(self, toaddrs, message):
         self.calls.append(dict(
-            fromaddr=fromaddr,
             toaddrs=toaddrs,
             message=message,
         ))
 
 class DummySettings:
+    envelope_from_addr = 'karl@example.org'
     def __init__(self, **kw):
         for k, v in kw.items():
             setattr(self, k, v)

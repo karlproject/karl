@@ -886,8 +886,8 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         class DummyMailDelivery:
             def __init__(self):
                 self._sent = []
-            def send(self, frm, to, message):
-                self._sent.append((frm, to, message))
+            def send(self, to, message):
+                self._sent.append((to, message))
         md = DummyMailDelivery()
         testing.registerUtility(md, IMailDelivery)
         return md
@@ -951,8 +951,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         adapter.handle(message, {'report': 'section+report'}, 'text', ())
 
         self.assertEqual(len(md._sent), 2)
-        for index, (frm, to, sentmessage) in enumerate(md._sent):
-            self.assertEqual(frm, message['From'])
+        for index, (to, sentmessage) in enumerate(md._sent):
             self.assertEqual(to, ['profile_%d@example.com' % index])
             self.failIf('Message-Id' in sentmessage)
             self.assertEqual(sentmessage['Reply-To'],
@@ -976,8 +975,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         adapter.handle(message, {'report': 'section+report'}, 'text', ())
 
         self.assertEqual(len(md._sent), 2)
-        for index, (frm, to, sentmessage) in enumerate(md._sent):
-            self.assertEqual(frm, message['From'])
+        for index, (to, sentmessage) in enumerate(md._sent):
             self.assertEqual(to, ['profile_%d@example.com' % index])
             self.failIf('Message-Id' in sentmessage)
             self.assertEqual(sentmessage['Reply-To'],

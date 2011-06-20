@@ -380,7 +380,7 @@ class EmailUsersView(object):
                 message.set_payload(body.encode('UTF-8'), 'UTF-8')
                 message.set_type('text/html')
 
-                mailer.send(message_from, [profile.email], message)
+                mailer.send([profile.email], message)
                 n += 1
 
             status_message = "Sent message to %d users." % n

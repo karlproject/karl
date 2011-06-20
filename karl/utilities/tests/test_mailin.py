@@ -483,12 +483,12 @@ class DummyQueue(list):
 
     def quarantine(self, message, error, send, message_from):
         self.quarantined.append((message, error))
-        send(message_from, ['foo@example.com'], "You're in quarantine!")
+        send(['foo@example.com'], "You're in quarantine!")
 
     def bounce(self, message, send, from_addr, error=None,
                bounce_message=None):
         self.bounced.append((message, from_addr, error, bounce_message))
-        send(from_addr, ['foo@example.com'], message)
+        send(['foo@example.com'], message)
 
 
 class DummyDispatcher(object):
@@ -503,5 +503,5 @@ class DummyDispatcher(object):
 
 
 class DummyMailer(list):
-    def send(self, from_addr, to_addrs, message):
-        self.append((from_addr, to_addrs, message))
+    def send(self, to_addrs, message):
+        self.append((to_addrs, message))

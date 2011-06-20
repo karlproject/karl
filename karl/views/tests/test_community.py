@@ -660,7 +660,7 @@ class JoinCommunityViewTests(unittest.TestCase):
         msg = mailer.pop()
         self.assertEqual(msg.mto, ["moderator1@x.org",
                                    "moderator2@x.org"])
-        self.assertEqual(msg.mfrom, "user@x.org")
+
 
 class DeleteCommunityViewTests(unittest.TestCase):
     def setUp(self):

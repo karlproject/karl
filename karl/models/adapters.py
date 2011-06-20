@@ -555,7 +555,7 @@ class PeopleReportMailinHandler(object):
             clone['Reply-To'] = reply_to
             mailer = getUtility(IMailDelivery)
             for address in self._reportAddresses(self.context):
-                mailer.send(message['From'], [address], clone)
+                mailer.send([address], clone)
 
     def _cloneMessage(self, message):
         clone = Message()

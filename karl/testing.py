@@ -180,16 +180,15 @@ class DummyCommunity(DummyModel):
 
 class DummyMailer(list):
     class DummyMessage(object):
-        def __init__(self, mfrom, mto, msg):
-            self.mfrom = mfrom
+        def __init__(self, mto, msg):
             self.mto = mto
             self.msg = msg
 
             from email.message import Message
             assert isinstance(msg, Message), type(msg)
 
-    def send(self, mfrom, mto, msg):
-        self.append(self.DummyMessage(mfrom, mto, msg))
+    def send(self, mto, msg):
+        self.append(self.DummyMessage(mto, msg))
 
 def registerDummyMailer():
     from repoze.bfg.testing import registerUtility
