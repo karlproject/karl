@@ -3,7 +3,7 @@
  *
  * These styles are needed for the integration to KARL,
  * for the correct interaction between themedstyles.css
- * and the original pluplload styles.
+ * and the original plupload styles.
  *
  * */
 
@@ -15,7 +15,7 @@ body .plupload {
 body .plupload .plupload_header_content {
     /* override logo to ours */
     background-image: url("../../images/logo.gif");
-    padding-left: 160px;
+    padding-left: 20px;
     padding-top: 8px;
 }
 

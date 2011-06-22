@@ -60,6 +60,26 @@ $.widget('karl.karlmultifileupload', {
                             self._flash_closed = false;
                             log('Flash uploader recreated');
                         }
+                        // change the logo in a way that the header text flows 
+                        // right from the background image and centered vertically
+                        // This is a bit tricky, but if it works well, it's worth it
+                        // Note: this needs to be done on open and not on bind time,
+                        // because Safari will not make the css style available at that time.
+                        var header_content = self.dialogSnippet.find('.plupload_header_content');
+                        if (! header_content.data('plupload_mogrified')) {
+                            var actualimage_src = header_content.css('background-image').replace(/"/g,"").replace(/url\(|\)$/ig, "");
+                            header_content.css('background-image', 'url()');
+                            var actualimage = new Image();
+                            actualimage.src = actualimage_src;
+                            var table = $('<table></table>').insertBefore(header_content);
+                            var tr = $('<tr></tr>').appendTo(table);
+                            var td1 = $('<td valign="middle"></td>').appendTo(tr);
+                            var td2 = $('<td valign="middle"></td>').appendTo(tr);
+                            td1.append(actualimage);
+                            td2.append(header_content);
+                            header_content.data('plupload_mogrified', true);
+                        }
+                        //
                         // Refresh in any case
                         self.uploader.refresh();
                     }
@@ -126,6 +146,7 @@ $.widget('karl.karlmultifileupload', {
             .click(function() {
                 self.close();
             });
+        //
         this.uploader.bind('BeforeUpload', function(up, file) {
             // Extend form parameters dynamically
             var multipart_params = up.settings.multipart_params;
