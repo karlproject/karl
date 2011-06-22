@@ -1837,15 +1837,21 @@
     />
 
   <adapter
+    for="*"
+    provides=".interfaces.ISearchResultsMacro"
+    factory=".adapters.searchresultsmacro_generic"
+    />
+
+  <adapter
     for="karl.content.interfaces.IIntranet"
     provides=".interfaces.ISearchResultsMacro"
     factory=".adapters.searchresultsmacro_office"
     />
 
   <adapter
-    for="*"
+    for="karl.models.interfaces.IProfile"
     provides=".interfaces.ISearchResultsMacro"
-    factory=".adapters.searchresultsmacro_generic"
+    factory=".adapters.searchresultsmacro_people"
     />
 
 </configure>

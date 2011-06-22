@@ -39,6 +39,7 @@ from repoze.bfg.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
 from karl.consts import countries
+from karl.utilities.image import thumb_url
 from karl.utils import find_intranet
 from karl.utils import find_intranets
 from karl.utils import find_site
@@ -483,6 +484,18 @@ class TemplateAPI(object):
         if update_dict:
             d.update(update_dict)
         return convert_to_script(d, var_name='karl_client_data')
+
+    def thumb_url(self, photo_object, size):
+        """
+        return photo url or default user url
+
+        photo_object is an instance of IImage or None
+        size is a width/heigh tuple
+        """
+        return (photo_object is None
+                and self.static_url + "/images/defaultUser.gif"
+                or thumb_url(photo_object, self.request, size))
+
 
 class SettingsReader:
     """Convenience for reading settings in templates"""

@@ -884,6 +884,33 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       </p>
     </div>
 
+    <div class="sras-result" metal:define-macro="searchresults_people"
+         tal:define="url string:${api.app_url}/profiles/${doc.__name__}">
+      <div class="sras-people-portrait">
+        <a title="${doc.title}" href="${url}">
+          <img width="50" height="50"
+               tal:define="photo doc.get('photo')"
+               tal:attributes="src api.thumb_url(photo, (50,50))" />
+        </a>
+      </div>
+      <div><a class="sras-people-name" href="${url}">${doc.title}</a></div>
+      <div>
+        <span class="sras-people-position" tal:content="' - '.join(filter(None, [doc.position, doc.department]))" />
+      </div>
+
+      <div class="sras-people-location"
+           tal:content="' - '.join(filter(None, [doc.organization, doc.location, doc.room_no and 'Room %s' % doc.room_no]))" />
+
+      <div>
+        <span class="sras-people-extension"
+              tal:condition="doc.extension"
+              tal:content="string:x${doc.extension}" />
+        <a tal:condition="doc.email"
+           tal:attributes="href string:mailto:${doc.email}"
+           tal:content="doc.email" />
+      </div>
+    </div>
+
     <ul id="header-menu" metal:define-macro="header-menu">
         <li>
           <a href="${api.app_url}/contentfeeds.html">Feeds</a>

@@ -3475,11 +3475,14 @@ ul.menu li {
 }
 
 #sras-results {
-    margin-left: 170px;
+    margin: 10px;
+    float: left;
+    width: 700px;
 }
 
 .sras-result {
     margin-bottom: 1em;
+    clear: both;
 }
 
 .sras-result-title,
@@ -3502,11 +3505,46 @@ ul.menu li {
     color: gray;
 }
 
+.sras-people-portrait {
+    float: left;
+    width: 60px;
+    height: 60px;
+}
+
+.sras-people-portrait img {
+    border: none;
+}
+
+.sras-people-name {
+    font-weight: bold;
+}
+a.sras-people-name {
+    text-decoration: none;
+}
+a.sras-people-name:hover {
+    text-decoration: underline;
+}
+
+.sras-people-position {
+    color: gray;
+    font-weight: normal;
+}
+
+.sras-people-extension {
+    margin-right: 1em;
+    font-weight: bold;
+}
+
+.sras-people-location {
+    color: gray;
+}
+
 #sras-pagination {
     margin: 2em 0 0 170px;
     background-color: #d3d3d3;
     text-align: right;
-    padding: 0.4em
+    padding: 0.4em;
+    clear: both;
 }
 
 #sras-authorknob, #sras-tagknob {

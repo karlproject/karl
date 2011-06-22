@@ -10,7 +10,6 @@ from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
-from karl.utilities.image import thumb_url
 from karl.utils import find_community
 from karl.utils import find_interface
 from karl.views.interfaces import IFooter
@@ -90,15 +89,12 @@ def generic_livesearch_result(context, request):
 
 @implementer(ILiveSearchEntry)
 def profile_livesearch_result(context, request):
+    # XXX cyclical import
+    # maybe we should move the livesearch adapters to a separate module?
+    from karl.views.api import TemplateAPI
+    api = TemplateAPI(context, request)
     photo = context.get('photo')
-    if photo is None:
-        # XXX cyclical import
-        # maybe we should move the livesearch adapters to a separate module?
-        from karl.views.api import TemplateAPI
-        api = TemplateAPI(context, request)
-        thumbnail = api.static_url + "/images/defaultUser.gif"
-    else:
-        thumbnail = thumb_url(photo, request, (85, 85))
+    thumbnail = api.thumb_url(photo, (85, 85))
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -231,9 +227,13 @@ def calendar_livesearch_result(context, request):
 
 # lookups to control which search results macro to use
 @implementer(ISearchResultsMacro)
+def searchresultsmacro_generic(context):
+    return 'searchresults_generic'
+
+@implementer(ISearchResultsMacro)
 def searchresultsmacro_office(context):
     return 'searchresults_office'
 
 @implementer(ISearchResultsMacro)
-def searchresultsmacro_generic(context):
-    return 'searchresults_generic'
+def searchresultsmacro_people(context):
+    return 'searchresults_people'
