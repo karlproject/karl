@@ -3522,3 +3522,8 @@ ul.menu li {
 .ui-grid-pagination .ui-icon {
     text-indent: 9999px
 }
+
+blockquote {
+    border-left: 2px solid gray;
+    padding-left: 20px;
+}
