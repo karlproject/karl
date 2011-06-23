@@ -145,6 +145,7 @@
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js" type="text/javascript"></script>
       </tal:resources>
 
     </metal:resources>

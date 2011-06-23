@@ -10,7 +10,7 @@ $(document).ready(function() {
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
     var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
-    var plugins = 'paste,embedmedia,spellchecker,imagedrawer';
+    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advimagescale';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
     }

@@ -46,5 +46,8 @@
 *     @depends 3.3.9.2/plugins/kaltura/editor_plugin_src.js
 *     @depends 3.3.9.2/plugins/kaltura/langs/en.js
 *
+* Advimagescale plugin:
+*     @depends 3.3.9.2/plugins/advimagescale/editor_plugin_src.js
+*
 */
 
