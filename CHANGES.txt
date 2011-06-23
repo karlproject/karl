@@ -21,6 +21,8 @@ Unreleased
 
 - Added the 'Precedence: bulk' header to content alert emails. (LP #785272)
 
+- Added 'clear log' link to error monitor view. (LP #795669)
+
 3.65 (2011-06-15)
 -----------------
 

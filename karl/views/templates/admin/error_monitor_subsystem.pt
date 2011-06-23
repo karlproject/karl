@@ -20,12 +20,21 @@
         <a href="${back_url}">Back to Error Monitor</a>
       </p>
 
+      <p tal:condition="entries">
+        <a href="${clear_url}">Clear Log</a>
+      </p>
+
       <div class="koverview_body">
         <div id="syslog">
           <div class="entry" tal:condition="not entries">No entries.</div>
           <div class="entry" tal:repeat="entry entries">${entry}</div>
         </div>
       </div>
+
+      <p tal:condition="entries">
+        <a href="${clear_url}">Clear Log</a>
+      </p>
+
     </div>
 
   </div>

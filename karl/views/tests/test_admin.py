@@ -1246,11 +1246,12 @@ class TestErrorMonitorView(ErrorMonitorBase, unittest.TestCase):
 
 class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
 
-    def call_fut(self, subsystem=None):
+    def call_fut(self, subsystem=None, **params):
         from karl.views.admin import error_monitor_subsystem_view
-        request = testing.DummyRequest(params={})
         if subsystem is not None:
-            request.params['subsystem'] = subsystem
+            params['subsystem'] = subsystem
+        request = testing.DummyRequest(params=params)
+        request.view_name = 'errors.html'
         return error_monitor_subsystem_view(self.site, request)
 
     def test_no_subsystem(self):
@@ -1272,6 +1273,18 @@ class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
         self.log_error('head', 'bar')
         result = self.call_fut('head')
         self.assertEqual(result['entries'], [u'fo\x92', 'bar'])
+
+    def test_clear_log(self):
+        self.log_error('head', 'bar')
+        result = self.call_fut('head')
+        self.assertEqual(
+            result['clear_url'],
+            'http://example.com/errors.html?subsystem=head&clear=1')
+        self.assertEqual(result['entries'], ['bar'])
+        result = self.call_fut('head', clear='1')
+        self.assertEqual(result.status, '302 Found')
+        result = self.call_fut('head')
+        self.assertEqual(result['entries'], [])
 
 
 class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):

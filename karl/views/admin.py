@@ -774,8 +774,16 @@ def error_monitor_subsystem_view(context, request):
     if subsystem is None or subsystem not in subsystems:
         raise NotFound()
 
-    entries = _get_error_monitor_state(error_monitor_dir, subsystem)
     back_url = model_url(context, request, 'error_monitor.html')
+    if 'clear' in request.params:
+        path = os.path.join(error_monitor_dir, subsystem)
+        os.remove(path)
+        return HTTPFound(location=back_url)
+
+
+    clear_url = model_url(context, request, request.view_name,
+                          query={'clear': '1', 'subsystem': subsystem})
+    entries = _get_error_monitor_state(error_monitor_dir, subsystem)
 
     return dict(
         api=AdminTemplateAPI(context, request),
@@ -783,6 +791,7 @@ def error_monitor_subsystem_view(context, request):
         subsystem=subsystem,
         entries=entries,
         back_url=back_url,
+        clear_url=clear_url,
     )
 
 def error_monitor_status_view(context, request):
