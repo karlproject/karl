@@ -1,3 +1,5 @@
+from zope.component import getUtility
+
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.url import model_url
 from repoze.lemonade.listitem import get_listitems
@@ -10,11 +12,12 @@ from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
+from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_community
 from karl.utils import find_interface
+from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
-from karl.views.interfaces import ISearchResultsMacro
 from karl.views.interfaces import IToolAddables
 from zope.component import getMultiAdapter
 from zope.interface import implementer
@@ -225,15 +228,35 @@ def calendar_livesearch_result(context, request):
         category='calendarevent',
         )
 
-# lookups to control which search results macro to use
-@implementer(ISearchResultsMacro)
-def searchresultsmacro_generic(context):
-    return 'searchresults_generic'
+class BaseAdvancedSearchResultsDisplay(object):
 
-@implementer(ISearchResultsMacro)
-def searchresultsmacro_office(context):
-    return 'searchresults_office'
+    implements(IAdvancedSearchResultsDisplay)
 
-@implementer(ISearchResultsMacro)
-def searchresultsmacro_people(context):
-    return 'searchresults_people'
+    macro = 'searchresults_generic'
+    display_data = {}
+
+    def __init__(self, context):
+        self.context = context
+
+class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_office'
+
+class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_people'
+
+class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_event'
+
+    def __init__(self, context):
+        super(AdvancedSearchResultsDisplayEvent, self).__init__(context)
+
+        karldates = getUtility(IKarlDates)
+        startDate = karldates(context.startDate, 'longform')
+        endDate = karldates(context.endDate, 'longform')
+        location = context.location
+
+        self.display_data = dict(
+            startDate = startDate,
+            endDate = endDate,
+            location = location,
+            )

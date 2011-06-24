@@ -1838,20 +1838,26 @@
 
   <adapter
     for="*"
-    provides=".interfaces.ISearchResultsMacro"
-    factory=".adapters.searchresultsmacro_generic"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.BaseAdvancedSearchResultsDisplay"
     />
 
   <adapter
     for="karl.content.interfaces.IIntranet"
-    provides=".interfaces.ISearchResultsMacro"
-    factory=".adapters.searchresultsmacro_office"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayOffice"
     />
 
   <adapter
     for="karl.models.interfaces.IProfile"
-    provides=".interfaces.ISearchResultsMacro"
-    factory=".adapters.searchresultsmacro_people"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayPeople"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayEvent"
     />
 
 </configure>

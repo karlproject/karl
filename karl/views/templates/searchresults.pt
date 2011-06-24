@@ -99,8 +99,10 @@ $(document).ready(function(){
     <div id="sras-results">
       <div class="search-error" tal:condition="error">${error}</div>
       <tal:loop repeat="r results">
-        <tal:var define="doc r['doc']">
-          <metal:searchresult use-macro="api.snippets.macros[r['macro']]">
+        <tal:var define="result_display r['result_display'];
+                         doc result_display.context">
+          <metal:searchresult
+              use-macro="api.snippets.macros[result_display.macro]">
           </metal:searchresult>
         </tal:var>
       </tal:loop>

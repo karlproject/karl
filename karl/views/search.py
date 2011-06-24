@@ -32,8 +32,8 @@ from karl.utils import find_profiles
 from karl.utils import get_content_type_name_and_icon
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
-from karl.views.interfaces import ISearchResultsMacro
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
@@ -277,7 +277,7 @@ def searchresults_view(context, request):
             else:
                 description = getattr(doc, 'description', '')
             type_name, icon = get_content_type_name_and_icon(doc)
-            macro_name = ISearchResultsMacro(doc)
+            result_display = IAdvancedSearchResultsDisplay(doc)
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
@@ -286,8 +286,7 @@ def searchresults_view(context, request):
                 'icon': icon,
                 'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'author': None,
-                'doc': doc,
-                'macro': macro_name,
+                'result_display': result_display,
             }
 
             result_community = find_community(doc)

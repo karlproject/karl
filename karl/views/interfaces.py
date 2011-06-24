@@ -84,7 +84,8 @@ class ILiveSearchEntry(Interface):
 
     the adaptation itself generates the dictionary"""
 
-class ISearchResultsMacro(Interface):
-    """ Lookup which macro to use for displaying advanced search results
+class IAdvancedSearchResultsDisplay(Interface):
+    """ Provides data/macro to use for custom search results display """
 
-    adaptation itself generates the macro name"""
+    display_data = Attribute('Custom data to use for the template')
+    macro = Attribute('Name of macro template to use')
