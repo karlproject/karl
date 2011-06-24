@@ -244,6 +244,24 @@ class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
 class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_people'
 
+    def __init__(self, context):
+        super(AdvancedSearchResultsDisplayPeople, self).__init__(context)
+        contact_items = []
+        if context.extension and context.extension.strip():
+            extension_html = ('<span class="sras-people-extension">x%s</span>'
+                              % context.extension)
+            contact_items.append(extension_html)
+        if context.room_no and context.room_no.strip():
+            room_html = ('<span class="sras-people-room">Room %s</span>'
+                         % context.room_no)
+            contact_items.append(room_html)
+        if context.email and context.email.strip():
+            email_html = ('<a href="mailto:%s">%s</a>'
+                          % (context.email, context.email))
+            contact_items.append(email_html)
+
+        self.display_data = dict(contact_html = ' - '.join(contact_items))
+
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_event'
 
