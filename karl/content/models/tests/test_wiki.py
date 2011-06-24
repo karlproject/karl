@@ -52,6 +52,12 @@ class WikiTests(unittest.TestCase):
         wiki = self._makeOne()
         self.failUnless(isinstance(wiki['front_page'], DummyContent))
 
+    def test_delete_frontpage_makes_new_frontpage(self):
+        wiki = self._makeOne()
+        del wiki['front_page']
+        self.failUnless(isinstance(wiki['front_page'], DummyContent))
+
+
 class WikiPageTests(unittest.TestCase):
 
     def _getTargetClass(self):

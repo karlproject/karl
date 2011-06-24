@@ -7,6 +7,9 @@ Unreleased
 - Make sure inactive users aren't emailed by the email blast tool.
   (LP #771888)
 
+- Wikis will now grow a new front_page if the existing front_page is removed.
+  (LP #773480)
+
 3.66.1 (2011-06-24)
 -------------------
 

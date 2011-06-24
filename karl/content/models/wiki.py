@@ -46,15 +46,26 @@ def _ijoin(a,b):
 class Wiki(Folder):
     implements(IWiki)
     title = u'Wiki'
+
     def __init__(self, creator):
         super(Wiki, self).__init__()
+        self.creator = creator
+        self._create_front_page()
+
+    def _create_front_page(self):
         self['front_page'] = create_content(
             IWikiPage,
             u'Front Page',
             FRONT_PAGE_CONTENT,
             FRONT_PAGE_DESCRIPTION,
-            creator,
+            self.creator,
             )
+
+    def __delitem__(self, name):
+        super(Wiki, self).__delitem__(name)
+        if name == 'front_page':
+            self._create_front_page()
+
 
 _rm_chars = re.compile('[\W]', re.U)
 def _eq_loose(s1, s2):
