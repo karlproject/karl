@@ -483,12 +483,12 @@ class DummyQueue(list):
 
     def quarantine(self, message, error, send, message_from):
         self.quarantined.append((message, error))
-        send(['foo@example.com'], "You're in quarantine!")
+        send(message_from, ['foo@example.com'], "You're in quarantine!")
 
     def bounce(self, message, send, from_addr, error=None,
                bounce_message=None):
         self.bounced.append((message, from_addr, error, bounce_message))
-        send(['foo@example.com'], message)
+        send(from_addr, ['foo@example.com'], message)
 
 
 class DummyDispatcher(object):

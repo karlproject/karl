@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed mailin bug where bounced and quarantined messages generated an
+  exception trying to email the authors.  (LP #801539)
 
 3.66 (2011-06-23)
 -----------------
