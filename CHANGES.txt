@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- ...
+- Make sure inactive users aren't emailed by the email blast tool.
+  (LP #771888)
 
 3.66.1 (2011-06-24)
 -------------------

@@ -445,12 +445,19 @@ class TestEmailUsersView(unittest.TestCase):
         barney = profiles['barney'] = testing.DummyModel(
             title='Barney Rubble', email='barney@example.com'
         )
+        wilma = profiles['wilma'] = testing.DummyModel(
+            title='Wilma', email='wilma@example.com',
+            security_state='inactive'
+        )
         users._by_id = users._by_login = {
             'fred': {
                 'groups': ['group.KarlStaff'],
             },
             'barney': {
                 'groups': ['group.KarlAdmin'],
+            },
+            'wilma': {
+                'groups': []
             }
         }
 
@@ -464,7 +471,7 @@ class TestEmailUsersView(unittest.TestCase):
             return search
         karltesting.registerAdapter(dummy_search_factory, Interface,
                                     ICatalogSearch)
-        search.add_result([fred, barney])
+        search.add_result([fred, barney, wilma])
         testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):

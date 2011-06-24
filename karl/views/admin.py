@@ -361,6 +361,8 @@ class EmailUsersView(object):
             n = 0
             for docid in docids:
                 profile = resolver(docid)
+                if getattr(profile, 'security_state', None) == 'inactive':
+                    continue
                 userid = profile.__name__
                 if group and not users.member_of_group(userid, group):
                     continue
