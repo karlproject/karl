@@ -9,7 +9,7 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IImage
 from karl.utils import find_tempfolder
 from karl.views.batch import get_catalog_batch
-from karl.views.utils import make_name
+from karl.views.utils import make_unique_name
 
 def thumb_url(image, request, size):
     """
@@ -69,7 +69,7 @@ def relocate_temp_images(doc, request):
             # Move temp image to attachments folder
             image = tempfolder[tempid]
             del tempfolder[tempid]
-            name = make_name(attachments, image.filename)
+            name = make_unique_name(attachments, image.filename)
             attachments[name] = image
             size = (int(matchdict['width']), int(matchdict['height']))
             url = thumb_url(image, request, size)

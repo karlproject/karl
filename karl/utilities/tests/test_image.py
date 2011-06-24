@@ -135,6 +135,49 @@ class Test_relocated_temp_images(unittest.TestCase):
         self.failUnless(tempfolder.cleanedup)
         self.assertEqual(workflow.initialized, [image])
 
+    def test_duplicate_filenames(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IImage
+        from repoze.workflow.testing import registerDummyWorkflow
+        from karl.content.interfaces import ICommunityFile
+        workflow = registerDummyWorkflow(
+            'security', content_type=ICommunityFile)
+        root = testing.DummyModel()
+        tempfolder = root['TEMP'] = DummyTempFolder()
+        image = tempfolder['1234'] = testing.DummyModel(
+            filename='kids.png'
+        )
+        directlyProvides(image, IImage)
+        doc = root['doc'] = testing.DummyModel(
+            text='Hey, check out this picture of my kids! '
+                 '<img alt="My Kids"'
+                 '     src="http://example.com/TEMP/1234/thumb/300x300.jpg"'
+                 '     width="300" height="200"/>'
+                 ' - Doting Father'
+                '<img alt="My Kids"'
+                '     src="http://example.com/doc/kids.png/thumb/300x300.jpg"'
+                '     width="300" height="200"/>')
+        doc['kids.png'] = testing.DummyModel(
+            filename='kids.png'
+        )
+        doc.get_attachments = lambda: doc
+
+        self._call_fut(doc, testing.DummyRequest())
+        self.failIf('1234' in tempfolder)
+        self.failUnless('kids.png' in doc)
+        self.assertEqual(doc.text,
+                'Hey, check out this picture of my kids! '
+                '<img alt="My Kids"'
+                '     src="http://example.com/doc/kids-1.png/thumb/300x300.jpg"'
+                '     width="300" height="200"/>'
+                ' - Doting Father'
+                '<img alt="My Kids"'
+                '     src="http://example.com/doc/kids.png/thumb/300x300.jpg"'
+                '     width="300" height="200"/>')
+        self.failUnless(tempfolder.cleanedup)
+        self.assertEqual(workflow.initialized, [image])
+
+
 class DummyTempFolder(testing.DummyModel):
     cleanedup = False
 
