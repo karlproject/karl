@@ -10,6 +10,9 @@ Unreleased
 - Wikis will now grow a new front_page if the existing front_page is removed.
   (LP #773480)
 
+- Handle case of user uploading two images with identical names via
+  imagedrawer. (LP #779870)
+
 3.66.1 (2011-06-24)
 -------------------
 
