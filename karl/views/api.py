@@ -38,6 +38,8 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
+from repoze.lemonade.listitem import get_listitems
+
 from karl.consts import countries
 from karl.utils import find_intranet
 from karl.utils import find_intranets
@@ -51,6 +53,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityInfo
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
+from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import ITagQuery
 from karl.views.adapters import DefaultFooter
 from karl.views.interfaces import IFooter
@@ -74,6 +77,7 @@ class TemplateAPI(object):
     _start_time = int(time.time())
     countries = countries
     _form_field_templates = None
+    _livesearch_options = None
 
     def __init__(self, context, request, page_title=None):
         self.context = context
@@ -483,6 +487,14 @@ class TemplateAPI(object):
         if update_dict:
             d.update(update_dict)
         return convert_to_script(d, var_name='karl_client_data')
+
+    @property
+    def livesearch_options(self):
+        if self._livesearch_options is None:
+            self._livesearch_options = [
+                item for item in get_listitems(IGroupSearchFactory )
+                if item['component'].livesearch]
+        return self._livesearch_options
 
 class SettingsReader:
     """Convenience for reading settings in templates"""

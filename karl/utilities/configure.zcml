@@ -32,55 +32,109 @@
   <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="People"
+    name="people"
     title="People"
-    description="People group"
+    description="Profiles"
     sort_key="10"
+   />
+
+   <lemonade:listitem
+    component=".groupsearch.manuals_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="manuals"
+    title="Reference Manuals"
+    description="Reference Manuals"
+    sort_key="15"
    />
 
   <lemonade:listitem
     component=".groupsearch.pages_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Pages"
-    title="Pages"
-    description="Pages group"
+    name="pages"
+    title="Wikis"
+    description="Wiki Pages and Reference Manuals"
+    sort_key="20"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.wiki_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="wiki"
+    title="Wikis"
+    description="Wiki Pages"
     sort_key="20"
    />
 
   <lemonade:listitem
     component=".groupsearch.posts_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Posts"
-    title="Posts"
-    description="Posts group"
+    name="posts"
+    title="Blogs"
+    description="Blog Posts, Comments and Forum Posts"
     sort_key="30"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.blog_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="blog"
+    title="Blogs"
+    description="Blog Posts"
+    sort_key="30"
+   />
+
+  <lemonade:listitem
+    component=".groupsearch.comments_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="comments"
+    title="Comments"
+    description="Comments"
+    sort_key="40"
+   />
+
+   <lemonade:listitem
+    component=".groupsearch.forums_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="forums"
+    title="Forums"
+    description="Forum Posts"
+    sort_key="50"
+   />
+
+   <lemonade:listitem
+    component=".groupsearch.news_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="news"
+    title="News Items"
+    description="News Items"
+    sort_key="60"
    />
 
   <lemonade:listitem
     component=".groupsearch.files_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Files"
+    name="files"
     title="Files"
-    description="Files group"
-    sort_key="40"
-   />
-
-  <lemonade:listitem
-    component=".groupsearch.communities_group_search"
-    provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Communities"
-    title="Communities"
-    description="Communities group"
-    sort_key="50"
+    description="Files"
+    sort_key="70"
    />
 
   <lemonade:listitem
     component=".groupsearch.events_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
-    name="Events"
+    name="events"
     title="Events"
-    description="Events group"
-    sort_key="60"
+    description="Calendar Events"
+    sort_key="80"
+   />
+
+   <lemonade:listitem
+    component=".groupsearch.communities_group_search"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="communities"
+    title="Communities"
+    description="Communities"
+    sort_key="90"
    />
 
 </configure>

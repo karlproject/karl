@@ -2,9 +2,16 @@ from zope.interface import directlyProvides
 from zope.interface import implements
 
 from repoze.bfg.security import effective_principals
+from repoze.lemonade.interfaces import IContent
 
+from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
+from karl.content.interfaces import IForumTopic
+from karl.content.interfaces import INewsItem
+from karl.content.interfaces import IReferenceManual
+from karl.content.interfaces import IWikiPage
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IGroupSearch
@@ -13,74 +20,128 @@ from karl.models.interfaces import IPosts
 from karl.models.interfaces import IFiles
 from karl.models.interfaces import IPages
 
-from karl.views.batch import get_catalog_batch_grid
 
-def groupsearchfactory(unwrapped):
-    directlyProvides(unwrapped, IGroupSearchFactory)
-    return unwrapped
+def groupsearchfactory(advanced_search=True, livesearch=True,
+                       live_to_advanced=None, icon='blue-document.png'):
+    def wrapper(unwrapped):
+        directlyProvides(unwrapped, IGroupSearchFactory)
+        unwrapped.advanced_search = advanced_search
+        unwrapped.livesearch = livesearch
+        unwrapped.live_to_advanced = live_to_advanced
+        unwrapped.icon = icon
+        return unwrapped
+    return wrapper
 
-@groupsearchfactory
+@groupsearchfactory(icon='user.png')
 def people_group_search(context, request, term):
     search = GroupSearch(context, request, [IPeople], term)
     return search
 
-@groupsearchfactory
+@groupsearchfactory(advanced_search=False, live_to_advanced='wiki',
+                    icon='wiki.png')
 def pages_group_search(context, request, term):
     search = GroupSearch(context, request, [IPages], term)
     return search
 
-@groupsearchfactory
+@groupsearchfactory(livesearch=False, icon='wiki.png')
+def wiki_group_search(context, request, term):
+    search = GroupSearch(context, request, [IWikiPage], term)
+    return search
+
+@groupsearchfactory(advanced_search=False, live_to_advanced='blog',
+                    icon='blog.png')
 def posts_group_search(context, request, term):
     search = GroupSearch(context, request, [IPosts], term)
     return search
 
-@groupsearchfactory
+@groupsearchfactory(livesearch=False, icon='blog.png')
+def blog_group_search(context, request, term):
+    search = GroupSearch(context, request, [IBlogEntry], term)
+    return search
+
+@groupsearchfactory(livesearch=False, icon='quill.png')
+def comments_group_search(context, request, term):
+    search = GroupSearch(context, request, [IComment], term)
+    return search
+
+@groupsearchfactory(livesearch=False, icon='blue-document.png')
+def forums_group_search(context, request, term):
+    search = GroupSearch(context, request, [IForumTopic], term)
+    return search
+
+@groupsearchfactory(livesearch=False, icon='newspaper.png')
+def news_group_search(context, request, term):
+    search = GroupSearch(context, request, [INewsItem], term)
+    return search
+
+@groupsearchfactory(icon='blue-document-text.png')
 def files_group_search(context, request, term):
     search = GroupSearch(context, request, [IFiles], term)
     return search
 
-@groupsearchfactory
+@groupsearchfactory(icon='calendar-select.png')
 def events_group_search(context, request, term):
     search = GroupSearch(context, request, [ICalendarEvent], term)
     return search
 
-@groupsearchfactory
+@groupsearchfactory(icon='building.png')
 def communities_group_search(context, request, term):
     search = GroupSearch(context, request, [ICommunity], term)
     return search
 
+@groupsearchfactory(icon='building.png')
+def communities_group_search(context, request, term):
+    search = GroupSearch(context, request, [ICommunity], term)
+    return search
+
+@groupsearchfactory(livesearch=False, icon='referencemanual_icon.gif')
+def manuals_group_search(context, request, term):
+    search = GroupSearch(context, request, [], term, [IReferenceManual])
+    return search
+
+@groupsearchfactory()
+def default_group_search(context, request, term):
+    search = GroupSearch(context, request, [], term)
+    return search
+
 class GroupSearch:
     implements(IGroupSearch)
-    def __init__(self, context, request, interfaces, term, limit=5):
+    def __init__(self, context, request, interfaces, term,
+                 containment=None, limit=5):
         self.context = context
         self.request = request
         self.interfaces = interfaces
         self.term = term
+        self.containment = containment
         self.limit = limit
+        self.criteria = self._makeCriteria()
 
     def __call__(self):
-        criteria = self._makeCriteria()
+        criteria = self.criteria.copy()
         criteria['limit'] = self.limit
         searcher = ICatalogSearch(self.context)
         num, docids, resolver = searcher(**criteria)
         return num, docids, resolver
-
-    def get_batch(self):
-        return get_catalog_batch_grid(
-            self.context, self.request, **self._makeCriteria())
 
     def _makeCriteria(self):
         principals = effective_principals(self.request)
         # this is always assumed to be a global search; it does no
         # path filtering
         criteria = {}
-        criteria['sort_index'] = 'texts'
-        q = WeightedQuery(self.term)
-        if len(self.interfaces) == 1:
-            q.marker = self.interfaces[0].queryTaggedValue('marker')
-        criteria['interfaces'] = {'query':self.interfaces, 'operator':'or'}
-        criteria['texts'] = q
+        if self.term:
+            criteria['sort_index'] = 'texts'
+            q = WeightedQuery(self.term)
+            if len(self.interfaces) == 1:
+                q.marker = self.interfaces[0].queryTaggedValue('marker')
+            criteria['texts'] = q
+        interfaces = self.interfaces
+        if not interfaces:
+            interfaces = [IContent]
+        criteria['interfaces'] = {'query':interfaces, 'operator':'or'}
         criteria['allowed'] = {'query':principals, 'operator':'or'}
+        containment = self.containment
+        if containment:
+            criteria['containment'] = {'query': containment, 'operator': 'or'}
         return criteria
 
 

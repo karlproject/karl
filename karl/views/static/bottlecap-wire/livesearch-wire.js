@@ -13,29 +13,27 @@ var appUrl = $("#karl-app-url").eq(0).attr('content');
 var livesearchUrl = appUrl + "/jquery_livesearch";
 var advancedSearchUrl = appUrl + "/searchresults.html";
 
-var typeLookupDisplay = {
-    profile: "People",
-    page: "Wikis",
-    post: "Blogs",
-    file: "Files",
-    community: "Communities",
-    calendarevent: "Events"
-};
+function lookup_type(name) {
+    var types = {
+        profile: {name: "people", title: "People"},
+        page: {name: "wiki", title: "Wikis"},
+        post: {name: "blog", title: "Blogs"},
+        file: {name: "files", title: "Files"},
+        community: {name: "communities", title: "Communities"},
+        calendarevent: {name: "events", title: "Events"}
+    };
+    return types[name] || {name: null, title: null};
+    /*
+    var type = types[name];
+    if (type === undefined) {
+        type = {name: null, title: null};
+    }
+    return type;
+    */
+}
 
-// mapping for what kind we ask the server
-var kindTable = {
-    Wikis: 'Pages',
-    Blogs: 'Posts'
-};
-
-// mapping from kind to type
-var kindToType = {
-    People: 'karl_models_interfaces_IProfile',
-    Wikis: 'karl_content_interfaces_IWikiPage',
-    Blogs: 'karl_content_interfaces_IBlogEntry',
-    Files: 'karl_content_interfaces_ICommunityFile',
-    Events: 'karl_content_interfaces_ICalendarEvent',
-    Communities: 'karl_models_interfaces_ICommunity'
+// mapping from kind in live search to kind in advanced search
+var liveToAdvancedKind = {
 };
 
 function getSearchValue() {
@@ -45,12 +43,12 @@ function getSearchValue() {
 function advancedSearchResultsUrl(query, kind) {
     if (!kind) {
         // grab current filter and use that
-        kind = $.trim($('.bc-livesearch-btn-select').text());
+        kind = $.trim($('.bc-livesearch-btn-select').parent().attr('name'));
     }
     kind = escape(kind);
-    var typeQueryString = (kind === "All%20Content")
+    var typeQueryString = (kind === "all_content")
                               ? ''
-                              : "&types=" + (kindToType[kind]);
+                              : "&kind=" + (liveToAdvancedKind[kind] || kind);
     var queryString = '?body=' + escape(query) + typeQueryString;
     return advancedSearchUrl + queryString;
 }
@@ -69,6 +67,13 @@ function ajaxError(xhr, status, exc) {
 }
 
 $(function() {
+    $('#searchbox li').each(function(index) {
+        var item = $(this);
+        var to_advanced = item.attr('advanced_search');
+        if (to_advanced) {
+            liveToAdvancedKind[item.attr('name')] = to_advanced;
+        }
+    });
 
     $('.bc-livesearch').livesearch({
         urlFn: createUrlFn(livesearchUrl),
@@ -82,13 +87,13 @@ $(function() {
             // because we are loading a new page
             shouldDisplayError = false;
             window.location = (
-                advancedSearchResultsUrl(searchText));
+                advancedSearchResultsUrl(searchText, ui.item['name']));
         },
         menu: function(event, ui) {
-            var text = $.trim(ui.text);
-            var urlFn = text === "All Content"
+            var kind = $.trim(ui.name);
+            var urlFn = kind === "all_content"
                 ? createUrlFn(livesearchUrl)
-                : createUrlFn(livesearchUrl, kindTable[text] || text);
+                : createUrlFn(livesearchUrl, kind);
             $('.bc-livesearch').livesearch('option', 'urlFn', urlFn);
         },
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
@@ -126,7 +131,7 @@ function renderCompletions(ul, items) {
             var li = $('<li class="bc-livesearch-autocomplete-category"></li>');
             li.append(
                 $('<span class="bc-livesearch-category-text"></span>')
-                    .text(typeLookupDisplay[item.type] || item.type || "Unknown")
+                    .text(lookup_type(item.type)['title'] || item.type || "Unknown")
             );
             li.append(
                 $('<span class="bc-livesearch-more"></span>')
@@ -135,7 +140,7 @@ function renderCompletions(ul, items) {
                     .click((function(type) {
                         return function() {
                             var searchText = $.trim(getSearchValue());
-                            var searchType = typeLookupDisplay[type] || "All Content";
+                            var searchType = lookup_type(type)['name'] || "all_content";
                             window.location = (
                                 advancedSearchResultsUrl(searchText, searchType));
                             return false;
@@ -185,7 +190,8 @@ function noResults(event, item) {
                     .text('All Content')
                     .click(function () {
                         displayer.hide();
-                        selectButtonText.text('All Content');
+                        selectButtonText.text('All Content')
+                                        .attr('name', 'all_content');
                         el.menuSelected(0, {item: selectButtonText});
                         return false;
                     }))

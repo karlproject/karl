@@ -488,7 +488,7 @@ class DummyQueue(list):
     def bounce(self, message, send, from_addr, error=None,
                bounce_message=None):
         self.bounced.append((message, from_addr, error, bounce_message))
-        send(from_addr, ['foo@example.com'], message)
+        send(message_from, ['foo@example.com'], message)
 
 
 class DummyDispatcher(object):

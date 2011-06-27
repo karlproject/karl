@@ -23,6 +23,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
+from karl.utilities.groupsearch import default_group_search
 from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
@@ -36,7 +37,6 @@ from karl.views.interfaces import ILiveSearchEntry
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
-from repoze.lemonade.interfaces import IContent
 from repoze.lemonade.listitem import get_listitems
 from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
@@ -52,11 +52,6 @@ import time
 
 import logging
 log = logging.getLogger(__name__)
-
-
-def interface_id(t):
-    return '%s_%s' % (t.__module__.replace('.', '_'), t.__name__)
-
 
 def _iter_userids(context, request, profile_text):
     """Yield userids given a profile text search string."""
@@ -75,11 +70,24 @@ def make_query(context, request):
     params = request.params
     query = {}
     terms = []
-    body = params.get('body')
-    if body:
-        query['texts'] = WeightedQuery(body)
-        query['sort_index'] = 'texts'
-        terms.append(body)
+
+    term = params.get('body')
+    if term:
+        terms.append(term)
+
+    kind = params.get('kind')
+    if kind:
+        searcher = queryUtility(IGroupSearchFactory, kind)
+        if searcher is None:
+            # If the 'kind' we got is not known, return an error
+            fmt = "The LiveSearch group %s is not known"
+            raise HTTPBadRequest(fmt % kind)
+        terms.append(kind)
+    else:
+        searcher = default_group_search
+
+    searcher = searcher(context, request, term)
+    query.update(searcher.criteria)
 
     creator = params.get('creator')
     if creator:
@@ -89,20 +97,6 @@ def make_query(context, request):
             'operator': 'or',
             }
         terms.append(creator)
-
-    types = params.getall('types')
-    if types:
-        type_dict = {}
-        for t in get_content_types():
-            type_dict[interface_id(t)] = t
-        ifaces = [type_dict[name] for name in types]
-        query['interfaces'] = {
-            'query': ifaces,
-            'operator': 'or',
-            }
-        terms.extend(iface.getTaggedValue('name') for iface in ifaces)
-    else:
-        query['interfaces'] = [IContent]
 
     tags = filter(None, params.getall('tags'))
     if tags:
@@ -138,30 +132,12 @@ def get_batch(context, request):
     """
     batch = None
     terms = ()
-    kind = request.params.get("kind")
-    if not kind:
-        # Search form
-        query, terms = make_query(context, request)
-        if terms:
-            context_path = model_path(context)
-            if context_path and context_path != '/':
-                query['path'] = {'query': context_path}
-            principals = effective_principals(request)
-            query['allowed'] = {'query':principals, 'operator':'or'}
-            batch = get_catalog_batch_grid(context, request, **query)
-
-    else:
-        # LiveSearch
-        text_term = request.params.get('body')
-        if text_term:
-            searcher = queryUtility(IGroupSearchFactory, kind)
-            if searcher is None:
-                # If the 'kind' we got is not known, return an error
-                fmt = "The LiveSearch group %s is not known"
-                raise HTTPBadRequest(fmt % kind)
-
-            batch = searcher(context, request, text_term).get_batch()
-            terms = [text_term, kind]
+    query, terms = make_query(context, request)
+    if terms:
+        context_path = model_path(context)
+        if context_path and context_path != '/':
+            query['path'] = {'query': context_path}
+        batch = get_catalog_batch_grid(context, request, **query)
 
     return batch, terms
 
@@ -193,53 +169,33 @@ def searchresults_view(context, request):
     if 'batch_size' in params:
         del params['batch_size']
 
-    type_knob = []
-    selected_type = params.get('types')
-    for t in get_content_types():
-        if t.queryTaggedValue('search_option', False):
-            id = interface_id(t)
-            query = params.copy()
-            query['types'] = id
-            type_name = t.getTaggedValue('name')
-            type_knob.append({
-                'name': type_name,
-                'display_text': facet_display_text.get(type_name, type_name),
-                'icon': t.queryTaggedValue('icon', 'blue-document.png'),
-                'url': model_url(context, request, request.view_name,
-                                 query=query),
-                'selected': id == selected_type,
-            })
-    def key_func(option):
-        """
-        OSF has a particular order they want the type facets to appear in.
-        Which is sort of odd, since we use tagged values to decide which facets
-        to show.  This func will cause the facets we're expecting to see to
-        sort in the order specified by OSF.  Any unexpected facets will sort
-        at the end.
-        """
-        facet_order = {
-            'Person': 0,
-            'Wiki Page': 1,
-            'Blog Entry': 2,
-            'Comment': 3,
-            'Forum Topic': 4,
-            'News Item': 5,
-            'File': 6,
-            'Event': 7,
-            'Community': 8,
-        }
-        return facet_order.get(option['name'], 100)
-
-    type_knob.sort(key=key_func)
+    kind_knob = []
+    selected_kind = params.get('kind')
+    for o in get_listitems(IGroupSearchFactory):
+        component = o['component']
+        if not component.advanced_search:
+            continue
+        kind = o['name']
+        query = params.copy()
+        query['kind'] = kind
+        kind_knob.append({
+            'name': kind,
+            'title': o['title'],
+            'icon': component.icon,
+            'url': model_url(context, request, request.view_name,
+                             query=query),
+            'selected': kind == selected_kind,
+        })
     query = params.copy()
-    if 'types' in query:
-        del query['types']
-    type_knob.insert(0, {
-        'name': 'All Content',
-        'display_text': 'All Content',
+    if 'kind' in query:
+        del query['kind']
+    kind_knob.insert(0, {
+        'name': 'all_content',
+        'title': 'All Content',
+        'description': 'All Content',
         'icon': None,
         'url': model_url(context, request, request.view_name, query=query),
-        'selected': not selected_type,
+        'selected': not selected_kind,
     })
 
     since_knob = []
@@ -324,7 +280,7 @@ def searchresults_view(context, request):
         results=results,
         total=total,
         batch_info=batch,
-        type_knob=type_knob,
+        kind_knob=kind_knob,
         since_knob=since_knob,
         params=params,
         elapsed='%0.2f' % elapsed
@@ -355,7 +311,8 @@ def jquery_livesearch_view(context, request):
 
     kind = request.params.get('kind', None)
     if kind is None:
-        listitems = get_listitems(IGroupSearchFactory)
+        listitems = [item for item in get_listitems(IGroupSearchFactory) if
+                     item['component'].livesearch]
     else:
         search_utility = queryUtility(IGroupSearchFactory, kind)
         if search_utility is None:

@@ -43,12 +43,12 @@
 
         <div class="sras-searchknobgroup sras-searchcontent">
             <ul>
-                <li tal:repeat="o type_knob">
+                <li tal:repeat="o kind_knob">
                     <img src="${api.static_url}/images/${o['icon']}"
-                         alt="${o['display_text']}" tal:condition="o['icon']"/>
+                         alt="${o['title']}" tal:condition="o['icon']"/>
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
-                          ${o['display_text']}</strong></a>
+                          ${o['title']}</strong></a>
                 </li>
             </ul>
         </div>

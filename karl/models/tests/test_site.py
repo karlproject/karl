@@ -543,6 +543,23 @@ class TestGetInterfaces(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(sorted(result), [Dummy1, Dummy2, Interface])
 
+class TestGetContainment(unittest.TestCase):
+    def test_it(self):
+        from karl.models.site import get_containment
+        from zope.interface import Interface
+        from zope.interface import alsoProvides
+        class Dummy1(Interface):
+            pass
+        class Dummy2(Interface):
+            pass
+        root = testing.DummyModel()
+        alsoProvides(root, Dummy1)
+        context = testing.DummyModel()
+        alsoProvides(context, Dummy2)
+        root['foo'] = context
+        result = get_containment(context, None)
+        self.assertEqual(sorted(result), [Dummy1, Dummy2, Interface])
+
 class TestGetTitleFirstletter(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_title_firstletter

@@ -395,41 +395,16 @@
 
       <div class="bc-header-toolbox">
         <button>All Content</button><ul>
-          <li><a title="Search Profiles" href="#">People</a></li>
-          <li><a title="Search Wiki Pages and Reference Manuals" href="#">Wikis</a></li>
-          <li><a title="Search Blog Posts, Comments, and Forum Posts" href="#">Blogs</a></li>
-          <li><a title="Search Files" href="#">Files</a></li>
-          <li><a title="Search Calendar Events" href="#">Events</a></li>
-          <li><a title="Search Community Names" href="#">Communities</a></li>
-          <li><a title="Search All Content" href="#">All Content</a></li>
+          <li tal:repeat="o api.livesearch_options" name="${o['name']}"
+              tal:attributes="advanced_search o['component'].live_to_advanced">
+              <a title="Search ${o['description']}" href="#">${o['title']}</a>
+          </li>
+          <li name="all_content">
+            <a title="Search All Content" href="#">All Content</a>
+          </li>
         </ul><input class="bc-livesearch"/><button>Search</button>
       </div>
 
-    </div>
-
-    <!-- XXX this is not used any more -->
-    <div metal:define-macro="livesearch_result" id="spotlight-output">
-      <div class="spo-header keynavigation">
-        <a class="spotlight-option keynavigation">Show All</a>
-      </div>
-      <div tal:repeat="group groups" class="spotlight-group">
-        <div class="spotlight-grouptitlebox">
-          <div class="spotlight-grouptitle">${group.name}</div>
-        </div>
-        <div class="spotlight-groupitems">
-          <div tal:repeat="item group.results" class="spotlight-item spotlight-record">
-            <a title="${item.title}" href="${item.href}"
-               class="spotlight-link spotlight-option type-${group.name}">${item.title}</a>
-          </div>
-          <div tal:condition="group.results" class="spotlight-grouplink">
-            <a class="spotlight-option"
-               href="${api.app_url}/searchresults.html?body=&amp;kind=${group.name}&amp;offset:int=0">Show All</a>
-          </div>
-          <div tal:condition="not group.results" class="spotlight-item">
-            <div style="margin-bottom: 10px;">No Results</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div metal:define-macro="byline" class="kbyline">Posted

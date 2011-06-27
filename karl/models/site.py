@@ -20,6 +20,7 @@ import re
 
 from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
+from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
@@ -154,6 +155,12 @@ def get_interfaces(object, default):
     provided_by = list(providedBy(object))
     spec = Declaration(provided_by)
     ifaces = list(spec.flattened())
+    return ifaces
+
+def get_containment(object, defaults):
+    ifaces = set()
+    for ancestor in lineage(object):
+        ifaces.update(get_interfaces(ancestor, ()))
     return ifaces
 
 def get_path(object, default):
@@ -382,6 +389,7 @@ class Site(Folder):
             'title': CatalogFieldIndex(get_title), # used as sort index
             'titlestartswith': CatalogFieldIndex(get_title_firstletter),
             'interfaces': CatalogKeywordIndex(get_interfaces),
+            'containment': CatalogKeywordIndex(get_containment),
             'texts': CatalogTextIndex(get_textrepr),
             'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
             'allowed':CatalogKeywordIndex(get_allowed_to_view),

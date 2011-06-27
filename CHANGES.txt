@@ -13,6 +13,11 @@ Unreleased
 - Handle case of user uploading two images with identical names via
   imagedrawer. (LP #779870)
 
+- Unified the search types seen on the search results page with the search
+  categories used in live search.  Added a 'Reference Manuals' search.  Merged
+  from branches/rossi_search_unification.
+  (LP # 784222)
+
 3.66.1 (2011-06-24)
 -------------------
 
@@ -40,6 +45,79 @@ Unreleased
 - Added the 'Precedence: bulk' header to content alert emails. (LP #785272)
 
 - Added 'clear log' link to error monitor view. (LP #795669)
+
+3.65 (2011-06-15)
+-----------------
+
+- Improved ranking of search results.  Merged from branches/rossi_docrank.
+
+- Pulled 'custom.css' out of the resources that are juiced. It is included
+  in each page separately so that customization packages can override.
+
+3.64 (2011-06-09)
+-----------------
+
+- The edit blog entry form is now only associated with the IBlogEntry content
+  type. (LP #715897)
+
+- Removed nonsensical 'Edit' button from the root people directory admin view.
+  (LP #715897)
+
+- In the advanced and live searches, set the unicode_errors policy to 'ignore'
+  in order to work around broken web browsers that send request strings in
+  character encodings other than UTF-8. (LP #788234)
+
+- Fixed spellcheck for Karl instances not rooted at '/'.
+
+- Added error logging for OSErrors encountered when trying to run spellcheck.
+  (LP #794279)
+
+- Improved thread safety of LRU cache implementation. Had not previously taken
+  into account havoc a clear() could play on reads.  (LP #791177)
+
+- Workaround for slow script execution on ie in files tool
+  (LP #792544)
+
+3.63 (2011-06-03)
+-----------------
+
+- Fix for grid error when viewing it not within a files section. This fixes an
+  error on the top level reference manuals page.
+
+3.62 (2011-06-02)
+-----------------
+
+- Multiple upload and file management (move/delete)
+
+- Fixed merge bug that made repoze.pgtextindex mandatory for building Karl.
+  repoze.pgtextindex (and psycopg2) are now optional again.
+
+3.61 (2011-05-26)
+-----------------
+
+- Livesearch result text overflow fix (LP #785450)
+
+- Trigger search on paste - rejuice from latest bottlecap (LP #785789)
+
+3.60 (2011-05-20)
+-----------------
+
+- Fixed error in displaying forum topics with comments. (LP #798125)
+
+- Improved text from html extraction used for extracting descriptions from
+  document text.  Weird Microsoft html is now removed.  (LP #794103)
+
+- Fixed error in search results page when search term is blank.  (LP #798727)
+
+- Made the html to text converter more tolerant of malformed html.
+
+- Refactored outgoing email to use Karl configuration for the envelope from
+  address. (LP #785267)
+
+- The custom weights (1, 1/32, 1/32**2, and 1/32**3) were not being applied
+  to text queries. Fixed.
+
+- Added the 'Precedence: bulk' header to content alert emails. (LP #785272)
 
 3.65 (2011-06-15)
 -----------------

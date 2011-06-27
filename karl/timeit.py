@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -46,7 +46,12 @@ class TimeitFilter(object):
 <div style="float:left">Requests per second: %s</div>
 """
             after = before + scoreboard % elapsed
-            resp.body = first_result.replace(before, after, 1)
+            body = first_result.replace(before, after, 1)
+            if isinstance(body, unicode):
+                resp.charset = 'UTF-8'
+                resp.unicode_body = body
+            else:
+                resp.body = body
 
         return resp(environ, start_response)
 
