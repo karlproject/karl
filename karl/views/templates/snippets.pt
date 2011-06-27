@@ -161,7 +161,7 @@
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/lists/editor_plugin.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/print/editor_plugin.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/table/editor_plugin.js" type="text/javascript"></script>
-        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js" type="text/javascript"></script>
 
       <!--

@@ -953,10 +953,12 @@
 
 		var key = inst.key,
 			s = instanceSettings[key];
+
+                var dataKey = settingsTemplate.dataKey + key + "|" + document.URL;
 		
 		if (!s) {
 			s = instanceSettings[key] = tinymce.extend({}, settingsTemplate, {
-				dataKey: settingsTemplate.dataKey + key,
+			    dataKey: dataKey, //settingsTemplate.dataKey + key,
 				saveDelegate: createDelegate(inst, save),
 				saveFinalDelegate: createDelegate(inst, saveFinal),
 				restoreDelegate: createDelegate(inst, restore),
