@@ -323,20 +323,8 @@ def content_to_private(ob, info):
 # of intranet sites.
 #------------------------------------------------------------------------------
 
-def intranet_content_to_inherits(ob, info):
-    acl = [
-        (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
-        (Allow, ob.creator, MEMBER_PERMS),
-        (Deny, Everyone, ('edit', 'delete')),
-        # Note:  don't add NO_INHERIT, ergo fall back to __parent__
-        ]
-    msg = None
-    added, removed = acl_diff(ob, acl)
-    if (added or removed):
-        ob.__acl__ = acl
-        msg = ts('intranet-content-inherited', model_path(ob), added, removed)
-    _reindex(ob)
-    return msg
+intranet_content_to_inherits = content_to_inherits
+
 
 # subscribers
 

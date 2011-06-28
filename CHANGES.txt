@@ -18,6 +18,9 @@ Unreleased
   from branches/rossi_search_unification.
   (LP # 784222)
 
+- Changed the workflow for intranet content so that content is owned by the
+  organization rather than by individual authors.  (LP #798850)
+
 3.66.1 (2011-06-24)
 -------------------
 

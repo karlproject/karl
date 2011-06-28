@@ -305,12 +305,7 @@ class Test_intranet_content_to_inherits(unittest.TestCase):
         ob.docid = 1234
         directlyProvides(ob, ICommunity)
         self._callFUT(ob, None)
-        self.assertEqual(ob.__acl__[0],
-                         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
-        self.assertEqual(ob.__acl__[1],
-                         (Allow, 'creator', MEMBER_PERMS))
-        self.assertEqual(ob.__acl__[2],
-                         (Deny, Everyone, ('edit', 'delete')))
+        self.failIf(hasattr(ob, '__acl__'))
         self.assertEqual(index.indexed, {1234: ob})
 
 class Test_community_to_private(unittest.TestCase):
