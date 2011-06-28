@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- On file view, show last modified user and time also.
+
 - Make sure inactive users aren't emailed by the email blast tool.
   (LP #771888)
 

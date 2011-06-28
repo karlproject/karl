@@ -88,6 +88,8 @@ class FileInfo(object):
     implements(IFileInfo)
     _url = None
     _modified = None
+    _modified_by_title = None
+    _modified_by_url = None
     _mimeinfo = None
     _size = None
 
@@ -108,6 +110,22 @@ class FileInfo(object):
         if self._modified is None:
             self._modified = self.context.modified.strftime("%m/%d/%Y")
         return self._modified
+
+    @property
+    def modified_by_title(self):
+        if self._modified_by_title is None:
+            profiles = find_profiles(self.context)
+            profile = profiles[self.context.modified_by]
+            self._modified_by_title = profile.title
+        return self._modified_by_title
+
+    @property
+    def modified_by_url(self):
+        if self._modified_by_url is None:
+            profiles = find_profiles(self.context)
+            profile = profiles[self.context.modified_by]
+            self._modified_by_url = model_url(profile, self.request)
+        return self._modified_by_url
 
     @property
     def url(self):

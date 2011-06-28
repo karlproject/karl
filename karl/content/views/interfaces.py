@@ -24,6 +24,8 @@ class IFileInfo(Interface):
     title = Attribute('The title of the file or folder')
     modified = Attribute('A string representing the modification time/date '
                          'of the file or folder')
+    modified_by_title = Attribute('Title of user who last modified the file')
+    modified_by_url = Attribute('Url to last modified user')
     url = Attribute('A url for the file or folder')
     mimeinfo = Attribute('Mime information for the file or folder '
         '(instance of karl.utilities.interfaces.IMimeInfo)')

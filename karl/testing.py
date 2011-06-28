@@ -137,7 +137,7 @@ class DummyRoot(DummyModel):
             (u'dummy3', u'Dummy Three'),
             ]
         for dummy in dummies:
-            self[u'profiles'][0] = DummyModel(title=dummy[1])
+            self[u'profiles'][dummy[0]] = DummyModel(title=dummy[1])
         self[u'communities'] = DummyModel()
 
 class DummySettings(dict):

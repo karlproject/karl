@@ -379,10 +379,13 @@
           href="${api.here_url}dl/${api.context.filename}">Click here to view
           the file</a>
       </div>
-      <div style="padding-top: 0.3em; padding-left: 3.3em;">Size: ${fileinfo.size} - File type:
+      <div style="padding: 0.3em 0 0 3.3em;">Size: ${fileinfo.size} - File type:
         ${fileinfo.mimeinfo.title}</div>
+      <div style="padding: 0.3em 0 0 3.3em;">
+        Last updated on ${fileinfo.modified}
+        by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
+      </div>
     </div>
-
 
     <div class="tagbox" metal:define-macro="list_tags">
       <strong class="label-tags" >Tags:</strong>

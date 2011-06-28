@@ -99,6 +99,27 @@ class TestFileInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.size, "32.9 MB")
 
+    def test_modified_by_title(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        root = karltesting.DummyRoot()
+        root['foo'] = context
+        context.modified_by = 'dummy1'
+
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_title, "Dummy One")
+
+    def test_modified_by_url(self):
+        request = testing.DummyRequest()
+        context = testing.DummyModel()
+        root = karltesting.DummyRoot()
+        root['foo'] = context
+        context.modified_by = 'dummy1'
+
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.modified_by_url,
+                         "http://example.com/profiles/dummy1/")
+
 
 class TestBylineInfo(unittest.TestCase):
     def setUp(self):

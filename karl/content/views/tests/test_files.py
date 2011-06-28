@@ -2462,6 +2462,8 @@ class DummyFileInfo(object):
         self.url = 'url'
         self.mimeinfo = {'small_icon_name': 'folder_small.gif', 'title': 'Folder'}
         self.modified = '12/12/2008'
+        self.modified_by_title = 'user name'
+        self.modified_by_url = '/profiles/user'
 
 class DummyModifiedDateIndex:
     def discriminator(self, obj, default):
