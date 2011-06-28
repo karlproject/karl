@@ -23,6 +23,10 @@ Unreleased
 - Changed the workflow for intranet content so that content is owned by the
   organization rather than by individual authors.  (LP #798850)
 
+- Created a new 'email' permission and new group, 'group.KarlCommunications' in
+  order to allow select non-administrators to send bulk email from Karl.
+  (LP #798415)
+
 3.66.1 (2011-06-24)
 -------------------
 

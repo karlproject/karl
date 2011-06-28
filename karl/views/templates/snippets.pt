@@ -782,7 +782,7 @@
     <div class="content" id="header-user-menu"
          metal:define-macro="header-user-menu">
       <ul class="horListing">
-        <li tal:condition="api.can_email">
+        <li tal:condition="api.can_email and not api.user_is_admin">
             <a href="${api.app_url}/email_users.html">Email</a> |
         </li>
         <li tal:condition="api.user_is_admin">

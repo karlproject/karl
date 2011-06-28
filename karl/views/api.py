@@ -80,6 +80,7 @@ class TemplateAPI(object):
     _livesearch_options = None
 
     def __init__(self, context, request, page_title=None):
+        site = find_site(context)
         self.context = context
         self.request = request
         self.userid = authenticated_userid(request)
@@ -110,9 +111,8 @@ class TemplateAPI(object):
         self.page_title = page_title
         self.system_name = get_setting(context, 'system_name', 'KARL')
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
-        self.can_administer = has_permission('administer', context, request)
-        self.can_email = has_permission('email', context, request)
-        site = find_site(context)
+        self.can_administer = has_permission('administer', site, request)
+        self.can_email = has_permission('email', site, request)
         self.admin_url = model_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
         # XXX XXX XXX This will never work from peoples formish templates

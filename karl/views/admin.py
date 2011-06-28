@@ -17,6 +17,7 @@ from zope.component import getUtility
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.security import has_permission
 from repoze.bfg.traversal import find_model
 from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
@@ -32,8 +33,10 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IProfile
+from karl.security.policy import ADMINISTER
 from karl.utilities.rename_user import rename_user
 
+from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import find_site
@@ -386,8 +389,15 @@ class EmailUsersView(object):
                 n += 1
 
             status_message = "Sent message to %d users." % n
-            redirect_to = model_url(context, request, 'admin.html',
-                                    query=dict(status_message=status_message))
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = model_url(
+                    context, request, 'admin.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = model_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
             return HTTPFound(location=redirect_to)
 
         return dict(

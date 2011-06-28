@@ -8,6 +8,7 @@ from karl.bootstrap.interfaces import IInitialData
 from karl.bootstrap.interfaces import IInitialOfficeData
 
 from karl.security.policy import ADMINISTRATOR_PERMS
+from karl.security.policy import EMAIL
 from karl.security.policy import GUEST_PERMS
 from karl.security.policy import MEMBER_PERMS
 from karl.security.policy import MODERATOR_PERMS
@@ -35,6 +36,7 @@ class DefaultInitialData(object):
         (Allow, 'group.KarlStaff', MEMBER_PERMS),
         (Allow, 'group.KarlModerator', MODERATOR_PERMS),
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
+        (Allow, 'group.KarlCommunications', EMAIL),
     ]
 
     profiles_acl = [
