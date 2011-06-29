@@ -27,6 +27,9 @@ Unreleased
   order to allow select non-administrators to send bulk email from Karl.
   (LP #798415)
 
+- Text index was not being updated when profiles changed from activate to
+  inactive state or vice versa.  (LP #803143)
+
 3.66.1 (2011-06-24)
 -------------------
 

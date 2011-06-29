@@ -31,7 +31,7 @@ from karl.views.communities import get_community_groups
 
 _marker = object()
 
-def _reindex(ob):
+def _reindex(ob, texts=False):
     catalog = find_catalog(ob)
     if catalog is None:
         return # Will be true for a mailin test trace
@@ -41,6 +41,12 @@ def _reindex(ob):
     # code; this is the "old" way of doing security filtering.
     path_index = catalog['path']
     path_index.reindex_doc(ob.docid, ob)
+
+    # In some cases changing the workflow state of an object can change its
+    # ranking in text search.
+    if texts:
+        text_index = catalog['texts']
+        text_index.reindex_doc(ob.docid, ob)
 
     # if the object is folderish, we need to reindex it plus all its
     # subobjects' 'allowed' index entries recursively; each object's
@@ -266,7 +272,7 @@ def to_profile_active(ob, info):
     if added or removed:
         ob.__acl__ = acl
         msg = ts('to-active', model_path(ob), added, removed)
-    _reindex(ob)
+    _reindex(ob, texts=True)
     _reindex_peopledir(ob)
     return msg
 
@@ -282,7 +288,7 @@ def to_profile_inactive(ob, info):
     if added or removed:
         ob.__acl__ = acl
         msg = ts('to-inactive', model_path(ob), added, removed)
-    _reindex(ob)
+    _reindex(ob, texts=True)
     _reindex_peopledir(ob)
     return msg
 

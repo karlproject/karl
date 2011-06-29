@@ -167,6 +167,7 @@ class Test_to_profile_active(unittest.TestCase):
         self.assertEqual(ob.__acl__[6], NO_INHERIT)
         self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
+        self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
         self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
 
 class Test_to_profile_inactive(unittest.TestCase):
@@ -202,6 +203,7 @@ class Test_to_profile_inactive(unittest.TestCase):
         self.assertEqual(ob.__acl__[3], NO_INHERIT)
         self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
+        self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
         self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
 
 class Test_comment_to_inherits(unittest.TestCase):
@@ -598,6 +600,7 @@ class DummyCatalog(dict):
         super(DummyCatalog, self).__init__()
         self['path'] = DummyIndex()
         self['allowed'] = DummyIndex()
+        self['texts'] = DummyIndex()
         self.document_map = self
 
     def reindex_doc(self, docid, obj): # pragma: no cover
