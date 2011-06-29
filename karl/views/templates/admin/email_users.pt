@@ -33,7 +33,7 @@
           </select><br/>
           <br/>
           <b>Subject</b><br/>
-          <input name="subject"/><br/>
+          <input name="subject" size="60"/><br/>
           <br/>
           <metal:input use-macro="api.formfields.macros['text-field']"/>
           <br/>
