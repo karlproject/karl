@@ -65,8 +65,7 @@ def _reindex_peopledir(profile):
     # is necessary to consult the document map.
     path = model_path(profile)
     docid = catalog.document_map.docid_for_address(path)
-    allowed_index = catalog.get('allowed')
-    allowed_index.reindex_doc(docid, profile)
+    catalog.reindex_doc(docid, profile)
 
 def ts(*args):
     return '\t'.join([unicode(x) for x in args])

@@ -141,7 +141,7 @@ class Test_to_profile_active(unittest.TestCase):
         ob.__acl__ = []
         ob.catalog = DummyCatalog()
         ob['people'] = people = testing.DummyModel()
-        people.catalog = DummyCatalog()
+        people.catalog = DummyPeopleCatalog()
         ob.creator = 'creator'
         ob.users = DummyUsers(**{'creator':
                                  {'groups':['group.community:foo:members']}})
@@ -168,7 +168,7 @@ class Test_to_profile_active(unittest.TestCase):
         self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
-        self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
+        self.assertEqual(people.catalog.reindexed, {12345: ob})
 
 class Test_to_profile_inactive(unittest.TestCase):
     def _callFUT(self, ob, transition):
@@ -185,7 +185,7 @@ class Test_to_profile_inactive(unittest.TestCase):
         ob.__acl__ = []
         ob.catalog = DummyCatalog()
         ob['people'] = people = testing.DummyModel()
-        people.catalog = DummyCatalog()
+        people.catalog = DummyPeopleCatalog()
         ob.creator = 'creator'
         ob.users = DummyUsers(**{'creator':
                                  {'groups':['group.community:foo:members']}})
@@ -204,7 +204,7 @@ class Test_to_profile_inactive(unittest.TestCase):
         self.assertEqual(ob.catalog['path'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['allowed'].indexed, {1234: ob})
         self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
-        self.assertEqual(people.catalog['allowed'].indexed, {12345: ob})
+        self.assertEqual(people.catalog.reindexed, {12345: ob})
 
 class Test_comment_to_inherits(unittest.TestCase):
     def _callFUT(self, ob, transition):
@@ -605,6 +605,18 @@ class DummyCatalog(dict):
 
     def reindex_doc(self, docid, obj): # pragma: no cover
         assert 0, "don't go here"
+
+    def docid_for_address(self, path):
+        return 12345
+
+class DummyPeopleCatalog(dict):
+    def __init__(self):
+        super(DummyPeopleCatalog, self).__init__()
+        self.document_map = self
+        self.reindexed = {}
+
+    def reindex_doc(self, docid, obj): # pragma: no cover
+        self.reindexed[docid] = obj
 
     def docid_for_address(self, path):
         return 12345
