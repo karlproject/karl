@@ -58,6 +58,10 @@ pre {
   padding: 10px;
   padding-bottom: 20px
 }
+blockquote {
+    border-left: 2px solid gray;
+    padding-left: 20px;
+}
 
 /** =FORMS
 ----------------------------------------------- */
@@ -3529,3 +3533,4 @@ body .ui-state-default .karl-icon-loading {
     background-image: url("images/karl-icon-loading.gif");
 }
 
+}

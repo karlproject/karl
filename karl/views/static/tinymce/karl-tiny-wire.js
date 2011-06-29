@@ -1,4 +1,3 @@
-
 (function($){
 
 //
@@ -10,14 +9,13 @@ $(document).ready(function() {
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
     var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
-    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advimagescale';
+    var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advimagescale,advlist,lists,print,table,tinyautosave';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
     }
     if (kaltura_data.enabled) {
         plugins += ',kaltura';
     }
-
 
     // Url that contains the context prefix
     var here_url = $('#karl-here-url')[0].content;
@@ -54,9 +52,11 @@ $(document).ready(function() {
         paste_unindented_list_class : "unindentedList",
         paste_convert_headers_to_strong : true,
         theme_advanced_toolbar_location: 'top',
-        theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image, embedmedia, kaltura, addwickedlink, delwickedlink, spellchecker',
-        theme_advanced_buttons2: '',
+        theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, print',
+        theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, addwickedlink, delwickedlink, code, spellchecker, tinyautosave',
         theme_advanced_buttons3: '',
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "center",
         plugins: plugins,
         extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         relative_urls : false,

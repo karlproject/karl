@@ -73,6 +73,8 @@
 .karlSkin .mceSplitButtonDisabled .mceAction, .karlSkin .mceSplitButtonDisabled span.mceOpen {opacity:0.3; filter:alpha(opacity=30)}
 .karlSkin .mceSplitButtonActive a.mceAction {border:1px solid #0A246A; background-color:#C2CBE0}
 .karlSkin .mceSplitButtonActive a.mceOpen {border-left:0;}
+.karlSkin .mceSplitButton span.mceAction.mce_bullist {background-position:-20px 0}
+.karlSkin .mceSplitButton span.mceAction.mce_numlist {background-position:-80px 0}
 
 /* ColorSplitButton */
 .karlSkin div.mceColorSplitMenu table {background:#FFF; border:1px solid gray}
