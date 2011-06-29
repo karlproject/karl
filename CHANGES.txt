@@ -33,6 +33,10 @@ Unreleased
 - Fixed bug where the form in the show tag view was generating a bad URL.
   (LP #790169)
 
+- Made the single file upload behave like the multi file upload with respect
+  to files with duplicate names.  Duplicate files are now simply renamed
+  rather than giving the user a form validation error.  (LP #790920)
+
 3.66.1 (2011-06-24)
 -------------------
 

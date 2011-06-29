@@ -457,7 +457,13 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(context['filename'].filename, 'filename')
 
         # attempt a duplicate upload
-        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location, 'http://example.com/filename-1/')
+        self.assertEqual(context['filename-1'].title, u'a title')
+        self.assertEqual(context['filename-1'].creator, 'userid')
+        self.assertEqual(context['filename-1'].stream, 'abc')
+        self.assertEqual(context['filename-1'].mimetype, 'x/foo')
+        self.assertEqual(context['filename-1'].filename, 'filename')
 
     def test_handle_submit_filename_with_only_symbols_and_smartquote(self):
         from repoze.bfg.formish import ValidationError
@@ -513,7 +519,13 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(context['filename'].filename, 'filename')
 
         # attempt a duplicate upload
-        self.assertRaises(ValidationError, controller.handle_submit, converted)
+        response = controller.handle_submit(converted)
+        self.assertEqual(response.location, 'http://example.com/filename-1/')
+        self.assertEqual(context['filename-1'].title, u'a title')
+        self.assertEqual(context['filename-1'].creator, 'userid')
+        self.assertEqual(context['filename-1'].stream, 'abc')
+        self.assertEqual(context['filename-1'].mimetype, 'x/foo')
+        self.assertEqual(context['filename-1'].filename, 'filename')
 
 
     def test_handle_submit_valid_alert(self):
@@ -1551,7 +1563,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         response = self._call_fut(context, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Inconsistent client file id'}) 
+        self.assertEqual(data, {u'client_id': u'', u'error': u'Inconsistent client file id'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
@@ -1583,7 +1595,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         response = self._call_fut(context, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'ABCDEF3', u'error': u'Inconsistent batch transaction'}) 
+        self.assertEqual(data, {u'client_id': u'ABCDEF3', u'error': u'Inconsistent batch transaction'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
@@ -2060,8 +2072,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 1, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
@@ -2087,8 +2099,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 0, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 0, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
@@ -2116,8 +2128,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 3, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 3, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
@@ -2143,7 +2155,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data,{u'error': u'Wrong parameters, `target_folder` is mandatory', 
+        self.assertEqual(data,{u'error': u'Wrong parameters, `target_folder` is mandatory',
                 u'result': u'ERROR', u'filename': u'*'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -2168,7 +2180,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u'Cannot move to target folder <a href="http://example.com/files/folder2/">/folder2</a>', 
+        self.assertEqual(data, {u'error': u'Cannot move to target folder <a href="http://example.com/files/folder2/">/folder2</a>',
                 u'result': u'ERROR', u'filename': u'f2.txt'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -2195,8 +2207,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         data = simplejson.loads(response.body)
 
         # This actually works.
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder1/', 
-            u'moved': 1, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder1/',
+            u'moved': 1, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder1'})
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
@@ -2223,8 +2235,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 1, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
@@ -2252,7 +2264,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
 
-        self.assertEqual(data, {u'error': u'Cannot move a folder into itself', 
+        self.assertEqual(data, {u'error': u'Cannot move a folder into itself',
                 u'result': u'ERROR', u'filename': u'folder1a'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -2279,7 +2291,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
 
-        self.assertEqual(data, {u'error': u'Cannot move a folder into itself', 
+        self.assertEqual(data, {u'error': u'Cannot move a folder into itself',
                 u'result': u'ERROR', u'filename': u'folder1a'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -2304,8 +2316,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 1, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
@@ -2339,12 +2351,12 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 3, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 3, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
-        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt', 'f1-2.txt', 'f1-3.txt', 
+        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt', 'f1-2.txt', 'f1-3.txt',
                 'f2.txt', 'f2-1.txt',
                 'f3.txt']))
         self.assertEqual(file1, folder2['f1-3.txt'])
@@ -2376,8 +2388,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/', 
-            u'moved': 2, u'result': u'OK', 
+        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 2, u'result': u'OK',
             u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
 
         self.assertEqual(folder1.keys(), [])
@@ -2389,7 +2401,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         # names are mangled if the title has not changed
         self.assertEqual(file1.title, 'f1-1.txt')
         self.assertEqual(file1.filename, 'f1-1.txt')
-        
+
         # title is mangled differently, in case someone has changed it from the upload original
         self.assertEqual(file2.title, 'SOMEONE CHANGED ME - 1')
         self.assertEqual(file2.filename, 'f2-1.txt')
@@ -2565,7 +2577,7 @@ class DummySearch:
     def __call__(self, **kw):
         return 1, [1], lambda x: dummycontent
 
-class MyDummyCatalog(dict):    
+class MyDummyCatalog(dict):
     def __init__(self):
         self['modified_date'] = DummyModifiedDateIndex()
         class DocumentMap(object):

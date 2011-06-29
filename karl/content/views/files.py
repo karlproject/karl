@@ -112,7 +112,7 @@ from karl.views.forms.filestore import get_filestore
 log = get_logger()
 
 def show_folder_view(context, request):
-    
+
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
 
@@ -441,9 +441,7 @@ class AddFileFormController(object):
             msg = 'The filename must not be empty'
             raise ValidationError(file=msg)
         # Is there a key in context with that filename?
-        if name in context:
-            msg = 'Filename %s already exists in this folder' % filename
-            raise ValidationError(file=msg)
+        name = make_unique_name(context, name)
         context[name] = file
 
         if workflow is not None:
@@ -810,7 +808,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     #      ... etc ...
     #
     # The current folder should also be in the list.
-    
+
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
 
@@ -872,7 +870,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 # --
 
 class ErrorResponse(Exception):
-    
+
     def __init__(self, txt, **kw):
         self.__dict__.update(kw)
         super(ErrorResponse, self).__init__(txt)
@@ -892,7 +890,7 @@ def ajax_file_reorganize_delete_view(context, request):
                 try:
                     del context[filename]
                 except Exception, exc:
-                    msg = str(exc) 
+                    msg = str(exc)
                     raise ErrorResponse(msg, filename=filename)
                 else:
                     deleted += 1
@@ -907,7 +905,7 @@ def ajax_file_reorganize_delete_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' % 
+        log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' %
             (exc.filename, str(exc)))
         transaction.doom()
     finally:
@@ -943,7 +941,7 @@ def get_file_folder_path(context):
     root_path = model_path(find_root_folder(context))
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
-        
+
 def get_target_folders(context):
     # Return the target folders for this community.
     #
@@ -973,7 +971,7 @@ def get_target_folders(context):
 
     query = ICatalogSearch(context)
     total, docids, resolver = query(
-        path = root_path, 
+        path = root_path,
         interfaces = (ICommunityFolder, ),
         )
     target_items = [
@@ -1014,7 +1012,7 @@ def get_current_folder(context):
     root_path = model_path(find_root_folder(context))
 
     context_path = model_path(context)
-    
+
     if not context_path.startswith(root_path):
         # we are not in the files tool, there will be no reorganize
         # feature.
@@ -1070,7 +1068,7 @@ def make_unique_file_in_folder(context, fileobj, orig_name=None):
     # return the name to be used as key
     # like: context[name] = fileobj
     return name
- 
+
 def ajax_file_reorganize_moveto_view(context, request):
 
     try:
@@ -1078,7 +1076,7 @@ def ajax_file_reorganize_moveto_view(context, request):
         filenames = params.getall('file[]')
         target_folder = params.get('target_folder', None)
         if target_folder is None:
-            msg = 'Wrong parameters, `target_folder` is mandatory' 
+            msg = 'Wrong parameters, `target_folder` is mandatory'
             raise ErrorResponse(msg, filename="*")
 
         # find the target folder
@@ -1124,7 +1122,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' % 
+        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' %
             (exc.filename, str(exc)))
         transaction.doom()
     finally:
@@ -1153,7 +1151,7 @@ def ajax_file_upload_view(context, request):
         f = params.get('file', None)
         client_id = params.get('client_id', None)
         if f is None or client_id is None:
-            msg = 'Wrong parameters, `file` and `client_id` are mandatory' 
+            msg = 'Wrong parameters, `file` and `client_id` are mandatory'
             raise ErrorResponse(msg, client_id='')
 
         # XXX Handling of chunk uploads.
@@ -1172,7 +1170,7 @@ def ajax_file_upload_view(context, request):
 
         # (we allow chunks==0 chunk==0 as this happens with 0-length files)
         if chunk < 0 or chunks > 0 and chunk >= chunks:
-            msg = 'Chunking inconsistency, `chunk` out of range' 
+            msg = 'Chunking inconsistency, `chunk` out of range'
             raise ErrorResponse(msg, client_id='')
 
         end_batch = params.get('end_batch', None)
@@ -1183,7 +1181,7 @@ def ajax_file_upload_view(context, request):
         # XXX We need to use the unique id from the client, as there is no way
         # to pass back the id we generate to the second chunk
         # (the flash runtime does not support this)
-        temp_id = make_temp_id(client_id) 
+        temp_id = make_temp_id(client_id)
 
         if is_first_chunk:
             # First chunk. Create the content object.
@@ -1206,12 +1204,12 @@ def ajax_file_upload_view(context, request):
                 # It _may_ happen that we have the same object: but only, if
                 # the client retries the same file that it thinks it had failed earlier.
                 # To avoid the error, we simply overwrite in this case.
-                del tempfolder[temp_id] 
+                del tempfolder[temp_id]
             fileobj.modified = datetime.datetime.now()
             tempfolder[temp_id] = fileobj
 
             # Add metadata to the newly created object
-            # This also has a role in security: 
+            # This also has a role in security:
             # We store the original parent and creator.
             # If the transaction is finalized on a different parent, or creator,
             # we will doom it.
@@ -1272,11 +1270,11 @@ def ajax_file_upload_view(context, request):
 
             # Iterate on all the files in the just finishing batch.
             for client_id in end_batch:
-                temp_id = make_temp_id(client_id) 
+                temp_id = make_temp_id(client_id)
                 try:
                     fileobj = tempfolder[temp_id]
                 except:
-                    msg = 'Inconsistent transaction, lost a file (temp_id=%r) ' % (temp_id, ) 
+                    msg = 'Inconsistent transaction, lost a file (temp_id=%r) ' % (temp_id, )
                     raise ErrorResponse(msg, client_id=client_id)
 
 
@@ -1303,7 +1301,7 @@ def ajax_file_upload_view(context, request):
                 # create a unique name of the -1, -2, ... style
                 # also change title and filename properties as needed
                 name = make_unique_file_in_folder(context, fileobj)
-   
+
                 # Move the file to its permanent location
                 del tempfolder[temp_id]
                 context[name] = fileobj
@@ -1332,7 +1330,7 @@ def ajax_file_upload_view(context, request):
             error = str(exc),
             client_id = exc.client_id,
         )
-        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' % 
+        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
             (client_id, filename, str(exc)))
         transaction.doom()
     finally:
