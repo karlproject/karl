@@ -235,8 +235,9 @@ class BaseAdvancedSearchResultsDisplay(object):
     macro = 'searchresults_generic'
     display_data = {}
 
-    def __init__(self, context):
+    def __init__(self, context, request):
         self.context = context
+        self.request = request
 
 class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_office'
@@ -244,8 +245,9 @@ class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
 class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_people'
 
-    def __init__(self, context):
-        super(AdvancedSearchResultsDisplayPeople, self).__init__(context)
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayPeople, self).__init__(context,
+                                                                 request)
         contact_items = []
         if context.extension and context.extension.strip():
             extension_html = ('<span class="sras-people-extension">x%s</span>'
@@ -265,8 +267,9 @@ class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_event'
 
-    def __init__(self, context):
-        super(AdvancedSearchResultsDisplayEvent, self).__init__(context)
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayEvent, self).__init__(context,
+                                                                request)
 
         karldates = getUtility(IKarlDates)
         startDate = karldates(context.startDate, 'longform')
@@ -277,4 +280,22 @@ class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
             startDate = startDate,
             endDate = endDate,
             location = location,
+            )
+
+class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_file'
+
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayFile, self).__init__(context,
+                                                               request)
+
+        fileinfo = getMultiAdapter((context, request), IFileInfo)
+        from karl.views.api import TemplateAPI
+        api = TemplateAPI(context, request)
+        icon = (api.static_url + "/images/" +
+                fileinfo.mimeinfo['small_icon_name'])
+
+        self.display_data = dict(
+            fileinfo = fileinfo,
+            icon = icon,
             )

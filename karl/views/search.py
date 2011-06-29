@@ -46,6 +46,7 @@ from webob import Response
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.component import getMultiAdapter
 from zope.index.text.parsetree import ParseError
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -277,7 +278,9 @@ def searchresults_view(context, request):
             else:
                 description = getattr(doc, 'description', '')
             type_name, icon = get_content_type_name_and_icon(doc)
-            result_display = IAdvancedSearchResultsDisplay(doc)
+
+            result_display = getMultiAdapter((doc, request),
+                                             IAdvancedSearchResultsDisplay)
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
