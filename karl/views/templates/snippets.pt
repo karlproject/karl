@@ -666,8 +666,8 @@
      <tal:block tal:condition="tag is not None">
 
       <h2 class="tagsHeaderSpace">
-       <form id="tag-form" action="showtag"
-            onsubmit="this.action='showtag/'+getElementById('tag-field').value;
+       <form id="tag-form" action="${api.view_url}"
+            onsubmit="this.action='${api.view_url}/'+getElementById('tag-field').value;
                       return true"
        ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
       ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /

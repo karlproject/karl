@@ -30,6 +30,9 @@ Unreleased
 - Text index was not being updated when profiles changed from activate to
   inactive state or vice versa.  (LP #803143)
 
+- Fixed bug where the form in the show tag view was generating a bad URL.
+  (LP #790169)
+
 3.66.1 (2011-06-24)
 -------------------
 
