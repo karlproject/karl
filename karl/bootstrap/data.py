@@ -36,7 +36,7 @@ class DefaultInitialData(object):
         (Allow, 'group.KarlStaff', MEMBER_PERMS),
         (Allow, 'group.KarlModerator', MODERATOR_PERMS),
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
-        (Allow, 'group.KarlCommunications', EMAIL),
+        (Allow, 'group.KarlCommunications', (EMAIL,)),
     ]
 
     profiles_acl = [
