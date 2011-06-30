@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.67 (2011-06-30)
+-----------------
 
 - On file view, show last modified user and time also.
 
