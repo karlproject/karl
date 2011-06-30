@@ -1,0 +1,45 @@
+
+.karl-wikitoc-gridwrapper {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+.karl-wikitoc-grid {
+    width: 100%;
+    height: 500px;
+}
+.karl-wikitoc-widthconstrainer {
+    width: 100%;
+    height: 500px;
+}
+.karl-wikitoc-footer {
+    width: 100%;
+    height: 36px;
+    border: 0 none;
+}
+
+.karl-wikitoc-button-inspector {
+    float: right;
+    margin: 4px;
+}
+
+.karl-wikitoc-inspector {
+    width: 0px;
+    height: 500px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1111;
+    overflow: hidden;
+}
+
+.karl-wikitoc-inspector-wrapper {
+    width: 190px;
+    padding: 20px;
+    padding-top: 75px;
+}
+
+.karl-wikitoc-columnselectors {
+    margin-top: 100px;
+}

@@ -706,6 +706,13 @@
     permission="view"
   />
 
+  <view
+    for="karl.content.interfaces.IWiki"
+    view=".wiki.show_wikitoc_view"
+    name="wikitoc.html"
+    permission="view"
+  />
+
   <formish:form
      controller=".wiki.EditWikiPageFormController"
      name="edit.html"

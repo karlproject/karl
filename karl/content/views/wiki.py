@@ -22,6 +22,7 @@ from validatish import validator
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
+from zope.component import getMultiAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
@@ -35,11 +36,13 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import ITagQuery
 
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
+from karl.utils import find_profiles
 
 from karl.views.api import TemplateAPI
 
@@ -53,6 +56,7 @@ from karl.views.forms import validators as karlvalidators
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.views.utils import extract_description
+from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
@@ -185,6 +189,36 @@ class AddWikiPageFormController(object):
         location = model_url(wikipage, request) + msg
         return HTTPFound(location=location)
 
+
+def get_wikitoc_data(context, request):
+    wikiparent = context.__parent__
+    entries = WikiAtomFeed(wikiparent, request)._entry_models
+    items = []
+    profiles = find_profiles(context)
+    for entry in entries:
+        tags = getMultiAdapter((entry, request), ITagQuery).tagswithcounts
+        author = entry.creator
+        profile = profiles.get(author, None)
+        if profile is not None:
+            author_name = '%s %s' % (profile.firstname, profile.lastname)
+        else:
+            author_name = author
+        items.append(dict(
+            id = "id_" + entry.__name__,
+            name = entry.__name__,
+            title = entry.title,
+            author = author,
+            author_name = author_name,
+            tags = [tag['tag'] for tag in tags],
+            creation_date = entry.created.isoformat(),
+        ))
+    items.sort(key=lambda item: item['creation_date'])       # ???
+    result = dict(
+        items = items,
+        )
+    return result
+
+
 def show_wikipage_view(context, request):
 
     is_front_page = (context.__name__ == 'front_page')
@@ -217,6 +251,50 @@ def show_wikipage_view(context, request):
     feed_url = model_url(wiki, request, "atom.xml")
     return render_template_to_response(
         'templates/show_wikipage.pt',
+        api=api,
+        actions=actions,
+        head_data=client_json_data,
+        feed_url=feed_url,
+        backto=backto,
+        )
+
+
+
+def show_wikitoc_view(context, request):
+
+    is_front_page = (context.__name__ == 'front_page')
+    if is_front_page:
+        community = find_interface(context, ICommunity)
+        page_title = '%s Community Wiki Page' % community.title
+        backto = False
+    else:
+        page_title = context.title
+        backto = {
+            'href': model_url(context.__parent__, request),
+            'title': context.__parent__.title,
+            }
+
+    actions = []
+    if has_permission('edit', context, request):
+        actions.append(('Edit', 'edit.html'))
+    if has_permission('delete', context, request) and not is_front_page:
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
+
+    api = TemplateAPI(context, request, page_title)
+
+    wikitoc_data = get_wikitoc_data(context, request)
+    ##print "**********", wikitoc_data
+
+    client_json_data = convert_to_script(dict(
+        wikitoc = wikitoc_data,
+        ))
+
+    wiki = find_interface(context, IWiki)
+    feed_url = model_url(wiki, request, "atom.xml")
+    return render_template_to_response(
+        'templates/show_wikitoc.pt',
         api=api,
         actions=actions,
         head_data=client_json_data,
