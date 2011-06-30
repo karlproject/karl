@@ -388,7 +388,8 @@
       </div>
       <div style="padding: 0.3em 0 0 3.3em;">Size: ${fileinfo.size} - File type:
         ${fileinfo.mimeinfo.title}</div>
-      <div style="padding: 0.3em 0 0 3.3em;">
+      <div style="padding: 0.3em 0 0 3.3em;"
+           tal:condition="fileinfo.modified_by_title">
         Last updated on ${fileinfo.modified}
         by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
       </div>

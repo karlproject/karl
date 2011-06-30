@@ -111,20 +111,29 @@ class FileInfo(object):
             self._modified = self.context.modified.strftime("%m/%d/%Y")
         return self._modified
 
+    def _find_profile(self, profile_name):
+        if profile_name is None:
+            return None
+        profiles = find_profiles(self.context)
+        return profiles.get(profile_name, None)
+
     @property
     def modified_by_title(self):
         if self._modified_by_title is None:
             profiles = find_profiles(self.context)
-            profile = profiles[self.context.modified_by]
-            self._modified_by_title = profile.title
+            profile_name = self.context.modified_by or self.context.creator
+            profile = self._find_profile(profile_name)
+            self._modified_by_title = profile and profile.title
         return self._modified_by_title
 
     @property
     def modified_by_url(self):
         if self._modified_by_url is None:
             profiles = find_profiles(self.context)
-            profile = profiles[self.context.modified_by]
-            self._modified_by_url = model_url(profile, self.request)
+            profile_name = self.context.modified_by or self.context.creator
+            profile = self._find_profile(profile_name)
+            self._modified_by_url = profile and model_url(profile,
+                                                          self.request)
         return self._modified_by_url
 
     @property
