@@ -275,17 +275,10 @@ def show_wikitoc_view(context, request):
             }
 
     actions = []
-    if has_permission('edit', context, request):
-        actions.append(('Edit', 'edit.html'))
-    if has_permission('delete', context, request) and not is_front_page:
-        actions.append(('Delete', 'delete.html'))
-    if has_permission('administer', context, request):
-        actions.append(('Advanced', 'advanced.html'))
 
     api = TemplateAPI(context, request, page_title)
 
     wikitoc_data = get_wikitoc_data(context, request)
-    ##print "**********", wikitoc_data
 
     client_json_data = convert_to_script(dict(
         wikitoc = wikitoc_data,
