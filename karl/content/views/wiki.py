@@ -23,12 +23,14 @@ from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.component import getMultiAdapter
+from zope.component import getAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
+from repoze.bfg.traversal import model_path
 
 from repoze.lemonade.content import create_content
 
@@ -37,6 +39,7 @@ from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ITagQuery
+from karl.models.interfaces import ICatalogSearch
 
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
@@ -192,10 +195,17 @@ class AddWikiPageFormController(object):
 
 def get_wikitoc_data(context, request):
     wikiparent = context.__parent__
-    entries = WikiAtomFeed(wikiparent, request)._entry_models
+    search = getAdapter(context, ICatalogSearch)
+    count, docids, resolver = search(
+        path = model_path(wikiparent),
+        sort_index = "creation_date",
+        reverse = True,
+        interfaces = [IWikiPage,]
+    )
     items = []
     profiles = find_profiles(context)
-    for entry in entries:
+    for docid in docids:
+        entry = resolver(docid)
         tags = getMultiAdapter((entry, request), ITagQuery).tagswithcounts
         author = entry.creator
         profile = profiles.get(author, None)
