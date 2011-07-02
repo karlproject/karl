@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import json
+import simplejson as json
 from random import choice
 
 from repoze.bfg.chameleon_zpt import render_template_to_response

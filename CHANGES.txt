@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Made agility use simplejson instead of the stdlib json module for
+  compatability with Python 2.5.  simplejson is already in use elsewhere in
+  the application.
 
 3.67 (2011-06-30)
 -----------------
