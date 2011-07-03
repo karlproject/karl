@@ -29,22 +29,23 @@
   
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <div class="contentbar-wrapper">
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <span class="contentbar-menu">
+          <a href="${api.here_url}">Front Page</a> |
+          Index |
+          Trash
+      </span>
+    </div>
 
-    <span>
-        <a href="${api.here_url}">Front Page</a> |
-        Index |
-        Trash
-    </span>
-    <div class="ui-helper-clearfix"></div>
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
 
     <h1 class="kscreentitle">Table of Contents
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
     </h1>
 
-    <div id='karl-wikitoc' style="width: 600px;"></div>
+    <div id='karl-wikitoc'></div>
     <script language="javascript" type="text/javascript">
         //<![CDATA[
         $(function() {

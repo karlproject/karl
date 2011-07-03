@@ -266,6 +266,7 @@ def show_wikipage_view(context, request):
         head_data=client_json_data,
         feed_url=feed_url,
         backto=backto,
+        is_front_page=is_front_page,
         )
 
 

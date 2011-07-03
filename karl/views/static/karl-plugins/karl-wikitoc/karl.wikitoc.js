@@ -124,10 +124,10 @@ $.widget('karl.karlwikitoc', {
 
         this.inactive_columns = {};
         this.grid_columns = [
-            {id:"title", name:"Title", field:"title", formatter: TitleCellFormatter, width:280, minWidth:20, sortable:true},
+            {id:"title", name:"Title", field:"title", formatter: TitleCellFormatter, width:320, minWidth:20, sortable:true},
             {id:"author_name", name:"Author", field:"author_name", width:80, minWidth:20, sortable:true},
             {id:"tags", name:"Tags", field:"tags", width: 140, minWidth:20, sortable:true},
-            {id:"creation_date", name:"Created", field:"creation_date", formatter: DateCellFormatter, width:100, minWidth:20, sortable:true}
+            {id:"creation_date", name:"Created", field:"creation_date", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true}
         ];
 
         this.filterGridColumns();

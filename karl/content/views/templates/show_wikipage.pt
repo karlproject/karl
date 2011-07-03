@@ -17,16 +17,16 @@
   
   <div metal:fill-slot="content">
 
+    <div class="contentbar-wrapper">
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <span class="contentbar-menu">
+          <a href="${api.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
+          <a href="${api.here_url}../wikitoc.html">Index</a> |
+          Trash
+      </span>
+    </div>
+
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
-
-    <span>
-        <a href="${api.here_url}..">Front Page</a> |
-        <a href="${api.here_url}../wikitoc.html">Index</a> |
-        Trash
-    </span>
-    <div class="ui-helper-clearfix"></div>
-
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 

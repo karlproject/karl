@@ -3533,4 +3533,27 @@ body .ui-state-default .karl-icon-loading {
     background-image: url("images/karl-icon-loading.gif");
 }
 
+/* contentbar is used for wikitoc */
+.contentbar-menu {
+    display: inline-block;
+    margin: 8px 0;
+}
+
+.contentbar-wrapper {
+    border-bottom: 1px solid #CECECE;
+    margin: -20px -9px 16px;
+    overflow: visible;
+    padding: 0 9px;
+}
+
+.contentbar-wrapper ul.menubar {
+    display: inline-block;
+    margin-top: 4px;
+}
+.contentbar-wrapper ul.menubar li a {
+    line-height: 22px;
+}
+
+#karl-wikitoc {
+    width: 668px;
 }
