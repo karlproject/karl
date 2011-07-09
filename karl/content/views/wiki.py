@@ -198,8 +198,6 @@ def get_wikitoc_data(context, request):
     search = getAdapter(context, ICatalogSearch)
     count, docids, resolver = search(
         path = model_path(wikiparent),
-        sort_index = "creation_date",
-        reverse = True,
         interfaces = [IWikiPage,]
     )
     items = []
@@ -209,6 +207,7 @@ def get_wikitoc_data(context, request):
         tags = getMultiAdapter((entry, request), ITagQuery).tagswithcounts
         author = entry.creator
         profile = profiles.get(author, None)
+        profile_url = model_url(profile, request)
         if profile is not None:
             author_name = '%s %s' % (profile.firstname, profile.lastname)
         else:
@@ -219,10 +218,11 @@ def get_wikitoc_data(context, request):
             title = entry.title,
             author = author,
             author_name = author_name,
+            profile_url = profile_url,
             tags = [tag['tag'] for tag in tags],
-            creation_date = entry.created.isoformat(),
+            created = entry.created.isoformat(),
+            modified = entry.modified.isoformat(),
         ))
-    items.sort(key=lambda item: item['creation_date'])       # ???
     result = dict(
         items = items,
         )

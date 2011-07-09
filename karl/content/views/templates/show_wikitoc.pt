@@ -33,14 +33,13 @@
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
           <a href="${api.here_url}">Front Page</a> |
-          Index |
-          Trash
+          Index
       </span>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1 class="kscreentitle">Table of Contents
+    <h1 class="kscreentitle">Wiki Index
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
     </h1>

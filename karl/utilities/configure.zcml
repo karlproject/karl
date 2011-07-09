@@ -19,10 +19,10 @@
       name="karl.utilities.textscrub:text_scrubber"
       />
 
-  <utility
+  <!--utility
     factory="karl.utilities.mailer.mail_delivery_factory"
     provides="repoze.sendmail.interfaces.IMailDelivery"
-  />
+  /-->
 
   <utility
     component=".randomid.friendly_random_id"

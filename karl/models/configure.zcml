@@ -228,11 +228,11 @@
     factory=".adapters.PeopleDirectoryCatalogSearch"
   />
 
-  <adapter
+  <!--adapter
     for=".adapters.PGTextIndex"
     provides=".interfaces.IContextualSummarizer"
     factory=".adapters.PGTextIndexContextualSummarizer"
-    />
+    /-->
 
   <adapter
     for=".interfaces.IPeopleReport"
