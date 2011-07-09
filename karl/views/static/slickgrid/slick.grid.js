@@ -25,8 +25,8 @@ You have to move faster then IE is able to catch up with displaying, IE, you scr
 slick.grid.js line 1367: Invalid Pointer
 
 for (i = 0, l = x.childNodes.length; i < l; i++) {
-                rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
-            }
+    rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+}
 
 i=36, l=43. This means that x had 46 child nodes, now we are processing the #36, 
 but yet at this time x.firstChild = null, somehow x lost more children then how
@@ -1404,6 +1404,7 @@ if (typeof Slick === "undefined") {
             //for (i = 0, l = x.childNodes.length; i < l; i++) {
                 try {
                 rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+                i += 1
                 } catch(e) {
                     var _debug = 123;
                     throw(e);
