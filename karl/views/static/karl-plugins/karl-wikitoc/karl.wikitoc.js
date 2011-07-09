@@ -250,11 +250,11 @@ $.widget('karl.karlwikitoc', {
         dataView.setFilter(function contentFilter(item) {
             return self._contentFilter(item);
         });
-        dataView.endUpdate();
 
         // sort initially
         grid.setSortColumn(this.sortCol, this.sortDir);
         dataView.sort(comparer, this.sortDir == 1);
+        dataView.endUpdate();
 
         // display the footer info
         this.el_label_items_num.text(this.options.items.length);       
@@ -273,6 +273,7 @@ $.widget('karl.karlwikitoc', {
             this._fake_records_added = true;
             // we add some fake records so each row appears multiple
             // times, under each tag group it belongs to.
+            this.dataView.beginUpdate();
             var items = this.dataView.getItems();
             $.each(items, function(index, item) {
                 var tags = item.tags;
@@ -293,6 +294,7 @@ $.widget('karl.karlwikitoc', {
                     });
                 }
             });
+            this.dataView.endUpdate();
         }
     },
 

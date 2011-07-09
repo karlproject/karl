@@ -1364,7 +1364,12 @@ if (typeof Slick === "undefined") {
             x.innerHTML = stringArray.join("");
 
             for (i = 0, l = x.childNodes.length; i < l; i++) {
+                try {
                 rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+                } catch(e) {
+                    var _debug = _debug;
+                    throw(e);
+                }
             }
 
             if (needToReselectCell) {
