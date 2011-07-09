@@ -13,6 +13,13 @@ var TitleCellFormatter = function(row, cell, value, columnDef, dataContext) {
     return result;
 }; 
 
+var AuthorCellFormatter = function(row, cell, value, columnDef, dataContext) { 
+    var url = dataContext.profile_url;
+    var result = '<a href="' + url + '">' + value + '</a>';
+    return result;
+}; 
+
+
 var DateCellFormatter = function(row, cell, value, columnDef, dataContext) { 
     var year = value.substring(0, 4);
     var month = value.substring(5, 7);
@@ -41,45 +48,56 @@ $.widget('karl.karlwikitoc', {
             '<div class="karl-wikitoc-widthconstrainer">' +
                 '<div class="karl-wikitoc-grid"></div>' +
             '</div>' +
-            '<div class="karl-wikitoc-inspector ui-widget-header">' +
-              '<div class="karl-wikitoc-inspector-wrapper">' +
+            '<div class="karl-wikitoc-inspector">' +
+              '<div class="karl-wikitoc-inspector-wrapper"><div class="karl-wikitoc-inspector-wrapper2">' +
+                
+                  '<fieldset class="karl-wikitoc-livesearch">' +
+                      '<legend>Search in index</legend>' +
+                        '<div>' +
+                          '<div>' +
+                            '<span class="karl-wikitoc-icon-search ui-icon ui-icon-search"></span>' +
+                            '<input class="karl-wikitoc-input-livesearch" type="text"></input>' +
+                          '</div>' +
+                          '<div class="ui-helper-clearfix"></div>' +
+                          '<div>' +
+                            '<input type="checkbox" class="karl-wikitoc-cb-grouping"></input>' +
+                            '<label>Group by tags</label>' +
+                          '</div>' +
+                    '</div>' +
+                  '</fieldset>' +
 
-                  '<p>Search in title:</p>' +
-                  '<div>' +
-                    '<span class="ui-icon ui-icon-search" style="float: left; position: relative;"></span>' +
-                    '<input type="text" disabled style="margin-left: -16px;></input>' +
-                  '</div>' +
-                  '<div class="ui-helper-clearfix"></div>' +
-                  '<div>' +
-                    '<input type="checkbox" disabled></input>' +
-                    '<label>Group by tags</label>' +
-                  '</div>' +
+                  '<fieldset class="karl-wikitoc-columnselectors">' +
+                      '<legend>Select columns</legend>' +
+                      '<div>' +
+                          '<div>' +
+                            '<input class="karl-wikitoc-cb-title" type="checkbox" checked="checked"></input>' +
+                            '<label>Title</label>' +
+                          '</div>' +
+                          '<div>' +
+                            '<input class="karl-wikitoc-cb-author_name" type="checkbox" checked="checked"></input>' +
+                            '<label>Author</label>' +
+                          '</div>' +
+                          '<div>' +
+                            '<input class="karl-wikitoc-cb-tags" type="checkbox"></input>' +
+                            '<label>Tags</label>' +
+                          '</div>' +
+                          '<div>' +
+                            '<input class="karl-wikitoc-cb-created" type="checkbox" checked="checked"></input>' +
+                            '<label>Created</label>' +
+                          '</div>' +
+                          '<div>' +
+                            '<input class="karl-wikitoc-cb-modified" type="checkbox"></input>' +
+                            '<label>Modified</label>' +
+                          '</div>' +
+                    '</div>' +
+                  '</fieldset>' +
 
-                  '<div class="karl-wikitoc-columnselectors">' +
-                      '<p>Select columns:</p>' +
-                      '<div>' +
-                        '<input class="karl-wikitoc-cb-title" type="checkbox" checked="checked"></input>' +
-                        '<label>Title</label>' +
-                      '</div>' +
-                      '<div>' +
-                        '<input class="karl-wikitoc-cb-author_name" type="checkbox" checked="checked"></input>' +
-                        '<label>Author</label>' +
-                      '</div>' +
-                      '<div>' +
-                        '<input class="karl-wikitoc-cb-tags" type="checkbox"></input>' +
-                        '<label>Tags</label>' +
-                      '</div>' +
-                      '<div>' +
-                        '<input class="karl-wikitoc-cb-creation_date" type="checkbox" checked="checked"></input>' +
-                        '<label>Created</label>' +
-                      '</div>' +
-                  '</div>' +
-
-              '</div>' +
+              '</div></div>' +
             '</div>' +
           '</div>' +
           '<div class="karl-wikitoc-footer ui-widget-header">' +
-            '<a href="#" class="karl-wikitoc-button-inspector">Inspector</a>' +
+            '<span class="karl-wikitoc-items"><span class="karl-wikitoc-items-num">0</span> items</span>' +
+            '<a href="#" class="karl-wikitoc-button-inspector">Options</a>' +
           '</div>'
         );
 
@@ -93,6 +111,9 @@ $.widget('karl.karlwikitoc', {
         this.el_columnselectors = this.el_inspector.find('.karl-wikitoc-columnselectors');
         this.el_footer = this.element.find('.karl-wikitoc-footer');
         this.el_button_inspector = this.el_footer.find('.karl-wikitoc-button-inspector');
+        this.el_input_livesearch = this.el_inspector.find('.karl-wikitoc-input-livesearch');
+        this.el_cb_grouping = this.el_inspector.find('.karl-wikitoc-cb-grouping');
+        this.el_label_items_num = this.el_footer.find('.karl-wikitoc-items-num');
 
         // sniff the inspector width from the css.
         this.inspector_width = $('.karl-wikitoc-inspector-wrapper').width();
@@ -101,7 +122,8 @@ $.widget('karl.karlwikitoc', {
             title: this.el_inspector.find('.karl-wikitoc-cb-title'),
             author_name: this.el_inspector.find('.karl-wikitoc-cb-author_name'),
             tags: this.el_inspector.find('.karl-wikitoc-cb-tags'),
-            creation_date: this.el_inspector.find('.karl-wikitoc-cb-creation_date') 
+            created: this.el_inspector.find('.karl-wikitoc-cb-created'), 
+            modified: this.el_inspector.find('.karl-wikitoc-cb-modified') 
         };
         $.each(this.el_column_selectors, function(id, el) {
             el.click(function() {
@@ -111,9 +133,10 @@ $.widget('karl.karlwikitoc', {
             });
         });
 
+        // inspector toggle
         this.el_button_inspector
             .button({
-                icons: { primary: 'ui-icon-circle-triangle-w' }
+                icons: { primary: 'ui-icon-triangle-1-w' }
             })
             .click(function(evt) {
                 // we need the current sizes and order, so refresh it.
@@ -122,12 +145,52 @@ $.widget('karl.karlwikitoc', {
                 return false;
             });
 
+        // livesearch
+        this.searchString = '';
+        this.el_input_livesearch.keyup(function(evt) {
+            Slick.GlobalEditorLock.cancelCurrentEdit();
+            // clear on Esc
+            if (evt.which == 27) {
+                this.value = '';
+            }
+            self.searchString = this.value;
+            self.dataView.refresh();
+        }); 
+
+        // grouping
+        this.el_cb_grouping.click(function(evt) {
+            var selected = $(this).is(':checked');
+            if (selected) {
+                self.enableGrouping();
+            } else {
+                self.disableGrouping();
+            }
+        });
+
+        // hover
+        this.el_grid.find('.slick-row')
+            .live("mouseenter mouseleave", function(evt) {
+                var el = $(this);
+                // do not hover group rows
+                if (el.is('.slick-group')) {
+                    return;
+                }
+                // handle hover class
+                if (evt.type == "mouseenter") {
+                    el.addClass('karl-wikitoc-grid-row-hover');
+                } else {
+                    el.removeClass('karl-wikitoc-grid-row-hover');
+                }
+            });
+
+        // columns
         this.inactive_columns = {};
         this.grid_columns = [
             {id:"title", name:"Title", field:"title", formatter: TitleCellFormatter, width:320, minWidth:20, sortable:true},
-            {id:"author_name", name:"Author", field:"author_name", width:80, minWidth:20, sortable:true},
-            {id:"tags", name:"Tags", field:"tags", width: 140, minWidth:20, sortable:true},
-            {id:"creation_date", name:"Created", field:"creation_date", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true}
+            {id:"author_name", name:"Author", field:"author_name", formatter: AuthorCellFormatter, width:80, minWidth:20, sortable:true},
+            {id:"tags", name:"Tags", field:"tags", width: 140, minWidth:20, sortable:false},
+            {id:"created", name:"Created", field:"created", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true},
+            {id:"modified", name:"Modified", field:"modified", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true}
         ];
 
         this.filterGridColumns();
@@ -139,21 +202,36 @@ $.widget('karl.karlwikitoc', {
             forceFitColumns: true
         };
 
-        var sortcol = "creation_date";
-        var sortdir = -1;
-
-        function comparer(a,b) {
-            var x = a[sortcol], y = b[sortcol];
-            return (x == y ? 0 : (x > y ? 1 : -1));
-        }
-
-
         var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
-        var dataView = new Slick.Data.DataView({
+        var dataView = this.dataView = new Slick.Data.DataView({
             groupItemMetadataProvider: groupItemMetadataProvider
         });
-        
+
+ 
+
         var grid = this.grid = new Slick.Grid(this.el_grid, dataView, columns, options);
+
+        // register the group item metadata provider to add expand/collapse group handlers
+        grid.registerPlugin(groupItemMetadataProvider);
+
+        function comparer(a,b) {
+            var va = a[self.sortCol].toLowerCase();
+            var vb = b[self.sortCol].toLowerCase();
+            return (va == vb ? 0 : (va > vb ? 1 : -1));
+        }
+
+        // sorting
+        this.sortCol = "title";
+        this.sortDir = 1;
+
+        grid.onSort.subscribe(function(e, args) {
+            self.sortDir = args.sortAsc ? 1 : -1;
+            self.sortCol = args.sortCol.field;
+
+            // using native sort with comparer
+            // preferred method but can be very slow in IE with huge datasets
+            dataView.sort(comparer, args.sortAsc);
+        });
 
         // wire up model events to drive the grid
         dataView.onRowCountChanged.subscribe(function(e,args) {
@@ -165,30 +243,130 @@ $.widget('karl.karlwikitoc', {
             grid.invalidateRows(args.rows);
             grid.render();
         });
-
-
-        //var pager = new Slick.Controls.Pager(dataView, grid, this.footer);
-        //var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
-
-        grid.onSort.subscribe(function(e, args) {
-            sortdir = args.sortAsc ? 1 : -1;
-            sortcol = args.sortCol.field;
-
-            // using native sort with comparer
-            // preferred method but can be very slow in IE with huge datasets
-            dataView.sort(comparer, args.sortAsc);
-        });
-
+        
         // initialize the model after all the events have been hooked up
         dataView.beginUpdate();
         dataView.setItems(this.options.items);
+        dataView.setFilter(function contentFilter(item) {
+            return self._contentFilter(item);
+        });
         dataView.endUpdate();
-        
+
+        // sort initially
+        grid.setSortColumn(this.sortCol, this.sortDir);
+        dataView.sort(comparer, this.sortDir == 1);
+
+        // display the footer info
+        this.el_label_items_num.text(this.options.items.length);       
     },
 
     //destroy: function() {
     //    $.Widget.prototype.destroy.call( this );
     //}
+
+    _addFakeRecords: function() {
+        var self = this;
+        // The fake records enable a record appear in as many
+        // tag groups, as needed. We enable this by adding the extra
+        // records to the grid.
+        if (! this._fake_records_added) {
+            this._fake_records_added = true;
+            // we add some fake records so each row appears multiple
+            // times, under each tag group it belongs to.
+            var items = this.dataView.getItems();
+            $.each(items, function(index, item) {
+                var tags = item.tags;
+                item.original = true;
+                if (tags.length === 0) {
+                    item.effective_tag = '';
+                } else {
+                    item.effective_tag = tags[0];
+                    $.each(tags, function(tagindex, tag) {
+                        if (tagindex === 0) {
+                            return;
+                        }
+                        var new_item = $.extend({}, item, {
+                            effective_tag: tag,
+                            original: false
+                            });
+                        self.dataView.addItem(new_item);
+                    });
+                }
+            });
+        }
+    },
+
+    enableGrouping: function() {
+        var self = this;
+        this.groupingEnabled = true;
+
+        // Add the fake records needed for the grouping
+        this._addFakeRecords();
+
+        this.dataView.groupBy(
+            'effective_tag',
+            function (g) {
+                if (g.value !== '') {
+                    return '<span class="karl-wikitoc-groupheader">Tag: ' + g.value + '</span>' ;
+                } else {
+                    return '<span class="karl-wikitoc-groupheader">Untagged:</span>';
+                }
+            },
+            function (a, b) {
+                // Search case insensitive.
+                var va = a.value.toLowerCase();
+                var vb = b.value.toLowerCase();
+                // equality
+                if (va == vb) {
+                    return 0;
+                }
+                // We want no-tags at the end,
+                // which have the value of ''.
+                if (va === '') {
+                    return +1;
+                }
+                if (vb === '') {
+                    return -1;
+                }
+                // Otherwise just order alphabetically.
+                return va < vb ? -1 : +1;
+            }
+        );
+
+    },
+
+    disableGrouping: function() {
+        this.groupingEnabled = false;
+        this.dataView.groupBy(null);
+    },
+
+    _contentFilter: function(item) {
+        // The fake records need to be filtered out in case there is
+        // no grouping.
+        if (! this.groupingEnabled && this._fake_records_added && ! item.original) {
+            return false;
+        }
+        // Next, filter based on the search string
+        // provided by the user.
+        var ss = this.searchString.toLowerCase();
+        if (ss === '') {
+            return true;
+        }
+        if (item.title.toLowerCase().indexOf(ss) != -1) {
+            return true;
+        }
+        if (item.author_name.toLowerCase().indexOf(ss) != -1) {
+            return true;
+        }
+        var found_in_tags = false;
+        $.each(item.tags, function(index, tag) {
+            if (tag.toLowerCase().indexOf(ss) != -1) {
+                found_in_tags = true;
+                return false;  // stop iteration
+            }
+        });
+        return found_in_tags;
+    },
 
     filterGridColumns: function() {
         var self = this;
@@ -259,7 +437,7 @@ $.widget('karl.karlwikitoc', {
         if (new_open) {
             // opening
             this.el_button_inspector
-                .button('option', 'icons', {primary: 'ui-icon-circle-triangle-e'});
+                .button('option', 'icons', {primary: 'ui-icon-triangle-1-e'});
             this.el_inspector
                 .animate({
                     'width': '' + width + 'px'
@@ -278,7 +456,7 @@ $.widget('karl.karlwikitoc', {
         } else {
             // closing
             this.el_button_inspector
-                .button('option', 'icons', {primary: 'ui-icon-circle-triangle-w'});
+                .button('option', 'icons', {primary: 'ui-icon-triangle-1-w'});
             this.el_inspector
                 .animate({
                     'width': '0px'
