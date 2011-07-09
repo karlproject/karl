@@ -1367,7 +1367,7 @@ if (typeof Slick === "undefined") {
                 try {
                 rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
                 } catch(e) {
-                    var _debug = _debug;
+                    var _debug = 123;
                     throw(e);
                 }
             }
