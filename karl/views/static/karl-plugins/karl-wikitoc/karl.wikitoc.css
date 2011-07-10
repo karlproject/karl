@@ -24,6 +24,8 @@
     margin: 4px;
 }
 
+/* inspector panel */
+
 .karl-wikitoc-inspector {
     width: 0px;
     height: 500px;
@@ -41,23 +43,42 @@
     border: 2px groove #f0f0f0;
 }
 .karl-wikitoc-inspector fieldset > div {
-    padding: 1em;
+    padding: 8px;
 }
 .karl-wikitoc-inspector legend {
     color: #222222;
+    margin-left: 11px;
 }
 
+.karl-wikitoc-inspector fieldset p {
+    margin: 0 0 10px 2px;
+    font-size: 90%;
+    font-weight: normal;
+    font-style: italic;
+}
+.karl-wikitoc-inspector fieldset label {
+    font-size: 90%;
+    font-weight: bold;
+}
+
+/* inspector panel fieldsets spacing */
+
 .karl-wikitoc-inspector-wrapper {
-    width: 190px;
+    width: 190px; /* this width is picked from js */
 }
 .karl-wikitoc-inspector-wrapper2 {
     padding: 10px;
-    padding-top: 90px;
+    padding-top: 40px;
+}
+
+fieldset.karl-wikitoc-grouping {
+    margin-top: 40px;
 }
 
 fieldset.karl-wikitoc-columnselectors {
-    margin-top: 90px;
+    margin-top: 40px;
 }
+
 
 .karl-wikitoc-icon-search {
     float: left;

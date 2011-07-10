@@ -52,13 +52,21 @@ $.widget('karl.karlwikitoc', {
               '<div class="karl-wikitoc-inspector-wrapper"><div class="karl-wikitoc-inspector-wrapper2">' +
                 
                   '<fieldset class="karl-wikitoc-livesearch">' +
-                      '<legend>Find in index</legend>' +
+                      '<legend>Find in text</legend>' +
                         '<div>' +
+                          '<p>Letters anywhere in title, tags, or author</p>' +
                           '<div>' +
                             '<span class="karl-wikitoc-icon-search ui-icon ui-icon-search"></span>' +
                             '<input class="karl-wikitoc-input-livesearch" type="text"></input>' +
                           '</div>' +
                           '<div class="ui-helper-clearfix"></div>' +
+                    '</div>' +
+                  '</fieldset>' +
+
+                  '<fieldset class="karl-wikitoc-grouping">' +
+                      '<legend>Grouping</legend>' +
+                        '<div>' +
+                          '<p>Column, if any, to group by</p>' +
                           '<div>' +
                             '<input type="checkbox" class="karl-wikitoc-cb-grouping"></input>' +
                             '<label>Group by tags</label>' +
@@ -67,8 +75,9 @@ $.widget('karl.karlwikitoc', {
                   '</fieldset>' +
 
                   '<fieldset class="karl-wikitoc-columnselectors">' +
-                      '<legend>Select columns</legend>' +
+                      '<legend>Columns</legend>' +
                       '<div>' +
+                          '<p>Which columns to show in the grid, in addition to title</p>' +
                           '<div>' +
                             '<input class="karl-wikitoc-cb-title" type="checkbox" checked="checked"></input>' +
                             '<label>Title</label>' +
