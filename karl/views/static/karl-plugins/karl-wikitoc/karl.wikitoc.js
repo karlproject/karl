@@ -52,7 +52,7 @@ $.widget('karl.karlwikitoc', {
               '<div class="karl-wikitoc-inspector-wrapper"><div class="karl-wikitoc-inspector-wrapper2">' +
                 
                   '<fieldset class="karl-wikitoc-livesearch">' +
-                      '<legend>Search in index</legend>' +
+                      '<legend>Find in index</legend>' +
                         '<div>' +
                           '<div>' +
                             '<span class="karl-wikitoc-icon-search ui-icon ui-icon-search"></span>' +
