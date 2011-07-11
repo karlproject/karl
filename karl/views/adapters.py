@@ -12,6 +12,7 @@ from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
+from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_community
 from karl.utils import find_interface
