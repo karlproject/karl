@@ -19,6 +19,7 @@ from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
+from karl.views.utils import get_static_url
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import implements
@@ -177,11 +178,7 @@ def forumtopic_livesearch_result(context, request):
 @implementer(ILiveSearchEntry)
 def file_livesearch_result(context, request):
     fileinfo = getMultiAdapter((context, request), IFileInfo)
-    # XXX cyclical import
-    # maybe we should move the livesearch adapters to a separate module?
-    from karl.views.api import TemplateAPI
-    api = TemplateAPI(context, request)
-    icon = api.static_url + "/images/" + fileinfo.mimeinfo['small_icon_name']
+    icon = get_static_url() + "/images/" + fileinfo.mimeinfo['small_icon_name']
     return livesearch_dict(
         context, request,
         modified_by=context.modified_by,
@@ -290,9 +287,7 @@ class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
                                                                request)
 
         fileinfo = getMultiAdapter((context, request), IFileInfo)
-        from karl.views.api import TemplateAPI
-        api = TemplateAPI(context, request)
-        icon = (api.static_url + "/images/" +
+        icon = (get_static_url() + "/images/" +
                 fileinfo.mimeinfo['small_icon_name'])
 
         self.display_data = dict(
