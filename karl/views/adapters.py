@@ -93,12 +93,11 @@ def generic_livesearch_result(context, request):
 
 @implementer(ILiveSearchEntry)
 def profile_livesearch_result(context, request):
-    # XXX cyclical import
-    # maybe we should move the livesearch adapters to a separate module?
-    from karl.views.api import TemplateAPI
-    api = TemplateAPI(context, request)
     photo = context.get('photo')
-    thumbnail = api.thumb_url(photo, (85, 85))
+    if photo is None:
+        thumbnail = get_static_url(request) + '/images/defaultUser.gif'
+    else:
+        thumbnail = thumb_url(photo, request, (85,85))
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -178,7 +177,8 @@ def forumtopic_livesearch_result(context, request):
 @implementer(ILiveSearchEntry)
 def file_livesearch_result(context, request):
     fileinfo = getMultiAdapter((context, request), IFileInfo)
-    icon = get_static_url() + "/images/" + fileinfo.mimeinfo['small_icon_name']
+    static_url = get_static_url(request)
+    icon =  "%s/images/%s" % (static_url, fileinfo.mimeinfo['small_icon_name'])
     return livesearch_dict(
         context, request,
         modified_by=context.modified_by,
@@ -259,7 +259,16 @@ class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
                           % (context.email, context.email))
             contact_items.append(email_html)
 
-        self.display_data = dict(contact_html = ' - '.join(contact_items))
+        photo = context.get('photo')
+        if photo is None:
+            thumbnail = get_static_url(request) + '/images/defaultUser.gif'
+        else:
+            thumbnail = thumb_url(photo, request, (50,50))
+
+        self.display_data = dict(
+            contact_html = ' - '.join(contact_items),
+            thumbnail = thumbnail,
+            )
 
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
     macro = 'searchresults_event'
@@ -287,7 +296,7 @@ class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
                                                                request)
 
         fileinfo = getMultiAdapter((context, request), IFileInfo)
-        icon = (get_static_url() + "/images/" +
+        icon = (get_static_url(request) + "/images/" +
                 fileinfo.mimeinfo['small_icon_name'])
 
         self.display_data = dict(

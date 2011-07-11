@@ -890,7 +890,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
         <a title="${doc.title}" href="${url}">
           <img width="50" height="50"
                tal:define="photo doc.get('photo')"
-               tal:attributes="src api.thumb_url(photo, (50,50))" />
+               tal:attributes="src result_display.display_data['thumbnail']" />
         </a>
       </div>
       <div><a class="sras-people-name" href="${url}">${doc.title}</a></div>
