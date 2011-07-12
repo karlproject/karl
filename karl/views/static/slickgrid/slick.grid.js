@@ -13,7 +13,41 @@
  *     This increases the speed dramatically, but can only be done safely because there are no event handlers
  *     or data associated with any cell/row DOM nodes.  Cell editors must make sure they implement .destroy()
  *     and do proper cleanup.
- */
+
+ * 2011 ree@greenfinity.hu:
+ * fixed an IE issue (hopefully).
+
+- IE7, IE8
+- visit a grid with more than 1500 items 
+- scroll down, move the scrollbar up and down frantically without releasing, then release, the error is always reproducable if you move wild enough.
+You have to move faster then IE is able to catch up with displaying, IE, you scroll in white content.
+
+slick.grid.js line 1367: Invalid Pointer
+
+for (i = 0, l = x.childNodes.length; i < l; i++) {
+    rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+}
+
+i=36, l=43. This means that x had 46 child nodes, now we are processing the #36, 
+but yet at this time x.firstChild = null, somehow x lost more children then how
+ much we actually removed from it.
+
+My first feeling is that this is a bug in slickgrid (or actually IE?).
+This part of code is unchanged in the current trunk of slickgrid.
+
+
+The following fixes it but I am not sure why the whole issue happens. 
+If we loose no rows then maybe this is just the correct fix.
+
+
+var i=0;
+while (x.firstChild) {
+    rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+    i += 1;
+}
+
+
+*/
 
 // make sure required JavaScript modules are loaded
 if (typeof jQuery === "undefined") {
@@ -1363,9 +1397,20 @@ if (typeof Slick === "undefined") {
             var x = document.createElement("div");
             x.innerHTML = stringArray.join("");
 
-            for (i = 0, l = x.childNodes.length; i < l; i++) {
+// XXX ree@greenfinity.hu fix IE?
+
+            var i=0;
+            while (x.firstChild) {
+            //for (i = 0, l = x.childNodes.length; i < l; i++) {
+                try {
                 rowsCache[rows[i]] = parentNode.appendChild(x.firstChild);
+                i += 1
+                } catch(e) {
+                    var _debug = 123;
+                    throw(e);
+                }
             }
+// XXX END
 
             if (needToReselectCell) {
                 activeCellNode = getCellNode(activeRow,activeCell);

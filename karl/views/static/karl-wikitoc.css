@@ -1,0 +1,12 @@
+
+/**
+* Wiki index resource composition for KARL
+* This is only loaded from the wiki index pages
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+*/
+
+@import url("slickgrid/slick.grid.css");
+@import url("karl-plugins/karl-wikitoc/karl.wikitoc.css");
+

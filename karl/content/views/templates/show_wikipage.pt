@@ -3,6 +3,12 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="api.community_layout.macros['master']">
 
+  <span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
+      <a href="${api.here_url}wikitoc.html">Contents</a> |
+      Tree |
+      This Wiki Page |
+  </span>
+
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
     <link rel="alternate" type="application/atom+xml" 
 	  title="${api.page_title}" href="${feed_url}"
@@ -11,9 +17,15 @@
   
   <div metal:fill-slot="content">
 
+    <div class="contentbar-wrapper">
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <span class="contentbar-menu">
+          <a href="${api.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
+          <a href="${api.here_url}../wikitoc.html">Index</a>
+      </span>
+    </div>
+
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
-    <a metal:use-macro="api.snippets.macros['backto_link']"/>
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 

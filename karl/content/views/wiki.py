@@ -22,12 +22,15 @@ from validatish import validator
 from webob.exc import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
+from zope.component import getMultiAdapter
+from zope.component import getAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
 from repoze.workflow import get_workflow
+from repoze.bfg.traversal import model_path
 
 from repoze.lemonade.content import create_content
 
@@ -35,11 +38,14 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import ITagQuery
+from karl.models.interfaces import ICatalogSearch
 
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
+from karl.utils import find_profiles
 
 from karl.views.api import TemplateAPI
 
@@ -53,6 +59,7 @@ from karl.views.forms import validators as karlvalidators
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.views.utils import extract_description
+from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
@@ -185,6 +192,43 @@ class AddWikiPageFormController(object):
         location = model_url(wikipage, request) + msg
         return HTTPFound(location=location)
 
+
+def get_wikitoc_data(context, request):
+    wikiparent = context.__parent__
+    search = getAdapter(context, ICatalogSearch)
+    count, docids, resolver = search(
+        path = model_path(wikiparent),
+        interfaces = [IWikiPage,]
+    )
+    items = []
+    profiles = find_profiles(context)
+    for docid in docids:
+        entry = resolver(docid)
+        tags = getMultiAdapter((entry, request), ITagQuery).tagswithcounts
+        author = entry.creator
+        profile = profiles.get(author, None)
+        profile_url = model_url(profile, request)
+        if profile is not None:
+            author_name = '%s %s' % (profile.firstname, profile.lastname)
+        else:
+            author_name = author
+        items.append(dict(
+            id = "id_" + entry.__name__,
+            name = entry.__name__,
+            title = entry.title,
+            author = author,
+            author_name = author_name,
+            profile_url = profile_url,
+            tags = [tag['tag'] for tag in tags],
+            created = entry.created.isoformat(),
+            modified = entry.modified.isoformat(),
+        ))
+    result = dict(
+        items = items,
+        )
+    return result
+
+
 def show_wikipage_view(context, request):
 
     is_front_page = (context.__name__ == 'front_page')
@@ -217,6 +261,44 @@ def show_wikipage_view(context, request):
     feed_url = model_url(wiki, request, "atom.xml")
     return render_template_to_response(
         'templates/show_wikipage.pt',
+        api=api,
+        actions=actions,
+        head_data=client_json_data,
+        feed_url=feed_url,
+        backto=backto,
+        is_front_page=is_front_page,
+        )
+
+
+
+def show_wikitoc_view(context, request):
+
+    is_front_page = (context.__name__ == 'front_page')
+    if is_front_page:
+        community = find_interface(context, ICommunity)
+        page_title = '%s Community Wiki Page' % community.title
+        backto = False
+    else:
+        page_title = context.title
+        backto = {
+            'href': model_url(context.__parent__, request),
+            'title': context.__parent__.title,
+            }
+
+    actions = []
+
+    api = TemplateAPI(context, request, page_title)
+
+    wikitoc_data = get_wikitoc_data(context, request)
+
+    client_json_data = convert_to_script(dict(
+        wikitoc = wikitoc_data,
+        ))
+
+    wiki = find_interface(context, IWiki)
+    feed_url = model_url(wiki, request, "atom.xml")
+    return render_template_to_response(
+        'templates/show_wikitoc.pt',
         api=api,
         actions=actions,
         head_data=client_json_data,

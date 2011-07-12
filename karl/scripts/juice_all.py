@@ -53,6 +53,9 @@ def main(argv=sys.argv):
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.js')) 
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.css')) 
 
+    run_juicer(os.path.join(static_dir, 'karl-wikitoc.js')) 
+    run_juicer(os.path.join(static_dir, 'karl-wikitoc.css'))  
+
     print "\n\n##### All files compressed OK"
 
 if __name__ == '__main__':
