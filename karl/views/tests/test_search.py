@@ -433,12 +433,7 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
-        class FileDummyAdapter(object):
-            def __init__(self, context, request):
-                pass
-            mimeinfo = dict(small_icon_name='imgpath.png')
-
-        testing.registerAdapter(FileDummyAdapter,
+        testing.registerAdapter(DummyFileAdapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 IFileInfo)
 
@@ -758,6 +753,92 @@ class SearchResultsViewTests(unittest.TestCase):
         self.assertEqual(len(result['results']), 1)
 
 
+class AdvancedSearchResultsDisplayTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_generic(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import BaseAdvancedSearchResultsDisplay
+        adapter = BaseAdvancedSearchResultsDisplay(context, request)
+        self.assertEqual('searchresults_generic', adapter.macro)
+        self.assertEqual({}, adapter.display_data)
+
+    def test_office(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import AdvancedSearchResultsDisplayOffice
+        adapter = AdvancedSearchResultsDisplayOffice(context, request)
+        self.assertEqual('searchresults_office', adapter.macro)
+        self.assertEqual({}, adapter.display_data)
+
+    def test_people(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import AdvancedSearchResultsDisplayPeople
+        context.extension = '1234'
+        context.room_no = '101'
+        context.email = 'foo@example.com'
+        context.photo = None
+        adapter = AdvancedSearchResultsDisplayPeople(context, request)
+        self.assertEqual('searchresults_people', adapter.macro)
+        self.failUnless('1234' in adapter.display_data['contact_html'])
+        self.failUnless('101' in adapter.display_data['contact_html'])
+        self.failUnless('foo@example.com'
+                        in adapter.display_data['contact_html'])
+        self.assertEqual('http://example.com/static/r7046/images/'
+                         'defaultUser.gif',
+                         adapter.display_data['thumbnail'])
+
+    def test_event(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import AdvancedSearchResultsDisplayEvent
+        from karl.utilities.interfaces import IKarlDates
+        testing.registerUtility(lambda x,y: "custom date string",
+                                IKarlDates)
+        from datetime import datetime
+        context.startDate = datetime(1900, 1, 1, 1, 1)
+        context.endDate = datetime(1900, 1, 1, 2, 2)
+        context.location = 'earth'
+        adapter = AdvancedSearchResultsDisplayEvent(context, request)
+        self.assertEqual('searchresults_event', adapter.macro)
+        self.assertEqual('custom date string',
+                         adapter.display_data['startDate'])
+        self.assertEqual('custom date string',
+                         adapter.display_data['endDate'])
+        self.assertEqual('earth',
+                         adapter.display_data['location'])
+
+    def test_file(self):
+        root = testing.DummyModel()
+        context = testing.DummyModel(__name__='foo', __parent__=root,
+                                     title='foo')
+        request = testing.DummyRequest()
+        from karl.views.adapters import AdvancedSearchResultsDisplayFile
+        from karl.content.views.interfaces import IFileInfo
+        testing.registerAdapter(DummyFileAdapter,
+                                (Interface, Interface),
+                                IFileInfo)
+        adapter = AdvancedSearchResultsDisplayFile(context, request)
+        self.assertEqual('searchresults_file', adapter.macro)
+        self.assertEqual('DummyFileAdapter',
+                         type(adapter.display_data['fileinfo']).__name__)
+        self.failUnless(adapter.display_data['icon'].endswith('/imgpath.png'))
+
+
 class GetBatchTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -967,3 +1048,8 @@ class DummyGroupSearchFactory:
         self.resolver = resolver
     def __call__(self):
         return self.limit, range(self.limit), self.resolver
+
+class DummyFileAdapter(object):
+    def __init__(self, context, request):
+        pass
+    mimeinfo = dict(small_icon_name='imgpath.png')
