@@ -608,3 +608,10 @@ def convert_entities(s):
 
     return _entity_re.sub(convert, s)
 
+
+def get_static_url(request):
+    # to avoid cyclical imports
+    from karl.views.api import _get_static_rev
+    app_url = request.application_url
+    static_url = '%s/static/%s' % (app_url, _get_static_rev())
+    return static_url

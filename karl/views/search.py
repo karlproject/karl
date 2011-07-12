@@ -33,6 +33,7 @@ from karl.utils import find_profiles
 from karl.utils import get_content_type_name_and_icon
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
 from repoze.bfg.security import effective_principals
 from repoze.bfg.traversal import model_path
@@ -45,6 +46,7 @@ from webob import Response
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.component import getMultiAdapter
 from zope.index.text.parsetree import ParseError
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -235,6 +237,9 @@ def searchresults_view(context, request):
             else:
                 description = getattr(doc, 'description', '')
             type_name, icon = get_content_type_name_and_icon(doc)
+
+            result_display = getMultiAdapter((doc, request),
+                                             IAdvancedSearchResultsDisplay)
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
@@ -243,6 +248,7 @@ def searchresults_view(context, request):
                 'icon': icon,
                 'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'author': None,
+                'result_display': result_display,
             }
 
             result_community = find_community(doc)

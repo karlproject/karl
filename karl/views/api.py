@@ -496,6 +496,7 @@ class TemplateAPI(object):
                 if item['component'].livesearch]
         return self._livesearch_options
 
+
 class SettingsReader:
     """Convenience for reading settings in templates"""
     def __init__(self, context):

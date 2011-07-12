@@ -1829,4 +1829,45 @@
     factory=".adapters.calendar_livesearch_result"
     />
 
+  <adapter
+    for="karl.content.interfaces.IIntranet
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.ILiveSearchEntry"
+    factory=".adapters.intranet_livesearch_result"
+    />
+
+  <adapter
+    for="* repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.BaseAdvancedSearchResultsDisplay"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IIntranet
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayOffice"
+    />
+
+  <adapter
+    for="karl.models.interfaces.IProfile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayPeople"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayEvent"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         repoze.bfg.interfaces.IRequest"
+    provides=".interfaces.IAdvancedSearchResultsDisplay"
+    factory=".adapters.AdvancedSearchResultsDisplayFile"
+    />
+
 </configure>

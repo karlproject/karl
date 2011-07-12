@@ -1,3 +1,5 @@
+from zope.component import getUtility
+
 from repoze.bfg.chameleon_zpt import render_template
 from repoze.bfg.url import model_url
 from repoze.lemonade.listitem import get_listitems
@@ -6,15 +8,19 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
+from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
 from karl.utilities.image import thumb_url
+from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_community
 from karl.utils import find_interface
+from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
+from karl.views.utils import get_static_url
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import implements
@@ -90,13 +96,9 @@ def generic_livesearch_result(context, request):
 def profile_livesearch_result(context, request):
     photo = context.get('photo')
     if photo is None:
-        # XXX cyclical import
-        # maybe we should move the livesearch adapters to a separate module?
-        from karl.views.api import TemplateAPI
-        api = TemplateAPI(context, request)
-        thumbnail = api.static_url + "/images/defaultUser.gif"
+        thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     else:
-        thumbnail = thumb_url(photo, request, (85, 85))
+        thumbnail = thumb_url(photo, request, (85,85))
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -176,11 +178,8 @@ def forumtopic_livesearch_result(context, request):
 @implementer(ILiveSearchEntry)
 def file_livesearch_result(context, request):
     fileinfo = getMultiAdapter((context, request), IFileInfo)
-    # XXX cyclical import
-    # maybe we should move the livesearch adapters to a separate module?
-    from karl.views.api import TemplateAPI
-    api = TemplateAPI(context, request)
-    icon = api.static_url + "/images/" + fileinfo.mimeinfo['small_icon_name']
+    static_url = get_static_url(request)
+    icon =  "%s/images/%s" % (static_url, fileinfo.mimeinfo['small_icon_name'])
     return livesearch_dict(
         context, request,
         modified_by=context.modified_by,
@@ -202,6 +201,20 @@ def community_livesearch_result(context, request):
         )
 
 @implementer(ILiveSearchEntry)
+def intranet_livesearch_result(context, request):
+    return livesearch_dict(
+        context, request,
+        address=context.address,
+        city=context.city,
+        state=context.state,
+        zipcode=context.zipcode,
+        telephone=context.telephone,
+        country=context.country,
+        type='community',
+        category='office',
+        )
+
+@implementer(ILiveSearchEntry)
 def calendar_livesearch_result(context, request):
     return livesearch_dict(
         context, request,
@@ -212,3 +225,82 @@ def calendar_livesearch_result(context, request):
         type='calendarevent',
         category='calendarevent',
         )
+
+class BaseAdvancedSearchResultsDisplay(object):
+
+    implements(IAdvancedSearchResultsDisplay)
+
+    macro = 'searchresults_generic'
+    display_data = {}
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_office'
+
+class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_people'
+
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayPeople, self).__init__(context,
+                                                                 request)
+        contact_items = []
+        if context.extension and context.extension.strip():
+            extension_html = ('<span class="sras-people-extension">x%s</span>'
+                              % context.extension)
+            contact_items.append(extension_html)
+        if context.room_no and context.room_no.strip():
+            room_html = ('<span class="sras-people-room">Room %s</span>'
+                         % context.room_no)
+            contact_items.append(room_html)
+        if context.email and context.email.strip():
+            email_html = ('<a href="mailto:%s">%s</a>'
+                          % (context.email, context.email))
+            contact_items.append(email_html)
+
+        photo = context.get('photo')
+        if photo is None:
+            thumbnail = get_static_url(request) + '/images/defaultUser.gif'
+        else:
+            thumbnail = thumb_url(photo, request, (50,50))
+
+        self.display_data = dict(
+            contact_html = ' - '.join(contact_items),
+            thumbnail = thumbnail,
+            )
+
+class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_event'
+
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayEvent, self).__init__(context,
+                                                                request)
+
+        karldates = getUtility(IKarlDates)
+        startDate = karldates(context.startDate, 'longform')
+        endDate = karldates(context.endDate, 'longform')
+        location = context.location
+
+        self.display_data = dict(
+            startDate = startDate,
+            endDate = endDate,
+            location = location,
+            )
+
+class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
+    macro = 'searchresults_file'
+
+    def __init__(self, context, request):
+        super(AdvancedSearchResultsDisplayFile, self).__init__(context,
+                                                               request)
+
+        fileinfo = getMultiAdapter((context, request), IFileInfo)
+        icon = (get_static_url(request) + "/images/" +
+                fileinfo.mimeinfo['small_icon_name'])
+
+        self.display_data = dict(
+            fileinfo = fileinfo,
+            icon = icon,
+            )

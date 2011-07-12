@@ -202,6 +202,10 @@
     width: 16px;
 }
 
+.bc-livesearch-office .telephone {
+    margin-left: 2em;
+}
+
 .ui-menu .ui-menu-item .bc-livesearch-profile a.email {
     display: inline;
     color: blue;
