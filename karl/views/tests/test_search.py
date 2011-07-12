@@ -535,10 +535,14 @@ class SearchResultsViewTests(unittest.TestCase):
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
@@ -571,10 +575,14 @@ class SearchResultsViewTests(unittest.TestCase):
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
@@ -587,6 +595,7 @@ class SearchResultsViewTests(unittest.TestCase):
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         class LocalDummyContent(testing.DummyModel):
@@ -598,6 +607,9 @@ class SearchResultsViewTests(unittest.TestCase):
             content = LocalDummyContent()
         testing.registerAdapter(LocalDummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo'])
         self.assertEqual(len(result['results']), 1)
@@ -619,9 +631,13 @@ class SearchResultsViewTests(unittest.TestCase):
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'People'}))
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo', 'People'])
         self.assertEqual(len(result['results']), 1)
@@ -639,10 +655,14 @@ class SearchResultsViewTests(unittest.TestCase):
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['community'], 'Citizens')
         self.assertEqual(result['terms'], ['yo'])
@@ -675,11 +695,15 @@ class SearchResultsViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.content.interfaces import IBlogEntry
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         registerContentFactory(DummyContent, IBlogEntry)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo', 'Blog Entry'])
         self.assertEqual(len(result['results']), 1)
@@ -696,11 +720,15 @@ class SearchResultsViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.content.interfaces import IBlogEntry
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         registerContentFactory(DummyContent, IBlogEntry)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['Blog Entry'])
         self.assertEqual(len(result['results']), 1)
@@ -716,11 +744,15 @@ class SearchResultsViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.content.interfaces import IBlogEntry
         from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         registerContentFactory(DummyContent, IBlogEntry)
         testing.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo', 'Past week'])
         self.assertEqual(len(result['results']), 1)
@@ -903,6 +935,12 @@ class DummySearch:
         pass
     def __call__(self, **kw):
         return 1, [1], lambda x: self.content
+
+class DummySearchResultsDisplay:
+    display_data = {}
+    macro = 'searchresults_generic'
+    def __init__(self, context, request):
+        pass
 
 class DummyEmptySearch:
     def __init__(self, context):
