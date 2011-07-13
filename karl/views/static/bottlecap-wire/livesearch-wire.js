@@ -376,14 +376,18 @@ function renderCommunity(item) {
 
 function renderOffice(item) {
     var entry = $('<a class="bc-livesearch-office" />');
+    function joinElements(elts) {
+        var nonnulls = $.grep(elts, function(x) { return x !== null; });
+        return nonnulls.join(', ');
+    }
     entry
         .append($('<div />')
                 .text(item.title + ' Office')
                 .append($('<span class="discreet telephone" />')
                         .text(item.telephone))
                 .append($('<div class="discreet" />').text(item.address))
-                .append($('<div class="discreet" />').text(item.city + (item.state ? ', ' + item.state : '')))
-                .append($('<div class="discreet" />').text(item.zipcode + ' ' + item.country)))
+                .append($('<div class="discreet" />').text(joinElements([item.city, item.state])))
+                .append($('<div class="discreet" />').text(item.zipcode)));
     return entry;
 }
 
