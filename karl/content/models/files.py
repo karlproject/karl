@@ -24,6 +24,7 @@ from repoze.lemonade.content import create_content
 
 from zope.interface import alsoProvides
 from zope.interface import implements
+from zope.interface import noLongerProvides
 
 from karl.content.interfaces import IImage
 from karl.models.tool import ToolFactory
@@ -64,21 +65,6 @@ class CommunityFile(Persistent):
         self.modified_by = self.creator
         self.blobfile = Blob()
         self.upload(stream)
-        self._init_image()
-
-    def _init_image(self):
-        if not self.mimetype.startswith('image'):
-            return
-
-        try:
-            image = PIL.Image.open(self.blobfile.open())
-        except IOError:
-            return
-
-        self._thumbs = OOBTree()
-        self.image_size = image.size
-        self.is_image = True
-        alsoProvides(self, IImage)
 
     def image(self):
         assert self.is_image, "Not an image."
@@ -97,6 +83,34 @@ class CommunityFile(Persistent):
         size = upload_stream(stream, f)
         f.close()
         self.size = size
+        self._init_image()
+
+    def _check_image(self):
+        if not self.mimetype.startswith('image'):
+            return
+
+        try:
+            image = PIL.Image.open(self.blobfile.open())
+        except IOError:
+            return
+
+        return image
+
+    def _init_image(self):
+        image = self._check_image()
+
+        if image is not None:
+            self._thumbs = OOBTree()
+            self.image_size = image.size
+            self.is_image = True
+            alsoProvides(self, IImage)
+
+        elif self.is_image:
+            del self._thumbs
+            del self.image_size
+            self.is_image = False
+            noLongerProvides(self, IImage)
+
 
 def upload_stream(stream, file):
     size = 0

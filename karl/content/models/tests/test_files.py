@@ -118,9 +118,16 @@ class CommunityFileTests(unittest.TestCase):
 
         from zope.interface.verify import verifyObject
         verifyObject(IImage, o)
+        return o
 
     def test_bad_image(self):
         o = self._makeOne(mimetype='image/jpeg')
+        self.failIf(o.is_image)
+
+    def test_from_image_to_nonimage(self):
+        o = self.test_jpg()
+        self.failUnless(o.is_image)
+        o.upload(DummyFile())
         self.failIf(o.is_image)
 
     def test_thumbnail(self):

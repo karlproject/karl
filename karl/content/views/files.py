@@ -713,9 +713,9 @@ class EditFileFormController(object):
         f = converted['file']
 
         if f.filename:
-            context.upload(f.file)
             context.mimetype = get_upload_mimetype(f)
             context.filename = f.filename
+            context.upload(f.file)
             check_upload_size(context, context, 'file')
         else:
             meta = f.metadata

@@ -8,6 +8,10 @@ Unreleased
   compatability with Python 2.5.  simplejson is already in use elsewhere in
   the application.
 
+- Fixed bug where replacing a file via the Edit File form would fail to check
+  if a file changed from an image file to a non-image file or vice versa.
+  (LP #807478)
+
 3.67 (2011-06-30)
 -----------------
 
