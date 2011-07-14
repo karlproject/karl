@@ -15,6 +15,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import re
+
 from zope.interface import implements
 from zope.component import queryUtility
 
@@ -136,6 +138,17 @@ FileTextIndexData = makeFlexibleTextIndexData(
                                  (_extract_and_cache_file_data, None),
                                 ])
 
+WIKILINK_RE = re.compile('\(\((.+)\)\)')
+
+class WikiTextIndexData(TitleAndTextIndexData):
+
+    def __call__(self):
+        parts = super(WikiTextIndexData, self).__call__()
+        def repl(match):
+            return match.groups()[0]
+        return tuple(WIKILINK_RE.sub(repl, part) for part in parts)
+
+
 class CalendarEventCategoryData(object):
     def __init__(self, context):
         self.context = context
@@ -146,7 +159,4 @@ class CalendarEventCategoryData(object):
             calendar = find_interface(self.context, ICalendar)
             category = model_path(calendar)
         return category
-
-
-
 

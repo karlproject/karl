@@ -15,6 +15,9 @@ Unreleased
 - Mailed in content now gets a created timestamp set from the Date header of
   the incoming email instead of the current time. (LP #806066)
 
+- Scrubbed the double parentheses from wiki links in search results for wiki
+  pages.  (LP #809969)
+
 3.67 (2011-06-30)
 -----------------
 

@@ -206,6 +206,49 @@ class TestTitleAndTextIndexData(unittest.TestCase):
         data = adapter()
         self.assertEqual(data, ('thetitle', '\n\nHi!\n\n'))
 
+class TestWikiTextIndexData(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.content.models.adapters import WikiTextIndexData as cls
+        return cls
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_class_conforms_to_ITextIndexData(self):
+        from zope.interface.verify import verifyClass
+        from karl.models.interfaces import ITextIndexData
+        verifyClass(ITextIndexData, self._getTargetClass())
+
+    def test_instance_conforms_to_ITextIndexData(self):
+        from zope.interface.verify import verifyObject
+        from karl.models.interfaces import ITextIndexData
+        context = testing.DummyModel()
+        verifyObject(ITextIndexData, self._makeOne(context))
+
+    def test_no_text(self):
+        context = testing.DummyModel(title = 'thetitle',
+                                     text = '',
+                                    )
+        adapter = self._makeOne(context)
+        data = adapter()
+        self.assertEqual(data, ('thetitle', ''))
+
+    def test_w_text(self):
+        context = testing.DummyModel(
+            title = 'thetitle',
+            text = '<html><body>Hi! Will you be my ((friend))?</body></html>',
+        )
+        adapter = self._makeOne(context)
+        data = adapter()
+        self.assertEqual(data, ('thetitle',
+                                '\n\nHi! Will you be my friend?\n\n'))
+
 class TestFileTextIndexData(unittest.TestCase):
     def setUp(self):
         cleanUp()

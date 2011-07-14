@@ -70,7 +70,7 @@
       factory=".blog.BlogEntry"
       type="karl.content.interfaces.IBlogEntry"
       />
-   
+
   <lemonade:content
       factory=".calendar.Calendar"
       type="karl.content.interfaces.ICalendar"
@@ -95,7 +95,7 @@
       factory=".files.CommunityRootFolder"
       type="karl.content.interfaces.ICommunityRootFolder"
       />
-    
+
   <lemonade:content
       factory=".files.CommunityFolder"
       type="karl.content.interfaces.ICommunityFolder"
@@ -110,12 +110,12 @@
       factory=".references.ReferenceManual"
       type="karl.content.interfaces.IReferenceManual"
       />
-    
+
   <lemonade:content
       factory=".references.ReferenceSection"
       type="karl.content.interfaces.IReferenceSection"
       />
-    
+
   <adapter
       for="karl.content.interfaces.ICommunityFile"
       provides="karl.models.interfaces.ITextIndexData"
@@ -155,7 +155,7 @@
   <adapter
       for="karl.content.interfaces.IWikiPage"
       provides="karl.models.interfaces.ITextIndexData"
-      factory=".adapters.TitleAndTextIndexData"
+      factory=".adapters.WikiTextIndexData"
      />
 
   <adapter
