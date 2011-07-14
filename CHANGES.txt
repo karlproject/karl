@@ -18,6 +18,10 @@ Unreleased
 - Scrubbed the double parentheses from wiki links in search results for wiki
   pages.  (LP #809969)
 
+- Fixed ie7 issue where adding in (un)ordered lists in tinymce was broken.
+
+- Display custom search results based on content type (LP #792333)
+
 3.67 (2011-06-30)
 -----------------
 
