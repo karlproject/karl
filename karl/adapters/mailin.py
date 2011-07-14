@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+import datetime
+import time
 from email.utils import getaddresses
+from email.utils import parsedate
+
 import re
 
 from repoze.bfg.security import has_permission
@@ -293,11 +297,27 @@ class MailinDispatcher(object):
     def crackHeaders(self, message):
         """ See IMailinDispatcher.
         """
-        # First, get all necessary info for addressing a community.
-        # This is important for allowing moderators to see all email
-        # addressed to their community, even if some email can't be
-        # posted for other reasons.
-        info = self.getMessageTargets(message)
+        info = {}
+
+        # Crack the date
+        datestr = message['Date']
+        if datestr:
+            # Per usual, the email module is broken. The documentation asserts
+            # that the tuple returned by parsedate is suitable for passing to
+            # time.mktime, but parsedate returns a time in GMT and time.mktime
+            # assumes a local time. There is no GMT equivalent to time.mktime
+            # in the time module, so we just manually subtract the timezone
+            # offset from the result of time.mktime.
+            timestamp = time.mktime(parsedate(datestr)) - time.timezone
+            timetuple = time.localtime(timestamp)
+            info['date'] = datetime.datetime(*timetuple[:6])
+        else:
+            info['date'] = datetime.datetime.now()
+
+        # Get all necessary info for addressing a community. This is important
+        # for allowing moderators to see all email addressed to their
+        # community, even if some email can't be posted for other reasons.
+        info.update(self.getMessageTargets(message))
         if info.get('error'):
             return info
 
@@ -313,7 +333,7 @@ class MailinDispatcher(object):
         if not good_targets:
             return info
 
-        # Finally, look for issues that a moderator can choose to ignore.
+        # Look for issues that a moderator can choose to ignore.
         info.update(self.getAutomationIndicators(message))
 
         return info

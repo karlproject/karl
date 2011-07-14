@@ -86,6 +86,7 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
     def test_handle_no_email_attachments(self):
         from repoze.bfg.testing import DummyModel
         from karl.models.interfaces import IComment
+        import datetime
         self._registerFactory(IComment, DummyModel)
         self._registerContextURL()
         self._registerSettings()
@@ -96,7 +97,8 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         comments.next_id = '1'
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
 
         adapter.handle(message, info, 'TEXT', [])
 
@@ -107,12 +109,15 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         self.assertEqual(comment.creator, 'phreddy')
         self.assertEqual(comment.text, 'TEXT')
         self.assertEqual(comment.description, 'TEXT')
+        self.assertEqual(comment.created,
+                         datetime.datetime(2010, 5, 12, 2, 42))
         self.failIf('attachments' in comment)
 
         self.assertEqual(len(alerts.emissions), 1)
         self.failUnless(workflow.initialized)
 
     def test_handle_w_email_attachments(self):
+        import datetime
         from repoze.bfg.testing import DummyModel
         from karl.models.interfaces import IComment
         from karl.content.interfaces import ICommunityFile
@@ -127,7 +132,8 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         comments.next_id = '1'
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
         attachments = [('file1.png', 'image/png', 'IMAGE1'),
                        ('file1.png', 'image/png', 'IMAGE2'),
                       ]
@@ -158,6 +164,7 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         self.failUnless(workflow.initialized)
 
     def test_handle_w_alert(self):
+        import datetime
         from repoze.bfg.testing import DummyModel
         from karl.models.interfaces import IComment
         self._registerFactory(IComment, DummyModel)
@@ -170,7 +177,8 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         comments.next_id = '1'
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
 
         adapter.handle(message, info, 'TEXT', [])
 
@@ -221,7 +229,8 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         context = DummyModel()
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
 
         adapter.handle(message, info, 'TEXT', [])
 
@@ -232,6 +241,7 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         self.assertEqual(entry.creator, 'phreddy')
         self.assertEqual(entry.text, 'TEXT')
         self.assertEqual(entry.description, 'TEXT')
+        self.assertEqual(entry.created, datetime.datetime(2010, 5, 12, 2, 42))
         self.failIf(len(entry['attachments']))
 
         self.assertEqual(len(alerts.emissions), 1)
@@ -254,7 +264,8 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         context = DummyModel()
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
         attachments = [('file1.bin', 'application/octet-stream', 'DATA'),
                        ('file2.png', 'image/png', 'IMAGE'),
                       ]
@@ -301,7 +312,8 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         context = DummyModel()
         adapter = self._makeOne(context)
         message = object() # ignored
-        info = {'subject': 'SUBJECT', 'author': 'phreddy'}
+        info = {'subject': 'SUBJECT', 'author': 'phreddy',
+                'date': datetime.datetime(2010, 5, 12, 2, 42)}
         attachments = [('file1.bin', 'application/octet-stream', 'DATA'),
                        ('file2.png', 'image/png', 'IMAGE'),
                       ]

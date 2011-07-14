@@ -71,6 +71,7 @@ class BlogEntryMailinHandler(object):
 
         reply.title = info['subject']
         reply.creator = info['author']
+        reply.created = info['date']
         reply.text = text
 
         target[target.next_id] = reply
@@ -103,6 +104,7 @@ class BlogMailinHandler(object):
             text=text,
             description=extract_description(text),
             )
+        entry.created = info['date']
 
         if attachments:
             if 'attachments' not in entry:

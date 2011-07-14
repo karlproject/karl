@@ -6,9 +6,26 @@ class MailinDispatcherTests(unittest.TestCase):
         from zope.testing.cleanup import cleanUp
         cleanUp()
 
+        import datetime
+        from karl.adapters import mailin
+        self._save_datetime = mailin.datetime
+
+        class DummyDateTime(object):
+            def __init__(self):
+                self.datetime = self
+            def now(self):
+                return datetime.datetime(1975, 7, 7, 7, 30)
+            def __call__(self, *args):
+                return datetime.datetime(*args)
+
+        mailin.datetime = DummyDateTime()
+
     def tearDown(self):
         from zope.testing.cleanup import cleanUp
         cleanUp()
+
+        from karl.adapters import mailin
+        mailin.datetime = self._save_datetime
 
     def _getTargetClass(self):
         from karl.adapters.mailin import MailinDispatcher
@@ -642,6 +659,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], '12345')
 
     def test_crackHeaders_default_ok(self):
+        import datetime
         from karl.testing import DummyUsers
         context = self._makeRoot()
         context.users = DummyUsers()
@@ -662,6 +680,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
         info = mailin.crackHeaders(message)
         self.failIf(info.get('error'))
+        self.assertEqual(info['date'], datetime.datetime(1975, 7, 7, 7, 30))
         self.assertEqual(info['author'], 'extant')
         self.assertEqual(info['subject'], 'subject')
         targets = info['targets']
@@ -670,6 +689,32 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
+
+    def test_crackHeaders_date(self):
+        import datetime
+        from email.utils import formatdate
+        from karl.testing import DummyUsers
+        import time
+        context = self._makeRoot()
+        context.users = DummyUsers()
+        profile = self._makeContext()
+        profile.__name__ = 'extant'
+        by_email = {'extant@example.com': profile}
+        pf = context['profiles'] = self._makeContext()
+        pf.getProfileByEmail = lambda email: by_email.get(email)
+        cf = context['communities'] = self._makeContext()
+        community = cf['testing'] = self._makeContext()
+        tool = community['default'] = self._makeContext()
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('testing@example.com',)
+        message.from_ = ('extant@example.com',)
+        message.subject = 'subject'
+        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, 0))
+        message.date = formatdate(date)
+        info = mailin.crackHeaders(message)
+        self.assertEqual(info['date'], datetime.datetime(2010, 5, 12, 2, 42))
 
     def test_crackHeaders_default_community_in_CC(self):
         from karl.testing import DummyUsers
@@ -1019,6 +1064,7 @@ class DummyMessage:
     content_type = None
     charset = None
     filename = None
+    date = None
 
     def _munge(self, name):
         name = name.lower()
