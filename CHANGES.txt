@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add in tagusers.html view for profiles
+
 
 3.68 (2011-07-14)
 -----------------

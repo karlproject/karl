@@ -130,6 +130,14 @@
   />
 
   <view
+    for="karl.models.interfaces.IProfile"
+    view=".tags.tag_users_view"
+    renderer="templates/tagusers.pt"
+    permission="view"
+    name="tagusers.html"
+  />
+
+  <view
     for="karl.models.interfaces.ISite"
     view=".tags.tag_users_view"
     renderer="templates/tagusers.pt"
