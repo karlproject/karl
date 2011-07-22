@@ -1,5 +1,6 @@
 import datetime
 
+from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -21,7 +22,9 @@ def show_history(context, request):
                 'url': model_url(editor, request),
                 },
             'preview_url': '#',
-            'restore_url': '#',
+            'restore_url': model_url(
+                context, request, 'revert',
+                query={'version_num': str(record.version_num)}),
             'is_current': record.current_version == record.version_num,
         }
 
@@ -35,6 +38,19 @@ def show_history(context, request):
         'api': TemplateAPI(context, request, page_title),
         'history': history,
     }
+
+
+def revert(context, request):
+    repo = find_repo(context)
+    version_num = int(request.params['version_num'])
+    for version in repo.history(context.docid):
+        if version.version_num == version_num:
+            break
+    else:
+        raise ValueError('No such version: %d' % version_num)
+    context.revert(version)
+    repo.reverted(context.docid, version_num)
+    return HTTPFound(location=model_url(context, request))
 
 
 def format_local_date(date):

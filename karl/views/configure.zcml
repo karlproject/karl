@@ -1753,6 +1753,13 @@
     renderer="templates/history.pt"
     />
 
+  <view
+    for="repoze.lemonade.interfaces.IContent"
+    view=".versions.revert"
+    permission="edit"
+    name="revert"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent

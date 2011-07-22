@@ -193,6 +193,15 @@ class WikiPage(Folder):
     def get_attachments(self):
         return self
 
+    def revert(self, version):
+        self.title = version.title
+        self.description = version.description
+        self.modified = version.modified
+        self.text = version.attrs['text']
+        self.creator = version.attrs['creator']
+        self.modified_by = version.user
+
+
 FRONT_PAGE_CONTENT = u"""\
 This is the front page of your wiki.
 """
@@ -232,7 +241,8 @@ class WikiPageVersion(object):
         self.title = page.title
         self.description = page.description
         # XXX Wiki pages apparently don't store created and modified dates.
-        self.created = self.modified = datetime.datetime.utcnow()
+        self.created = page.created
+        self.modified = page.modified
         self.docid = page.docid
         self.path = model_path(page)
         self.attrs = dict((name, getattr(page, name)) for name in [
