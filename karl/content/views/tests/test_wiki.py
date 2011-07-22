@@ -192,7 +192,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 2)
+        self.assertEqual(len(renderer.actions), 3)
         self.assertEqual(renderer.actions[0][1], 'edit.html')
         # Front page should not have backlink breadcrumb thingy
         self.assert_(renderer.backto is False)
@@ -208,7 +208,7 @@ class TestShowWikipageView(unittest.TestCase):
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 3)
+        self.assertEqual(len(renderer.actions), 4)
         self.assertEqual(renderer.actions[0][1], 'edit.html')
         self.assertEqual(renderer.actions[1][1], 'delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
