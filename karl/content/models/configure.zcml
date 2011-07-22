@@ -164,6 +164,12 @@
       factory=".adapters.TitleAndTextIndexData"
      />
 
+  <adapter
+      for="karl.content.interfaces.IWikiPage"
+      provides="repozitory.interfaces.IObjectVersion"
+      factory=".wiki.WikiPageVersion"
+     />
+
   <lemonade:content
       factory=".wiki.Wiki"
       type="karl.content.interfaces.IWiki"

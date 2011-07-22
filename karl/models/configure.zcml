@@ -54,11 +54,6 @@
       handler=".subscribers.reindex_content"/>
 
   <subscriber
-      for="repoze.lemonade.interfaces.IContent
-           .interfaces.IObjectModifiedEvent"
-      handler=".subscribers.set_modified"/>
-
-  <subscriber
       for=".interfaces.ICommunity
            repoze.folder.interfaces.IObjectWillBeRemovedEvent"
       handler=".subscribers.delete_community"/>

@@ -16,10 +16,12 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime
+import logging
 import math
 import os
 from pprint import pformat
 
+from zope.component import queryAdapter
 from zope.component import queryUtility
 
 from repoze.bfg.interfaces import ISettings
@@ -27,6 +29,7 @@ from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
+from repozitory.interfaces import IObjectVersion
 
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
@@ -35,9 +38,12 @@ from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
+from karl.utils import find_repo
 from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
+
+log = logging.getLogger(__name__)
 
 _NOW = None
 def _now():     # unittests can replace this to get known results
@@ -114,6 +120,13 @@ def set_modified(obj, event):
         now = _now()
         obj.modified = now
         _modify_community(obj, now)
+        repo = find_repo(obj)
+        if repo is not None:
+            adapter = queryAdapter(obj, IObjectVersion)
+            if adapter is not None:
+                repo.archive(adapter)
+            else:
+                log.warning("No IObjectVersion adapter exists for %s", obj)
 
 def set_created(obj, event):
     """ Add modified and created attributes to obj and children.

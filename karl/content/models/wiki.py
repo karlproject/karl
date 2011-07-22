@@ -15,12 +15,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import datetime
 import re
 import htmlentitydefs
 import urllib
 
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
+from repozitory.interfaces import IObjectVersion
 
 from repoze.folder import Folder
 from zope.interface import implements
@@ -220,3 +223,23 @@ class WikiToolFactory(ToolFactory):
         del context['wiki']
 
 wiki_tool_factory = WikiToolFactory()
+
+
+class WikiPageVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, page):
+        self.title = page.title
+        self.description = page.description
+        # XXX Wiki pages apparently don't store created and modified dates.
+        self.created = self.modified = datetime.datetime.utcnow()
+        self.docid = page.docid
+        self.path = model_path(page)
+        self.attrs = dict((name, getattr(page, name)) for name in [
+            'text',
+            'creator',
+        ])
+        self.attachments = None
+        self.klass = page.__class__
+        self.user = page.modified_by
+        self.comment = None

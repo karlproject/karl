@@ -1744,6 +1744,15 @@
     name="kaltura_create_session.json"
   />
 
+  <!-- Versioning UI -->
+  <view
+    for="repoze.lemonade.interfaces.IContent"
+    view=".versions.show_history"
+    permission="edit"
+    name="history.html"
+    renderer="templates/history.pt"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent

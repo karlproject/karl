@@ -22,6 +22,7 @@ from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
 from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ILocation
+from repoze.bfg.settings import get_settings
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
 from repoze.bfg.security import principals_allowed_by_permission
@@ -36,6 +37,7 @@ from repoze.lemonade.content import create_content
 from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
 from repoze.who.plugins.zodb.users import Users
+from repozitory.archive import Archive
 from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface.declarations import Declaration
@@ -347,6 +349,15 @@ def get_virtual(object, default):
         return adapter()
     return default
 
+class RepozitoryEngineParams(object):
+    @property
+    def db_string(self):
+        return get_settings()['repozitory_db_string']
+
+    @property
+    def kwargs(self):
+        return {}
+
 class Site(Folder):
     implements(ISite, ILocation)
     __name__ = None
@@ -354,6 +365,7 @@ class Site(Folder):
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
     list_aliases = None
+    _repo = None
 
     def __init__(self):
         super(Site, self).__init__()
@@ -372,6 +384,16 @@ class Site(Folder):
         self.sessions = SessionDataManager(3600, 5)
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
+        self._repo = Archive(RepozitoryEngineParams())
+
+    @property
+    def repo(self):
+        # Create self._repo on demand.
+        repo = self._repo
+        if repo is not None:
+            return repo
+        self._repo = repo = Archive(RepozitoryEngineParams())
+        return repo
 
     def update_indexes(self):
         """ Ensure that we have indexes matching what the application needs.
