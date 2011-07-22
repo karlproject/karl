@@ -16,7 +16,12 @@
                 <th>Editor</th>
                 <th>Action</th>
             </tr>
-            <tr tal:repeat="v history">
+            <tr tal:condition="not history">
+                <td colspan="4">
+                    No versions have been saved yet for this content.
+                </td>
+            </tr>
+            <tr tal:repeat="v history" tal:condition="history">
                 <td>${v['date']}</td>
                 <td>
                     <a href="${v['editor']['url']}">

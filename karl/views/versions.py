@@ -1,6 +1,7 @@
 import datetime
 
 from repoze.bfg.url import model_url
+from sqlalchemy.orm.exc import NoResultFound
 
 from karl.utils import find_repo
 from karl.utils import find_profiles
@@ -24,8 +25,11 @@ def show_history(context, request):
             'is_current': record.current_version == record.version_num,
         }
 
-    history = map(display_record, repo.history(context.docid))
-    history.reverse()
+    try:
+        history = map(display_record, repo.history(context.docid))
+        history.reverse()
+    except:
+        history = []
     page_title = 'History for %s' % context.title
     return {
         'api': TemplateAPI(context, request, page_title),
