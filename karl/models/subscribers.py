@@ -111,9 +111,9 @@ def reindex_content(obj, event):
 
 def set_modified(obj, event):
     """ Set the modified date on a single piece of content.
-    
+
     This subscriber is non-recursive.
-    
+
     Intended use is as an IObjectModified event subscriber.
     """
     if is_content(obj):
@@ -125,14 +125,16 @@ def set_modified(obj, event):
             adapter = queryAdapter(obj, IObjectVersion)
             if adapter is not None:
                 repo.archive(adapter)
+                if adapter.comment is None:
+                    adapter.comment = 'Content modified.'
             else:
                 log.warning("No IObjectVersion adapter exists for %s", obj)
 
 def set_created(obj, event):
     """ Add modified and created attributes to obj and children.
-    
+
     Only add to content objects which do not yet have them (recursively)
-    
+
     Intended use is as an IObjectWillBeAddedEvent subscriber.
     """
     now = _now()
@@ -145,6 +147,23 @@ def set_created(obj, event):
     parent = getattr(event, 'parent', None)
     if parent is not None:
         _modify_community(parent, now)
+
+def add_to_repo(obj, event):
+    """
+    Add a newly created object to the version repository.
+
+    Intended uses is as an IObjectAddedEvent subscriber.
+    """
+    if is_content(obj):
+        repo = find_repo(obj)
+        if repo is not None:
+            adapter = queryAdapter(obj, IObjectVersion)
+            if adapter is not None:
+                if adapter.comment is None:
+                    adapter.comment = 'Content created.'
+                repo.archive(adapter)
+            else:
+                log.warning("No IObjectVersion adapter exists for %s", obj)
 
 def _modify_community(obj, when):
     # manage content_modified on community whenever a piece of content
