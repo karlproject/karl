@@ -40,7 +40,7 @@ class KarlMailDelivery(QueuedMailDelivery):
     """
 
     def __init__(self, settings):
-        self.mfrom = settings.envelope_from_addr
+        self.mfrom = getattr(settings, 'envelope_from_addr', None)
         queue_path = getattr(settings, "mail_queue_path", None)
         if queue_path is None:
             # Default to var/mail_queue
