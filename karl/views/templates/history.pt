@@ -5,9 +5,12 @@
 
     <div metal:fill-slot="content">
 
+    <h1 metal:use-macro="api.snippets.macros['backto_link']"/>
+
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
 
     <div class="kbody">
         <table class="content-listing">

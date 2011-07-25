@@ -37,9 +37,16 @@ def show_history(context, request):
     except:
         history = []
     page_title = 'History for %s' % context.title
+
+    backto = {
+        'href': model_url(context, request),
+        'title': context.title
+    }
+
     return {
         'api': TemplateAPI(context, request, page_title),
         'history': history,
+        'backto': backto,
     }
 
 
