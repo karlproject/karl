@@ -50,7 +50,7 @@
                     alert("Unable to retrieve preview.");
                     return;
                 }
-                var wtf = $('<div>' + html + '</div>')
+                $('<div>' + html + '</div>')
                     .appendTo('body')
                     .hide()
                     .karldialog({
