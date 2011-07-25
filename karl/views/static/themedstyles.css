@@ -3590,3 +3590,7 @@ body .ui-state-default .karl-icon-loading {
 #karl-wikitoc {
     width: 668px;
 }
+
+.preview_dialog {
+  text-align: left;
+}

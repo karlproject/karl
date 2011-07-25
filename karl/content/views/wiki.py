@@ -56,6 +56,7 @@ from karl.views.utils import make_name
 from karl.views.tags import set_tags
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
+from karl.views.versions import format_local_date
 
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
@@ -274,7 +275,6 @@ def show_wikipage_view(context, request):
 
 
 def preview_wikipage_view(context, request):
-    print 'Hello!'
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
@@ -297,8 +297,13 @@ def preview_wikipage_view(context, request):
         context.creator)
     page.revert(version)
 
+    profiles = find_profiles(context)
+    author = profiles[version.user]
+
     return {
-        'api': TemplateAPI(context, request, page_title),
+        'date': format_local_date(version.archive_time),
+        'author': author.title,
+        'title': page_title,
         'body': page.cook(request),
     }
 

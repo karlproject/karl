@@ -33,7 +33,7 @@
                 </td>
                 <td tal:condition="not v['is_current']">
                     <a href="#"
-                        onClick="preview('${v['preview_url']}');">Preview</a> |
+                       onClick="preview('${v['preview_url']}');">Preview</a> |
                     <a href="${v['restore_url']}">Restore</a>
                 </td>
             </tr>
@@ -44,23 +44,26 @@
     //<![CDATA[
     function preview(url) {
         $.ajax({
-            'url': url,
-            'success': function(html, status) {
-                if (status != "success") {
-                    alert("Unable to retrieve preview.");
-                    return;
-                }
-                $('<div>' + html + '</div>')
+            url: url,
+            success: function(data) {
+                var page_title = $('.kscreentitle');
+                var position = page_title.offset();
+                position = [position.left, position.top + page_title.height()];
+                var title = 'Preview Version from ' + data['date'] + ' by ' +
+                            data['author'];
+                var dialog = $('<div class="preview_dialog">' +
+                                  '<p><b>' + data['title'] + '</b></p>' +
+                                  '<div class="kbody">' + data['body'] + '</div>' +
+                               '</div>')
                     .appendTo('body')
                     .hide()
                     .karldialog({
-                        width: 400,
-                        buttons: {
-                            Close: function() {
-                                $(this).karldialog('close');
-                            },
-                        },
+                        title: title,
+                        width: 600,
+                        position: position,
+                        draggable: true // Draggable doesn't seem to work :(
                     });
+                dialog.karldialog('open');
             }
         });
         return false;

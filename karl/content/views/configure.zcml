@@ -712,7 +712,7 @@
     view=".wiki.preview_wikipage_view"
     permission="edit"
     name="preview.html"
-    renderer="templates/preview_wikipage.pt"
+    renderer="json"
   />
 
   <view
