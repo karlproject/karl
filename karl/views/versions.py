@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
@@ -56,4 +57,5 @@ def revert(context, request):
 
 
 def format_local_date(date):
-    return date.strftime('%Y-%m-%d %H:%M')
+    local = date - datetime.timedelta(seconds=time.timezone)
+    return local.strftime('%Y-%m-%d %H:%M')
