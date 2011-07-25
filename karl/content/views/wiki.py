@@ -46,6 +46,7 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
 from karl.utils import find_profiles
+from karl.utils import find_repo
 
 from karl.views.api import TemplateAPI
 
@@ -58,6 +59,7 @@ from karl.views.forms import validators as karlvalidators
 
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
+from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
 from karl.content.views.atom import WikiAtomFeed
 
@@ -261,8 +263,7 @@ def show_wikipage_view(context, request):
 
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
-    return render_template_to_response(
-        'templates/show_wikipage.pt',
+    return dict(
         api=api,
         actions=actions,
         head_data=client_json_data,
@@ -271,6 +272,35 @@ def show_wikipage_view(context, request):
         is_front_page=is_front_page,
         )
 
+
+def preview_wikipage_view(context, request):
+    print 'Hello!'
+    is_front_page = (context.__name__ == 'front_page')
+    if is_front_page:
+        community = find_interface(context, ICommunity)
+        page_title = '%s Community Wiki Page' % community.title
+    else:
+        page_title = context.title
+
+    version_num = int(request.params['version_num'])
+    repo = find_repo(context)
+    for version in repo.history(context.docid):
+        if version.version_num == version_num:
+            break
+    else:
+        raise ValueError("No such version: %d" % version_num)
+
+    page = WikiPage(
+        context.title,
+        context.text,
+        context.description,
+        context.creator)
+    page.revert(version)
+
+    return {
+        'api': TemplateAPI(context, request, page_title),
+        'body': page.cook(request),
+    }
 
 
 def show_wikitoc_view(context, request):

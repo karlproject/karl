@@ -704,6 +704,15 @@
     for="karl.content.interfaces.IWikiPage"
     view=".wiki.show_wikipage_view"
     permission="view"
+    renderer="templates/show_wikipage.pt"
+  />
+
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.preview_wikipage_view"
+    permission="edit"
+    name="preview.html"
+    renderer="templates/preview_wikipage.pt"
   />
 
   <view

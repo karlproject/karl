@@ -21,7 +21,9 @@ def show_history(context, request):
                 'name': editor.title,
                 'url': model_url(editor, request),
                 },
-            'preview_url': '#',
+            'preview_url': model_url(
+                context, request, 'preview.html',
+                query={'version_num': str(record.version_num)}),
             'restore_url': model_url(
                 context, request, 'revert',
                 query={'version_num': str(record.version_num)}),
