@@ -74,6 +74,11 @@
       handler=".subscribers.add_to_repo"/>
 
   <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectRemovedEvent"
+      handler=".subscribers.delete_in_repo"/>
+
+  <subscriber
       for=".interfaces.ICommunity
            .interfaces.IObjectModifiedEvent"
       handler=".subscribers.alpha_added"/>

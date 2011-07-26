@@ -1760,6 +1760,21 @@
     name="revert"
     />
 
+  <view
+    for="repoze.folder.interfaces.IFolder"
+    view=".versions.show_trash"
+    permission="edit"
+    name="trash.html"
+    renderer="templates/trash.pt"
+    />
+
+  <view
+    for="repoze.folder.interfaces.IFolder"
+    view=".versions.undelete"
+    permission="edit"
+    name="restore"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent

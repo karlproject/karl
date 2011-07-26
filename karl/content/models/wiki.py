@@ -23,11 +23,13 @@ import urllib
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
+from repozitory.interfaces import IContainerVersion
 from repozitory.interfaces import IObjectVersion
 
 from repoze.folder import Folder
 from zope.interface import implements
 
+from repoze.bfg.traversal import model_path
 from repoze.bfg.url import model_url
 
 from karl.models.tool import ToolFactory
@@ -107,7 +109,7 @@ class WikiPage(Folder):
     implements(IWikiPage)
     modified_by = None
 
-    def __init__(self, title, text, description, creator):
+    def __init__(self, title=u'', text=u'', description=u'', creator=u''):
         super(WikiPage, self).__init__()
         self.title = unicode(title)
         if text is None:
@@ -194,6 +196,8 @@ class WikiPage(Folder):
         return self
 
     def revert(self, version):
+        # catalog document map blows up if you feed it a long int
+        self.docid = int(version.docid)
         self.title = version.title
         self.description = version.description
         self.modified = version.modified
@@ -240,7 +244,6 @@ class WikiPageVersion(object):
     def __init__(self, page):
         self.title = page.title
         self.description = page.description
-        # XXX Wiki pages apparently don't store created and modified dates.
         self.created = page.created
         self.modified = page.modified
         self.docid = page.docid
@@ -253,3 +256,24 @@ class WikiPageVersion(object):
         self.klass = page.__class__
         self.user = page.modified_by
         self.comment = None
+
+
+class WikiContainerVersion(object):
+    implements(IContainerVersion)
+
+    def __init__(self, wiki):
+        self.container_id = wiki.docid
+        self.path = model_path(wiki)
+        self.map = dict((name, page.docid) for name, page in wiki.items())
+        self.ns_map = {}
+
+
+class WikiPageContainerVersion(object):
+    implements(IContainerVersion)
+
+    def __init__(self, page):
+        self.container_id = page.docid
+        self.path = model_path(page)
+        self.map = dict((name, attachment.docid)
+                        for name, attachment in page.items())
+        self.ns_map = {}

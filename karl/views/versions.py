@@ -63,6 +63,64 @@ def revert(context, request):
     return HTTPFound(location=model_url(context, request))
 
 
+def show_trash(context, request):
+    repo = find_repo(context)
+    profiles = find_profiles(context)
+
+    def display_record(record):
+        deleted_by = profiles[record.deleted_by]
+        version = repo.history(record.docid, only_current=True)[0]
+        return {
+            'date': format_local_date(record.deleted_time),
+            'deleted_by': {
+                'name': deleted_by.title,
+                'url': model_url(deleted_by, request),
+                },
+            'restore_url': model_url(
+                context, request, 'restore',
+                query={'docid': str(record.docid), 'name': record.name}),
+            'title': version.title,
+        }
+
+    try:
+        contents = repo.container_contents(context.docid)
+        deleted = contents.deleted
+    except:
+        deleted = []
+
+    return {
+        'api': TemplateAPI(context, request, 'Trash'),
+        'deleted': map(display_record, deleted),
+    }
+
+
+def _undelete(repo, parent, docid, name):
+    version = repo.history(docid, only_current=True)[0]
+    doc = version.klass()
+    doc.revert(version)
+
+    try:
+        container = repo.container_contents(docid)
+    except:
+        container = None
+
+    if container is not None:
+        for child_name, child_docid in container.map.items():
+            _undelete(repo, doc, child_docid, child_name)
+
+    parent[name] = doc
+    return doc
+
+
+def undelete(context, request):
+    repo = find_repo(context)
+    docid = int(request.params['docid'])
+    name = request.params['name']
+    doc = _undelete(repo, context, docid, name)
+
+    return HTTPFound(location=model_url(doc, request))
+
+
 def format_local_date(date):
     local = date - datetime.timedelta(seconds=time.timezone)
     return local.strftime('%Y-%m-%d %H:%M')

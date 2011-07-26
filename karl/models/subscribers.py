@@ -25,10 +25,13 @@ from zope.component import queryAdapter
 from zope.component import queryUtility
 
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.security import authenticated_userid
+from repoze.bfg.threadlocal import get_current_request
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
+from repozitory.interfaces import IContainerVersion
 from repozitory.interfaces import IObjectVersion
 
 from karl.models.interfaces import ILetterManager
@@ -127,8 +130,6 @@ def set_modified(obj, event):
                 repo.archive(adapter)
                 if adapter.comment is None:
                     adapter.comment = 'Content modified.'
-            else:
-                log.warning("No IObjectVersion adapter exists for %s", obj)
 
 def set_created(obj, event):
     """ Add modified and created attributes to obj and children.
@@ -152,18 +153,54 @@ def add_to_repo(obj, event):
     """
     Add a newly created object to the version repository.
 
-    Intended uses is as an IObjectAddedEvent subscriber.
+    Intended use is as an IObjectAddedEvent subscriber.
     """
-    if is_content(obj):
-        repo = find_repo(obj)
-        if repo is not None:
-            adapter = queryAdapter(obj, IObjectVersion)
-            if adapter is not None:
-                if adapter.comment is None:
-                    adapter.comment = 'Content created.'
-                repo.archive(adapter)
-            else:
-                log.warning("No IObjectVersion adapter exists for %s", obj)
+    repo = find_repo(obj)
+    if repo is None:
+        return
+
+    try:
+        # If we're undeleting an object, it might already be in the repo
+        repo.history(obj.docid)
+    except:
+        # It is not in the repo, so add it
+        adapter = queryAdapter(obj, IObjectVersion)
+        if adapter is not None:
+            if adapter.comment is None:
+                adapter.comment = 'Content created.'
+            repo.archive(adapter)
+
+    container = event.parent
+    adapter = queryAdapter(container, IContainerVersion)
+    if adapter is not None:
+        request = get_current_request()
+        user = authenticated_userid(request)
+        repo.archive_container(adapter, user)
+
+    # Recurse into children if adding a subtree
+    if IFolder.providedBy(obj):
+        for name, child in obj.items():
+            fake_event = FakeEvent()
+            fake_event.parent = obj
+            add_to_repo(child, fake_event)
+
+class FakeEvent(object):
+    pass
+
+def delete_in_repo(obj, event):
+    """
+    Add object to deleted items in repozitory.
+
+    Intended use is as an IObjectRemovedEvent subscriber.
+    """
+    container = event.parent
+    repo = find_repo(container)
+    if repo is not None:
+        adapter = queryAdapter(container, IContainerVersion)
+        if adapter is not None:
+            request = get_current_request()
+            user = authenticated_userid(request)
+            repo.archive_container(adapter, user)
 
 def _modify_community(obj, when):
     # manage content_modified on community whenever a piece of content

@@ -10,18 +10,19 @@
   </span>
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml" 
+    <link rel="alternate" type="application/atom+xml"
 	  title="${api.page_title}" href="${feed_url}"
 	  />
   </span>
-  
+
   <div metal:fill-slot="content">
 
     <div class="contentbar-wrapper">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
           <a href="${api.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
-          <a href="${api.here_url}../wikitoc.html">Index</a>
+          <a href="${api.here_url}../wikitoc.html">Index</a> |
+          <a href="${api.here_url}../trash.html">Trash</a>
       </span>
     </div>
 
@@ -29,7 +30,7 @@
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div class="kbody"> <span tal:replace="structure api.context.cook(api.request)"/> </div>
 
