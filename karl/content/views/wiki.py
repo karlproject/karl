@@ -17,6 +17,7 @@
 
 import formish
 import schemaish
+import transaction
 from validatish import validator
 
 from webob.exc import HTTPFound
@@ -295,10 +296,16 @@ def preview_wikipage_view(context, request):
         context.text,
         context.description,
         context.creator)
+    page.__parent__ = context.__parent__
     page.revert(version)
 
     profiles = find_profiles(context)
     author = profiles[version.user]
+
+    # Extra paranoia, probably not strictly necessary.  I just want to make
+    # extra special sure that the temp WikiPage object we create above
+    # doesn't accidentally get attached to the persistent object graph.
+    transaction.doom()
 
     return {
         'date': format_local_date(version.archive_time),
