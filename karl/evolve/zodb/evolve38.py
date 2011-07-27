@@ -5,18 +5,17 @@ from repozitory.interfaces import IObjectVersion
 from zope.component import queryAdapter
 
 from karl.utils import find_repo
+from karl.utils import get_setting
 
 
 def evolve(site):
     """
     Initialize repozitory.
     """
-    try:
+    has_repo = get_setting(site, 'repozitory_db_string') is not None
+    if has_repo:
         repo = find_repo(site)
-    except KeyError:
-        # Not repo enabled
-        return
-    init_repo(repo, site)
+        init_repo(repo, site)
 
 
 def init_repo(repo, context):
