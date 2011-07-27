@@ -31,6 +31,9 @@ def init_repo(repo, context):
     container = queryAdapter(context, IContainerVersion)
     if container is not None:
         print "Updating container version for %s" % model_path(context)
-        repo.archive_container(container, context.creator)
+        user = getattr(context, 'creator', None)
+        if user is None:
+            user = get_setting(context, 'system_user', 'admin')
+        repo.archive_container(container, user)
 
     context._p_deactivate() # try not to run out of memory
