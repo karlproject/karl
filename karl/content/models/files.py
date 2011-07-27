@@ -123,6 +123,7 @@ class CommunityFile(Persistent):
     def revert(self, version):
         # catalog document map blows up if you feed it a long int
         self.docid = int(version.docid)
+        self.created = version.created
         self.title = version.title
         self.modified = version.modified
         self.filename = version.attrs['filename']

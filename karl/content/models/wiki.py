@@ -198,6 +198,7 @@ class WikiPage(Folder):
     def revert(self, version):
         # catalog document map blows up if you feed it a long int
         self.docid = int(version.docid)
+        self.created = version.created
         self.title = version.title
         self.description = version.description
         self.modified = version.modified

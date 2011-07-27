@@ -2,9 +2,12 @@ import datetime
 import time
 
 from webob.exc import HTTPFound
+from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
+from repozitory.interfaces import IContainerVersion
 from sqlalchemy.orm.exc import NoResultFound
 
+from karl.models.subscribers import index_content
 from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
@@ -108,7 +111,7 @@ def _undelete(repo, parent, docid, name):
         for child_name, child_docid in container.map.items():
             _undelete(repo, doc, child_docid, child_name)
 
-    parent[name] = doc
+    parent.add(name, doc, send_events=False)
     return doc
 
 
@@ -117,7 +120,9 @@ def undelete(context, request):
     docid = int(request.params['docid'])
     name = request.params['name']
     doc = _undelete(repo, context, docid, name)
-
+    repo.archive_container(IContainerVersion(context),
+                           authenticated_userid(request))
+    index_content(context, None)
     return HTTPFound(location=model_url(doc, request))
 
 
