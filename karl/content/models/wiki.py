@@ -256,6 +256,8 @@ class WikiPageVersion(object):
         self.attachments = None
         self.klass = page.__class__
         self.user = page.modified_by
+        if self.user is None:
+            self.user = page.creator
         self.comment = None
 
 

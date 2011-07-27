@@ -199,6 +199,8 @@ class CommunityFileVersion(object):
         self.blobs = {'blob': file.blobfile.open()}
         self.klass = type(file)
         self.user = file.modified_by
+        if self.user is None:
+            self.user = file.creator
         self.comment = None
 
 class FilesToolFactory(ToolFactory):
