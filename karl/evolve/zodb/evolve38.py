@@ -1,3 +1,4 @@
+from repoze.bfg.traversal import model_path
 from repoze.folder.interfaces import IFolder
 from repozitory.interfaces import IContainerVersion
 from repozitory.interfaces import IObjectVersion
@@ -10,7 +11,11 @@ def evolve(site):
     """
     Initialize repozitory.
     """
-    repo = find_repo(site)
+    try:
+        repo = find_repo(site)
+    except KeyError:
+        # Not repo enabled
+        return
     init_repo(repo, site)
 
 
@@ -21,10 +26,12 @@ def init_repo(repo, context):
 
     version = queryAdapter(context, IObjectVersion)
     if version is not None:
+        print "Updating version for %s" % model_path(context)
         repo.archive(version)
 
     container = queryAdapter(context, IContainerVersion)
     if container is not None:
+        print "Updating container version for %s" % model_path(context)
         repo.archive_container(container, context.creator)
 
     context._p_deactivate() # try not to run out of memory
