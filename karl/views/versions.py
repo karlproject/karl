@@ -35,10 +35,12 @@ def show_history(context, request):
         }
 
     try:
-        history = map(display_record, repo.history(context.docid))
-        history.reverse()
+        history = repo.history(context.docid)
     except:
         history = []
+    map(display_record, history)
+    history.reverse()
+
     page_title = 'History for %s' % context.title
 
     backto = {
