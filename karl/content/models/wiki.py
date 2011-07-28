@@ -157,7 +157,7 @@ class WikiPage(Folder):
                     subs.append(WIKI_LINK % (url, wikilink))
                     break
             else:
-                quoted = urllib.quote(cleaned)
+                quoted = urllib.quote(cleaned.encode('UTF-8'))
                 subs.append(ADD_WIKIPAGE_LINK % (
                         wikilink, quoted))
 

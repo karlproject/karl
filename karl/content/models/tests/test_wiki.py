@@ -114,6 +114,21 @@ class WikiPageTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.assertEqual(wp.cook(request), EXPECTED)
 
+    def test_cook_w_wiki_markup_no_match_unicode(self):
+        TEXT = (u'Now is the time for ((\xe0ll good men)) '
+                 'to come to the aid of the Party')
+        EXPECTED = (u'Now is the time for '
+                    u'<span class="wicked_unresolved">\xe0ll good men</span> '
+                     '<a href="../add_wikipage.html'
+                     '?title=%C3%A0ll%20good%20men">+</a> '
+                     'to come to the aid of the Party')
+        wp = self._makeOne(text=TEXT)
+        parent = testing.DummyModel()
+        wp.__parent__ = parent
+        wp.__name__ = 'wikipage'
+        request = testing.DummyRequest()
+        self.assertEqual(wp.cook(request), EXPECTED)
+
     def test_cook_w_wiki_markup_and_html_no_match(self):
         TEXT = (u'Now is the time for ((<b>all good men</b>)) '
                  'to come to the aid of the Party')
