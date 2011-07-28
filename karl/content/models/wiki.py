@@ -30,6 +30,7 @@ from repoze.bfg.url import model_url
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
+from karl.content.models.adapters import extract_text_from_html
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 
@@ -149,13 +150,14 @@ class WikiPage(Folder):
 
         # Every other chunk is a wiki link
         for wikilink in chunks[1::2]:
+            cleaned = extract_text_from_html(wikilink)
             for page in self.__parent__.values():
-                if _eq_loose(page.title, wikilink):
+                if _eq_loose(page.title, cleaned):
                     url = model_url(page, request)
                     subs.append(WIKI_LINK % (url, wikilink))
                     break
             else:
-                quoted = urllib.quote(wikilink)
+                quoted = urllib.quote(cleaned)
                 subs.append(ADD_WIKIPAGE_LINK % (
                         wikilink, quoted))
 

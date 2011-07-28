@@ -114,6 +114,21 @@ class WikiPageTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.assertEqual(wp.cook(request), EXPECTED)
 
+    def test_cook_w_wiki_markup_and_html_no_match(self):
+        TEXT = (u'Now is the time for ((<b>all good men</b>)) '
+                 'to come to the aid of the Party')
+        EXPECTED = (u'Now is the time for '
+                     '<span class="wicked_unresolved"><b>all good men</b></span> '
+                     '<a href="../add_wikipage.html'
+                     '?title=all%20good%20men">+</a> '
+                     'to come to the aid of the Party')
+        wp = self._makeOne(text=TEXT)
+        parent = testing.DummyModel()
+        wp.__parent__ = parent
+        wp.__name__ = 'wikipage'
+        request = testing.DummyRequest()
+        self.assertEqual(wp.cook(request), EXPECTED)
+
     def test_cook_w_wiki_markup_w_match(self):
         TEXT = (u'Now is the time for ((all good men)) '
                  'to come to the aid of the Party')
@@ -138,6 +153,21 @@ class WikiPageTests(unittest.TestCase):
                      'to come to the aid of the Party')
         parent = testing.DummyModel()
         parent['whatever'] = testing.DummyModel(title=u'L\u00e1;')
+        wp = self._makeOne(text=TEXT)
+        wp.__parent__ = parent
+        wp.__name__ = 'wikipage'
+        request = testing.DummyRequest()
+        self.assertEqual(wp.cook(request), EXPECTED)
+
+    def test_cook_w_wiki_markup_and_html_w_match(self):
+        TEXT = (u'Now is the time for ((<b>all good men</b>)) '
+                 'to come to the aid of the Party')
+        EXPECTED = (u'Now is the time for '
+                     '<a href="http://example.com/whatever/">'
+                     '<span class="wicked_resolved"><b>all good men</b></span></a> '
+                     'to come to the aid of the Party')
+        parent = testing.DummyModel()
+        parent['whatever'] = testing.DummyModel(title='all good men')
         wp = self._makeOne(text=TEXT)
         wp.__parent__ = parent
         wp.__name__ = 'wikipage'

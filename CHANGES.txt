@@ -6,6 +6,8 @@ Unreleased
 
 - Add in tagusers.html view for profiles
 
+- HTML is now stripped from wiki links for the purposes of generating a title.
+  (LP #811107)
 
 3.68 (2011-07-14)
 -----------------
