@@ -25,15 +25,19 @@ import os
 import sys
 
 from paste.deploy import loadapp
+from repoze.bfg.settings import get_settings
 from repoze.bfg.scripting import get_root
 
 from karl.scripting import get_default_config
 from karl.utilities import stats
 
 import logging
-logging.basicConfig()
+
+log = logging.getLogger(__name__)
+
 
 def main(argv=sys.argv):
+    logging.basicConfig()
     parser = optparse.OptionParser(
         description=__doc__,
         usage="%prog [options]",
@@ -56,7 +60,9 @@ def main(argv=sys.argv):
 
     root, closer = get_root(app)
     folder = os.path.abspath(options.output)
+    generate_reports(root, folder)
 
+def generate_reports(root, folder):
     # Communities report
     path = os.path.join(folder, 'communities.csv')
     fd = open(path, 'wb')
@@ -82,6 +88,33 @@ def _unicode(row):
             v = v.encode('utf-8')
         converted[k] = v
     return converted
+
+
+# Karlserve script
+def config_parser(name, subparsers, **helpers):
+    parser = subparsers.add_parser(
+        name, help='Generate statistics about communities and users.')
+    helpers['config_choose_instances'](parser)
+    parser.set_defaults(func=main2, parser=parser)
+
+
+def main2(args):
+    for instance in args.instances:
+        generate_stats(args, instance)
+
+
+def generate_stats(args, instance):
+    root, closer = args.get_root(instance)
+    settings = get_settings()
+    folder = settings.get('statistics_folder')
+    if folder is None:
+        return
+
+    log.info("Generating stats for %s" % instance)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    generate_reports(root, folder)
+
 
 if __name__ == '__main__':
     main()

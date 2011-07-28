@@ -9,6 +9,8 @@ Unreleased
 - HTML is now stripped from wiki links for the purposes of generating a title.
   (LP #811107)
 
+- Hook up the `generate_stats` script for use with karlserve. (LP #812444)
+
 3.68 (2011-07-14)
 -----------------
 

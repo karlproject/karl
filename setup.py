@@ -99,10 +99,12 @@ setup(name='karl',
       entry_points = """\
       [paste.app_factory]
       make_app = karl.application:make_app
+
       [paste.filter_app_factory]
       timeit = karl.timeit:main
       karlerrorpage = karl.errorpage:ErrorPageFilter
       errorlog = karl.errorlog:make_middleware
+
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
       evolve = karl.scripts.evolve:main
@@ -120,6 +122,9 @@ setup(name='karl',
       user_activity_report = karl.scripts.user_activity_report:main
       analyze_queries = karl.scripts.analyze_queries:main
       juice_all = karl.scripts.juice_all:main
+
+      [karlserve.scripts]
+      generate_stats = karl.scripts.generate_stats:config_parser
       """
       )
 
