@@ -11,6 +11,9 @@ Unreleased
 
 - Hook up the `generate_stats` script for use with karlserve. (LP #812444)
 
+- Added onChange handlers for the author and tags fields on the search results
+  page to automatically submit their respective forms.  (LP #784257)
+
 3.68 (2011-07-14)
 -----------------
 

@@ -72,7 +72,8 @@
                 </tal:block>
                 <label>Author</label>
                 <input style="width: 130px" size="20"
-                       name="creator" value="${params.get('creator', '')}"/>
+                       name="creator" value="${params.get('creator', '')}"
+                       onChange="this.form.submit()"/>
                 <input id="sras-authorknob" type="submit" value="Search" />
             </form>
             <form method="GET">
@@ -83,7 +84,8 @@
                 </tal:block>
                 <label>Tag</label>
                 <input style="width: 130px" size="20"
-                       name="tags" value="${params.get('tags', '')}"/>
+                       name="tags" value="${params.get('tags', '')}"
+                       onChange="this.form.submit()"/>
                 <input id="sras-tagknob" type="submit" value="Search" />
             </form>
         </div>
