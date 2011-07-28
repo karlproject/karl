@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -84,7 +84,7 @@ entitydefs = {
     'agrave':   u'\u00e0',         # latin small letter a with grave = latin small letter a grave, U+00E0 ISOlat1
     'alefsym':  u'\u2135',         # alef symbol = first transfinite cardinal, U+2135 NEW
     'alpha':    u'\u03b1',         # greek small letter alpha, U+03B1 ISOgrk3
-    #'amp':      u'\u0026',        # ampersand, U+0026 ISOnum
+    'amp':      u'\u0026',        # ampersand, U+0026 ISOnum
     'and':      u'\u2227',         # logical and = wedge, U+2227 ISOtech
     'ang':      u'\u2220',         # angle, U+2220 ISOamso
     'ap':      u'\u2245',          # approximate,
