@@ -126,6 +126,13 @@ class TestUtilFunctions(unittest.TestCase):
         self.failUnless(isinstance(tempfolder, TempFolder))
         self.assertEqual(root['TEMP'], tempfolder)
 
+    def test_find_repo(self):
+        from karl.utils import find_repo
+        context = testing.DummyModel()
+        self.assertEqual(find_repo(context), None)
+        context.repo = '1'
+        self.assertEqual(find_repo(context), '1')
+
 class TestDebugSearch(unittest.TestCase):
     def setUp(self):
         from zope.testing.cleanup import cleanUp
