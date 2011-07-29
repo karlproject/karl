@@ -318,6 +318,19 @@ class Test_set_modified(unittest.TestCase,
         self.assertEqual(len(index._called_with), 1)
         self.assertEqual(index._called_with[0], (42, root))
 
+    def test_content_object_w_repo(self):
+        from zope.interface import directlyProvides
+        from repoze.lemonade.interfaces import IContent
+        from repozitory.interfaces import IObjectVersion
+        testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
+        model = testing.DummyModel()
+        model.repo = DummyArchive()
+        model.comment = None
+        directlyProvides(model, IContent)
+        self._callFUT(model, None)
+        self.assertEquals(model.repo.archived, [model])
+
+
 class Test_set_created(unittest.TestCase,
                        _NOW_replacer,
                       ):
@@ -409,6 +422,87 @@ class TestDeleteCommunity(unittest.TestCase):
         community.users = users
         self._callFUT(community, None)
         self.assertEqual(users.groups_deleted, ['1', '2'])
+
+class Test_add_to_repo(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+        from zope.interface import Interface
+        from repozitory.interfaces import IObjectVersion
+        testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, event):
+        from karl.models.subscribers import add_to_repo
+        return add_to_repo(object, event)
+
+    def test_no_repo(self):
+        model = testing.DummyModel(repo=None)
+        self._callFUT(model, None)
+
+    def test_new_non_container(self):
+        event = Dummy(parent=None)
+        model = testing.DummyModel()
+        model.repo = archive = DummyArchive()
+        model.comment = None
+        self._callFUT(model, event)
+        self.assertEqual(archive.archived, [model])
+
+    def test_new_container(self):
+        from repozitory.interfaces import IContainerVersion
+        from zope.interface import Interface
+        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        parent = testing.DummyModel()
+        event = Dummy(parent=parent)
+        model = testing.DummyModel()
+        model.repo = archive = DummyArchive()
+        model.comment = None
+        self._callFUT(model, event)
+        self.assertEqual(archive.archived, [model])
+        self.assertEqual(archive.containers, [(parent, None)])
+
+    def test_new_container_with_children(self):
+        from repoze.folder.interfaces import IFolder
+        from repozitory.interfaces import IContainerVersion
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        parent = testing.DummyModel()
+        parent.repo = archive = DummyArchive()
+        parent.comment = None
+        directlyProvides(parent, IFolder)
+        event = Dummy(parent=None)
+        model = testing.DummyModel()
+        model.comment = None
+        parent['foo'] = model
+        self._callFUT(parent, event)
+        self.assertEqual(archive.archived, [parent, model])
+        self.assertEqual(archive.containers, [(parent, None)])
+
+class Test_delete_in_repo(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+        from zope.interface import Interface
+        from repozitory.interfaces import IContainerVersion
+        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, object, event):
+        from karl.models.subscribers import delete_in_repo
+        return delete_in_repo(object, event)
+
+    def test_it(self):
+        parent = testing.DummyModel()
+        event = Dummy(parent=parent)
+        parent.repo = archive = DummyArchive()
+        self._callFUT(None, event)
+        self.assertEqual(archive.containers, [(parent, None)])
 
 class DummyUsers:
     def __init__(self):
@@ -792,3 +886,19 @@ class DummySettings:
         self.query_log_dir = log_dir
         self.query_log_min_duration = min_duration
         self.query_log_all = log_all
+
+class DummyArchive(object):
+    def __init__(self):
+        self.archived = []
+        self.containers = []
+    def archive(self, obj):
+        self.archived.append(obj)
+    def archive_container(self, obj, user):
+        self.containers.append((obj, user))
+
+def DummyAdapter(obj):
+    return obj
+
+class Dummy(object):
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
