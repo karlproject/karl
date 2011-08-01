@@ -14,6 +14,9 @@ Unreleased
 - Added onChange handlers for the author and tags fields on the search results
   page to automatically submit their respective forms.  (LP #784257)
 
+- Added versioning and trash folder for Wiki Pages using Shane's 'repozitory'.
+  Merged from 'branches/rossi_repozitory'.
+
 3.68 (2011-07-14)
 -----------------
 
