@@ -184,18 +184,17 @@ class TestShowWikipageView(unittest.TestCase):
 
     def test_frontpage(self):
         self._register()
-        renderer = testing.registerDummyRenderer('templates/show_wikipage.pt')
         context = testing.DummyModel()
         context.__name__ = 'front_page'
         context.title = 'Page'
         from karl.testing import DummyCommunity
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 3)
-        self.assertEqual(renderer.actions[0][1], 'edit.html')
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 3)
+        self.assertEqual(response['actions'][0][1], 'edit.html')
         # Front page should not have backlink breadcrumb thingy
-        self.assert_(renderer.backto is False)
+        self.assert_(response['backto'] is False)
 
     def test_otherpage(self):
         self._register()
@@ -207,12 +206,12 @@ class TestShowWikipageView(unittest.TestCase):
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 4)
-        self.assertEqual(renderer.actions[0][1], 'edit.html')
-        self.assertEqual(renderer.actions[1][1], 'delete.html')
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 4)
+        self.assertEqual(response['actions'][0][1], 'edit.html')
+        self.assertEqual(response['actions'][1][1], 'delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
-        self.assert_(renderer.backto is not False)
+        self.assert_(response['backto'] is not False)
 
 class TestEditWikiPageFormController(unittest.TestCase):
     def _makeOne(self, context, request):
@@ -362,12 +361,63 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
 
+class Test_preview_wikipage_view(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.wiki import preview_wikipage_view as fut
+        return fut(context, request, WikiPage=DummyWikiPage)
+
+    def test_front_page(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        context = testing.DummyModel(docid=5)
+        directlyProvides(context, ICommunity)
+        context.title = 'Foo'
+        context.__name__ = 'front_page'
+        context.repo = DummyArchive()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['fred'] = testing.DummyModel(title='Fred')
+        request = testing.DummyRequest(params={'version_num': '2'})
+        response = self._callFUT(context, request)
+        self.assertEqual(response['author'], 'Fred')
+        self.assertEqual(response['title'], 'Foo Community Wiki Page')
+        self.assertEqual(response['body'], 'COOKED: Reverted 2')
+
+    def test_non_front_page(self):
+        context = testing.DummyModel(docid=5)
+        context.title = 'Foo'
+        context.__name__ = 'foo'
+        context.repo = DummyArchive()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['fred'] = testing.DummyModel(title='Fred')
+        request = testing.DummyRequest(params={'version_num': '2'})
+        response = self._callFUT(context, request)
+        self.assertEqual(response['author'], 'Fred')
+        self.assertEqual(response['title'], 'Foo')
+        self.assertEqual(response['body'], 'COOKED: Reverted 2')
+
+    def test_no_such_version(self):
+        from repoze.bfg.exceptions import NotFound
+        context = testing.DummyModel(docid=5)
+        context.title = 'Foo'
+        context.__name__ = 'foo'
+        context.repo = DummyArchive()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['fred'] = testing.DummyModel(title='Fred')
+        request = testing.DummyRequest(params={'version_num': '3'})
+        self.assertRaises(NotFound, self._callFUT, context, request)
 
 from karl.content.interfaces import IWikiPage
 
 class DummyWikiPage:
     implements(IWikiPage)
-    def __init__(self, title, text, description, creator):
+    def __init__(self, title='', text='', description='', creator=''):
         self.title = title
         self.text = text
         self.description = description
@@ -375,6 +425,11 @@ class DummyWikiPage:
 
     def get_attachments(self):
         return self
+
+    def revert(self, version):
+        self.text = 'Reverted %d' % version.version_num
+    def cook(self, request):
+        return 'COOKED: ' + self.text
 
 class DummyAdapter:
     def __init__(self, context, request):
@@ -409,3 +464,19 @@ class DummyWorkflow:
 
     def initialize(self, content):
         self.initialized = content
+
+class DummyArchive(object):
+
+    def history(self, docid):
+        import datetime
+        return [Dummy(
+            version_num=2,
+            user='fred',
+            archive_time=datetime.datetime(2010, 5, 12, 2, 42),
+        )]
+
+
+class Dummy(object):
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)

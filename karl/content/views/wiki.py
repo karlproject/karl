@@ -27,6 +27,7 @@ from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
@@ -275,7 +276,7 @@ def show_wikipage_view(context, request):
         )
 
 
-def preview_wikipage_view(context, request):
+def preview_wikipage_view(context, request, WikiPage=WikiPage):
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
@@ -289,13 +290,9 @@ def preview_wikipage_view(context, request):
         if version.version_num == version_num:
             break
     else:
-        raise ValueError("No such version: %d" % version_num)
+        raise NotFound("No such version: %d" % version_num)
 
-    page = WikiPage(
-        context.title,
-        context.text,
-        context.description,
-        context.creator)
+    page = WikiPage()
     page.__parent__ = context.__parent__
     page.revert(version)
 
