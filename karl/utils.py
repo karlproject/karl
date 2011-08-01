@@ -181,3 +181,6 @@ def find_tempfolder(context):
     if not 'TEMP' in root:
         root['TEMP'] = TempFolder()
     return root['TEMP']
+
+def find_repo(context):
+    return getattr(find_site(context), 'repo', None)

@@ -1752,6 +1752,37 @@
     name="kaltura_create_session.json"
   />
 
+  <!-- Versioning UI -->
+  <view
+    for="repoze.lemonade.interfaces.IContent"
+    view=".versions.show_history"
+    permission="edit"
+    name="history.html"
+    renderer="templates/history.pt"
+    />
+
+  <view
+    for="repoze.lemonade.interfaces.IContent"
+    view=".versions.revert"
+    permission="edit"
+    name="revert"
+    />
+
+  <view
+    for="repoze.folder.interfaces.IFolder"
+    view=".versions.show_trash"
+    permission="edit"
+    name="trash.html"
+    renderer="templates/trash.pt"
+    />
+
+  <view
+    for="repoze.folder.interfaces.IFolder"
+    view=".versions.undelete"
+    permission="edit"
+    name="restore"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent

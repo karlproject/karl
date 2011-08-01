@@ -20,6 +20,8 @@ import PIL.Image
 
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
+
+from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
 
 from zope.interface import alsoProvides
@@ -27,6 +29,7 @@ from zope.interface import implements
 from zope.interface import noLongerProvides
 
 from karl.content.interfaces import IImage
+from karl.models.interfaces import IObjectVersion
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
@@ -57,14 +60,20 @@ class CommunityFile(Persistent):
     modified_by = None  # Sorry, persistence
     is_image = False    # Sorry, persistence
 
-    def __init__(self, title, stream, mimetype, filename, creator=u''):
+    def __init__(self,
+                 title=u'',
+                 stream=None,
+                 mimetype=u'',
+                 filename=u'',
+                 creator=u''):
         self.title = unicode(title)
         self.mimetype = mimetype
         self.filename = filename
         self.creator = unicode(creator)
         self.modified_by = self.creator
         self.blobfile = Blob()
-        self.upload(stream)
+        if stream is not None:
+            self.upload(stream)
 
     def image(self):
         assert self.is_image, "Not an image."
@@ -110,6 +119,18 @@ class CommunityFile(Persistent):
             del self.image_size
             self.is_image = False
             noLongerProvides(self, IImage)
+
+    def revert(self, version):
+        # catalog document map blows up if you feed it a long int
+        self.docid = int(version.docid)
+        self.created = version.created
+        self.title = version.title
+        self.modified = version.modified
+        self.filename = version.attrs['filename']
+        self.mimetype = version.attrs['mimetype']
+        self.creator = version.attrs['creator']
+        self.modified_by = version.user
+        self.upload(version.blobs['blob'])
 
 
 def upload_stream(stream, file):
@@ -159,6 +180,28 @@ def _thumb_size(orig_size, max_size):
 
     assert x < max_x
     return x, y
+
+class CommunityFileVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, file):
+        self.title = file.title
+        self.description = None
+        self.created = file.created
+        self.modified = file.modified
+        self.docid = file.docid
+        self.path = model_path(file)
+        self.attrs = dict((name, getattr(file, name)) for name in [
+            'mimetype',
+            'filename',
+            'creator',
+        ])
+        self.blobs = {'blob': file.blobfile.open()}
+        self.klass = type(file)
+        self.user = file.modified_by
+        if self.user is None:
+            self.user = file.creator
+        self.comment = None
 
 class FilesToolFactory(ToolFactory):
     implements(IToolFactory)

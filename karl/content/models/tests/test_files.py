@@ -150,6 +150,91 @@ class CommunityFileTests(unittest.TestCase):
         thumb = o.thumbnail((200, 200))
         self.assertEqual(thumb.image_size, (137, 200))
 
+    def test_revert(self):
+        from pkg_resources import resource_stream
+        o = self._makeOne(mimetype='image/gif')
+        class DummyVersion:
+            docid = 5l
+            created = 'created'
+            title = 'title'
+            modified = 'modified'
+            attrs = {
+                'filename': 'filename',
+                'mimetype': 'image/jpg',
+                'creator': 'creator'
+            }
+            user = 'user'
+            blobs = {'blob': resource_stream(
+                'karl.content.models.tests', 'test.jpg')}
+        self.failIf(o.is_image)
+        o.revert(DummyVersion)
+        self.assertEqual(o.docid, 5)
+        self.failUnless(type(o.docid) is int)
+        self.assertEqual(o.created, 'created')
+        self.assertEqual(o.title, 'title')
+        self.assertEqual(o.modified, 'modified')
+        self.assertEqual(o.filename, 'filename')
+        self.assertEqual(o.mimetype, 'image/jpg')
+        self.assertEqual(o.creator, 'creator')
+        self.assertEqual(o.modified_by, 'user')
+        self.failUnless(o.is_image)
+
+    def test_version(self):
+        from karl.content.models.files import CommunityFileVersion
+        o = self._makeOne()
+        o.title = 'title'
+        o.created = 'created'
+        o.modified = 'modified'
+        o.docid = 'docid'
+        o.filename = 'filename'
+        o.creator = 'creator'
+        o.mimetype = 'mimetype'
+        o.modified_by = 'user'
+        site = testing.DummyModel()
+        site['foo'] = o
+        version = CommunityFileVersion(o)
+        self.assertEqual(version.title, 'title')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'created')
+        self.assertEqual(version.modified, 'modified')
+        self.assertEqual(version.docid, 'docid')
+        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.attrs['filename'], 'filename')
+        self.assertEqual(version.attrs['creator'], 'creator')
+        self.assertEqual(version.attrs['mimetype'], 'mimetype')
+        self.assertEqual(version.blobs['blob'].read(), 'FAKECONTENT')
+        self.assertEqual(version.klass, type(o))
+        self.assertEqual(version.user, 'user')
+        self.assertEqual(version.comment, None)
+
+    def test_version_no_modified_by(self):
+        from karl.content.models.files import CommunityFileVersion
+        o = self._makeOne()
+        o.title = 'title'
+        o.created = 'created'
+        o.modified = 'modified'
+        o.docid = 'docid'
+        o.filename = 'filename'
+        o.creator = 'creator'
+        o.mimetype = 'mimetype'
+        o.modified_by = None
+        site = testing.DummyModel()
+        site['foo'] = o
+        version = CommunityFileVersion(o)
+        self.assertEqual(version.title, 'title')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'created')
+        self.assertEqual(version.modified, 'modified')
+        self.assertEqual(version.docid, 'docid')
+        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.attrs['filename'], 'filename')
+        self.assertEqual(version.attrs['creator'], 'creator')
+        self.assertEqual(version.attrs['mimetype'], 'mimetype')
+        self.assertEqual(version.blobs['blob'].read(), 'FAKECONTENT')
+        self.assertEqual(version.klass, type(o))
+        self.assertEqual(version.user, 'creator')
+        self.assertEqual(version.comment, None)
+
 class TestThumbnail(unittest.TestCase):
     def _getTargetClass(self):
         from karl.content.models.files import Thumbnail

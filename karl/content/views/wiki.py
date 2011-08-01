@@ -17,6 +17,7 @@
 
 import formish
 import schemaish
+import transaction
 from validatish import validator
 
 from webob.exc import HTTPFound
@@ -26,6 +27,7 @@ from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.security import has_permission
 from repoze.bfg.url import model_url
@@ -46,6 +48,7 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utils import find_interface
 from karl.utils import find_profiles
+from karl.utils import find_repo
 
 from karl.views.api import TemplateAPI
 
@@ -55,9 +58,11 @@ from karl.views.utils import make_name
 from karl.views.tags import set_tags
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidators
+from karl.views.versions import format_local_date
 
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
+from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
 from karl.content.views.atom import WikiAtomFeed
 
@@ -248,6 +253,9 @@ def show_wikipage_view(context, request):
         actions.append(('Edit', 'edit.html'))
     if has_permission('delete', context, request) and not is_front_page:
         actions.append(('Delete', 'delete.html'))
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
+        actions.append(('History', 'history.html'))
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -259,16 +267,51 @@ def show_wikipage_view(context, request):
 
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
-    return render_template_to_response(
-        'templates/show_wikipage.pt',
+    return dict(
         api=api,
         actions=actions,
         head_data=client_json_data,
         feed_url=feed_url,
         backto=backto,
         is_front_page=is_front_page,
+        show_trash=repo is not None,
         )
 
+
+def preview_wikipage_view(context, request, WikiPage=WikiPage):
+    is_front_page = (context.__name__ == 'front_page')
+    if is_front_page:
+        community = find_interface(context, ICommunity)
+        page_title = '%s Community Wiki Page' % community.title
+    else:
+        page_title = context.title
+
+    version_num = int(request.params['version_num'])
+    repo = find_repo(context)
+    for version in repo.history(context.docid):
+        if version.version_num == version_num:
+            break
+    else:
+        raise NotFound("No such version: %d" % version_num)
+
+    page = WikiPage()
+    page.__parent__ = context.__parent__
+    page.revert(version)
+
+    profiles = find_profiles(context)
+    author = profiles[version.user]
+
+    # Extra paranoia, probably not strictly necessary.  I just want to make
+    # extra special sure that the temp WikiPage object we create above
+    # doesn't accidentally get attached to the persistent object graph.
+    transaction.doom()
+
+    return {
+        'date': format_local_date(version.archive_time),
+        'author': author.title,
+        'title': page_title,
+        'body': page.cook(request),
+    }
 
 
 def show_wikitoc_view(context, request):

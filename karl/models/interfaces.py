@@ -594,3 +594,14 @@ class ISiteEvents(Interface):
     def push(**kw):
         """ Append an mapping to the stack.
         """
+
+# Reproduce repozitory interfaces here in order to be able to hedge instances
+# where repozitory is not available.
+try:
+    from repozitory.interfaces import IContainerVersion
+    from repozitory.interfaces import IObjectVersion
+except ImportError:
+    class IContainerVersion(Interface):
+        pass
+    class IObjectVersion(Interface):
+        pass

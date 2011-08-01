@@ -57,6 +57,25 @@ class WikiTests(unittest.TestCase):
         del wiki['front_page']
         self.failUnless(isinstance(wiki['front_page'], DummyContent))
 
+    def test_container_version(self):
+        from karl.content.models.wiki import WikiContainerVersion
+        wiki = self._makeOne()
+        wiki.docid = 5
+        wiki['one'] = testing.DummyModel(docid=6)
+        wiki['two'] = testing.DummyModel(docid=7)
+        wiki['front_page'].docid = 8
+        root = testing.DummyModel()
+        root['foo'] = wiki
+        container = WikiContainerVersion(wiki)
+        self.assertEqual(container.container_id, 5)
+        self.assertEqual(container.path, '/foo')
+        self.assertEqual(container.map, {
+            'one': 6,
+            'two': 7,
+            'front_page': 8
+        })
+        self.assertEqual(container.ns_map, {})
+
 
 class WikiPageTests(unittest.TestCase):
 
@@ -262,6 +281,100 @@ class WikiPageTests(unittest.TestCase):
     def test_get_attachements(self):
         page = self._makeOne()
         self.assertEqual(page.get_attachments(), page)
+
+    def test_revert(self):
+        class Version:
+            docid = 5l
+            created = 'created'
+            title = 'the title'
+            description = 'description'
+            modified = 'modified'
+            user = 'modified_by'
+            attrs = {
+                'text': 'wiki text',
+                'creator': 'creator'
+            }
+
+        page = self._makeOne()
+        page.revert(Version)
+        self.assertEqual(page.docid, 5)
+        self.failUnless(type(page.docid), int)
+        self.assertEqual(page.created, 'created')
+        self.assertEqual(page.title, 'the title')
+        self.assertEqual(page.description, 'description')
+        self.assertEqual(page.modified, 'modified')
+        self.assertEqual(page.modified_by, 'modified_by')
+        self.assertEqual(page.text, 'wiki text')
+        self.assertEqual(page.creator, 'creator')
+
+    def test_version(self):
+        from karl.content.models.wiki import WikiPageVersion
+        page = self._makeOne()
+        page.title = 'the title'
+        page.description = 'description'
+        page.created = 'created'
+        page.modified = 'modified'
+        page.docid = 5
+        page.text = 'wiki text'
+        page.creator = 'creator'
+        page.modified_by = 'modified_by'
+        container = testing.DummyModel()
+        container['foo'] = page
+        version = WikiPageVersion(page)
+        self.assertEqual(version.title, 'the title')
+        self.assertEqual(version.description, 'description')
+        self.assertEqual(version.created, 'created')
+        self.assertEqual(version.modified, 'modified')
+        self.assertEqual(version.docid, 5)
+        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.attrs['text'], 'wiki text')
+        self.assertEqual(version.attrs['creator'], 'creator')
+        self.assertEqual(version.attachments, None)
+        self.assertEqual(version.klass, type(page))
+        self.assertEqual(version.user, 'modified_by')
+        self.assertEqual(version.comment, None)
+
+    def test_version_no_modified_by(self):
+        from karl.content.models.wiki import WikiPageVersion
+        page = self._makeOne()
+        page.title = 'the title'
+        page.description = 'description'
+        page.created = 'created'
+        page.modified = 'modified'
+        page.docid = 5
+        page.text = 'wiki text'
+        page.creator = 'creator'
+        page.modified_by = None
+        container = testing.DummyModel()
+        container['foo'] = page
+        version = WikiPageVersion(page)
+        self.assertEqual(version.title, 'the title')
+        self.assertEqual(version.description, 'description')
+        self.assertEqual(version.created, 'created')
+        self.assertEqual(version.modified, 'modified')
+        self.assertEqual(version.docid, 5)
+        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.attrs['text'], 'wiki text')
+        self.assertEqual(version.attrs['creator'], 'creator')
+        self.assertEqual(version.attachments, None)
+        self.assertEqual(version.klass, type(page))
+        self.assertEqual(version.user, 'creator')
+        self.assertEqual(version.comment, None)
+
+    def test_container_version(self):
+        from karl.content.models.wiki import WikiPageContainerVersion
+        root = testing.DummyModel()
+        page = self._makeOne()
+        root['foo'] = page
+        page.docid = 5
+        page['one'] = testing.DummyModel(docid=6)
+        page['two'] = testing.DummyModel(docid=7)
+        container = WikiPageContainerVersion(page)
+        self.assertEqual(container.container_id, 5)
+        self.assertEqual(container.path, '/foo')
+        self.assertEqual(container.map, {'one': 6, 'two': 7})
+        self.assertEqual(container.ns_map, {})
+
 
 class TestWikiToolFactory(unittest.TestCase):
     def setUp(self):

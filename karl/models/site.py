@@ -22,6 +22,7 @@ from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
 from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ILocation
+from repoze.bfg.settings import get_settings
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Authenticated
 from repoze.bfg.security import principals_allowed_by_permission
@@ -67,6 +68,12 @@ from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_tags
 from karl.utils import find_users
+
+try:
+    from repozitory.archive import Archive
+except ImportError:
+    Archive = None
+
 
 class UserEvent(object):
     def __init__(self, site, id, login, groups, old_groups=None):
@@ -347,6 +354,19 @@ def get_virtual(object, default):
         return adapter()
     return default
 
+class RepozitoryEngineParams(object):
+    @property
+    def db_string(self):
+        return get_settings()['repozitory_db_string']
+
+    @property
+    def kwargs(self):
+        return {}
+
+
+Uninitialized = object()
+
+
 class Site(Folder):
     implements(ISite, ILocation)
     __name__ = None
@@ -354,6 +374,7 @@ class Site(Folder):
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
     list_aliases = None
+    _repo = Uninitialized
 
     def __init__(self):
         super(Site, self).__init__()
@@ -372,6 +393,17 @@ class Site(Folder):
         self.sessions = SessionDataManager(3600, 5)
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
+
+    @property
+    def repo(self):
+        if get_settings().get('repozitory_db_string') is None:
+            return None
+
+        # Create self._repo on demand.
+        repo = self._repo
+        if repo is Uninitialized:
+            self._repo = repo = Archive(RepozitoryEngineParams())
+        return repo
 
     def update_indexes(self):
         """ Ensure that we have indexes matching what the application needs.

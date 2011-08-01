@@ -1,0 +1,44 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    metal:use-macro="api.community_layout.macros['master']">
+
+    <div metal:fill-slot="content">
+
+    <h1 metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div class="kbody">
+        <table class="content-listing">
+            <tr>
+                <th>Title</th>
+                <th>Date Deleted</th>
+                <th>Deleted By</th>
+                <th>Action</th>
+            </tr>
+            <tr tal:condition="not deleted">
+                <td colspan="4">
+                    Trash is empty for this folder.
+                </td>
+            </tr>
+            <tr tal:repeat="v deleted" tal:condition="deleted">
+                <td>${v['title']}</td>
+                <td>${v['date']}</td>
+                <td>
+                    <a href="${v['deleted_by']['url']}">
+                        ${v['deleted_by']['name']}
+                    </a>
+                </td>
+                <td>
+                    <a href="${v['restore_url']}">Restore</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    </div>
+
+</html>

@@ -16,18 +16,24 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime
+import logging
 import math
 import os
 from pprint import pformat
 
+from zope.component import queryAdapter
 from zope.component import queryUtility
 
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.security import authenticated_userid
+from repoze.bfg.threadlocal import get_current_request
 from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
 
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
@@ -35,9 +41,12 @@ from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
 from karl.utils import find_peopledirectory_catalog
 from karl.utils import find_profiles
+from karl.utils import find_repo
 from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
+
+log = logging.getLogger(__name__)
 
 _NOW = None
 def _now():     # unittests can replace this to get known results
@@ -105,21 +114,28 @@ def reindex_content(obj, event):
 
 def set_modified(obj, event):
     """ Set the modified date on a single piece of content.
-    
+
     This subscriber is non-recursive.
-    
+
     Intended use is as an IObjectModified event subscriber.
     """
     if is_content(obj):
         now = _now()
         obj.modified = now
         _modify_community(obj, now)
+        repo = find_repo(obj)
+        if repo is not None:
+            adapter = queryAdapter(obj, IObjectVersion)
+            if adapter is not None:
+                repo.archive(adapter)
+                if adapter.comment is None:
+                    adapter.comment = 'Content modified.'
 
 def set_created(obj, event):
     """ Add modified and created attributes to obj and children.
-    
+
     Only add to content objects which do not yet have them (recursively)
-    
+
     Intended use is as an IObjectWillBeAddedEvent subscriber.
     """
     now = _now()
@@ -132,6 +148,59 @@ def set_created(obj, event):
     parent = getattr(event, 'parent', None)
     if parent is not None:
         _modify_community(parent, now)
+
+def add_to_repo(obj, event):
+    """
+    Add a newly created object to the version repository.
+
+    Intended use is as an IObjectAddedEvent subscriber.
+    """
+    repo = find_repo(obj)
+    if repo is None:
+        return
+
+    try:
+        # If we're undeleting an object, it might already be in the repo
+        repo.history(obj.docid)
+    except:
+        # It is not in the repo, so add it
+        adapter = queryAdapter(obj, IObjectVersion)
+        if adapter is not None:
+            if adapter.comment is None:
+                adapter.comment = 'Content created.'
+            repo.archive(adapter)
+
+    container = event.parent
+    adapter = queryAdapter(container, IContainerVersion)
+    if adapter is not None:
+        request = get_current_request()
+        user = authenticated_userid(request)
+        repo.archive_container(adapter, user)
+
+    # Recurse into children if adding a subtree
+    if IFolder.providedBy(obj):
+        for name, child in obj.items():
+            fake_event = FakeEvent()
+            fake_event.parent = obj
+            add_to_repo(child, fake_event)
+
+class FakeEvent(object):
+    pass
+
+def delete_in_repo(obj, event):
+    """
+    Add object to deleted items in repozitory.
+
+    Intended use is as an IObjectRemovedEvent subscriber.
+    """
+    container = event.parent
+    repo = find_repo(container)
+    if repo is not None:
+        adapter = queryAdapter(container, IContainerVersion)
+        if adapter is not None:
+            request = get_current_request()
+            user = authenticated_userid(request)
+            repo.archive_container(adapter, user)
 
 def _modify_community(obj, when):
     # manage content_modified on community whenever a piece of content
