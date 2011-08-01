@@ -1,38 +1,26 @@
-from repoze.bfg.traversal import model_path
-from repoze.folder.interfaces import IFolder
-from zope.component import queryAdapter
+    from repoze.bfg.traversal import model_path
+from zope.component.event import objectEventNotify
 
-from karl.models.interfaces import IContainerVersion
-from karl.models.interfaces import IObjectVersion
-from karl.utils import find_repo
-from karl.utils import get_setting
+from karl.content.models.adapters import extract_text_from_html
+from karl.content.interfaces import IWikiPage
+from karl.events import ObjectModifiedEvent
+from karl.events import ObjectWillBeModifiedEvent
+from karl.models.interfaces import ICatalogSearch
 
 
 def evolve(site):
     """
-    Initialize repozitory.
+    Clean up Wiki page titles so links will still work after change where
+    we start stripping html from the link for purposes of matching the title
+    and setting the title for new wiki pages.
     """
-    repo = find_repo(site)
-    if repo is not None:
-        init_repo(repo, site)
+    count, docids, resolver = ICatalogSearch(site)(interfaces=[IWikiPage])
+    for docid in docids:
+        page = resolver(docid)
+        cleaned = extract_text_from_html(page.title)
+        if page.title != cleaned:
+            print "Updating title for %s" % model_path(page)
+            objectEventNotify(ObjectWillBeModifiedEvent(page))
+            page.title = cleaned
+            objectEventNotify(ObjectModifiedEvent(page))
 
-
-def init_repo(repo, context):
-    if IFolder.providedBy(context):
-        for child in context.values():
-            init_repo(repo, child)
-
-    version = queryAdapter(context, IObjectVersion)
-    if version is not None:
-        print "Updating version for %s" % model_path(context)
-        repo.archive(version)
-
-    container = queryAdapter(context, IContainerVersion)
-    if container is not None:
-        print "Updating container version for %s" % model_path(context)
-        user = getattr(context, 'creator', None)
-        if user is None:
-            user = get_setting(context, 'system_user', 'admin')
-        repo.archive_container(container, user)
-
-    context._p_deactivate() # try not to run out of memory
