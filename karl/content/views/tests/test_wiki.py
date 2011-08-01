@@ -40,7 +40,6 @@ class TestRedirectToFrontPage(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/front_page/')
 
-
 class Test_redirect_to_add_form(unittest.TestCase):
 
     def _callFUT(self, context, request):
@@ -191,7 +190,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(len(response['actions']), 3)
+        self.assertEqual(len(response['actions']), 2)
         self.assertEqual(response['actions'][0][1], 'edit.html')
         # Front page should not have backlink breadcrumb thingy
         self.assert_(response['backto'] is False)
@@ -207,7 +206,25 @@ class TestShowWikipageView(unittest.TestCase):
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
-        self.assertEqual(len(response['actions']), 4)
+        self.assertEqual(len(response['actions']), 3)
+        self.assertEqual(response['actions'][0][1], 'edit.html')
+        self.assertEqual(response['actions'][1][1], 'delete.html')
+        # Backlink breadcrumb thingy should appear on non-front-page
+        self.assert_(response['backto'] is not False)
+
+    def test_otherpage_w_repo(self):
+        self._register()
+        renderer = testing.registerDummyRenderer('templates/show_wikipage.pt')
+        context = testing.DummyModel(title='Other Page')
+        context.__parent__ = testing.DummyModel(title='Front Page')
+        context.__parent__.__name__ = 'front_page'
+        context.__name__ = 'other_page'
+        context.repo = object()
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.params = request.POST = MultiDict()
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 3)
         self.assertEqual(response['actions'][0][1], 'edit.html')
         self.assertEqual(response['actions'][1][1], 'delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
@@ -366,8 +383,15 @@ class Test_preview_wikipage_view(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
+        from karl.content.views import wiki
+        self._save_transaction = wiki.transaction
+        wiki.transaction = DummyTransactionManager()
+
     def tearDown(self):
         cleanUp()
+
+        from karl.content.views import wiki
+        wiki.transaction = self._save_transaction
 
     def _callFUT(self, context, request):
         from karl.content.views.wiki import preview_wikipage_view as fut
@@ -475,8 +499,11 @@ class DummyArchive(object):
             archive_time=datetime.datetime(2010, 5, 12, 2, 42),
         )]
 
-
 class Dummy(object):
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
+class DummyTransactionManager(object):
+    def doom(self):
+        pass

@@ -21,8 +21,10 @@
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
           <a href="${api.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
-          <a href="${api.here_url}../wikitoc.html">Index</a> |
-          <a href="${api.here_url}../trash.html">Trash</a>
+          <a href="${api.here_url}../wikitoc.html">Index</a>
+          <tal:block condition="show_trash"> |
+            <a href="${api.here_url}../trash.html">Trash</a>
+          </tal:block>
       </span>
     </div>
 

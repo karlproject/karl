@@ -23,13 +23,13 @@ from BTrees.OOBTree import OOBTree
 
 from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
-from repozitory.interfaces import IObjectVersion
 
 from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import noLongerProvides
 
 from karl.content.interfaces import IImage
+from karl.models.interfaces import IObjectVersion
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 

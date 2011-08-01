@@ -187,8 +187,13 @@ class SiteTests(unittest.TestCase):
         self.failUnless(hasattr(site, 'catalog'))
         self.failUnless('people' in site)
 
+    def test_no_repo(self):
+        testing.registerSettings({})
+        self._registerUtilities()
+        site = self._makeOne()
+        self.assertEqual(site.repo, None)
+
     def test_repo(self):
-        from karl.models.site import RepozitoryEngineParams
         testing.registerSettings({'repozitory_db_string': 'dbstring'})
         self._registerUtilities()
         site = self._makeOne()
@@ -197,16 +202,6 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(archive.params.kwargs, {})
         self.failUnless(site.repo is archive)
 
-    def test_repo_bbb_persistence(self):
-        from karl.models.site import RepozitoryEngineParams
-        testing.registerSettings({'repozitory_db_string': 'dbstring'})
-        self._registerUtilities()
-        site = self._makeOne()
-        site._repo = None
-        archive = site.repo
-        self.assertEqual(archive.params.db_string, 'dbstring')
-        self.assertEqual(archive.params.kwargs, {})
-        self.failUnless(site.repo is archive)
 
 class TestGetTextRepr(unittest.TestCase):
     def setUp(self):

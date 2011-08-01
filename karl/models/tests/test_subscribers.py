@@ -321,7 +321,7 @@ class Test_set_modified(unittest.TestCase,
     def test_content_object_w_repo(self):
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from repozitory.interfaces import IObjectVersion
+        from karl.models.interfaces import IObjectVersion
         testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
         model = testing.DummyModel()
         model.repo = DummyArchive()
@@ -428,7 +428,7 @@ class Test_add_to_repo(unittest.TestCase):
         cleanUp()
 
         from zope.interface import Interface
-        from repozitory.interfaces import IObjectVersion
+        from karl.models.interfaces import IObjectVersion
         testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
 
     def tearDown(self):
@@ -451,7 +451,7 @@ class Test_add_to_repo(unittest.TestCase):
         self.assertEqual(archive.archived, [model])
 
     def test_new_container(self):
-        from repozitory.interfaces import IContainerVersion
+        from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
         parent = testing.DummyModel()
@@ -465,7 +465,7 @@ class Test_add_to_repo(unittest.TestCase):
 
     def test_new_container_with_children(self):
         from repoze.folder.interfaces import IFolder
-        from repozitory.interfaces import IContainerVersion
+        from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         from zope.interface import directlyProvides
         testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
@@ -487,7 +487,7 @@ class Test_delete_in_repo(unittest.TestCase):
         cleanUp()
 
         from zope.interface import Interface
-        from repozitory.interfaces import IContainerVersion
+        from karl.models.interfaces import IContainerVersion
         testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
 
     def tearDown(self):

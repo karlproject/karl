@@ -4,13 +4,18 @@ import time
 from webob.exc import HTTPFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
-from repozitory.interfaces import IContainerVersion
-from sqlalchemy.orm.exc import NoResultFound
+from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
 from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
+
+try:
+    from sqlalchemy.orm.exc import NoResultFound
+except ImportError:
+    class NoResultFound(Exception):
+        pass
 
 
 def show_history(context, request):

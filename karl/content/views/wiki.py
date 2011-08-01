@@ -253,7 +253,8 @@ def show_wikipage_view(context, request):
         actions.append(('Edit', 'edit.html'))
     if has_permission('delete', context, request) and not is_front_page:
         actions.append(('Delete', 'delete.html'))
-    if has_permission('edit', context, request):
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
         actions.append(('History', 'history.html'))
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
@@ -273,6 +274,7 @@ def show_wikipage_view(context, request):
         feed_url=feed_url,
         backto=backto,
         is_front_page=is_front_page,
+        show_trash=repo is not None,
         )
 
 

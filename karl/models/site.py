@@ -37,7 +37,6 @@ from repoze.lemonade.content import create_content
 from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
 from repoze.who.plugins.zodb.users import Users
-from repozitory.archive import Archive
 from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface.declarations import Declaration
@@ -69,6 +68,12 @@ from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_tags
 from karl.utils import find_users
+
+try:
+    from repozitory.archive import Archive
+except ImportError:
+    Archive = None
+
 
 class UserEvent(object):
     def __init__(self, site, id, login, groups, old_groups=None):
@@ -358,6 +363,10 @@ class RepozitoryEngineParams(object):
     def kwargs(self):
         return {}
 
+
+Uninitialized = object()
+
+
 class Site(Folder):
     implements(ISite, ILocation)
     __name__ = None
@@ -365,7 +374,7 @@ class Site(Folder):
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
     list_aliases = None
-    _repo = None
+    _repo = Uninitialized
 
     def __init__(self):
         super(Site, self).__init__()
@@ -384,15 +393,16 @@ class Site(Folder):
         self.sessions = SessionDataManager(3600, 5)
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
-        self._repo = Archive(RepozitoryEngineParams())
 
     @property
     def repo(self):
+        if get_settings().get('repozitory_db_string') is None:
+            return None
+
         # Create self._repo on demand.
         repo = self._repo
-        if repo is not None:
-            return repo
-        self._repo = repo = Archive(RepozitoryEngineParams())
+        if repo is Uninitialized:
+            self._repo = repo = Archive(RepozitoryEngineParams())
         return repo
 
     def update_indexes(self):

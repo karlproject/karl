@@ -58,7 +58,6 @@ requires = [
     'repoze.whoplugins.zodb',
     'repoze.workflow',
     'repoze.zodbconn',
-    'repozitory',
     'setuptools',
     'simplejson',
     'ZODB3',

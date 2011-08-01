@@ -23,8 +23,8 @@ import urllib
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.traversal import model_path
 from repoze.lemonade.content import create_content
-from repozitory.interfaces import IContainerVersion
-from repozitory.interfaces import IObjectVersion
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IObjectVersion
 
 from repoze.folder import Folder
 from zope.interface import implements

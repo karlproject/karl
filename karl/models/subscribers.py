@@ -31,9 +31,9 @@ from repoze.bfg.traversal import model_path
 from repoze.bfg.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
-from repozitory.interfaces import IContainerVersion
-from repozitory.interfaces import IObjectVersion
 
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile

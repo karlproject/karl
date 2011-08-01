@@ -1,9 +1,9 @@
 from repoze.bfg.traversal import model_path
 from repoze.folder.interfaces import IFolder
-from repozitory.interfaces import IContainerVersion
-from repozitory.interfaces import IObjectVersion
 from zope.component import queryAdapter
 
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IObjectVersion
 from karl.utils import find_repo
 from karl.utils import get_setting
 
@@ -12,9 +12,8 @@ def evolve(site):
     """
     Initialize repozitory.
     """
-    has_repo = get_setting(site, 'repozitory_db_string') is not None
-    if has_repo:
-        repo = find_repo(site)
+    repo = find_repo(site)
+    if repo is not None:
         init_repo(repo, site)
 
 

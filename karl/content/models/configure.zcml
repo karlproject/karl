@@ -166,25 +166,25 @@
 
   <adapter
       for="karl.content.interfaces.IWikiPage"
-      provides="repozitory.interfaces.IObjectVersion"
+      provides="karl.models.interfaces.IObjectVersion"
       factory=".wiki.WikiPageVersion"
      />
 
   <adapter
       for="karl.content.interfaces.IWiki"
-      provides="repozitory.interfaces.IContainerVersion"
+      provides="karl.models.interfaces.IContainerVersion"
       factory=".wiki.WikiContainerVersion"
       />
 
   <adapter
       for="karl.content.interfaces.IWikiPage"
-      provides="repozitory.interfaces.IContainerVersion"
+      provides="karl.models.interfaces.IContainerVersion"
       factory=".wiki.WikiPageContainerVersion"
       />
 
   <adapter
       for="karl.content.interfaces.ICommunityFile"
-      provides="repozitory.interfaces.IObjectVersion"
+      provides="karl.models.interfaces.IObjectVersion"
       factory=".files.CommunityFileVersion"
      />
 
