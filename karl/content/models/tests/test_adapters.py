@@ -204,7 +204,7 @@ class TestTitleAndTextIndexData(unittest.TestCase):
                                     )
         adapter = self._makeOne(context)
         data = adapter()
-        self.assertEqual(data, ('thetitle', '\n\nHi!\n\n'))
+        self.assertEqual(data, ('thetitle', 'Hi!'))
 
 class TestWikiTextIndexData(unittest.TestCase):
     def setUp(self):
@@ -247,7 +247,7 @@ class TestWikiTextIndexData(unittest.TestCase):
         adapter = self._makeOne(context)
         data = adapter()
         self.assertEqual(data, ('thetitle',
-                                '\n\nHi! Will you be my friend?\n\n'))
+                                'Hi! Will you be my friend?'))
 
 class TestFileTextIndexData(unittest.TestCase):
     def setUp(self):
@@ -333,6 +333,43 @@ class TestCalendarEventCategoryData(unittest.TestCase):
         result = adapter()
         self.assertEqual(result, 'virt')
 
+class Test_extract_text_from_html(unittest.TestCase):
+    # XXX It would be nice if the extracter didn't add extra whitespace.
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, html):
+        from karl.content.models.adapters import extract_text_from_html as fut
+        return fut(html)
+
+    def test_convert_lt(self):
+        html = u"<p>It is well <i>known</i> that f(x) = 1 for x &lt; 0.</p>"
+        text = u"It is well known that f(x) = 1 for x < 0."
+        self.assertEqual(self._callFUT(html), text)
+
+    def test_convert_gt(self):
+        html = u"<p>It is well <i>known</i> that f(x) = 1 for x &gt; 0.</p>"
+        text = u"It is well known that f(x) = 1 for x > 0."
+        self.assertEqual(self._callFUT(html), text)
+
+    def test_convert_amp(self):
+        html = u"<p>Let's you &amp; me go <i>shopping</i>.</p>"
+        text = u"Let's you & me go shopping."
+        self.assertEqual(self._callFUT(html), text)
+
+    def test_convert_quot(self):
+        html = u"<p>Wow, that's a really good &quot;idea&quot;.</p>"
+        text = u'Wow, that\'s a really good "idea".'
+        self.assertEqual(self._callFUT(html), text)
+
+    def test_convert_unicode_char_entity(self):
+        html = u"Let's close Guant&amp;aacute;namo."
+        text = u"Let's close Guant\xe1namo."
+        self.assertEqual(self._callFUT(html), text)
 
 class DummyConverter:
     def __init__(self, data):

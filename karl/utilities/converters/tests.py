@@ -134,7 +134,32 @@ class ConverterTests(unittest.TestCase):
 
     def testHTMLWithNumericEntities(self):
         body = (u'<html><body>Non&#160;breaking&#160;space.</body></html>')
-        utf8doc = u'Non breaking space.'.encode('utf-8')
+        utf8doc = 'Non\xc2\xa0breaking\xc2\xa0space.'
+        from karl.utilities.converters import html
+
+        import tempfile
+        C = html.Converter()
+
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('iso-8859-15'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'iso-8859-15', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('utf-8'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'utf8', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+    def testHTMLWithStupidUserEntities(self):
+        body = (u"<html><body><p>Let's close Guant&amp;aacute;namo."
+                u"</p></body></html>")
+        utf8doc = u"Let's close Guant\xe1namo.".encode('UTF-8')
         from karl.utilities.converters import html
 
         import tempfile

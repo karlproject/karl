@@ -71,7 +71,7 @@ def makeFlexibleTextIndexData(attr_weights):
 def extract_text_from_html(text):
     if not isinstance(text, unicode):
         text = unicode(text, 'utf-8', 'replace')
-    return html2text(convert_entities(text))
+    return convert_entities(html2text(convert_entities(text))).strip()
 
 TitleAndDescriptionIndexData = makeFlexibleTextIndexData(
                                 [('title', None),

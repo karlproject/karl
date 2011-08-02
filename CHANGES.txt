@@ -17,6 +17,9 @@ Unreleased
 - Added versioning and trash folder for Wiki Pages using Shane's 'repozitory'.
   Merged from 'branches/rossi_repozitory'.
 
+- Fixed UnicodeDecodeError encountered while reindexing text data on staging.
+  Made improvements to the text from html extracter.
+
 3.68 (2011-07-14)
 -----------------
 

@@ -33,7 +33,8 @@ def handler(x):
 
 def convert_entities(text):
     """ replace all entities inside a unicode string """
-    assert isinstance(text, unicode)
+    if not isinstance(text, unicode):
+        text = text.decode('UTF-8')
     text = entity_reg.sub(handler, text)
     return text
 

@@ -84,7 +84,8 @@ entitydefs = {
     'agrave':   u'\u00e0',         # latin small letter a with grave = latin small letter a grave, U+00E0 ISOlat1
     'alefsym':  u'\u2135',         # alef symbol = first transfinite cardinal, U+2135 NEW
     'alpha':    u'\u03b1',         # greek small letter alpha, U+03B1 ISOgrk3
-    'amp':      u'\u0026',        # ampersand, U+0026 ISOnum
+    #'amp':      u'\u0026',        # ampersand, U+0026 ISOnum
+    'amp':      u'&amp;',          # ampersand, U+0026 ISOnum
     'and':      u'\u2227',         # logical and = wedge, U+2227 ISOtech
     'ang':      u'\u2220',         # angle, U+2220 ISOamso
     'ap':      u'\u2245',          # approximate,
@@ -139,6 +140,7 @@ entitydefs = {
     'gamma':    u'\u03b3',         # greek small letter gamma, U+03B3 ISOgrk3
     'ge':       u'\u2265',         # greater-than or equal to, U+2265 ISOtech
     #'gt':       u'\u003e',        # greater-than sign, U+003E ISOnum
+    'gt':       u'&gt;',           # greater-than sign, U+003E ISOnum
     'hArr':     u'\u21d4',         # left right double arrow, U+21D4 ISOamsa
     'harr':     u'\u2194',         # left right arrow, U+2194 ISOamsa
     'hearts':   u'\u2665',         # black heart suit = valentine, U+2665 ISOpub
@@ -170,6 +172,7 @@ entitydefs = {
     'lsaquo':   u'\u2039',         # single left-pointing angle quotation mark, U+2039 ISO proposed
     'lsquo':    u'\u2018',         # left single quotation mark, U+2018 ISOnum
     #'lt':       u'\u003c',        # less-than sign, U+003C ISOnum
+    'lt':       u'&lt;',           # less-than sign, U+003C ISOnum
     'macr':     u'\u00af',         # macron = spacing macron = overline = APL overbar, U+00AF ISOdia
     'mdash':    u'\u2014',         # em dash, U+2014 ISOpub
     'micro':    u'\u00b5',         # micro sign, U+00B5 ISOnum
@@ -215,7 +218,8 @@ entitydefs = {
     'prod':     u'\u220f',         # n-ary product = product sign, U+220F ISOamsb
     'prop':     u'\u221d',         # proportional to, U+221D ISOtech
     'psi':      u'\u03c8',         # greek small letter psi, U+03C8 ISOgrk3
-    #'quot':     u'\u0022,         # quotation mark = APL quote, U+0022 ISOnum
+    #'quot':     u'\u0022',        # quotation mark = APL quote, U+0022 ISOnum
+    'quot':     u'&quot;',         # quotation mark = APL quote, U+0022 ISOnum
     'rArr':     u'\u21d2',         # rightwards double arrow, U+21D2 ISOtech
     'radic':    u'\u221a',         # square root = radical sign, U+221A ISOtech
     'rang':     u'\u232a',         # right-pointing angle bracket = ket, U+232A ISOtech

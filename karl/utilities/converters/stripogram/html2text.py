@@ -26,8 +26,7 @@ class HTML2Text(sgmllib.SGMLParser):
 
     def add_text(self,text):
         # convert text into words
-        words = split(replace(text,'\n',' '))
-        self.line.extend(words)
+        self.line.append(replace(text, '\n', ' '))
 
     def add_break(self):
         self.lines.append((self.indent,self.line))
@@ -53,11 +52,11 @@ class HTML2Text(sgmllib.SGMLParser):
                     out_line.append(word)
                     len_out_line = len_out_line + len_word
                 else:
-                    out_para = out_para + indent_string + join(out_line, ' ') + '\n'
+                    out_para = out_para + indent_string + join(out_line, '') + '\n'
                     out_line=[word]
                     len_out_line=len_word
 
-            out_para = out_para + indent_string + join(out_line, ' ')
+            out_para = out_para + indent_string + join(out_line, '')
             out_paras.append(out_para)
 
         self.result = join(out_paras,'\n\n')
