@@ -63,7 +63,7 @@ _VIEW_URL_LOOKUP = dict([(x[0], x[3]) for x in _VIEWS])
 
 
 def show_communities_view(context, request):
-    default = 'all'
+    default = 'active'
     which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
     target = model_url(context, request, urlname)

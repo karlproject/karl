@@ -20,6 +20,8 @@ Unreleased
 - Fixed UnicodeDecodeError encountered while reindexing text data on staging.
   Made improvements to the text from html extracter.
 
+- Default to active view for /communities
+
 3.68 (2011-07-14)
 -----------------
 
