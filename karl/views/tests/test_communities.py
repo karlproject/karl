@@ -47,7 +47,7 @@ class Test_show_communities_view(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self._checkResponse(response,
-                            model_url(context, request, 'all_communities.html'))
+                            model_url(context, request, 'active_communities.html'))
 
     def test_w_cookie(self):
         from karl.views.communities import _VIEW_COOKIE
