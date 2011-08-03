@@ -340,6 +340,7 @@ def show_wikitoc_view(context, request):
 
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
+    repo = find_repo(context)
     return render_template_to_response(
         'templates/show_wikitoc.pt',
         api=api,
@@ -347,6 +348,7 @@ def show_wikitoc_view(context, request):
         head_data=client_json_data,
         feed_url=feed_url,
         backto=backto,
+        show_trash=repo is not None,
         )
 
 class EditWikiPageFormController(object):

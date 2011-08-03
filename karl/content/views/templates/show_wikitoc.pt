@@ -29,7 +29,7 @@
       <link rel="stylesheet" href="${api.static_url}/karl-wikitoc.css" type="text/css"/>
     </tal:resources>
   </span>
-  
+
   <div metal:fill-slot="content">
 
     <div class="contentbar-wrapper">
@@ -38,6 +38,9 @@
           <a href="${api.here_url}">Front Page</a> |
           Index
       </span>
+      <tal:block condition="show_trash"> |
+        <a href="${api.here_url}../trash.html">Trash</a>
+      </tal:block>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
