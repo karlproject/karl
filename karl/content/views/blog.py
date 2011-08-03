@@ -237,7 +237,7 @@ def show_blogentry_view(context, request):
     if has_permission('edit', context, request):
         actions.append(('Delete', 'delete.html'))
     if has_permission('administer', context, request):
-        actions.append(('Administer', 'advanced.html'))
+        actions.append(('Advanced', 'advanced.html'))
 
     api.is_taggable = True
 

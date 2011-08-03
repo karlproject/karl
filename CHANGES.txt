@@ -22,6 +22,9 @@ Unreleased
 
 - Default to active view for /communities
 
+- Modify advanced button text on blog page to read "Advanced" instead of
+  "Administer". (LP #820547)
+
 3.68 (2011-07-14)
 -----------------
 
