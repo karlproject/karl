@@ -256,6 +256,9 @@ def show_wikipage_view(context, request):
     repo = find_repo(context)
     if repo is not None and has_permission('edit', context, request):
         actions.append(('History', 'history.html'))
+        show_trash = True
+    else:
+        show_trash = False
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -274,7 +277,7 @@ def show_wikipage_view(context, request):
         feed_url=feed_url,
         backto=backto,
         is_front_page=is_front_page,
-        show_trash=repo is not None,
+        show_trash=show_trash,
         )
 
 
@@ -341,6 +344,8 @@ def show_wikitoc_view(context, request):
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
     repo = find_repo(context)
+    show_trash = repo is not None and has_permission('edit', context, request)
+
     return render_template_to_response(
         'templates/show_wikitoc.pt',
         api=api,
@@ -348,7 +353,7 @@ def show_wikitoc_view(context, request):
         head_data=client_json_data,
         feed_url=feed_url,
         backto=backto,
-        show_trash=repo is not None,
+        show_trash=show_trash,
         )
 
 class EditWikiPageFormController(object):
