@@ -98,6 +98,7 @@ class Test_revert(unittest.TestCase):
             Dummy(version_num=1,),
             Dummy(version_num=2,),
         ])
+        context.catalog = DummyCatalog()
         reverted = []
         def dummy_revert(version):
             reverted.append(version)
@@ -107,6 +108,7 @@ class Test_revert(unittest.TestCase):
         self.assertEqual(len(reverted), 1)
         self.assertEqual(reverted[0].version_num, 1)
         self.assertEqual(context.repo._reverted, [(3, 1)])
+        self.assertEqual(context.catalog.reindexed, [(3, context)])
 
     def test_it_no_such_version(self):
         from datetime import datetime
@@ -304,3 +306,11 @@ class DummyModel(testing.DummyModel):
 
 def DummyAdapter(obj):
     return obj
+
+class DummyCatalog(object):
+
+    def __init__(self):
+        self.reindexed = []
+
+    def reindex_doc(self, docid, doc):
+        self.reindexed.append((docid, doc))

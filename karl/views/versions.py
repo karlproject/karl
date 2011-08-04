@@ -7,6 +7,7 @@ from repoze.bfg.url import model_url
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
+from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
@@ -70,6 +71,8 @@ def revert(context, request):
         raise ValueError('No such version: %d' % version_num)
     context.revert(version)
     repo.reverted(context.docid, version_num)
+    catalog = find_catalog(context)
+    catalog.reindex_doc(context.docid, context)
     return HTTPFound(location=model_url(context, request))
 
 
