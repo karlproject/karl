@@ -27,6 +27,8 @@ Unreleased
 
 - Fix layout issue on community search results page (LP #820523)
 
+- Update jquery.timeago to 0.9.3 to resolve NaN date issues (LP #821014)
+
 3.68 (2011-07-14)
 -----------------
 
