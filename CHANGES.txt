@@ -25,6 +25,8 @@ Unreleased
 - Modify advanced button text on blog page to read "Advanced" instead of
   "Administer". (LP #820547)
 
+- Fix layout issue on community search results page (LP #820523)
+
 3.68 (2011-07-14)
 -----------------
 

@@ -3484,6 +3484,11 @@ ul.menu li {
     width: 700px;
 }
 
+/* we have less width to work with in a community search */
+.community-layout #sras-results {
+    width: 475px;
+}
+
 .sras-result {
     margin-bottom: 1em;
     clear: both;
