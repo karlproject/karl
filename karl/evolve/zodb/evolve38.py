@@ -18,6 +18,9 @@ def evolve(site):
 
 
 def init_repo(repo, context):
+    if context.__name__ == 'TEMP':
+        return 
+
     if IFolder.providedBy(context):
         for child in context.values():
             init_repo(repo, child)
