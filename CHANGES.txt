@@ -7,6 +7,9 @@ Unreleased
 - The statistics option is now hidden in the admin UI if no statistics have
   been generated yet.  (LP #821204)
 
+- Fixed bug in Wiki Page version preview where the title was always from the
+  current version rather than the version being previewed.  (LP #823552)
+
 3.69 (2011-08-04)
 -----------------
 

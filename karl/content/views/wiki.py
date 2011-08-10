@@ -282,13 +282,6 @@ def show_wikipage_view(context, request):
 
 
 def preview_wikipage_view(context, request, WikiPage=WikiPage):
-    is_front_page = (context.__name__ == 'front_page')
-    if is_front_page:
-        community = find_interface(context, ICommunity)
-        page_title = '%s Community Wiki Page' % community.title
-    else:
-        page_title = context.title
-
     version_num = int(request.params['version_num'])
     repo = find_repo(context)
     for version in repo.history(context.docid):
@@ -300,6 +293,13 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage):
     page = WikiPage()
     page.__parent__ = context.__parent__
     page.revert(version)
+
+    is_front_page = (context.__name__ == 'front_page')
+    if is_front_page:
+        community = find_interface(context, ICommunity)
+        page_title = '%s Community Wiki Page' % community.title
+    else:
+        page_title = page.title
 
     profiles = find_profiles(context)
     author = profiles[version.user]

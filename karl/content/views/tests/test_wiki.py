@@ -423,7 +423,7 @@ class Test_preview_wikipage_view(unittest.TestCase):
         request = testing.DummyRequest(params={'version_num': '2'})
         response = self._callFUT(context, request)
         self.assertEqual(response['author'], 'Fred')
-        self.assertEqual(response['title'], 'Foo')
+        self.assertEqual(response['title'], 'Title 2')
         self.assertEqual(response['body'], 'COOKED: Reverted 2')
 
     def test_no_such_version(self):
@@ -452,6 +452,8 @@ class DummyWikiPage:
 
     def revert(self, version):
         self.text = 'Reverted %d' % version.version_num
+        self.title = 'Title %d' % version.version_num
+
     def cook(self, request):
         return 'COOKED: ' + self.text
 
