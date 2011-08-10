@@ -58,7 +58,7 @@ class AdminTemplateAPI(TemplateAPI):
             context, 'error_monitor_subsystems', None
         )
         statistics_folder = get_setting(context, 'statistics_folder', None)
-        if statistics_folder is not None:
+        if statistics_folder is not None and os.path.exists(statistics_folder):
             csv_files = [fn for fn in os.listdir(statistics_folder)
                          if fn.endswith('.csv')]
             self.statistics_view_enabled = not not csv_files
