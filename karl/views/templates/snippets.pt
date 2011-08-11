@@ -978,7 +978,8 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     </ul>
 
     <metal:wikilock define-macro="wikilock">
-      <div class="portalWarningMessage" tal:condition="is_locked | None">
+      <div class="portalWarningMessage pageLockMessage"
+           tal:condition="is_locked | None">
         <p>This page is <strong>currently</strong> being edited by
           <a href="${lock_user_url}">${lock_user_name}</a>.
           <tal:email_block condition="lock_user_email">
