@@ -11,11 +11,19 @@ class Test_show_history(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
+    def _register(self):
+        from karl.content.views.interfaces import IWikiLock
+        from repoze.bfg import testing
+        from zope.interface import Interface
+        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
+
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
         return show_history(context, request)
 
     def test_it(self):
+        self._register()
+
         from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
@@ -61,6 +69,8 @@ class Test_show_history(unittest.TestCase):
         self.assertEqual(history[1]['is_current'], False)
 
     def test_it_no_repo(self):
+        self._register()
+
         from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
@@ -249,6 +259,41 @@ class Test_undelete(unittest.TestCase):
         self.assertEqual(len(context['foo2']['foo3'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
+
+class Test_show_history_wikilock(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _register(self):
+        from karl.content.views.interfaces import IWikiLock
+        from repoze.bfg import testing
+        from zope.interface import Interface
+        def make_adapter(context):
+            adapter = DummyWikiLockAdapter(context, locked=True)
+            return adapter
+        testing.registerAdapter(make_adapter, (Interface,), IWikiLock)
+
+    def _callFUT(self, context, request):
+        from karl.views.versions import show_history
+        return show_history(context, request)
+
+    def test_show_locked_page(self):
+        from karl.testing import DummyRoot
+        site = DummyRoot()
+        context = testing.DummyModel(title='title')
+        site['foo'] = context
+
+        self._register()
+
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(response['is_locked'])
+
+
 class DummyArchive(object):
 
     def __init__(self, history):
@@ -314,3 +359,13 @@ class DummyCatalog(object):
 
     def reindex_doc(self, docid, doc):
         self.reindexed.append((docid, doc))
+
+class DummyWikiLockAdapter(object):
+    def __init__(self, context, locked=False):
+        self.context = context
+        self.locked = locked
+    def is_locked(self):
+        return self.locked
+    def lock_info(self):
+        from datetime import datetime
+        return dict(userid='foo', lock_time=datetime.now())
