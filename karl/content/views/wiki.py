@@ -72,6 +72,8 @@ from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
+from karl.utilities.wikilock import lock_info_from_wikilock
+
 _wiki_text_help = """You can create a new page by naming it and surrounding
 the name with ((double parentheses)). When you save the page, the contents
 of the parentheses will have a small + link next to it, which you can click
@@ -276,25 +278,7 @@ def show_wikipage_view(context, request):
     feed_url = model_url(wiki, request, "atom.xml")
 
     wikilock = IWikiLock(context)
-    if wikilock.is_locked():
-        is_locked = True
-        lock_info = wikilock.lock_info()
-        userid = lock_info['userid']
-        profiles = find_profiles(context)
-        profile = profiles.get(userid, None)
-        if profile is not None:
-            lock_user_url = model_url(profile, request)
-            lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
-            lock_user_email = profile.email
-        else:
-            lock_user_url = model_url(profiles, request)
-            lock_user_name = 'Unknown'
-            lock_user_email = ''
-    else:
-        is_locked = False
-        lock_user_url = None
-        lock_user_name = None
-        lock_user_email = None
+    lock_info = lock_info_from_wikilock(wikilock, request)
 
     return dict(
         api=api,
@@ -304,10 +288,7 @@ def show_wikipage_view(context, request):
         backto=backto,
         is_front_page=is_front_page,
         show_trash=show_trash,
-        is_locked=wikilock.is_locked(),
-        lock_user_url=lock_user_url,
-        lock_user_name=lock_user_name,
-        lock_user_email=lock_user_email,
+        lock_info=lock_info,
         )
 
 
@@ -449,27 +430,6 @@ class EditWikiPageFormController(object):
         if not self.wikilock.is_locked():
             self.wikilock.lock(self.userid)
 
-        # don't show page is locked message if locked by current user
-        if self.wikilock.owns_lock(self.userid):
-            is_locked = False
-            lock_user_url = None
-            lock_user_name = None
-            lock_user_email = None
-        else:
-            is_locked = True
-            lock_info = self.wikilock.lock_info()
-            userid = lock_info['userid']
-            profiles = find_profiles(self.context)
-            profile = profiles.get(userid, None)
-            if profile is not None:
-                lock_user_url = model_url(profile, self.request)
-                lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
-                lock_user_email = profile.email
-            else:
-                lock_user_url = model_url(profiles, self.request)
-                lock_user_name = 'Unknown'
-                lock_user_email = ''
-
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
@@ -477,12 +437,10 @@ class EditWikiPageFormController(object):
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
+        lock_info = lock_info_from_wikilock(self.wikilock, self.request)
         return {'api':api,
                 'actions':(),
-                'is_locked': is_locked,
-                'lock_user_url': lock_user_url,
-                'lock_user_name': lock_user_name,
-                'lock_user_email': lock_user_email,
+                'lock_info':lock_info,
                 }
 
     def handle_cancel(self):

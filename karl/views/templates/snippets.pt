@@ -979,11 +979,11 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
 
     <metal:wikilock define-macro="wikilock">
       <div class="portalWarningMessage pageLockMessage"
-           tal:condition="is_locked | None">
+           tal:condition="lock_info['is_locked'] | None">
         <p>This page is <strong>currently</strong> being edited by
-          <a href="${lock_user_url}">${lock_user_name}</a>.
-          <tal:email_block condition="lock_user_email">
-            Click <a href="mailto:${lock_user_email}">here</a> to email them.
+          <a href="${lock_info['url']}">${lock_info['name']}</a>.
+          <tal:email_block condition="lock_info['email']">
+            Click <a href="mailto:${lock_info['email']}">here</a> to email them.
           </tal:email_block>
         </p>
       </div>

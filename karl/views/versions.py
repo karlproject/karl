@@ -8,6 +8,7 @@ from karl.content.views.interfaces import IWikiLock
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
+from karl.utilities.wikilock import lock_info_from_wikilock
 from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
@@ -56,34 +57,13 @@ def show_history(context, request):
     }
 
     wikilock = IWikiLock(context)
-    if wikilock.is_locked():
-        is_locked = True
-        lock_info = wikilock.lock_info()
-        userid = lock_info['userid']
-        profiles = find_profiles(context)
-        profile = profiles.get(userid, None)
-        if profile is not None:
-            lock_user_url = model_url(profile, request)
-            lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
-            lock_user_email = profile.email
-        else:
-            lock_user_url = model_url(profiles, request)
-            lock_user_name = 'Unknown'
-            lock_user_email = ''
-    else:
-        is_locked = False
-        lock_user_url = None
-        lock_user_name = None
-        lock_user_email = None
+    lock_info = lock_info_from_wikilock(wikilock, request)
 
     return {
         'api': TemplateAPI(context, request, page_title),
         'history': history,
         'backto': backto,
-        'is_locked': is_locked,
-        'lock_user_url': lock_user_url,
-        'lock_user_name': lock_user_name,
-        'lock_user_email': lock_user_email,
+        'lock_info': lock_info,
     }
 
 

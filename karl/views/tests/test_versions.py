@@ -291,7 +291,7 @@ class Test_show_history_wikilock(unittest.TestCase):
 
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.failUnless(response['is_locked'])
+        self.failUnless(response['lock_info']['is_locked'])
 
 
 class DummyArchive(object):
