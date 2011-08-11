@@ -2716,4 +2716,17 @@ jQuery.fn.extend({
     }
 });
 
+Karl.clear_wikilock_on_unload = function() {
+    var here_url = $("#karl-here-url").eq(0).attr('content');
+    var maybeSlash = here_url.match(/\/$/) ? '' : '/';
+    var unlock_url = here_url + maybeSlash + 'unlock.html';
+    $(window).bind('beforeunload', function() {
+        $.ajax({type: 'POST',
+                url: unlock_url,
+                data: {},
+                async: false
+               });
+    });
+};
+
 })();                   // END CLOSURE Karl

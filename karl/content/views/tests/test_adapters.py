@@ -647,6 +647,69 @@ class TestDefaultShowSendalert(unittest.TestCase):
         self.failIf(self._call_fut(context, None))
 
 
+class TestWikiLock(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from karl.content.views.adapters import WikiLock
+        return WikiLock
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_unlocked_by_default(self):
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        self.failIf(adapter.is_locked())
+
+    def test_lock(self):
+        from datetime import datetime
+        date = datetime(1985, 1, 1)
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        adapter.lock('foo', date)
+        self.failUnless(adapter.is_locked(date))
+
+    def test_lock_owner(self):
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        adapter.lock('foo')
+        self.failUnless(adapter.owns_lock('foo'))
+        self.failIf(adapter.owns_lock('bar'))
+
+    def test_lock_timeout(self):
+        from datetime import datetime
+        past = datetime(1955, 1, 1, 0, 0, 1)
+        past_plus_1 = datetime(1955, 1, 1, 0, 0, 2)
+        future = datetime(1985, 1, 1)
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        adapter.lock('foo', past)
+        self.failUnless(adapter.is_locked(past_plus_1))
+        self.failIf(adapter.is_locked(future))
+
+    def test_lockinfo(self):
+        from datetime import datetime
+        past = datetime(1985, 1, 1, 0, 0, 1)
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        adapter.lock('foo', past)
+        lockinfo = adapter.lock_info()
+        self.assertEqual('foo', lockinfo['userid'])
+        self.assertEqual(past, lockinfo['time'])
+
+    def test_clear(self):
+        context = DummyContext()
+        adapter = self._makeOne(context)
+        adapter.lock('foo')
+        adapter.clear()
+        self.failIf(adapter.is_locked())
+
+
 class DummySearchAdapter:
     def __init__(self, context):
         self.context = context

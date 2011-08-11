@@ -727,7 +727,7 @@
      name="edit.html"
      for="karl.content.interfaces.IWikiPage"
      permission="create"
-     renderer="karl.views.forms:templates/community_formish_form.pt"
+     renderer="karl.views.forms:templates/wiki_edit_form.pt"
      form_id="save">
 
      <formish:action
@@ -742,6 +742,13 @@
        />
 
   </formish:form>
+
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.unlock_wiki_view"
+    permission="create"
+    name="unlock.html"
+  />
 
   <view
     for="karl.content.interfaces.INewsItem"
@@ -1137,6 +1144,11 @@
     factory=".references.FileHTML"
     />
 
+  <adapter
+    for="karl.content.interfaces.IWikiPage"
+    provides=".interfaces.IWikiLock"
+    factory=".adapters.WikiLock"
+    />
 
   <!-- Ajax file reorganize -->
   <view
@@ -1255,4 +1267,3 @@
   </formish:form>
 
 </configure>
-

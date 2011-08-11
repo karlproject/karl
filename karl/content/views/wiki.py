@@ -20,7 +20,10 @@ import schemaish
 import transaction
 from validatish import validator
 
+from datetime import datetime
+
 from webob.exc import HTTPFound
+from webob.exc import HTTPOk
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.component import getMultiAdapter
@@ -63,6 +66,7 @@ from karl.views.versions import format_local_date
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
+from karl.content.views.interfaces import IWikiLock
 from karl.content.views.utils import extract_description
 from karl.content.views.atom import WikiAtomFeed
 
@@ -270,6 +274,25 @@ def show_wikipage_view(context, request):
 
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
+
+    wikilock = IWikiLock(context)
+    if wikilock.is_locked():
+        is_locked = True
+        lock_info = wikilock.lock_info()
+        userid = lock_info['userid']
+        profiles = find_profiles(context)
+        profile = profiles.get(userid, None)
+        if profile is not None:
+            lock_user_url = model_url(profile, request)
+            lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
+        else:
+            lock_user_url = model_url(profiles, request)
+            lock_user_name = 'Unknown'
+    else:
+        is_locked = False
+        lock_user_url = None
+        lock_user_name = None
+
     return dict(
         api=api,
         actions=actions,
@@ -278,6 +301,9 @@ def show_wikipage_view(context, request):
         backto=backto,
         is_front_page=is_front_page,
         show_trash=show_trash,
+        is_locked=wikilock.is_locked(),
+        lock_user_url=lock_user_url,
+        lock_user_name=lock_user_name,
         )
 
 
@@ -361,6 +387,8 @@ class EditWikiPageFormController(object):
         self.context = context
         self.request = request
         self.workflow = get_workflow(IWikiPage, 'security', context)
+        self.userid = authenticated_userid(self.request)
+        self.wikilock = IWikiLock(context)
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
@@ -414,6 +442,27 @@ class EditWikiPageFormController(object):
         return widgets
 
     def __call__(self):
+        if not self.wikilock.is_locked():
+            self.wikilock.lock(self.userid)
+
+        # don't show page is locked message if locked by current user
+        if self.wikilock.owns_lock(self.userid):
+            is_locked = False
+            lock_user_url = None
+            lock_user_name = None
+        else:
+            is_locked = True
+            lock_info = self.wikilock.lock_info()
+            userid = lock_info['userid']
+            profiles = find_profiles(self.context)
+            profile = profiles.get(userid, None)
+            if profile is not None:
+                lock_user_url = model_url(profile, self.request)
+                lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
+            else:
+                lock_user_url = model_url(profiles, self.request)
+                lock_user_name = 'Unknown'
+
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
@@ -423,12 +472,20 @@ class EditWikiPageFormController(object):
                 )
         return {'api':api,
                 'actions':(),
+                'is_locked': is_locked,
+                'lock_user_url': lock_user_url,
+                'lock_user_name': lock_user_name,
                 }
 
     def handle_cancel(self):
+        if self.wikilock.owns_lock(self.userid):
+            self.wikilock.clear()
         return HTTPFound(location=model_url(self.context, self.request))
 
     def handle_submit(self, converted):
+        if self.wikilock.owns_lock(self.userid):
+            self.wikilock.clear()
+
         context = self.context
         request = self.request
         workflow = self.workflow
@@ -456,3 +513,11 @@ class EditWikiPageFormController(object):
         msg = "?status_message=Wiki%20Page%20edited"
         return HTTPFound(location=location+msg)
 
+def unlock_wiki_view(context, request):
+    if request.method.lower() == 'post':
+        userid = authenticated_userid(request)
+        wikilock = IWikiLock(context)
+        if wikilock.owns_lock(userid):
+            wikilock.clear()
+        return HTTPOk(body='')
+    return HTTPFound(location=model_url(context, request))

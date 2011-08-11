@@ -177,9 +177,11 @@ class TestShowWikipageView(unittest.TestCase):
     def _register(self):
         from repoze.bfg import testing
         from zope.interface import Interface
+        from karl.content.views.interfaces import IWikiLock
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
 
     def test_frontpage(self):
         self._register()
@@ -245,9 +247,11 @@ class TestEditWikiPageFormController(unittest.TestCase):
     def _register(self):
         from repoze.bfg import testing
         from zope.interface import Interface
+        from karl.content.views.interfaces import IWikiLock
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
+        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
@@ -302,8 +306,12 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.failUnless('tags' in widgets)
 
     def test___call__(self):
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
         context = testing.DummyModel()
         context.title = 'title'
+        site['foo'] = context
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
@@ -311,6 +319,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
+        self._register()
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -378,6 +387,54 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
 
+    def test__call__wikilock(self):
+        from karl.content.views.interfaces import IWikiLock
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
+        context = testing.DummyModel()
+        context.title = 'title'
+        site['foo'] = context
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        wikilock = IWikiLock(context)
+        self.failUnless(wikilock.is_locked())
+
+    def test_handle_cancel_wikilock(self):
+        self._register()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        context.locked = True
+        context.owns_lock = True
+        response = controller.handle_cancel()
+        self.failIf(context.locked)
+
+    def test_handle_submit_wikilock(self):
+        from karl.testing import DummyCatalog
+        self._register()
+        converted = {
+            'text':'text',
+            'title':'title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags': 'thetesttag',
+            }
+        context = testing.DummyModel(title='oldtitle')
+        request = testing.DummyRequest()
+        def change_title(newtitle):
+            context.title = newtitle
+        context.change_title = change_title
+        context.catalog = DummyCatalog()
+
+        controller = self._makeOne(context, request)
+        context.locked = True
+        context.owns_lock = True
+        response = controller.handle_submit(converted)
+        self.failIf(context.locked)
+
+
 class Test_preview_wikipage_view(unittest.TestCase):
 
     def setUp(self):
@@ -437,6 +494,50 @@ class Test_preview_wikipage_view(unittest.TestCase):
         request = testing.DummyRequest(params={'version_num': '3'})
         self.assertRaises(NotFound, self._callFUT, context, request)
 
+
+class TestUnlockView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.wiki import unlock_wiki_view
+        return unlock_wiki_view(context, request)
+
+    def test_get(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(302, response.status_int)
+        self.assertEqual('http://example.com/', response.location)
+
+    def test_post_has_lock(self):
+        from karl.content.views.interfaces import IWikiLock
+        from zope.interface import Interface
+        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.locked = True
+        context.owns_lock = True
+        response = self._callFUT(context, request)
+        self.assertEqual(200, response.status_int)
+        self.failIf(context.locked)
+
+    def test_post_does_not_have_lock(self):
+        from karl.content.views.interfaces import IWikiLock
+        from zope.interface import Interface
+        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.locked = True
+        context.owns_lock = False
+        response = self._callFUT(context, request)
+        self.assertEqual(200, response.status_int)
+        self.failUnless(context.locked)
+
+
 from karl.content.interfaces import IWikiPage
 
 class DummyWikiPage:
@@ -465,6 +566,21 @@ class DummyAdapter:
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
+
+class DummyWikiLockAdapter(object):
+    def __init__(self, context):
+        self.context = context
+    def is_locked(self):
+        return getattr(self.context, 'locked', False)
+    def owns_lock(self, userid):
+        return getattr(self.context, 'owns_lock', False)
+    def lock(self, userid):
+        self.context.locked = True
+    def lock_info(self):
+        from datetime import datetime
+        return dict(userid='foo', time=datetime.now())
+    def clear(self):
+        self.context.locked = False
 
 class DummyWorkflow:
     state_attr = 'security_state'

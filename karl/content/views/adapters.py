@@ -65,6 +65,7 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.interfaces import IShowSendalert
+from karl.content.views.interfaces import IWikiLock
 from karl.utilities.interfaces import IAlert
 from karl.utilities.interfaces import IKarlDates
 from karl.utilities.interfaces import IMimeInfo
@@ -928,3 +929,42 @@ class DefaultShowSendalert(object):
             return False
 
         return True
+
+class WikiLock(object):
+    implements(IWikiLock)
+
+    lock_timeout_seconds = 30 * 60
+
+    def __init__(self, context):
+        self.context = context
+
+    def is_locked(self, from_time=None):
+        if from_time is None:
+            from_time = datetime.datetime.now()
+        lock_info = self.lock_info()
+        lock_time = lock_info.get('time', None)
+        if lock_time is None:
+            return False
+        delta = from_time - lock_time
+        if delta.seconds == 0:
+            # if the difference is too great, seconds can be 0
+            return from_time == lock_time
+        return delta.seconds < self.lock_timeout_seconds
+
+    def clear(self):
+        self.context.lock = {}
+
+    def lock(self, userid, lock_time=None):
+        if lock_time is None:
+            lock_time = datetime.datetime.now()
+        self.context.lock = dict(
+            userid = userid,
+            time = lock_time,
+            )
+
+    def lock_info(self):
+        return getattr(self.context, 'lock', {})
+
+    def owns_lock(self, userid):
+        lock_info = self.lock_info()
+        return lock_info.get('userid', None) == userid

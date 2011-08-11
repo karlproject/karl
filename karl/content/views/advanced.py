@@ -4,12 +4,14 @@ import schemaish
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.url import model_url
 from webob.exc import HTTPFound
+from zope.component import queryAdapter
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import IReferencesFolder
+from karl.content.views.interfaces import IWikiLock
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 from karl.events import ObjectModifiedEvent
@@ -62,6 +64,14 @@ weight_widget = formish.SelectChoice(
     none_option=None,
 )
 
+unlock_field = schemaish.Boolean(
+    title='Force unlock',
+    description='This wiki page is currently locked. Force unlock it.',
+)
+
+class UnlockWidget(widgets.Checkbox):
+    checkbox_label = 'Unlock'
+unlock_widget = UnlockWidget()
 
 class AdvancedFormController(object):
 
@@ -72,6 +82,9 @@ class AdvancedFormController(object):
         in_intranets = find_interface(context, IIntranets) is not None
         is_folder = ICommunityFolder.providedBy(context)
         self.use_folder_options = is_folder and in_intranets
+
+        wikilock = queryAdapter(context, IWikiLock)
+        self.use_unlock = wikilock is not None and wikilock.is_locked()
 
         title = getattr(context, 'title', context.__name__)
         self.page_title = 'Advanced Settings for %s' % title
@@ -91,6 +104,10 @@ class AdvancedFormController(object):
 
         defaults['keywords'] = getattr(context, 'search_keywords', [])
         defaults['weight'] = getattr(context, 'search_weight', 0)
+
+        if self.use_unlock:
+            defaults['unlock'] = False
+
         return defaults
 
     def form_fields(self):
@@ -99,6 +116,10 @@ class AdvancedFormController(object):
             fields.append(('marker', marker_field))
         fields.append(('keywords', keywords_field))
         fields.append(('weight', weight_field))
+
+        if self.use_unlock:
+            fields.append(('unlock', unlock_field))
+
         return fields
 
     def form_widgets(self, fields):
@@ -107,6 +128,8 @@ class AdvancedFormController(object):
             form_widgets['marker'] = marker_widget
         form_widgets['keywords'] = keywords_widget
         form_widgets['weight'] = weight_widget
+        if self.use_unlock:
+            form_widgets['unlock'] = unlock_widget
         return form_widgets
 
     def __call__(self):
@@ -141,6 +164,10 @@ class AdvancedFormController(object):
         weight = params.get('weight')
         if weight is not None:
             context.search_weight = weight
+
+        if self.use_unlock and params.get('unlock'):
+            wikilock = IWikiLock(self.context)
+            wikilock.clear()
 
         objectEventNotify(ObjectModifiedEvent(context))
         return HTTPFound(location=model_url(self.context, self.request,
