@@ -285,13 +285,16 @@ def show_wikipage_view(context, request):
         if profile is not None:
             lock_user_url = model_url(profile, request)
             lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
+            lock_user_email = profile.email
         else:
             lock_user_url = model_url(profiles, request)
             lock_user_name = 'Unknown'
+            lock_user_email = ''
     else:
         is_locked = False
         lock_user_url = None
         lock_user_name = None
+        lock_user_email = None
 
     return dict(
         api=api,
@@ -304,6 +307,7 @@ def show_wikipage_view(context, request):
         is_locked=wikilock.is_locked(),
         lock_user_url=lock_user_url,
         lock_user_name=lock_user_name,
+        lock_user_email=lock_user_email,
         )
 
 
@@ -450,6 +454,7 @@ class EditWikiPageFormController(object):
             is_locked = False
             lock_user_url = None
             lock_user_name = None
+            lock_user_email = None
         else:
             is_locked = True
             lock_info = self.wikilock.lock_info()
@@ -459,9 +464,11 @@ class EditWikiPageFormController(object):
             if profile is not None:
                 lock_user_url = model_url(profile, self.request)
                 lock_user_name = '%s %s' % (profile.firstname, profile.lastname)
+                lock_user_email = profile.email
             else:
                 lock_user_url = model_url(profiles, self.request)
                 lock_user_name = 'Unknown'
+                lock_user_email = ''
 
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
@@ -475,6 +482,7 @@ class EditWikiPageFormController(object):
                 'is_locked': is_locked,
                 'lock_user_url': lock_user_url,
                 'lock_user_name': lock_user_name,
+                'lock_user_email': lock_user_email,
                 }
 
     def handle_cancel(self):
