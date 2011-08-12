@@ -221,7 +221,32 @@ def _make_calendar_presenter_url_func(context, request):
         return model_url(ctx, request, *args, **kargs)
     return url_for
 
+
+def _select_calendar_layout(context, request):
+    # Check if we are in /offices/calendar.
+    # If yes, we will need to put a css marker class "karl-calendar-wide"
+    # on the outside of the template, and we will also use the generic
+    # layout instead of the community layout.
+    # XXX TODO we will also restrict permissions.
+    context_path = model_path(context)
+    wide_calendar = context_path.startswith('/offices/calendar')
+    if wide_calendar:
+        calendar_format_class = 'karl-calendar-wide'
+        calendar_layout_template = 'generic_layout'
+    else:
+        calendar_format_class = None
+        calendar_layout_template = 'community_layout'
+    return dict(
+        wide_calendar = wide_calendar,
+        calendar_format_class = calendar_format_class,
+        calendar_layout_template = calendar_layout_template,
+    )
+
+
 def _show_calendar_view(context, request, make_presenter):
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+
     year, month, day = _date_requested(context, request)
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
@@ -248,6 +273,8 @@ def _show_calendar_view(context, request, make_presenter):
     api = TemplateAPI(context, request, calendar.title)
     return render_template_to_response(
         calendar.template_filename,
+        calendar_format_class = calendar_layout['calendar_format_class'],
+        calendar_layout_template = calendar_layout['calendar_layout_template'],
         api=api,
         setup_url=setup_url,
         calendar=calendar,
@@ -273,6 +300,9 @@ def show_day_view(context, request):
     return response
 
 def show_list_view(context, request):
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+
     year, month, day = _date_requested(context, request)
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
@@ -304,6 +334,8 @@ def show_list_view(context, request):
     api = TemplateAPI(context, request, calendar.title)
     response = render_template_to_response(
         calendar.template_filename,
+        calendar_format_class = calendar_layout['calendar_format_class'],
+        calendar_layout_template = calendar_layout['calendar_layout_template'],
         api=api,
         setup_url=setup_url,
         calendar=calendar,
