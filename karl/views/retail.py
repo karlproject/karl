@@ -18,10 +18,10 @@
 from zope.component import getMultiAdapter
 from zope.component import ComponentLookupError
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from pyramid.chameleon_zpt import render_template
+from pyramid.chameleon_zpt import render_template_to_response
 
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 
 from karl.utils import find_intranets
 from karl.views.api import TemplateAPI

@@ -16,8 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-from webob.exc import HTTPFound
-from repoze.bfg.url import model_url
+from pyramid.httpexceptions import HTTPFound
+from pyramid.url import model_url
 
 from karl.views.api import TemplateAPI
 

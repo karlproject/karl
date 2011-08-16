@@ -1,9 +1,9 @@
-from webob import Response
+from pyramid.response import Response
 import sys
 import os
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.exceptions import NotFound
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.exceptions import NotFound
 from karl.views.api import TemplateAPI
 
 def stats(context, request):

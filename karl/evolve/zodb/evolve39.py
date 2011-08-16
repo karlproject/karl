@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from zope.component.event import objectEventNotify
 
 from karl.content.models.adapters import extract_text_from_html

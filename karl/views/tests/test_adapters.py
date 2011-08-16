@@ -19,8 +19,8 @@ import unittest
 
 from zope.interface import Interface
 
-from repoze.bfg import testing
-from repoze.bfg.testing import cleanUp
+from pyramid import testing
+from pyramid.testing import cleanUp
 
 
 class LiveSearchEntryAdapterTests(unittest.TestCase):

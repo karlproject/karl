@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class Test_edit_acl_view(unittest.TestCase):
     def setUp(self):
@@ -32,7 +32,7 @@ class Test_edit_acl_view(unittest.TestCase):
 
     def _makeACL(self, admins=(), moderators=(), members=(), guests=(),
                  no_inherit=True):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import GUEST_PERMS
         from karl.security.policy import MEMBER_PERMS

@@ -17,7 +17,7 @@
 
 import unittest
 from zope.testing.cleanup import cleanUp
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestLoginView(unittest.TestCase):
     def setUp(self):
@@ -97,7 +97,7 @@ class TestLoginView(unittest.TestCase):
                          (request.environ, {}))
 
     def test_POST_no_login_in_form(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['password'] = 'password'
@@ -107,7 +107,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/login.html')
 
     def test_POST_no_password_in_form(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -117,7 +117,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/login.html')
 
     def test_POST_no_authentication_plugins(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
         try:
             from urlparse import parse_qsl
@@ -137,7 +137,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(query['reason'], 'No authenticatable users')
 
     def test_POST_w_plugins_miss(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
         try:
             from urlparse import parse_qsl
@@ -171,7 +171,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_POST_w_plugins_zodb_hit_no_came_from_w_profile(self):
         from datetime import datetime
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -210,7 +210,7 @@ class TestLoginView(unittest.TestCase):
         self.failUnless(before <= profile.last_login_time <= after)
 
     def test_POST_w_plugins_impostor_hit_w_came_from_no_profile(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -250,7 +250,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -287,7 +287,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age_unicode(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -324,7 +324,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age_no_auth_tkt_plugin(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'

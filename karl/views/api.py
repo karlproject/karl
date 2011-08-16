@@ -26,16 +26,16 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.url import model_url
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import quote_path_segment
+from pyramid.chameleon_zpt import get_template
+from pyramid.url import model_url
+from pyramid.security import effective_principals
+from pyramid.traversal import quote_path_segment
 
-from repoze.bfg.location import lineage
-from repoze.bfg.traversal import model_path
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.interfaces import ISettings
+from pyramid.location import lineage
+from pyramid.traversal import model_path
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
 from repoze.lemonade.listitem import get_listitems
@@ -60,7 +60,7 @@ from karl.views.interfaces import IFooter
 from karl.views.interfaces import ISidebar
 from karl.views.utils import get_user_home
 
-from repoze.bfg.traversal import find_interface
+from pyramid.traversal import find_interface
 
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')

@@ -19,9 +19,9 @@ import unittest
 
 from zope.interface import Interface
 from zope.interface import taggedValue
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyFolderCustomizer
@@ -55,9 +55,9 @@ class TestShowFolderView(unittest.TestCase):
                                 IFolderAddables)
 
         if permissions is not None:
-            from repoze.bfg.interfaces import IAuthenticationPolicy
-            from repoze.bfg.interfaces import IAuthorizationPolicy
-            from repoze.bfg.testing import registerUtility
+            from pyramid.interfaces import IAuthenticationPolicy
+            from pyramid.interfaces import IAuthorizationPolicy
+            from pyramid.testing import registerUtility
             policy = DummySecurityPolicy("userid", permissions=permissions)
             registerUtility(policy, IAuthenticationPolicy)
             registerUtility(policy, IAuthorizationPolicy)
@@ -156,7 +156,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -173,7 +173,7 @@ class TestAddFolderFormController(unittest.TestCase):
         testing.tearDown()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
@@ -322,7 +322,7 @@ class TestAddFileFormController(unittest.TestCase):
         from karl.content.views.adapters import CommunityFileAlert
         from karl.content.interfaces import ICommunityFile
         from karl.models.interfaces import IProfile
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         from karl.utilities.interfaces import IAlert
         testing.registerAdapter(CommunityFileAlert,
                                 (ICommunityFile, IProfile, IRequest),
@@ -405,7 +405,7 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_handle_submit_filename_with_only_symbols(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         self._register()
@@ -431,7 +431,7 @@ class TestAddFileFormController(unittest.TestCase):
         from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self._register()
 
         testing.registerDummySecurityPolicy('userid')
@@ -466,7 +466,7 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(context['filename-1'].filename, 'filename')
 
     def test_handle_submit_filename_with_only_symbols_and_smartquote(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         self._register()
@@ -492,7 +492,7 @@ class TestAddFileFormController(unittest.TestCase):
         from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self._register()
 
         testing.registerDummySecurityPolicy('userid')
@@ -577,7 +577,7 @@ class TestAddFileFormController(unittest.TestCase):
     def test_submitted_toobig(self):
         self._register()
 
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
 
         def check_upload_size(*args):
             raise ValidationError(file='TEST VALIDATION ERROR')
@@ -737,7 +737,7 @@ class TestThumbnailView(unittest.TestCase):
         context = self._get_context()
         request = testing.DummyRequest()
 
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, self._callFUT, context, request)
 
     def test_it_bad_subpath(self):
@@ -747,7 +747,7 @@ class TestThumbnailView(unittest.TestCase):
         request = testing.DummyRequest()
         request.subpath = ('fooxbar.jpg',)
 
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, self._callFUT, context, request)
 
 class TestEditFolderFormController(unittest.TestCase):
@@ -759,7 +759,7 @@ class TestEditFolderFormController(unittest.TestCase):
         testing.tearDown()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
@@ -1045,7 +1045,7 @@ class TestEditFileFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
 
     def test_handle_submit_valid_nofile_withremove(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from schemaish.type import File as SchemaFile
@@ -2525,8 +2525,8 @@ class DummyShowSendalert(object):
         pass
     show_sendalert = True
 
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import Everyone
+from pyramid.security import Authenticated
+from pyramid.security import Everyone
 
 class DummySecurityPolicy:
     """ A standin for both an IAuthentication and IAuthorization policy """

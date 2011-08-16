@@ -30,7 +30,7 @@ from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.interface import implements
 
-from repoze.bfg.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import get_template
 from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.models.interfaces import IProfile

@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 
 def _makeProfile(**kw):
@@ -196,11 +196,11 @@ class TestProfileCategoryGetter(unittest.TestCase):
 class TestPeopleDirectory(unittest.TestCase):
 
     def setUp(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def tearDown(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def _getTargetClass(self):
@@ -482,14 +482,14 @@ class TestPeopleReportMailingList(unittest.TestCase):
         verifyObject(IPeopleReportMailingList, self._makeOne())
 
     def test_short_address_not_overridden_uses_parent_name(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         parent = DummyModel(__name__ = 'testing')
         mlist = self._makeOne()
         mlist.__parent__ = parent
         self.assertEqual(mlist.short_address, 'testing')
 
     def test_short_address_overridden(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         parent = DummyModel(__name__ = 'testing')
         mlist = self._makeOne()
         mlist.__parent__ = parent
@@ -497,7 +497,7 @@ class TestPeopleReportMailingList(unittest.TestCase):
         self.assertEqual(mlist.short_address, 'overridden')
 
     def test_short_address_overridden_then_deleted(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         parent = DummyModel(__name__ = 'testing')
         mlist = self._makeOne()
         mlist.__parent__ = parent

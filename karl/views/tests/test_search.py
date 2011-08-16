@@ -17,11 +17,11 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import taggedValue
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class JQueryLivesearchViewTests(unittest.TestCase):
     def setUp(self):
@@ -233,7 +233,7 @@ class SearchResultsViewTests(unittest.TestCase):
             params=MultiDict({'kind':'unknown', 'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
         testing.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
         self.assertRaises(HTTPBadRequest, self._callFUT, context, request)
@@ -516,7 +516,7 @@ class GetBatchTests(unittest.TestCase):
 
     def test_bad_kind_with_body(self):
         from webob.multidict import MultiDict
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'doesntexist'}))
         context = testing.DummyModel()

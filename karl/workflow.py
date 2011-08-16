@@ -1,8 +1,8 @@
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import Everyone
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import model_path
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import Everyone
+from pyramid.traversal import find_interface
+from pyramid.traversal import model_path
 
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IUserAddedGroup

@@ -22,8 +22,8 @@ from zope.component import queryUtility
 
 from ZODB.POSException import POSKeyError
 
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
+from pyramid.traversal import model_path
+from pyramid.traversal import find_interface
 
 from karl.models.interfaces import ITextIndexData
 from karl.content.interfaces import ICalendar

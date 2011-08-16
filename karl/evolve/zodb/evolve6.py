@@ -1,8 +1,8 @@
 from karl.content.interfaces import IForumTopic
 from karl.models.interfaces import ICatalogSearch
 from karl.security.workflow import has_custom_acl
-from repoze.bfg.traversal import find_root
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import find_root
+from pyramid.traversal import model_path
 from repoze.workflow import get_workflow
 
 def evolve(context):

@@ -1,5 +1,5 @@
-<configure xmlns="http://namespaces.repoze.org/bfg"
-           xmlns:formish="http://namespaces.repoze.org/formish">
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:formish="http://pylonshq.com/pyramid_formish">
 
   <view
     for="karl.content.interfaces.IBlog"
@@ -245,7 +245,7 @@
   <adapter
     for="karl.content.interfaces.ICalendarEvent
          karl.models.interfaces.IProfile
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.utilities.interfaces.IAlert"
     factory=".adapters.CalendarEventAlert"
     />
@@ -808,7 +808,7 @@
   <adapter
       for="karl.content.interfaces.IWikiPage
            karl.models.interfaces.IProfile
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.WikiPageAlert"
       />
@@ -843,119 +843,119 @@
 
   <adapter
     for="karl.content.interfaces.ICommunityContent
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.NullContentAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IBlogEntry
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.ICalendarEvent
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.content.views.atom.CalendarEventAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IReferenceManual
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IReferenceSection
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IPage
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IWikiPage
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.IForumTopic
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.views.atom.GenericAtomEntry"
     />
 
   <adapter
     for="karl.content.interfaces.ICommunityFile
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.IAtomEntry"
     factory="karl.content.views.atom.CommunityFileAtomEntry"
     />
 
   <adapter
       for="karl.content.interfaces.ICommunityFile
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.FileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.IPage
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.PageFileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.IReferenceManual
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.ReferenceManualFileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.ICalendarEvent
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.CalendarEventFileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.IReferenceSection
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.ReferenceSectionFileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.ICommunityRootFolder
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.FileInfo"
      />
 
   <adapter
       for="karl.content.interfaces.ICommunityFolder
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IFileInfo"
       factory=".adapters.FileInfo"
      />
 
   <adapter
       for="karl.models.interfaces.ICommunityContent
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides=".interfaces.IBylineInfo"
       factory=".adapters.BylineInfo"
      />
@@ -963,7 +963,7 @@
   <adapter
       for="karl.content.interfaces.IBlogEntry
            karl.models.interfaces.IProfile
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.BlogEntryAlert"
       />
@@ -971,7 +971,7 @@
   <adapter
       for="karl.models.interfaces.IComment
            karl.models.interfaces.IProfile
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.BlogCommentAlert"
       />
@@ -979,7 +979,7 @@
   <adapter
       for="karl.content.interfaces.ICommunityFile
            karl.models.interfaces.IProfile
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.utilities.interfaces.IAlert"
       factory=".adapters.CommunityFileAlert"
       />
@@ -1068,7 +1068,7 @@
 
   <adapter
     for="karl.content.interfaces.IBlog
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.ISidebar"
     factory=".blog.BlogSidebar"
   />
@@ -1076,28 +1076,28 @@
 
   <adapter
       for="karl.content.interfaces.IForum
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.views.interfaces.IIntranetPortlet"
       factory=".adapters.ForumPortlet"
      />
 
   <adapter
       for="karl.content.views.interfaces.INetworkEventsMarker
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.views.interfaces.IIntranetPortlet"
       factory=".adapters.NetworkEventsPortlet"
      />
 
   <adapter
       for="karl.content.views.interfaces.INetworkNewsMarker
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.views.interfaces.IIntranetPortlet"
       factory=".adapters.NetworkNewsPortlet"
      />
 
   <adapter
       for="karl.models.interfaces.IFeed
-           repoze.bfg.interfaces.IRequest"
+           pyramid.interfaces.IRequest"
       provides="karl.views.interfaces.IIntranetPortlet"
       factory=".adapters.FeedPortlet"
     />
@@ -1118,21 +1118,21 @@
 
   <adapter
     for="karl.content.interfaces.IReferenceSection
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.content.interfaces.IReferenceManualHTML"
     factory=".references.DescriptionHTML"
     />
 
   <adapter
     for="karl.content.interfaces.IPage
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.content.interfaces.IReferenceManualHTML"
     factory=".references.TextHTML"
     />
 
   <adapter
     for="karl.content.interfaces.ICommunityFile
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.content.interfaces.IReferenceManualHTML"
     factory=".references.FileHTML"
     />

@@ -41,7 +41,7 @@ class UpdateFeedsTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IFeedsContainer
         from karl.models.interfaces import IFeed
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         registerContentFactory(DummyModel, IFeedsContainer)
         registerContentFactory(DummyFeed, IFeed)
 
@@ -184,7 +184,7 @@ class UpdateFeedsTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IFeedsContainer
         from karl.models.interfaces import IFeed
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         registerContentFactory(DummyModel, IFeedsContainer)
         registerContentFactory(DummyFeed, IFeed)
 

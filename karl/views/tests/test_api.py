@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 class TemplateAPITests(unittest.TestCase):
@@ -215,7 +215,7 @@ class TemplateAPITests(unittest.TestCase):
     def test_custom_logo_url(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = karltesting.DummySettings()
         settings.logo_path = 'mylogo.png'
         testing.registerUtility(settings, ISettings)
@@ -226,12 +226,12 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info, {'enabled': False})
+        self.assertEqual(api.kaltura_info['enabled'],  False)
 
     def test_kaltura_info(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = karltesting.DummySettings()
         settings.kaltura_enabled = 'true'
         # kaltura_client_session missing

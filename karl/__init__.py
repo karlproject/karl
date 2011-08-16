@@ -23,7 +23,7 @@ __import__('pkg_resources').declare_namespace(__name__)
 
 try:
     import zope.testing.cleanup
-    from repoze.bfg.testing import setUp
+    from pyramid.testing import setUp
     zope.testing.cleanup.addCleanUp(setUp)
 except ImportError:
     pass

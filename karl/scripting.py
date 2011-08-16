@@ -25,7 +25,7 @@ import ConfigParser
 
 from paste.deploy import loadapp
 from ZODB.POSException import ConflictError
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 from karl.log import get_logger
 
 _debug_object_refs = hasattr(sys, 'getobjects')

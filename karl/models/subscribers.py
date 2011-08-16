@@ -24,11 +24,11 @@ from pprint import pformat
 from zope.component import queryAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.threadlocal import get_current_request
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
+from pyramid.interfaces import ISettings
+from pyramid.security import authenticated_userid
+from pyramid.threadlocal import get_current_request
+from pyramid.traversal import model_path
+from pyramid.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
 

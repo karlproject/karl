@@ -397,11 +397,11 @@ class _EventSubscriberTestsBase:
     _old_now = None
 
     def setUp(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def tearDown(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
         if self._old_now is not None:
@@ -413,7 +413,7 @@ class _EventSubscriberTestsBase:
 
     def _makeSite(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import DENY_ALL
+        from pyramid.security import DENY_ALL
         from repoze.lemonade.content import create_content
         from repoze.lemonade.testing import registerContentFactory
         from karl.testing import DummyModel
@@ -503,8 +503,8 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_w_nonesuch_community_group(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         event = self._makeEvent(site=site,
@@ -521,8 +521,8 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_w_community_group(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -608,8 +608,8 @@ class Test_user_left_community(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_w_nonesuch_community_group(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         event = self._makeEvent(site=site,
@@ -627,8 +627,8 @@ class Test_user_left_community(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_w_community_group(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -702,8 +702,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_added_community(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -745,8 +745,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
 
     def test_added_profile(self):
         from datetime import datetime
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
@@ -785,8 +785,8 @@ class Test_user_added_content(_EventSubscriberTestsBase,
 
     def test_added_content_inside_profile(self):
         from datetime import datetime
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
@@ -830,9 +830,9 @@ class Test_user_added_content(_EventSubscriberTestsBase,
 
     def test_added_non_community_non_comment(self):
         from datetime import datetime
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerUtility
         from karl.models.interfaces import IPosts
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -881,9 +881,9 @@ class Test_user_added_content(_EventSubscriberTestsBase,
 
     def test_added_comment(self):
         from datetime import datetime
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerUtility
         from karl.models.interfaces import IPosts
         from karl.models.interfaces import IComment
         NOW = datetime(2010, 7, 13, 12, 47, 12)
@@ -964,8 +964,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_modified_community(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1006,8 +1006,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
                          ])
 
     def test_modified_profile(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1046,8 +1046,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
                          ])
 
     def test_modified_content_inside_profile(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1091,8 +1091,8 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
                          ])
 
     def test_modified_non_community(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import registerUtility
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1161,10 +1161,10 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.failIf(site.events._pushed)
 
     def test_tagged_community(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import DummyRequest
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.threadlocal import manager
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import DummyRequest
+        from pyramid.testing import registerUtility
+        from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1213,10 +1213,10 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
                          ])
 
     def test_tagged_profile(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import DummyRequest
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.threadlocal import manager
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import DummyRequest
+        from pyramid.testing import registerUtility
+        from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1263,10 +1263,10 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
                          ])
 
     def test_tagged_non_community(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.testing import DummyRequest
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.threadlocal import manager
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.testing import DummyRequest
+        from pyramid.testing import registerUtility
+        from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)

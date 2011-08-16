@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
 from zope.component.event import objectEventNotify
 
@@ -24,12 +24,12 @@ import schemaish
 from schemaish.type import File as SchemaFile
 from validatish import validator
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from pyramid.chameleon_zpt import render_template_to_response
 
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.url import model_url
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
+from pyramid_formish import ValidationError
+from pyramid.url import model_url
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
 
 from repoze.lemonade.content import create_content
 

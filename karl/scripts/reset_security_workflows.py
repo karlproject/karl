@@ -21,7 +21,7 @@
 """
 
 import sys
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 
 from karl.scripting import get_default_config
 from karl.scripting import open_root

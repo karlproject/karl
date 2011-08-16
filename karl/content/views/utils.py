@@ -19,10 +19,10 @@ import re
 from itertools import islice
 import mimetypes
 
-from repoze.bfg.interfaces import IView
-from repoze.bfg.security import has_permission
-from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.url import model_url
+from pyramid.interfaces import IView
+from pyramid.security import has_permission
+from pyramid.threadlocal import get_current_registry
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from zope.interface import providedBy
 from zope.component import getMultiAdapter

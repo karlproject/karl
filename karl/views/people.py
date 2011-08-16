@@ -18,13 +18,13 @@
 import uuid
 
 import formish
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid_formish import ValidationError
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.workflow import get_workflow
@@ -32,7 +32,7 @@ import schemaish
 from schemaish.type import File as SchemaFile
 import validatish
 from validatish import validator
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 

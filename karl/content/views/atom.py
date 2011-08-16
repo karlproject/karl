@@ -16,8 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from zope.component import getAdapter
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 from karl.models.interfaces import ICatalogSearch
 from karl.views.atom import format_datetime
 from karl.views.atom import AtomFeed

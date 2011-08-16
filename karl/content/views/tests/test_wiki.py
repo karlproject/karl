@@ -16,10 +16,10 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 from zope.interface import implements
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestRedirectToFrontPage(unittest.TestCase):
     def setUp(self):
@@ -47,7 +47,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -67,7 +67,7 @@ class TestAddWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -175,7 +175,7 @@ class TestShowWikipageView(unittest.TestCase):
         return show_wikipage_view(context, request)
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -243,7 +243,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -263,7 +263,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         from karl.content.interfaces import IWikiPage
         from karl.content.views.adapters import WikiPageAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         testing.registerAdapter(WikiPageAlert,
                                 (IWikiPage, IProfile, IRequest),
                                 IAlert)
@@ -427,7 +427,7 @@ class Test_preview_wikipage_view(unittest.TestCase):
         self.assertEqual(response['body'], 'COOKED: Reverted 2')
 
     def test_no_such_version(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         context = testing.DummyModel(docid=5)
         context.title = 'Foo'
         context.__name__ = 'foo'

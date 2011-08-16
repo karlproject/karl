@@ -17,9 +17,9 @@
 
 from zope.interface import implements
 import unittest
-from repoze.bfg import testing
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.testing import cleanUp
+from pyramid import testing
+from pyramid_formish import ValidationError
+from pyramid.testing import cleanUp
 from karl.content.interfaces import ICalendarEvent
 
 from karl.testing import registerLayoutProvider
@@ -36,7 +36,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -108,9 +108,9 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from repoze.bfg.threadlocal import manager
-        from repoze.bfg.registry import Registry
-        manager.stack[0]['registry'] = Registry('testing')
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
+        #manager.stack[0]['registry'] = Registry('testing')
         testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
@@ -118,7 +118,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarEvent
         from karl.content.views.adapters import CalendarEventAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         testing.registerAdapter(CalendarEventAlert,
                                 (ICalendarEvent, IProfile, IRequest),
                                 IAlert)
@@ -427,9 +427,9 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from repoze.bfg.threadlocal import manager
-        from repoze.bfg.registry import Registry
-        manager.stack[0]['registry'] = Registry('testing')
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
+        #manager.stack[0]['registry'] = Registry('testing')
         testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
@@ -437,7 +437,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         from karl.content.interfaces import ICalendarEvent
         from karl.content.views.adapters import CalendarEventAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         testing.registerAdapter(CalendarEventAlert,
                                 (ICalendarEvent, IProfile, IRequest),
                                 IAlert)
@@ -638,8 +638,8 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         from datetime import datetime
         from icalendar import Calendar
         from icalendar import UTC
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         community = DummyModel()
         community.__name__ = 'testing'
         community['calendar'] = tool = DummyModel()
@@ -683,8 +683,8 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         from datetime import datetime
         from icalendar import Calendar
         from icalendar import UTC
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         community = DummyModel()
         community.__name__ = 'testing'
         community['calendar'] = tool = DummyModel()
@@ -771,14 +771,14 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(model_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -793,7 +793,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
@@ -804,7 +804,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
@@ -815,7 +815,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_category_name(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
 
@@ -878,7 +878,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarCategory
         context = DummyCalendar()
@@ -905,7 +905,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     # edit an existing category
 
     def test_edit_does_not_allow_editing_the_default_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -923,7 +923,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -937,7 +937,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1061,14 +1061,14 @@ class CalendarLayersViewTests(unittest.TestCase):
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(model_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from karl.content.models.calendar import ICalendarLayer
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1083,7 +1083,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
@@ -1094,7 +1094,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
@@ -1105,7 +1105,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_layer_name(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         context['foo'] = DummyCalendarLayer('foo-title')
 
@@ -1183,7 +1183,7 @@ class CalendarLayersViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
@@ -1213,7 +1213,7 @@ class CalendarLayersViewTests(unittest.TestCase):
     # edit an existing layer
 
     def test_edit_does_not_allow_editing_the_default_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1231,7 +1231,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1245,7 +1245,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1298,7 +1298,7 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(model_url(context, request),
                          renderer.back_to_calendar_url)
 
@@ -1311,7 +1311,7 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(model_url(context, request, 'categories.html'),
                          renderer.categories_url)
 
@@ -1324,7 +1324,7 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(model_url(context, request, 'layers.html'),
                          renderer.layers_url)
 
@@ -1513,7 +1513,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the default view, which is 'day'.
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, model_url(context, request, 'day.html'))
 
@@ -1535,7 +1535,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, model_url(context, request, 'day.html'))
 
@@ -1557,7 +1557,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, model_url(context, request, 'week.html'))
 
@@ -1579,7 +1579,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, model_url(context, request, 'month.html'))
 
@@ -1601,7 +1601,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, model_url(context, request, 'list.html'))
 

@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 
 from karl.models.site import get_containment

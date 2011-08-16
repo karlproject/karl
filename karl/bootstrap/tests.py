@@ -1,10 +1,10 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.configuration import Configurator
+from pyramid.threadlocal import get_current_registry
 
 from karl.views.interfaces import IToolAddables
 from karl.models.interfaces import IToolFactory
@@ -33,6 +33,7 @@ class TestPopulate(unittest.TestCase):
         reg = get_current_registry()
         config = Configurator(reg)
         config.setup_registry()
+        config.include('pyramid_zcml')
         config.load_zcml('karl.includes:configure.zcml')
         from zope.interface import Interface
         testing.registerAdapter(DummyToolAddables, (Interface, Interface),

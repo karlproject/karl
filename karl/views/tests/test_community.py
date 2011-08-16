@@ -19,7 +19,7 @@ import unittest
 
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl import testing as karltesting
 
@@ -92,7 +92,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         return community
 
     def test_not_a_member(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
@@ -276,7 +276,7 @@ class FormControllerTestBase(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        from repoze.bfg.formish import IFormishRenderer
+        from pyramid_formish import IFormishRenderer
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
         def renderer(template, args):
@@ -532,7 +532,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_handle_submit_sharingchange(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from pyramid.testing import registerDummySecurityPolicy
         from karl.testing import DummyCatalog
         registerDummySecurityPolicy('userid')
         context = testing.DummyModel(

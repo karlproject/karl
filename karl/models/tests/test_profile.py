@@ -49,7 +49,7 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(inst.firstname, 'fred')
 
     def test_creator_is___name__(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         profiles = DummyModel()
         inst = profiles['flinty'] = self._makeOne(firstname='fred',
                                                   lastname='flintstone ')
@@ -187,14 +187,14 @@ class ProfilesFolderTests(unittest.TestCase):
         self.assertEqual(pf.getProfileByEmail('nonesuch@example.com'), None)
 
     def test_getProfileByEmail_hit(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         pf = self._makeOne()
         profile = pf['extant'] = DummyModel()
         pf.email_to_name['extant@example.com'] = 'extant'
         self.failUnless(pf.getProfileByEmail('extant@example.com') is profile)
 
     def test_getProfileByEmail_mixedcase(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         pf = self._makeOne()
         profile = pf['extant'] = DummyModel()
         pf.email_to_name['eXtant@example.com'] = 'extant'
@@ -208,12 +208,12 @@ class Test_profile_textindexdata(unittest.TestCase):
         return profile_textindexdata(profile)
 
     def test_no_attrs(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         callable = self._callFUT(DummyModel(title='title'))
         self.assertEqual(callable(), ('title', ''))
 
     def test_w_all_attrs(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         ATTR_NAMES = [
             '__name__',
             'firstname',
@@ -240,7 +240,7 @@ class Test_profile_textindexdata(unittest.TestCase):
         self.assertEqual(callable(), ('TITLE', '\n'.join(ATTR_VALUES)))
 
     def test_w_extra_attrs(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         profile = DummyModel(title='Phred Phlyntstone',
                              firstname='Phred',
                              lastname='Phlyntstone',
@@ -251,14 +251,14 @@ class Test_profile_textindexdata(unittest.TestCase):
                          ('Phred Phlyntstone', 'Phred\nPhlyntstone'))
 
     def test_w_UTF8_attrs(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         FIRSTNAME = u'Phr\xE9d'
         profile = DummyModel(title='title', firstname=FIRSTNAME.encode('UTF8'))
         callable = self._callFUT(profile)
         self.assertEqual(callable(), ('title', FIRSTNAME))
 
     def test_w_latin1_attrs(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         FIRSTNAME = u'Phr\xE9d'
         profile = DummyModel(title='title',
                              firstname=FIRSTNAME.encode('latin1'))

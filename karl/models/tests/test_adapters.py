@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from zope.interface import Interface
 from zope.testing.cleanup import cleanUp
 
@@ -58,12 +58,12 @@ class TestDeprecatedCatalogSearch(unittest.TestCase):
         self.assertEqual(list(docids), [])
 
     def test_unfound_model(self):
-        from repoze.bfg.interfaces import ILogger
+        from pyramid.interfaces import IDebugLogger
         class DummyLogger:
             def warn(self, msg):
                 self.msg = msg
         logger = DummyLogger()
-        testing.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        testing.registerUtility(logger, IDebugLogger)
         a = testing.DummyModel()
         b = testing.DummyModel()
         testing.registerModels({'/a':a})
@@ -112,12 +112,12 @@ class TestCatalogSearch(unittest.TestCase):
         self.assertEqual(list(docids), [])
 
     def test_unfound_model(self):
-        from repoze.bfg.interfaces import ILogger
+        from pyramid.interfaces import IDebugLogger
         class DummyLogger:
             def warn(self, msg):
                 self.msg = msg
         logger = DummyLogger()
-        testing.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        testing.registerUtility(logger, IDebugLogger)
         a = testing.DummyModel()
         b = testing.DummyModel()
         testing.registerModels({'/a':a})

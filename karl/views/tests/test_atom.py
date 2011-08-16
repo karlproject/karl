@@ -19,7 +19,7 @@ import datetime
 from zope.interface import directlyProvides
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl import testing as karltesting
 from karl.views.tests.test_community import DummyTagQuery

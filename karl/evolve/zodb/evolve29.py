@@ -1,6 +1,6 @@
 
-from repoze.bfg.security import Allow
-from repoze.bfg.security import DENY_ALL
+from pyramid.security import Allow
+from pyramid.security import DENY_ALL
 from karl.utils import find_peopledirectory
 
 def evolve(root):

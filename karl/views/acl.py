@@ -17,9 +17,9 @@
 
 import re
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type

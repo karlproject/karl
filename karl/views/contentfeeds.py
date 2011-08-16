@@ -19,8 +19,8 @@
 from itertools import islice
 from urlparse import urljoin
 
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import authenticated_userid
 
 from karl.utils import find_events
 from karl.views.api import TemplateAPI

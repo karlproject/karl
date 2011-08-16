@@ -23,7 +23,7 @@ from karl.scripting import run_daemon
 from karl.utilities.feed import update_feeds
 import optparse
 from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 import socket
 import sys
 import transaction

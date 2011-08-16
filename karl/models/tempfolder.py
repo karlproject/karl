@@ -5,8 +5,8 @@ from zope.interface import implements
 
 from repoze.folder import Folder
 
-from repoze.bfg.authorization import Allow
-from repoze.bfg.authorization import Everyone
+from pyramid.authorization import Allow
+from pyramid.authorization import Everyone
 
 from karl.models.interfaces import ITempFolder
 

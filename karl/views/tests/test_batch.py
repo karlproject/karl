@@ -18,7 +18,7 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestGetCatalogBatch(unittest.TestCase):
     def setUp(self):

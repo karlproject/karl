@@ -17,9 +17,9 @@
 
 import unittest
 from zope.interface import directlyProvides
-from repoze.bfg import testing
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid import testing
+from pyramid.configuration import Configurator
+from pyramid.threadlocal import get_current_registry
 from karl.testing import DummySessions
 
 class ResetRequestFormControllerTests(unittest.TestCase):
@@ -199,7 +199,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         # no key
         controller = self._makeOne(self.context, request)
         response = controller()
-        from webob.response import Response
+        from pyramid.response import Response
         self.assertEqual(response.__class__, Response)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
@@ -211,7 +211,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         request.params['key'] = 'foofoofoo'
         controller = self._makeOne(self.context, request)
         response = controller()
-        from webob.response import Response
+        from pyramid.response import Response
         self.assertEqual(response.__class__, Response)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
@@ -250,7 +250,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self._setupUsers()
         controller = self._makeOne(self.context, request)
         converted = {'login': 'bogus'}
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         try:
             response = controller.handle_submit(converted)
@@ -264,7 +264,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.context['profiles'] = testing.DummyModel()
         controller = self._makeOne(self.context, request)
         converted = {'login': 'me'}
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         try:
             response = controller.handle_submit(converted)

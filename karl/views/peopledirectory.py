@@ -24,15 +24,15 @@ from xml.sax.saxutils import quoteattr
 from urllib import basejoin
 
 from lxml import etree
-from repoze.bfg.exceptions import Forbidden
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import model_path_tuple
-from repoze.bfg.url import model_url
+from pyramid.exceptions import Forbidden
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
+from pyramid.traversal import model_path_tuple
+from pyramid.url import model_url
 from simplejson import JSONEncoder
-from webob import Response
-from webob.exc import HTTPFound
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 from zope.interface import providedBy
 from validatish import validator
 from validatish import validate

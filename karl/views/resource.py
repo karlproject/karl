@@ -17,8 +17,8 @@
 """Views registered to multiple content types.
 """
 
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.url import model_url
+from pyramid.httpexceptions import HTTPFound
 
 from karl.utils import find_community
 from karl.utils import find_intranet

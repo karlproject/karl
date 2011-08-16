@@ -17,8 +17,8 @@
 
 import unittest
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 from karl.testing import DummySessions
 
 class AddNewsItemFormControllerTests(unittest.TestCase):

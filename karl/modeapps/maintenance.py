@@ -1,4 +1,4 @@
-from repoze.bfg.configuration import Configurator
+from pyramid.configuration import Configurator
 
 def dummy_view(context, request):
     return {

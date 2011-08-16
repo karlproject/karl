@@ -19,11 +19,11 @@ import unittest
 
 from datetime import datetime
 
-from repoze.bfg import testing
+from pyramid import testing
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import taggedValue
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 def _checkCookie(request_or_response, filterby):
     from karl.views.contentfeeds import _FILTER_COOKIE

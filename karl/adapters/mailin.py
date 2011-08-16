@@ -21,12 +21,12 @@ from email.utils import parsedate
 
 import re
 
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import find_model
+from pyramid.security import has_permission
+from pyramid.traversal import find_model
+from pyramid.request import Request
 from repoze.postoffice.message import decode_header
 from zope.component import getUtility
 from zope.interface import implements
-import webob
 
 from karl.adapters.interfaces import IMailinDispatcher
 from karl.utilities.interfaces import IMailinTextScrubber
@@ -288,7 +288,7 @@ class MailinDispatcher(object):
 
             # BFG Security API always assumes http request, so we fabricate a
             # fake request.
-            request = webob.Request.blank('/')
+            request = Request.blank('/')
             request.environ['repoze.who.identity'] = user
 
             if not has_permission(permission, context, request):

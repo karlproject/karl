@@ -37,19 +37,19 @@ from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 from zope.interface import implementedBy
 
-from webob import Response
-from webob.exc import HTTPFound
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import model_path
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.exceptions import NotFound
+from pyramid.traversal import find_interface
+from pyramid.traversal import model_path
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import model_url
 from repoze.workflow import get_workflow
-from repoze.bfg.formish import ValidationError
+from pyramid_formish import ValidationError
 
 from repoze.lemonade.content import create_content
 
@@ -480,7 +480,7 @@ def show_file_view(context, request):
     # If we are in an attachments folder, the backto skips the
     # attachments folder and goes up to the grandparent
     from karl.models.interfaces import IAttachmentsFolder
-    from repoze.bfg.traversal import find_interface
+    from pyramid.traversal import find_interface
     attachments = find_interface(context, IAttachmentsFolder)
     if attachments is not None:
         up_to = context.__parent__.__parent__

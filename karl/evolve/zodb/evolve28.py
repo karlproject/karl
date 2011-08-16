@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 
 from karl.content.interfaces import ICommunityFile
 from karl.models.interfaces import ICatalogSearch

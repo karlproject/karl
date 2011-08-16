@@ -30,7 +30,7 @@ class UpdateFeedsScriptTests(unittest.TestCase):
 
     def _callFUT(self, args=[]):
         from karl.scripts.update_feeds import main
-        from repoze.bfg import testing
+        from pyramid import testing
         argv = ['update_feeds'] + args
         res = []
         tx = DummyTransaction()

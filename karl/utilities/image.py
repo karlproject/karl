@@ -1,7 +1,7 @@
 import re
 
-from repoze.bfg.security import effective_principals
-from repoze.bfg.url import model_url
+from pyramid.security import effective_principals
+from pyramid.url import model_url
 
 from repoze.workflow import get_workflow
 

@@ -23,7 +23,7 @@ from persistent import Persistent
 from zope.component import queryAdapter
 from zope.event import notify
 from zope.interface import implements
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 
 from karl.utils import find_catalog
 from karl.utils import find_community

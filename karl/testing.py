@@ -20,10 +20,10 @@ from cStringIO import StringIO
 from zope.interface import implements
 from zope.interface import Interface
 
-from repoze.bfg.testing import DummyModel
-from repoze.bfg.testing import registerAdapter
-from repoze.bfg.testing import registerDummyRenderer
-from repoze.bfg.testing import registerUtility
+from pyramid.testing import DummyModel
+from pyramid.testing import registerAdapter
+from pyramid.testing import registerDummyRenderer
+from pyramid.testing import registerUtility
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
@@ -191,7 +191,7 @@ class DummyMailer(list):
         self.append(self.DummyMessage(mto, msg))
 
 def registerDummyMailer():
-    from repoze.bfg.testing import registerUtility
+    from pyramid.testing import registerUtility
     from repoze.sendmail.interfaces import IMailDelivery
     mailer = DummyMailer()
     registerUtility(mailer, IMailDelivery)
@@ -442,6 +442,6 @@ def registerSecurityWorkflow():
     return registerDummyWorkflow('security')
 
 def registerSettings(**kw):
-    from repoze.bfg.interfaces import ISettings
+    from pyramid.interfaces import ISettings
     settings = DummySettings(**kw)
     registerUtility(settings, ISettings)

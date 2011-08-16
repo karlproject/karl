@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 
@@ -37,12 +37,12 @@ class Test_show_communities_view(unittest.TestCase):
         return show_communities_view(context, request)
 
     def _checkResponse(self, response, target):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, target)
 
     def test_no_cookie(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -52,7 +52,7 @@ class Test_show_communities_view(unittest.TestCase):
     def test_w_cookie(self):
         from karl.views.communities import _VIEW_COOKIE
         COOKIES = {_VIEW_COOKIE: 'active'}
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest(cookies=COOKIES)
         response = self._callFUT(context, request)

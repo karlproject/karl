@@ -1,7 +1,7 @@
 from zope.component import getUtility
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template
+from pyramid.url import model_url
 from repoze.lemonade.listitem import get_listitems
 
 from karl.content.interfaces import IBlogEntry

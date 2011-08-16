@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 from zope.testing.cleanup import cleanUp
@@ -461,7 +461,7 @@ class TestEmailUsersView(unittest.TestCase):
             }
         }
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         testing.registerUtility(karltesting.DummySettings(), ISettings)
 
         from karl.models.interfaces import ICatalogSearch
@@ -546,7 +546,7 @@ class TestSyslogView(unittest.TestCase):
         import os
         import sys
         here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         self.settings = settings = karltesting.DummySettings(
             syslog_view=os.path.join(here, 'test.log'),
             syslog_view_instances=['org1', 'org2'],
@@ -561,7 +561,7 @@ class TestSyslogView(unittest.TestCase):
         cleanUp()
 
     def test_no_syslog_path(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         self.settings = settings = karltesting.DummySettings()
         testing.registerUtility(settings, ISettings)
         request = testing.DummyRequest()
@@ -622,7 +622,7 @@ class TestLogsView(unittest.TestCase):
         import os
         import sys
         here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
 
         self.logs = [os.path.join(here, 'test.log'),
                      os.path.join(here, 'test_admin.py')]
@@ -679,7 +679,7 @@ class TestStatisticsView(unittest.TestCase):
         import sys
         here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         self.stats_folder = here
 
         settings = karltesting.DummySettings(
@@ -707,7 +707,7 @@ class TestStatisticsCSVView(unittest.TestCase):
         import sys
         here = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         self.stats_folder = here
 
         settings = karltesting.DummySettings(
@@ -723,26 +723,26 @@ class TestStatisticsCSVView(unittest.TestCase):
 
     def test_download_csv(self):
         import os
-        import webob
+        from pyramid.request import Request
         expected = open(os.path.join(self.stats_folder,
                                      'test_users1.csv')).read()
-        request = webob.Request.blank('/')
+        request = Request.blank('/')
         request.context = None
         request.matchdict = {'csv_file': 'test_users1.csv'}
         self.assertEqual(self.fut(request).body, expected)
 
     def test_not_csv(self):
-        from repoze.bfg.exceptions import NotFound
-        import webob
-        request = webob.Request.blank('/')
+        from pyramid.exceptions import NotFound
+        from pyramid.request import Request
+        request = Request.blank('/')
         request.context = None
         request.matchdict = {'csv_file': 'test_admin.py'}
         self.assertRaises(NotFound, self.fut, request)
 
     def test_file_not_found(self):
-        from repoze.bfg.exceptions import NotFound
-        import webob
-        request = webob.Request.blank('/')
+        from pyramid.exceptions import NotFound
+        from pyramid.request import Request
+        request = Request.blank('/')
         request.context = None
         request.matchdict = {'csv_file': 'foo.csv'}
         self.assertRaises(NotFound, self.fut, request)
@@ -1188,7 +1188,7 @@ class ErrorMonitorBase:
 
         self.site = testing.DummyModel()
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = karltesting.DummySettings(**{
             'error_monitor_dir': tmpdir,
             'error_monitor_subsystems': ["blonde", "red", "head"],
@@ -1262,7 +1262,7 @@ class TestErrorMonitorSubsystemView(ErrorMonitorBase, unittest.TestCase):
         return error_monitor_subsystem_view(self.site, request)
 
     def test_no_subsystem(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, self.call_fut)
 
     def test_no_errors(self):
@@ -1344,7 +1344,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         testing.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
@@ -1416,7 +1416,7 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         testing.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
@@ -1447,7 +1447,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         testing.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
@@ -1470,7 +1470,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
         )
 
     def test_notfound(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, self._call_fut, 2)
 
 class Test_rename_or_merge_user_view(unittest.TestCase):

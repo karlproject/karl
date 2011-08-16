@@ -1,5 +1,5 @@
-from repoze.bfg.authorization import Allow
-from repoze.bfg.traversal import model_path
+from pyramid.authorization import Allow
+from pyramid.traversal import model_path
 
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity

@@ -1,7 +1,7 @@
 # Find and fix photos whose 'creator' was mis-identified as their container's
 # '__name__' (anywhere but profiles, really).  See LP #633191 for details.
 
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 
 from karl.content.interfaces import ICommunityFile
 from karl.models.interfaces import ICatalogSearch

@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from zope.testing.cleanup import cleanUp
 
 class TestLiveSearchGroup(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestLiveSearchGroup(unittest.TestCase):
         return searchkw
 
     def test_makeCriteria(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from pyramid.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('fred', ['group:foo', 'group:bar'])
         request = testing.DummyRequest()
         context = testing.DummyModel()
@@ -54,7 +54,7 @@ class TestLiveSearchGroup(unittest.TestCase):
 
     def test_makeCriteria_no_interfaces(self):
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from pyramid.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('fred', ['group:foo', 'group:bar'])
         request = testing.DummyRequest()
         context = testing.DummyModel()

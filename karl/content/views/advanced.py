@@ -1,9 +1,9 @@
 import formish
 import schemaish
 
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.traversal import find_interface
+from pyramid.url import model_url
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides

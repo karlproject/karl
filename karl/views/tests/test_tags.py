@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 class AddTagsTests(unittest.TestCase):

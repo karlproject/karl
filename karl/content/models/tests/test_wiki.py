@@ -18,7 +18,7 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class WikiTests(unittest.TestCase):
 
@@ -392,7 +392,7 @@ class TestWikiToolFactory(unittest.TestCase):
         testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
                                 IContentFactory)
         context = testing.DummyModel()
-        request = testing.DummyRequest
+        request = testing.DummyRequest()
         factory = self._makeOne()
         factory.add(context, request)
         self.failUnless(context['wiki'])

@@ -1,9 +1,9 @@
 import datetime
 import time
 
-from webob.exc import HTTPFound
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.url import model_url
+from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
+from pyramid.url import model_url
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content

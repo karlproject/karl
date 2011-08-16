@@ -2,7 +2,7 @@ import datetime
 import re
 
 from lxml.html.clean import clean_html
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 from repoze.who.plugins.zodb.users import get_sha_password
 from validatish import validate
 from validatish.validator import Validator

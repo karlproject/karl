@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 from repoze.lemonade.content import IContent
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer

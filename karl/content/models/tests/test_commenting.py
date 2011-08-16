@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class CommentsFolderTests(unittest.TestCase):
 

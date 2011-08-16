@@ -19,13 +19,13 @@ from email.message import Message
 import string
 import warnings
 
-from repoze.bfg.interfaces import ILogger
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.interfaces import IDebugLogger
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.traversal import find_interface
+from pyramid.traversal import find_model
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.sendmail.interfaces import IMailDelivery
 from zope.component import getUtility
@@ -72,7 +72,7 @@ class CatalogSearch(object):
     def __call__(self, **kw):
         num, docids = self.catalog.search(**kw)
         address = self.catalog.document_map.address_for_docid
-        logger = queryUtility(ILogger, 'repoze.bfg.debug')
+        logger = queryUtility(IDebugLogger)
         def resolver(docid):
             path = address(docid)
             if path is None:

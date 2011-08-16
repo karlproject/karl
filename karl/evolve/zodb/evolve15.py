@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from karl.content.views.files import ie_types
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog

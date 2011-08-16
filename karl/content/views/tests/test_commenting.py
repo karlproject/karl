@@ -21,9 +21,9 @@ import unittest
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl.content.interfaces import IBlogEntry
 from karl.models.interfaces import IComment
@@ -46,7 +46,7 @@ class AddCommentFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import IComment
         from karl.content.views.adapters import BlogCommentAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         testing.registerAdapter(BlogCommentAlert,
                                 (IComment, IProfile, IRequest),
                                 IAlert)
@@ -140,7 +140,7 @@ class AddCommentFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         controller = self._makeOne(self.context, self.request)
-        from webob.exc import HTTPExpectationFailed
+        from pyramid.httpexceptions import HTTPExpectationFailed
         self.assertRaises(HTTPExpectationFailed, controller)
 
     def test_handle_cancel(self):

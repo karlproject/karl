@@ -29,8 +29,8 @@ import sys
 import traceback
 import transaction
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.traversal import find_model
+from pyramid.chameleon_zpt import render_template
+from pyramid.traversal import find_model
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
 from repoze.postoffice.message import Message

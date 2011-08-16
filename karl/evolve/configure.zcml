@@ -1,4 +1,4 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://pylonshq.com/pyramid">
 
   <utility
       provides="repoze.evolution.IEvolutionManager"

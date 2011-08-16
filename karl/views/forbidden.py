@@ -1,9 +1,9 @@
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.url import model_url
 
 from karl.views.api import TemplateAPI
 from karl.utils import find_site
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
 def forbidden(context, request):
     site = find_site(context)

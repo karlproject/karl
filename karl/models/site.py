@@ -20,13 +20,13 @@ import re
 
 from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
-from repoze.bfg.location import lineage
-from repoze.bfg.interfaces import ILocation
-from repoze.bfg.settings import get_settings
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import principals_allowed_by_permission
-from repoze.bfg.traversal import model_path
+from pyramid.location import lineage
+from pyramid.interfaces import ILocation
+from pyramid.settings import get_settings
+from pyramid.security import Allow
+from pyramid.security import Authenticated
+from pyramid.security import principals_allowed_by_permission
+from pyramid.traversal import model_path
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex

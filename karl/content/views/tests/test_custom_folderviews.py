@@ -20,10 +20,10 @@ import unittest
 from zope.interface import Interface
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg.testing import DummyModel
-from repoze.bfg.testing import DummyRequest
-from repoze.bfg.testing import registerAdapter
-from repoze.bfg.testing import registerUtility
+from pyramid.testing import DummyModel
+from pyramid.testing import DummyRequest
+from pyramid.testing import registerAdapter
+from pyramid.testing import registerUtility
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyLayoutProvider
@@ -82,12 +82,12 @@ class TestShowNetworkEventsView(unittest.TestCase):
 
     def _registerSecurityPolicy(self, permissions):
         if permissions is None:
-            from repoze.bfg.testing import registerDummySecurityPolicy
+            from pyramid.testing import registerDummySecurityPolicy
             registerDummySecurityPolicy("userid")
         else:
-            from repoze.bfg.interfaces import IAuthenticationPolicy
-            from repoze.bfg.interfaces import IAuthorizationPolicy
-            from repoze.bfg.testing import registerUtility
+            from pyramid.interfaces import IAuthenticationPolicy
+            from pyramid.interfaces import IAuthorizationPolicy
+            from pyramid.testing import registerUtility
             policy = DummySecurityPolicy("userid", permissions=permissions)
             registerUtility(policy, IAuthenticationPolicy)
             registerUtility(policy, IAuthorizationPolicy)
@@ -269,7 +269,7 @@ class TestShowNetworkNewsView(unittest.TestCase):
                              ILayoutProvider)
 
     def _registerSecurityPolicy(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from pyramid.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy("userid")
 
     def _register(self):
@@ -324,8 +324,8 @@ class TestShowNetworkNewsView(unittest.TestCase):
 
         self.assertEqual(response['searchterm'], None)
 
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import Everyone
+from pyramid.security import Authenticated
+from pyramid.security import Everyone
 
 class DummySecurityPolicy:
     """ A standin for both an IAuthentication and IAuthorization policy """

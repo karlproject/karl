@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 
 """
 Some profiles have wound up with photos owned by 'None'.  There is no profile

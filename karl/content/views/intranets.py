@@ -34,13 +34,13 @@ from karl.views.api import TemplateAPI
 from karl.views.community import EditCommunityFormController
 from karl.views.forms import validators as karlvalidators
 from karl.views.utils import make_name
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid_formish import ValidationError
+from pyramid.security import authenticated_userid
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.listitem import get_listitems
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 

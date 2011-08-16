@@ -38,8 +38,8 @@ from karl.views.utils import make_unique_name
 from optparse import OptionParser
 from karl.scripting import get_default_config
 from karl.scripting import open_root
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import model_path
+from pyramid.traversal import find_model
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type
 from repoze.workflow import get_workflow

@@ -18,7 +18,7 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestPostorder(unittest.TestCase):
     def setUp(self):
@@ -91,7 +91,7 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         model = testing.DummyModel()
         path = model_path(model)
         directlyProvides(model, IContent)
@@ -106,7 +106,7 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         model = testing.DummyModel()
         path = model_path(model)
         directlyProvides(model, IContent)
@@ -196,7 +196,7 @@ class TestHandleContentRemoved(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object_w_catalog_no_tags(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
         path = model_path(model)
@@ -209,7 +209,7 @@ class TestHandleContentRemoved(unittest.TestCase):
         self.assertEqual(catalog.document_map.removed, [1, 2, 3])
 
     def test_content_object_w_catalog_w_tags(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
         path = model_path(model)
@@ -243,7 +243,7 @@ class TestReindexContent(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
         path = model_path(model)
@@ -571,7 +571,7 @@ class Test_add_mailinglist(MLBase, unittest.TestCase):
         return add_mailinglist(obj, event)
 
     def test_event(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         aliases, mlist = self._makeMailinglist()
         self.failIf(aliases)
         self._callFUT(mlist, None)
@@ -585,7 +585,7 @@ class Test_remove_mailinglist(MLBase, unittest.TestCase):
         return remove_mailinglist(obj, event)
 
     def test_event(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         aliases, mlist = self._makeMailinglist()
         aliases[mlist.short_address] = model_path(mlist.__parent__)
         self._callFUT(mlist, None)
@@ -682,7 +682,7 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
         path = model_path(model)
@@ -698,7 +698,7 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
         path = model_path(model)
@@ -738,7 +738,7 @@ class TestUnindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         path = model_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
@@ -769,7 +769,7 @@ class TestReindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         path = model_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
@@ -798,18 +798,12 @@ class QueryLoggerTests(unittest.TestCase):
         self.assertEquals(logger.log_dir, None)
 
     def test_configure_by_utility(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         testing.registerUtility(DummySettings(None), ISettings)
         logger = self._makeOne()
         self.assertEquals(logger._configured, False)
         logger(DummyQueryEvent())
         self.assertEquals(logger._configured, True)
-        self.assertEquals(logger.log_dir, None)
-
-    def test_log_without_settings(self):
-        logger = self._makeOne()
-        logger(DummyQueryEvent())
-        self.assertEquals(logger._configured, False)
         self.assertEquals(logger.log_dir, None)
 
     def test_log(self):

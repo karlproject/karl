@@ -19,7 +19,7 @@ import unittest
 
 from zope.testing.cleanup import cleanUp
 from karl import testing
-from repoze.bfg import testing as bfgtesting
+from pyramid import testing as bfgtesting
 
 class ExtractDescriptionTests(unittest.TestCase):
 

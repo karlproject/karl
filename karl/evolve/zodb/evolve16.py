@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 from karl.utils import find_catalog
 
 def evolve(root):

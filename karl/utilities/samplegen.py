@@ -27,8 +27,8 @@ from karl.content.views.calendar_events import AddCalendarEventFormController
 from karl.content.views.wiki import AddWikiPageFormController
 from karl.views.community import add_community
 from karl.models.interfaces import IProfile
-from repoze.bfg import testing
-from repoze.bfg.url import model_url
+from pyramid import testing
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 import datetime

@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from zope.testing.cleanup import cleanUp
 
@@ -30,8 +30,8 @@ class TestTempFolder(unittest.TestCase):
 
     def test_ctor(self):
         import datetime
-        from repoze.bfg.authorization import Allow
-        from repoze.bfg.authorization import Everyone
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Everyone
         obj = self._make_one()
         self.assertEqual(obj.__acl__, [(Allow, Everyone, ('view',))])
         self.assertEqual(obj.LIFESPAN, datetime.timedelta(hours=24))

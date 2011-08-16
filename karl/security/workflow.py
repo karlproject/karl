@@ -1,5 +1,5 @@
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.interfaces import IContent
 from repoze.lemonade.content import get_content_type

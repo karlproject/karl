@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from zope.testing.cleanup import cleanUp
 

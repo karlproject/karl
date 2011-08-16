@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from repoze.folder.interfaces import IFolder
 from zope.component import queryAdapter
 

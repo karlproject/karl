@@ -21,8 +21,8 @@ from zope.interface import Interface
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyProfile

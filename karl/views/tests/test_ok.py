@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestOKView(unittest.TestCase):
     def _callFUT(self, context, request):

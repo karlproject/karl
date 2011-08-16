@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 class MailinRunnerTests(unittest.TestCase):
 
@@ -45,7 +45,7 @@ class MailinRunnerTests(unittest.TestCase):
 
     def _makeOne(self, root=None, maildir_root=None, options=None):
         if root is None:
-            from repoze.bfg import testing
+            from pyramid import testing
             root = testing.DummyModel()
         if maildir_root is None:
             maildir_root = self.maildir_root
@@ -88,9 +88,9 @@ class MailinRunnerTests(unittest.TestCase):
         self.assertEqual(mailin.printed, [])
 
     def test_processMessage_reply_no_attachments_community(self):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerAdapter
-        from repoze.bfg.testing import registerModels
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerAdapter
+        from pyramid.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
         INFO = {'report': None,
                 'community': 'testing',
@@ -124,9 +124,9 @@ class MailinRunnerTests(unittest.TestCase):
                          (message, INFO, text, attachments))
 
     def test_processMessage_reply_w_attachment_community(self):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerAdapter
-        from repoze.bfg.testing import registerModels
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerAdapter
+        from pyramid.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
         INFO = {'report': None,
                 'community': 'testing',
@@ -161,8 +161,8 @@ class MailinRunnerTests(unittest.TestCase):
 
     def test_processMessage_report(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerAdapter
         from karl.adapters.interfaces import IMailinHandler
         from karl.models.interfaces import IPeopleDirectory
         INFO = {'report': 'section+testing',
@@ -206,7 +206,7 @@ class MailinRunner2Tests(unittest.TestCase):
 
     def _makeOne(self, root=None):
         if root is None:
-            from repoze.bfg import testing
+            from pyramid import testing
             root = testing.DummyModel()
         mailin = self._getTargetClass()(
             root, 'zodb://test', '/postoffice', 'queue',
@@ -217,12 +217,12 @@ class MailinRunner2Tests(unittest.TestCase):
     def _set_up_queue(self, messages):
         self.queue = DummyQueue(messages)
 
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.adapters.interfaces import IMailinDispatcher
         from karl.adapters.interfaces import IMailinHandler
-        from repoze.bfg.testing import registerAdapter
-        from repoze.bfg.testing import registerUtility
+        from pyramid.testing import registerAdapter
+        from pyramid.testing import registerUtility
 
         self.handlers = []
         def handler_factory(context):
@@ -236,8 +236,8 @@ class MailinRunner2Tests(unittest.TestCase):
         registerUtility(self.mailer, IMailDelivery)
 
     def test_one_message_reply_no_attachments(self):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerModels
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerModels
         info = {'targets': [{'report': None,
                             'community': 'testing',
                             'tool': 'random',
@@ -272,8 +272,8 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.mailer), 0)
 
     def test_process_message_reply_w_attachment(self):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerModels
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerModels
         info = {'targets': [{'report': None,
                              'community': 'testing',
                              'tool': 'random',
@@ -309,7 +309,7 @@ class MailinRunner2Tests(unittest.TestCase):
 
     def test_process_message_report(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.interfaces import IPeopleDirectory
         INFO = {'targets': [{'report': 'section+testing',
                              'community': None,
@@ -396,8 +396,8 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.mailer), 1)
 
     def test_quarantine_message(self):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerModels
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerModels
         info = {'targets': [{'community': 'testing',
                              'tool': 'random',
                              'in_reply_to': '7FFFFFFF', # token for docid 0

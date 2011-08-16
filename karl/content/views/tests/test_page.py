@@ -18,13 +18,13 @@
 import unittest
 
 from zope.interface import Interface
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 
-from repoze.bfg.testing import DummyModel
-from repoze.bfg.testing import DummyRequest
-from repoze.bfg.testing import registerDummyRenderer
-from repoze.bfg.testing import registerAdapter
+from pyramid.testing import DummyModel
+from pyramid.testing import DummyRequest
+from pyramid.testing import registerDummyRenderer
+from pyramid.testing import registerAdapter
 
 from repoze.lemonade.testing import registerContentFactory
 

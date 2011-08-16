@@ -9,18 +9,18 @@ import os
 import re
 import transaction
 from paste.fileapp import FileApp
-from webob import Response
-from webob.exc import HTTPFound
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
 from zope.component import getUtility
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.exceptions import NotFound
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.traversal import find_model
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
@@ -855,11 +855,11 @@ def mailin_monitor_view(context, request):
     if _mailin_monitor_app is None:
         # Keep imports local in hopes that this can be removed when BFG 1.3
         # comes out.
-        from repoze.bfg.authorization import ACLAuthorizationPolicy
-        from repoze.bfg.configuration import Configurator
+        from pyramid.authorization import ACLAuthorizationPolicy
+        from pyramid.configuration import Configurator
         from karl.models.mailin_monitor import KarlMailInMonitor
         from karl.security.policy import get_groups
-        from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
+        from pyramid.authentication import RepozeWho1AuthenticationPolicy
 
         authentication_policy = RepozeWho1AuthenticationPolicy(
             callback=get_groups
@@ -874,12 +874,12 @@ def mailin_monitor_view(context, request):
         _mailin_monitor_app = config.make_wsgi_app()
 
     # Dispatch to subapp
-    import webob
+    from pyramid.request import Request
     sub_environ = request.environ.copy()
     sub_environ['SCRIPT_NAME'] = '/%s/%s' % (model_path(context),
                                             request.view_name)
     sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
-    sub_request = webob.Request(sub_environ)
+    sub_request = Request(sub_environ)
     return sub_request.get_response(_mailin_monitor_app)
 
 def _get_postoffice_queue(context):

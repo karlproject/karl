@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 _marker = object()
 
@@ -203,7 +203,7 @@ class TagsTests(unittest.TestCase):
         testing.registerAdapter(_factory, Interface, ITagCommunityFinder)
 
     def _registerEventsListener(self):
-        from repoze.bfg.testing import registerEventListener
+        from pyramid.testing import registerEventListener
         events = registerEventListener()
         del events[:]
         return events

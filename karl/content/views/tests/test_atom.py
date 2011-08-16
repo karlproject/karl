@@ -18,8 +18,8 @@
 import datetime
 import unittest
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 
 class EasternTimeZone(datetime.tzinfo):
     """'The datetime module does not supply any concrete subclasses of tzinfo.'

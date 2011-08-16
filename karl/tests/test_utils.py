@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestUtilFunctions(unittest.TestCase):
     def test_find_users(self):

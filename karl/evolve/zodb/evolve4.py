@@ -1,9 +1,9 @@
 import re
 import urllib
 
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import find_root
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import find_model
+from pyramid.traversal import find_root
+from pyramid.traversal import model_path
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarEvent

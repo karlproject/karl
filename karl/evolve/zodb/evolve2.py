@@ -1,7 +1,7 @@
 from datetime import datetime
 from zope.component import getSiteManager
 
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from repoze.folder.interfaces import IObjectWillBeAddedEvent
 
 from repoze.lemonade.content import create_content

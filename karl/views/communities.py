@@ -18,12 +18,12 @@
 import datetime
 import re
 
-from repoze.bfg.security import has_permission
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.security import has_permission
+from pyramid.security import effective_principals
+from pyramid.security import authenticated_userid
+from pyramid.traversal import model_path
+from pyramid.url import model_url
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getMultiAdapter
 from zope.index.text.parsetree import ParseError
 

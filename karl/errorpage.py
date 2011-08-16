@@ -21,9 +21,9 @@
 
 from traceback import format_exc
 
-from webob import Request
+from pyramid.request import Request
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from pyramid.chameleon_zpt import render_template_to_response
 
 GENERAL_MESSAGE = """
 %(system_name)s encountered an application error.  Please click

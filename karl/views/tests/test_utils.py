@@ -18,7 +18,7 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestClientJsonData(unittest.TestCase):
 
@@ -252,7 +252,7 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
         testing.registerDummySecurityPolicy("userid")
@@ -283,7 +283,7 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path_w_view(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
         testing.registerDummySecurityPolicy("userid")
@@ -314,7 +314,7 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path_w_subpath(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
         testing.registerDummySecurityPolicy("userid")
@@ -344,7 +344,7 @@ class TestGetUserHome(unittest.TestCase):
 
     def test_space_as_home_path(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
         from karl.testing import DummyProfile

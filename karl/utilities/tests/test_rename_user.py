@@ -1,7 +1,7 @@
 import unittest
 
 from zope.testing.cleanup import cleanUp
-from repoze.bfg import testing
+from pyramid import testing
 import karl.testing as karltesting
 
 class Test_rename_user(unittest.TestCase):

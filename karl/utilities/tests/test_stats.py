@@ -178,7 +178,7 @@ class TestProfileStats(unittest.TestCase):
 
     def registerCatalogSearch(self):
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(DummySearchAdapter, (Interface, Interface),
                         ICatalogSearch)
@@ -310,7 +310,7 @@ class TestUserActivityReport(unittest.TestCase):
 
     def registerCatalogSearch(self, search_adapter):
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(search_adapter, (Interface,), ICatalogSearch)
 

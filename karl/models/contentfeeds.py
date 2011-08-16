@@ -22,10 +22,10 @@ _NOW = datetime.utcnow
 from appendonly import AppendStack
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
-from repoze.bfg.security import principals_allowed_by_permission
-from repoze.bfg.threadlocal import get_current_request
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
+from pyramid.security import principals_allowed_by_permission
+from pyramid.threadlocal import get_current_request
+from pyramid.traversal import find_model
+from pyramid.traversal import model_path
 from repoze.folder.interfaces import IObjectAddedEvent
 from repoze.lemonade.content import get_content_type
 from zope.interface import implements

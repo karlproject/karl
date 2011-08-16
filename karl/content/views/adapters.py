@@ -38,12 +38,12 @@ from zope.component import getAdapter
 from zope.component import getUtility
 from zope.interface import implements
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.path import package_path
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import render_template
+from pyramid.path import package_path
+from pyramid.traversal import model_path
+from pyramid.traversal import find_interface
+from pyramid.url import model_url
 
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent

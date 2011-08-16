@@ -15,9 +15,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from repoze.bfg.interfaces import IContextURL
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.traversal import model_path
+from pyramid.interfaces import IContextURL
+from pyramid.interfaces import IRequest
+from pyramid.traversal import model_path
+from pyramid.testing import DummyRequest
+    
 from zope.interface import implements
 
 from karl.utils import get_setting
@@ -56,10 +58,11 @@ class OfflineContextURL(object):
             app_url = app_url[:-1]
         path = model_path(self.model)
         return app_url + path
-    
-class OfflineRequest(object):
+
+class OfflineRequest(DummyRequest):
     """
     Use this in places where you don't have an HTTP request to get alternate
     registration of IContextURL.
     """
     implements(IRequest)
+    

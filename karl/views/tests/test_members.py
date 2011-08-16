@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 class ShowMembersViewTests(unittest.TestCase):
@@ -133,7 +133,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
             response.location.startswith('http://example.com/manage.html'))
 
     def test_handle_submit_badprofile(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         request = testing.DummyRequest()
         context = self._getContext()
         controller = self._makeOne(context, request)
@@ -209,7 +209,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
     def test_form_fields_w_tos_and_privacy_statement_adapter(self):
         from karl.views.interfaces import IInvitationBoilerplate
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
                         IInvitationBoilerplate)
         context = self._makeContext()
@@ -245,7 +245,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
     def test_form_widgets_w_tos_and_privacty_policy(self):
         from karl.views.interfaces import IInvitationBoilerplate
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
                         IInvitationBoilerplate)
         context = self._makeContext()
@@ -257,7 +257,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.failUnless('accept_privacy_policy' in widgets)
 
     def test_handle_submit_password_mismatch(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
@@ -265,7 +265,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_username_exists(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeContext()
         request = self._makeRequest()
         profiles = testing.DummyModel()
@@ -477,7 +477,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             }
         testing.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_already_in_community(self):
@@ -612,7 +612,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
                          'http://example.com/communities/community/')
 
     def test_handle_submit_remove_sole_moderator(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -626,7 +626,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_deop_sole_moderator(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -839,7 +839,7 @@ class DummyInvitationBoilerPlate(object):
         pass
 
 def registerCatalogSearch(results={}):
-    from repoze.bfg.testing import registerAdapter
+    from pyramid.testing import registerAdapter
     from zope.interface import Interface
     from karl.models.interfaces import ICatalogSearch
     registerAdapter(dummy_search(results), (Interface,), ICatalogSearch)

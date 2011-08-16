@@ -63,7 +63,7 @@ class Test_load_peopleconf(unittest.TestCase):
             args.append((root, tree, force_reindex))
 
         if root is None:
-            from repoze.bfg.testing import DummyModel
+            from pyramid.testing import DummyModel
             root = DummyModel()
 
         if filename is None:
@@ -76,7 +76,7 @@ class Test_load_peopleconf(unittest.TestCase):
         return args[0]
 
     def test_force_reindex_w_existing(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.peopledirectory import PeopleDirectory
         self._makeXML(_EMPTY_XML_TEMPLATE)
         root = DummyModel()
@@ -86,7 +86,7 @@ class Test_load_peopleconf(unittest.TestCase):
         self.assertEqual(force_reindex, True)
 
     def test_force_reindex_no_existing(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.peopledirectory import PeopleDirectory
         self._makeXML(_EMPTY_XML_TEMPLATE)
         root = DummyModel()

@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 
 class TestSiteView(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestSiteView(unittest.TestCase):
     def test_user_home_path(self):
         from zope.interface.interfaces import IInterface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
         testing.registerDummySecurityPolicy("userid")
@@ -91,7 +91,7 @@ class TestSiteView(unittest.TestCase):
     def test_user_home_path_w_view(self):
         from zope.interface.interfaces import IInterface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
         testing.registerDummySecurityPolicy("userid")

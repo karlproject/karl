@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 
 class Test_redirect_up_view(unittest.TestCase):

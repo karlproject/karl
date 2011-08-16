@@ -19,10 +19,10 @@
 Reindex if necessary.
 """
 from lxml import etree
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import DENY_ALL
-from repoze.bfg.traversal import model_path
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import DENY_ALL
+from pyramid.traversal import model_path
 from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector

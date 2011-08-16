@@ -20,10 +20,10 @@
 import os
 import re
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.url import model_url
-from repoze.bfg.view import static
+from pyramid.url import model_url
+from pyramid.view import static
 
 from karl.views.utils import get_user_home
 

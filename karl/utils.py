@@ -22,9 +22,9 @@ from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.traversal import find_root
-from repoze.bfg.traversal import find_interface
+from pyramid.interfaces import ISettings
+from pyramid.traversal import find_root
+from pyramid.traversal import find_interface
 from repoze.lemonade.content import get_content_type
 
 from karl.models.interfaces import ICatalogSearch

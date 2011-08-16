@@ -17,7 +17,7 @@
 
 import datetime
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from zope.testing.cleanup import cleanUp
 
 _NOW = datetime.datetime.now()

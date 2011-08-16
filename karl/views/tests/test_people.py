@@ -18,7 +18,7 @@
 import unittest
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from karl.testing import DummySessions
 
@@ -174,7 +174,7 @@ class TestEditProfileFormController(unittest.TestCase):
             form.errors['websites'].message, 'You made a boo boo.')
 
     def test_admin_redirected(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
         testing.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
@@ -229,7 +229,7 @@ class TestEditProfileFormController(unittest.TestCase):
                 continue
             converted[fieldname] = value
 
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_w_websites_no_scheme(self):
@@ -443,7 +443,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
 
     def test_handle_submit_existing_login(self):
         # try w/ a login already in use
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -457,7 +457,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
                           converted)
 
     def test_handle_submit_w_login_raising_ValidationError(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -668,7 +668,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.failIf('invite' in self.community2)
 
     def test_handle_submit_duplicate_id(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = testing.DummyModel(
@@ -685,7 +685,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(controller.reactivate_user, None)
 
     def test_handle_submit_duplicate_id_inactive_user(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = testing.DummyModel(
@@ -705,7 +705,7 @@ class AddUserFormControllerTests(unittest.TestCase):
 
     def test_handle_submit_duplicate_email(self):
         from karl.models.interfaces import IProfile
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = existing = testing.DummyModel(
@@ -727,7 +727,7 @@ class AddUserFormControllerTests(unittest.TestCase):
     def test_handle_submit_duplicate_email_inactive_user(self):
         from karl.models.interfaces import IProfile
         from karl.models.interfaces import IProfile
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = existing = testing.DummyModel(
@@ -934,7 +934,7 @@ class ShowProfileTests(unittest.TestCase):
         self._registerTagbox()
         self._registerCatalogSearch()
 
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
         renderer = testing.registerDummyRenderer('templates/profile.pt')
@@ -971,8 +971,8 @@ class ShowProfileTests(unittest.TestCase):
         self._registerTagbox()
         self._registerCatalogSearch()
 
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from pyramid.testing import DummyModel
+        from pyramid.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy(permissive=False)
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
@@ -1096,7 +1096,7 @@ class ShowProfileTests(unittest.TestCase):
                 return len(docids), docids, lambda docid: docid
             return search
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(searcher, (Interface,), ICatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
@@ -1220,7 +1220,7 @@ class RecentContentTests(unittest.TestCase):
                 return len(docids), docids, lambda docid: docid
             return search
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(searcher, (Interface), ICatalogSearch)
         from karl.models.interfaces import IGridEntryInfo

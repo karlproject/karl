@@ -27,16 +27,16 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 from zope.interface import implements
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import render_template
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 
 from repoze.sendmail.interfaces import IMailDelivery
 

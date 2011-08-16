@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from zope.testing.cleanup import cleanUp
 from zope.interface import implements
@@ -97,7 +97,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
         return _parse_tinymce_request(request)
            
     def test_raises_bad_method_when_not_POST(self):
-        from webob.exc import HTTPMethodNotAllowed
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
         
         request = testing.DummyRequest(method='GET')
         self.assertRaises(HTTPMethodNotAllowed,
@@ -105,7 +105,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
         )
 
     def test_raises_bad_request_when_not_json_encoded(self):
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
 
         request = testing.DummyRequest(method='POST', body='not json')
         self.assertRaises(HTTPBadRequest,
@@ -114,7 +114,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
 
     def test_raises_bad_request_when_json_contents_are_invalid(self):
         from simplejson import JSONEncoder
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
         
         rpc_request = {'invalid':'contents'}
         json = JSONEncoder().encode(rpc_request)
@@ -127,7 +127,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
         
     def test_raises_bad_request_when_rpc_method_is_invalid(self):
         from simplejson import JSONEncoder
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
 
         rpc_request = {'method': 'invalid', 'params': ['en', ['foo']]}
         json = JSONEncoder().encode(rpc_request)
@@ -140,7 +140,7 @@ class TinyMceRequestParsingTests(unittest.TestCase):
 
     def test_raises_bad_request_when_rpc_params_are_invalid(self):
         from simplejson import JSONEncoder
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
 
         rpc_request = {'method': 'checkWords', 'params': ['en']}
         json = JSONEncoder().encode(rpc_request)

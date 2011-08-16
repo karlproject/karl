@@ -5,7 +5,7 @@ import sys
 
 from zope.interface import implements
 from zope.component import queryUtility
-from repoze.bfg.interfaces import ISettings
+from pyramid.interfaces import ISettings
 from repoze.sendmail.delivery import QueuedMailDelivery
 from repoze.sendmail.interfaces import IMailDelivery
 

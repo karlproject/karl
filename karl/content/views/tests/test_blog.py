@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from zope.interface import implements
 
@@ -367,7 +367,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -382,8 +382,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from repoze.bfg.threadlocal import manager
-        from repoze.bfg.registry import Registry
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
         manager.stack[0]['registry'] = Registry('testing')
         testing.registerUtility(self.mailer, IMailDelivery)
 
@@ -392,7 +392,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         from karl.content.interfaces import IBlogEntry
         from karl.content.views.adapters import BlogEntryAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         testing.registerAdapter(BlogEntryAlert,
                                 (IBlogEntry, IProfile, IRequest),
                                 IAlert)
@@ -625,7 +625,7 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         return context
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),

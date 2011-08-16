@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import time
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from pyramid.chameleon_zpt import render_template_to_response
 
 class ConnectionInfo:
 

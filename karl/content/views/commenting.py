@@ -17,8 +17,8 @@
 
 import urllib
 
-from webob.exc import HTTPFound
-from webob.exc import HTTPExpectationFailed
+from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPExpectationFailed
 from zope.component.event import objectEventNotify
 
 from zope.component import getMultiAdapter
@@ -27,10 +27,10 @@ from zope.component import queryUtility
 from schemaish.type import File as SchemaFile
 import schemaish
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import model_url
 from repoze.workflow import get_workflow
 
 from karl.events import ObjectModifiedEvent

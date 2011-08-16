@@ -20,13 +20,13 @@ from simplejson import JSONEncoder
 import transaction
 import urlparse
 import os
-from webob import Response
+from pyramid.response import Response
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import traverse
-from repoze.bfg.url import model_url
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
+from pyramid.traversal import traverse
+from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 

@@ -24,20 +24,20 @@ import schemaish
 from validatish import validator
 from schemaish.type import File as SchemaFile
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.interface import implements
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import Form
-from repoze.bfg.formish.zcml import FormAction
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid_formish import Form
+from pyramid_formish.zcml import FormAction
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import model_url
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
 

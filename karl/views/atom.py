@@ -19,10 +19,10 @@ import time
 
 from zope.component import getMultiAdapter
 
-from webob import Response
+from pyramid.response import Response
 from zope.interface import implements
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template
+from pyramid.url import model_url
 
 from karl.utils import find_profiles
 from karl.views.community import get_recent_items_batch

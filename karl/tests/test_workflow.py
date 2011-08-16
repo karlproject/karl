@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestIntranetsContainment(unittest.TestCase):
     def _callFUT(self, ob):
@@ -112,7 +112,7 @@ class Test_content_to_private(unittest.TestCase):
         ob.moderators_group_name = 'moderators'
         ob.members_group_name = 'members'
         self._callFUT(ob, None)
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.security.policy import MODERATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
         from karl.security.policy import NO_INHERIT
@@ -131,7 +131,7 @@ class Test_to_profile_active(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import GUEST_PERMS
@@ -177,7 +177,7 @@ class Test_to_profile_inactive(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import NO_INHERIT
@@ -213,9 +213,9 @@ class Test_comment_to_inherits(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -242,9 +242,9 @@ class Test_forum_topic_to_inherits(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -271,7 +271,7 @@ class Test_forum_to_inherits(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import CREATE
         ob = testing.DummyModel()
@@ -293,9 +293,9 @@ class Test_intranet_content_to_inherits(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -317,7 +317,7 @@ class Test_community_to_private(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -346,7 +346,7 @@ class Test_community_to_public(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import GUEST_PERMS
@@ -378,7 +378,7 @@ class Test_community_to_intranet(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -405,9 +405,9 @@ class Test_blogentry_to_inherits(unittest.TestCase):
         return blogentry_to_inherits(ob, transition)
 
     def test_it_has_no_acl(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         from karl.security.policy import MEMBER_PERMS
         from karl.security.policy import ADMINISTRATOR_PERMS
         ob = testing.DummyModel()
@@ -425,9 +425,9 @@ class Test_blogentry_to_inherits(unittest.TestCase):
         self.assertEqual(index.indexed, {1234: ob})
 
     def test_it_has_acl(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         from karl.security.policy import MEMBER_PERMS
         from karl.security.policy import ADMINISTRATOR_PERMS
         ob = testing.DummyModel()
@@ -453,7 +453,7 @@ class Test_blogentry_to_private(unittest.TestCase):
 
     def test_it(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import GUEST_PERMS

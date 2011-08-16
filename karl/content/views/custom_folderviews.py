@@ -20,11 +20,11 @@ import datetime
 
 from zope.index.text.parsetree import ParseError
 
-from repoze.bfg.url import model_url
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
+from pyramid.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
 
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid

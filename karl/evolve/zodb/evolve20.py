@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 

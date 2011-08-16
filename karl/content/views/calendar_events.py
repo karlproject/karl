@@ -31,17 +31,17 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid_formish import ValidationError
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import model_path
+from pyramid.traversal import find_model
 
-from repoze.bfg.url import model_url
+from pyramid.url import model_url
 from repoze.workflow import get_workflow
 
 from repoze.lemonade.content import create_content

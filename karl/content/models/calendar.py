@@ -19,7 +19,7 @@ from persistent import Persistent
 from repoze.lemonade.content import create_content
 
 from repoze.folder import Folder
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 
 from zope.interface import implements
 

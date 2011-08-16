@@ -42,7 +42,7 @@ class MailinScriptTests(unittest.TestCase):
 
     def _callFUT(self, args=[]):
         from karl.scripts.mailin import main
-        from repoze.bfg import testing
+        from pyramid import testing
         argv = ['mailin', self.maildir_root] + args
         res = []
         def mailin_factory(root, maildir_root, options):

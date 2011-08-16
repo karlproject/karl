@@ -19,7 +19,7 @@ import unittest
 import datetime
 import calendar
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl.content.calendar.presenters.month import MonthViewPresenter
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for

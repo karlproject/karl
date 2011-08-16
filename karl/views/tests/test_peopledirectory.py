@@ -19,7 +19,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from simplejson import JSONDecoder
 
 
@@ -76,14 +76,14 @@ class Test_peopledirectory_view(unittest.TestCase):
                                 ILetterManager)
 
     def test_empty(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         pd = testing.DummyModel()
         pd.order = ()
         request = testing.DummyRequest()
         self.assertRaises(Forbidden, self._callFUT, pd, request)
 
     def test_no_sections_allowed(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         testing.registerDummySecurityPolicy(permissive=False)
         pd = testing.DummyModel()
         pd['s1'] = testing.DummyModel()
@@ -92,7 +92,7 @@ class Test_peopledirectory_view(unittest.TestCase):
         self.assertRaises(Forbidden, self._callFUT, pd, request)
 
     def test_one_section_allowed(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         testing.registerDummySecurityPolicy(permissive=True)
         site = testing.DummyModel()
         pd = site['people'] = testing.DummyModel()
@@ -104,9 +104,9 @@ class Test_peopledirectory_view(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/people/s1/')
 
     def test_first_section_not_allowed(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
-        from webob.exc import HTTPFound
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.httpexceptions import HTTPFound
         testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
@@ -179,7 +179,7 @@ class Test_upload_peopledirectory_xml(unittest.TestCase):
 
     def test_w_submit_empty_clears_existing(self):
         from StringIO import StringIO
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         XML = """<?xml version="1.0"?>
@@ -263,8 +263,8 @@ class Test_get_tabs(unittest.TestCase):
         self.failUnless(tab['selected'])
 
     def test_skip_unauthorized(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.threadlocal import get_current_registry
         testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
@@ -591,7 +591,7 @@ class Test_section_view(unittest.TestCase):
         # when a section contains only a single report, redirect to that report
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         self._register()
         pd, section, report = _makeReport()
         directlyProvides(report, IPeopleReport)
@@ -1214,7 +1214,7 @@ class Test_redirector_view(unittest.TestCase):
         return redirector_view(context, request)
 
     def test_w_absolute_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         context.target_url = 'http://other.example.com/'
         request = testing.DummyRequest()
@@ -1223,7 +1223,7 @@ class Test_redirector_view(unittest.TestCase):
         self.assertEqual(response.location, 'http://other.example.com/')
 
     def test_w_site_relative_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         context.target_url = '/somewhere/over/the/rainbow'
         request = testing.DummyRequest()
@@ -1233,7 +1233,7 @@ class Test_redirector_view(unittest.TestCase):
                          'http://example.com/somewhere/over/the/rainbow')
 
     def test_w_relative_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         grandparent = testing.DummyModel()
         parent = grandparent['parent'] = testing.DummyModel()
         context = parent['context'] = testing.DummyModel()
@@ -1257,7 +1257,7 @@ class Test_redirector_admin_view(unittest.TestCase):
         return redirector_admin_view(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)

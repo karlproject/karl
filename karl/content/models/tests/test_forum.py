@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from zope.testing.cleanup import cleanUp
 
 class ForumsFolderTests(unittest.TestCase):

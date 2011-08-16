@@ -17,9 +17,9 @@
 
 """Catalog results batching functions"""
 
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
-from repoze.bfg.url import urlencode
+from pyramid.security import has_permission
+from pyramid.url import model_url
+from pyramid.url import urlencode
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
 

@@ -20,7 +20,7 @@ import transaction
 
 from zope.interface import implements
 
-from repoze.bfg.settings import get_settings
+from pyramid.settings import get_settings
 from repoze.lemonade.content import create_content
 from repoze.folder import Folder
 

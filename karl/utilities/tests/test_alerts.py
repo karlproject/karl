@@ -22,7 +22,7 @@ from zope.interface import directlyProvides
 from zope.interface import implements
 from zope.interface import Interface
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl.utilities.interfaces import IAlert
 
@@ -42,7 +42,7 @@ class TestAlerts(unittest.TestCase):
 
     def test_emit(self):
         from repoze.sendmail.interfaces import IMailDelivery
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         from karl.models.interfaces import IProfile
         from karl.testing import DummyMailer
 
@@ -71,7 +71,7 @@ class TestAlerts(unittest.TestCase):
 
     def test_respect_alert_prefs(self):
         from repoze.sendmail.interfaces import IMailDelivery
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         from karl.models.interfaces import IProfile
         from karl.testing import DummyMailer
 
@@ -105,7 +105,7 @@ class TestAlerts(unittest.TestCase):
 
     def test_digest(self):
         from repoze.sendmail.interfaces import IMailDelivery
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         from karl.models.interfaces import IProfile
         from karl.testing import DummyMailer
 

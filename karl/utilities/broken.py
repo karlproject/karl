@@ -2,8 +2,8 @@ from BTrees.Length import Length
 from BTrees.OOBTree import OOBTree
 from ZODB.broken import Broken
 from repoze.folder.interfaces import IFolder
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import find_model
+from pyramid.traversal import model_path
 
 from karl.utils import find_catalog
 

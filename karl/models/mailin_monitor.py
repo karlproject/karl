@@ -1,8 +1,8 @@
 from zope.component import queryUtility
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import Everyone
+from pyramid.interfaces import ISettings
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import Everyone
 from repoze.mailin.monitor.models import MailInMonitor
 
 def KarlMailInMonitor():

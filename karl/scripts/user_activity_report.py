@@ -25,7 +25,7 @@ import os
 import sys
 
 from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 
 from karl.scripting import get_default_config
 from karl.utilities import stats

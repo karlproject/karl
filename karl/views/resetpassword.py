@@ -25,15 +25,15 @@ from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms import widgets as karlwidgets
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import render_template
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid_formish import ValidationError
+from pyramid.url import model_url
 from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
 from validatish import validator
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getAdapter
 from zope.component import getUtility
 import datetime

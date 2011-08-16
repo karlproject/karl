@@ -19,7 +19,7 @@
 import optparse
 import logging
 from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 
 from karl.log import set_subsystem
 from karl.scripting import get_default_config

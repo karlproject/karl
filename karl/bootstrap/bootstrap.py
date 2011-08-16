@@ -3,8 +3,8 @@ import transaction
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 
-from repoze.bfg.traversal import model_path
-from repoze.bfg import testing
+from pyramid.traversal import model_path
+from pyramid import testing
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
 

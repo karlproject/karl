@@ -9,7 +9,7 @@ from zope.event import notify
 from zope.interface import implements
 from zope.component import queryUtility
 
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_model
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.interfaces import ICatalog
 

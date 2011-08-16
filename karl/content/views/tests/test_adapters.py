@@ -16,11 +16,11 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from datetime import datetime
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 
 class TestFileInfo(unittest.TestCase):

@@ -20,8 +20,8 @@ import re
 import htmlentitydefs
 import urllib
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.traversal import model_path
+from pyramid.security import authenticated_userid
+from pyramid.traversal import model_path
 from repoze.lemonade.content import create_content
 from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IObjectVersion
@@ -29,8 +29,8 @@ from karl.models.interfaces import IObjectVersion
 from repoze.folder import Folder
 from zope.interface import implements
 
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.traversal import model_path
+from pyramid.url import model_url
 
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory

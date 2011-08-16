@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import model_path
 from repoze.workflow import get_workflow
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile

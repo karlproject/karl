@@ -19,9 +19,9 @@ from datetime import datetime
 from urllib import urlencode
 from urlparse import urljoin
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.url import model_url
+from pyramid.httpexceptions import HTTPFound
 
 from karl.utils import find_profiles
 from karl.utils import find_site

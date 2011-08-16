@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 
 class TestMailDeliveryFactory(unittest.TestCase):
@@ -15,13 +15,8 @@ class TestMailDeliveryFactory(unittest.TestCase):
         from karl.utilities.mailer import mail_delivery_factory
         return mail_delivery_factory(os=os)
 
-    def test_no_settings(self):
-        from karl.utilities.mailer import FakeMailDelivery
-        delivery = self._callFUT()
-        self.assertEqual(delivery.__class__, FakeMailDelivery)
-
     def test_with_settings_and_suppress_mail(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         from karl.utilities.mailer import FakeMailDelivery
         settings = DummySettings()
         testing.registerUtility(settings, ISettings)
@@ -32,7 +27,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
     def test_mail_queue_path_unspecified(self):
         import os
         import sys
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = DummySettings()
         testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
@@ -42,7 +37,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         self.assertEqual(delivery.queuePath, queue_path)
 
     def test_mail_queue_path_specified(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = DummySettings(mail_queue_path='/var/tmp')
         testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
@@ -50,7 +45,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
 
     def test_with_white_list(self):
         from tempfile import NamedTemporaryFile
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         from karl.utilities.mailer import WhiteListMailDelivery
         settings = DummySettings()
         f = NamedTemporaryFile()
@@ -83,8 +78,8 @@ class TestWhiteListMailDelivery(unittest.TestCase):
 
     def _set_whitelist(self, white_list):
         import tempfile
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.testing import registerUtility
+        from pyramid.interfaces import ISettings
         tmp = self.tmp_file = tempfile.NamedTemporaryFile()
         settings = DummySettings(mail_white_list=tmp.name)
         registerUtility(settings, ISettings)

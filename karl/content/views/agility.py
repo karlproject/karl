@@ -18,8 +18,8 @@
 import simplejson as json
 from random import choice
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.url import model_url
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.url import model_url
 
 from karl.views.api import TemplateAPI
 
