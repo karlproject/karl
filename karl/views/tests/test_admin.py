@@ -1302,7 +1302,7 @@ class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
         request = testing.DummyRequest()
         request.params = MultiDict()
         if params is not None:
-            request.params.update(params)
+            request.params.extend(params)
         return error_monitor_status_view(self.site, request)
 
     def test_all_ok(self):
