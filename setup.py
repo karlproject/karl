@@ -47,7 +47,7 @@ requires = [
     'repoze.folder',
     'repoze.lemonade',
     'repoze.mailin',
-#    'repoze.mailin.monitor', # XXX reenable; depends on bfg
+    'repoze.mailin.monitor',
     'repoze.monty',
     'repoze.postoffice',
     'repoze.retry',
