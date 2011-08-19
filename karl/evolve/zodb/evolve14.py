@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_catalog

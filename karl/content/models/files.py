@@ -21,7 +21,7 @@ import PIL.Image
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.lemonade.content import create_content
 
 from zope.interface import alsoProvides
@@ -190,7 +190,7 @@ class CommunityFileVersion(object):
         self.created = file.created
         self.modified = file.modified
         self.docid = file.docid
-        self.path = model_path(file)
+        self.path = resource_path(file)
         self.attrs = dict((name, getattr(file, name)) for name in [
             'mimetype',
             'filename',

@@ -3,7 +3,7 @@ import transaction
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid import testing
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
@@ -44,7 +44,7 @@ def populate(root, do_transaction_begin=True):
 
     # the ZODB root isn't a Folder, so it doesn't send events that
     # would cause the root Site to be indexed
-    docid = site.catalog.document_map.add(model_path(site))
+    docid = site.catalog.document_map.add(resource_path(site))
     site.catalog.index_doc(docid, site)
     site.docid = docid
 

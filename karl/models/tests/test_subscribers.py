@@ -91,9 +91,9 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IContent)
         catalog = DummyCatalog()
         model.catalog = catalog
@@ -106,9 +106,9 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IContent)
         catalog = DummyCatalog()
         model.catalog = catalog
@@ -196,10 +196,10 @@ class TestHandleContentRemoved(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object_w_catalog_no_tags(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         catalog = model.catalog = DummyCatalog({1: path,
                                                 2: '%s/foo' % path,
                                                 3: '%s/bar' % path,
@@ -209,10 +209,10 @@ class TestHandleContentRemoved(unittest.TestCase):
         self.assertEqual(catalog.document_map.removed, [1, 2, 3])
 
     def test_content_object_w_catalog_w_tags(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         tags = model.tags = DummyTags()
         catalog = model.catalog = DummyCatalog({1: path,
                                                 2: '%s/foo' % path,
@@ -243,10 +243,10 @@ class TestReindexContent(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         catalog = DummyCatalog({1:path})
         model.catalog = catalog
         self._callFUT(model, None)
@@ -571,12 +571,12 @@ class Test_add_mailinglist(MLBase, unittest.TestCase):
         return add_mailinglist(obj, event)
 
     def test_event(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         aliases, mlist = self._makeMailinglist()
         self.failIf(aliases)
         self._callFUT(mlist, None)
         self.assertEqual(aliases.items(),
-                         [('alias', model_path(mlist.__parent__))])
+                         [('alias', resource_path(mlist.__parent__))])
 
 
 class Test_remove_mailinglist(MLBase, unittest.TestCase):
@@ -585,9 +585,9 @@ class Test_remove_mailinglist(MLBase, unittest.TestCase):
         return remove_mailinglist(obj, event)
 
     def test_event(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         aliases, mlist = self._makeMailinglist()
-        aliases[mlist.short_address] = model_path(mlist.__parent__)
+        aliases[mlist.short_address] = resource_path(mlist.__parent__)
         self._callFUT(mlist, None)
         self.failIf(aliases)
 
@@ -682,10 +682,10 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IProfile)
         catalog = DummyCatalog()
         model['people'].catalog = catalog
@@ -698,10 +698,10 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IProfile)
         catalog = DummyCatalog()
         model['people'].catalog = catalog
@@ -738,8 +738,8 @@ class TestUnindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from pyramid.traversal import model_path
-        path = model_path(model)
+        from pyramid.traversal import resource_path
+        path = resource_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
         model['people'].catalog = catalog
@@ -769,8 +769,8 @@ class TestReindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from pyramid.traversal import model_path
-        path = model_path(model)
+        from pyramid.traversal import resource_path
+        path = resource_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
         model['people'].catalog = catalog

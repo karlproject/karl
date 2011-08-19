@@ -43,7 +43,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.exceptions import NotFound
 from pyramid.traversal import find_interface
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -937,8 +937,8 @@ def traverse_file_folder(context, folder):
 def get_file_folder_path(context):
     # Return the absolute path to the fileobjext in context, relative
     # to the community.
-    context_path = model_path(context)
-    root_path = model_path(find_root_folder(context))
+    context_path = resource_path(context)
+    root_path = resource_path(find_root_folder(context))
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
 
@@ -957,14 +957,14 @@ def get_target_folders(context):
     #
     catalog = find_catalog(context)
     root_folder = find_root_folder(context)
-    root_path = model_path(root_folder)
+    root_path = resource_path(root_folder)
 
     # Check if we are in the files section
     # for example, we are in /offices/nyc/referencemanuals which is a folder but
     # not inside the files tool /offices/nyc/files.
     # In this case we will return None as a velue, and the client should
     # detect this value and disable the reorganize features.
-    context_path = model_path(context)
+    context_path = resource_path(context)
     if not context_path.startswith(root_path):
         return None
 
@@ -1009,9 +1009,9 @@ def get_target_folders(context):
 def get_current_folder(context):
     # Calculate the current folder in the same format as the results
     # from get_target_folders (relative to community)
-    root_path = model_path(find_root_folder(context))
+    root_path = resource_path(find_root_folder(context))
 
-    context_path = model_path(context)
+    context_path = resource_path(context)
 
     if not context_path.startswith(root_path):
         # we are not in the files tool, there will be no reorganize

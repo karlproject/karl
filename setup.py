@@ -40,6 +40,7 @@ requires = [
     'python-dateutil',
     'PILwoTk',
     'pyramid',
+    'pyramid_zcml',
     'pyramid_formish',
     'repoze.browserid',
     'repoze.catalog',

@@ -33,7 +33,7 @@ from pyramid.chameleon_zpt import render_template_to_response
 from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
 from pyramid.url import model_url
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -708,7 +708,7 @@ def number_of_comments(forum, request):
     searcher = ICatalogSearch(forum)
     total, docids, resolver = searcher(
         interfaces=[IComment],
-        path={'query': model_path(forum)},
+        path={'query': resource_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         )
     return total
@@ -718,7 +718,7 @@ def latest_object(forum, request):
     total, docids, resolver = searcher(
         sort_index='modified_date',
         interfaces={'query': [IForumTopic, IComment], 'operator':'or'},
-        path={'query': model_path(forum)},
+        path={'query': resource_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         reverse=True)
 
@@ -731,7 +731,7 @@ def latest_object(forum, request):
 def get_topic_batch(forum, request):
     return get_catalog_batch_grid(
         forum, request, interfaces=[IForumTopic], reverse=True,
-        path={'query': model_path(forum)},
+        path={'query': resource_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         )
 

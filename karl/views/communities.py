@@ -21,7 +21,7 @@ import re
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
 from pyramid.security import authenticated_userid
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from pyramid.httpexceptions import HTTPFound
 from zope.component import getMultiAdapter
@@ -84,7 +84,7 @@ def _show_communities_view_helper(context,
                                   **kw
                                  ):
     # Grab the data for the two listings, main communities and portlet
-    communities_path = model_path(context)
+    communities_path = resource_path(context)
 
     query = dict(
         sort_index='title',

@@ -36,7 +36,7 @@ from karl.views.batch import get_catalog_batch_grid
 from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
 from pyramid.security import effective_principals
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.lemonade.content import get_content_types
@@ -136,7 +136,7 @@ def get_batch(context, request):
     terms = ()
     query, terms = make_query(context, request)
     if terms:
-        context_path = model_path(context)
+        context_path = resource_path(context)
         if context_path and context_path != '/':
             query['path'] = {'query': context_path}
         batch = get_catalog_batch_grid(context, request, **query)

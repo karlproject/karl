@@ -25,7 +25,7 @@ from persistent.mapping import PersistentMapping
 from pyramid.security import principals_allowed_by_permission
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import find_model
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.folder.interfaces import IObjectAddedEvent
 from repoze.lemonade.content import get_content_type
 from zope.interface import implements
@@ -115,7 +115,7 @@ def _getInfo(profile, content):
         context_name = context_url = None
     else:
         context_name = context.title
-        context_url = model_path(context)
+        context_url = resource_path(context)
     tagger = find_tags(content)
     if tagger is not None:
         cloud = list(tagger.getCloud(items=(content.docid,)))
@@ -139,7 +139,7 @@ def _getInfo(profile, content):
             'context_name': context_name,
             'context_url': context_url,
             'content_creator': content_creator,
-            'url': model_path(content),
+            'url': resource_path(content),
             'title': content.title,
             'description': desc,
             'short_description': short,

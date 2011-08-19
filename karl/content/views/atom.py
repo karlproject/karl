@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from zope.component import getAdapter
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from karl.models.interfaces import ICatalogSearch
 from karl.views.atom import format_datetime
@@ -49,7 +49,7 @@ class BlogAtomFeed(AtomFeed):
         search = getAdapter(self.context, ICatalogSearch)
         count, docids, resolver = search(
             limit=N_ENTRIES,
-            path=model_path(self.context),
+            path=resource_path(self.context),
             sort_index="modified_date",
             reverse=True,
             interfaces=[IBlogEntry,]
@@ -66,7 +66,7 @@ class CalendarAtomFeed(AtomFeed):
         search = getAdapter(self.context, ICatalogSearch)
         count, docids, resolver = search(
             limit=N_ENTRIES,
-            path=model_path(self.context),
+            path=resource_path(self.context),
             sort_index="modified_date",
             reverse=True,
             interfaces=[ICalendarEvent,]
@@ -104,7 +104,7 @@ class WikiAtomFeed(AtomFeed):
         search = getAdapter(self.context, ICatalogSearch)
         count, docids, resolver = search(
             limit=N_ENTRIES,
-            path=model_path(self.context),
+            path=resource_path(self.context),
             sort_index="modified_date",
             reverse=True,
             interfaces=[IWikiPage,]
@@ -126,7 +126,7 @@ class CommunityFilesAtomFeed(AtomFeed):
         search = getAdapter(self.context, ICatalogSearch)
         count, docids, resolver = search(
             limit=N_ENTRIES,
-            path=model_path(self.context),
+            path=resource_path(self.context),
             sort_index="modified_date",
             reverse=True,
             interfaces={ "operator": "or",

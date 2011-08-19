@@ -25,7 +25,7 @@ from pyramid.response import Response
 
 from zope.component import getMultiAdapter
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import find_model
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -72,7 +72,7 @@ def add_tags(context, request, values):
     if values:
         if isinstance(values, basestring):
             values = [values]
-        path = model_path(context)
+        path = resource_path(context)
         catalog = find_catalog(context)
         docid = catalog.document_map.docid_for_address(path)
         username = authenticated_userid(request)
@@ -87,7 +87,7 @@ def del_tags(context, request, values):
     """ Delete the specified tags.
     """
     username = authenticated_userid(request)
-    path = model_path(context)
+    path = resource_path(context)
     catalog = find_catalog(context)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(context)
@@ -101,7 +101,7 @@ def set_tags(context, request, values):
     if values is None:
         values = ()
     username = authenticated_userid(request)
-    path = model_path(context)
+    path = resource_path(context)
     catalog = find_catalog(context)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(context)

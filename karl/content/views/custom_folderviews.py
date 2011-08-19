@@ -24,7 +24,7 @@ from pyramid.url import model_url
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
@@ -45,7 +45,7 @@ def get_catalog_events(context, request,
 
     # Build up a query
     query = dict(
-        path={'query': model_path(context)},
+        path={'query': resource_path(context)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         interfaces=[ICalendarEvent],
         sort_index="start_date",
@@ -103,7 +103,7 @@ def get_catalog_news(context, request,
 
     # Build up a query
     query = dict(
-        path={'query': model_path(context)},
+        path={'query': resource_path(context)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         interfaces=[INewsItem],
         sort_index="publication_date",

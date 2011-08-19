@@ -3,7 +3,7 @@ from BTrees.OOBTree import OOBTree
 from ZODB.broken import Broken
 from repoze.folder.interfaces import IFolder
 from pyramid.traversal import find_model
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.utils import find_catalog
 
@@ -21,7 +21,7 @@ def _traverse(startnode):
         yield node, path, container
         if hasattr(node, '_p_deactivate'):
             node._p_deactivate()
-    return visit(startnode, model_path(startnode).split('/'), None)
+    return visit(startnode, resource_path(startnode).split('/'), None)
 
 def remove_broken_objects(root, out=None):
     """

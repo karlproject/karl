@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.lemonade.content import get_content_type
 from repoze.workflow import get_workflow
 
@@ -30,7 +30,7 @@ def evolve(site):
         if wf.name != 'intranet-content':
             continue
 
-        print 'Resetting workflow for', model_path(doc)
+        print 'Resetting workflow for', resource_path(doc)
         wf.reset(doc)
 
     _reindex(offices)

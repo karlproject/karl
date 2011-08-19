@@ -27,8 +27,8 @@ from lxml import etree
 from pyramid.exceptions import Forbidden
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
-from pyramid.traversal import model_path_tuple
+from pyramid.traversal import resource_path
+from pyramid.traversal import resource_path_tuple
 from pyramid.url import model_url
 from simplejson import JSONEncoder
 from pyramid.response import Response
@@ -284,8 +284,8 @@ def section_column_view(context, request):
 def _get_mailto(context, peopledir):
     mailinglist = context.get('mailinglist')
     if mailinglist is not None:
-        pd_path = model_path_tuple(peopledir)
-        report_path = model_path_tuple(context)
+        pd_path = resource_path_tuple(peopledir)
+        report_path = resource_path_tuple(context)
         mail_name = '+'.join(report_path[len(pd_path):])
         system_email_domain = get_setting(context, "system_email_domain")
         system_list_subdomain = get_setting(context, "system_list_subdomain",
@@ -964,7 +964,7 @@ class EditReportMailingListFormController(EditBase):
     def after_edit(self):
         context = self.context
         aliases = find_site(context).list_aliases
-        aliases[context.short_address] = model_path(context.__parent__)
+        aliases[context.short_address] = resource_path(context.__parent__)
 
 
 report_schema = [

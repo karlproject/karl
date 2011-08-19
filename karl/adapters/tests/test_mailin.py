@@ -131,7 +131,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failUnless(mailin.isReport('section+extant'))
 
     def test_isReport_alias(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         context = self._makeRoot()
@@ -139,7 +139,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['alias'] = model_path(extant)
+        context.list_aliases['alias'] = resource_path(extant)
         mailin = self._makeOne(context)
         self.failUnless(mailin.isReport('alias'))
 
@@ -450,7 +450,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failIf(info.get('in_reply_to'), info)
 
     def test_getMessageTarget_report_alias(self):
-        from pyramid.traversal import model_path
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         context = self._makeRoot()
@@ -458,7 +458,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['alias'] = model_path(extant)
+        context.list_aliases['alias'] = resource_path(extant)
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('alias@example.com',)

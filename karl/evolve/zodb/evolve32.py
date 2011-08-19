@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 """
 Some profiles have wound up with photos owned by 'None'.  There is no profile
@@ -15,5 +15,5 @@ def evolve(root):
             continue
         photo = profile['photo']
         if photo.creator != name:
-            print "Updating creator for %s" % model_path(photo)
+            print "Updating creator for %s" % resource_path(photo)
             photo.creator = name

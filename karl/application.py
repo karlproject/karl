@@ -8,7 +8,7 @@ from zope.component import queryUtility
 
 from pyramid_zcml import make_app as bfg_make_app
 from pyramid.scripting import get_root
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.who.plugins.zodb.users import Users
 from repoze.zodbconn.finder import PersistentApplicationFinder
 

@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.workflow import get_workflow
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
@@ -13,7 +13,7 @@ def evolve(root):
         if profile.security_state != 'inactive':
             continue
 
-        print "Updating acl for %s" % model_path(profile)
+        print "Updating acl for %s" % resource_path(profile)
         workflow = get_workflow(IProfile, 'security', profile)
         workflow.reset(profile)
         allowed_index.reindex_doc(docid, profile)

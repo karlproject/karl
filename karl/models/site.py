@@ -26,7 +26,7 @@ from pyramid.settings import get_settings
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from pyramid.security import principals_allowed_by_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
@@ -171,7 +171,7 @@ def get_containment(object, defaults):
     return ifaces
 
 def get_path(object, default):
-    return model_path(object)
+    return resource_path(object)
 
 def _get_texts(object, default):
     if IPhoto.providedBy(object):
@@ -211,7 +211,7 @@ else: #pragma NO COVERAGE
         implements(IWeightedText)
 
 def get_object_tags(obj):
-    path = model_path(obj)
+    path = resource_path(obj)
     catalog = find_catalog(obj)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(obj)

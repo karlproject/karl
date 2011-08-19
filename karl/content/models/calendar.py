@@ -19,7 +19,7 @@ from persistent import Persistent
 from repoze.lemonade.content import create_content
 
 from repoze.folder import Folder
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from zope.interface import implements
 
@@ -93,7 +93,7 @@ class CalendarToolFactory(ToolFactory):
         calendar[default_category_name] = default_category
         local_layer = create_content(ICalendarLayer,
                                      "This Calendar's Events Only",' blue',
-                                     [model_path(default_category)])
+                                     [resource_path(default_category)])
         calendar[default_layer_name] = local_layer
 
     def remove(self, context, request):

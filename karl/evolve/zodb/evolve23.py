@@ -1,7 +1,7 @@
 # Find and fix photos whose 'creator' was mis-identified as their container's
 # '__name__' (anywhere but profiles, really).  See LP #633191 for details.
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.content.interfaces import ICommunityFile
 from karl.models.interfaces import ICatalogSearch
@@ -15,5 +15,5 @@ def evolve(context):
         if photo is None:
             print 'Invalid photo docid: %s' % docid
         elif photo.creator not in profiles:
-            print 'Fixing bad creator for profile: %s' % model_path(photo)
+            print 'Fixing bad creator for profile: %s' % resource_path(photo)
             photo.creator = photo.__parent__.creator

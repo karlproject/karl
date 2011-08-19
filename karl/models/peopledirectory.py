@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.catalog.document import DocumentMap
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
@@ -347,7 +347,7 @@ def reindex_peopledirectory(peopledir):
     profiles = find_profiles(peopledir)
     for obj in profiles.values():
         if IProfile.providedBy(obj):
-            path = model_path(obj)
+            path = resource_path(obj)
             docid = document_map.docid_for_address(path)
             if not docid:
                 docid = document_map.add(path)

@@ -2,7 +2,7 @@ from karl.content.interfaces import IForumTopic
 from karl.models.interfaces import ICatalogSearch
 from karl.security.workflow import has_custom_acl
 from pyramid.traversal import find_root
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.workflow import get_workflow
 
 def evolve(context):
@@ -18,8 +18,8 @@ def evolve(context):
         try:
             state, msg = workflow.reset(topic)
         except:
-            print "ERROR while resetting topic workflow: %s" % model_path(topic)
+            print "ERROR while resetting topic workflow: %s" % resource_path(topic)
         else:
-            print "Reset topic workflow: %s" % model_path(topic)
+            print "Reset topic workflow: %s" % resource_path(topic)
             count += 1
     print "Updated %d forum topic workflows" % count

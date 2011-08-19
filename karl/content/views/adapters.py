@@ -41,7 +41,7 @@ from zope.interface import implements
 from pyramid.chameleon_zpt import get_template
 from pyramid.chameleon_zpt import render_template
 from pyramid.path import package_path
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.url import model_url
 
@@ -718,7 +718,7 @@ class ForumPortlet(AbstractPortlet):
 
         searcher = getAdapter(self.context, ICatalogSearch)
         path = {
-            'query':model_path(self.context),
+            'query':resource_path(self.context),
             }
         total, docids, resolver = searcher(
             path=path,
@@ -736,7 +736,7 @@ class NetworkNewsPortlet(AbstractPortlet):
 
         searcher = getAdapter(self.context, ICatalogSearch)
         path = {
-            'query':model_path(self.context),
+            'query':resource_path(self.context),
             }
         total, docids, resolver = searcher(
             path=path,
@@ -754,7 +754,7 @@ class NetworkEventsPortlet(AbstractPortlet):
 
         searcher = getAdapter(self.context, ICatalogSearch)
         path = {
-            'query':model_path(self.context),
+            'query':resource_path(self.context),
             }
         # show only upcoming events, the soonest first.
         now = coarse_datetime_repr(datetime.datetime.now())

@@ -38,7 +38,7 @@ from pyramid_formish import ValidationError
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import find_model
 
 from pyramid.url import model_url
@@ -369,7 +369,7 @@ def _get_all_calendar_categories(context, request):
 
         for docid in docids:
             ob = resolver(docid)
-            path = model_path(ob)
+            path = resource_path(ob)
             folder = path.rsplit('/', 1)[0]
             title = _calendar_category_title(ob)
             calendar_categories.append({'title':title, 'path':path,
@@ -444,7 +444,7 @@ class CalendarEventFormControllerBase(object):
         if calendar:
             default_category_name = ICalendarCategory.getTaggedValue('default_name')
             for category in _get_calendar_categories(calendar):
-                category_tuple = (model_path(category), category.title)
+                category_tuple = (resource_path(category), category.title)
                 if category.__name__ == default_category_name:
                     default_category = category_tuple
                 else:
@@ -646,7 +646,7 @@ def show_calendarevent_view(context, request):
     if calendar is not None:
         titles = {}
         for cat in _get_calendar_categories(calendar):
-            titles[model_path(cat)] = cat.title
+            titles[resource_path(cat)] = cat.title
         category_title = titles.get(context.calendar_category)
     else:
         category_title = None
@@ -883,7 +883,7 @@ def convert_to_unicode(value, field_name, encoding='utf-8'):
 def calendar_setup_categories_view(context, request):
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     default_category = context[default_category_name]
-    default_category_path = model_path(default_category)
+    default_category_path = resource_path(default_category)
     categories = _get_calendar_categories(context)
     editable_categories = filter(lambda x: x.__name__ != default_category_name,
                                  categories)
@@ -902,7 +902,7 @@ def calendar_setup_categories_view(context, request):
         elif category_name and category_name in category_names:
             categ = context[category_name]
             title = categ.title
-            categ_path = model_path(categ)
+            categ_path = resource_path(categ)
             if categ_path in default_layer.paths:
                 default_layer.paths.remove(categ_path)
                 default_layer._p_changed = True
@@ -989,7 +989,7 @@ def calendar_setup_categories_view(context, request):
 
             category = create_content(ICalendarCategory, title)
             context[name] = category
-            default_layer.paths.append(model_path(category))
+            default_layer.paths.append(resource_path(category))
             default_layer._p_changed = True
 
             location = model_url(

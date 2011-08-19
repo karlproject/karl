@@ -1,7 +1,7 @@
 from datetime import datetime
 from zope.component import getSiteManager
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.folder.interfaces import IObjectWillBeAddedEvent
 
 from repoze.lemonade.content import create_content
@@ -39,7 +39,7 @@ def evolve(context):
                 calendar[default_category_name] = default_category
                 local_layer = create_content(ICalendarLayer,
                                              "This Calendar's Events Only", 'blue',
-                                             [model_path(default_category)])
+                                             [resource_path(default_category)])
                 local_layer.created = local_layer.modified = now
                 if not default_layer_name in calendar:
                     calendar[default_layer_name] = local_layer

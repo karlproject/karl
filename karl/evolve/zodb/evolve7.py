@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.folder import Folder
 from karl.models.interfaces import ICatalogSearch
 from karl.content.interfaces import ICommunityFile
@@ -19,7 +19,7 @@ def evolve(context):
             continue  # Work around catalog bug
         obj._init_image()
         if obj.is_image:
-            print "Image: %s" % model_path(obj)
+            print "Image: %s" % resource_path(obj)
             catalog.reindex_doc(obj.docid, obj)
 
     # Convert WikiPages to Folders so they can contain attachments
@@ -28,6 +28,6 @@ def evolve(context):
         obj = resolver(docid)
         if obj is None:
             continue # Work around catalog bug
-        print "Convert wiki page to folder: %s" % model_path(obj)
+        print "Convert wiki page to folder: %s" % resource_path(obj)
         Folder.__init__(obj)
         catalog.reindex_doc(obj.docid, obj)

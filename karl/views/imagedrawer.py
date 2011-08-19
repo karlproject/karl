@@ -24,7 +24,7 @@ from pyramid.response import Response
 
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import traverse
 from pyramid.url import model_url
 from repoze.lemonade.content import create_content
@@ -215,7 +215,7 @@ def batch_images(context, request,
         creator = None
         community = find_community(context)
         # batching api requires the community path
-        community_path = model_path(community)
+        community_path = resource_path(community)
     else:               # All Karl
         creator = None
         community_path = None

@@ -1,4 +1,4 @@
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from zope.component.event import objectEventNotify
 
 from karl.content.models.adapters import extract_text_from_html
@@ -21,6 +21,6 @@ def evolve(site):
         page = resolver(docid)
         cleaned = extract_text_from_html(page.title)
         if page.title != cleaned:
-            print "Updating title for %s" % model_path(page)
+            print "Updating title for %s" % resource_path(page)
             page.title = cleaned
             catalog.reindex_doc(page.docid, page)

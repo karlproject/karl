@@ -24,7 +24,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.traversal import find_interface
 from pyramid.traversal import find_model
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.sendmail.interfaces import IMailDelivery
@@ -193,7 +193,7 @@ class TagQuery(object):
         self.context = context
         self.request = request
         self.username = authenticated_userid(request)
-        self.path = model_path(context)
+        self.path = resource_path(context)
         self.catalog = find_catalog(context)
         self.tags = find_tags(context)
 

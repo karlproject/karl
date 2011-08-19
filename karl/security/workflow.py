@@ -1,5 +1,5 @@
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.interfaces import IContent
 from repoze.lemonade.content import get_content_type
@@ -66,7 +66,7 @@ def reset_security_workflow(root, output=None):
                     state, msg = workflow.reset(node)
                 except:
                     if output is not None:
-                        output('Error while resetting %s' % model_path(node))
+                        output('Error while resetting %s' % resource_path(node))
                     raise
                 if output is not None:
                     if msg:

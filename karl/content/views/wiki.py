@@ -32,7 +32,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.url import model_url
 from repoze.workflow import get_workflow
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from repoze.lemonade.content import create_content
 
@@ -202,7 +202,7 @@ def get_wikitoc_data(context, request):
     wikiparent = context.__parent__
     search = getAdapter(context, ICatalogSearch)
     count, docids, resolver = search(
-        path = model_path(wikiparent),
+        path = resource_path(wikiparent),
         interfaces = [IWikiPage,]
     )
     items = []

@@ -18,7 +18,7 @@
 import re
 
 from pyramid.chameleon_zpt import render_template_to_response
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 
 from repoze.folder.interfaces import IFolder
@@ -161,7 +161,7 @@ def edit_acl_view(context, request):
 def make_acls(node, request, acls=None, offset=0):
     if acls is None:
         acls = []
-    path = model_path(node)
+    path = resource_path(node)
     url = model_url(node, request)
     acl = getattr(node, '__acl__', None)
     folderish = IFolder.providedBy(node)

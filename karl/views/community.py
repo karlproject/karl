@@ -35,7 +35,7 @@ from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 
 from repoze.sendmail.interfaces import IMailDelivery
@@ -78,7 +78,7 @@ def get_recent_items_batch(community, request, size=10):
     batch = get_catalog_batch_grid(
         community, request, interfaces=[ICommunityContent],
         sort_index="modified_date", reverse=True, batch_size=size,
-        path={'query': model_path(community)},
+        path={'query': resource_path(community)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
     )
     return batch

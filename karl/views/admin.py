@@ -19,7 +19,7 @@ from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.traversal import find_model
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from repoze.lemonade.content import create_content
 from repoze.postoffice.queue import open_queue
@@ -113,7 +113,7 @@ def _populate_content_selection_widget(context, request):
     for docid in docids:
         community = resolver(docid)
         communities.append(dict(
-            path=model_path(community),
+            path=resource_path(community),
             title=community.title,
         ))
 
@@ -133,7 +133,7 @@ def _grid_item(item, request):
         creator_url = model_url(profile, request)
 
     return dict(
-        path=model_path(item),
+        path=resource_path(item),
         url=model_url(item, request),
         title=item.title,
         modified=_format_date(item.modified),
@@ -235,8 +235,8 @@ def _find_dst_container(src_obj, dst_community):
     destination community.  In this example, the relative container path is
     'blog', so we the destination container is /communities/bar/blog.'
     """
-    src_container_path = model_path(src_obj.__parent__)
-    src_community_path = model_path(find_community(src_obj))
+    src_container_path = resource_path(src_obj.__parent__)
+    src_community_path = resource_path(find_community(src_obj))
     rel_container_path = src_container_path[len(src_community_path):]
     dst_container = dst_community
     for node_name in filter(None, rel_container_path.split('/')):
@@ -244,7 +244,7 @@ def _find_dst_container(src_obj, dst_community):
         if dst_container is None:
             raise _DstNotFound(
                 'Path does not exist in destination community: %s' %
-                model_path(dst_community) + rel_container_path
+                resource_path(dst_community) + rel_container_path
             )
     return dst_container
 
@@ -876,7 +876,7 @@ def mailin_monitor_view(context, request):
     # Dispatch to subapp
     from pyramid.request import Request
     sub_environ = request.environ.copy()
-    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (model_path(context),
+    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (resource_path(context),
                                             request.view_name)
     sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
     sub_request = Request(sub_environ)

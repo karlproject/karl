@@ -22,7 +22,7 @@ from zope.component import queryUtility
 
 from ZODB.POSException import POSKeyError
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 
 from karl.models.interfaces import ITextIndexData
@@ -157,6 +157,6 @@ class CalendarEventCategoryData(object):
         category = getattr(self.context, 'calendar_category', None)
         if not category:
             calendar = find_interface(self.context, ICalendar)
-            category = model_path(calendar)
+            category = resource_path(calendar)
         return category
 

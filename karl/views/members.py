@@ -44,7 +44,7 @@ from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.chameleon_zpt import get_template
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.url import model_url
 
@@ -106,7 +106,7 @@ def _get_common_email_info(community, community_href):
 def _member_profile_batch(context, request):
     community = find_interface(context, ICommunity)
     member_names = community.member_names
-    profiles_path = model_path(find_profiles(context))
+    profiles_path = resource_path(find_profiles(context))
     batch = get_catalog_batch(
         context, request,
         batch_size = 12,

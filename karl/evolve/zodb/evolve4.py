@@ -3,7 +3,7 @@ import urllib
 
 from pyramid.traversal import find_model
 from pyramid.traversal import find_root
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarEvent
@@ -36,13 +36,13 @@ def evolve(context):
         if ob is not None:
             ob_name = ob.__name__
             if not (ob_name.startswith('_default_') or is_opaque_id(ob_name)):
-                old_path = model_path(ob)
+                old_path = resource_path(ob)
                 container = ob.__parent__
                 new_name = generate_name(container)
                 del container[ob_name]
                 ob.__name__ = new_name # XXX required?
                 container.add(new_name, ob, send_events=False)
-                new_path = model_path(ob)
+                new_path = resource_path(ob)
                 index_content(ob, None)
                 print 'path fixed: %s -> %s' % (old_path, new_path)
                 if ICalendarCategory.providedBy(ob):
@@ -68,7 +68,7 @@ def evolve(context):
                     layer.paths = new_paths
                     reindex_content(layer, None)
                     print 'layer fixed: %s, %s' % (
-                        model_path(layer), [ '%s -> %s' % x for x in changed ])
+                        resource_path(layer), [ '%s -> %s' % x for x in changed ])
 
         # fix the category of events
         events_query = dict(
@@ -85,7 +85,7 @@ def evolve(context):
                     event.calendar_category = new_category
                     reindex_content(event, None)
                     print 'event fixed: %s, %s -> %s' % (
-                        model_path(event),
+                        resource_path(event),
                         old_category,
                         new_category)
 

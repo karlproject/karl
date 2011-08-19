@@ -21,7 +21,7 @@ import htmlentitydefs
 import urllib
 
 from pyramid.security import authenticated_userid
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.lemonade.content import create_content
 from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IObjectVersion
@@ -29,7 +29,7 @@ from karl.models.interfaces import IObjectVersion
 from repoze.folder import Folder
 from zope.interface import implements
 
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.url import model_url
 
 from karl.models.tool import ToolFactory
@@ -250,7 +250,7 @@ class WikiPageVersion(object):
         self.created = page.created
         self.modified = page.modified
         self.docid = page.docid
-        self.path = model_path(page)
+        self.path = resource_path(page)
         self.attrs = dict((name, getattr(page, name)) for name in [
             'text',
             'creator',
@@ -268,7 +268,7 @@ class WikiContainerVersion(object):
 
     def __init__(self, wiki):
         self.container_id = wiki.docid
-        self.path = model_path(wiki)
+        self.path = resource_path(wiki)
         self.map = dict((name, page.docid) for name, page in wiki.items())
         self.ns_map = {}
 
@@ -278,7 +278,7 @@ class WikiPageContainerVersion(object):
 
     def __init__(self, page):
         self.container_id = page.docid
-        self.path = model_path(page)
+        self.path = resource_path(page)
         self.map = dict((name, attachment.docid)
                         for name, attachment in page.items())
         self.ns_map = {}

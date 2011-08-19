@@ -32,7 +32,7 @@ from pyramid.security import effective_principals
 from pyramid.traversal import quote_path_segment
 
 from pyramid.location import lineage
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.interfaces import ISettings
@@ -213,7 +213,7 @@ class TemplateAPI(object):
         if self._recent_items is None:
             community = find_interface(self.context, ICommunity)
             if community is not None:
-                community_path = model_path(community)
+                community_path = resource_path(community)
                 search = getAdapter(self.context, ICatalogSearch)
                 principals = effective_principals(self.request)
                 self._recent_items = []

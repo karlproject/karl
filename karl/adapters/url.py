@@ -17,7 +17,7 @@
 
 from pyramid.interfaces import IContextURL
 from pyramid.interfaces import IRequest
-from pyramid.traversal import model_path
+from pyramid.traversal import resource_path
 from pyramid.testing import DummyRequest
     
 from zope.interface import implements
@@ -56,7 +56,7 @@ class OfflineContextURL(object):
             raise ValueError('offline_app_url is not set')
         if app_url.endswith('/'):
             app_url = app_url[:-1]
-        path = model_path(self.model)
+        path = resource_path(self.model)
         return app_url + path
 
 class OfflineRequest(DummyRequest):
