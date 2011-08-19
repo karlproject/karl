@@ -20,7 +20,7 @@ import datetime
 
 from zope.index.text.parsetree import ParseError
 
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -225,7 +225,7 @@ class CustomFolderView(object):
         entries = []
         for entry in batch["entries"]:
             info = {}
-            info['url'] = model_url(entry, request)
+            info['url'] = resource_url(entry, request)
             info['title'] = entry.title
             info['date'] = self._get_date(entry)
             entries.append(info)
@@ -249,7 +249,7 @@ class CustomFolderView(object):
 
         back_target, extra_path = get_user_home(context, request)
         backto = {
-            'href': model_url(back_target, request, *extra_path),
+            'href': resource_url(back_target, request, *extra_path),
             'title': getattr(back_target, "title", "Home")
             }
 
@@ -296,7 +296,7 @@ class NetworkEventsView(CustomFolderView):
     def past_events_url(self):
         if (not self.year and not self.searchterm
             and not self._past_events):
-            return model_url(self.context, self.request,
+            return resource_url(self.context, self.request,
                              query={"past_events":"True"})
         return None
 
@@ -304,7 +304,7 @@ class NetworkEventsView(CustomFolderView):
     def future_events_url(self):
         if (not self.year and not self.searchterm
             and self._past_events):
-            return model_url(self.context, self.request,
+            return resource_url(self.context, self.request,
                              query={"past_events":"False"})
         return None
 

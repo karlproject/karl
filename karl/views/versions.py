@@ -3,7 +3,7 @@ import time
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
@@ -29,12 +29,12 @@ def show_history(context, request):
             'date': format_local_date(record.archive_time),
             'editor': {
                 'name': editor.title,
-                'url': model_url(editor, request),
+                'url': resource_url(editor, request),
                 },
-            'preview_url': model_url(
+            'preview_url': resource_url(
                 context, request, 'preview.html',
                 query={'version_num': str(record.version_num)}),
-            'restore_url': model_url(
+            'restore_url': resource_url(
                 context, request, 'revert',
                 query={'version_num': str(record.version_num)}),
             'is_current': record.current_version == record.version_num,
@@ -50,7 +50,7 @@ def show_history(context, request):
     page_title = 'History for %s' % context.title
 
     backto = {
-        'href': model_url(context, request),
+        'href': resource_url(context, request),
         'title': context.title
     }
 
@@ -73,7 +73,7 @@ def revert(context, request):
     repo.reverted(context.docid, version_num)
     catalog = find_catalog(context)
     catalog.reindex_doc(context.docid, context)
-    return HTTPFound(location=model_url(context, request))
+    return HTTPFound(location=resource_url(context, request))
 
 
 def show_trash(context, request):
@@ -87,9 +87,9 @@ def show_trash(context, request):
             'date': format_local_date(record.deleted_time),
             'deleted_by': {
                 'name': deleted_by.title,
-                'url': model_url(deleted_by, request),
+                'url': resource_url(deleted_by, request),
                 },
-            'restore_url': model_url(
+            'restore_url': resource_url(
                 context, request, 'restore',
                 query={'docid': str(record.docid), 'name': record.name}),
             'title': version.title,
@@ -133,7 +133,7 @@ def undelete(context, request):
     repo.archive_container(IContainerVersion(context),
                            authenticated_userid(request))
     index_content(context, None)
-    return HTTPFound(location=model_url(doc, request))
+    return HTTPFound(location=resource_url(doc, request))
 
 
 def format_local_date(date):

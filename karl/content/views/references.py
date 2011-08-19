@@ -29,7 +29,7 @@ from pyramid.chameleon_zpt import render_template
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 
 from karl.content.interfaces import IReferenceManual
@@ -125,7 +125,7 @@ def getTree(root, request, api, _subpath_prefix='|'):
         html = html_adapter and html_adapter(api) or '<p>Unknown type</p>'
         item = {'name': name,
                 'title': child.title,
-                'href': model_url(child, request),
+                'href': resource_url(child, request),
                 'html': html,
                 'subpath': subpath,
                 'items': items,
@@ -167,7 +167,7 @@ def reference_outline_view(context, request):
         status_message = move_subpath(context, subpath, direction)
 
     backto = {
-        'href': model_url(context.__parent__, request),
+        'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 
@@ -214,7 +214,7 @@ def reference_outline_view(context, request):
 def reference_viewall_view(context, request):
 
     backto = {
-        'href': model_url(context.__parent__, request),
+        'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 
@@ -268,7 +268,7 @@ def _get_ordered_listing(context, request):
         child = context.get(name, False)
         entries.append({
                 'title': child.title,
-                'href': model_url(child, request),
+                'href': resource_url(child, request),
                 })
     return entries
 
@@ -309,7 +309,7 @@ class AddReferenceFCBase(object):
         return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -333,7 +333,7 @@ class AddReferenceFCBase(object):
         # save the tags
         set_tags(reference_object, request, converted['tags'])
 
-        location = model_url(reference_object, request)
+        location = resource_url(reference_object, request)
         return HTTPFound(location=location)
 
 
@@ -391,7 +391,7 @@ class EditReferenceFCBase(object):
         return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -407,7 +407,7 @@ class EditReferenceFCBase(object):
         # modified
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         msg = "?status_message=%s" % self.success_msg
         return HTTPFound(location='%s%s' % (location, msg))
 

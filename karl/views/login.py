@@ -20,7 +20,7 @@ from urllib import urlencode
 from urlparse import urljoin
 
 from pyramid.chameleon_zpt import render_template_to_response
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 
 from karl.utils import find_profiles
@@ -118,8 +118,8 @@ def login_view(context, request):
 
 def logout_view(context, request, reason='Logged out'):
     site = find_site(context)
-    site_url = model_url(site, request)
-    login_url = model_url(site, request, 'login.html', query={
+    site_url = resource_url(site, request)
+    login_url = resource_url(site, request, 'login.html', query={
         'reason': reason, 'came_from': site_url})
 
     redirect = HTTPFound(location=login_url)

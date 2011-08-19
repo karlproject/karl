@@ -771,14 +771,14 @@ class CalendarCategoriesViewTests(unittest.TestCase):
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from pyramid.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_category(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -788,34 +788,34 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Cannot delete default category'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_empty(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Category is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_invalid(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Category is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_category_name(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
 
@@ -834,7 +834,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
 
         self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'foo-title category removed'})
         self.assertEqual(response.location, expected)
         self.failIf('foo' in context)
@@ -878,7 +878,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_category(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarCategory
         context = DummyCalendar()
@@ -896,7 +896,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         name, ann = find_nondefault(context)
         self.assertEqual(ann.arg, ('Announcements',))
 
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                              query={'status_message':'Calendar category added'})
         self.assertEqual(response.location, expected)
         self.assertEqual(context['_default_layer_'].paths, ['/'+name])
@@ -905,7 +905,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     # edit an existing category
 
     def test_edit_does_not_allow_editing_the_default_category(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -918,12 +918,12 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Cannot edit default category'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_empty(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -932,12 +932,12 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Could not find category to edit'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_invalid(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -946,7 +946,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Could not find category to edit'})
         self.assertEqual(response.location, expected)
 
@@ -1061,14 +1061,14 @@ class CalendarLayersViewTests(unittest.TestCase):
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from pyramid.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_layer(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarLayer
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1078,34 +1078,34 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Cannot delete default layer'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_empty(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Layer is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_invalid(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Layer is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_layer_name(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         context['foo'] = DummyCalendarLayer('foo-title')
 
@@ -1114,7 +1114,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'foo-title layer removed'})
         self.assertEqual(response.location, expected)
 
@@ -1183,7 +1183,7 @@ class CalendarLayersViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_layer(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
@@ -1206,14 +1206,14 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(ann.arg,
                          ('Announcements', 'blue', ['/path']))
 
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                              query={'status_message':'Calendar layer added'})
         self.assertEqual(response.location, expected)
 
     # edit an existing layer
 
     def test_edit_does_not_allow_editing_the_default_layer(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1226,12 +1226,12 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Cannot edit default layer'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_empty(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1240,12 +1240,12 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Could not find layer to edit'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_invalid(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1254,7 +1254,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Could not find layer to edit'})
         self.assertEqual(response.location, expected)
 
@@ -1298,8 +1298,8 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from pyramid.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     def test_sets_categories_url(self):
@@ -1311,8 +1311,8 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from pyramid.url import model_url
-        self.assertEqual(model_url(context, request, 'categories.html'),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request, 'categories.html'),
                          renderer.categories_url)
 
     def test_sets_layers_url(self):
@@ -1324,8 +1324,8 @@ class CalendarSetupViewTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from pyramid.url import model_url
-        self.assertEqual(model_url(context, request, 'layers.html'),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request, 'layers.html'),
                          renderer.layers_url)
 
 class Test__get_catalog_events(unittest.TestCase):
@@ -1513,9 +1513,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the default view, which is 'day'.
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'day.html'))
 
     def test_default_day(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1535,9 +1535,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'day.html'))
 
     def test_default_week(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1557,9 +1557,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'week.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'week.html'))
 
     def test_default_month(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1579,9 +1579,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'month.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'month.html'))
 
     def test_default_list(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1601,9 +1601,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'list.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'list.html'))
 
 
 class DummyContentFactory:

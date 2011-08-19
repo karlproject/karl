@@ -29,7 +29,7 @@ from pyramid.chameleon_zpt import get_template
 from pyramid.chameleon_zpt import render_template
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid_formish import ValidationError
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
 from validatish import validator
@@ -77,7 +77,7 @@ class ResetRequestFormController(object):
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -114,7 +114,7 @@ class ResetRequestFormController(object):
             forgot_password_url = get_setting(
                 context, 'forgot_password_url')
             if forgot_password_url:
-                came_from = model_url(context, request, "login.html")
+                came_from = resource_url(context, request, "login.html")
                 url = '%s?email=%s&came_from=%s' % (
                     forgot_password_url, urllib.quote_plus(address),
                     urllib.quote_plus(came_from))
@@ -122,7 +122,7 @@ class ResetRequestFormController(object):
 
         request_password_reset(user, profile, request)
 
-        url = model_url(context, request, 'reset_sent.html') + (
+        url = resource_url(context, request, 'reset_sent.html') + (
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
 
@@ -131,7 +131,7 @@ def request_password_reset(user, profile, request):
         str(random.random())).hexdigest()
     profile.password_reset_time = datetime.datetime.now()
     context = find_site(profile)
-    reset_url = model_url(
+    reset_url = resource_url(
         context, request, "reset_confirm.html",
         query=dict(key=profile.password_reset_key))
 
@@ -206,7 +206,7 @@ class ResetConfirmFormController(object):
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         try:

@@ -32,7 +32,7 @@ from pyramid.chameleon_zpt import render_template_to_response
 
 from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
@@ -109,7 +109,7 @@ class ShowForumsView(object):
         for forum in forums:
             D = {}
             D['title'] = forum.title
-            D['url'] = model_url(forum, request)
+            D['url'] = resource_url(forum, request)
             D['number_of_topics'] = number_of_topics(forum)
             D['number_of_comments'] = number_of_comments(forum, request)
 
@@ -118,7 +118,7 @@ class ShowForumsView(object):
             _NOW = datetime.datetime.now()
 
             if latest:
-                D['latest_activity_url'] = model_url(latest, request)
+                D['latest_activity_url'] = resource_url(latest, request)
                 D['latest_activity_link'] = getattr(latest, 'title', None)
                 D['latest_activity_by'] = getattr(latest, 'creator', None)
                 modified = getattr(latest, 'modified_date', _NOW)
@@ -167,7 +167,7 @@ def show_forum_view(context, request):
         profile = profiles.get(topic.creator)
         posted_by = getattr(profile, 'title', None)
         date = karldates(topic.created, 'longform')
-        D['url'] = model_url(topic, request)
+        D['url'] = resource_url(topic, request)
         D['title'] = topic.title
         D['posted_by'] = posted_by
         D['date'] = date
@@ -178,7 +178,7 @@ def show_forum_view(context, request):
     # view (the default)
     forums = context.__parent__
     backto = {
-        'href': model_url(forums, request),
+        'href': resource_url(forums, request),
         'title': forums.title,
         }
 
@@ -265,7 +265,7 @@ class AddForumFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -288,7 +288,7 @@ class AddForumFormController(object):
                 workflow.transition_to_state(forum, request,
                                              converted['security_state'])
 
-        location = model_url(forum, request)
+        location = resource_url(forum, request)
         return HTTPFound(location=location)
 
 class EditForumFormController(object):
@@ -338,7 +338,7 @@ class EditForumFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -358,12 +358,12 @@ class EditForumFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={'status_message':'Forum Edited'})
         return HTTPFound(location=location)
 
 def show_forum_topic_view(context, request):
-    post_url = model_url(context, request, "comments", "add_comment.html")
+    post_url = resource_url(context, request, "comments", "add_comment.html")
     karldates = getUtility(IKarlDates)
     profiles = find_profiles(context)
 
@@ -385,22 +385,22 @@ def show_forum_topic_view(context, request):
     for comment in context['comments'].values():
         profile = profiles.get(comment.creator)
         author_name = profile.title
-        author_url = model_url(profile, request)
+        author_url = resource_url(profile, request)
 
         newc = {}
         newc['id'] = comment.__name__
         if has_permission('edit', comment, request):
-            newc['edit_url'] = model_url(comment, request, 'edit.html')
+            newc['edit_url'] = resource_url(comment, request, 'edit.html')
         else:
             newc['edit_url'] = None
 
         if has_permission('delete', comment, request):
-            newc['delete_url'] = model_url(comment, request, 'delete.html')
+            newc['delete_url'] = resource_url(comment, request, 'delete.html')
         else:
             newc['delete_url'] = None
 
         if has_permission('administer', comment, request):
-            newc['advanced_url'] = model_url(comment, request, 'advanced.html')
+            newc['advanced_url'] = resource_url(comment, request, 'advanced.html')
         else:
             newc['advanced_url'] = None
 
@@ -428,7 +428,7 @@ def show_forum_topic_view(context, request):
     byline_info = getMultiAdapter((context, request), IBylineInfo)
     forum = find_interface(context, IForum)
     backto = {
-        'href': model_url(forum, request),
+        'href': resource_url(forum, request),
         'title': forum.title,
         }
 
@@ -452,7 +452,7 @@ def show_forum_topic_view(context, request):
     form_fields = controller.form_fields()
     for fieldname, field in form_fields:
         form_schema.add(fieldname, field)
-    form_action_url = '%sadd_comment.html' % model_url(context['comments'],
+    form_action_url = '%sadd_comment.html' % resource_url(context['comments'],
                                                        request)
     comment_form = Form(form_schema, add_default_action=False, name='save',
                         action_url=form_action_url)
@@ -557,7 +557,7 @@ class AddForumTopicFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -592,7 +592,7 @@ class AddForumTopicFormController(object):
             upload_attachments(converted['attachments'], topic['attachments'],
                                creator, request)
 
-        location = model_url(topic, request)
+        location = resource_url(topic, request)
         return HTTPFound(location=location)
 
 class EditForumTopicFormController(object):
@@ -666,7 +666,7 @@ class EditForumTopicFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -697,7 +697,7 @@ class EditForumTopicFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={'status_message':'Forum Topic Edited'})
         return HTTPFound(location=location)
 

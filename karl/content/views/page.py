@@ -26,7 +26,7 @@ import schemaish
 
 from pyramid.chameleon_zpt import render_template_to_response
 
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 
@@ -120,7 +120,7 @@ class AddPageFormController(object):
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -147,7 +147,7 @@ class AddPageFormController(object):
         if hasattr(context, 'ordering'):
             context.ordering.add(name)
 
-        location = model_url(page, request)
+        location = resource_url(page, request)
         self.filestore.clear()
         return HTTPFound(location=location)
 
@@ -213,7 +213,7 @@ class EditPageFormController(object):
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -238,14 +238,14 @@ class EditPageFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         self.filestore.clear()
-        location = model_url(context, request)
+        location = resource_url(context, request)
         msg = "?status_message=Page%20edited"
         return HTTPFound(location=location+msg)
 
 def show_page_view(context, request):
 
     backto = {
-        'href': model_url(context.__parent__, request),
+        'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 

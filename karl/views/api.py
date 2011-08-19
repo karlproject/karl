@@ -27,7 +27,7 @@ from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
 from pyramid.chameleon_zpt import get_template
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.security import effective_principals
 from pyramid.traversal import quote_path_segment
 
@@ -86,8 +86,8 @@ class TemplateAPI(object):
         self.userid = authenticated_userid(request)
         self.app_url = app_url = request.application_url
         self.profile_url = app_url + '/profiles/%s' % self.userid
-        self.here_url = self.context_url = model_url(context, request)
-        self.view_url = model_url(context, request, request.view_name)
+        self.here_url = self.context_url = resource_url(context, request)
+        self.view_url = resource_url(context, request, request.view_name)
         settings = queryUtility(ISettings)
         self.js_devel_mode = settings and getattr(settings,
                                                   'js_devel_mode', None)
@@ -113,7 +113,7 @@ class TemplateAPI(object):
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
         self.can_administer = has_permission('administer', site, request)
         self.can_email = has_permission('email', site, request)
-        self.admin_url = model_url(site, request, 'admin.html')
+        self.admin_url = resource_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
         # XXX XXX XXX This will never work from peoples formish templates
         # XXX XXX XXX (edit_profile and derivates) because, in those form
@@ -312,7 +312,7 @@ class TemplateAPI(object):
                 # Maybe there aren't any intranets defined yet
                 return []
             request = self.request
-            intranets_url = model_url(intranets, request)
+            intranets_url = resource_url(intranets, request)
             for name, entry in intranets.items():
                 try:
                     content_iface = get_content_type(entry)
@@ -430,7 +430,7 @@ class TemplateAPI(object):
     def home_url(self):
         if self._home_url is None:
             target, extra_path = get_user_home(self.context, self.request)
-            self._home_url = model_url(target, self.request, *extra_path)
+            self._home_url = resource_url(target, self.request, *extra_path)
         return self._home_url
 
     @property

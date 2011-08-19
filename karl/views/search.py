@@ -37,7 +37,7 @@ from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
 from pyramid.security import effective_principals
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
@@ -184,7 +184,7 @@ def searchresults_view(context, request):
             'name': kind,
             'title': o['title'],
             'icon': component.icon,
-            'url': model_url(context, request, request.view_name,
+            'url': resource_url(context, request, request.view_name,
                              query=query),
             'selected': kind == selected_kind,
         })
@@ -196,7 +196,7 @@ def searchresults_view(context, request):
         'title': 'All Content',
         'description': 'All Content',
         'icon': None,
-        'url': model_url(context, request, request.view_name, query=query),
+        'url': resource_url(context, request, request.view_name, query=query),
         'selected': not selected_kind,
     })
 
@@ -209,7 +209,7 @@ def searchresults_view(context, request):
             query['since'] = id
         elif 'since' in query:
             del query['since']
-        option['url'] = model_url(context, request, request.view_name,
+        option['url'] = resource_url(context, request, request.view_name,
                                   query=query)
         option['selected'] = id == selected_since
         since_knob.append(option)
@@ -243,7 +243,7 @@ def searchresults_view(context, request):
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
-                'url': model_url(doc, request),
+                'url': resource_url(doc, request),
                 'type': type_name,
                 'icon': icon,
                 'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -255,7 +255,7 @@ def searchresults_view(context, request):
             if result_community is not None:
                 result['community'] = {
                     'title': result_community.title,
-                    'url': model_url(result_community, request),
+                    'url': resource_url(result_community, request),
                 }
             else:
                 result['community'] = None
@@ -265,7 +265,7 @@ def searchresults_view(context, request):
                 if author is not None:
                     result['author'] = {
                         'name': author.title,
-                        'url': model_url(author, request),
+                        'url': resource_url(author, request),
                     }
 
             results.append(result)

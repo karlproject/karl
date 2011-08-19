@@ -30,7 +30,7 @@ from repoze.folder import Folder
 from zope.interface import implements
 
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
@@ -158,7 +158,7 @@ class WikiPage(Folder):
             cleaned = extract_text_from_html(wikilink)
             for page in self.__parent__.values():
                 if _eq_loose(page.title, cleaned):
-                    url = model_url(page, request)
+                    url = resource_url(page, request)
                     subs.append(WIKI_LINK % (url, wikilink))
                     break
             else:

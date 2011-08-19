@@ -28,7 +28,7 @@ from karl.content.views.wiki import AddWikiPageFormController
 from karl.views.community import add_community
 from karl.models.interfaces import IProfile
 from pyramid import testing
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 import datetime
@@ -143,7 +143,7 @@ def _parse_add_response(request, response, parent):
 
     Raises an exception if the add form did not redirect as expected.
     """
-    parent_url = model_url(parent, request)
+    parent_url = resource_url(parent, request)
     if not response.location:
         # The add operation failed.  Try to extract the error messages.
         errors = _parse_form_errors(response.body)

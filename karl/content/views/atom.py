@@ -17,7 +17,7 @@
 
 from zope.component import getAdapter
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from karl.models.interfaces import ICatalogSearch
 from karl.views.atom import format_datetime
 from karl.views.atom import AtomFeed
@@ -143,7 +143,7 @@ class CommunityFileAtomEntry(AtomEntry):
     @xml_content
     def content(self):
         return '<a href="%s">%s</a>' % (
-            model_url(self.context, self.request),
+            resource_url(self.context, self.request),
             self.context.filename
         )
 

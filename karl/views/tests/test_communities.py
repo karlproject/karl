@@ -42,22 +42,22 @@ class Test_show_communities_view(unittest.TestCase):
         self.assertEqual(response.location, target)
 
     def test_no_cookie(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self._checkResponse(response,
-                            model_url(context, request, 'active_communities.html'))
+                            resource_url(context, request, 'active_communities.html'))
 
     def test_w_cookie(self):
         from karl.views.communities import _VIEW_COOKIE
         COOKIES = {_VIEW_COOKIE: 'active'}
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         context = testing.DummyModel()
         request = testing.DummyRequest(cookies=COOKIES)
         response = self._callFUT(context, request)
         self._checkResponse(response,
-                            model_url(context, request,
+                            resource_url(context, request,
                                         'active_communities.html'))
 
 

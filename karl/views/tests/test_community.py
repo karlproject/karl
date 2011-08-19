@@ -92,7 +92,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         return community
 
     def test_not_a_member(self):
-        from pyramid.url import model_url
+        from pyramid.url import resource_url
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
@@ -104,7 +104,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Advanced', 'advanced.html'),
                          ])
         self.assertEqual(info['feed_url'],
-                         model_url(context, request, "atom.xml"))
+                         resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
         self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
 

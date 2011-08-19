@@ -47,7 +47,7 @@ from pyramid.traversal import resource_path
 
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 from pyramid_formish import ValidationError
 
@@ -138,7 +138,7 @@ def show_folder_view(context, request):
             actions.append(('Delete', 'delete.html'))
 
         backto = {
-            'href': model_url(context.__parent__, request),
+            'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
             }
 
@@ -148,7 +148,7 @@ def show_folder_view(context, request):
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
-        feed_url = model_url(context, request, "atom.xml")
+        feed_url = resource_url(context, request, "atom.xml")
     else:
         feed_url = None
 
@@ -179,7 +179,7 @@ def show_folder_view(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=model_url(context, request, 'add_file.html'))
+            location=resource_url(context, request, 'add_file.html'))
 
 title_field = schemaish.String(
     validator=validator.All(
@@ -251,7 +251,7 @@ class AddFolderFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -281,7 +281,7 @@ class AddFolderFormController(object):
             for interface in customizer.markers:
                 alsoProvides(folder, interface)
 
-        location = model_url(folder, request)
+        location = resource_url(folder, request)
         return HTTPFound(location=location)
 
 def delete_folder_view(context, request,
@@ -295,7 +295,7 @@ def advanced_folder_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=resource_url(context, request))
 
     if 'form.submitted' in request.POST:
         marker = request.POST.get('marker', False)
@@ -313,7 +313,7 @@ def advanced_folder_view(context, request):
             noLongerProvides(context, INetworkNewsMarker)
 
         if marker:
-            location = model_url(context, request, query=
+            location = resource_url(context, request, query=
                                  {'status_message': 'Marker changed'})
             return HTTPFound(location=location)
 
@@ -335,7 +335,7 @@ def advanced_folder_view(context, request):
         api=api,
         actions=[],
         formfields=api.formfields,
-        post_url=model_url(context, request, 'advanced.html'),
+        post_url=resource_url(context, request, 'advanced.html'),
         layout=layout,
         fielderrors={},
         selected=selected,
@@ -408,7 +408,7 @@ class AddFileFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -457,7 +457,7 @@ class AddFileFormController(object):
             alerts.emit(file, request)
 
         self.filestore.clear()
-        location = model_url(file, request)
+        location = resource_url(file, request)
         return HTTPFound(location=location)
 
 def show_file_view(context, request):
@@ -487,7 +487,7 @@ def show_file_view(context, request):
     else:
         up_to = context.__parent__
     backto = {
-        'href': model_url(up_to, request),
+        'href': resource_url(up_to, request),
         'title': up_to.title,
         }
 
@@ -606,7 +606,7 @@ class EditFolderFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -629,7 +629,7 @@ class EditFolderFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request, query=
+        location = resource_url(context, request, query=
                              {'status_message':'Folder changed'})
         return HTTPFound(location=location)
 
@@ -694,7 +694,7 @@ class EditFileFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -730,7 +730,7 @@ class EditFileFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         self.filestore.clear()
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
 
@@ -1085,7 +1085,7 @@ def ajax_file_reorganize_moveto_view(context, request):
         except KeyError:
             msg = 'Cannot find target folder "%s"' % (target_folder, )
             raise ErrorResponse(msg, filename="*")
-        target_folder_url = model_url(target_context, request)
+        target_folder_url = resource_url(target_context, request)
 
         moved = 0
         for filename in filenames:

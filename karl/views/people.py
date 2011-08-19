@@ -24,7 +24,7 @@ from pyramid_formish import ValidationError
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.interfaces import IContent
 from repoze.workflow import get_workflow
@@ -178,7 +178,7 @@ class EditProfileFormController(object):
                    'languages': formish.Input(empty=''),
                    'photo': karlwidgets.PhotoImageWidget(
                        filestore=self.filestore,
-                       url_base=model_url(self.context, self.request),
+                       url_base=resource_url(self.context, self.request),
                        image_thumbnail_default=default_icon,
                        show_remove_checkbox=show_remove_checkbox),
                    'biography': karlwidgets.RichTextWidget(empty=''),
@@ -209,7 +209,7 @@ class EditProfileFormController(object):
         _fix_website_validation_errors(self.request.form)
         api = TemplateAPI(self.context, self.request, self.page_title)
         if api.user_is_admin:
-            return HTTPFound(location=model_url(self.context,
+            return HTTPFound(location=resource_url(self.context,
                 self.request, 'admin_edit_profile.html'))
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
@@ -222,7 +222,7 @@ class EditProfileFormController(object):
                 'form_title': form_title, 'include_blurb': True}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -242,7 +242,7 @@ class EditProfileFormController(object):
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
         # Whew, we made it!
-        path = model_url(context, request)
+        path = resource_url(context, request)
         msg = '?status_message=Profile%20edited'
         return HTTPFound(location=path+msg)
 
@@ -377,7 +377,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         # Emit a modified event for recataloging
         objectEventNotify(ObjectModifiedEvent(context))
         # Whew, we made it!
-        path = model_url(context, request)
+        path = resource_url(context, request)
         msg = '?status_message=User%20edited'
         return HTTPFound(location=path+msg)
 
@@ -475,7 +475,7 @@ class AddUserFormController(EditProfileFormController):
         profile = context.get(userid)
         if profile is not None:
             if profile.security_state == 'inactive':
-                url = model_url(profile, request, 'reactivate.html')
+                url = resource_url(profile, request, 'reactivate.html')
                 self.reactivate_user = dict(userid=userid, url=url)
                 msg = ("User ID '%s' is used by a previously deactivated "
                        "user.  Perhaps you mean to reactivate this user. "
@@ -494,7 +494,7 @@ class AddUserFormController(EditProfileFormController):
             if count == 1:
                 profile = resolver(docids[0])
                 if profile.security_state ==  'inactive':
-                    url = model_url(profile, request, 'reactivate.html')
+                    url = resource_url(profile, request, 'reactivate.html')
                     userid = profile.__name__
                     self.reactivate_user = dict(userid=userid, url=url)
                     msg = ("Email address is in use by a previously "
@@ -531,7 +531,7 @@ class AddUserFormController(EditProfileFormController):
             handle_photo_upload(profile, converted)
         except Invalid, e:
             raise ValidationError(**e.error_dict)
-        location = model_url(profile, request)
+        location = resource_url(profile, request)
         return HTTPFound(location=location)
 
 def _normalize_websites(converted):
@@ -653,7 +653,7 @@ def show_profile_view(context, request):
                     communities[community_name] = {
                         "title": community.title,
                         "moderator": role == "moderators",
-                        "url": model_url(community, request),
+                        "url": resource_url(community, request),
                     }
 
     communities = communities.values()
@@ -759,7 +759,7 @@ def manage_communities_view(context, request):
 
     # Handle cancel
     if request.params.get("form.cancel", False):
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=resource_url(context, request))
 
     # Handle form submission
     if request.params.get("form.submitted", False):
@@ -785,7 +785,7 @@ def manage_communities_view(context, request):
 
         context.alert_attachments = request.params.get('attachments', 'link')
 
-        path = model_url(context, request)
+        path = resource_url(context, request)
         msg = '?status_message=Community+preferences+updated.'
         return HTTPFound(location=path+msg)
 
@@ -905,7 +905,7 @@ class ChangePasswordFormController(object):
                 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -915,7 +915,7 @@ class ChangePasswordFormController(object):
 
         users.change_password(userid, converted['password'])
 
-        path = model_url(context, self.request)
+        path = resource_url(context, self.request)
         msg = '?status_message=Password%20changed'
         return HTTPFound(location=path+msg)
 
@@ -936,7 +936,7 @@ def deactivate_profile_view(context, request):
             return logout_view(context, request, reason='User removed')
         query = {'status_message': 'Deactivated user account: %s' % name}
         parent = context.__parent__
-        location = model_url(parent, request, query=query)
+        location = resource_url(parent, request, query=query)
 
         return HTTPFound(location=location)
 
@@ -959,7 +959,7 @@ def reactivate_profile_view(context, request,
         workflow.transition_to_state(context, request, 'active')
         reset_password(users.get_by_id(name), context, request)
         query = {'status_message': 'Reactivated user account: %s' % name}
-        location = model_url(context, request, query=query)
+        location = resource_url(context, request, query=query)
 
         return HTTPFound(location=location)
 

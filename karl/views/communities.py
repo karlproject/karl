@@ -22,7 +22,7 @@ from pyramid.security import has_permission
 from pyramid.security import effective_principals
 from pyramid.security import authenticated_userid
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 from zope.component import getMultiAdapter
 from zope.index.text.parsetree import ParseError
@@ -66,7 +66,7 @@ def show_communities_view(context, request):
     default = 'active'
     which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
-    target = model_url(context, request, urlname)
+    target = resource_url(context, request, urlname)
     response = HTTPFound(location=target)
     return response
 

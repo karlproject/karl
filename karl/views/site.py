@@ -22,7 +22,7 @@ import re
 
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.view import static
 
 from karl.views.utils import get_user_home
@@ -45,7 +45,7 @@ def versioning_static_view(context, request):
 
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)
-    return HTTPFound(location=model_url(home, request, *extra_path))
+    return HTTPFound(location=resource_url(home, request, *extra_path))
 
 class StaticRootFactory(object):
     def __init__(self, environ):

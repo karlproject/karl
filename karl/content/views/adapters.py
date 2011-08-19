@@ -43,7 +43,7 @@ from pyramid.chameleon_zpt import render_template
 from pyramid.path import package_path
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
@@ -132,14 +132,14 @@ class FileInfo(object):
             profiles = find_profiles(self.context)
             profile_name = self.context.modified_by or self.context.creator
             profile = self._find_profile(profile_name)
-            self._modified_by_url = profile and model_url(profile,
+            self._modified_by_url = profile and resource_url(profile,
                                                           self.request)
         return self._modified_by_url
 
     @property
     def url(self):
         if self._url is None:
-            self._url = model_url(self.context, self.request)
+            self._url = resource_url(self.context, self.request)
         return self._url
 
     @property
@@ -222,7 +222,7 @@ class BylineInfo(object):
     @property
     def author_url(self):
         if self._author_url is None:
-            self._author_url = model_url(self.profile, self.request)
+            self._author_url = resource_url(self.profile, self.request)
         return self._author_url
 
 
@@ -278,7 +278,7 @@ class Alert(object):
         for name, model in folder.items():
             if profile.alert_attachments == 'link':
                 attachment_links.append(name)
-                attachment_hrefs[name] = model_url(model, request)
+                attachment_hrefs[name] = resource_url(model, request)
 
             elif profile.alert_attachments == 'attach':
                 with model.blobfile.open() as f:
@@ -286,7 +286,7 @@ class Alert(object):
                     size = f.tell()
                     if size > MAX_ATTACHMENT_SIZE:
                         attachment_links.append(name)
-                        attachment_hrefs[name] = model_url(model, request)
+                        attachment_hrefs[name] = resource_url(model, request)
 
                     else:
                         f.seek(0, 0)
@@ -340,9 +340,9 @@ class BlogAlert(Alert):
         profile = self.profile
         blogentry = self._blogentry
 
-        community_href = model_url(community, request)
-        blogentry_href = model_url(blogentry, request)
-        manage_preferences_href = model_url(profile, request)
+        community_href = resource_url(community, request)
+        blogentry_href = resource_url(blogentry, request)
+        manage_preferences_href = resource_url(profile, request)
         system_name = get_setting(self.context, "system_name", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
@@ -499,9 +499,9 @@ class NonBlogAlert(Alert):
         profile = self.profile
         model = self._model
 
-        community_href = model_url(community, request)
-        model_href = model_url(model, request)
-        manage_preferences_href = model_url(profile, request)
+        community_href = resource_url(community, request)
+        model_href = resource_url(model, request)
+        manage_preferences_href = resource_url(profile, request)
         system_name = get_setting(self.context, "system_name", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
@@ -662,7 +662,7 @@ class AbstractPortlet(object):
 
     @property
     def href(self):
-        return model_url(self.context, self.request)
+        return resource_url(self.context, self.request)
 
     @property
     def entries(self):
@@ -676,7 +676,7 @@ class AbstractPortlet(object):
                 doc = resolver(docid)
                 entries.append({
                         'title': doc.title,
-                        'href': model_url(doc, self.request),
+                        'href': resource_url(doc, self.request),
                         })
             return entries
 
@@ -781,7 +781,7 @@ class NetworkEventsPortlet(AbstractPortlet):
                 doc = resolver(docid)
                 entries.append({
                         'title': doc.title,
-                        'href': model_url(doc, self.request),
+                        'href': resource_url(doc, self.request),
                         'startDate': doc.startDate,
                         })
             return entries

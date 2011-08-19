@@ -370,8 +370,8 @@ class DummyAlerts(object):
         self.emissions = []
 
     def emit(self, context, request):
-        from pyramid.url import model_url
-        url = model_url(context, request)
+        from pyramid.url import resource_url
+        url = resource_url(context, request)
         self.emissions.append((context, url))
 
 class DummySettings:

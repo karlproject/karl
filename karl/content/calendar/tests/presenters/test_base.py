@@ -218,8 +218,8 @@ class BaseEventTests(unittest.TestCase):
 def dummy_url_for(*args, **kargs):
     context = testing.DummyModel()
     request = testing.DummyRequest()
-    from pyramid.url import model_url
-    return model_url(context, request, *args, **kargs)
+    from pyramid.url import resource_url
+    return resource_url(context, request, *args, **kargs)
 
 
 class DummyDayWithEvents(object):

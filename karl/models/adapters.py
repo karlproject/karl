@@ -25,7 +25,7 @@ from pyramid.security import effective_principals
 from pyramid.traversal import find_interface
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.sendmail.interfaces import IMailDelivery
 from zope.component import getUtility
@@ -122,9 +122,9 @@ class GridEntryInfo(object):
                 # (its parent is a comments folder.)
                 parent = self.context.__parent__.__parent__
                 self._url = '%s#comment-%s' % (
-                    model_url(parent, self.request), self.context.__name__)
+                    resource_url(parent, self.request), self.context.__name__)
             else:
-                self._url = model_url(self.context, self.request)
+                self._url = resource_url(self.context, self.request)
         return self._url
 
     @property
@@ -163,7 +163,7 @@ class GridEntryInfo(object):
         if self._profile is None:
             self._profile = self._profiles.get(self.context.creator, None)
         if self._creator_url is None:
-            self._creator_url = model_url(self._profile, self.request)
+            self._creator_url = resource_url(self._profile, self.request)
         return self._creator_url
 
     @property
@@ -183,7 +183,7 @@ class GridEntryInfo(object):
 
     @property
     def modified_by_url(self):
-        return model_url(self.modified_by_profile, self.request)
+        return resource_url(self.modified_by_profile, self.request)
 
 
 class TagQuery(object):
@@ -286,7 +286,7 @@ class CommunityInfo(object):
     @property
     def url(self):
         if self._url is None:
-            self._url = model_url(self.context, self.request)
+            self._url = resource_url(self.context, self.request)
         return self._url
 
     @property
@@ -313,7 +313,7 @@ class CommunityInfo(object):
                 found_current = True
 
             tabs = [
-                {'url':model_url(self.context, self.request, 'view.html'),
+                {'url':resource_url(self.context, self.request, 'view.html'),
                  'css_class':overview_css_class,
                  'name':'OVERVIEW'}
                 ]

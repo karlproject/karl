@@ -1,7 +1,7 @@
 import re
 
 from pyramid.security import effective_principals
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from repoze.workflow import get_workflow
 
@@ -17,7 +17,7 @@ def thumb_url(image, request, size):
     size.
     """
     assert IImage.providedBy(image), "Cannot take thumbnail of non-image."
-    return model_url(image, request, 'thumb', '%dx%d.jpg' % size)
+    return resource_url(image, request, 'thumb', '%dx%d.jpg' % size)
 
 def get_images_batch(context,
                      request,

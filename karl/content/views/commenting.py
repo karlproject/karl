@@ -30,7 +30,7 @@ import schemaish
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 
 from karl.events import ObjectModifiedEvent
@@ -62,7 +62,7 @@ def redirect_comments_view(context, request):
     # easier to implement another redirect than re-implement the
     # delete view.
 
-    url = model_url(context.__parent__, request)
+    url = resource_url(context.__parent__, request)
     status_message = request.GET.get('status_message', False)
     if status_message:
         msg = '?status_message=' + status_message
@@ -94,7 +94,7 @@ def show_comment_view(context, request):
         # Comments can also be in forum topics
         container = find_interface(context, IForumTopic)
     backto = {
-        'href': model_url(container, request),
+        'href': resource_url(container, request),
         'title': container.title,
         }
 
@@ -162,7 +162,7 @@ class AddCommentFormController(object):
                                      u'It is submit only.')
 
     def handle_cancel(self):
-        location = model_url(self.context.__parent__, self.request)
+        location = resource_url(self.context.__parent__, self.request)
         return HTTPFound(location=location)
 
     def handle_submit(self, converted):
@@ -196,7 +196,7 @@ class AddCommentFormController(object):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(comment, request)
 
-        location = model_url(parent, request)
+        location = resource_url(parent, request)
         msg = 'Comment added'
         location = '%s?status_message=%s' % (location, urllib.quote(msg))
         self.filestore.clear()
@@ -248,7 +248,7 @@ class EditCommentFormController(object):
     def handle_cancel(self):
         context = self.context
         blogentry = find_interface(self.context, IBlogEntry)
-        return HTTPFound(location=model_url(blogentry, self.request))
+        return HTTPFound(location=resource_url(blogentry, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -268,6 +268,6 @@ class EditCommentFormController(object):
                                request)
         context.modified_by = creator
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         self.filestore.clear()
         return HTTPFound(location=location)

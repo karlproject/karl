@@ -20,7 +20,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
@@ -76,7 +76,7 @@ class AdminTemplateAPI(TemplateAPI):
 
         site = find_site(context)
         if 'offices' in site:
-            self.offices_url = model_url(site['offices'], request)
+            self.offices_url = resource_url(site['offices'], request)
         else:
             self.offices_url = None
 
@@ -130,11 +130,11 @@ def _grid_item(item, request):
     if creator is not None and creator in profiles:
         profile = profiles[creator]
         creator_name = profile.title
-        creator_url = model_url(profile, request)
+        creator_url = resource_url(profile, request)
 
     return dict(
         path=resource_path(item),
-        url=model_url(item, request),
+        url=resource_url(item, request),
         title=item.title,
         modified=_format_date(item.modified),
         creator_name=creator_name,
@@ -205,7 +205,7 @@ def delete_content_view(context, request):
             else:
                 status_message = 'Deleted %d content items.' % len(paths)
 
-            redirect_to = model_url(
+            redirect_to = resource_url(
                 context, request, request.view_name,
                 query=dict(status_message=status_message)
             )
@@ -286,7 +286,7 @@ def move_content_view(context, request):
                 else:
                     status_message = 'Moved %d content items.' % len(paths)
 
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     context, request, request.view_name,
                     query=dict(status_message=status_message)
                 )
@@ -390,11 +390,11 @@ class EmailUsersView(object):
 
             status_message = "Sent message to %d users." % n
             if has_permission(ADMINISTER, context, request):
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     context, request, 'admin.html',
                     query=dict(status_message=status_message))
             else:
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     find_communities(context), request, 'all_communities.html',
                     query=dict(status_message=status_message))
 
@@ -750,7 +750,7 @@ def error_monitor_view(context, request):
     states = {}
     urls = {}
     for subsystem in subsystems:
-        urls[subsystem] = model_url(context, request,
+        urls[subsystem] = resource_url(context, request,
                                     'error_monitor_subsystem.html',
                                     query={'subsystem': subsystem})
         states[subsystem] = _get_error_monitor_state(
@@ -786,14 +786,14 @@ def error_monitor_subsystem_view(context, request):
     if subsystem is None or subsystem not in subsystems:
         raise NotFound()
 
-    back_url = model_url(context, request, 'error_monitor.html')
+    back_url = resource_url(context, request, 'error_monitor.html')
     if 'clear' in request.params:
         path = os.path.join(error_monitor_dir, subsystem)
         os.remove(path)
         return HTTPFound(location=back_url)
 
 
-    clear_url = model_url(context, request, request.view_name,
+    clear_url = resource_url(context, request, request.view_name,
                           query={'clear': '1', 'subsystem': subsystem})
     entries = _get_error_monitor_state(error_monitor_dir, subsystem)
 
@@ -921,7 +921,7 @@ def postoffice_quarantine_view(request):
                     queue.add(message)
         closer.conn.transaction_manager.commit()
         return HTTPFound(
-            location=model_url(context, request, request.view_name)
+            location=resource_url(context, request, request.view_name)
         )
 
     messages = []

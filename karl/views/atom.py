@@ -22,7 +22,7 @@ from zope.component import getMultiAdapter
 from pyramid.response import Response
 from zope.interface import implements
 from pyramid.chameleon_zpt import render_template
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.utils import find_profiles
 from karl.views.community import get_recent_items_batch
@@ -67,7 +67,7 @@ class AtomFeed(object):
         self.context = context
         self.request = request
 
-        self._url = model_url(context, request)
+        self._url = resource_url(context, request)
 
     def __call__(self):
         xml = render_template(self._template, view=self)
@@ -132,7 +132,7 @@ class AtomEntry(object):
 
     @property
     def uri(self):
-        return model_url(self.context, self.request)
+        return resource_url(self.context, self.request)
 
     @property
     def published(self):
@@ -148,7 +148,7 @@ class AtomEntry(object):
         profile = profiles[self.context.creator]
         return {
             "name": profile.title,
-            "uri": model_url(profile, self.request)
+            "uri": resource_url(profile, self.request)
         }
 
     @property

@@ -1,7 +1,7 @@
 from zope.component import getUtility
 
 from pyramid.chameleon_zpt import render_template
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 
 from karl.content.interfaces import IBlogEntry
@@ -85,7 +85,7 @@ def _community_title(context):
 def livesearch_dict(context, request, **kwargs):
     """helper to add some common elements to the livesearch result"""
     common_elts = dict(title=getattr(context, 'title', '<No Title>'),
-                       url=model_url(context, request))
+                       url=resource_url(context, request))
     return dict(common_elts, **kwargs)
 
 @implementer(ILiveSearchEntry)

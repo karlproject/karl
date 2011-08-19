@@ -37,7 +37,7 @@ class BasePresenter(object):
      
     ``url_for``
        
-       A function wrapping ``repoze.bfg.url.model_url``, where the current 
+       A function wrapping ``repoze.bfg.url.resource_url``, where the current 
        context and request are already set.  A presenter often needs to
        generate URLs, but the context and request are not its concern.
     '''

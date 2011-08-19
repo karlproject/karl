@@ -1,5 +1,5 @@
 from pyramid.chameleon_zpt import render_template_to_response
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
 from karl.utils import find_site
@@ -16,15 +16,15 @@ def forbidden(context, request):
         response =  render_template_to_response(
             'templates/forbidden.pt',
             api=api,
-            login_form_url = model_url(site, request, 'login.html'),
-            homepage_url = model_url(site, request),
+            login_form_url = resource_url(site, request, 'login.html'),
+            homepage_url = resource_url(site, request),
             )
         response.status = '403 Forbidden'
         return response
     elif '/login.html' in referrer:
         url = request.url
         # this request came from a user submitting the login form
-        login_url = model_url(site, request, 'login.html',
+        login_url = resource_url(site, request, 'login.html',
                               query={'reason':'Bad username or password',
                                      'came_from':url})
         return HTTPFound(location=login_url)
@@ -37,5 +37,5 @@ def forbidden(context, request):
             url = url[:-1]
         if url != request.application_url: # if request isnt for homepage
             query['reason'] = 'Not logged in'
-        login_url = model_url(site, request, 'login.html', query=query)
+        login_url = resource_url(site, request, 'login.html', query=query)
         return HTTPFound(location=login_url)

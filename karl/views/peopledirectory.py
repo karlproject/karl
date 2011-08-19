@@ -29,7 +29,7 @@ from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 from pyramid.traversal import resource_path_tuple
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from simplejson import JSONEncoder
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -85,7 +85,7 @@ def admin_contents(context, request):
                 selected = [selected]
             for name in selected:
                 del context[name]
-            return HTTPFound(location=model_url(context, request,
+            return HTTPFound(location=resource_url(context, request,
                                                 'admin.html')
                             )
     actions = get_admin_actions(context, request)
@@ -109,7 +109,7 @@ def admin_contents_moveup_view(context, request):
     else:
        order[n], order[n-1] = order[n-1], order[n]
        context.order = order
-    return HTTPFound(location=model_url(context, request, 'admin.html'))
+    return HTTPFound(location=resource_url(context, request, 'admin.html'))
 
 
 def admin_contents_movedown_view(context, request):
@@ -123,7 +123,7 @@ def admin_contents_movedown_view(context, request):
     else:
        order[n], order[n+1] = order[n+1], order[n]
        context.order = order
-    return HTTPFound(location=model_url(context, request, 'admin.html'))
+    return HTTPFound(location=resource_url(context, request, 'admin.html'))
 
 
 def peopledirectory_view(context, request):
@@ -131,7 +131,7 @@ def peopledirectory_view(context, request):
     for section_id in context.order:
         section = context[section_id]
         if has_permission('view', section, request):
-            return HTTPFound(location=model_url(section, request))
+            return HTTPFound(location=resource_url(section, request))
     raise Forbidden("No accessible sections")
 
 
@@ -152,7 +152,7 @@ def upload_peopledirectory_xml(context, request):
         xml = request.POST['xml'].file
         tree = etree.parse(xml)
         peopleconf(context, tree, force_reindex=True)
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=resource_url(context, request))
 
     return dict(api=TemplateAPI(context, request, 'Upload People XML'),
                 peopledir=peopledir,
@@ -168,7 +168,7 @@ def get_tabs(peopledir, request, current_sectionid):
         if not has_permission('view', section, request):
             continue
         result.append({
-            'href': model_url(section, request),
+            'href': resource_url(section, request),
             'title': section.tab_title,
             'selected': current_sectionid == section.__name__,
             })
@@ -190,7 +190,7 @@ def render_report_group(group, request, css_class=''):
         result.append('<ul>')
     for obj in group.values():
         if IPeopleReport.providedBy(obj):
-            url = model_url(obj, request)
+            url = resource_url(obj, request)
             result.append('<li><a href=%s class=%s>%s</a></li>' % (
                 quoteattr(url),
                 quoteattr(obj.css_class),
@@ -249,7 +249,7 @@ def get_actions(context, request):
         if request.view_name != 'admin.html':
             #actions.append(('Admin', 'admin.html'))
             pass # see LP #668489
-        actions.append(('Add User', model_url(profiles, request, 'add.html')))
+        actions.append(('Add User', resource_url(profiles, request, 'add.html')))
     return actions
 
 
@@ -260,7 +260,7 @@ def section_view(context, request):
                  IPeopleReport.providedBy(sub)]
 
     if len(subs) == 1:
-        return HTTPFound(location=model_url(subs[0], request))
+        return HTTPFound(location=resource_url(subs[0], request))
 
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
@@ -305,10 +305,10 @@ def report_view(context, request):
     letter_info = mgr.get_info(request)
 
     kw, qualifiers = get_search_qualifiers(request)
-    print_url = model_url(context, request, 'print.html', **kw)
-    csv_url = model_url(context, request, 'csv', **kw)
-    pictures_url = model_url(context, request, 'picture_view.html', **kw)
-    opensearch_url = model_url(context, request, 'opensearch.xml')
+    print_url = resource_url(context, request, 'print.html', **kw)
+    csv_url = resource_url(context, request, 'csv', **kw)
+    pictures_url = resource_url(context, request, 'picture_view.html', **kw)
+    opensearch_url = resource_url(context, request, 'opensearch.xml')
 
     return dict(
         api=api,
@@ -366,7 +366,7 @@ def profile_photo_rows(entries, request, api, columns=3):
             photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
         else:
             photo_url = api.static_url + "/images/defaultUser.gif"
-        url = model_url(profile, request)
+        url = resource_url(profile, request)
         row.append({'profile': profile, 'photo_url': photo_url, 'url': url})
 
         if len(row) >= columns:
@@ -400,9 +400,9 @@ def picture_view(context, request):
     kw, qualifiers = get_search_qualifiers(request)
 
     descriptions = get_report_descriptions(context)
-    print_url = model_url(context, request, 'print.html', **kw)
-    csv_url = model_url(context, request, 'csv', **kw)
-    tabular_url = model_url(context, request, **kw)
+    print_url = resource_url(context, request, 'print.html', **kw)
+    csv_url = resource_url(context, request, 'csv', **kw)
+    tabular_url = resource_url(context, request, **kw)
 
     return dict(
         api=api,
@@ -493,7 +493,7 @@ def get_grid_data(context, request, start=0, limit=12,
         records.append(record)
 
     kw, _ = get_search_qualifiers(request)
-    fetch_url = model_url(context, request, 'jquery_grid', **kw)
+    fetch_url = resource_url(context, request, 'jquery_grid', **kw)
 
     payload = dict(
         fetch_url=fetch_url,
@@ -577,7 +577,7 @@ def opensearch_view(context, request):
     api = TemplateAPI(context, request, 'KARL People OpenSearch')
     return dict(api=api,
                 report=context,
-                url=model_url(context, request),
+                url=resource_url(context, request),
                )
 
 
@@ -585,15 +585,15 @@ def redirector_view(context, request):
     where = context.target_url
     if not where.startswith('http'):
         if where.startswith('/'):
-            where = basejoin(model_url(context, request), where)
+            where = basejoin(resource_url(context, request), where)
         else:
             elements = where.split('/')
-            where = model_url(context.__parent__, request, *elements)
+            where = resource_url(context.__parent__, request, *elements)
     return HTTPFound(location=where)
 
 
 def redirector_admin_view(context, request):
-    where = model_url(context, request, 'edit.html')
+    where = resource_url(context, request, 'edit.html')
     return HTTPFound(location=where)
 
 
@@ -628,7 +628,7 @@ class NameColumn(ReportColumn):
 
     def render_html(self, profile, request):
         value = unicode(profile.title)
-        url = model_url(profile, request)
+        url = resource_url(profile, request)
         return '%s<a href=%s style="display: none;"/>' % (
             escape(value), quoteattr(url))
 
@@ -681,7 +681,7 @@ class EditBase(object):
                 }
 
     def handle_cancel(self):
-        location = model_url(self.context, self.request, 'admin.html')
+        location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 
     def handle_submit(self, converted):
@@ -691,7 +691,7 @@ class EditBase(object):
         for name, field in self.schema:
             setattr(context, name, converted[name])
         self.after_edit()
-        location = model_url(context, request, 'admin.html')
+        location = resource_url(context, request, 'admin.html')
         return HTTPFound(location=location)
 
     def before_edit(self):
@@ -724,7 +724,7 @@ class AddBase(object):
                 }
 
     def handle_cancel(self):
-        location = model_url(self.context, self.request, 'admin.html')
+        location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 
     def handle_submit(self, converted):
@@ -736,7 +736,7 @@ class AddBase(object):
         for field_name, field in self.schema:
             setattr(to_add, field_name, converted[field_name])
         self.after_edit()
-        location = model_url(to_add, request, 'admin.html')
+        location = resource_url(to_add, request, 'admin.html')
         return HTTPFound(location=location)
 
     def before_edit(self):
@@ -757,7 +757,7 @@ category_schema = [
 
 def edit_categories_view(context, request):
     # There is nothing useful to be done here.
-    return HTTPFound(location=model_url(context, request, 'admin.html'))
+    return HTTPFound(location=resource_url(context, request, 'admin.html'))
 
 
 class EditCategoryFormController(EditBase):

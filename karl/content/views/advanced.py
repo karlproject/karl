@@ -2,7 +2,7 @@ import formish
 import schemaish
 
 from pyramid.traversal import find_interface
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
@@ -116,7 +116,7 @@ class AdvancedFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, params):
         context = self.context
@@ -143,5 +143,5 @@ class AdvancedFormController(object):
             context.search_weight = weight
 
         objectEventNotify(ObjectModifiedEvent(context))
-        return HTTPFound(location=model_url(self.context, self.request,
+        return HTTPFound(location=resource_url(self.context, self.request,
                     query={'status_message': 'Advanced settings changed.'}))

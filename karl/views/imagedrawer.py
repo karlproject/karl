@@ -26,7 +26,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 from pyramid.traversal import traverse
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 
@@ -148,7 +148,7 @@ def breadcrumbs(doc, request):
             for ancestor in visit(node.__parent__):
                 yield ancestor
 
-        yield dict(title=title_or_id(node), href=model_url(node, request))
+        yield dict(title=title_or_id(node), href=resource_url(node, request))
 
     return list(visit(doc))
 

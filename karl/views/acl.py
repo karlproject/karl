@@ -19,7 +19,7 @@ import re
 
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type
@@ -162,7 +162,7 @@ def make_acls(node, request, acls=None, offset=0):
     if acls is None:
         acls = []
     path = resource_path(node)
-    url = model_url(node, request)
+    url = resource_url(node, request)
     acl = getattr(node, '__acl__', None)
     folderish = IFolder.providedBy(node)
     name = node.__name__ or '/'

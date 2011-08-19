@@ -22,7 +22,7 @@ import mimetypes
 from pyramid.interfaces import IView
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from zope.interface import providedBy
 from zope.component import getMultiAdapter
@@ -105,16 +105,16 @@ def get_previous_next(context, request, viewname=''):
 
     if previous:
         if _find_view(previous, request, viewname) is not None:
-            href = model_url(previous, request, viewname)
+            href = resource_url(previous, request, viewname)
         else:
-            href = model_url(previous, request)
+            href = resource_url(previous, request)
         previous = {'title': previous.title, 'href': href}
 
     if next:
         if _find_view(next, request, viewname) is not None:
-            href = model_url(next, request, viewname)
+            href = resource_url(next, request, viewname)
         else:
-            href = model_url(next, request)
+            href = resource_url(next, request)
         next = {'title': next.title, 'href': href}
 
     return previous, next

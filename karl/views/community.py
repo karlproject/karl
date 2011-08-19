@@ -36,7 +36,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from repoze.sendmail.interfaces import IMailDelivery
 
@@ -89,7 +89,7 @@ def redirect_community_view(context, request):
     default_tool = getattr(context, 'default_tool', None)
     if not default_tool:
         default_tool = 'view.html'
-    return HTTPFound(location=model_url(context, request, default_tool))
+    return HTTPFound(location=resource_url(context, request, default_tool))
 
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
@@ -126,7 +126,7 @@ def show_community_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    feed_url = model_url(context, request, "atom.xml")
+    feed_url = resource_url(context, request, "atom.xml")
 
     return {'api': api,
             'actions': actions,
@@ -317,7 +317,7 @@ class AddCommunityFormController(object):
         return {'api':api}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -365,7 +365,7 @@ class AddCommunityFormController(object):
         set_tags(community, request, converted['tags'])
         # Adding a community should take you to the Add Existing
         # User screen, so the moderator can include some users.
-        location = model_url(community, request,
+        location = resource_url(community, request,
                              'members', 'add_existing.html',
                              query={'status_message':'Community added'})
         return HTTPFound(location=location)
@@ -439,7 +439,7 @@ class EditCommunityFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -475,7 +475,7 @@ class EditCommunityFormController(object):
 
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         return HTTPFound(location=location)
 
     def _get_security_states(self):
@@ -506,8 +506,8 @@ def join_community_view(context, request):
         mail["Subject"] = "Request to join %s community" % context.title
 
         body_template = get_template("templates/email_join_community.pt")
-        profile_url = model_url(profile, request)
-        accept_url=model_url(context, request, "members", "add_existing.html",
+        profile_url = resource_url(profile, request)
+        accept_url=resource_url(context, request, "members", "add_existing.html",
                              query={"user_id": user})
         body = body_template(
             message=message,
@@ -528,7 +528,7 @@ def join_community_view(context, request):
         mailer.send(recipients, mail)
 
         status_message = "Your request has been sent to the moderators."
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={"status_message": status_message})
 
         return HTTPFound(location=location)
@@ -541,7 +541,7 @@ def join_community_view(context, request):
         api=api,
         profile=profile,
         community=context,
-        post_url=model_url(context, request, "join.html"),
+        post_url=resource_url(context, request, "join.html"),
         formfields=api.formfields,
     )
 
@@ -554,7 +554,7 @@ def delete_community_view(context, request):
     if confirm == '1':
         name = context.__name__
         del context.__parent__[name]
-        location = model_url(context.__parent__, request)
+        location = resource_url(context.__parent__, request)
         return HTTPFound(location=location)
 
     # Get a layout

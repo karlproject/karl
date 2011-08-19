@@ -19,7 +19,7 @@ import simplejson as json
 from random import choice
 
 from pyramid.chameleon_zpt import render_template_to_response
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
 
@@ -101,7 +101,7 @@ def get_agility_data(context, request):
 
 def show_agility_view(context, request):
     backto = {
-        'href': model_url(context, request),
+        'href': resource_url(context, request),
         'title': context.title,
         }
 
@@ -111,7 +111,7 @@ def show_agility_view(context, request):
         wiki_url=backto["href"]
     ))
 
-    feed_url = model_url(context, request, "atom.xml")
+    feed_url = resource_url(context, request, "atom.xml")
     return render_template_to_response(
         'templates/show_agility2.pt',
         api=api,

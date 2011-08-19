@@ -37,7 +37,7 @@ from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
 
@@ -110,7 +110,7 @@ def show_blog_view(context, request):
     for entry in batch['entries']:
         profile = profiles[entry.creator]
         byline_info = getMultiAdapter((entry, request), IBylineInfo)
-        entry_url = model_url(entry, request)
+        entry_url = resource_url(entry, request)
 
         # Get information about comments on this entry to display in
         # the last line of the entry
@@ -123,7 +123,7 @@ def show_blog_view(context, request):
             comments_blurb = fmt2 % (entry_url, comment_count)
         info = {
             'title': entry.title,
-            'href': model_url(entry, request),
+            'href': resource_url(entry, request),
             'description': entry.description,
             'creator_title': profile.title,
             'creator_href': entry_url,
@@ -134,7 +134,7 @@ def show_blog_view(context, request):
         entries.append(info)
 
     system_email_domain = get_setting(context, "system_email_domain")
-    feed_url = "%satom.xml" % model_url(context, request)
+    feed_url = "%satom.xml" % resource_url(context, request)
     workflow = get_workflow(IBlogEntry, 'security', context)
     if workflow is None:
         security_states = []
@@ -166,11 +166,11 @@ def show_mailin_trace_blog(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=model_url(context, request, 'add_blogentry.html'))
+            location=resource_url(context, request, 'add_blogentry.html'))
 
 def show_blogentry_view(context, request):
 
-    post_url = model_url(context, request, "comments", "add_comment.html")
+    post_url = resource_url(context, request, "comments", "add_comment.html")
     karldates = getUtility(IKarlDates)
     profiles = find_profiles(context)
     workflow = get_workflow(IBlogEntry, 'security', context)
@@ -188,22 +188,22 @@ def show_blogentry_view(context, request):
     for comment in context['comments'].values():
         profile = profiles.get(comment.creator)
         author_name = profile.title
-        author_url = model_url(profile, request)
+        author_url = resource_url(profile, request)
 
         newc = {}
         newc['id'] = comment.__name__
         if has_permission('edit', comment, request):
-            newc['edit_url'] = model_url(comment, request, 'edit.html')
+            newc['edit_url'] = resource_url(comment, request, 'edit.html')
         else:
             newc['edit_url'] = None
 
         if has_permission('delete', comment, request):
-            newc['delete_url'] = model_url(comment, request, 'delete.html')
+            newc['delete_url'] = resource_url(comment, request, 'delete.html')
         else:
             newc['delete_url'] = None
 
         if has_permission('administer', comment, request):
-            newc['advanced_url'] = model_url(comment, request, 'advanced.html')
+            newc['advanced_url'] = resource_url(comment, request, 'advanced.html')
         else:
             newc['advanced_url'] = None
 
@@ -244,7 +244,7 @@ def show_blogentry_view(context, request):
     byline_info = getMultiAdapter((context, request), IBylineInfo)
     blog = find_interface(context, IBlog)
     backto = {
-        'href': model_url(blog, request),
+        'href': resource_url(blog, request),
         'title': blog.title,
         }
 
@@ -254,7 +254,7 @@ def show_blogentry_view(context, request):
     form_fields = controller.form_fields()
     for fieldname, field in form_fields:
         form_schema.add(fieldname, field)
-    form_action_url = '%sadd_comment.html' % model_url(context['comments'],
+    form_action_url = '%sadd_comment.html' % resource_url(context['comments'],
                                                        request)
     comment_form = Form(form_schema, add_default_action=False, name='save',
                         action_url=form_action_url)
@@ -369,7 +369,7 @@ class AddBlogEntryFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -408,7 +408,7 @@ class AddBlogEntryFormController(object):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(blogentry, request)
 
-        location = model_url(blogentry, request)
+        location = resource_url(blogentry, request)
         self.filestore.clear()
         return HTTPFound(location=location)
 
@@ -481,7 +481,7 @@ class EditBlogEntryFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -511,7 +511,7 @@ class EditBlogEntryFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request)
+        location = resource_url(context, request)
         self.filestore.clear()
         return HTTPFound(location=location)
 
@@ -556,7 +556,7 @@ class BlogSidebar(object):
         counts.reverse()
         activity_list = [MonthlyActivity(year, month, count)
             for ((year, month), count) in counts]
-        blog_url = model_url(self.context, self.request)
+        blog_url = resource_url(self.context, self.request)
         return render_template(
             'templates/blog_sidebar.pt',
             api=api,

@@ -29,7 +29,7 @@ from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from karl.models.interfaces import ITagQuery
 
@@ -162,7 +162,7 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
     # and do a redirect.
     jump_tag = request.params.get('jumptag', False)
     if jump_tag:
-        location = model_url(context, request, request.view_name, jump_tag)
+        location = resource_url(context, request, request.view_name, jump_tag)
         return HTTPFound(location=location)
 
     # Our strategy is to support tag URLs that are like this:
@@ -214,12 +214,12 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             else:
                 tuh = '%s people' % len(users)
 
-            tuhref = model_url(context, request, 'tagusers.html',
+            tuhref = resource_url(context, request, 'tagusers.html',
                                query={'tag': tag, 'docid': docid})
             entry = {
                 'title': resource.title,
                 'description': getattr(resource, 'description', ''),
-                'href': model_url(resource, request),
+                'href': resource_url(resource, request),
                 'type': get_content_type_name(resource),
                 'tagusers_href': tuhref,
                 'tagusers_count': tuh,
@@ -421,7 +421,7 @@ def tag_users_view(context, request):
     return dict(
         api=api,
         tag=tag,
-        url=model_url(target, request),
+        url=resource_url(target, request),
         title=target.title,
         users=users,
         )
@@ -464,7 +464,7 @@ def community_tag_users_view(context, request):
     return dict(
         api=api,
         tag=tag,
-        url=model_url(target, request),
+        url=resource_url(target, request),
         title=target.title,
         users=users,
         )
