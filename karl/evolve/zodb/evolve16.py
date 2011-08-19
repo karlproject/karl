@@ -1,4 +1,4 @@
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from karl.utils import find_catalog
 
 def evolve(root):
@@ -17,6 +17,6 @@ def evolve(root):
     for n, (docid, addr) in enumerate(entries):
         if n % 500 == 0:
             print "Indexed %d/%d documents" % (n, n_docs)
-        doc = find_model(root, addr)
+        doc = find_resource(root, addr)
         index.index_doc(docid, doc)
         doc._p_deactivate()

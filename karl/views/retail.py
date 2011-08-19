@@ -21,7 +21,7 @@ from zope.component import ComponentLookupError
 from pyramid.chameleon_zpt import render_template
 from pyramid.chameleon_zpt import render_template_to_response
 
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 
 from karl.utils import find_intranets
 from karl.views.api import TemplateAPI
@@ -63,7 +63,7 @@ def _get_portlet_html(context, request, portlet_ids):
     html = ''
     for portlet_id in portlet_ids:
         try:
-            model = find_model(context, portlet_id)
+            model = find_resource(context, portlet_id)
         except KeyError:
             html += missing % portlet_id
             continue

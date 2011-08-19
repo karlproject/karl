@@ -30,7 +30,7 @@ import traceback
 import transaction
 
 from pyramid.chameleon_zpt import render_template
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
 from repoze.postoffice.message import Message
@@ -103,7 +103,7 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
         report_name = info.get('report')
         if report_name is not None:
             pd = find_peopledirectory(self.root)
-            target = find_model(pd, report_name.split('+'))
+            target = find_resource(pd, report_name.split('+'))
         else:
             community = find_communities(self.root)[info['community']]
             target = tool = community[info['tool']]
@@ -113,7 +113,7 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
                 docid = int(hex_to_docid(info['in_reply_to']))
                 catalog = find_catalog(target)
                 path = catalog.document_map.address_for_docid(docid)
-                item = find_model(self.root, path)
+                item = find_resource(self.root, path)
                 target = item
 
         IMailinHandler(target).handle(message, info, text, attachments)
@@ -255,7 +255,7 @@ class MailinRunner2(object):
         report_name = target.get('report')
         if report_name is not None:
             pd = find_peopledirectory(self.root)
-            context = find_model(pd, report_name.split('+'))
+            context = find_resource(pd, report_name.split('+'))
         else:
             community = find_communities(self.root)[target['community']]
             context = tool = community[target['tool']]
@@ -264,7 +264,7 @@ class MailinRunner2(object):
                 docid = int(hex_to_docid(target['in_reply_to']))
                 catalog = find_catalog(context)
                 path = catalog.document_map.address_for_docid(docid)
-                item = find_model(self.root, path)
+                item = find_resource(self.root, path)
                 context = item
 
         IMailinHandler(context).handle(message, info, text, attachments)

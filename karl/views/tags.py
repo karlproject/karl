@@ -26,7 +26,7 @@ from pyramid.response import Response
 from zope.component import getMultiAdapter
 
 from pyramid.traversal import resource_path
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.url import model_url
@@ -199,7 +199,7 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             address = dm.address_for_docid(int(docid))
             if address is None:
                 raise KeyError(docid)
-            resource = find_model(context, address)
+            resource = find_resource(context, address)
 
             # Skip documents which aren't viewable by authenticated user
             if not has_permission('view', resource, request):
@@ -402,7 +402,7 @@ def tag_users_view(context, request):
     profiles = find_profiles(context)
     catalog = find_catalog(context)
     address = catalog.document_map.address_for_docid(docid)
-    target = find_model(context, address)
+    target = find_resource(context, address)
     if tags is not None and profiles is not None:
         users = []
         for userid in tags.getUsers(tags=[tag], items=[docid]):
@@ -443,7 +443,7 @@ def community_tag_users_view(context, request):
     profiles = find_profiles(context)
     catalog = find_catalog(context)
     address = catalog.document_map.address_for_docid(docid)
-    target = find_model(context, address)
+    target = find_resource(context, address)
     if tags is not None and profiles is not None:
         users = []
         for userid in tags.getUsers(tags=[tag], items=[docid],
@@ -485,7 +485,7 @@ def manage_tags_view(context, request):
     address_for_docid = catalog.document_map.address_for_docid
     def get_doc(docid):
         path = address_for_docid(docid)
-        return find_model(context, path)
+        return find_resource(context, path)
 
     if 'form.rename' in request.POST and 'old_tag' in request.POST:
         old_tag = request.POST['old_tag']

@@ -18,7 +18,7 @@ from pyramid.chameleon_zpt import get_template
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from repoze.lemonade.content import create_content
@@ -192,10 +192,10 @@ def delete_content_view(context, request):
         if paths:
             for path in paths:
                 try:
-                    content = find_model(context, path)
+                    content = find_resource(context, path)
                     del content.__parent__[content.__name__]
                 except KeyError:
-                    # Thrown by find_model if we've already deleted an
+                    # Thrown by find_resource if we've already deleted an
                     # ancestor of this node.  Can safely ignore becuase child
                     # node has been deleted along with ancestor.
                     pass
@@ -273,9 +273,9 @@ def move_content_view(context, request):
         else:
             try:
                 paths = request.params.getall('selected_content')
-                dst_community = find_model(context, to_community)
+                dst_community = find_resource(context, to_community)
                 for path in paths:
-                    obj = find_model(context, path)
+                    obj = find_resource(context, path)
                     dst_container = _find_dst_container(obj, dst_community)
                     name = make_unique_name(dst_container, obj.__name__)
                     del obj.__parent__[obj.__name__]

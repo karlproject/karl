@@ -23,7 +23,7 @@ from pyramid.interfaces import IDebugLogger
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.traversal import find_interface
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pyramid.url import model_url
 from repoze.lemonade.listitem import get_listitems
@@ -78,7 +78,7 @@ class CatalogSearch(object):
             if path is None:
                 return None
             try:
-                return find_model(self.context, path)
+                return find_resource(self.context, path)
             except KeyError:
                 logger and logger.warn('Model missing: %s' % path)
                 return None

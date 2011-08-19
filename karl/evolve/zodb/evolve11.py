@@ -1,10 +1,10 @@
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from karl.utils import find_catalog
 import transaction
 
 def _exists(context, path):
     try:
-        find_model(context, path)
+        find_resource(context, path)
         return True
     except KeyError:
         return False

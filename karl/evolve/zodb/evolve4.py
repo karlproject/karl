@@ -1,7 +1,7 @@
 import re
 import urllib
 
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.traversal import find_root
 from pyramid.traversal import resource_path
 
@@ -29,7 +29,7 @@ def evolve(context):
             path = root.catalog.document_map.docid_to_address.get(docid)
             if path is not None:
                 container_path, ob_name = path.rsplit('/', 1)
-                container = find_model(root, container_path)
+                container = find_resource(root, container_path)
                 name = urllib.unquote(ob_name)
                 ob = container.get(name)
             

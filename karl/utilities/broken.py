@@ -2,7 +2,7 @@ from BTrees.Length import Length
 from BTrees.OOBTree import OOBTree
 from ZODB.broken import Broken
 from repoze.folder.interfaces import IFolder
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 
 from karl.utils import find_catalog
@@ -54,7 +54,7 @@ def prune_catalog(root, out=None):
     catalog = find_catalog(root)
     for path, docid in list(catalog.document_map.address_to_docid.items()):
         try:
-            model = find_model(root, path)
+            model = find_resource(root, path)
         except KeyError:
             if out is not None:
                 print >>out, "Removing dead catalog record: %s" % path

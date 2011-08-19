@@ -23,7 +23,7 @@ from persistent import Persistent
 from zope.component import queryAdapter
 from zope.event import notify
 from zope.interface import implements
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 
 from karl.utils import find_catalog
 from karl.utils import find_community
@@ -490,6 +490,6 @@ class TagCommunityFinder(object):
         path = catalog.document_map.address_for_docid(docid)
         if path is None:
             raise KeyError(docid)
-        doc = find_model(site, path)
+        doc = find_resource(site, path)
         community = find_community(doc)
         return community and community.__name__ or None

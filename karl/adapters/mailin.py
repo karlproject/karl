@@ -22,7 +22,7 @@ from email.utils import parsedate
 import re
 
 from pyramid.security import has_permission
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.request import Request
 from repoze.postoffice.message import decode_header
 from zope.component import getUtility
@@ -81,7 +81,7 @@ class MailinDispatcher(object):
         pd = find_peopledirectory(self.context)
         tokens = name.split('+')
         try:
-            find_model(pd, tokens)
+            find_resource(pd, tokens)
         except KeyError:
             return False
         return True
@@ -274,7 +274,7 @@ class MailinDispatcher(object):
             report_name = target.get('report')
             if report_name is not None:
                 pd = find_peopledirectory(self.context)
-                context = find_model(pd, report_name.split('+'))
+                context = find_resource(pd, report_name.split('+'))
                 permission = "email"
             else:
                 communities = find_communities(self.context)

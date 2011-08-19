@@ -39,7 +39,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 
 from pyramid.url import model_url
 from repoze.workflow import get_workflow
@@ -348,7 +348,7 @@ def _get_calendar_layers(context):
         for path in layer.paths:
             category = {}
             try:
-                calendar = find_model(context, path)
+                calendar = find_resource(context, path)
                 title = _calendar_category_title(calendar)
                 category['title'] = title
                 layer._v_categories.append(category)

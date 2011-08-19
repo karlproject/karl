@@ -24,7 +24,7 @@ from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from pyramid.security import principals_allowed_by_permission
 from pyramid.threadlocal import get_current_request
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from repoze.folder.interfaces import IObjectAddedEvent
 from repoze.lemonade.content import get_content_type
@@ -251,7 +251,7 @@ def user_tagged_content(event):
         site = find_site(context)
         catalog = find_catalog(context)
         path = catalog.document_map.address_for_docid(event.item)
-        tagged = find_model(site, path)
+        tagged = find_resource(site, path)
         if tagged is None:
             return
         profile_id = event.user

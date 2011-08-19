@@ -1,4 +1,4 @@
-from pyramid.traversal import find_model
+from pyramid.traversal import find_resource
 from repoze.lemonade.content import IContent
 from karl.content.interfaces import ICalendarCategory
 from karl.content.interfaces import ICalendarLayer
@@ -10,7 +10,7 @@ def evolve(context):
     for docid in index.index._docweight.keys():
         try:
             path = catalog.document_map.address_for_docid(docid)
-            context = find_model(context, path)
+            context = find_resource(context, path)
             if (ICalendarLayer.providedBy(context) or
                 ICalendarCategory.providedBy(context) or
                 not IContent.providedBy(context)):
