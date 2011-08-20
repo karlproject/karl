@@ -105,20 +105,47 @@ def _now():
         return _NOW
     return datetime.datetime.now()
 
-def _date_requested(context, request):
+
+KARL_CALENDAR_COOKIE = 'karl.calendar.cookie'
+
+def _get_calendar_cookies(context, request):
     now = _now()
-    session = get_session(context, request)
-    if 'year' in request.GET:
-        year  = int(request.GET.get('year', now.year))
-        month = int(request.GET.get('month', now.month))
-        day   = int(request.GET.get('day', now.day))
-        value = (year, month, day)
-        session['calendar_date_requested'] = value
-    elif 'calendar_date_requested' in session:
-        value = session['calendar_date_requested']
-    else:
-        value = (now.year, now.month, now.day)
-    return value
+
+    # fetch the cookies
+    cookie = request.cookies.get(KARL_CALENDAR_COOKIE, '')
+    try:
+        viewtype, term, year, month, day = cookie.split(',')
+        year = int(year)
+        month = int(month)
+        day = int(day)
+    except (AttributeError, TypeError, ValueError), exc:
+        viewtype, term, year, month, day = None, None, now.year, now.month, now.day
+
+    # request parameters override the cookies
+    viewtype = request.GET.get('viewtype', viewtype)
+    term = request.GET.get('term', term)
+    year = int(request.GET.get('year', year))
+    month = int(request.GET.get('month', month))
+    day = int(request.GET.get('day', day))
+
+    return dict(
+        viewtype=viewtype,
+        term=term,
+        year=year,
+        month=month,
+        day=day,
+    )
+
+def _set_calendar_cookies(response, selection):
+    value = ','.join([
+        selection['viewtype'],
+        selection['term'],
+        str(selection['year']),
+        str(selection['month']),
+        str(selection['day']),
+    ])
+    response.set_cookie(KARL_CALENDAR_COOKIE, value)
+
 
 def _default_dates_requested(context, request):
     try:
@@ -199,6 +226,7 @@ def _paginate_catalog_events(calendar, request,
 
     return events, has_more
 
+# XXX XXX TODO: remove the session, make a cookie
 def _calendar_filter(context, request):
     session = get_session(context, request)
 
@@ -243,11 +271,11 @@ def _select_calendar_layout(context, request):
     )
 
 
-def _show_calendar_view(context, request, make_presenter):
+def _show_calendar_view(context, request, make_presenter, selection):
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
-    year, month, day = _date_requested(context, request)
+    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
@@ -271,7 +299,8 @@ def _show_calendar_view(context, request, make_presenter):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
-    return render_template_to_response(
+    api.karl_client_data['calendar_selection'] = selection
+    response = render_template_to_response(
         calendar.template_filename,
         calendar_format_class = calendar_layout['calendar_format_class'],
         calendar_layout_template = calendar_layout['calendar_layout_template'],
@@ -283,27 +312,39 @@ def _show_calendar_view(context, request, make_presenter):
         quote = quote,
         may_create = has_permission(CREATE, context, request),
     )
+    return response
 
 def show_month_view(context, request):
-    response = _show_calendar_view(context, request, MonthViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'month')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'month'
+    response = _show_calendar_view(context, request, MonthViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_week_view(context, request):
-    response = _show_calendar_view(context, request, WeekViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'week')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'week'
+    response = _show_calendar_view(context, request, WeekViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_day_view(context, request):
-    response = _show_calendar_view(context, request, DayViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'day')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'day'
+    response = _show_calendar_view(context, request, DayViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_list_view(context, request):
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'list'
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
-    year, month, day = _date_requested(context, request)
+    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
@@ -332,6 +373,7 @@ def show_list_view(context, request):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
+    api.karl_client_data['calendar_selection'] = selection
     response = render_template_to_response(
         calendar.template_filename,
         calendar_format_class = calendar_layout['calendar_format_class'],
@@ -344,7 +386,7 @@ def show_list_view(context, request):
         quote = quote,
         may_create = has_permission(CREATE, context, request),
     )
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'list')
+    _set_calendar_cookies(response, selection)
     return response
 
 
@@ -355,14 +397,18 @@ def show_view(context, request):
 
     We do redirect in order to maintain the working of links.
     """
-    view_type = request.cookies.get(KARL_CALENDAR_VIEW_COOKIE, '')
-    view_name = {
-        'month': 'month.html',
-        'week': 'week.html',
-        'day': 'day.html',
-        'list': 'list.html',
-        }.get(view_type, 'day.html')
-    return HTTPFound(location=model_url(context, request, view_name))
+    selection = _get_calendar_cookies(context, request)
+    if selection['viewtype'] == 'list':
+        view_name = 'list.html'
+    else:
+        view_name = {
+            'month': 'month.html',
+            'week': 'week.html',
+            'day': 'day.html',
+            }.get(selection['term'], 'day.html')
+    response = HTTPFound(location=model_url(context, request, view_name))
+    _set_calendar_cookies(response, selection)
+    return response
 
 
 def redirect_to_add_form(context, request):

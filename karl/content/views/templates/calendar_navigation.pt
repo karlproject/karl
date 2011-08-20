@@ -31,46 +31,9 @@
           </div>
         </div>
 
-        <!-- buttons -->
-        <div class="cal_buttons clearafter">
-          <div class="cal_nav">
-            <!-- today, previous, next buttons -->
-            <ul class="cal_nav menubar">
-                <li class="todayButton">
-                    <a href="${calendar.navigation.today_url}"
-                       tal:attributes="class not(calendar.navigation.today_url) and 'disabled' or ''">
-                       <span>Today</span>
-                    </a>
-                </li>
-                <li class="firstItem">
-                    <a href="${calendar.navigation.prev_url}"
-                       tal:attributes="class not(calendar.navigation.prev_url) and 'disabled previous' or 'previous'">
-                       <span>&lt;</span>
-                    </a>
-                </li>
-                <li class="lastItem">
-                    <a href="${calendar.navigation.next_url}"
-                       tal:attributes="class not(calendar.navigation.next_url) and 'disabled next' or 'next'">
-                       <span>&gt;</span>
-                    </a>
-                </li>
-            </ul>
-          </div>
+          <!-- buttons -->
+          <div class="cal_buttons cal-buttonbar clearafter"></div>
 
-          <ul tal:attributes="class string:${calendar.navigation._presenter.name}-view cal_scope menubar">
-            <li class="firstItem">
-                <a class="day" href="${calendar.navigation.day_button_url}"><span>Day</span></a>
-            </li>
-            <li>
-                <a class="week" href="${calendar.navigation.week_button_url}"><span>Week</span></a>
-            </li>
-            <li>
-                <a class="month" href="${calendar.navigation.month_button_url}"><span>Month</span></a>
-            </li>
-            <li class="lastItem">
-                <a class="list" href="${calendar.navigation.list_button_url}"><span>List</span></a>
-            </li>
-          </ul>
         </div>
       </div>
 
