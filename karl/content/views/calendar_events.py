@@ -119,7 +119,7 @@ def _get_calendar_cookies(context, request):
         month = int(month)
         day = int(day)
     except (AttributeError, TypeError, ValueError), exc:
-        viewtype, term, year, month, day = None, None, now.year, now.month, now.day
+        viewtype, term, year, month, day = '', '', now.year, now.month, now.day
 
     # request parameters override the cookies
     viewtype = request.GET.get('viewtype', viewtype)
