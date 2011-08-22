@@ -12,6 +12,8 @@ Unreleased
 
 - Updated the calendar to use cookies instead of a persistent session.
 
+- Added special handling in error page for read only errors.
+
 3.69 (2011-08-04)
 -----------------
 
