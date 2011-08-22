@@ -11,12 +11,12 @@ from zope.interface import noLongerProvides
 
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import IReferencesFolder
-from karl.content.views.interfaces import IWikiLock
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import IIntranets
+from karl.utilities import lock
 from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
 from karl.views.forms import widgets
@@ -83,8 +83,7 @@ class AdvancedFormController(object):
         is_folder = ICommunityFolder.providedBy(context)
         self.use_folder_options = is_folder and in_intranets
 
-        wikilock = queryAdapter(context, IWikiLock)
-        self.use_unlock = wikilock is not None and wikilock.is_locked()
+        self.use_unlock = lock.is_locked(context)
 
         title = getattr(context, 'title', context.__name__)
         self.page_title = 'Advanced Settings for %s' % title
@@ -166,8 +165,7 @@ class AdvancedFormController(object):
             context.search_weight = weight
 
         if self.use_unlock and params.get('unlock'):
-            wikilock = IWikiLock(self.context)
-            wikilock.clear()
+            lock.clear(context)
 
         objectEventNotify(ObjectModifiedEvent(context))
         return HTTPFound(location=model_url(self.context, self.request,

@@ -46,6 +46,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ICatalogSearch
 
+from karl.utilities import lock
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
@@ -66,13 +67,10 @@ from karl.views.versions import format_local_date
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
-from karl.content.views.interfaces import IWikiLock
 from karl.content.views.utils import extract_description
 from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
-
-from karl.utilities.wikilock import lock_info_from_wikilock
 
 _wiki_text_help = """You can create a new page by naming it and surrounding
 the name with ((double parentheses)). When you save the page, the contents
@@ -277,9 +275,6 @@ def show_wikipage_view(context, request):
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
 
-    wikilock = IWikiLock(context)
-    lock_info = lock_info_from_wikilock(wikilock, request)
-
     return dict(
         api=api,
         actions=actions,
@@ -288,7 +283,7 @@ def show_wikipage_view(context, request):
         backto=backto,
         is_front_page=is_front_page,
         show_trash=show_trash,
-        lock_info=lock_info,
+        lock_info=lock.lock_data(context, request),
         )
 
 
@@ -373,7 +368,6 @@ class EditWikiPageFormController(object):
         self.request = request
         self.workflow = get_workflow(IWikiPage, 'security', context)
         self.userid = authenticated_userid(self.request)
-        self.wikilock = IWikiLock(context)
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
@@ -427,8 +421,8 @@ class EditWikiPageFormController(object):
         return widgets
 
     def __call__(self):
-        if not self.wikilock.is_locked():
-            self.wikilock.lock(self.userid)
+        if not lock.is_locked(self.context):
+            lock.lock(self.context, self.userid)
 
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
@@ -437,20 +431,19 @@ class EditWikiPageFormController(object):
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
-        lock_info = lock_info_from_wikilock(self.wikilock, self.request)
         return {'api':api,
                 'actions':(),
-                'lock_info':lock_info,
+                'lock_info':lock.lock_data(self.context, self.request),
                 }
 
     def handle_cancel(self):
-        if self.wikilock.owns_lock(self.userid):
-            self.wikilock.clear()
+        if lock.owns_lock(self.context, self.userid):
+            lock.clear(self.context)
         return HTTPFound(location=model_url(self.context, self.request))
 
     def handle_submit(self, converted):
-        if self.wikilock.owns_lock(self.userid):
-            self.wikilock.clear()
+        if lock.owns_lock(self.context, self.userid):
+            lock.clear(self.context)
 
         context = self.context
         request = self.request
@@ -479,11 +472,12 @@ class EditWikiPageFormController(object):
         msg = "?status_message=Wiki%20Page%20edited"
         return HTTPFound(location=location+msg)
 
-def unlock_wiki_view(context, request):
+def unlock_wiki_view(context, request, userid=None):
     if request.method.lower() == 'post':
-        userid = authenticated_userid(request)
-        wikilock = IWikiLock(context)
-        if wikilock.owns_lock(userid):
-            wikilock.clear()
+        if userid is None:
+            # for unit tests to override
+            userid = authenticated_userid(request)
+        if lock.owns_lock(context, userid):
+            lock.clear(context)
         return HTTPOk(body='')
     return HTTPFound(location=model_url(context, request))

@@ -53,29 +53,3 @@ class INetworkNewsMarker(Interface):
 
 class INetworkEventsMarker(Interface):
     """ TTW assignable marker to customize a network events folder """
-
-class IWikiLock(Interface):
-    """ Behavior around multiple users editing a wiki page """
-
-    def is_locked(from_time=None):
-        """ returns whether somebody is actively editing this page
-
-        if from_time is specified, it uses that to calculate if the lock has
-        expired, otherwise it defaults to now """
-
-    def clear():
-        """ remove the current active lock from the page """
-
-    def lock(userid, lock_time=None):
-        """ lock a particular page with a particular userid
-
-        if lock_time is specified, it locks with that time, otherwise it
-        defaults to now """
-
-    def lock_info():
-        """ return the current lock information, if any.
-
-        this is a dict with the keys userid and time or an empty dict """
-
-    def owns_lock(userid):
-        """ return whether the active lock is owned by the userid """

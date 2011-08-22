@@ -4,11 +4,10 @@ import time
 from webob.exc import HTTPFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
-from karl.content.views.interfaces import IWikiLock
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
-from karl.utilities.wikilock import lock_info_from_wikilock
+from karl.utilities.lock import lock_data
 from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
@@ -56,14 +55,11 @@ def show_history(context, request):
         'title': context.title
     }
 
-    wikilock = IWikiLock(context)
-    lock_info = lock_info_from_wikilock(wikilock, request)
-
     return {
         'api': TemplateAPI(context, request, page_title),
         'history': history,
         'backto': backto,
-        'lock_info': lock_info,
+        'lock_info': lock_data(context, request),
     }
 
 

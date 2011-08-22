@@ -273,19 +273,19 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/?status_message=Advanced+settings+changed.')
 
-    def test_handle_submit_wikilock(self):
-        from karl.content.views.interfaces import IWikiLock
+    def test_handle_submit_lock(self):
+        import datetime
         from repoze.bfg import testing
-        from zope.interface import Interface
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'userid': 'foo', 'time': lock_time}
         form = self._make_one(context, request)
         response = form.handle_submit({'unlock': True})
         self.assertEqual(response.status_int, 302)
-        self.failIf(context.locked)
+        self.failIf(context.lock)
 
-    def test___call__wikilock(self):
+    def test___call__lock(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
 
@@ -297,9 +297,10 @@ class TestAdvancedFormController(unittest.TestCase):
         self.failIf('unlock' in field_names)
         self.failIf('unlock' in widget_names)
 
-        from karl.content.views.interfaces import IWikiLock
-        from zope.interface import Interface
-        testing.registerAdapter(DummyWikiLockAdapter, (Interface,), IWikiLock)
+        import datetime
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'time': lock_time,
+                        'userid': 'foo'}
         form = self._make_one(context, request)
         fields = form.form_fields()
         widgets = form.form_widgets(fields)
@@ -307,12 +308,3 @@ class TestAdvancedFormController(unittest.TestCase):
         widget_names = [x[0] for x in fields]
         self.failUnless('unlock' in field_names)
         self.failUnless('unlock' in widget_names)
-
-
-class DummyWikiLockAdapter(object):
-    def __init__(self, context):
-        self.context = context
-    def is_locked(self):
-        return True
-    def clear(self):
-        self.context.locked = False

@@ -1144,12 +1144,6 @@
     factory=".references.FileHTML"
     />
 
-  <adapter
-    for="karl.content.interfaces.IWikiPage"
-    provides=".interfaces.IWikiLock"
-    factory=".adapters.WikiLock"
-    />
-
   <!-- Ajax file reorganize -->
   <view
     for="karl.content.interfaces.ICommunityFolder"
