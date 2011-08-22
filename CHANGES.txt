@@ -10,6 +10,8 @@ Unreleased
 - Fixed bug in Wiki Page version preview where the title was always from the
   current version rather than the version being previewed.  (LP #823552)
 
+- Updated the calendar to use cookies instead of a persistent session.
+
 3.69 (2011-08-04)
 -----------------
 

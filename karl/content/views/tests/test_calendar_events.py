@@ -1381,9 +1381,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         self.site.catalog = DummyCatalog()
 
         # This is the cookie that stores the sticky state of the view
-        import karl.content.views.calendar_events
-        self.KARL_CALENDAR_VIEW_COOKIE = \
-            karl.content.views.calendar_events.KARL_CALENDAR_VIEW_COOKIE
+        from karl.content.views import calendar_events
+        self.view_cookie = calendar_events.KARL_CALENDAR_VIEW_COOKIE
+        self.date_cookie = calendar_events.KARL_CALENDAR_DATE_COOKIE
 
     def tearDown(self):
         cleanUp()
@@ -1408,6 +1408,15 @@ class ShowCalendarViewTests(unittest.TestCase):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
+    def assert_cookie(self, response, cookie_name, cookie_value):
+        for name, value in response.headerlist:
+            if name == 'Set-Cookie' and value.startswith(cookie_name):
+                self.assertEqual(
+                    value, '%s=%s; Path=/' % (cookie_name, cookie_value))
+                break
+        else:
+            raise AssertionError('Cookie not set: %s' % cookie_name)
+
     def test_day(self):
         context = DummyCalendar(sessions=DummySessions())
         context['1'] = DummyCalendarCategory('1')
@@ -1427,8 +1436,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_day_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'],
-            '%s=day; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+        self.assert_cookie(response, self.view_cookie, 'day')
 
     def test_week(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1449,8 +1457,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_week_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'],
-            '%s=week; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+        self.assert_cookie(response, self.view_cookie, 'week')
 
     def test_month(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1471,8 +1478,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_month_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'],
-            '%s=month; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+        self.assert_cookie(response, self.view_cookie, 'month')
 
     def test_list(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1493,8 +1499,53 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_list_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assertEqual(response.headers['Set-Cookie'],
-            '%s=list; Path=/' % (self.KARL_CALENDAR_VIEW_COOKIE, ))
+        self.assert_cookie(response, self.view_cookie, 'list')
+
+    def test_list_request_date(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest(params={
+            'year': '2010', 'month': '5', 'day': '12'})
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_list.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_list_view
+        response = show_list_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assert_cookie(response, self.view_cookie, 'list')
+        self.assert_cookie(response, self.date_cookie, '2010-05-12')
+
+    def test_list_cookie_date(self):
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.cookies[self.date_cookie] = '2010-05-12'
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_list.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_list_view
+        response = show_list_view(context, request)
+
+        # check if calendar view has been made sticky
+        self.assert_cookie(response, self.view_cookie, 'list')
+        self.assert_cookie(response, self.date_cookie, '2010-05-12')
 
     def test_default(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1529,7 +1580,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'day' view selected as sticky
-        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'day'
+        request.cookies[self.view_cookie] = 'day'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
@@ -1551,7 +1602,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'week' view selected as sticky
-        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'week'
+        request.cookies[self.view_cookie] = 'week'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
@@ -1573,7 +1624,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'month' view selected as sticky
-        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'month'
+        request.cookies[self.view_cookie] = 'month'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
@@ -1595,7 +1646,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'list' view selected as sticky
-        request.cookies[self.KARL_CALENDAR_VIEW_COOKIE] = 'list'
+        request.cookies[self.view_cookie] = 'list'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
