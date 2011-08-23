@@ -34,7 +34,6 @@
           <!-- buttons -->
           <div class="cal_buttons cal-buttonbar clearafter"></div>
 
-        </div>
       </div>
 
       <div class="cal_footer clearafter" metal:define-macro="footer">
