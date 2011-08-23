@@ -14,6 +14,10 @@ Unreleased
 
 - Added special handling in error page for read only errors.
 
+- 'last_login_time' is now only saved for a user if Karl is not in read only
+  mode, in order to allow users to log in when in read only mode without an
+  error.
+
 3.69 (2011-08-04)
 -----------------
 

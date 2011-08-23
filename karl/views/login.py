@@ -25,6 +25,8 @@ from webob.exc import HTTPFound
 
 from karl.utils import find_profiles
 from karl.utils import find_site
+from karl.utils import get_setting
+
 from karl.views.api import TemplateAPI
 
 def _fixup_came_from(request, came_from):
@@ -87,12 +89,14 @@ def login_view(context, request):
         else:
             remember_headers = []
 
-        # log the time on the user's profile.
-        profiles = find_profiles(context)
-        if profiles is not None:
-            profile = profiles.get(userid)
-            if profile is not None:
-                profile.last_login_time = datetime.utcnow()
+        # log the time on the user's profile, unless in read only mode
+        read_only = get_setting(context, 'read_only', False)
+        if not read_only:
+            profiles = find_profiles(context)
+            if profiles is not None:
+                profile = profiles.get(userid)
+                if profile is not None:
+                    profile.last_login_time = datetime.utcnow()
 
         # and redirect
         return HTTPFound(headers=remember_headers, location=came_from)
