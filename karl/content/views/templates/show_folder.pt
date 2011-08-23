@@ -72,6 +72,9 @@
       <span class="contentbar-menu">
         <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
       </span>
+      <tal:block condition="show_trash">
+       <a href="trash.html">Trash</a>
+      </tal:block>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>

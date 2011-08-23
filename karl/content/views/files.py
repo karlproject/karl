@@ -87,6 +87,7 @@ from base64 import decodestring
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
+from karl.utils import find_repo
 
 # This import is BBB for karl.evolve.zodb.evolve15
 from karl.content.views.utils import ie_types
@@ -142,6 +143,13 @@ def show_folder_view(context, request):
             'title': context.__parent__.title,
             }
 
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
+        actions.append(('History', 'history.html'))
+        show_trash = True
+    else:
+        show_trash = False
+
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -174,6 +182,7 @@ def show_folder_view(context, request):
         backto=backto,
         layout=layout,
         feed_url=feed_url,
+        show_trash=show_trash,
         )
 
 

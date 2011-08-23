@@ -116,13 +116,27 @@ class TestShowFolderView(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
 
-    def test_editable(self):
+    def test_editable_wo_repo(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html')])
+        self.failIf(response['show_trash'])
+
+    def test_editable_w_repo(self):
+        root = self._make_community()
+        root.repo = object()
+        root['files'] = context = testing.DummyModel(title='thetitle')
+        self._register({context: ('view', 'edit'),})
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'],
+                         [('Edit', 'edit.html'),
+                          ('History', 'history.html'),
+                         ])
+        self.failUnless(response['show_trash'])
 
     def test_deletable(self):
         root = self._make_community()
