@@ -10,6 +10,9 @@ Unreleased
 - Fixed bug in Wiki Page version preview where the title was always from the
   current version rather than the version being previewed.  (LP #823552)
 
+- Add locking to Wiki pages. Users are notified via a status-like message when
+  viewing a page that is currently being edited.
+
 3.69 (2011-08-04)
 -----------------
 
