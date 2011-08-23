@@ -283,7 +283,7 @@ def show_wikipage_view(context, request):
         backto=backto,
         is_front_page=is_front_page,
         show_trash=show_trash,
-        lock_info=lock.lock_data(context, request),
+        lock_info=lock.lock_info_for_view(context, request),
         )
 
 
@@ -433,7 +433,7 @@ class EditWikiPageFormController(object):
                 )
         return {'api':api,
                 'actions':(),
-                'lock_info':lock.lock_data(self.context, self.request),
+                'lock_info':lock.lock_info_for_view(self.context, self.request),
                 }
 
     def handle_cancel(self):

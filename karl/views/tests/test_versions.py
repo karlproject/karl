@@ -250,7 +250,7 @@ class Test_undelete(unittest.TestCase):
         self.assertEqual(context.repo.containers, [(context, None)])
 
 
-class Test_show_history_wikilock(unittest.TestCase):
+class Test_show_history_lock(unittest.TestCase):
 
     def setUp(self):
         cleanUp()

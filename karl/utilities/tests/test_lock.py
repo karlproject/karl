@@ -2,7 +2,7 @@ import unittest
 from karl import testing as karltesting
 from repoze.bfg import testing
 
-class TestWikiLock(unittest.TestCase):
+class TestLock(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
 
@@ -67,5 +67,5 @@ class TestWikiLock(unittest.TestCase):
         site = karltesting.DummyRoot()
         site['bar'] = context
         lock.lock(context, 'foo', past)
-        lockdata = lock.lock_data(context, request, now)
+        lockdata = lock.lock_info_for_view(context, request, now)
         self.failUnless(lockdata['is_locked'])

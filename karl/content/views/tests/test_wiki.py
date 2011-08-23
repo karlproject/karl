@@ -383,7 +383,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
 
-    def test__call__wikilock(self):
+    def test__call__lock(self):
         from karl.utilities import lock
         from karl.testing import DummyRoot
         self._register()
@@ -396,7 +396,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         response = controller()
         self.failUnless(context.lock)
 
-    def test_handle_cancel_wikilock(self):
+    def test_handle_cancel_lock(self):
         from datetime import datetime
         self._register()
         context = testing.DummyModel()
@@ -406,7 +406,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         response = controller.handle_cancel()
         self.failIf(context.lock)
 
-    def test_handle_submit_wikilock(self):
+    def test_handle_submit_lock(self):
         from datetime import datetime
         from karl.testing import DummyCatalog
         self._register()

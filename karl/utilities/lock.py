@@ -53,7 +53,7 @@ def owns_lock(context, userid):
     lock = lock_info(context)
     return lock.get('userid', None) == userid
 
-def lock_data(context, request, from_time=None):
+def lock_info_for_view(context, request, from_time=None):
     """return a structure suitable for displaying in a template"""
 
     if is_locked(context, from_time):

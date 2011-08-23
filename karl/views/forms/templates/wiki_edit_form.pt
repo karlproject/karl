@@ -6,7 +6,7 @@
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['wikilock']" />
+    <div metal:use-macro="api.snippets.macros['lock']" />
     <div metal:use-macro="api.snippets.macros['error_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
     <h1>${api.page_title}</h1>
@@ -15,7 +15,7 @@
 
     <script type="text/javascript">
         //<![CDATA[
-        $(document).ready(Karl.clear_wikilock_on_unload);
+        $(document).ready(Karl.clear_lock_on_unload);
         //]]>
     </script>
 
