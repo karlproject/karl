@@ -302,8 +302,12 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.failUnless('tags' in widgets)
 
     def test___call__(self):
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
         context = testing.DummyModel()
         context.title = 'title'
+        site['foo'] = context
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
@@ -311,6 +315,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
+        self._register()
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -378,6 +383,53 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
 
+    def test__call__lock(self):
+        from karl.utilities import lock
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
+        context = testing.DummyModel()
+        context.title = 'title'
+        site['foo'] = context
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless(context.lock)
+
+    def test_handle_cancel_lock(self):
+        from datetime import datetime
+        self._register()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        context.lock = {'time': datetime.now()}
+        response = controller.handle_cancel()
+        self.failIf(context.lock)
+
+    def test_handle_submit_lock(self):
+        from datetime import datetime
+        from karl.testing import DummyCatalog
+        self._register()
+        converted = {
+            'text':'text',
+            'title':'title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags': 'thetesttag',
+            }
+        context = testing.DummyModel(title='oldtitle')
+        request = testing.DummyRequest()
+        def change_title(newtitle):
+            context.title = newtitle
+        context.change_title = change_title
+        context.catalog = DummyCatalog()
+
+        controller = self._makeOne(context, request)
+        context.lock = {'time': datetime.now()}
+        response = controller.handle_submit(converted)
+        self.failIf(context.lock)
+
+
 class Test_preview_wikipage_view(unittest.TestCase):
 
     def setUp(self):
@@ -436,6 +488,44 @@ class Test_preview_wikipage_view(unittest.TestCase):
         profiles['fred'] = testing.DummyModel(title='Fred')
         request = testing.DummyRequest(params={'version_num': '3'})
         self.assertRaises(NotFound, self._callFUT, context, request)
+
+
+class TestUnlockView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request, userid=None):
+        from karl.content.views.wiki import unlock_wiki_view
+        return unlock_wiki_view(context, request, userid)
+
+    def test_get(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(302, response.status_int)
+        self.assertEqual('http://example.com/', response.location)
+
+    def test_post_has_lock(self):
+        from datetime import datetime
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.lock = {'time': datetime.now(), 'userid': 'foo'}
+        response = self._callFUT(context, request, userid='foo')
+        self.assertEqual(200, response.status_int)
+        self.failIf(context.lock)
+
+    def test_post_does_not_have_lock(self):
+        from datetime import datetime
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.lock = {'time': datetime.now(), 'userid': 'foo'}
+        response = self._callFUT(context, request, userid='bar')
+        self.assertEqual(200, response.status_int)
+        self.failUnless(context.lock)
+
 
 from karl.content.interfaces import IWikiPage
 

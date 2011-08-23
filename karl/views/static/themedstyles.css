@@ -304,11 +304,15 @@ button.inline span {
   margin: 1em 0em;
   padding: 6px 10px 6px 30px;
   vertical-align: middle;
-  width: 47em;
+  width: 600px;
   font-size: 1em;
   text-align: left;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
+}
+.pageLockMessage {
+  background-image: url('images/lock-icon.jpg');
+  padding-left: 50px;
 }
 #inner .portalMessage {
   padding: 0.5em 10px 0.5em 30px;

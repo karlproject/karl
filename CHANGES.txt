@@ -18,6 +18,9 @@ Unreleased
   mode, in order to allow users to log in when in read only mode without an
   error.
 
+- Add locking to Wiki pages. Users are notified via a status-like message when
+  viewing a page that is currently being edited.
+
 3.69 (2011-08-04)
 -----------------
 

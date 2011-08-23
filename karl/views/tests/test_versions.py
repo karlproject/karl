@@ -249,6 +249,35 @@ class Test_undelete(unittest.TestCase):
         self.assertEqual(len(context['foo2']['foo3'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
+
+class Test_show_history_lock(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.versions import show_history
+        return show_history(context, request)
+
+    def test_show_locked_page(self):
+        from karl.testing import DummyRoot
+        site = DummyRoot()
+        context = testing.DummyModel(title='title')
+        site['foo'] = context
+
+        import datetime
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'time': lock_time,
+                        'userid': 'foo'}
+
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(response['lock_info']['is_locked'])
+
+
 class DummyArchive(object):
 
     def __init__(self, history):

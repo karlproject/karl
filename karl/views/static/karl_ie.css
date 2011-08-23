@@ -46,7 +46,7 @@ img#login-gradient {
 #error-handling,
 .kstatus_message {
     height: 1%;
-    width: 47em;
+    width: 600px;
 }
 * html .portalMessage, 
 * html .portalWarningMessage, 
