@@ -51,6 +51,7 @@ var enableOldStyleDropdowns = function () {
 };
 
 
+
 // Custom jquery extensions
 
 $.widget('ui.karlstatusbox', {
@@ -2373,6 +2374,26 @@ function initCalendar() {
 
             document.location.href = url;
       }
+
+
+  });
+
+  /* calendar print action */
+
+  $('.cal_actions a.cal_print').click(function() {
+        // I cannot seem to show the entire
+        // calendar from css, so to avoid
+        // scrolling / overflow, the height
+        // is manipulated directly here.
+        var inner =  $('.cal_scroll');
+        var outer = $('.cal_hours_scroll');
+        var fullheight = inner.height();
+        var oldheight = outer.height();
+        outer.height(fullheight);
+        window.focus();
+        window.print();
+        outer.height(oldheight);
+        return false;
   });
 
   scrollToTime();
