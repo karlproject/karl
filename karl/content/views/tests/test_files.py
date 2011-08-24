@@ -627,15 +627,23 @@ class TestShowFileView(unittest.TestCase):
         from karl.content.views.files import show_file_view
         return show_file_view(context, request)
 
-    def test_it(self):
+    def _make_community(self):
+        # factorize a fake community
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel(title='thecommunity')
+        directlyProvides(community, ICommunity)
+        community.catalog = MyDummyCatalog()
+        return community
 
+    def test_editable_wo_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
-        parent = testing.DummyModel(title='parent')
-        context = testing.DummyModel(title='thetitle')
-        parent['child'] = context
+        root = self._make_community()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
         request = testing.DummyRequest()
         renderer  = testing.registerDummyRenderer('templates/show_file.pt')
 
@@ -647,6 +655,32 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(len(actions), 3)
         self.assertEqual(actions[0][1], 'edit.html')
         self.assertEqual(actions[1][1], 'delete.html')
+        self.assertEqual(actions[2][1], 'advanced.html')
+        self.failIf(renderer.show_trash)
+
+    def test_editable_w_repo(self):
+        from karl.content.views.interfaces import IFileInfo
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        root = self._make_community()
+        root.repo = object()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
+        request = testing.DummyRequest()
+        renderer  = testing.registerDummyRenderer('templates/show_file.pt')
+
+        testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+                                IFileInfo)
+
+        self._callFUT(context, request)
+        actions = renderer.actions
+        self.assertEqual(len(actions), 4)
+        self.assertEqual(actions[0][1], 'edit.html')
+        self.assertEqual(actions[1][1], 'delete.html')
+        self.assertEqual(actions[2][1], 'advanced.html')
+        self.assertEqual(actions[3][1], 'history.html')
+        self.failUnless(renderer.show_trash)
 
 class TestDownloadFileView(unittest.TestCase):
     def setUp(self):

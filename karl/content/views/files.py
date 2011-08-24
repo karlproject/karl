@@ -511,6 +511,13 @@ def show_file_view(context, request):
     else:
         layout = layout_provider('generic')
 
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
+        actions.append(('History', 'history.html'))
+        show_trash = True
+    else:
+        show_trash = False
+
     return render_template_to_response(
         'templates/show_file.pt',
         api=api,
@@ -521,6 +528,7 @@ def show_file_view(context, request):
         previous_entry=previous,
         next_entry=next,
         layout=layout,
+        show_trash=show_trash,
         )
 
 def download_file_view(context, request):

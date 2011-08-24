@@ -6,7 +6,12 @@
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <div class="view-show-file-actions">
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <tal:block condition="show_trash">
+       <a href="../trash.html">Trash</a>
+      </tal:block>
+    </div>
 
     <div metal:use-macro="api.snippets.macros['backto_link']"/>
 
