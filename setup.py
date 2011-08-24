@@ -125,6 +125,7 @@ setup(name='karl',
 
       [karlserve.scripts]
       generate_stats = karl.scripts.generate_stats:config_parser
+      init_repozitory = karl.scripts.init_repozitory:config_parser
       """
       )
 
