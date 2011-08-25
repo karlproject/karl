@@ -81,15 +81,20 @@ class CommunityFolderObjectVersionTests(unittest.TestCase):
         context = root['folder'] = Dummy(title='Testing',
                                          docid=42,
                                          creator='unittest',
+                                         created='CREATED',
                                          modified_by=None,
+                                         modified='MODIFIED',
                                         )
         version = self._makeOne(context)
         self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
         self.assertEqual(version.docid, 42)
         self.assertEqual(version.path, '/folder')
         self.assertEqual(version.attrs,
                         {'creator': 'unittest', 'modified_by': None})
-        self.failUnless(version.klass is None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'unittest')
         self.assertEqual(version.comment, None)
 
@@ -100,15 +105,20 @@ class CommunityFolderObjectVersionTests(unittest.TestCase):
         context = root['folder'] = Dummy(title='Testing',
                                          docid=42,
                                          creator='unittest',
+                                         created='CREATED',
                                          modified_by='otherbloke',
+                                         modified='MODIFIED',
                                         )
         version = self._makeOne(context)
         self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
         self.assertEqual(version.docid, 42)
         self.assertEqual(version.path, '/folder')
         self.assertEqual(version.attrs,
                         {'creator': 'unittest', 'modified_by': 'otherbloke'})
-        self.failUnless(version.klass is None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'otherbloke')
         self.assertEqual(version.comment, None)
 
@@ -297,7 +307,7 @@ class CommunityFileVersionTests(unittest.TestCase):
                          'filename': 'FILENAME',
                          'mimetype': 'MIMETYPE'})
         self.assertEqual(version.blobs, {'blob': OPEN_FILE})
-        self.failUnless(version.klass is None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'unittest')
         self.assertEqual(version.comment, None)
 
@@ -332,7 +342,7 @@ class CommunityFileVersionTests(unittest.TestCase):
                          'filename': 'FILENAME',
                          'mimetype': 'MIMETYPE'})
         self.assertEqual(version.blobs, {'blob': OPEN_FILE})
-        self.failUnless(version.klass is None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'otherbloke')
         self.assertEqual(version.comment, None)
 

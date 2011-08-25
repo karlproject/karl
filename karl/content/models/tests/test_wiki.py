@@ -325,17 +325,19 @@ class WikiPageVersionTests(unittest.TestCase):
         return self._getTargetClass()(context)
 
     def test_version_w_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
         root = testing.DummyModel()
         wiki = root['wiki'] = testing.DummyModel()
-        page = wiki['page'] = testing.DummyModel(title='the title',
-                                                 description = 'description',
-                                                 created = 'created',
-                                                 modified = 'modified',
-                                                 docid = 5,
-                                                 text = 'wiki text',
-                                                 creator = 'creator',
-                                                 modified_by = 'modified_by',
-                                                )
+        page = wiki['page'] = Dummy(title='the title',
+                                    description='description',
+                                    created='created',
+                                    modified='modified',
+                                    docid=5,
+                                    text='wiki text',
+                                    creator='creator',
+                                    modified_by='modified_by',
+                                   )
         version = self._makeOne(page)
         self.assertEqual(version.title, 'the title')
         self.assertEqual(version.description, 'description')
@@ -346,22 +348,24 @@ class WikiPageVersionTests(unittest.TestCase):
         self.assertEqual(version.attrs['text'], 'wiki text')
         self.assertEqual(version.attrs['creator'], 'creator')
         self.assertEqual(version.attachments, None)
-        self.assertEqual(version.klass, None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'modified_by')
         self.assertEqual(version.comment, None)
 
     def test_version_no_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
         root = testing.DummyModel()
         wiki = root['wiki'] = testing.DummyModel()
-        page = wiki['page'] = testing.DummyModel(title='the title',
-                                                 description = 'description',
-                                                 created = 'created',
-                                                 modified = 'modified',
-                                                 docid = 5,
-                                                 text = 'wiki text',
-                                                 creator = 'creator',
-                                                 modified_by = None,
-                                                )
+        page = wiki['page'] = Dummy(title='the title',
+                                    description='description',
+                                    created='created',
+                                    modified='modified',
+                                    docid=5,
+                                    text='wiki text',
+                                    creator='creator',
+                                    modified_by=None,
+                                   )
         version = self._makeOne(page)
         self.assertEqual(version.title, 'the title')
         self.assertEqual(version.description, 'description')
@@ -372,7 +376,7 @@ class WikiPageVersionTests(unittest.TestCase):
         self.assertEqual(version.attrs['text'], 'wiki text')
         self.assertEqual(version.attrs['creator'], 'creator')
         self.assertEqual(version.attachments, None)
-        self.assertEqual(version.klass, None)
+        self.failUnless(version.klass is Dummy)
         self.assertEqual(version.user, 'creator')
         self.assertEqual(version.comment, None)
 

@@ -48,7 +48,7 @@ class CommunityFolder(Folder):
     implements(ICommunityFolder, IEventContainer)
     modified_by = None
 
-    def __init__(self, title, creator):
+    def __init__(self, title='', creator=''):
         super(CommunityFolder, self).__init__()
         self.title = unicode(title)
         self.creator = unicode(creator)
@@ -60,13 +60,16 @@ class CommunityFolderObjectVersion(object):
 
     def __init__(self, folder):
         self.title = folder.title
+        self.description = None
+        self.created = folder.created
+        self.modified = folder.modified
         self.docid = folder.docid
         self.path = model_path(folder)
         self.attrs = dict((name, getattr(folder, name)) for name in [
             'creator',
             'modified_by',
         ])
-        self.klass = None # let repozitory detect it
+        self.klass = folder.__class__ # repozitory can't detect we are a shim
         self.user = folder.modified_by
         if self.user is None:
             self.user = folder.creator
@@ -228,7 +231,7 @@ class CommunityFileVersion(object):
             'creator',
         ])
         self.blobs = {'blob': file.blobfile.open()}
-        self.klass = None # let repozitory detect it
+        self.klass = file.__class__ # repozitory can't detect we are a shim
         self.user = file.modified_by
         if self.user is None:
             self.user = file.creator

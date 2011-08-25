@@ -256,7 +256,7 @@ class WikiPageVersion(object):
             'creator',
         ])
         self.attachments = None
-        self.klass = None   # let repozistory detect it
+        self.klass = page.__class__ # repozitory can't detect we are a shim
         self.user = page.modified_by
         if self.user is None:
             self.user = page.creator
