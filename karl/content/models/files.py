@@ -55,6 +55,24 @@ class CommunityFolder(Folder):
         self.modified_by = self.creator
 
 
+class CommunityFolderObjectVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, folder):
+        self.title = folder.title
+        self.docid = folder.docid
+        self.path = model_path(folder)
+        self.attrs = dict((name, getattr(folder, name)) for name in [
+            'creator',
+            'modified_by',
+        ])
+        self.klass = None # let repozitory detect it
+        self.user = folder.modified_by
+        if self.user is None:
+            self.user = folder.creator
+        self.comment = None
+
+
 class CommunityFolderContainerVersion(object):
     implements(IContainerVersion)
 

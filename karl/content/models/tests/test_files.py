@@ -65,6 +65,55 @@ class CommunityFolderTests(unittest.TestCase):
         self.assertEqual(instance.modified_by, u'admin')
 
 
+class CommunityFolderObjectVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.content.models.files import CommunityFolderObjectVersion
+        return CommunityFolderObjectVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_wo_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        context = root['folder'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         modified_by=None,
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest', 'modified_by': None})
+        self.failUnless(version.klass is None)
+        self.assertEqual(version.user, 'unittest')
+        self.assertEqual(version.comment, None)
+
+    def test_w_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        context = root['folder'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         modified_by='otherbloke',
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest', 'modified_by': 'otherbloke'})
+        self.failUnless(version.klass is None)
+        self.assertEqual(version.user, 'otherbloke')
+        self.assertEqual(version.comment, None)
+
+
+
 class CommunityFolderContainerVersionTests(unittest.TestCase):
 
     def _getTargetClass(self):

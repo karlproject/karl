@@ -200,6 +200,12 @@
       factory=".files.CommunityFileVersion"
      />
 
+  <adapter
+      for="karl.content.interfaces.ICommunityFolder"
+      provides="karl.models.interfaces.IObjectVersion"
+      factory=".files.CommunityFolderObjectVersion"
+     />
+
   <lemonade:content
       factory=".wiki.Wiki"
       type="karl.content.interfaces.IWiki"
