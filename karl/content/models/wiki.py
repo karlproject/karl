@@ -256,7 +256,7 @@ class WikiPageVersion(object):
             'creator',
         ])
         self.attachments = None
-        self.klass = page.__class__
+        self.klass = None   # let repozistory detect it
         self.user = page.modified_by
         if self.user is None:
             self.user = page.creator

@@ -314,47 +314,55 @@ class WikiPageTests(unittest.TestCase):
         self.assertEqual(page.text, 'wiki text')
         self.assertEqual(page.creator, 'creator')
 
-    def test_version(self):
+
+class WikiPageVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
         from karl.content.models.wiki import WikiPageVersion
-        page = self._makeOne()
-        page.title = 'the title'
-        page.description = 'description'
-        page.created = 'created'
-        page.modified = 'modified'
-        page.docid = 5
-        page.text = 'wiki text'
-        page.creator = 'creator'
-        page.modified_by = 'modified_by'
-        container = testing.DummyModel()
-        container['foo'] = page
-        version = WikiPageVersion(page)
+        return WikiPageVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_version_w_modified_by(self):
+        root = testing.DummyModel()
+        wiki = root['wiki'] = testing.DummyModel()
+        page = wiki['page'] = testing.DummyModel(title='the title',
+                                                 description = 'description',
+                                                 created = 'created',
+                                                 modified = 'modified',
+                                                 docid = 5,
+                                                 text = 'wiki text',
+                                                 creator = 'creator',
+                                                 modified_by = 'modified_by',
+                                                )
+        version = self._makeOne(page)
         self.assertEqual(version.title, 'the title')
         self.assertEqual(version.description, 'description')
         self.assertEqual(version.created, 'created')
         self.assertEqual(version.modified, 'modified')
         self.assertEqual(version.docid, 5)
-        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.path, '/wiki/page')
         self.assertEqual(version.attrs['text'], 'wiki text')
         self.assertEqual(version.attrs['creator'], 'creator')
         self.assertEqual(version.attachments, None)
-        self.assertEqual(version.klass, type(page))
+        self.assertEqual(version.klass, None)
         self.assertEqual(version.user, 'modified_by')
         self.assertEqual(version.comment, None)
 
     def test_version_no_modified_by(self):
-        from karl.content.models.wiki import WikiPageVersion
-        page = self._makeOne()
-        page.title = 'the title'
-        page.description = 'description'
-        page.created = 'created'
-        page.modified = 'modified'
-        page.docid = 5
-        page.text = 'wiki text'
-        page.creator = 'creator'
-        page.modified_by = None
-        container = testing.DummyModel()
-        container['foo'] = page
-        version = WikiPageVersion(page)
+        root = testing.DummyModel()
+        wiki = root['wiki'] = testing.DummyModel()
+        page = wiki['page'] = testing.DummyModel(title='the title',
+                                                 description = 'description',
+                                                 created = 'created',
+                                                 modified = 'modified',
+                                                 docid = 5,
+                                                 text = 'wiki text',
+                                                 creator = 'creator',
+                                                 modified_by = None,
+                                                )
+        version = self._makeOne(page)
         self.assertEqual(version.title, 'the title')
         self.assertEqual(version.description, 'description')
         self.assertEqual(version.created, 'created')
@@ -364,7 +372,7 @@ class WikiPageTests(unittest.TestCase):
         self.assertEqual(version.attrs['text'], 'wiki text')
         self.assertEqual(version.attrs['creator'], 'creator')
         self.assertEqual(version.attachments, None)
-        self.assertEqual(version.klass, type(page))
+        self.assertEqual(version.klass, None)
         self.assertEqual(version.user, 'creator')
         self.assertEqual(version.comment, None)
 
