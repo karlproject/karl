@@ -183,6 +183,12 @@
       />
 
   <adapter
+      for="karl.content.interfaces.ICommunityFolder"
+      provides="karl.models.interfaces.IContainerVersion"
+      factory=".files.CommunityFolderContainerVersion"
+      />
+
+  <adapter
       for="karl.content.interfaces.ICommunityFile"
       provides="karl.models.interfaces.IObjectVersion"
       factory=".files.CommunityFileVersion"

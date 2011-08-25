@@ -64,6 +64,34 @@ class CommunityFolderTests(unittest.TestCase):
         self.assertEqual(instance.creator, u'admin')
         self.assertEqual(instance.modified_by, u'admin')
 
+
+class CommunityFolderContainerVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.content.models.files import CommunityFolderContainerVersion
+        return CommunityFolderContainerVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_container_version(self):
+        root = testing.DummyModel()
+        folder = root['folder'] = testing.DummyModel('folder')
+        folder.docid = 5
+        folder['one'] = testing.DummyModel(docid=6)
+        folder['two'] = testing.DummyModel(docid=7)
+        folder['three'] = testing.DummyModel(docid=8)
+        container = self._makeOne(folder)
+        self.assertEqual(container.container_id, 5)
+        self.assertEqual(container.path, '/folder')
+        self.assertEqual(container.map, {
+            'one': 6,
+            'two': 7,
+            'three': 8
+        })
+        self.assertEqual(container.ns_map, {})
+
+
 class CommunityFileTests(unittest.TestCase):
 
     def _getTargetClass(self):

@@ -33,6 +33,7 @@ from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IEventContainer
 from karl.content.interfaces import IImage
+from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import IToolFactory
 from karl.models.tool import ToolFactory
@@ -52,6 +53,16 @@ class CommunityFolder(Folder):
         self.title = unicode(title)
         self.creator = unicode(creator)
         self.modified_by = self.creator
+
+
+class CommunityFolderContainerVersion(object):
+    implements(IContainerVersion)
+
+    def __init__(self, folder):
+        self.container_id = folder.docid
+        self.path = model_path(folder)
+        self.map = dict((name, page.docid) for name, page in folder.items())
+        self.ns_map = {}
 
 
 class CommunityFile(Persistent):
