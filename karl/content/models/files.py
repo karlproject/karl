@@ -210,7 +210,7 @@ class CommunityFileVersion(object):
             'creator',
         ])
         self.blobs = {'blob': file.blobfile.open()}
-        self.klass = file.__class__
+        self.klass = None # let repozitory detect it
         self.user = file.modified_by
         if self.user is None:
             self.user = file.creator
