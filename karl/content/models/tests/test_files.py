@@ -58,6 +58,11 @@ class CommunityFolderTests(unittest.TestCase):
         from karl.content.interfaces import ICommunityFolder
         verifyObject(ICommunityFolder, self._makeOne())
 
+    def test_ctor_wo_args(self):
+        folder = self._getTargetClass()()
+        self.assertEqual(folder.title, '')
+        self.assertEqual(folder.creator, '')
+
     def test_instance_has_valid_construction(self):
         instance = self._makeOne()
         self.assertEqual(instance.title, u'')
