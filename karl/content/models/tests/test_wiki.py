@@ -57,18 +57,25 @@ class WikiTests(unittest.TestCase):
         del wiki['front_page']
         self.failUnless(isinstance(wiki['front_page'], DummyContent))
 
-    def test_container_version(self):
+
+class WikiContainerVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
         from karl.content.models.wiki import WikiContainerVersion
-        wiki = self._makeOne()
-        wiki.docid = 5
+        return WikiContainerVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_container_version(self):
+        root = testing.DummyModel()
+        wiki = root['wiki'] = testing.DummyModel(docid=5)
         wiki['one'] = testing.DummyModel(docid=6)
         wiki['two'] = testing.DummyModel(docid=7)
-        wiki['front_page'].docid = 8
-        root = testing.DummyModel()
-        root['foo'] = wiki
-        container = WikiContainerVersion(wiki)
+        wiki['front_page'] = testing.DummyModel(docid=8)
+        container = self._makeOne(wiki)
         self.assertEqual(container.container_id, 5)
-        self.assertEqual(container.path, '/foo')
+        self.assertEqual(container.path, '/wiki')
         self.assertEqual(container.map, {
             'one': 6,
             'two': 7,
@@ -361,17 +368,24 @@ class WikiPageTests(unittest.TestCase):
         self.assertEqual(version.user, 'creator')
         self.assertEqual(version.comment, None)
 
-    def test_container_version(self):
+
+class WikiPageContainerVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
         from karl.content.models.wiki import WikiPageContainerVersion
+        return WikiPageContainerVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_container_version(self):
         root = testing.DummyModel()
-        page = self._makeOne()
-        root['foo'] = page
-        page.docid = 5
+        page = root['page'] = testing.DummyModel(docid=5)
         page['one'] = testing.DummyModel(docid=6)
         page['two'] = testing.DummyModel(docid=7)
-        container = WikiPageContainerVersion(page)
+        container = self._makeOne(page)
         self.assertEqual(container.container_id, 5)
-        self.assertEqual(container.path, '/foo')
+        self.assertEqual(container.path, '/page')
         self.assertEqual(container.map, {'one': 6, 'two': 7})
         self.assertEqual(container.ns_map, {})
 
