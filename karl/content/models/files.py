@@ -210,7 +210,7 @@ class CommunityFileVersion(object):
             'creator',
         ])
         self.blobs = {'blob': file.blobfile.open()}
-        self.klass = type(file)
+        self.klass = file.__class__
         self.user = file.modified_by
         if self.user is None:
             self.user = file.creator
