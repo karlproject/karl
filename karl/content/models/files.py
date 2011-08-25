@@ -54,6 +54,15 @@ class CommunityFolder(Folder):
         self.creator = unicode(creator)
         self.modified_by = self.creator
 
+    def revert(self, version):
+        # catalog document map blows up if you feed it a long int
+        self.title = version.title
+        self.created = version.created
+        self.modified = version.modified
+        self.docid = int(version.docid)
+        self.creator = version.attrs['creator']
+        self.modified_by = version.user
+
 
 class CommunityFolderObjectVersion(object):
     implements(IObjectVersion)

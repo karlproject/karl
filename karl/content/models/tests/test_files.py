@@ -69,6 +69,29 @@ class CommunityFolderTests(unittest.TestCase):
         self.assertEqual(instance.creator, u'admin')
         self.assertEqual(instance.modified_by, u'admin')
 
+    def test_revert(self):
+        o = self._makeOne()
+        class DummyVersion:
+            title = 'title'
+            description = None
+            created = 'created'
+            modified = 'modified'
+            docid = 5
+            path = '/path/to/folder'
+            attrs = {
+                'creator': 'creator',
+                'modified_by': 'modified_by',
+            }
+            user = 'user'
+        o.revert(DummyVersion)
+        self.assertEqual(o.docid, 5)
+        self.failUnless(type(o.docid) is int)
+        self.assertEqual(o.created, 'created')
+        self.assertEqual(o.title, 'title')
+        self.assertEqual(o.modified, 'modified')
+        self.assertEqual(o.creator, 'creator')
+        self.assertEqual(o.modified_by, 'user')
+
 
 class CommunityFolderObjectVersionTests(unittest.TestCase):
 
