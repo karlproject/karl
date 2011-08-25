@@ -41,9 +41,11 @@ from karl.content.interfaces import IEventContainer
 from repoze.folder import Folder
 from ZODB.blob import Blob
 
+
 class CommunityRootFolder(Folder):
     implements(ICommunityRootFolder, IEventContainer)
     title = u'Files'
+
 
 class CommunityFolder(Folder):
     implements(ICommunityFolder, IEventContainer)
@@ -54,6 +56,7 @@ class CommunityFolder(Folder):
         self.title = unicode(title)
         self.creator = unicode(creator)
         self.modified_by = self.creator
+
 
 class CommunityFile(Persistent):
     implements(ICommunityFile)
@@ -143,6 +146,7 @@ def upload_stream(stream, file):
         file.write(data)
     return size
 
+
 class Thumbnail(Persistent):
     mimetype = 'image/jpeg'
 
@@ -163,6 +167,7 @@ class Thumbnail(Persistent):
     def image(self):
         return PIL.Image.open(self.blobfile.open())
 
+
 def _thumb_size(orig_size, max_size):
     orig_x, orig_y = orig_size
     max_x, max_y = max_size
@@ -180,6 +185,7 @@ def _thumb_size(orig_size, max_size):
 
     assert x < max_x
     return x, y
+
 
 class CommunityFileVersion(object):
     implements(IObjectVersion)
@@ -202,6 +208,7 @@ class CommunityFileVersion(object):
         if self.user is None:
             self.user = file.creator
         self.comment = None
+
 
 class FilesToolFactory(ToolFactory):
     implements(IToolFactory)
