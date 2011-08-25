@@ -368,7 +368,7 @@ class WikiPageVersionTests(unittest.TestCase):
         self.assertEqual(version.created, 'created')
         self.assertEqual(version.modified, 'modified')
         self.assertEqual(version.docid, 5)
-        self.assertEqual(version.path, '/foo')
+        self.assertEqual(version.path, '/wiki/page')
         self.assertEqual(version.attrs['text'], 'wiki text')
         self.assertEqual(version.attrs['creator'], 'creator')
         self.assertEqual(version.attachments, None)
