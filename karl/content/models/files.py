@@ -16,30 +16,26 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from cStringIO import StringIO
-import PIL.Image
 
-from persistent import Persistent
 from BTrees.OOBTree import OOBTree
-
+import PIL.Image
+from ZODB.blob import Blob
+from persistent import Persistent
 from repoze.bfg.traversal import model_path
+from repoze.folder import Folder
 from repoze.lemonade.content import create_content
-
 from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import noLongerProvides
-
-from karl.content.interfaces import IImage
-from karl.models.interfaces import IObjectVersion
-from karl.models.tool import ToolFactory
-from karl.models.interfaces import IToolFactory
 
 from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IEventContainer
-
-from repoze.folder import Folder
-from ZODB.blob import Blob
+from karl.content.interfaces import IImage
+from karl.models.interfaces import IObjectVersion
+from karl.models.interfaces import IToolFactory
+from karl.models.tool import ToolFactory
 
 
 class CommunityRootFolder(Folder):
