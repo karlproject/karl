@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.70 (2011-08-25)
+-----------------
 
 - The statistics option is now hidden in the admin UI if no statistics have
   been generated yet.  (LP #821204)
