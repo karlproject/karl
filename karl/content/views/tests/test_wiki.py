@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import datetime
 from repoze.bfg.testing import cleanUp
 from zope.interface import implements
 
@@ -229,6 +230,67 @@ class TestShowWikipageView(unittest.TestCase):
         self.assertEqual(response['actions'][1][1], 'delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
         self.assert_(response['backto'] is not False)
+
+
+class TestShowWikitocView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.wiki import show_wikitoc_view
+        return show_wikitoc_view(context, request)
+
+    def _register(self):
+        from repoze.bfg import testing
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+
+        from karl.models.interfaces import ICatalogSearch
+        testing.registerAdapter(DummySearch, (Interface, ),
+                                ICatalogSearch)
+
+
+    def test_frontpage(self):
+        self._register()
+        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        context = DummyWikiPage()
+        context.__name__ = 'front_page'
+        context.title = 'Page'
+        from karl.testing import DummyCommunity
+        context.__parent__ = DummyCommunity()
+        from karl.testing import DummyCatalog
+        context.__parent__.catalog = DummyCatalog()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(len(renderer.actions), 0)
+        self.assertEqual(renderer.backto, False)
+        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+
+    def test_otherpage(self):
+        self._register()
+        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        context = DummyWikiPage(title='Other Page')
+        context.__name__ = 'other_page'
+        from karl.testing import DummyCommunity
+        context.__parent__ = DummyCommunity()
+        from karl.testing import DummyCatalog
+        context.__parent__.catalog = DummyCatalog()
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.params = request.POST = MultiDict()
+        response = self._callFUT(context, request)
+        self.assertEqual(len(renderer.actions), 0)
+        self.assertEqual(renderer.backto, {
+            'href': 'http://example.com/communities/community/',
+            'title': u'Dummy Communit\xe0',
+            })
+        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+
 
 class TestEditWikiPageFormController(unittest.TestCase):
     def _makeOne(self, context, request):
@@ -531,11 +593,14 @@ from karl.content.interfaces import IWikiPage
 
 class DummyWikiPage:
     implements(IWikiPage)
+    __name__ = 'WIKIPAGE'
     def __init__(self, title='', text='', description='', creator=''):
         self.title = title
         self.text = text
         self.description = description
         self.creator = creator
+        self.created = datetime.datetime(2011, 8, 20)
+        self.modified = datetime.datetime(2011, 8, 20)
 
     def get_attachments(self):
         return self
@@ -546,6 +611,16 @@ class DummyWikiPage:
 
     def cook(self, request):
         return 'COOKED: ' + self.text
+
+
+dummywikipage = DummyWikiPage()
+
+class DummySearch:
+    def __init__(self, context):
+        pass
+    def __call__(self, **kw):
+        return 1, [1], lambda x: dummywikipage
+
 
 class DummyAdapter:
     def __init__(self, context, request):
