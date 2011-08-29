@@ -35,6 +35,7 @@ from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.utils import find_root
 from karl.utils import find_users
+from karl.utils import get_setting
 
 REPORT_REPLY_REGX = re.compile(r'peopledir-'
                                 '(?P<report>\w+(\+\w+)*)'
@@ -48,7 +49,17 @@ REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
 
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
-ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
+ALIAS_REGX_PREFIX = r'(?P<alias>.*)@'
+ALIAS_REGX = None
+def _get_ALIAS_REGX(context):
+    global ALIAS_REGX
+    if ALIAS_REGX is None:
+        subdomain = get_setting(context, "system_list_subdomain", None)
+        if subdomain is not None:
+            ALIAS_REGX = re.compile(r'(?P<alias>.*)@%s' % subdomain)
+        else:
+            ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
+    return ALIAS_REGX
 
 class MailinDispatcher(object):
     implements(IMailinDispatcher)
@@ -147,7 +158,7 @@ class MailinDispatcher(object):
                 targets.append(target)
                 continue
 
-            match = ALIAS_REGX.search(email)
+            match = _get_ALIAS_REGX(self.context).search(email)
             if match:
                 alias = match.group('alias')
                 path = self.context.list_aliases.get(alias)
