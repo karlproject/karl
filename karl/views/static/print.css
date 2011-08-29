@@ -10,6 +10,10 @@
 #header, #footer, #spo-header, #cheader, #backto, #crightcol, #left, ul.peopleTabs, #right {display:none}
 .cheader, .chactions, .kalphabetlisting, .search_utility_bar, .kpagination_frame {display:none}
 
+.cal_search_header {
+    display: none;
+}
+
 /* Make sure our content doesn't get cut its right margin cut off */
 .ccontent {width:75%;}
 

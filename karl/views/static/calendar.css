@@ -1122,3 +1122,31 @@ select.category_paths {
 */
 
 
+
+/** =CALENDAR HEADER (H1, SEARCH)
+----------------------------------------------- */
+
+.cal_search_header {
+  margin-bottom: 25px;
+  position: relative;
+}
+.cal_search_header h1 {
+  font-weight: normal;
+  margin-top: 0;
+}
+.cal_search_header form {
+  float: right;
+  width: 35em;
+  text-align: right;
+}
+.cal_search_header form input {
+  margin-right: 2px;
+  font-size: 11px;
+  display: inline;
+  height: 19px;
+  vertical-align: baseline;
+}
+.cal_search_header form .inp {
+	width: 15em;
+}
+

@@ -11,6 +11,8 @@
 
   <div metal:fill-slot="content" class="${calendar_format_class}">
 
+    <div metal:use-macro="calendar.navigation.macros['search']"/>
+
     <div metal:use-macro="calendar.navigation.macros['header']"/>
 
     <!-- cal legend -->
