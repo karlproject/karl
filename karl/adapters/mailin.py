@@ -49,7 +49,6 @@ REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
 
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
-ALIAS_REGX_PREFIX = r'(?P<alias>.*)@'
 ALIAS_REGX = None
 def _get_ALIAS_REGX(context):
     global ALIAS_REGX
