@@ -15,7 +15,7 @@ from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 
 
-def show_history(context, request, tz=time.timezone):
+def show_history(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
@@ -73,7 +73,7 @@ def revert(context, request):
     return HTTPFound(location=model_url(context, request))
 
 
-def show_trash(context, request, tz=time.timezone):
+def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
@@ -137,6 +137,26 @@ def undelete(context, request):
     return HTTPFound(location=model_url(doc, request))
 
 
-def format_local_date(date, tz):
+epoch = datetime.datetime.utcfromtimestamp(0)
+
+
+def format_local_date(date, tz=None, time_module=time):
+    """Format a UTC datetime for the local time zone."""
+    # time_module is a testing hook.
+    if tz is None:
+        if not time_module.daylight:
+            # DST does not apply to the local time zone.
+            tz = time_module.timezone
+        else:
+            # Figure out whether DST applied on the given date in the
+            # local time zone.
+            delta = date - epoch
+            seconds = delta.days * 86400 + delta.seconds
+            struct_time = time_module.localtime(seconds)
+            if struct_time.tm_isdst:
+                tz = time_module.altzone
+            else:
+                tz = time_module.timezone
+
     local = date - datetime.timedelta(seconds=tz)
     return local.strftime('%Y-%m-%d %H:%M')

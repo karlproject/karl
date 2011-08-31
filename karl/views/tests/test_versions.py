@@ -297,6 +297,60 @@ class Test_show_history_lock(unittest.TestCase):
         self.failUnless(response['lock_info']['is_locked'])
 
 
+class Test_format_local_date(unittest.TestCase):
+
+    def _callFUT(self, date, tz=None, time_module=None):
+        if time_module is None:
+            import time
+            time_module = time
+        from karl.views.versions import format_local_date
+        return format_local_date(date, tz=tz, time_module=time_module)
+
+    def test_with_tz_specified(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt, 7 * 3600)
+        self.assertEqual(s, '2011-08-30 00:30')
+
+    def _make_time_module(self, daylight=0, isdst=False):
+        # Make an object simulates the time module.
+
+        class TimeModule:
+            timezone = 6 * 3600
+            altzone = 7 * 3600
+
+            def __init__(self):
+                self.daylight = daylight
+
+            def localtime(self, t):
+                class struct_time:
+                    tm_isdst = isdst
+
+                return struct_time()
+
+        return TimeModule()
+
+    def test_in_zone_without_daylight_savings(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt, time_module=self._make_time_module(daylight=0))
+        self.assertEqual(s, '2011-08-30 01:30')
+
+    def test_with_daylight_savings_in_effect(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt,
+            time_module=self._make_time_module(daylight=1, isdst=True))
+        self.assertEqual(s, '2011-08-30 00:30')
+
+    def test_with_daylight_savings_not_in_effect(self):
+        import datetime
+        dt = datetime.datetime(2011, 1, 30, 7, 30, 15)
+        s = self._callFUT(dt,
+            time_module=self._make_time_module(daylight=1, isdst=False))
+        self.assertEqual(s, '2011-01-30 01:30')
+
+
 class DummyArchive(object):
 
     def __init__(self, history):
