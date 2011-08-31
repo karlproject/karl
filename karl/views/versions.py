@@ -13,21 +13,15 @@ from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 
-try:
-    from sqlalchemy.orm.exc import NoResultFound
-except ImportError:
-    class NoResultFound(Exception):
-        pass
 
-
-def show_history(context, request):
+def show_history(context, request, tz=time.timezone):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
     def display_record(record):
         editor = profiles[record.user]
         return {
-            'date': format_local_date(record.archive_time),
+            'date': format_local_date(record.archive_time, tz),
             'editor': {
                 'name': editor.title,
                 'url': model_url(editor, request),
@@ -78,7 +72,7 @@ def revert(context, request):
     return HTTPFound(location=model_url(context, request))
 
 
-def show_trash(context, request):
+def show_trash(context, request, tz=time.timezone):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
@@ -86,7 +80,7 @@ def show_trash(context, request):
         deleted_by = profiles[record.deleted_by]
         version = repo.history(record.docid, only_current=True)[0]
         return {
-            'date': format_local_date(record.deleted_time),
+            'date': format_local_date(record.deleted_time, tz),
             'deleted_by': {
                 'name': deleted_by.title,
                 'url': model_url(deleted_by, request),
@@ -138,6 +132,6 @@ def undelete(context, request):
     return HTTPFound(location=model_url(doc, request))
 
 
-def format_local_date(date):
-    local = date - datetime.timedelta(seconds=time.timezone)
+def format_local_date(date, tz):
+    local = date - datetime.timedelta(seconds=tz)
     return local.strftime('%Y-%m-%d %H:%M')

@@ -71,6 +71,7 @@ from karl.content.views.utils import extract_description
 from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
+import time
 
 _wiki_text_help = """You can create a new page by naming it and surrounding
 the name with ((double parentheses)). When you save the page, the contents
@@ -287,7 +288,8 @@ def show_wikipage_view(context, request):
         )
 
 
-def preview_wikipage_view(context, request, WikiPage=WikiPage):
+def preview_wikipage_view(context, request, WikiPage=WikiPage,
+        tz=time.timezone):
     version_num = int(request.params['version_num'])
     repo = find_repo(context)
     for version in repo.history(context.docid):
@@ -316,7 +318,7 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage):
     transaction.doom()
 
     return {
-        'date': format_local_date(version.archive_time),
+        'date': format_local_date(version.archive_time, tz),
         'author': author.title,
         'title': page_title,
         'body': page.cook(request),

@@ -8,11 +8,13 @@ class Test_get_default_config(unittest.TestCase):
         return get_default_config()
 
     def test_it(self):
-        import os
-        self.assertEqual(self._callFUT(),
-                         os.path.abspath(
-                            os.path.join(
-                                os.getcwd(), '../..', 'etc', 'karl.ini')))
+        import os.path
+        path = self._callFUT()
+        self.assertTrue(path.endswith('/etc/karl.ini'))
+        # Expect to find a bin dir next to etc/karl.ini.
+        sandbox = os.path.dirname(os.path.dirname(path))
+        bindir = os.path.join(sandbox, 'bin')
+        self.assertTrue(os.path.exists(bindir), 'Expected to find %s' % bindir)
 
 
 class Test_run_daemon(unittest.TestCase):
@@ -153,14 +155,20 @@ class Test_only_once(unittest.TestCase):
         shutil.rmtree(self._tmpdir)
 
     def _callFUT(self, progname, config=None, tempdir=None):
+        import os.path
         import subprocess
+        import sys
         if tempdir is None:
             tempdir = self._tmpdir
         python_cmds = ('from karl import scripting as s; '
                        's.LOCKDIR = "%s"; '
                        's.only_once("%s", %r); '
                        'print "OK"' % (tempdir, progname, config))
-        child = subprocess.Popen(['../../bin/py', '-c', python_cmds],
+        bindir = os.path.dirname(sys.argv[0])
+        py = os.path.join(bindir, 'py')
+        if not os.path.exists(py):
+            self.fail("Expected to find python interpreter at %s" % py)
+        child = subprocess.Popen([py, '-c', python_cmds],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE,
                                 )
@@ -169,7 +177,7 @@ class Test_only_once(unittest.TestCase):
 
     def _makeConfig(self):
         import os
-        config = os.path.join(self._tmpdir, 'testing.ini') 
+        config = os.path.join(self._tmpdir, 'testing.ini')
         f = open(config, 'w')
         f.write('[DEFAULT]\nlockdir = %s\n' % self._tmpdir)
         f.flush()
@@ -179,7 +187,7 @@ class Test_only_once(unittest.TestCase):
     def test_lockfile_present_wo_config(self):
         import os
         job_name = '%s-testing' % os.getlogin()
-        filename = os.path.join(self._tmpdir, job_name) 
+        filename = os.path.join(self._tmpdir, job_name)
         open(filename, 'w').write('testing')
         child, stdout, stderr = self._callFUT('testing')
         self.assertEqual(child.returncode, 1)
@@ -189,7 +197,7 @@ class Test_only_once(unittest.TestCase):
     def test_lockfile_present_w_config(self):
         import os
         job_name = '%s-testing' % os.getlogin()
-        filename = os.path.join(self._tmpdir, job_name) 
+        filename = os.path.join(self._tmpdir, job_name)
         open(filename, 'w').write('testing')
         config = self._makeConfig()
         child, stdout, stderr = self._callFUT('testing', config, '/tmp')
@@ -200,7 +208,7 @@ class Test_only_once(unittest.TestCase):
     def test_lockfile_not_present_wo_config(self):
         import os
         job_name = '%s-testing' % os.getlogin()
-        filename = os.path.join(self._tmpdir, job_name) 
+        filename = os.path.join(self._tmpdir, job_name)
         child, stdout, stderr = self._callFUT('testing')
         self.assertEqual(child.returncode, 0)
         self.assertEqual(stdout, 'OK\n')
@@ -210,7 +218,7 @@ class Test_only_once(unittest.TestCase):
     def test_lockfile_not_present_w_config(self):
         import os
         job_name = '%s-testing' % os.getlogin()
-        filename = os.path.join(self._tmpdir, job_name) 
+        filename = os.path.join(self._tmpdir, job_name)
         config = self._makeConfig()
         child, stdout, stderr = self._callFUT('testing', config, '/tmp')
         self.assertEqual(child.returncode, 0)

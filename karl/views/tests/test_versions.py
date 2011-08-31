@@ -13,7 +13,7 @@ class Test_show_history(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
-        return show_history(context, request)
+        return show_history(context, request, tz=5 * 3600)
 
     def test_it(self):
         from datetime import datetime
@@ -61,7 +61,6 @@ class Test_show_history(unittest.TestCase):
         self.assertEqual(history[1]['is_current'], False)
 
     def test_it_no_repo(self):
-        from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
@@ -84,7 +83,6 @@ class Test_revert(unittest.TestCase):
         return revert(context, request)
 
     def test_it(self):
-        from datetime import datetime
         request = testing.DummyRequest(params={
             'version_num': '1',
         })
@@ -111,7 +109,6 @@ class Test_revert(unittest.TestCase):
         self.assertEqual(context.catalog.reindexed, [(3, context)])
 
     def test_it_no_such_version(self):
-        from datetime import datetime
         request = testing.DummyRequest(params={
             'version_num': '5',
         })
@@ -138,7 +135,7 @@ class Test_show_trash(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_trash
-        return show_trash(context, request)
+        return show_trash(context, request, tz=5 * 3600)
 
     def test_it(self):
         from datetime import datetime
@@ -184,7 +181,6 @@ class Test_show_trash(unittest.TestCase):
         self.assertEqual(history[1]['title'], 'Title 3')
 
     def test_it_no_repo(self):
-        from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
