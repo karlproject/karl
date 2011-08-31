@@ -13,6 +13,9 @@ Unreleased
 - Fixed a DST issue in the versions.format_local_date() function which
   formats a date for display in versioning UIs.
 
+- Fixed the interpretation of message timestamps so that objects created
+  through email will have the correct time.  (LP #837699)
+
 3.70 (2011-08-25)
 -----------------
 
