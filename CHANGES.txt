@@ -5,8 +5,10 @@ Unreleased
 ----------
 
 - Made mail-in processing with aliased distribution lists respect the
-  'system_list_subdomain' setting, if configuredd.  (LP #824014)
+  'system_list_subdomain' setting, if configured.  (LP #824014)
 
+- When restoring an object from the trash, if a conflicting name is
+  in the container, append a suffix to the name.  (LP #821206)
 
 3.70 (2011-08-25)
 -----------------
@@ -60,7 +62,7 @@ Unreleased
 -----------------
 
 - Made agility use simplejson instead of the stdlib json module for
-  compatability with Python 2.5.  simplejson is already in use elsewhere in
+  compatibility with Python 2.5.  simplejson is already in use elsewhere in
   the application.
 
 - Fixed bug where replacing a file via the Edit File form would fail to check

@@ -12,6 +12,7 @@ from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
+from karl.views.utils import make_unique_name
 
 
 def show_history(context, request, tz=time.timezone):
@@ -116,6 +117,10 @@ def _undelete(repo, parent, docid, name):
     if container is not None:
         for child_name, child_docid in container.map.items():
             _undelete(repo, doc, child_docid, child_name)
+
+    if name in parent:
+        # Choose a non-conflicting name to restore to.  (LP #821206)
+        name = make_unique_name(parent, name)
 
     parent.add(name, doc, send_events=False)
     return doc

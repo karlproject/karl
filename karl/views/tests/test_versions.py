@@ -207,17 +207,8 @@ class Test_undelete(unittest.TestCase):
         from karl.views.versions import undelete
         return undelete(context, request)
 
-    def test_it(self):
+    def _make_repo(self, context):
         from datetime import datetime
-        request = testing.DummyRequest({
-            'docid': 2, 'name': 'foo2'
-        })
-        context = DummyModel(
-            docid=33,
-            title='Title',
-        )
-        context['profiles'] = profiles = testing.DummyModel()
-        profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
             Dummy(
                 klass=DummyModel,
@@ -237,12 +228,44 @@ class Test_undelete(unittest.TestCase):
             ),
         ])
         context.repo.maps.append({'foo3': 33})
+
+    def test_non_conflicting_name(self):
+        request = testing.DummyRequest({
+            'docid': 2, 'name': 'foo2'
+        })
+        context = DummyModel(
+            docid=33,
+            title='Title',
+        )
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['ed'] = testing.DummyModel(title='Ed')
+        self._make_repo(context)
         result = self._callFUT(context, request)
         self.assertEqual(result.location, 'http://example.com/foo2/')
         self.assertEqual(context['foo2'].reverted[0].docid, 2)
         self.assertEqual(len(context['foo2'].reverted), 1)
         self.assertEqual(context['foo2']['foo3'].reverted[0].docid, 33)
         self.assertEqual(len(context['foo2']['foo3'].reverted), 1)
+        self.assertEqual(context.repo.containers, [(context, None)])
+
+    def test_conflicting_name(self):
+        request = testing.DummyRequest({
+            'docid': 2, 'name': 'foo2'
+        })
+        context = DummyModel(
+            docid=33,
+            title='Title',
+        )
+        context['foo2'] = DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['ed'] = testing.DummyModel(title='Ed')
+        self._make_repo(context)
+        result = self._callFUT(context, request)
+        self.assertEqual(result.location, 'http://example.com/foo2-1/')
+        self.assertEqual(context['foo2-1'].reverted[0].docid, 2)
+        self.assertEqual(len(context['foo2-1'].reverted), 1)
+        self.assertEqual(context['foo2-1']['foo3'].reverted[0].docid, 33)
+        self.assertEqual(len(context['foo2-1']['foo3'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
 
