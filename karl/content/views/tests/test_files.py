@@ -2180,8 +2180,70 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u'Cannot move to target folder <a href="http://example.com/files/folder2/">/folder2</a>',
+        self.assertEqual(data, {u'error': u"File f2.txt not found in source folder (KeyError('f2.txt',))",
                 u'result': u'ERROR', u'filename': u'f2.txt'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_cant_delete_file(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+
+        class DummyModelThatFailsDelete(testing.DummyModel):
+            def __delitem__(self, name):
+                raise KeyError(name)
+
+        folder1 = rootfolder['folder1'] = DummyModelThatFailsDelete(
+            title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'error': u"Unable to delete file f1.txt from source folder (KeyError('f1.txt',))",
+                u'result': u'ERROR', u'filename': u'f1.txt'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_cant_add_file(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+
+        class DummyModelThatFailsSetitem(testing.DummyModel):
+            def __setitem__(self, name, value):
+                raise KeyError(name)
+
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = DummyModelThatFailsSetitem(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'error': u"Cannot move to target folder "
+            u"<a href=\"http://example.com/files/folder2/\">/folder2</a> (KeyError('f1.txt',))",
+            u'result': u'ERROR', u'filename': u'f1.txt'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
