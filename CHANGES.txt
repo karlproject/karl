@@ -16,6 +16,8 @@ Unreleased
 - Fixed the interpretation of message timestamps so that objects created
   through email will have the correct time.  (LP #837699)
 
+- Use modern SI prefixes for file size display.  (1 KB = 1000 bytes)
+
 3.70 (2011-08-25)
 -----------------
 
