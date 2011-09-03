@@ -27,3 +27,8 @@ try:
     zope.testing.cleanup.addCleanUp(setUp)
 except ImportError:
     pass
+
+# for security pickles that referred to bfg
+import pyramid.security
+import sys
+sys.modules['repoze.bfg.security'] = pyramid.security
