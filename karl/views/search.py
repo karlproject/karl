@@ -156,7 +156,15 @@ def searchresults_view(context, request):
     page_title = 'Search Results'
     api = TemplateAPI(context, request, page_title)
     if ICommunity.providedBy(context):
-        layout = api.community_layout
+        # We are either in /communities, or in /offices. In the first case:
+        # we use the community layout. For offices: we need the wide layout
+        # with the generic layout.
+        context_path = model_path(context)
+        wide = context_path.startswith('/offices')
+        if wide:
+            layout = api.generic_layout
+        else:
+            layout = api.community_layout
         community = context.title
     else:
         layout = api.generic_layout
