@@ -1102,6 +1102,13 @@
       factory=".adapters.FeedPortlet"
     />
 
+  <adapter
+      for="karl.content.interfaces.ICalendar
+           repoze.bfg.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.CalendarPortlet"
+     />
+
   <view
     for="karl.content.views.interfaces.INetworkNewsMarker"
     view=".custom_folderviews.NetworkNewsView"

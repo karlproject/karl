@@ -1787,6 +1787,21 @@ table#staffprofile-content td a:hover {
   padding-left: 20px;
 }
 
+/** =CALENDAR PORTLET
+----------------------------------------------- */
+#calendar_portlet {
+  width: 95%;
+  margin-left: 0px;
+  padding-left: 0px;
+}
+#calendar_portlet li {
+  list-style: none;
+  margin-bottom: 6px;
+}
+#calendar_portlet .event_title {
+  padding-left: 20px;
+}
+
 /** =TESTING
 ----------------------------------------------- */
 
