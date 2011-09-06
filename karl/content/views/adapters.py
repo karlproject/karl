@@ -830,6 +830,46 @@ class NetworkEventsPortlet(AbstractPortlet):
         return tostring(portlet, pretty_print=True)
 
 
+class CalendarPortlet(NetworkEventsPortlet):
+    """ Adapter for showing calendar events """
+
+    @property
+    def asHTML(self):
+        # The network events portlet is different.  Everything is different.
+        portlet = fragment_fromstring('<div class="generic-portlet"/>')
+        heading = SubElement(portlet, 'h3')
+        heading.text = "Staff Calendar"
+
+        # Now the entries
+        entries = self.entries
+        if entries:
+            ul = SubElement(portlet, 'ul', id='calendar_portlet')
+            event_style = 'text-decoration:none'
+            date_format = '%m/%d/%Y' #'%A, %B %d, %Y %I:%M %p'
+            for entry in self.entries:
+                li = SubElement(ul, 'li')
+
+                span1 = SubElement(li, 'span')
+                span1.text = entry['startDate'].strftime(date_format)
+                span2 = SubElement(li, 'span')
+                span2.set('class', 'event_title')
+                a = SubElement(span2, 'a',
+                               href=entry['href'],
+                               style=event_style)
+                a.text = entry['title']
+        else:
+            msg = SubElement(portlet, 'p')
+            msg.text = "No entries found"
+
+        # Close out with the more link
+        more = SubElement(portlet, 'p')
+        more.set('class', 'more')
+        more_a = SubElement(more, 'a', href=self.href)
+        more_a.text = 'MORE' 
+
+        return tostring(portlet, pretty_print=True)
+
+
 class FeedPortlet(object):
     implements(IIntranetPortlet)
 
