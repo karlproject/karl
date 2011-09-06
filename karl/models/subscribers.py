@@ -32,10 +32,11 @@ from repoze.bfg.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
 
-from karl.models.interfaces import IContainerVersion
-from karl.models.interfaces import IObjectVersion
-from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IIntranets
+from karl.models.interfaces import ILetterManager
+from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import IProfile
 from karl.models.peopledirectory import reindex_peopledirectory
 from karl.utils import find_catalog
@@ -155,6 +156,10 @@ def add_to_repo(obj, event):
 
     Intended use is as an IObjectAddedEvent subscriber.
     """
+    if find_interface(obj, IIntranets):
+        # Exclude /offices from repo
+        return
+
     repo = find_repo(obj)
     if repo is None:
         return
@@ -194,6 +199,10 @@ def delete_in_repo(obj, event):
     Intended use is as an IObjectRemovedEvent subscriber.
     """
     container = event.parent
+    if find_interface(container, IIntranets):
+        # Exclude /offices from repo
+        return
+
     repo = find_repo(container)
     if repo is not None:
         adapter = queryAdapter(container, IContainerVersion)

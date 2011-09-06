@@ -7,8 +7,10 @@ from repoze.folder.interfaces import IFolder
 from zope.component import queryAdapter
 
 from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IObjectVersion
 from karl.utils import find_catalog
+from karl.utils import find_interface
 from karl.utils import find_repo
 from karl.utils import get_setting
 
@@ -66,6 +68,8 @@ def init_history(docid, path, repo, site):
     context = find_model(site, path)
     if context.__name__ == 'TEMP':
         return
+    if find_interface(context, IIntranets):
+        return
 
     version = queryAdapter(context, IObjectVersion)
     if version is not None:
@@ -86,6 +90,8 @@ def init_container(docid, path, repo, site):
 
     context = find_model(site, path)
     if context.__name__ == 'TEMP':
+        return
+    if find_interface(context, IIntranets):
         return
 
     container = queryAdapter(context, IContainerVersion)
