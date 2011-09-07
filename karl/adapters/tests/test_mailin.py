@@ -797,7 +797,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('testing@example.com',)
         message.from_ = ('extant@example.com',)
         message.subject = 'subject'
-        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, 0))
+        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, -1))
         message.date = formatdate(date)
         info = mailin.crackHeaders(message)
         self.assertEqual(info['date'], datetime.datetime(2010, 5, 12, 2, 42))

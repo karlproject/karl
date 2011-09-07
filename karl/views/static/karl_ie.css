@@ -159,19 +159,6 @@ ol#references-listing li a.topLevelItem {
 /** =ROUNDED CORNERS / BUTTONS (other browsers use all CSS)
 ----------------------------------------------- */
 
-/* tags - people - communities */
-ul#header-menu li {
-    background: transparent url(images/corners.png) no-repeat right -5px;
-    padding-right: 18px;
-    top: -1px;
-}
-ul#header-menu li a {
-    background: transparent url(images/corners.png) no-repeat left -5px;
-    border: none;
-    line-height: 20px;
-    padding: 5px 9px 3px 27px;
-}
-
 /* general button styles */
 button {
     overflow: visible;
