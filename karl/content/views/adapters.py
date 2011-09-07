@@ -160,7 +160,7 @@ class FileInfo(object):
             powers = ["bytes", "KB", "MB", "GB", "TB"] # Future proof ;)
             size = self.context.size
             if size > 0:
-                power = int(math.log(size, 1024))
+                power = int(math.log(size, 1000))
                 assert power < len(powers), "File is larger than 999 TB"
             else:
                 power = 0
@@ -169,7 +169,7 @@ class FileInfo(object):
                 self._size = "%d %s" % (size, powers[0])
 
             else:
-                size = float(size) / (1 << (10 * power))
+                size = float(size) / (1000 ** power)
                 self._size = "%0.1f %s" % (size, powers[power])
 
         return self._size

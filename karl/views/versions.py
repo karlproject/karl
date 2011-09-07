@@ -12,22 +12,17 @@ from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
-
-try:
-    from sqlalchemy.orm.exc import NoResultFound
-except ImportError:
-    class NoResultFound(Exception):
-        pass
+from karl.views.utils import make_unique_name
 
 
-def show_history(context, request):
+def show_history(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
     def display_record(record):
         editor = profiles[record.user]
         return {
-            'date': format_local_date(record.archive_time),
+            'date': format_local_date(record.archive_time, tz),
             'editor': {
                 'name': editor.title,
                 'url': model_url(editor, request),
@@ -78,7 +73,7 @@ def revert(context, request):
     return HTTPFound(location=model_url(context, request))
 
 
-def show_trash(context, request):
+def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
@@ -86,7 +81,7 @@ def show_trash(context, request):
         deleted_by = profiles[record.deleted_by]
         version = repo.history(record.docid, only_current=True)[0]
         return {
-            'date': format_local_date(record.deleted_time),
+            'date': format_local_date(record.deleted_time, tz),
             'deleted_by': {
                 'name': deleted_by.title,
                 'url': model_url(deleted_by, request),
@@ -123,6 +118,10 @@ def _undelete(repo, parent, docid, name):
         for child_name, child_docid in container.map.items():
             _undelete(repo, doc, child_docid, child_name)
 
+    if name in parent:
+        # Choose a non-conflicting name to restore to.  (LP #821206)
+        name = make_unique_name(parent, name)
+
     parent.add(name, doc, send_events=False)
     return doc
 
@@ -138,6 +137,26 @@ def undelete(context, request):
     return HTTPFound(location=model_url(doc, request))
 
 
-def format_local_date(date):
-    local = date - datetime.timedelta(seconds=time.timezone)
+epoch = datetime.datetime.utcfromtimestamp(0)
+
+
+def format_local_date(date, tz=None, time_module=time):
+    """Format a UTC datetime for the local time zone."""
+    # time_module is a testing hook.
+    if tz is None:
+        if not time_module.daylight:
+            # DST does not apply to the local time zone.
+            tz = time_module.timezone
+        else:
+            # Figure out whether DST applied on the given date in the
+            # local time zone.
+            delta = date - epoch
+            seconds = delta.days * 86400 + delta.seconds
+            struct_time = time_module.localtime(seconds)
+            if struct_time.tm_isdst:
+                tz = time_module.altzone
+            else:
+                tz = time_module.timezone
+
+    local = date - datetime.timedelta(seconds=tz)
     return local.strftime('%Y-%m-%d %H:%M')

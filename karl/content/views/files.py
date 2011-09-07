@@ -1091,20 +1091,30 @@ def ajax_file_reorganize_moveto_view(context, request):
         for filename in filenames:
             try:
                 fileobj = context[filename]
-                file_path = get_file_folder_path(fileobj)
+            except KeyError, e:
+                msg = 'File %s not found in source folder (%r)' % (filename, e)
+                raise ErrorResponse(msg, filename=filename)
 
-                if target_folder.startswith(file_path):
-                    msg = 'Cannot move a folder into itself'
-                    raise ErrorResponse(msg, filename=filename)
+            file_path = get_file_folder_path(fileobj)
+            if target_folder.startswith(file_path):
+                msg = 'Cannot move a folder into itself'
+                raise ErrorResponse(msg, filename=filename)
+
+            try:
                 del context[filename]
+            except KeyError, e:
+                msg = 'Unable to delete file %s from source folder (%r)' % (filename, e)
+                raise ErrorResponse(msg, filename=filename)
 
-                # create a unique name of the -1, -2, ... style
-                # also change title and filename properties as needed
-                target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
+            # create a unique name of the -1, -2, ... style
+            # also change title and filename properties as needed
+            target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
 
+            try:
                 target_context[target_filename] = fileobj
-            except KeyError:
-                msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
+            except KeyError, e:
+                msg = 'Cannot move to target folder <a href="%s">%s</a> (%r)' % (
+                    target_folder_url, target_folder, e)
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
 

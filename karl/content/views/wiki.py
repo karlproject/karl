@@ -20,8 +20,6 @@ import schemaish
 import transaction
 from validatish import validator
 
-from datetime import datetime
-
 from webob.exc import HTTPFound
 from webob.exc import HTTPOk
 from zope.component.event import objectEventNotify
@@ -68,7 +66,6 @@ from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
-from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
@@ -287,7 +284,7 @@ def show_wikipage_view(context, request):
         )
 
 
-def preview_wikipage_view(context, request, WikiPage=WikiPage):
+def preview_wikipage_view(context, request, WikiPage=WikiPage, tz=None):
     version_num = int(request.params['version_num'])
     repo = find_repo(context)
     for version in repo.history(context.docid):
@@ -316,7 +313,7 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage):
     transaction.doom()
 
     return {
-        'date': format_local_date(version.archive_time),
+        'date': format_local_date(version.archive_time, tz),
         'author': author.title,
         'title': page_title,
         'body': page.cook(request),
