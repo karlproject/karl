@@ -46,10 +46,8 @@
           <div class="cheader">
             <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
               <fieldset>
-                <input type="text" class="inp" name="body"/>
-                <button type="submit" class="button normal_button inline">
-                    <span>Search Community</span>
-                </button>
+                <input type="text" class="inp search-community-input" name="body"/>
+                <button type="submit" class="search-community-button">Search&nbsp;Community</button>
               </fieldset>
             </form>
             <h1>${api.community_info.title}

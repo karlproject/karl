@@ -29,6 +29,7 @@ $.widget('karl.karlcalendarbuttons', {
             '<span class="karl-calendar-buttonset-navigate">' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-prev" class="karl-calendar-button-prev"></input><label for="karl-calendar-button-prev" class="karl-calendar-label-prev">&nbsp;</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-next" class="karl-calendar-button-next"></input><label for="karl-calendar-button-next" class="karl-calendar-label-next">&nbsp;</label>' +
+            '</span>' +
             '<select class="karl-calendar-dropdown-year">' +
             '</select>' +
             '<select class="karl-calendar-dropdown-month">' +

@@ -165,8 +165,8 @@ button {
     height: 22px;
 }
 button span {
-    height: 22px !important;
-    line-height: 22px !important;
+    height: 22px;
+    line-height: 22px;
     margin-bottom: -1px;
 }
 .primary_button,

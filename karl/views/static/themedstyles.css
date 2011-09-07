@@ -2679,3 +2679,13 @@ body .ui-state-default .karl-icon-loading {
   text-align: left;
 }
 
+
+/* Search community button */
+.search-community-button {
+    font-size: 11px;
+    margin-left: 3px;
+}
+.search-community-button .ui-button-text {
+    line-height: 11px;
+}
+

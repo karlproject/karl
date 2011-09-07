@@ -2685,6 +2685,45 @@ $(document).ready(function() {
     DD_roundies.addRule('ul#header-menu li a', '0 0 10px 10px');
 
 
+    // Search Community button
+    var searchCommunityButton = $('.search-community-button')
+        .button({
+        })
+        .css('verticalAlign', 'top');
+    var searchCommunityInput = $('.search-community-input');
+    // dynamically set height to match. This makes sure that
+    // the button is aligned to the input _always, on all browsers_.
+    var _height = searchCommunityButton.outerHeight();
+    var _searchCommunityInputWrapper = $('<span></span>');
+    _searchCommunityInputWrapper
+        .css('display', 'inline-block')
+        .css('margin', '0')
+        .css('padding', '0')
+        .css('border', '0')
+        .css('height', _height +'px')
+        .css('verticalAlign', 'top');
+    searchCommunityInput
+        .wrap(_searchCommunityInputWrapper)
+        .css('margin', '0')
+        .css('padding', '0 3px')
+        .css('height', '' + (_height - 2) + 'px')
+        .css('lineHeight', '' + (_height - 2) + 'px');
+    var _searchCommunityMarginTop = searchCommunityButton.css('marginTop');
+    // this  is essential _sometimes_ on WebKit
+    searchCommunityInput.css('marginTop', _searchCommunityMarginTop);
+    // hack IE7 that handles top margin differently
+    if ($.browser.msie && parseInt($.browser.version) == 7) {
+        searchCommunityButton.css('marginTop', '1px');
+    }
+    if ($.browser.msie && parseInt($.browser.version) == 8) {
+        searchCommunityButton.css('marginTop', '1px');
+    }
+
+    // rounded corners in IE
+    DD_roundies.addRule('.search-community-button', '4px');
+
+
+
     // add class to #center if there are no right portlets
     rcol = $(".generic-layout .rightcol").text();
     if ($.trim(rcol) == '') {
