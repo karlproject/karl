@@ -307,6 +307,21 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1) # Didn't call converter again
 
+    def test_cache_with_converter_empty_string(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('')
+        testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), ('Some Title', ''))
+        self.assertEqual(converter.called, 1)
+        self.assertEqual(adapter(), ('Some Title', ''))
+        self.assertEqual(converter.called, 2)
+
 class TestCalendarEventCategoryData(unittest.TestCase):
     def setUp(self):
         cleanUp()

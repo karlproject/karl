@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+- When doing the text indexing on files, text data is now re-extracted from
+  files if the cached text is an empty string.  This allows for files
+  previously indexed when an external converter was unavailable to be properly
+  reindexed after the external converter is added to the system.
+
 - When restoring an object from the trash, if a conflicting name is
   in the container, append a suffix to the name.  (LP #821206)
 

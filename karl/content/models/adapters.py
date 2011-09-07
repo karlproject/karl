@@ -85,7 +85,7 @@ TitleAndTextIndexData = makeFlexibleTextIndexData(
 
 def _extract_and_cache_file_data(context):
     data = getattr(context, '_extracted_data', None)
-    if data is None:
+    if not data:
         context._extracted_data = data = _extract_file_data(context)
     return data
 
