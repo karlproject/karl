@@ -204,6 +204,9 @@
       <!--[if IE 8]> <style type="text/css" media="all">@import
           url(${api.static_url}/karl_ie8.css);</style>
       <![endif]-->
+      <!--[if gte IE 9]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie9.css);</style>
+      <![endif]-->
 
    </metal:resources>
 
