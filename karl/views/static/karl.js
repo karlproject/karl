@@ -2629,6 +2629,10 @@ $(document).ready(function() {
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');
     
+    // rounded corners in IE on global tabs
+    DD_roundies.addRule('ul#header-menu li a', '0 0 10px 10px');
+
+
     // add class to #center if there are no right portlets
     rcol = $(".generic-layout .rightcol").text();
     if ($.trim(rcol) == '') {
