@@ -120,7 +120,6 @@ def show_folder_view(context, request):
 
     # Now get the data that goes with this
 
-
     # Actions
     backto = False
     actions = []
@@ -146,14 +145,12 @@ def show_folder_view(context, request):
 
     repo = find_repo(context)
     if repo is not None and has_permission('edit', context, request):
-        actions.append(('History', 'history.html'))
         show_trash = True
     else:
         show_trash = False
 
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
-
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
