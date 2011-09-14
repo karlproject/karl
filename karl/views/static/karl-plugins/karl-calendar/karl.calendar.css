@@ -70,9 +70,14 @@
     color: #3A74A9;
 }
 
+.cal-buttonbar .karl-calendar-button-today {
+    line-height: 9px;
+    height: 20px;
+}
 .cal-buttonbar .karl-calendar-button-today .ui-button-text {
     color: #3A74A9;
     font-weight: normal;
+    font-size: 11px;
 }
 
 
@@ -94,13 +99,16 @@
 
 .cal-buttonbar .karl-calendar-dropdown-year {
     margin-left: 24px;
+    width: 64px;
 }
 
 .cal-buttonbar .karl-calendar-dropdown-month {
     margin-left: 4px;
+    width: 57px;
 }
 
 .cal-buttonbar .karl-calendar-dropdown-day {
     margin-left: 4px;
+    width: 50px;
 }
 

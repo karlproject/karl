@@ -25,7 +25,9 @@ $.widget('karl.karlcalendarbuttons', {
         var self = this;   
 
         this.element.append(
-            '<button class="karl-calendar-button-today">Today</button>' +
+            '<span>' +
+                '<button class="karl-calendar-button-today">Today</button>' +
+            '</span>' +
             '<span class="karl-calendar-buttonset-navigate">' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-prev" class="karl-calendar-button-prev"></input><label for="karl-calendar-button-prev" class="karl-calendar-label-prev">&nbsp;</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-next" class="karl-calendar-button-next"></input><label for="karl-calendar-button-next" class="karl-calendar-label-next">&nbsp;</label>' +
