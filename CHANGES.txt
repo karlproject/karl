@@ -20,6 +20,9 @@ Unreleased
 
 - Use modern SI prefixes for file size display.  (1 KB = 1000 bytes)
 
+- Fix error in HTML text extractor causing it to fail if no character encoding
+  was supplied via a <meta> content type tag. (LP #848194)
+
 3.71 (2011-09-01)
 -----------------
 
