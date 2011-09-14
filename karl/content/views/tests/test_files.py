@@ -682,6 +682,66 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(actions[3][1], 'history.html')
         self.failUnless(renderer.show_trash)
 
+
+class TestPreviewFile(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_it(self):
+        from karl.content.views.files import preview_file
+        context = testing.DummyModel()
+        request = testing.DummyRequest({'version_num': '2'})
+        response = preview_file(context, request)
+        self.assertEqual(response,
+            {'url': 'http://example.com/download_preview?version_num=2'})
+
+
+class TestDownloadFilePreview(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def call_fut(self, context, request):
+        from karl.content.views.files import download_file_preview as fut
+        return fut(context, request)
+
+    def test_it(self):
+        from karl.content.views.files import download_file_preview
+        context = testing.DummyModel(docid=1)
+        context.repo = DummyArchive()
+        request = testing.DummyRequest({'version_num': '2'})
+        response = self.call_fut(context, request)
+        self.assertEqual(response.body, 'TESTING')
+        self.assertEqual(response.content_length, 7)
+        self.assertEqual(response.content_type, 'x-application/testing')
+
+    def test_it_notfound(self):
+        from karl.content.views.files import download_file_preview
+        from repoze.bfg.exceptions import NotFound
+        context = testing.DummyModel(docid=1)
+        context.repo = DummyArchive()
+        request = testing.DummyRequest({'version_num': '3'})
+        self.assertRaises(NotFound, self.call_fut, context, request)
+
+
+class DummyArchive(object):
+    from cStringIO import StringIO
+    version_num = 2
+    blobs = {'blob': StringIO('TESTING')}
+    attrs = {'mimetype': 'x-application/testing'}
+
+    def history(self, docid):
+        assert docid == 1
+        yield self
+
+
 class TestDownloadFileView(unittest.TestCase):
     def setUp(self):
         cleanUp()

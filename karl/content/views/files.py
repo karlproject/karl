@@ -107,6 +107,7 @@ from karl.views.tags import set_tags
 from karl.views.batch import get_container_batch
 
 from karl.views.utils import check_upload_size
+from karl.views.utils import copy_stream_to_tmpfile_and_iter
 
 from karl.views.forms.filestore import get_filestore
 
@@ -530,6 +531,28 @@ def show_file_view(context, request):
         layout=layout,
         show_trash=show_trash,
         )
+
+def preview_file(context, request):
+    # Just tell the AJAX that we want to do a direct file download rather than
+    # an in browser preview.
+    url = model_url(context, request, 'download_preview',
+                    query={'version_num': request.params['version_num']})
+    return {'url': url}
+
+def download_file_preview(context, request):
+    version_num = int(request.params['version_num'])
+    repo = find_repo(context)
+    for version in repo.history(context.docid):
+        if version.version_num == version_num:
+            break
+    else:
+        raise NotFound("No such version: %d" % version_num)
+
+    size, stream = copy_stream_to_tmpfile_and_iter(version.blobs['blob'])
+    return Response(
+        content_type=version.attrs['mimetype'],
+        content_length=size,
+        app_iter=stream)
 
 def download_file_view(context, request):
     # To view image-ish files in-line, use thumbnail_view.
