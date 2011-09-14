@@ -41,6 +41,7 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ICatalogSearch
 
@@ -255,11 +256,11 @@ def show_wikipage_view(context, request):
     if has_permission('delete', context, request) and not is_front_page:
         actions.append(('Delete', 'delete.html'))
     repo = find_repo(context)
-    if repo is not None and has_permission('edit', context, request):
-        actions.append(('History', 'history.html'))
-        show_trash = True
-    else:
-        show_trash = False
+    show_trash = False
+    if not find_interface(context, IIntranets):
+        if repo is not None and has_permission('edit', context, request):
+            actions.append(('History', 'history.html'))
+            show_trash = True
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 

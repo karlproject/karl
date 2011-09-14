@@ -132,10 +132,7 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'],
-                         [('Edit', 'edit.html'),
-                          ('History', 'history.html'),
-                         ])
+        self.assertEqual(response['actions'], [('Edit', 'edit.html'),])
         self.failUnless(response['show_trash'])
 
     def test_deletable(self):

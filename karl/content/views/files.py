@@ -509,12 +509,12 @@ def show_file_view(context, request):
     else:
         layout = layout_provider('generic')
 
-    repo = find_repo(context)
-    if repo is not None and has_permission('edit', context, request):
-        actions.append(('History', 'history.html'))
-        show_trash = True
-    else:
-        show_trash = False
+    show_trash = False
+    if not find_interface(context, IIntranets):
+        repo = find_repo(context)
+        if repo is not None and has_permission('edit', context, request):
+            actions.append(('History', 'history.html'))
+            show_trash = True
 
     return render_template_to_response(
         'templates/show_file.pt',
