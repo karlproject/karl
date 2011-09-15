@@ -19,7 +19,7 @@ $.widget('karl.karlcalendarbuttons', {
         //     day: 23
         // }
         // change: function(evt, selection) {} // data is the same format as this.options.selection
-        ddRoundies: false                   // use DD_roundies on IE?
+        ddRoundies: true                   // use DD_roundies on IE?
     },
 
     _create: function() {
