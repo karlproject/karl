@@ -19,15 +19,24 @@ $.widget('karl.karlcalendarbuttons', {
         //     day: 23
         // }
         // change: function(evt, selection) {} // data is the same format as this.options.selection
+        ddRoundies: false                   // use DD_roundies on IE?
     },
 
     _create: function() {
         var self = this;   
 
         this.element.append(
-            '<span>' +
-                '<button class="karl-calendar-button-today">Today</button>' +
+            '<span class="karl-calendar-buttonset-term">' +
+                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-day" class="karl-calendar-button-day"></input><label for="karl-calendar-button-day">Day</label>' +
+                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-week" class="karl-calendar-button-week"></input><label for="karl-calendar-button-week">Week</label>' +
+                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-month" class="karl-calendar-button-month"></input><label for="karl-calendar-button-month">Month</label>' +
             '</span>' +
+            '<span class="karl-calendar-buttonset-viewtype">' +
+                '<input type="radio" name="karl-calendar-buttonset-viewtype" id="karl-calendar-button-calendar" class="karl-calendar-button-calendar"></input><label for="karl-calendar-button-calendar">Calendar</label>' +
+                '<input type="radio" name="karl-calendar-buttonset-viewtype" id="karl-calendar-button-list" class="karl-calendar-button-list"></input><label for="karl-calendar-button-list">List</label>' +
+            '</span>' +
+
+            '<button class="karl-calendar-button-today">Today</button>' +
             '<span class="karl-calendar-buttonset-navigate">' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-prev" class="karl-calendar-button-prev"></input><label for="karl-calendar-button-prev" class="karl-calendar-label-prev">&nbsp;</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-next" class="karl-calendar-button-next"></input><label for="karl-calendar-button-next" class="karl-calendar-label-next">&nbsp;</label>' +
@@ -49,16 +58,7 @@ $.widget('karl.karlcalendarbuttons', {
                 '<option value="12">Dec</option>' +
             '</select>' +
             '<select class="karl-calendar-dropdown-day">' +
-            '</select>' +
-            '<span class="karl-calendar-buttonset-term">' +
-                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-day" class="karl-calendar-button-day"></input><label for="karl-calendar-button-day">Day</label>' +
-                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-week" class="karl-calendar-button-week"></input><label for="karl-calendar-button-week">Week</label>' +
-                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-month" class="karl-calendar-button-month"></input><label for="karl-calendar-button-month">Month</label>' +
-            '</span>' +
-            '<span class="karl-calendar-buttonset-viewtype">' +
-                '<input type="radio" name="karl-calendar-buttonset-viewtype" id="karl-calendar-button-calendar" class="karl-calendar-button-calendar"></input><label for="karl-calendar-button-calendar">Calendar</label>' +
-                '<input type="radio" name="karl-calendar-buttonset-viewtype" id="karl-calendar-button-list" class="karl-calendar-button-list"></input><label for="karl-calendar-button-list">List</label>' +
-            '</span>'
+            '</select>'
         );
 
         this.el_b_today = this.element.find('.karl-calendar-button-today');
@@ -185,6 +185,57 @@ $.widget('karl.karlcalendarbuttons', {
 
         this._updateSelection();
         
+        this.element.find('a.ui-selectmenu').each(function () {
+                $(this).css('margin-top', '-4px');
+            });
+        // Dropdowns need a -2px top offset. margin-top: -4px does not
+        // work well on IE7.
+        if ($.browser.msie && $.browser.version <= 7) {
+            this.element.find('a.ui-selectmenu').each(function () {
+                $(this)
+                    .css('top', '-2px');
+            });
+            this.element.find('.karl-calendar-label-prev, .karl-calendar-label-next').each(function () {
+                $(this)
+                    .css('top', '-2px')
+                    .height($(this).height() + 1);
+            });
+        }
+        
+
+        // Use DD_roundies to give the rounded corners on IE.
+        if (this.options.ddRoundies) {
+            if (! DD_roundies) {
+                throw new Error('DD_roundies must be present, or ddRoundies=false option must be specified.');
+            }
+            DD_roundies.addRule('.cal-buttonbar .ui-corner-left', '4px 0 0 4px');
+            DD_roundies.addRule('.cal-buttonbar .ui-corner-right', '0 4px 4px 0');
+            DD_roundies.addRule('.cal-buttonbar .ui-corner-all', '4px 4px 4px 4px');
+            if ($.browser.msie && $.browser.version == 8) {
+                // DD_roundies broken? adds a -1px offset
+                // so, let's take it away
+                this.element.find('.ui-corner-left, .ui-corner-right, ' + 
+                            '.ui-corner-all')
+                    .each(function () {
+                        $(this)
+                            .css('top', '1px')
+                            .css('left', '1px')
+                            // ... and add it back to the children
+                            .children().each(function () {
+                                // act only on static position
+                                var el = $(this);
+                                if (el.css('position') == 'static') {
+                                    el
+                                        .css('position', 'relative')
+                                        .css('top', '' + (this.offsetTop - 2) + 'px')
+                                        .css('left', '' + (this.offsetLeft - 2) + 'px');
+                                }
+                            });
+                    });
+
+            }
+        }
+
     },
     
     disable: function(evt) {

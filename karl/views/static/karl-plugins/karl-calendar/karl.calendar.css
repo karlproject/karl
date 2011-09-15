@@ -46,7 +46,6 @@
 .cal-buttonbar a.ui-selectmenu {
     color: #3A74A9;
     height: 18px;
-    margin-top: -4px;
     background-color: #F6F7F6;
     background-image: none;
 }
@@ -84,8 +83,8 @@
 /* spacing of toolbar */
 
 .cal-buttonbar .karl-calendar-buttonset-term {
-    float: right;
     margin-left: 8px;
+    float: right;
 }
 
 .cal-buttonbar .karl-calendar-buttonset-viewtype {
@@ -107,8 +106,10 @@
     width: 57px;
 }
 
+
 .cal-buttonbar .karl-calendar-dropdown-day {
     margin-left: 4px;
     width: 50px;
 }
+
 
