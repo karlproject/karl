@@ -99,10 +99,11 @@ def show_trash(context, request, tz=None):
     active_docs = catalog.document_map.docid_to_address
     try:
         contents = repo.container_contents(context.docid)
-        deleted = [display_record(doc) for doc in contents.deleted
-                   if doc.docid not in active_docs]
     except:
         deleted = []
+    else:
+        deleted = [display_record(doc) for doc in contents.deleted
+                   if int(doc.docid) not in active_docs]
 
     return {
         'api': TemplateAPI(context, request, 'Trash'),
