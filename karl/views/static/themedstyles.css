@@ -3579,6 +3579,7 @@ body .ui-state-default .karl-icon-loading {
 .contentbar-menu {
     display: inline-block;
     margin: 8px 0;
+    height: 15px;
 }
 
 .contentbar-wrapper {
