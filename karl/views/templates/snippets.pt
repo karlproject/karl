@@ -245,7 +245,7 @@
       <ul class="menubar">
           <tal:block repeat="action api.actions_to_menu(actions)">
               <li tal:attributes="id string:menubar-${repeat.action.number()}"
-                  class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
+                  class="menubar-action-${action[0].replace(' ', '').lower()} ${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
               <a href="${api.here_url}${action[1]}"
                    class="${action[2] and 'karldropdown-heading' or ''}"
                    tal:condition="not action[1].startswith('http')"

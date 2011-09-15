@@ -32,7 +32,7 @@
         var here_url = $("#karl-here-url").eq(0).attr('content');
         $(document).ready(function() {
             // bind the karl.multifileupload widget
-            $('.view-show-folder-actions #menubar-3')
+            $('.view-show-folder-actions .menubar-action-multiupload')
                 .karlmultifileupload({
                   plupload_src: static_url + '/plupload',
                   upload_url: here_url + '/upload_file.json'
@@ -67,7 +67,7 @@
   
   <div metal:fill-slot="content">
 
-    <div class="contentbar-wrapper">
+    <div class="contentbar-wrapper view-show-folder-actions">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
         <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
