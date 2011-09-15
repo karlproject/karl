@@ -118,7 +118,7 @@ $.widget('karl.karlcalendarbuttons', {
             
 
         for(var i=2000; i<2025; i++) {
-            this.el_dd_year.append('<option name="' + i + '">' + i + '</option>');
+            this.el_dd_year.append('<option value="' + i + '">' + i + '</option>');
         }
 
         this.el_dd_year.find('option').addClass('karl-calendar-dropdown-item');
@@ -291,7 +291,7 @@ $.widget('karl.karlcalendarbuttons', {
             days = 31;
         }
         for (var i=1; i<=days; i++) {
-            this.el_dd_day.append('<option name="' + i + '">' + i + '</option>');
+            this.el_dd_day.append('<option value="' + i + '">' + i + '</option>');
         }
 
         // rebind
