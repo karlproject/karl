@@ -143,11 +143,11 @@ def show_folder_view(context, request):
             'title': context.__parent__.title,
             }
 
-    repo = find_repo(context)
-    if repo is not None and has_permission('edit', context, request):
-        show_trash = True
-    else:
-        show_trash = False
+    show_trash = False
+    if not find_interface(context, IIntranets):
+        repo = find_repo(context)
+        if repo is not None and has_permission('edit', context, request):
+            show_trash = True
 
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
