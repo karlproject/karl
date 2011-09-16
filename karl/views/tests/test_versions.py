@@ -144,8 +144,6 @@ class Test_show_trash(unittest.TestCase):
             docid=3,
             title='Title',
         )
-        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
-            docid_to_address={1: None}))
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
@@ -155,6 +153,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=1,
                 name="foo1",
                 title="Title 1",
+                new_container_ids=[6],
             ),
             Dummy(
                 deleted_by='ed',
@@ -162,6 +161,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=2,
                 name="foo2",
                 title="Title 2",
+                new_container_ids=[],
             ),
             Dummy(
                 deleted_by='ed',
@@ -169,6 +169,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=3,
                 name="foo3",
                 title="Title 3",
+                new_container_ids=[],
             ),
         ])
         result = self._callFUT(context, request)
