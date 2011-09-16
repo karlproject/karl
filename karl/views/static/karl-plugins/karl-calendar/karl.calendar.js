@@ -19,7 +19,8 @@ $.widget('karl.karlcalendarbuttons', {
         //     day: 23
         // }
         // change: function(evt, selection) {} // data is the same format as this.options.selection
-        ddRoundies: true                   // use DD_roundies on IE?
+        ddRoundies: false,                   // use DD_roundies on IE?
+        ie8OnePixelCompensate: true          // compensate the 1-px differences on IE8? (only if ddRoundies == true)
     },
 
     _create: function() {
@@ -211,6 +212,9 @@ $.widget('karl.karlcalendarbuttons', {
             DD_roundies.addRule('.cal-buttonbar .ui-corner-left', '4px 0 0 4px');
             DD_roundies.addRule('.cal-buttonbar .ui-corner-right', '0 4px 4px 0');
             DD_roundies.addRule('.cal-buttonbar .ui-corner-all', '4px 4px 4px 4px');
+        }
+
+        if (this.options.ddRoundies && this.options.ie8OnePixelCompensate) {         // compensate the 1-px differences on IE8
             if ($.browser.msie && $.browser.version == 8) {
                 // DD_roundies broken? adds a -1px offset
                 // so, let's take it away
@@ -232,10 +236,8 @@ $.widget('karl.karlcalendarbuttons', {
                                 }
                             });
                     });
-
             }
         }
-
     },
     
     disable: function(evt) {
