@@ -653,7 +653,6 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(actions[0][1], 'edit.html')
         self.assertEqual(actions[1][1], 'delete.html')
         self.assertEqual(actions[2][1], 'advanced.html')
-        self.failIf(renderer.show_trash)
 
     def test_editable_w_repo(self):
         from karl.content.views.interfaces import IFileInfo
@@ -677,7 +676,6 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(actions[1][1], 'delete.html')
         self.assertEqual(actions[2][1], 'advanced.html')
         self.assertEqual(actions[3][1], 'history.html')
-        self.failUnless(renderer.show_trash)
 
 
 class TestPreviewFile(unittest.TestCase):
