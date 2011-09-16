@@ -481,6 +481,18 @@ class Test_add_to_repo(unittest.TestCase):
         self.assertEqual(archive.archived, [parent, model])
         self.assertEqual(archive.containers, [(parent, None)])
 
+    def test_in_intranets(self):
+        from karl.models.interfaces import IIntranets
+        from zope.interface import directlyProvides
+        event = Dummy(parent=None)
+        model = testing.DummyModel()
+        model.repo = archive = DummyArchive()
+        model.comment = None
+        directlyProvides(model, IIntranets)
+        self._callFUT(model, event)
+        self.assertEqual(archive.archived, [])
+
+
 class Test_delete_in_repo(unittest.TestCase):
 
     def setUp(self):
@@ -503,6 +515,17 @@ class Test_delete_in_repo(unittest.TestCase):
         parent.repo = archive = DummyArchive()
         self._callFUT(None, event)
         self.assertEqual(archive.containers, [(parent, None)])
+
+    def test_it_intranet(self):
+        from karl.models.interfaces import IIntranets
+        from zope.interface import directlyProvides
+        parent = testing.DummyModel()
+        directlyProvides(parent, IIntranets)
+        event = Dummy(parent=parent)
+        parent.repo = archive = DummyArchive()
+        self._callFUT(None, event)
+        self.assertEqual(archive.containers, [])
+
 
 class DummyUsers:
     def __init__(self):

@@ -198,7 +198,7 @@
       <link rel="stylesheet" type="text/css" media="print" href="${api.static_url}/print.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/custom.css"/>
-      <!--[if IE]> <style type="text/css" media="all">@import
+      <!--[if lte IE 8]> <style type="text/css" media="all">@import
           url(${api.static_url}/karl_ie.css);</style>
       <![endif]-->
       <!--[if IE 8]> <style type="text/css" media="all">@import
@@ -263,7 +263,7 @@
       <ul class="menubar">
           <tal:block repeat="action api.actions_to_menu(actions)">
               <li tal:attributes="id string:menubar-${repeat.action.number()}"
-                  class="${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
+                  class="menubar-action-${action[0].replace(' ', '').lower()} ${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
               <a href="${api.here_url}${action[1]}"
                    class="${action[2] and 'karldropdown-heading' or ''}"
                    tal:condition="not action[1].startswith('http')"
@@ -391,10 +391,14 @@
     </div>
 
     <div class="chparent_wrapper" metal:define-macro="backto_link" tal:condition="backto|False">
+      <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
+    </div>
+
+    <tal:block metal:define-macro="backto_link_new" tal:condition="backto|False">
       <a class="chparent" href="${backto['href']}" id="backto">
         <img src="${api.static_url}/images/arrow_up.jpg" height="15"
              width="15" alt="Up to"/> Back to ${backto['title']} </a>
-    </div>
+    </tal:block>
 
     <div metal:define-macro="download_file">
       <div style="margin-top: 2em;">
@@ -1001,6 +1005,17 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
         </li>
     </ul>
 
+    <metal:lock define-macro="lock">
+      <div class="portalWarningMessage pageLockMessage"
+           tal:condition="lock_info['is_locked'] | None">
+        <p>This page is <strong>currently</strong> being edited by
+          <a href="${lock_info['url']}">${lock_info['name']}</a>.
+          <tal:email_block condition="lock_info['email']">
+            Click <a href="mailto:${lock_info['email']}">here</a> to email them.
+          </tal:email_block>
+        </p>
+      </div>
+    </metal:lock>
 
   </body>
 </html>

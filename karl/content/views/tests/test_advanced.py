@@ -273,3 +273,38 @@ class TestAdvancedFormController(unittest.TestCase):
         self.assertEqual(response.location,
             'http://example.com/?status_message=Advanced+settings+changed.')
 
+    def test_handle_submit_lock(self):
+        import datetime
+        from repoze.bfg import testing
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'userid': 'foo', 'time': lock_time}
+        form = self._make_one(context, request)
+        response = form.handle_submit({'unlock': True})
+        self.assertEqual(response.status_int, 302)
+        self.failIf(context.lock)
+
+    def test___call__lock(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+
+        form = self._make_one(context, request)
+        fields = form.form_fields()
+        widgets = form.form_widgets(fields)
+        field_names = [x[0] for x in fields]
+        widget_names = [x[0] for x in fields]
+        self.failIf('unlock' in field_names)
+        self.failIf('unlock' in widget_names)
+
+        import datetime
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'time': lock_time,
+                        'userid': 'foo'}
+        form = self._make_one(context, request)
+        fields = form.form_fields()
+        widgets = form.form_widgets(fields)
+        field_names = [x[0] for x in fields]
+        widget_names = [x[0] for x in fields]
+        self.failUnless('unlock' in field_names)
+        self.failUnless('unlock' in widget_names)

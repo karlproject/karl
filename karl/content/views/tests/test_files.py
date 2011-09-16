@@ -116,13 +116,24 @@ class TestShowFolderView(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [])
 
-    def test_editable(self):
+    def test_editable_wo_repo(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html')])
+        self.failIf(response['show_trash'])
+
+    def test_editable_w_repo(self):
+        root = self._make_community()
+        root.repo = object()
+        root['files'] = context = testing.DummyModel(title='thetitle')
+        self._register({context: ('view', 'edit'),})
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response['actions'], [('Edit', 'edit.html'),])
+        self.failUnless(response['show_trash'])
 
     def test_deletable(self):
         root = self._make_community()
@@ -613,15 +624,23 @@ class TestShowFileView(unittest.TestCase):
         from karl.content.views.files import show_file_view
         return show_file_view(context, request)
 
-    def test_it(self):
+    def _make_community(self):
+        # factorize a fake community
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel(title='thecommunity')
+        directlyProvides(community, ICommunity)
+        community.catalog = MyDummyCatalog()
+        return community
 
+    def test_editable_wo_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
         testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
-        parent = testing.DummyModel(title='parent')
-        context = testing.DummyModel(title='thetitle')
-        parent['child'] = context
+        root = self._make_community()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
         request = testing.DummyRequest()
         renderer  = testing.registerDummyRenderer('templates/show_file.pt')
 
@@ -633,6 +652,92 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(len(actions), 3)
         self.assertEqual(actions[0][1], 'edit.html')
         self.assertEqual(actions[1][1], 'delete.html')
+        self.assertEqual(actions[2][1], 'advanced.html')
+        self.failIf(renderer.show_trash)
+
+    def test_editable_w_repo(self):
+        from karl.content.views.interfaces import IFileInfo
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+        root = self._make_community()
+        root.repo = object()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
+        request = testing.DummyRequest()
+        renderer  = testing.registerDummyRenderer('templates/show_file.pt')
+
+        testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+                                IFileInfo)
+
+        self._callFUT(context, request)
+        actions = renderer.actions
+        self.assertEqual(len(actions), 4)
+        self.assertEqual(actions[0][1], 'edit.html')
+        self.assertEqual(actions[1][1], 'delete.html')
+        self.assertEqual(actions[2][1], 'advanced.html')
+        self.assertEqual(actions[3][1], 'history.html')
+        self.failUnless(renderer.show_trash)
+
+
+class TestPreviewFile(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def test_it(self):
+        from karl.content.views.files import preview_file
+        context = testing.DummyModel()
+        request = testing.DummyRequest({'version_num': '2'})
+        response = preview_file(context, request)
+        self.assertEqual(response,
+            {'url': 'http://example.com/download_preview?version_num=2'})
+
+
+class TestDownloadFilePreview(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def call_fut(self, context, request):
+        from karl.content.views.files import download_file_preview as fut
+        return fut(context, request)
+
+    def test_it(self):
+        from karl.content.views.files import download_file_preview
+        context = testing.DummyModel(docid=1)
+        context.repo = DummyArchive()
+        request = testing.DummyRequest({'version_num': '2'})
+        response = self.call_fut(context, request)
+        self.assertEqual(response.body, 'TESTING')
+        self.assertEqual(response.content_length, 7)
+        self.assertEqual(response.content_type, 'x-application/testing')
+
+    def test_it_notfound(self):
+        from karl.content.views.files import download_file_preview
+        from repoze.bfg.exceptions import NotFound
+        context = testing.DummyModel(docid=1)
+        context.repo = DummyArchive()
+        request = testing.DummyRequest({'version_num': '3'})
+        self.assertRaises(NotFound, self.call_fut, context, request)
+
+
+class DummyArchive(object):
+    from cStringIO import StringIO
+    version_num = 2
+    blobs = {'blob': StringIO('TESTING')}
+    attrs = {'mimetype': 'x-application/testing'}
+
+    def history(self, docid):
+        assert docid == 1
+        yield self
+
 
 class TestDownloadFileView(unittest.TestCase):
     def setUp(self):
@@ -2180,8 +2285,70 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         response = self._call_fut(folder1, request)
         self.assertEqual(response.status, '200 OK')
         data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u'Cannot move to target folder <a href="http://example.com/files/folder2/">/folder2</a>',
+        self.assertEqual(data, {u'error': u"File f2.txt not found in source folder (KeyError('f2.txt',))",
                 u'result': u'ERROR', u'filename': u'f2.txt'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_cant_delete_file(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+
+        class DummyModelThatFailsDelete(testing.DummyModel):
+            def __delitem__(self, name):
+                raise KeyError(name)
+
+        folder1 = rootfolder['folder1'] = DummyModelThatFailsDelete(
+            title='a folder')
+        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'error': u"Unable to delete file f1.txt from source folder (KeyError('f1.txt',))",
+                u'result': u'ERROR', u'filename': u'f1.txt'})
+        self.failUnless(self.transaction.doomed)  # assert that doom was called
+        self.transaction.doomed = False
+
+
+    def test_cant_add_file(self):
+        import simplejson
+        testing.registerDummySecurityPolicy('chris')
+        community = self._make_community()
+        rootfolder = community['files']
+
+        class DummyModelThatFailsSetitem(testing.DummyModel):
+            def __setitem__(self, name, value):
+                raise KeyError(name)
+
+        folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
+        folder2 = rootfolder['folder2'] = DummyModelThatFailsSetitem(title='a folder')
+
+        folder1['f1.txt'] = testing.DummyModel(title='a file')
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'file[]': ['f1.txt'],
+                'target_folder': '/folder2',
+            })
+        )
+        response = self._call_fut(folder1, request)
+        self.assertEqual(response.status, '200 OK')
+        data = simplejson.loads(response.body)
+        self.assertEqual(data, {u'error': u"Cannot move to target folder "
+            u"<a href=\"http://example.com/files/folder2/\">/folder2</a> (KeyError('f1.txt',))",
+            u'result': u'ERROR', u'filename': u'f1.txt'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 

@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '3.70dev'
+__version__ = '3.72dev'
 import os
 
 from ez_setup import use_setuptools
@@ -125,6 +125,7 @@ setup(name='karl',
 
       [karlserve.scripts]
       generate_stats = karl.scripts.generate_stats:config_parser
+      init_repozitory = karl.scripts.init_repozitory:config_parser
       """
       )
 

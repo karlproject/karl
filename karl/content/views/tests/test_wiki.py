@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import datetime
 from repoze.bfg.testing import cleanUp
 from zope.interface import implements
 
@@ -230,6 +231,67 @@ class TestShowWikipageView(unittest.TestCase):
         # Backlink breadcrumb thingy should appear on non-front-page
         self.assert_(response['backto'] is not False)
 
+
+class TestShowWikitocView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.wiki import show_wikitoc_view
+        return show_wikitoc_view(context, request)
+
+    def _register(self):
+        from repoze.bfg import testing
+        from zope.interface import Interface
+        from karl.models.interfaces import ITagQuery
+        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                ITagQuery)
+
+        from karl.models.interfaces import ICatalogSearch
+        testing.registerAdapter(DummySearch, (Interface, ),
+                                ICatalogSearch)
+
+
+    def test_frontpage(self):
+        self._register()
+        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        context = DummyWikiPage()
+        context.__name__ = 'front_page'
+        context.title = 'Page'
+        from karl.testing import DummyCommunity
+        context.__parent__ = DummyCommunity()
+        from karl.testing import DummyCatalog
+        context.__parent__.catalog = DummyCatalog()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(len(renderer.actions), 0)
+        self.assertEqual(renderer.backto, False)
+        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+
+    def test_otherpage(self):
+        self._register()
+        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        context = DummyWikiPage(title='Other Page')
+        context.__name__ = 'other_page'
+        from karl.testing import DummyCommunity
+        context.__parent__ = DummyCommunity()
+        from karl.testing import DummyCatalog
+        context.__parent__.catalog = DummyCatalog()
+        request = testing.DummyRequest()
+        from webob.multidict import MultiDict
+        request.params = request.POST = MultiDict()
+        response = self._callFUT(context, request)
+        self.assertEqual(len(renderer.actions), 0)
+        self.assertEqual(renderer.backto, {
+            'href': 'http://example.com/communities/community/',
+            'title': u'Dummy Communit\xe0',
+            })
+        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+
+
 class TestEditWikiPageFormController(unittest.TestCase):
     def _makeOne(self, context, request):
         from karl.content.views.wiki import EditWikiPageFormController
@@ -302,8 +364,12 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.failUnless('tags' in widgets)
 
     def test___call__(self):
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
         context = testing.DummyModel()
         context.title = 'title'
+        site['foo'] = context
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
@@ -311,6 +377,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):
+        self._register()
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -378,6 +445,53 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.modified_by, 'testeditor')
         self.assertEqual(context.title, 'newtitle')
 
+    def test__call__lock(self):
+        from karl.utilities import lock
+        from karl.testing import DummyRoot
+        self._register()
+        site = DummyRoot()
+        context = testing.DummyModel()
+        context.title = 'title'
+        site['foo'] = context
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        response = controller()
+        self.failUnless(context.lock)
+
+    def test_handle_cancel_lock(self):
+        from datetime import datetime
+        self._register()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        context.lock = {'time': datetime.now()}
+        response = controller.handle_cancel()
+        self.failIf(context.lock)
+
+    def test_handle_submit_lock(self):
+        from datetime import datetime
+        from karl.testing import DummyCatalog
+        self._register()
+        converted = {
+            'text':'text',
+            'title':'title',
+            'sendalert': False,
+            'security_state': 'public',
+            'tags': 'thetesttag',
+            }
+        context = testing.DummyModel(title='oldtitle')
+        request = testing.DummyRequest()
+        def change_title(newtitle):
+            context.title = newtitle
+        context.change_title = change_title
+        context.catalog = DummyCatalog()
+
+        controller = self._makeOne(context, request)
+        context.lock = {'time': datetime.now()}
+        response = controller.handle_submit(converted)
+        self.failIf(context.lock)
+
+
 class Test_preview_wikipage_view(unittest.TestCase):
 
     def setUp(self):
@@ -437,15 +551,56 @@ class Test_preview_wikipage_view(unittest.TestCase):
         request = testing.DummyRequest(params={'version_num': '3'})
         self.assertRaises(NotFound, self._callFUT, context, request)
 
+
+class TestUnlockView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request, userid=None):
+        from karl.content.views.wiki import unlock_wiki_view
+        return unlock_wiki_view(context, request, userid)
+
+    def test_get(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(302, response.status_int)
+        self.assertEqual('http://example.com/', response.location)
+
+    def test_post_has_lock(self):
+        from datetime import datetime
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.lock = {'time': datetime.now(), 'userid': 'foo'}
+        response = self._callFUT(context, request, userid='foo')
+        self.assertEqual(200, response.status_int)
+        self.failIf(context.lock)
+
+    def test_post_does_not_have_lock(self):
+        from datetime import datetime
+        context = testing.DummyModel()
+        request = testing.DummyRequest(post={})
+        context.lock = {'time': datetime.now(), 'userid': 'foo'}
+        response = self._callFUT(context, request, userid='bar')
+        self.assertEqual(200, response.status_int)
+        self.failUnless(context.lock)
+
+
 from karl.content.interfaces import IWikiPage
 
 class DummyWikiPage:
     implements(IWikiPage)
+    __name__ = 'WIKIPAGE'
     def __init__(self, title='', text='', description='', creator=''):
         self.title = title
         self.text = text
         self.description = description
         self.creator = creator
+        self.created = datetime.datetime(2011, 8, 20)
+        self.modified = datetime.datetime(2011, 8, 20)
 
     def get_attachments(self):
         return self
@@ -456,6 +611,16 @@ class DummyWikiPage:
 
     def cook(self, request):
         return 'COOKED: ' + self.text
+
+
+dummywikipage = DummyWikiPage()
+
+class DummySearch:
+    def __init__(self, context):
+        pass
+    def __call__(self, **kw):
+        return 1, [1], lambda x: dummywikipage
+
 
 class DummyAdapter:
     def __init__(self, context, request):

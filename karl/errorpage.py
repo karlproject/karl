@@ -19,6 +19,8 @@
 # Simple deployment-oriented middleware to format errors to look like
 # KARL pages
 
+from ZODB.POSException import ReadOnlyError
+
 from traceback import format_exc
 
 from webob import Request
@@ -29,8 +31,15 @@ GENERAL_MESSAGE = """
 %(system_name)s encountered an application error.  Please click
 the link below to return to the %(system_name)s home page.
 """
+
 NOTFOUND_MESSAGE = """
 %(system_name)s was unable to find the content at this URL."""
+
+READONLY_MESSAGE = """ %(system_name)s has been placed in read only mode
+temporarily so that administrators may perform routine maintenance tasks.
+During this time no new content may be added to %(system_name)s or any edits
+made. Please try again later. Thank you."""
+
 
 class ErrorPageFilter(object):
     """ Simple middleware to provide pretty error pages """
@@ -49,7 +58,7 @@ class ErrorPageFilter(object):
         req = Request(environ)
         try:
             resp = req.get_response(self.app)
-        except:
+        except Exception, e:
             # General failures get wrapped into a General KARL Error
             static_url = req.relative_url(self._static_url, to_application=True)
             home_url = req.relative_url(self._home_url, to_application=True)
@@ -60,12 +69,22 @@ class ErrorPageFilter(object):
                     self._errorlog_url, to_application=True
                 )
 
-            traceback_info = format_exc()
+            if isinstance(e, ReadOnlyError):
+                error_message = 'Site is in Read Only Mode'
+                error_text = READONLY_MESSAGE % {
+                    'system_name': self._system_name}
+                traceback_info = None
+
+            else:
+                error_message = 'General Error'
+                error_text = GENERAL_MESSAGE % {
+                    'system_name': self._system_name}
+                traceback_info = format_exc()
+
             resp = render_template_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
-                error_message='General Error',
-                error_text=GENERAL_MESSAGE %
-                           {'system_name': self._system_name},
+                error_message=error_message,
+                error_text=error_text,
                 static_url=static_url,
                 errorlog_url=errorlog_url,
                 home_url=home_url,

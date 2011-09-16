@@ -21,6 +21,7 @@ import transaction
 from validatish import validator
 
 from webob.exc import HTTPFound
+from webob.exc import HTTPOk
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.component import getMultiAdapter
@@ -40,9 +41,11 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ICatalogSearch
 
+from karl.utilities import lock
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
@@ -64,7 +67,6 @@ from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
-from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
@@ -254,11 +256,11 @@ def show_wikipage_view(context, request):
     if has_permission('delete', context, request) and not is_front_page:
         actions.append(('Delete', 'delete.html'))
     repo = find_repo(context)
-    if repo is not None and has_permission('edit', context, request):
-        actions.append(('History', 'history.html'))
-        show_trash = True
-    else:
-        show_trash = False
+    show_trash = False
+    if not find_interface(context, IIntranets):
+        if repo is not None and has_permission('edit', context, request):
+            actions.append(('History', 'history.html'))
+            show_trash = True
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -270,6 +272,7 @@ def show_wikipage_view(context, request):
 
     wiki = find_interface(context, IWiki)
     feed_url = model_url(wiki, request, "atom.xml")
+
     return dict(
         api=api,
         actions=actions,
@@ -278,10 +281,11 @@ def show_wikipage_view(context, request):
         backto=backto,
         is_front_page=is_front_page,
         show_trash=show_trash,
+        lock_info=lock.lock_info_for_view(context, request),
         )
 
 
-def preview_wikipage_view(context, request, WikiPage=WikiPage):
+def preview_wikipage_view(context, request, WikiPage=WikiPage, tz=None):
     version_num = int(request.params['version_num'])
     repo = find_repo(context)
     for version in repo.history(context.docid):
@@ -310,7 +314,7 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage):
     transaction.doom()
 
     return {
-        'date': format_local_date(version.archive_time),
+        'date': format_local_date(version.archive_time, tz),
         'author': author.title,
         'title': page_title,
         'body': page.cook(request),
@@ -361,6 +365,7 @@ class EditWikiPageFormController(object):
         self.context = context
         self.request = request
         self.workflow = get_workflow(IWikiPage, 'security', context)
+        self.userid = authenticated_userid(self.request)
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
@@ -414,6 +419,9 @@ class EditWikiPageFormController(object):
         return widgets
 
     def __call__(self):
+        if not lock.is_locked(self.context):
+            lock.lock(self.context, self.userid)
+
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
@@ -423,12 +431,18 @@ class EditWikiPageFormController(object):
                 )
         return {'api':api,
                 'actions':(),
+                'lock_info':lock.lock_info_for_view(self.context, self.request),
                 }
 
     def handle_cancel(self):
+        if lock.owns_lock(self.context, self.userid):
+            lock.clear(self.context)
         return HTTPFound(location=model_url(self.context, self.request))
 
     def handle_submit(self, converted):
+        if lock.owns_lock(self.context, self.userid):
+            lock.clear(self.context)
+
         context = self.context
         request = self.request
         workflow = self.workflow
@@ -456,3 +470,12 @@ class EditWikiPageFormController(object):
         msg = "?status_message=Wiki%20Page%20edited"
         return HTTPFound(location=location+msg)
 
+def unlock_wiki_view(context, request, userid=None):
+    if request.method.lower() == 'post':
+        if userid is None:
+            # for unit tests to override
+            userid = authenticated_userid(request)
+        if lock.owns_lock(context, userid):
+            lock.clear(context)
+        return HTTPOk(body='')
+    return HTTPFound(location=model_url(context, request))

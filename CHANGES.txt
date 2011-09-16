@@ -4,11 +4,50 @@ karl package Changelog
 Unreleased
 ----------
 
+- When doing the text indexing on files, text data is now re-extracted from
+  files if the cached text is an empty string.  This allows for files
+  previously indexed when an external converter was unavailable to be properly
+  reindexed after the external converter is added to the system.
+
+- When restoring an object from the trash, if a conflicting name is
+  in the container, append a suffix to the name.  (LP #821206)
+
+- Fixed a DST issue in the versions.format_local_date() function which
+  formats a date for display in versioning UIs.
+
+- Fixed the interpretation of message timestamps so that objects created
+  through email will have the correct time.  (LP #837699)
+
+- Use modern SI prefixes for file size display.  (1 KB = 1000 bytes)
+
+- Fix error in HTML text extractor causing it to fail if no character encoding
+  was supplied via a <meta> content type tag. (LP #848194)
+
+3.71 (2011-09-01)
+-----------------
+
+- Made mail-in processing with aliased distribution lists respect the
+  'system_list_subdomain' setting, if configured.  (LP #824014)
+
+3.70 (2011-08-25)
+-----------------
+
 - The statistics option is now hidden in the admin UI if no statistics have
   been generated yet.  (LP #821204)
 
 - Fixed bug in Wiki Page version preview where the title was always from the
   current version rather than the version being previewed.  (LP #823552)
+
+- Updated the calendar to use cookies instead of a persistent session.
+
+- Added special handling in error page for read only errors.
+
+- 'last_login_time' is now only saved for a user if Karl is not in read only
+  mode, in order to allow users to log in when in read only mode without an
+  error.
+
+- Add locking to Wiki pages. Users are notified via a status-like message when
+  viewing a page that is currently being edited.
 
 3.69 (2011-08-04)
 -----------------
@@ -42,7 +81,7 @@ Unreleased
 -----------------
 
 - Made agility use simplejson instead of the stdlib json module for
-  compatability with Python 2.5.  simplejson is already in use elsewhere in
+  compatibility with Python 2.5.  simplejson is already in use elsewhere in
   the application.
 
 - Fixed bug where replacing a file via the Edit File form would fail to check

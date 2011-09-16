@@ -18,6 +18,9 @@
 """Useful functions that appear in several places in the KARL UI"""
 import os
 import re
+import shutil
+import tempfile
+
 from cStringIO import StringIO
 from os.path import splitext
 
@@ -176,7 +179,7 @@ def make_unique_name_and_postfix(context, title):
             counter += 1
             # This could actually cause all our
             # processes hang forever :)
-            
+
     return unique_name, postfix
 
 def basename_of_filepath(title):
@@ -615,3 +618,23 @@ def get_static_url(request):
     app_url = request.application_url
     static_url = '%s/static/%s' % (app_url, _get_static_rev())
     return static_url
+
+
+def stream_iter(stream, blocksize=1<<20, close=True):
+    try:
+        block = stream.read(blocksize)
+        while block:
+            yield block
+            block = stream.read(blocksize)
+    finally:
+        if close:
+            stream.close()
+
+
+def copy_stream_to_tmpfile_and_iter(stream, blocksize=1<<20):
+    f = tempfile.NamedTemporaryFile()
+    shutil.copyfileobj(stream, f)
+    size = f.tell()
+    f.seek(0, 0)
+    return size, stream_iter(f, blocksize)
+

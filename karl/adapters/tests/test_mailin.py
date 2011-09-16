@@ -26,6 +26,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
         from karl.adapters import mailin
         mailin.datetime = self._save_datetime
+        mailin.ALIAS_REGX = None
 
     def _getTargetClass(self):
         from karl.adapters.mailin import MailinDispatcher
@@ -357,6 +358,26 @@ class MailinDispatcherTests(unittest.TestCase):
                          'no community or distribution list specified')
         self.assertEqual(len(info['targets']), 0)
 
+    def test_getMessageTarget_default_valid_community(self):
+        context = self._makeRoot()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('testing@example.com',)
+
+        info = mailin.getMessageTargets(message)
+
+        self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'default')
+        self.assertEqual(info['in_reply_to'], None)
+
     def test_getMessageTarget_report_reply_invalid_report(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
@@ -462,6 +483,71 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('alias@example.com',)
+
+        info = mailin.getMessageTargets(message)
+
+        self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
+        self.assertEqual(info['report'], 'section+extant')
+        self.assertEqual(info['community'], None)
+        self.assertEqual(info['tool'], None)
+        self.failIf(info.get('in_reply_to'), info)
+
+    def test_getMessageTarget_report_alias_doesnt_shadow_community(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.testing import registerUtility
+        from repoze.bfg.traversal import model_path
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        class DummySettings:
+            system_list_subdomain = 'lists.example.com'
+        registerUtility(DummySettings(), ISettings)
+        context = self._makeRoot()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        extant = section['extant'] = self._makeContext()
+        context.list_aliases['testing'] = model_path(extant)
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('testing@example.com',)
+
+        info = mailin.getMessageTargets(message)
+
+        self.failIf(info.get('error'), info)
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'default')
+        self.assertEqual(info['in_reply_to'], None)
+
+    def test_getMessageTarget_report_alias_w_subdomain(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.testing import registerUtility
+        from repoze.bfg.traversal import model_path
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        class DummySettings:
+            system_list_subdomain = 'lists.example.com'
+        registerUtility(DummySettings(), ISettings)
+        context = self._makeRoot()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        pd = context['people'] = self._makeContext()
+        directlyProvides(pd, IPeopleDirectory)
+        section = pd['section'] = self._makeContext()
+        extant = section['extant'] = self._makeContext()
+        context.list_aliases['testing'] = model_path(extant)
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.to = ('testing@lists.example.com',)
 
         info = mailin.getMessageTargets(message)
 
@@ -711,7 +797,7 @@ class MailinDispatcherTests(unittest.TestCase):
         message.to = ('testing@example.com',)
         message.from_ = ('extant@example.com',)
         message.subject = 'subject'
-        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, 0))
+        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, -1))
         message.date = formatdate(date)
         info = mailin.crackHeaders(message)
         self.assertEqual(info['date'], datetime.datetime(2010, 5, 12, 2, 42))

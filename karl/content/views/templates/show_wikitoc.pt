@@ -37,10 +37,10 @@
       <span class="contentbar-menu">
           <a href="${api.here_url}">Front Page</a> |
           Index
+          <tal:block condition="show_trash"> |
+            <a href="${api.here_url}../trash.html">Trash</a>
+          </tal:block>
       </span>
-      <tal:block condition="show_trash"> |
-        <a href="${api.here_url}../trash.html">Trash</a>
-      </tal:block>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>

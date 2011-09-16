@@ -17,7 +17,8 @@
 import datetime
 import time
 from email.utils import getaddresses
-from email.utils import parsedate
+from email.utils import parsedate_tz
+from calendar import timegm
 
 import re
 
@@ -35,6 +36,7 @@ from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
 from karl.utils import find_root
 from karl.utils import find_users
+from karl.utils import get_setting
 
 REPORT_REPLY_REGX = re.compile(r'peopledir-'
                                 '(?P<report>\w+(\+\w+)*)'
@@ -48,7 +50,16 @@ REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
 
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
-ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
+ALIAS_REGX = None
+def _get_ALIAS_REGX(context):
+    global ALIAS_REGX
+    if ALIAS_REGX is None:
+        subdomain = get_setting(context, "system_list_subdomain", None)
+        if subdomain is not None:
+            ALIAS_REGX = re.compile(r'(?P<alias>.*)@%s' % subdomain)
+        else:
+            ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
+    return ALIAS_REGX
 
 class MailinDispatcher(object):
     implements(IMailinDispatcher)
@@ -147,7 +158,7 @@ class MailinDispatcher(object):
                 targets.append(target)
                 continue
 
-            match = ALIAS_REGX.search(email)
+            match = _get_ALIAS_REGX(self.context).search(email)
             if match:
                 alias = match.group('alias')
                 path = self.context.list_aliases.get(alias)
@@ -302,14 +313,16 @@ class MailinDispatcher(object):
         # Crack the date
         datestr = message['Date']
         if datestr:
-            # Per usual, the email module is broken. The documentation asserts
-            # that the tuple returned by parsedate is suitable for passing to
-            # time.mktime, but parsedate returns a time in GMT and time.mktime
-            # assumes a local time. There is no GMT equivalent to time.mktime
-            # in the time module, so we just manually subtract the timezone
-            # offset from the result of time.mktime.
-            timestamp = time.mktime(parsedate(datestr)) - time.timezone
+            # Extract the fields of the date into 'parsed', a 10-tuple.
+            parsed = parsedate_tz(datestr)
+            # Set timestamp equal to the UTC epoch offset represented by
+            # 'parsed'.
+            timestamp = timegm(parsed[:9])
+            if parsed[9]:
+                timestamp -= parsed[9]
+            # Compute the local time tuple for timestamp.
             timetuple = time.localtime(timestamp)
+            # Store the local time when the message was sent as a datetime.
             info['date'] = datetime.datetime(*timetuple[:6])
         else:
             info['date'] = datetime.datetime.now()

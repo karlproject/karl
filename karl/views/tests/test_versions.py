@@ -13,7 +13,7 @@ class Test_show_history(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
-        return show_history(context, request)
+        return show_history(context, request, tz=5 * 3600)
 
     def test_it(self):
         from datetime import datetime
@@ -61,7 +61,6 @@ class Test_show_history(unittest.TestCase):
         self.assertEqual(history[1]['is_current'], False)
 
     def test_it_no_repo(self):
-        from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
@@ -84,7 +83,6 @@ class Test_revert(unittest.TestCase):
         return revert(context, request)
 
     def test_it(self):
-        from datetime import datetime
         request = testing.DummyRequest(params={
             'version_num': '1',
         })
@@ -111,7 +109,6 @@ class Test_revert(unittest.TestCase):
         self.assertEqual(context.catalog.reindexed, [(3, context)])
 
     def test_it_no_such_version(self):
-        from datetime import datetime
         request = testing.DummyRequest(params={
             'version_num': '5',
         })
@@ -138,7 +135,7 @@ class Test_show_trash(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_trash
-        return show_trash(context, request)
+        return show_trash(context, request, tz=5 * 3600)
 
     def test_it(self):
         from datetime import datetime
@@ -184,7 +181,6 @@ class Test_show_trash(unittest.TestCase):
         self.assertEqual(history[1]['title'], 'Title 3')
 
     def test_it_no_repo(self):
-        from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
@@ -211,17 +207,8 @@ class Test_undelete(unittest.TestCase):
         from karl.views.versions import undelete
         return undelete(context, request)
 
-    def test_it(self):
+    def _make_repo(self, context):
         from datetime import datetime
-        request = testing.DummyRequest({
-            'docid': 2, 'name': 'foo2'
-        })
-        context = DummyModel(
-            docid=33,
-            title='Title',
-        )
-        context['profiles'] = profiles = testing.DummyModel()
-        profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
             Dummy(
                 klass=DummyModel,
@@ -241,6 +228,18 @@ class Test_undelete(unittest.TestCase):
             ),
         ])
         context.repo.maps.append({'foo3': 33})
+
+    def test_non_conflicting_name(self):
+        request = testing.DummyRequest({
+            'docid': 2, 'name': 'foo2'
+        })
+        context = DummyModel(
+            docid=33,
+            title='Title',
+        )
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['ed'] = testing.DummyModel(title='Ed')
+        self._make_repo(context)
         result = self._callFUT(context, request)
         self.assertEqual(result.location, 'http://example.com/foo2/')
         self.assertEqual(context['foo2'].reverted[0].docid, 2)
@@ -248,6 +247,109 @@ class Test_undelete(unittest.TestCase):
         self.assertEqual(context['foo2']['foo3'].reverted[0].docid, 33)
         self.assertEqual(len(context['foo2']['foo3'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
+
+    def test_conflicting_name(self):
+        request = testing.DummyRequest({
+            'docid': 2, 'name': 'foo2'
+        })
+        context = DummyModel(
+            docid=33,
+            title='Title',
+        )
+        context['foo2'] = DummyModel()
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['ed'] = testing.DummyModel(title='Ed')
+        self._make_repo(context)
+        result = self._callFUT(context, request)
+        self.assertEqual(result.location, 'http://example.com/foo2-1/')
+        self.assertEqual(context['foo2-1'].reverted[0].docid, 2)
+        self.assertEqual(len(context['foo2-1'].reverted), 1)
+        self.assertEqual(context['foo2-1']['foo3'].reverted[0].docid, 33)
+        self.assertEqual(len(context['foo2-1']['foo3'].reverted), 1)
+        self.assertEqual(context.repo.containers, [(context, None)])
+
+
+class Test_show_history_lock(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.versions import show_history
+        return show_history(context, request)
+
+    def test_show_locked_page(self):
+        from karl.testing import DummyRoot
+        site = DummyRoot()
+        context = testing.DummyModel(title='title')
+        site['foo'] = context
+
+        import datetime
+        lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)
+        context.lock = {'time': lock_time,
+                        'userid': 'foo'}
+
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.failUnless(response['lock_info']['is_locked'])
+
+
+class Test_format_local_date(unittest.TestCase):
+
+    def _callFUT(self, date, tz=None, time_module=None):
+        if time_module is None:
+            import time
+            time_module = time
+        from karl.views.versions import format_local_date
+        return format_local_date(date, tz=tz, time_module=time_module)
+
+    def test_with_tz_specified(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt, 7 * 3600)
+        self.assertEqual(s, '2011-08-30 00:30')
+
+    def _make_time_module(self, daylight=0, isdst=False):
+        # Make an object simulates the time module.
+
+        class TimeModule:
+            timezone = 6 * 3600
+            altzone = 7 * 3600
+
+            def __init__(self):
+                self.daylight = daylight
+
+            def localtime(self, t):
+                class struct_time:
+                    tm_isdst = isdst
+
+                return struct_time()
+
+        return TimeModule()
+
+    def test_in_zone_without_daylight_savings(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt, time_module=self._make_time_module(daylight=0))
+        self.assertEqual(s, '2011-08-30 01:30')
+
+    def test_with_daylight_savings_in_effect(self):
+        import datetime
+        dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
+        s = self._callFUT(dt,
+            time_module=self._make_time_module(daylight=1, isdst=True))
+        self.assertEqual(s, '2011-08-30 00:30')
+
+    def test_with_daylight_savings_not_in_effect(self):
+        import datetime
+        dt = datetime.datetime(2011, 1, 30, 7, 30, 15)
+        s = self._callFUT(dt,
+            time_module=self._make_time_module(daylight=1, isdst=False))
+        self.assertEqual(s, '2011-01-30 01:30')
+
 
 class DummyArchive(object):
 
