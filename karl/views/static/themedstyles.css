@@ -2802,8 +2802,10 @@ a.disabled img {
     cursor: pointer;
     padding: 1px 10px;
     margin: 2px;
+/*
     height: 16px;
     line-height: 16px;
+*/
     float: left;
     border-radius: 5px;
     -moz-border-radius: 5px;

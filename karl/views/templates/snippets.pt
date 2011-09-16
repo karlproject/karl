@@ -180,7 +180,7 @@
       <link rel="stylesheet" type="text/css" media="print" href="${api.static_url}/print.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/custom.css"/>
-      <!--[if IE]> <style type="text/css" media="all">@import
+      <!--[if lte IE 8]> <style type="text/css" media="all">@import
           url(${api.static_url}/karl_ie.css);</style>
       <![endif]-->
       <!--[if IE 8]> <style type="text/css" media="all">@import
