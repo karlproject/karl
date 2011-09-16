@@ -181,14 +181,13 @@ class Test_show_trash(unittest.TestCase):
                          'http://example.com/restore?docid=3&name=foo3')
         self.assertEqual(history[1]['title'], 'Title 3')
 
-    def test_it_no_repo(self):
+    def test_it_container_not_in_repo(self):
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
             title='Title',
         )
-        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
-            docid_to_address={}))
+        context.repo = DummyArchive([])
         result = self._callFUT(context, request)
         history = result['deleted']
         self.assertEqual(len(history), 0)
@@ -376,8 +375,9 @@ class DummyArchive(object):
         self._reverted.append((docid, version_num))
 
     def container_contents(self, docid):
+        from sqlalchemy.orm.exc import NoResultFound
         if docid == 33:
-            raise KeyError(docid)
+            raise NoResultFound
         return self
 
     @property

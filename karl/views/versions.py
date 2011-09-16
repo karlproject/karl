@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from sqlalchemy.orm.exc import NoResultFound
 from webob.exc import HTTPFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
@@ -90,7 +91,7 @@ def show_trash(context, request, tz=None):
 
     try:
         contents = repo.container_contents(context.docid)
-    except:
+    except NoResultFound:
         deleted = []
     else:
         deleted = [display_record(doc) for doc in contents.deleted
@@ -109,7 +110,7 @@ def _undelete(repo, parent, docid, name):
 
     try:
         container = repo.container_contents(docid)
-    except:
+    except NoResultFound:
         container = None
 
     if container is not None:

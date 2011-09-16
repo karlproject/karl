@@ -1,5 +1,6 @@
 import BTrees
 import transaction
+from sqlalchemy.orm.exc import NoResultFound
 
 from repoze.bfg.traversal import find_model
 from repoze.bfg.traversal import model_path
@@ -80,7 +81,7 @@ def init_container(docid, path, repo, site):
         repo.container_contents(docid)
         # Already in repo
         return
-    except:
+    except NoResultFound:
         # Not in repo
         pass
 
