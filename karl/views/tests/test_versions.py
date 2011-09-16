@@ -60,15 +60,6 @@ class Test_show_history(unittest.TestCase):
                          'http://example.com/revert?version_num=1')
         self.assertEqual(history[1]['is_current'], False)
 
-    def test_it_no_repo(self):
-        request = testing.DummyRequest()
-        context = testing.DummyModel(
-            docid=3,
-            title='Title',
-        )
-        result = self._callFUT(context, request)
-        history = result['history']
-        self.assertEqual(len(history), 0)
 
 class Test_revert(unittest.TestCase):
 
@@ -296,7 +287,8 @@ class Test_show_history_lock(unittest.TestCase):
     def test_show_locked_page(self):
         from karl.testing import DummyRoot
         site = DummyRoot()
-        context = testing.DummyModel(title='title')
+        context = testing.DummyModel(title='title', docid=1)
+        site.repo = DummyArchive([])
         site['foo'] = context
 
         import datetime

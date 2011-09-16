@@ -57,13 +57,9 @@ def main(args):
 
 
 def init_history(docid, path, repo, site):
-    try:
-        repo.history(docid, True)
+    if repo.history(docid, True):
         # Already in repo
         return
-    except:
-        # Not in repo
-        pass
 
     context = find_model(site, path)
     if context.__name__ == 'TEMP':
