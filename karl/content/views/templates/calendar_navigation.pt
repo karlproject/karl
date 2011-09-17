@@ -52,7 +52,9 @@
         <div class="cal_actions">
            <!-- <a class="cal_download" href="#">Download</a> -->
            <span><a class="cal_subscribe" href="${calendar.feed_url}">Subscribe</a></span>
+           <!--
            <span><a class="cal_print" href="#">Print</a></span>
+           -->
         </div>
       </div>
 
