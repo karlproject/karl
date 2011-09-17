@@ -37,7 +37,7 @@
 </form>
 
 <div id="sras-content">
-    <div class="sras-searchknobs">
+    <div class="sras-searchknobs" tal:condition="show_search_knobs">
 
         <!-- Left hand column of search knobs -->
 

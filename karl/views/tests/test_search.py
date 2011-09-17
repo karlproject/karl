@@ -202,7 +202,8 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         self.assertEqual(len(results), 20)
 
 
-class SearchResultsViewTests(unittest.TestCase):
+class SearchResultsViewBase(object):
+
     def setUp(self):
         cleanUp()
         testing.registerDummyRenderer('karl.views:templates/generic_layout.pt')
@@ -211,10 +212,6 @@ class SearchResultsViewTests(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.views.search import searchresults_view
-        return searchresults_view(context, request)
 
     def test_no_searchterm(self):
         from webob.multidict import MultiDict
@@ -450,6 +447,134 @@ class SearchResultsViewTests(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], ['yo', 'Past week'])
         self.assertEqual(len(result['results']), 1)
+
+
+
+class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.search import searchresults_view
+        return searchresults_view(context, request)
+
+    def test_community_search_layout(self):
+        root = testing.DummyModel()
+        root.catalog = {}
+        root['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        from webob.multidict import MultiDict
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+
+        root['communities'] = testing.DummyModel()
+        community = root['communities']['default'] = testing.DummyModel(title='citizens')
+        office = root['offices'] = testing.DummyModel(title='all rights')
+        directlyProvides(community, ICommunity)
+        directlyProvides(office, ICommunity)
+
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
+
+        import karl.views.api
+        save_community = karl.views.api.TemplateAPI.community_layout
+        save_generic = karl.views.api.TemplateAPI.community_layout
+        try:
+            karl.views.api.TemplateAPI.community_layout = 'COMMUNITY'
+            karl.views.api.TemplateAPI.generic_layout = 'GENERIC'
+
+            # not on community
+            result = self._callFUT(root, request)
+            self.assertEqual(result['community'], None)
+            self.assertEqual(result['layout'], 'GENERIC')
+            self.assertEqual(result['show_search_knobs'], True)
+
+            # normal community
+            result = self._callFUT(community, request)
+            self.assertEqual(result['community'], 'citizens')
+            self.assertEqual(result['layout'], 'COMMUNITY')
+            self.assertEqual(result['show_search_knobs'], True)
+
+            # office
+            result = self._callFUT(office, request)
+            self.assertEqual(result['community'], 'all rights')
+            self.assertEqual(result['layout'], 'COMMUNITY')
+            self.assertEqual(result['show_search_knobs'], True)
+
+        finally:
+            karl.views.api.TemplateAPI.community_layout = save_community
+            karl.views.api.TemplateAPI.generic_layout = save_generic
+
+class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.views.search import calendar_searchresults_view
+        return calendar_searchresults_view(context, request)
+
+    def test_calendar_search_layout(self):
+        root = testing.DummyModel()
+        root.catalog = {}
+        root['profiles'] = profiles = testing.DummyModel()
+        profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
+        from webob.multidict import MultiDict
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+
+        root['communities'] = testing.DummyModel()
+        community = root['communities']['default'] = testing.DummyModel(title='citizens')
+        office = root['offices'] = testing.DummyModel(title='all rights')
+        directlyProvides(community, ICommunity)
+        directlyProvides(office, ICommunity)
+
+        request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IAdvancedSearchResultsDisplay
+        from repoze.lemonade.testing import registerContentFactory
+        registerContentFactory(DummyContent, IDummyContent)
+        testing.registerAdapter(DummySearch, (Interface),
+                                ICatalogSearch)
+        testing.registerAdapter(DummySearchResultsDisplay,
+                                (Interface, Interface),
+                                IAdvancedSearchResultsDisplay)
+
+        import karl.views.api
+        save_community = karl.views.api.TemplateAPI.community_layout
+        save_generic = karl.views.api.TemplateAPI.community_layout
+        try:
+            karl.views.api.TemplateAPI.community_layout = 'COMMUNITY'
+            karl.views.api.TemplateAPI.generic_layout = 'GENERIC'
+
+            # not on community
+            result = self._callFUT(root, request)
+            self.assertEqual(result['community'], None)
+            self.assertEqual(result['layout'], 'GENERIC')
+            self.assertEqual(result['show_search_knobs'], False)
+
+            # normal community
+            result = self._callFUT(community, request)
+            self.assertEqual(result['community'], 'citizens')
+            self.assertEqual(result['layout'], 'COMMUNITY')
+            self.assertEqual(result['show_search_knobs'], False)
+
+            # office (generic layout, ie, wide here)
+            result = self._callFUT(office, request)
+            self.assertEqual(result['community'], 'all rights')
+            self.assertEqual(result['layout'], 'GENERIC')
+            self.assertEqual(result['show_search_knobs'], False)
+
+        finally:
+            karl.views.api.TemplateAPI.community_layout = save_community
+            karl.views.api.TemplateAPI.generic_layout = save_generic
+
+
 
 
 class GetBatchTests(unittest.TestCase):

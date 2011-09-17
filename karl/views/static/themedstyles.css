@@ -577,6 +577,7 @@ a.chparent:hover {
   margin: 0 15px 15px;
   float: left;
 }
+/*
 .generic-layout #center.fill-width,
 .community-layout #center.fill-width {
     width: 900px;
@@ -585,6 +586,15 @@ a.chparent:hover {
 .community-layout #center {
     width: 704px;
 }
+*/
+
+.generic-layout #center {
+    width: 900px;
+}
+.community-layout #center {
+    width: 704px;
+}
+
 #right {
  	float: right;
 	width: 262px;
