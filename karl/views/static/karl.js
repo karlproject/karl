@@ -2726,13 +2726,12 @@ $(document).ready(function() {
 
     // add class to #center if there are no right portlets
     //
-    // XXX Removing this code, as its role is not clear.
-    //
-    //rcol = $(".generic-layout .rightcol").text();
-    //if ($.trim(rcol) == '') {
-    //    //console.log("true");
-    //    $(".generic-layout #center").addClass("fill-width");
-    //}
+    // XXX Would like to remove the code, but needed for the current layout.
+    rcol = $(".generic-layout .rightcol").html();
+    if ($.trim(rcol) == '') {
+        //console.log("true");
+        $(".generic-layout #center").addClass("fill-width");
+    }
 
 
     /** =CALENDAR ATTACH EVENTS

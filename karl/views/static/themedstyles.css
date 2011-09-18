@@ -588,9 +588,10 @@ a.chparent:hover {
 }
 */
 
-.generic-layout #center {
+.generic-layout #center.fill-width {
     width: 900px;
 }
+.generic-layout #center,
 .community-layout #center {
     width: 704px;
 }
