@@ -5,8 +5,6 @@
 
 <head>
  <metal:slot metal:fill-slot="extra-headers">
-  <link rel="stylesheet" type="text/css" 
-	    href="${api.static_url}/jquery-ui/1.8.2/development-bundle/themes/smoothness/jquery.ui.tabs.css" />
   <style type="text/css">
    .ui-tabs .ui-tabs-hide {
      display: none;
@@ -21,7 +19,6 @@
         font-size: x-small;
    }
   </style>
-  <script src="${api.static_url}/jquery-ui/1.8.2/development-bundle/ui/jquery.ui.tabs.js"></script>
  </metal:slot>
 </head>
 
