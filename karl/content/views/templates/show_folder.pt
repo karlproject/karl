@@ -4,7 +4,7 @@
      metal:use-macro="layout.macros['master']">
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml" 
+    <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml"
 	  title="${api.page_title}" href="${feed_url}"
 	  />
     <tal:resources condition="not api.js_devel_mode == 'true'">
@@ -46,7 +46,7 @@
                 .bind('karlmultifileuploadclose', function(evt, data) {
                     if (data.runtime == 'flash' && $.browser.msie) {
                       var ua = $.browser.version;
-                      var ieversion = ua.substring(0, ua.indexOf('.'));	
+                      var ieversion = ua.substring(0, ua.indexOf('.'));
                       if (ieversion <= '7') {
                         // IE7 has problems when we close the dialog, because
                         // it cannot suffer hiding / showing the flash component.
@@ -64,25 +64,25 @@
     </script>
 
   </span>
-  
+
   <div metal:fill-slot="content">
 
     <div class="contentbar-wrapper view-show-folder-actions">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
         <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
-        <tal:block condition="show_trash">
+        <tal:block condition="trash_url">
           <span tal:omit-tag="True" tal:condition="backto">|</span>
-          <a href="trash.html">Trash</a>
+          <a href="${trash_url}">Trash</a>
         </tal:block>
       </span>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-  
+
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div metal:use-macro="api.snippets.macros['folder_grid']"> </div>
 

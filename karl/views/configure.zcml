@@ -1772,7 +1772,7 @@
     for="repoze.folder.interfaces.IFolder"
     view=".versions.show_trash"
     permission="edit"
-    name="trash.html"
+    name="trash"
     renderer="templates/trash.pt"
     />
 
