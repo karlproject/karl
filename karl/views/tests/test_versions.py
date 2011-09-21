@@ -144,9 +144,18 @@ class Test_show_trash(unittest.TestCase):
             docid=3,
             title='Title',
         )
+        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
+            docid_to_address={1: None}))
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
+            Dummy(
+                deleted_by='ed',
+                deleted_time=datetime(2010, 5, 12, 2, 42),
+                docid=1,
+                name="foo1",
+                title="Title 1",
+            ),
             Dummy(
                 deleted_by='ed',
                 deleted_time=datetime(2010, 5, 12, 2, 42),
@@ -186,6 +195,8 @@ class Test_show_trash(unittest.TestCase):
             docid=3,
             title='Title',
         )
+        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
+            docid_to_address={}))
         result = self._callFUT(context, request)
         history = result['deleted']
         self.assertEqual(len(history), 0)

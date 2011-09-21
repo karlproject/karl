@@ -92,15 +92,22 @@ def show_trash(context, request, tz=None):
             'title': version.title,
         }
 
+    # Some documents will show up as deleted in a folder when they've really
+    # just been moved to another folder. We can figure out whether a document
+    # is truly orphaned by checking for it in the catalog.
+    catalog = find_catalog(context)
+    active_docs = catalog.document_map.docid_to_address
     try:
         contents = repo.container_contents(context.docid)
-        deleted = contents.deleted
     except:
         deleted = []
+    else:
+        deleted = [display_record(doc) for doc in contents.deleted
+                   if int(doc.docid) not in active_docs]
 
     return {
         'api': TemplateAPI(context, request, 'Trash'),
-        'deleted': map(display_record, deleted),
+        'deleted': deleted,
     }
 
 

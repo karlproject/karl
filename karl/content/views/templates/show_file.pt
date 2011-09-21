@@ -9,10 +9,6 @@
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
         <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
-        <tal:block condition="show_trash">
-          <span tal:omit-tag="True" tal:condition="backto">|</span>
-          <a href="trash.html">Trash</a>
-        </tal:block>
       </span>
     </div>
 
@@ -20,7 +16,7 @@
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div class="kbody">
 

@@ -23,6 +23,13 @@ Unreleased
 - Fix error in HTML text extractor causing it to fail if no character encoding
   was supplied via a <meta> content type tag. (LP #848194)
 
+- Added versioning for the Files tool.
+
+- Made the Trash folder aware of documents that may have been marked deleted in
+  a folder because they were moved to another folder. Documents that are still
+  accessible in some way are not displayed in the Trash view.  This is a
+  workaround for LP #851118.
+
 3.71 (2011-09-01)
 -----------------
 
