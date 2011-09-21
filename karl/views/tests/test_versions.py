@@ -60,15 +60,6 @@ class Test_show_history(unittest.TestCase):
                          'http://example.com/revert?version_num=1')
         self.assertEqual(history[1]['is_current'], False)
 
-    def test_it_no_repo(self):
-        request = testing.DummyRequest()
-        context = testing.DummyModel(
-            docid=3,
-            title='Title',
-        )
-        result = self._callFUT(context, request)
-        history = result['history']
-        self.assertEqual(len(history), 0)
 
 class Test_revert(unittest.TestCase):
 
@@ -144,8 +135,6 @@ class Test_show_trash(unittest.TestCase):
             docid=3,
             title='Title',
         )
-        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
-            docid_to_address={1: None}))
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
@@ -155,6 +144,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=1,
                 name="foo1",
                 title="Title 1",
+                new_container_ids=[6],
             ),
             Dummy(
                 deleted_by='ed',
@@ -162,6 +152,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=2,
                 name="foo2",
                 title="Title 2",
+                new_container_ids=[],
             ),
             Dummy(
                 deleted_by='ed',
@@ -169,6 +160,7 @@ class Test_show_trash(unittest.TestCase):
                 docid=3,
                 name="foo3",
                 title="Title 3",
+                new_container_ids=[],
             ),
         ])
         result = self._callFUT(context, request)
@@ -189,14 +181,13 @@ class Test_show_trash(unittest.TestCase):
                          'http://example.com/restore?docid=3&name=foo3')
         self.assertEqual(history[1]['title'], 'Title 3')
 
-    def test_it_no_repo(self):
+    def test_it_container_not_in_repo(self):
         request = testing.DummyRequest()
         context = testing.DummyModel(
             docid=3,
             title='Title',
         )
-        context.catalog = testing.DummyModel(document_map=testing.DummyModel(
-            docid_to_address={}))
+        context.repo = DummyArchive([])
         result = self._callFUT(context, request)
         history = result['deleted']
         self.assertEqual(len(history), 0)
@@ -295,7 +286,8 @@ class Test_show_history_lock(unittest.TestCase):
     def test_show_locked_page(self):
         from karl.testing import DummyRoot
         site = DummyRoot()
-        context = testing.DummyModel(title='title')
+        context = testing.DummyModel(title='title', docid=1)
+        site.repo = DummyArchive([])
         site['foo'] = context
 
         import datetime
@@ -383,8 +375,9 @@ class DummyArchive(object):
         self._reverted.append((docid, version_num))
 
     def container_contents(self, docid):
+        from sqlalchemy.orm.exc import NoResultFound
         if docid == 33:
-            raise KeyError(docid)
+            raise NoResultFound
         return self
 
     @property

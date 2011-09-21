@@ -164,10 +164,7 @@ def add_to_repo(obj, event):
     if repo is None:
         return
 
-    try:
-        # If we're undeleting an object, it might already be in the repo
-        repo.history(obj.docid)
-    except:
+    if not repo.history(obj.docid, True):
         # It is not in the repo, so add it
         adapter = queryAdapter(obj, IObjectVersion)
         if adapter is not None:

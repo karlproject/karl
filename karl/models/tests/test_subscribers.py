@@ -444,7 +444,7 @@ class Test_add_to_repo(unittest.TestCase):
 
     def test_new_non_container(self):
         event = Dummy(parent=None)
-        model = testing.DummyModel()
+        model = testing.DummyModel(docid=1)
         model.repo = archive = DummyArchive()
         model.comment = None
         self._callFUT(model, event)
@@ -454,9 +454,9 @@ class Test_add_to_repo(unittest.TestCase):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
-        parent = testing.DummyModel()
+        parent = testing.DummyModel(docid=1)
         event = Dummy(parent=parent)
-        model = testing.DummyModel()
+        model = testing.DummyModel(docid=2)
         model.repo = archive = DummyArchive()
         model.comment = None
         self._callFUT(model, event)
@@ -469,12 +469,12 @@ class Test_add_to_repo(unittest.TestCase):
         from zope.interface import Interface
         from zope.interface import directlyProvides
         testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
-        parent = testing.DummyModel()
+        parent = testing.DummyModel(docid=1)
         parent.repo = archive = DummyArchive()
         parent.comment = None
         directlyProvides(parent, IFolder)
         event = Dummy(parent=None)
-        model = testing.DummyModel()
+        model = testing.DummyModel(docid=2)
         model.comment = None
         parent['foo'] = model
         self._callFUT(parent, event)
@@ -918,6 +918,8 @@ class DummyArchive(object):
         self.archived.append(obj)
     def archive_container(self, obj, user):
         self.containers.append((obj, user))
+    def history(self, docid, latest=False):
+        return []
 
 def DummyAdapter(obj):
     return obj

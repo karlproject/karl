@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from sqlalchemy.orm.exc import NoResultFound
 from webob.exc import HTTPFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
@@ -36,11 +37,7 @@ def show_history(context, request, tz=None):
             'is_current': record.current_version == record.version_num,
         }
 
-    try:
-        history = repo.history(context.docid)
-    except:
-        history = []
-    history = map(display_record, history)
+    history = map(display_record, repo.history(context.docid))
     history.reverse()
 
     page_title = 'History for %s' % context.title
@@ -92,18 +89,13 @@ def show_trash(context, request, tz=None):
             'title': version.title,
         }
 
-    # Some documents will show up as deleted in a folder when they've really
-    # just been moved to another folder. We can figure out whether a document
-    # is truly orphaned by checking for it in the catalog.
-    catalog = find_catalog(context)
-    active_docs = catalog.document_map.docid_to_address
     try:
         contents = repo.container_contents(context.docid)
-    except:
+    except NoResultFound:
         deleted = []
     else:
         deleted = [display_record(doc) for doc in contents.deleted
-                   if int(doc.docid) not in active_docs]
+                   if not doc.new_container_ids]
 
     return {
         'api': TemplateAPI(context, request, 'Trash'),
@@ -118,7 +110,7 @@ def _undelete(repo, parent, docid, name):
 
     try:
         container = repo.container_contents(docid)
-    except:
+    except NoResultFound:
         container = None
 
     if container is not None:
