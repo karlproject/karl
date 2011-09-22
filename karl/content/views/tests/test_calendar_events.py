@@ -1362,7 +1362,12 @@ class Test__get_catalog_events(unittest.TestCase):
                                first_moment=now,
                                last_moment=now,
                                layer_name=None)
-        self.assertEqual(list(result), [event])
+        # We won't have an equality, as this is a clone.
+        # So, check its dict instead.
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].startDate, event.startDate)
+        self.assertEqual(result[0].endDate, event.endDate)
+        # ... and so on.
 
 class ShowCalendarViewTests(unittest.TestCase):
     """Test cases to check interaction of different calendar views
@@ -1668,10 +1673,14 @@ class DummyContentFactory:
         return content_object
 
 
+import datetime
+startDate = datetime.datetime(2011, 9, 22, 9, 0)
+endDate = datetime.datetime(2011, 9, 23, 10, 0)
+
 class DummyCalendarEvent(testing.DummyModel):
     implements(ICalendarEvent)
 
-    def __init__(self, title='', startDate=None, endDate=None, creator=0,
+    def __init__(self, title='', startDate=startDate, endDate=endDate, creator=0,
                  text='', location='', attendees=[], contact_name='',
                  contact_email='', calendar_category=''):
         testing.DummyModel.__init__(self)

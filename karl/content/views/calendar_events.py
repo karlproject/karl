@@ -19,6 +19,7 @@ import calendar
 calendar.setfirstweekday(calendar.SUNDAY)
 import datetime
 import time
+import copy
 
 from urllib import quote
 
@@ -165,11 +166,36 @@ def _get_catalog_events(calendar, request,
 
         for docid in docids:
             if docid not in docids_seen:
-                docids_seen.add(docid)
 
-                event = resolver(docid)
+                # We need to clone the event, because if an event is
+                # shown in multiple layers, then we want to show it multiple
+                # times.
+                # This also means that making the color and title
+                # volatile, serves no purpose any more. It used to serve
+                # a purpose when the same event could only have
+                # been displayed once.
+                
+                event = copy.deepcopy(resolver(docid))
                 event._v_layer_color = layer.color.strip()
                 event._v_layer_title = layer.title
+
+                # but... showing an event multiple times, for each
+                # layer it is in,
+                # currently only makes sense for all-day
+                # events. As, for normal events, this would make
+                # them undisplayable.
+                # So we only add the event to the seen ones, if
+                # it is a normal, and not an all-day event.
+                # A special case is list views when we want the normal
+                # events duplicated too. The characteristics of a list
+                # view is that the end date is open.
+                all_day = event.startDate.hour == 0 and \
+                    event.startDate.minute == 0 and \
+                    event.endDate.hour == 0 and \
+                    event.endDate.minute == 0
+                in_list_view = last_moment is None
+                if not in_list_view and not all_day:
+                    docids_seen.add(docid)
 
                 events.append(event)
 
