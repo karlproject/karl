@@ -143,11 +143,12 @@ def show_folder_view(context, request):
             'title': context.__parent__.title,
             }
 
-    show_trash = False
+    trash_url = None
     if not find_interface(context, IIntranets):
         repo = find_repo(context)
         if repo is not None and has_permission('edit', context, request):
-            show_trash = True
+            tool = find_interface(context, ICommunityRootFolder)
+            trash_url = model_url(tool, request, 'trash')
 
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
@@ -180,7 +181,7 @@ def show_folder_view(context, request):
         backto=backto,
         layout=layout,
         feed_url=feed_url,
-        show_trash=show_trash,
+        trash_url=trash_url,
         )
 
 
