@@ -231,7 +231,7 @@ def undelete(context, request):
                     repo.archive_container(IContainerVersion(parent),
                                            authenticated_userid(request))
                     break
-            else:
+            else: #pragma NO COVERAGE
                 # Will only get here in case of programmer error or db
                 # corruption (due to programmer error)
                 raise RuntimeError("Cannot find container to restore: %d" %

@@ -130,7 +130,7 @@ class Test_show_trash(unittest.TestCase):
         from karl.views.versions import show_trash
         return show_trash(context, request, tz=5 * 3600)
 
-    def test_it(self):
+    def test_shallow(self):
         from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
@@ -187,6 +187,58 @@ class Test_show_trash(unittest.TestCase):
         self.assertEqual(history[1]['restore_url'],
                          'http://example.com/restore?docid=3&name=foo3')
         self.assertEqual(history[1]['title'], 'Title 3')
+        self.assertEqual(history[0]['url'], None)
+
+    def test_file_deleted_in_subfolder(self):
+        from datetime import datetime
+        request = testing.DummyRequest()
+        context = testing.DummyModel(
+            docid=0,
+            title='Title',
+            map={},
+        )
+        context['profiles'] = profiles = testing.DummyModel()
+        profiles['ed'] = testing.DummyModel(title='Ed')
+        deleted_item =  Dummy(
+            deleted_by='ed',
+            deleted_time=datetime(2010, 5, 12, 2, 42),
+            docid=1,
+            name="foo1",
+            title="Title 1",
+            new_container_ids=[])
+
+        context.repo = DummyArchive([
+            Dummy(docid=0, deleted=[], map={'parent': 2},
+                  new_container_ids=[]),
+            Dummy(docid=2, deleted=[deleted_item], map={},
+                  new_container_ids=[], title='Parent'),
+            deleted_item,
+        ])
+
+        # Show top level
+        result = self._callFUT(context, request)
+        history = result['deleted']
+        self.assertEqual(len(history), 1)
+        self.assertEqual(len(history[0]), 5)
+        self.assertEqual(history[0]['date'], None)
+        self.assertEqual(history[0]['deleted_by'], None)
+        self.assertEqual(history[0]['restore_url'], None)
+        self.assertEqual(history[0]['title'], 'Parent')
+        self.assertEqual(history[0]['url'],
+                         'http://example.com/trash?subfolder=2')
+
+        # Show second level
+        request.params['subfolder'] = '2'
+        result = self._callFUT(context, request)
+        history = result['deleted']
+        self.assertEqual(len(history), 1)
+        self.assertEqual(len(history[0]), 5)
+        self.assertEqual(history[0]['date'], '2010-05-11 21:42')
+        self.assertEqual(history[0]['deleted_by'], {
+            'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
+        self.assertEqual(history[0]['restore_url'],
+                         'http://example.com/restore?docid=1&name=foo1')
+        self.assertEqual(history[0]['title'], 'Title 1')
         self.assertEqual(history[0]['url'], None)
 
     def test_it_container_not_in_repo(self):
@@ -288,6 +340,85 @@ class Test_undelete(unittest.TestCase):
         self.assertEqual(len(context['foo2-1']['child'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
+    def test_restore_file_to_subfolder(self):
+        from datetime import datetime
+        context = DummyModel(docid=1, title='The Context')
+        context['folder'] = DummyModel(docid=2, title='The Folder')
+        deleted_item = Dummy(
+            klass=DummyModel,
+            deleted_by='ed',
+            deleted_time=datetime(2010, 5, 12, 2, 42),
+            docid=3,
+            name="doc",
+            title="The Document",
+            new_container_ids=[],
+        )
+        context.repo = DummyArchive([
+            deleted_item,
+            Dummy(
+                klass=DummyModel,
+                docid=1,
+                name="context",
+                title="The Context",
+                new_container_ids=[],
+                map={'folder': 2},
+                deleted=[]),
+            Dummy(
+                klass=DummyModel,
+                docid=2,
+                name='folder',
+                title='The Folder',
+                new_container_ids=[],
+                map={},
+                deleted=[deleted_item])])
+        request = testing.DummyRequest({
+            'docid': 3, 'name': 'doc'
+        })
+        result = self._callFUT(context, request)
+        self.assertEqual(result.location, 'http://example.com/folder/')
+        self.assertEqual(context['folder']['doc'].reverted[0].docid, 3)
+
+    def test_restore_file_in_deleted_subfolder(self):
+        from datetime import datetime
+        context = DummyModel(docid=1, title='The Context')
+        deleted_item = Dummy(
+            klass=DummyModel,
+            deleted_by='ed',
+            deleted_time=datetime(2010, 5, 12, 2, 42),
+            docid=3,
+            name="doc",
+            title="The Document",
+            new_container_ids=[],
+        )
+        deleted_subfolder = Dummy(
+            klass=DummyModel,
+            deleted_by='ed',
+            deleted_time=datetime(2010, 5, 12, 2, 42),
+            docid=2,
+            name="folder",
+            title="The Folder",
+            new_container_ids=[],
+            map={'doc': 3},
+            deleted=[])
+        context.repo = DummyArchive([
+            deleted_item,
+            deleted_subfolder,
+            Dummy(
+                klass=DummyModel,
+                docid=1,
+                name="context",
+                title="The Context",
+                new_container_ids=[],
+                map={'folder': 2},
+                deleted=[deleted_subfolder])])
+
+        request = testing.DummyRequest({
+            'docid': 3, 'name': 'doc'
+        })
+        result = self._callFUT(context, request)
+        self.assertEqual(result.location, 'http://example.com/folder/')
+        self.assertEqual(context['folder'].reverted[0].docid, 2)
+        self.assertEqual(context['folder']['doc'].reverted[0].docid, 3)
 
 class Test_show_history_lock(unittest.TestCase):
 
