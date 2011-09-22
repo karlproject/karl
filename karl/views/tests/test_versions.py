@@ -26,12 +26,14 @@ class Test_show_history(unittest.TestCase):
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
             Dummy(
+                docid=1,
                 user='ed',
                 archive_time=datetime(2010, 5, 12, 2, 42),
                 version_num=1,
                 current_version=2,
             ),
             Dummy(
+                docid=2,
                 user='ed',
                 archive_time=datetime(2010, 5, 13, 2, 42),
                 version_num=2,
@@ -84,8 +86,8 @@ class Test_revert(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
-            Dummy(version_num=1,),
-            Dummy(version_num=2,),
+            Dummy(version_num=1, docid=1),
+            Dummy(version_num=2, docid=2),
         ])
         context.catalog = DummyCatalog()
         reverted = []
@@ -110,8 +112,8 @@ class Test_revert(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
-            Dummy(version_num=1,),
-            Dummy(version_num=2,),
+            Dummy(version_num=1, docid=1),
+            Dummy(version_num=2, docid=2),
         ])
         self.assertRaises(ValueError, self._callFUT, context, request)
 
@@ -132,12 +134,13 @@ class Test_show_trash(unittest.TestCase):
         from datetime import datetime
         request = testing.DummyRequest()
         context = testing.DummyModel(
-            docid=3,
+            docid=0,
             title='Title',
+            map={},
         )
         context['profiles'] = profiles = testing.DummyModel()
         profiles['ed'] = testing.DummyModel(title='Ed')
-        context.repo = DummyArchive([
+        deleted =  [
             Dummy(
                 deleted_by='ed',
                 deleted_time=datetime(2010, 5, 12, 2, 42),
@@ -161,25 +164,30 @@ class Test_show_trash(unittest.TestCase):
                 name="foo3",
                 title="Title 3",
                 new_container_ids=[],
-            ),
-        ])
+            )]
+
+        context.repo = DummyArchive(
+            [Dummy(docid=0, deleted=deleted, map={})] + deleted)
+
         result = self._callFUT(context, request)
         history = result['deleted']
         self.assertEqual(len(history), 2)
-        self.assertEqual(len(history[0]), 4)
+        self.assertEqual(len(history[0]), 5)
         self.assertEqual(history[0]['date'], '2010-05-11 21:42')
         self.assertEqual(history[0]['deleted_by'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[0]['restore_url'],
                          'http://example.com/restore?docid=2&name=foo2')
         self.assertEqual(history[0]['title'], 'Title 2')
-        self.assertEqual(len(history[1]), 4)
+        self.assertEqual(history[0]['url'], None)
+        self.assertEqual(len(history[1]), 5)
         self.assertEqual(history[1]['date'], '2010-05-12 21:42')
         self.assertEqual(history[1]['deleted_by'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[1]['restore_url'],
                          'http://example.com/restore?docid=3&name=foo3')
         self.assertEqual(history[1]['title'], 'Title 3')
+        self.assertEqual(history[0]['url'], None)
 
     def test_it_container_not_in_repo(self):
         request = testing.DummyRequest()
@@ -211,15 +219,25 @@ class Test_undelete(unittest.TestCase):
 
     def _make_repo(self, context):
         from datetime import datetime
+        deleted_child = Dummy(
+            klass=DummyModel,
+            docid=3,
+            name='child',
+            new_container_ids=[])
+        deleted_item = Dummy(
+            klass=DummyModel,
+            deleted_by='ed',
+            deleted_time=datetime(2010, 5, 12, 2, 42),
+            docid=2,
+            name="foo2",
+            title="Title 2",
+            new_container_ids=[],
+            map={'child': 3},
+            deleted=[],
+        )
         context.repo = DummyArchive([
-            Dummy(
-                klass=DummyModel,
-                deleted_by='ed',
-                deleted_time=datetime(2010, 5, 12, 2, 42),
-                docid=2,
-                name="foo2",
-                title="Title 2",
-            ),
+            deleted_item,
+            deleted_child,
             Dummy(
                 klass=DummyModel,
                 deleted_by='ed',
@@ -227,9 +245,9 @@ class Test_undelete(unittest.TestCase):
                 docid=33,
                 name="foo3",
                 title="Title 3",
-            ),
+                map={},
+                deleted=[deleted_item]),
         ])
-        context.repo.maps.append({'foo3': 33})
 
     def test_non_conflicting_name(self):
         request = testing.DummyRequest({
@@ -243,11 +261,11 @@ class Test_undelete(unittest.TestCase):
         profiles['ed'] = testing.DummyModel(title='Ed')
         self._make_repo(context)
         result = self._callFUT(context, request)
-        self.assertEqual(result.location, 'http://example.com/foo2/')
+        self.assertEqual(result.location, 'http://example.com/')
         self.assertEqual(context['foo2'].reverted[0].docid, 2)
         self.assertEqual(len(context['foo2'].reverted), 1)
-        self.assertEqual(context['foo2']['foo3'].reverted[0].docid, 33)
-        self.assertEqual(len(context['foo2']['foo3'].reverted), 1)
+        self.assertEqual(context['foo2']['child'].reverted[0].docid, 3)
+        self.assertEqual(len(context['foo2']['child'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
     def test_conflicting_name(self):
@@ -263,11 +281,11 @@ class Test_undelete(unittest.TestCase):
         profiles['ed'] = testing.DummyModel(title='Ed')
         self._make_repo(context)
         result = self._callFUT(context, request)
-        self.assertEqual(result.location, 'http://example.com/foo2-1/')
+        self.assertEqual(result.location, 'http://example.com/')
         self.assertEqual(context['foo2-1'].reverted[0].docid, 2)
         self.assertEqual(len(context['foo2-1'].reverted), 1)
-        self.assertEqual(context['foo2-1']['foo3'].reverted[0].docid, 33)
-        self.assertEqual(len(context['foo2-1']['foo3'].reverted), 1)
+        self.assertEqual(context['foo2-1']['child'].reverted[0].docid, 3)
+        self.assertEqual(len(context['foo2-1']['child'].reverted), 1)
         self.assertEqual(context.repo.containers, [(context, None)])
 
 
@@ -358,8 +376,8 @@ class DummyArchive(object):
 
     def __init__(self, history):
         self._history = history
+        self._docs = dict([(doc.docid, doc) for doc in history])
         self._reverted = []
-        self.maps = []
         self.containers = []
 
     def history(self, docid, only_current=False):
@@ -375,20 +393,11 @@ class DummyArchive(object):
         self._reverted.append((docid, version_num))
 
     def container_contents(self, docid):
-        from sqlalchemy.orm.exc import NoResultFound
-        if docid == 33:
+        contents = self._docs.get(docid)
+        if contents is None or not hasattr(contents, 'map'):
+            from sqlalchemy.orm.exc import NoResultFound
             raise NoResultFound
-        return self
-
-    @property
-    def deleted(self):
-        return self._history
-
-    @property
-    def map(self):
-        if self.maps:
-            return self.maps.pop(0)
-        return {}
+        return contents
 
     def archive_container(self, container, user):
         self.containers.append((container, user))

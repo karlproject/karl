@@ -123,7 +123,7 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html')])
-        self.failIf(response['show_trash'])
+        self.assertEqual(response['trash_url'], None)
 
     def test_editable_w_repo(self):
         root = self._make_community()
@@ -133,7 +133,7 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html'),])
-        self.failUnless(response['show_trash'])
+        self.assertEqual(response['trash_url'], 'http://example.com/trash')
 
     def test_deletable(self):
         root = self._make_community()
