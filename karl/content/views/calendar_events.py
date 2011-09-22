@@ -173,6 +173,10 @@ def _get_catalog_events(calendar, request,
 
                 events.append(event)
 
+    # The result set needs to be sorted by start_date.
+    # XXX maybe we can do this directly from the catalog?
+    events.sort(key=lambda event: event.startDate)
+
     return events
 
 def _paginate_catalog_events(calendar, request,
