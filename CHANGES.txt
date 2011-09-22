@@ -16,7 +16,8 @@ Unreleased
   formats a date for display in versioning UIs.
 
 - Fixed the interpretation of message timestamps so that objects created
-  through email will have the correct time.  (LP #837699)
+  through email will have the correct time.  Also, prefer to use the
+  delivery timestamp provided by repoze.postoffice 0.17+. (LP #837699)
 
 - Use modern SI prefixes for file size display.  (1 KB = 1000 bytes)
 

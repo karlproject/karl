@@ -310,22 +310,27 @@ class MailinDispatcher(object):
         """
         info = {}
 
-        # Crack the date
-        datestr = message['Date']
-        if datestr:
-            # Extract the fields of the date into 'parsed', a 10-tuple.
-            parsed = parsedate_tz(datestr)
-            # Set timestamp equal to the UTC epoch offset represented by
-            # 'parsed'.
-            timestamp = timegm(parsed[:9])
-            if parsed[9]:
-                timestamp -= parsed[9]
-            # Compute the local time tuple for timestamp.
-            timetuple = time.localtime(timestamp)
-            # Store the local time when the message was sent as a datetime.
+        # Crack the date.
+        t = message.get('X-Postoffice-Date')
+        if t:
+            timetuple = time.localtime(int(t))
             info['date'] = datetime.datetime(*timetuple[:6])
         else:
-            info['date'] = datetime.datetime.now()
+            datestr = message['Date']
+            if datestr:
+                # Extract the fields of the date into 'parsed', a 10-tuple.
+                parsed = parsedate_tz(datestr)
+                # Set timestamp equal to the UTC epoch offset represented by
+                # 'parsed'.
+                timestamp = timegm(parsed[:9])
+                if parsed[9]:
+                    timestamp -= parsed[9]
+                # Compute the local time tuple for timestamp.
+                timetuple = time.localtime(timestamp)
+                # Store the local time when the message was sent as a datetime.
+                info['date'] = datetime.datetime(*timetuple[:6])
+            else:
+                info['date'] = datetime.datetime.now()
 
         # Get all necessary info for addressing a community. This is important
         # for allowing moderators to see all email addressed to their

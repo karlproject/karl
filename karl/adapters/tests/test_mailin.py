@@ -776,7 +776,32 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['tool'], 'default')
         self.assertEqual(info['in_reply_to'], None)
 
-    def test_crackHeaders_date(self):
+    def test_crackHeaders_with_date_from_x_postoffice_date(self):
+        import datetime
+        from karl.testing import DummyUsers
+        import time
+        context = self._makeRoot()
+        context.users = DummyUsers()
+        profile = self._makeContext()
+        profile.__name__ = 'extant'
+        by_email = {'extant@example.com': profile}
+        pf = context['profiles'] = self._makeContext()
+        pf.getProfileByEmail = lambda email: by_email.get(email)
+        cf = context['communities'] = self._makeContext()
+        community = cf['testing'] = self._makeContext()
+        tool = community['default'] = self._makeContext()
+        mailin = self._makeOne(context)
+        mailin.default_tool = 'default'
+        message = DummyMessage()
+        message.to = ('testing@example.com',)
+        message.from_ = ('extant@example.com',)
+        message.subject = 'subject'
+        date = time.mktime((2010, 5, 12, 2, 42, 0, 0, 0, -1))
+        setattr(message, 'x-postoffice-date', '%d' % date)
+        info = mailin.crackHeaders(message)
+        self.assertEqual(info['date'], datetime.datetime(2010, 5, 12, 2, 42))
+
+    def test_crackHeaders_with_date_from_date_header(self):
         import datetime
         from email.utils import formatdate
         from karl.testing import DummyUsers
