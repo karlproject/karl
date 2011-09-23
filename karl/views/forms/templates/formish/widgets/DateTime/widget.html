@@ -4,6 +4,9 @@
       // create the widget
       $('#${field.cssname}')
           .karldatetimepicker({
+              // make sure the date select popup comes over everything
+              // most notably, buttons. A problem on IE7. */
+              zIndex: 20000
           });
   });
 </script>

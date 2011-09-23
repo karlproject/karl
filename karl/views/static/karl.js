@@ -1857,6 +1857,7 @@ $.widget('ui.karlquotablecomment', {
 $.widget('ui.karldatetimepicker', {
 
     options: {
+        zIndex: undefined
     },
 
     _create: function() {
@@ -1873,12 +1874,32 @@ $.widget('ui.karldatetimepicker', {
             .after(this.container);
         // Create the date and time inputs inside the container.
         this.dateinput = $('<input class="ui-karldatetimepicker-dateinput"></input>')
-            .appendTo(this.container)
+            .appendTo(this.container);
+        // fix the z-index
+        if (this.options.zIndex) {
+            // The component will always set $(input).zIndex() + 1
+            // as the z-index of the popup. However, for static
+            // elements zIndex is always 0. This means that the
+            // z-index will mostly be 1, which is a problem because
+            // we have higher z-indexes (3) on certain elements, like
+            // all old-style IE rounded corner hacks.
+            //
+            // So, we provide a way to set the z-index. But
+            // we have to actually set it on the input we just created.
+            // We also have to make it position relative, otherwise
+            // the popup will not pick up the index we want.
+            // Not very elegant.
+            this.dateinput
+                .css('position', 'relative')
+                .zIndex(this.options.zIndex - 1);
+        }
+        this.dateinput
             .datepicker({
             })
             .change(function(evt) {
                 self.setDate($(evt.target).val());
             });
+
         this.hourinput = $('<select class="ui-karldatetimepicker-hourinput"></input>')
             .appendTo(this.container)
             .change(function(evt) {
@@ -2388,6 +2409,9 @@ function initNewEvent() {
 function initStartDatePicker() {
   $('#save-start_date')
       .karldatetimepicker({
+            // make sure the date select popup comes over everything
+            // most notably, buttons. A problem on IE7. */
+            zIndex: 20000
       })
       .bind('change.karldatetimepicker', function() {
           $('#save-end_date').karldatetimepicker('limitMinMax',
@@ -2400,6 +2424,9 @@ function initStartDatePicker() {
 function initEndDatePicker() {
   $('#save-end_date')
       .karldatetimepicker({
+            // make sure the date select popup comes over everything
+            // most notably, buttons. A problem on IE7. */
+            zIndex: 20000
       })
       .bind('change.karldatetimepicker', function() {
           $(this).karldatetimepicker('limitMinMax', $('#save-start_date').karldatetimepicker('getAsDate'), null);
