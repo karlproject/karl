@@ -1,7 +1,18 @@
 
+/* Calendar. Import the base styles and
+ * trim them down a little. */
+
+@import url("calendar.css");
+
+
+
 /* Hide unwanted elements */
 #header, #footer, #spo-header, #cheader, #backto, #crightcol, #left, ul.peopleTabs, #right {display:none}
 .cheader, .chactions, .kalphabetlisting, .search_utility_bar, .kpagination_frame {display:none}
+
+.cal_search_header {
+    display: none;
+}
 
 /* Make sure our content doesn't get cut its right margin cut off */
 .ccontent {width:75%;}
@@ -64,3 +75,16 @@ width:95%;
 .profile_page_body {
 width:50%;
 }
+
+/* Calendar trim down. */
+
+.cal_header,
+.cal_footer,
+.cal_actions,
+.ui-selectmenu-menu {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+

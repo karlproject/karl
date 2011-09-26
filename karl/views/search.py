@@ -151,17 +151,46 @@ def get_contextual_summarizer(context):
                         default=ZopeTextIndexContextualSummarizer(index))
 
 
+def calendar_searchresults_view(context, request):
+    return _searchresults_view(context, request,
+        page_title='Calendar Search Results',
+        calendar_search=True,
+        show_search_knobs=False,
+        )
+
 def searchresults_view(context, request):
-    request.unicode_errors = 'ignore'
-    page_title = 'Search Results'
+    return _searchresults_view(context, request,
+        page_title='Search Results',
+        calendar_search=False,
+        show_search_knobs=True,
+        )
+
+def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
+
+    # The layout is decided independently of whether we are a
+    # calendar search or not. What is taken in consideration: if we are
+    # in a community. The /offices section is considered a non-community
+    # and will use the wide layout.
     if ICommunity.providedBy(context):
-        layout = api.community_layout
+        if calendar_search:
+            # We are either in /communities, or in /offices. In the first case:
+            # we use the community layout. For offices: we need the wide layout
+            # with the generic layout.
+            context_path = model_path(context)
+            wide = context_path.startswith('/offices')
+            if wide:
+                layout = api.generic_layout
+            else:
+                layout = api.community_layout
+        else:
+            layout = api.community_layout
         community = context.title
     else:
         layout = api.generic_layout
         community = None
 
+    request.unicode_errors = 'ignore'
     batch = None
     terms = ()
     error = None
@@ -281,6 +310,7 @@ def searchresults_view(context, request):
         api=api,
         layout=layout,
         error=error,
+        show_search_knobs=show_search_knobs,
         terms=terms,
         community=community,
         results=results,

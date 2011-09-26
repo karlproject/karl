@@ -51,6 +51,7 @@ var enableOldStyleDropdowns = function () {
 };
 
 
+
 // Custom jquery extensions
 
 $.widget('ui.karlstatusbox', {
@@ -2365,6 +2366,57 @@ function initCalendar() {
     $("#cal_scroll .cal_hour_event .with_tooltip").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
   }
 
+  var here_url = $("#karl-here-url").eq(0).attr('content');
+  // calendar (new) buttonbar
+  $('.cal-buttonbar').karlcalendarbuttons({
+      selection: window.karl_client_data && karl_client_data.calendar_selection || null,
+      change: function(evt, selection) {
+            // For now, we submit to the correct url.
+            // In the future, we will want to do ajax here. 
+            var view_name;
+            var more = '';
+            if (selection.viewtype == 'list') {
+                view_name = 'list.html';
+                more = '&term=' + selection.term;
+            } else {
+                view_name = {
+                    month: 'month.html',
+                    week: 'week.html',
+                    day: 'day.html'
+                }[selection.term];
+            }
+            var url = here_url + view_name + 
+                '?year=' + selection.year +
+                '&month=' + selection.month +
+                '&day=' + selection.day +
+                more;
+            // user cannot click now, cue this
+            $(this).karlcalendarbuttons('disable');
+
+            document.location.href = url;
+      }
+
+
+  });
+
+  /* calendar print action */
+
+  $('.cal_actions a.cal_print').click(function() {
+        // I cannot seem to show the entire
+        // calendar from css, so to avoid
+        // scrolling / overflow, the height
+        // is manipulated directly here.
+        var inner =  $('.cal_scroll');
+        var outer = $('.cal_hours_scroll');
+        var fullheight = inner.height();
+        var oldheight = outer.height();
+        outer.height(fullheight);
+        window.focus();
+        window.print();
+        outer.height(oldheight);
+        return false;
+  });
+
   scrollToTime();
 }
 
@@ -2700,11 +2752,14 @@ $(document).ready(function() {
 
 
     // add class to #center if there are no right portlets
-    rcol = $(".generic-layout .rightcol").text();
+    //
+    // XXX Would like to remove the code, but needed for the current layout.
+    rcol = $(".generic-layout .rightcol").html();
     if ($.trim(rcol) == '') {
         //console.log("true");
         $(".generic-layout #center").addClass("fill-width");
     }
+
 
     /** =CALENDAR ATTACH EVENTS
     ----------------------------------------------- */
