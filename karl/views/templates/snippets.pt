@@ -985,7 +985,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     </div>
 
     <ul id="header-menu" metal:define-macro="header-menu">
-        <li id="header-calendar" tal:condition="api.user_is_staff">
+        <li id="header-calendar" tal:condition="False and api.user_is_staff">
           <a href="${api.app_url}/offices/calendar">Calendar</a>
         </li>
         <li>
