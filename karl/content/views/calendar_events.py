@@ -202,8 +202,12 @@ def _get_catalog_events(calendar, request,
                 # volatile, serves no purpose any more. It used to serve
                 # a purpose when the same event could only have
                 # been displayed once.
-                
-                event = copy.deepcopy(resolver(docid))
+                #
+                # It's important to perform a shallow copy of the event. A deep
+                # copy can leak out and try to copy the entire database through
+                # the parent reference
+
+                event = copy.copy(resolver(docid))
                 event._v_layer_color = layer.color.strip()
                 event._v_layer_title = layer.title
 
