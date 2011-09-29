@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.72 (2011-09-29)
+-----------------
 
 - When doing the text indexing on files, text data is now re-extracted from
   files if the cached text is an empty string.  This allows for files
