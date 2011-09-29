@@ -2676,14 +2676,14 @@ body .ui-state-default .karl-icon-loading {
 
 .contentbar-wrapper {
     border-bottom: 1px solid #CECECE;
-    margin: -18px -9px 16px;
+    margin: -20px -9px 16px;
     overflow: visible;
     padding: 0 9px;
 }
 
 .contentbar-wrapper ul.menubar {
     display: inline-block;
-    margin-top: 8px;
+    margin-top: 4px;
 }
 .contentbar-wrapper ul.menubar li a {
     line-height: 22px;
