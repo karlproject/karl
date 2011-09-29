@@ -32,7 +32,10 @@ def main(args):
     repo = find_repo(site)
     if repo is None:
         args.parser.error("No repository is configured.")
+    init_repozitory(repo, site, args.batch_size)
 
+
+def init_repozitory(repo, site, batch_size=500):
     docids = getattr(site, '_init_repozitory_docids', None)
     if docids is None:
         # Store tuple of (path, docid) in order to guarantee sort order by
@@ -43,7 +46,7 @@ def main(args):
         site._init_repozitory_docids = docids
 
     while docids:
-        for i in xrange(min(args.batch_size, len(docids))):
+        for i in xrange(min(batch_size, len(docids))):
             # Iterate backwards over documents so that children are processed
             # before their parents, since adding a container requires that its
             # children already be added.
