@@ -2689,6 +2689,12 @@ body .ui-state-default .karl-icon-loading {
     line-height: 22px;
 }
 
+/* layout without tools tab */
+.generic-layout .contentbar-wrapper {
+    margin-top: -8px;
+}
+
+
 #karl-wikitoc {
     width: 668px;
 }
