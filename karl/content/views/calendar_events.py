@@ -87,8 +87,11 @@ from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import get_show_sendalert
 
 from karl.content.calendar.presenters.day import DayViewPresenter
+from karl.content.calendar.presenters.day import DayEventHorizon
 from karl.content.calendar.presenters.week import WeekViewPresenter
+from karl.content.calendar.presenters.week import WeekEventHorizon
 from karl.content.calendar.presenters.month import MonthViewPresenter
+from karl.content.calendar.presenters.month import MonthEventHorizon
 from karl.content.calendar.presenters.list import ListViewPresenter
 from karl.content.calendar.utils import is_all_day_event
 
@@ -388,13 +391,24 @@ def show_list_view(context, request):
     calendar = ListViewPresenter(focus_datetime,
                                  now_datetime,
                                  url_for)
+    # Also make an event horizon for the selected term
+    # (day, week or month)
+    if not selection['term']:
+        selection['term'] = 'day'
+    event_horizon = {
+        'day': DayEventHorizon,
+        'week': WeekEventHorizon,
+        'month': MonthEventHorizon,
+        }[selection['term']](focus_datetime,
+                                 now_datetime,
+                                 url_for)
 
     # find events and paint them on the calendar
     selected_layer = _calendar_filter(context, request)
 
     events, has_more = _paginate_catalog_events(context, request,
-                                           first_moment=now_datetime,
-                                           last_moment=None,
+                                           first_moment=event_horizon.first_moment,
+                                           last_moment=event_horizon.last_moment,
                                            layer_name=selected_layer,
                                            per_page=per_page,
                                            page=page)

@@ -1512,7 +1512,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_list_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assert_cookie(response, self.view_cookie, 'list,,1969,9,23')
+        self.assert_cookie(response, self.view_cookie, 'list,day,1969,9,23')
 
     def test_list_request_date(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1534,7 +1534,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_list_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assert_cookie(response, self.view_cookie, 'list,,2010,5,12')
+        self.assert_cookie(response, self.view_cookie, 'list,day,2010,5,12')
 
     def test_list_cookie_date(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1556,7 +1556,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_list_view(context, request)
 
         # check if calendar view has been made sticky
-        self.assert_cookie(response, self.view_cookie, 'list,,2010,5,12')
+        self.assert_cookie(response, self.view_cookie, 'list,day,2010,5,12')
 
     def test_default(self):
         context = DummyCalendar(sessions=DummySessions())

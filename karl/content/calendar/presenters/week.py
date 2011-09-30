@@ -23,11 +23,10 @@ from karl.content.calendar.presenters.base import BaseEvent
 from karl.content.calendar.presenters.day import DayViewPresenter
 from karl.content.calendar.utils import BubblePainter
 from karl.content.calendar.utils import MonthSkeleton
-from karl.content.calendar.utils import next_month
-from karl.content.calendar.utils import prior_month                   
+#from karl.content.calendar.utils import next_month
+#from karl.content.calendar.utils import prior_month                   
 
-class WeekViewPresenter(BasePresenter):
-    name = 'week'
+class WeekEventHorizon(BasePresenter):
     
     def _initialize(self):
         self._init_title()
@@ -35,12 +34,15 @@ class WeekViewPresenter(BasePresenter):
 
         self._init_week_around_focus_datetime()
         self._init_first_and_last_moment()
-        self._init_next_and_prev_datetime()
-        self._init_hour_labels()
-        self._init_navigation()
-        self._init_indexes_to_days_in_week()
-        self._init_bubble_painter()
-        
+
+    @property
+    def first_moment(self):
+        return self._first_moment
+
+    @property
+    def last_moment(self):
+        return self._last_moment
+    
     def _init_title(self):
         day_num = calendar.weekday(self.focus_datetime.year,
                                    self.focus_datetime.month,
@@ -80,14 +82,6 @@ class WeekViewPresenter(BasePresenter):
                 DayOnWeekView(dt.year, dt.month, dt.day, show_url)
             )
 
-    def _init_indexes_to_days_in_week(self):
-        self._idx_month_day = {}
-        self.all_days = [] 
-
-        for day in self.week:
-            self._idx_month_day.setdefault(day.month, {})[day.day] = day
-            self.all_days.append(day)
-    
     def _init_first_and_last_moment(self):
         first_day = self.week[0]
         self._first_moment = datetime.datetime(first_day.year,
@@ -100,6 +94,26 @@ class WeekViewPresenter(BasePresenter):
                                               last_day.day,
                                               23, 59, 59)
 
+
+class WeekViewPresenter(WeekEventHorizon):
+    name = 'week'
+
+    def _initialize(self):
+        WeekEventHorizon._initialize(self)
+        self._init_next_and_prev_datetime()
+        self._init_hour_labels()
+        self._init_navigation()
+        self._init_indexes_to_days_in_week()
+        self._init_bubble_painter()
+
+    def _init_indexes_to_days_in_week(self):
+        self._idx_month_day = {}
+        self.all_days = [] 
+
+        for day in self.week:
+            self._idx_month_day.setdefault(day.month, {})[day.day] = day
+            self.all_days.append(day)
+    
     def _init_next_and_prev_datetime(self):                          
         seven_days = datetime.timedelta(days=7)
         self.next_datetime  = self.focus_datetime + seven_days
@@ -232,14 +246,6 @@ class WeekViewPresenter(BasePresenter):
 
         return css_class
 
-    @property
-    def first_moment(self):
-        return self._first_moment
-
-    @property
-    def last_moment(self):
-        return self._last_moment
-    
     @property
     def template_filename(self):
         return 'karl.content.views:templates/calendar_week.pt'

@@ -22,9 +22,25 @@ from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month
-from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 
-class DayViewPresenter(BasePresenter):
+
+class DayEventHorizon(BasePresenter):
+    @property
+    def first_moment(self):
+        return datetime.datetime(self.focus_datetime.year, 
+                                 self.focus_datetime.month, 
+                                 self.focus_datetime.day, 
+                                 0, 0, 0)
+    
+    @property
+    def last_moment(self):
+        return datetime.datetime(self.focus_datetime.year, 
+                                 self.focus_datetime.month, 
+                                 self.focus_datetime.day, 
+                                 23, 59, 59)
+
+
+class DayViewPresenter(DayEventHorizon):
     name = 'day'
     
     def _initialize(self):
@@ -211,20 +227,6 @@ class DayViewPresenter(BasePresenter):
             slot_index = i
         
         return slot_index
-
-    @property
-    def first_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 self.focus_datetime.day, 
-                                 0, 0, 0)
-    
-    @property
-    def last_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 self.focus_datetime.day, 
-                                 23, 59, 59)
 
     @property
     def auto_scroll_class(self):

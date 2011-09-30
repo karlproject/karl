@@ -26,23 +26,24 @@ from karl.content.calendar.utils import MonthSkeleton
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month                   
 
-
-class MonthViewPresenter(BasePresenter):
-    name = 'month'
+class MonthEventHorizon(BasePresenter):
 
     def _initialize(self):
         monthname = calendar.month_name[self.focus_datetime.month]
         self.title = "%s %d" % (monthname, self.focus_datetime.year)
         self.feed_url = self.url_for('atom.xml')
-        
         self._init_weeks_skeleton()
-        self._init_day_indexes_from_weeks()
-        
-        self._init_prev_datetime()
-        self._init_next_datetime()
 
-        self._init_navigation()
-        self._init_bubble_painter()
+    @property    
+    def first_moment(self):                      
+        day = self.weeks[0][0]
+        return datetime.datetime(day.year, day.month, day.day) 
+
+    @property    
+    def last_moment(self):
+        day = self.weeks[-1][-1]
+        return datetime.datetime(day.year, day.month, day.day, 23, 59, 59)
+
 
     def _init_weeks_skeleton(self):
         skeleton = MonthSkeleton(self.focus_datetime.year,
@@ -84,6 +85,21 @@ class MonthViewPresenter(BasePresenter):
 
                 week[d] = day
         self.weeks = weeks                                          
+
+
+class MonthViewPresenter(MonthEventHorizon):
+    name = 'month'
+
+    def _initialize(self):
+        MonthEventHorizon._initialize(self)
+
+        self._init_day_indexes_from_weeks()
+        
+        self._init_prev_datetime()
+        self._init_next_datetime()
+
+        self._init_navigation()
+        self._init_bubble_painter()
 
     def _init_day_indexes_from_weeks(self):
         self._idx_month_day = {}
@@ -184,16 +200,6 @@ class MonthViewPresenter(BasePresenter):
                         show_url=self.url_for(context=catalog_event)
                     )
         return tpl_event
-
-    @property    
-    def first_moment(self):                      
-        day = self.weeks[0][0]
-        return datetime.datetime(day.year, day.month, day.day) 
-
-    @property    
-    def last_moment(self):
-        day = self.weeks[-1][-1]
-        return datetime.datetime(day.year, day.month, day.day, 23, 59, 59)
 
     @property
     def template_filename(self):
