@@ -26,7 +26,7 @@
               <option
                       tal:repeat="layer layers"
                       tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
-                                      class 'color cal_' +layer.color;
+                                      class 'color cal_' + layer.color.strip();
                                       selected layer.__name__ == selected_layer"
                       >${layer.title}</option>
             </select>
