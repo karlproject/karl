@@ -18,7 +18,6 @@
 import urllib
 
 from webob.exc import HTTPFound
-from webob.exc import HTTPExpectationFailed
 from zope.component.event import objectEventNotify
 
 from zope.component import getMultiAdapter
@@ -158,8 +157,15 @@ class AddCommentFormController(object):
         return widgets
 
     def __call__(self):
-        raise HTTPExpectationFailed(u'This is not a self-posting form. '
-                                     u'It is submit only.')
+        # we used to throw an exception here, but users tend to find
+        # ways of calling this form directly, so better redirect to
+        # add comment, which is what they seem to be trying anyway
+        add_comment = "addcomment"
+        location = model_url(self.context.__parent__,
+                             self.request,
+                             anchor=add_comment)
+        return HTTPFound(location=location)
+
 
     def handle_cancel(self):
         location = model_url(self.context.__parent__, self.request)
