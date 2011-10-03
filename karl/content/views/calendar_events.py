@@ -59,7 +59,6 @@ from karl.utilities.randomid import unfriendly_random_id
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
 from karl.utils import find_community
-from karl.utils import get_session
 
 from karl.security.policy import CREATE
 from karl.security.workflow import get_security_states
@@ -97,6 +96,8 @@ from karl.content.calendar.utils import is_all_day_event
 # In case of no value or unknown value, 'day' is considered
 # as default.
 KARL_CALENDAR_VIEW_COOKIE = 'karl.calendar_view'
+KARL_CALENDAR_DATE_COOKIE = 'karl.calendar.date'
+KARL_CALENDAR_FILTER_COOKIE = 'karl.calendar.filter'
 
 _NOW = None
 
@@ -106,19 +107,18 @@ def _now():
     return datetime.datetime.now()
 
 def _date_requested(context, request):
-    now = _now()
-    session = get_session(context, request)
     if 'year' in request.GET:
-        year  = int(request.GET.get('year', now.year))
-        month = int(request.GET.get('month', now.month))
-        day   = int(request.GET.get('day', now.day))
-        value = (year, month, day)
-        session['calendar_date_requested'] = value
-    elif 'calendar_date_requested' in session:
-        value = session['calendar_date_requested']
-    else:
-        value = (now.year, now.month, now.day)
-    return value
+        year  = int(request.GET.get('year'))
+        month = int(request.GET.get('month'))
+        day   = int(request.GET.get('day'))
+        return year, month, day
+
+    cookie_data = request.cookies.get(KARL_CALENDAR_DATE_COOKIE, None)
+    if cookie_data is not None:
+        return map(int, cookie_data.split('-'))
+
+    now = _now()
+    return now.year, now.month, now.day
 
 def _default_dates_requested(context, request):
     try:
@@ -200,12 +200,9 @@ def _paginate_catalog_events(calendar, request,
     return events, has_more
 
 def _calendar_filter(context, request):
-    session = get_session(context, request)
-
     filt = request.params.get('filter', None)
     if filt is None:
-        filt = session.get('calendar_filter', None)
-    session['calendar_filter'] = filt
+        filt = request.cookies.get(KARL_CALENDAR_FILTER_COOKIE, None)
     return filt
 
 def _calendar_setup_url(context, request):
@@ -246,7 +243,7 @@ def _show_calendar_view(context, request, make_presenter):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
-    return render_template_to_response(
+    response = render_template_to_response(
         calendar.template_filename,
         api=api,
         setup_url=setup_url,
@@ -256,6 +253,11 @@ def _show_calendar_view(context, request, make_presenter):
         quote = quote,
         may_create = has_permission(CREATE, context, request),
     )
+    response.set_cookie(KARL_CALENDAR_DATE_COOKIE,
+                        '%04d-%02d-%02d' % (year, month, day))
+    if selected_layer:
+        response.set_cookie(KARL_CALENDAR_FILTER_COOKIE, selected_layer)
+    return response
 
 def show_month_view(context, request):
     response = _show_calendar_view(context, request, MonthViewPresenter)
@@ -313,6 +315,10 @@ def show_list_view(context, request):
         may_create = has_permission(CREATE, context, request),
     )
     response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'list')
+    response.set_cookie(KARL_CALENDAR_DATE_COOKIE,
+                        '%04d-%02d-%02d' % (year, month, day))
+    if selected_layer:
+        response.set_cookie(KARL_CALENDAR_FILTER_COOKIE, selected_layer)
     return response
 
 

@@ -7,6 +7,7 @@ from pyramid.url import resource_url
 from karl.models.interfaces import IContainerVersion
 
 from karl.models.subscribers import index_content
+from karl.utilities.lock import lock_info_for_view
 from karl.utils import find_catalog
 from karl.utils import find_repo
 from karl.utils import find_profiles
@@ -58,6 +59,7 @@ def show_history(context, request):
         'api': TemplateAPI(context, request, page_title),
         'history': history,
         'backto': backto,
+        'lock_info': lock_info_for_view(context, request),
     }
 
 

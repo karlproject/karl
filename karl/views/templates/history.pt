@@ -9,6 +9,8 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
+    <div metal:use-macro="api.snippets.macros['lock']" />
+
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
 
