@@ -544,14 +544,9 @@ def download_file_preview(context, request):
         raise NotFound("No such version: %d" % version_num)
 
     size, stream = copy_stream_to_tmpfile_and_iter(version.blobs['blob'])
-    headers = [
-        ('Content-Type', version.attrs['mimetype']),
-        ('Content-Length', size),
-        ('Content-Disposition',
-            'attachment; filename=%s' % version.attrs['filename']),
-    ]
     return Response(
-        headerlist=headers,
+        content_type=version.attrs['mimetype'],
+        content_length=size,
         app_iter=stream)
 
 def download_file_view(context, request):
