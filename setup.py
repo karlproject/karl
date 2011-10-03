@@ -42,6 +42,7 @@ requires = [
     'pyramid',
     'pyramid_zcml',
     'pyramid_formish',
+    'formish<0.9'
     'repoze.browserid',
     'repoze.catalog',
     'repoze.evolution',
