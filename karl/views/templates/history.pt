@@ -37,8 +37,13 @@
                     Current Version
                 </td>
                 <td tal:condition="not v['is_current']">
-                    <a href="#"
-                       onClick="preview('${v['preview_url']}');">Preview</a> |
+                    <a href="#" tal:condition="use_ajax"
+                       onClick="preview('${v['preview_url']}');">Preview</a> 
+                    <a tal:condition="not use_ajax"
+                       href="${v['preview_url']}">Preview</a>
+
+                    |
+
                     <a href="${v['restore_url']}">Restore</a>
                 </td>
             </tr>

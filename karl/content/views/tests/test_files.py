@@ -730,7 +730,8 @@ class DummyArchive(object):
     from cStringIO import StringIO
     version_num = 2
     blobs = {'blob': StringIO('TESTING')}
-    attrs = {'mimetype': 'x-application/testing'}
+    attrs = {'mimetype': 'x-application/testing',
+             'filename': 'testing.test'}
 
     def history(self, docid):
         assert docid == 1

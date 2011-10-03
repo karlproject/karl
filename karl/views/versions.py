@@ -7,6 +7,7 @@ from webob.exc import HTTPFound
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import model_url
 from karl.models.interfaces import IContainerVersion
+from karl.content.interfaces import ICommunityFile
 
 from karl.models.subscribers import index_content
 from karl.utilities.lock import lock_info_for_view
@@ -21,6 +22,14 @@ def show_history(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
+    # downloading files using ajax shows information bar in IE
+    # We need to disable that if context is a file
+    use_ajax = True
+    preview_view = 'preview.html'
+    if ICommunityFile.providedBy(context):
+        use_ajax = False
+        preview_view = 'download_preview'
+
     def display_record(record):
         editor = profiles[record.user]
         return {
@@ -30,7 +39,7 @@ def show_history(context, request, tz=None):
                 'url': model_url(editor, request),
                 },
             'preview_url': model_url(
-                context, request, 'preview.html',
+                context, request, preview_view,
                 query={'version_num': str(record.version_num)}),
             'restore_url': model_url(
                 context, request, 'revert',
@@ -51,6 +60,7 @@ def show_history(context, request, tz=None):
     return {
         'api': TemplateAPI(context, request, page_title),
         'history': history,
+        'use_ajax': use_ajax,
         'backto': backto,
         'lock_info': lock_info_for_view(context, request),
     }
