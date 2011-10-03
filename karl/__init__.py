@@ -28,10 +28,15 @@ try:
 except ImportError:
     pass
 
-# for security pickles that referred to bfg
-try:
-    import pyramid.security
-    import sys
-    sys.modules['repoze.bfg.security'] = pyramid.security
-except ImportError:
-    pass
+# for pickles that referred to bfg
+import pyramid.security
+import pyramid.interfaces
+import sys
+sys.modules['repoze.bfg.security'] = pyramid.security
+sys.modules['repoze.bfg.interfaces'] = pyramid.interfaces
+
+# formish 0.8.5.2 needs to import UnicodeMultiDict from webob; webob 1.0+
+# moved it; pyramid doesn't work with any webob < 1.0
+from webob.multidict import UnicodeMultiDict
+import webob
+webob.UnicodeMultiDict = UnicodeMultiDict
