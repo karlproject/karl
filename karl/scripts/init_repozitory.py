@@ -1,6 +1,6 @@
 import transaction
 
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.folder.interfaces import IFolder
 from zope.component import queryAdapter
 
@@ -42,12 +42,12 @@ def init_repo(repo, context):
 
     version = queryAdapter(context, IObjectVersion)
     if version is not None:
-        print "Updating version for %s" % model_path(context)
+        print "Updating version for %s" % resource_path(context)
         repo.archive(version)
 
     container = queryAdapter(context, IContainerVersion)
     if container is not None:
-        print "Updating container version for %s" % model_path(context)
+        print "Updating container version for %s" % resource_path(context)
         user = getattr(context, 'creator', None)
         if user is None:
             user = get_setting(context, 'system_user', 'admin')
