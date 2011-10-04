@@ -21,6 +21,8 @@ from pyramid.testing import cleanUp
 from pyramid import testing
 from karl.testing import DummySessions
 
+import karl.testing
+
 class AddNewsItemFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -37,14 +39,14 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                                     (Interface, Interface),
-                                     ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
     def _makeOne(self, context, request):
         from karl.content.views.newsitem import AddNewsItemFormController
@@ -105,7 +107,7 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
         site.catalog = DummyCatalog()
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         context = self.context
         site['newsfolder'] = context
         tags = DummyTags()
@@ -172,14 +174,14 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                                     (Interface, Interface),
-                                     ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
     def _makeOne(self, context, request):
         from karl.content.views.newsitem import EditNewsItemFormController
@@ -233,7 +235,7 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
         site.catalog = DummyCatalog()
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         context = self.context
         site['newsitem'] = context
         tags = DummyTags()
