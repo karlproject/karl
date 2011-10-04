@@ -17,7 +17,6 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from zope.interface import directlyProvides
 from zope.interface import implements
 from zope.interface import Interface
@@ -31,10 +30,10 @@ from karl.testing import DummyProfile
 
 class TestAlerts(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        self.config = testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _get_instance(self):
         from karl.utilities.alerts import Alerts
@@ -47,7 +46,7 @@ class TestAlerts(unittest.TestCase):
         from karl.testing import DummyMailer
 
         mailer = DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        self.config.registry.registerUtility(mailer, IMailDelivery)
 
         community = DummyCommunity()
         community["foo"] = context = testing.DummyModel()
@@ -63,8 +62,9 @@ class TestAlerts(unittest.TestCase):
         community.moderator_names = set(("b",))
 
         request = testing.DummyRequest()
-        testing.registerAdapter(DummyEmailAlertAdapter,
-                                (IDummy, IProfile, IRequest), IAlert)
+        self.config.registry.registerAdapter(DummyEmailAlertAdapter,
+                                             (IDummy, IProfile, IRequest),
+                                             IAlert)
 
         self._get_instance().emit(context, request)
         self.assertEqual(3, len(mailer))
@@ -76,7 +76,7 @@ class TestAlerts(unittest.TestCase):
         from karl.testing import DummyMailer
 
         mailer = DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        self.config.registry.registerUtility(mailer, IMailDelivery)
 
         community = DummyCommunity()
         community["foo"] = context = testing.DummyModel()
@@ -96,8 +96,9 @@ class TestAlerts(unittest.TestCase):
         community.moderator_names = set(("b",))
 
         request = testing.DummyRequest()
-        testing.registerAdapter(DummyEmailAlertAdapter,
-                                (IDummy, IProfile, IRequest), IAlert)
+        self.config.registry.registerAdapter(DummyEmailAlertAdapter,
+                                             (IDummy, IProfile, IRequest),
+                                             IAlert)
 
         self._get_instance().emit(context, request)
         self.assertEqual(1, len(mailer))
@@ -110,7 +111,7 @@ class TestAlerts(unittest.TestCase):
         from karl.testing import DummyMailer
 
         mailer = DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        self.config.registry.registerUtility(mailer, IMailDelivery)
 
         community = DummyCommunity()
         community["foo"] = context = testing.DummyModel()
@@ -129,8 +130,9 @@ class TestAlerts(unittest.TestCase):
         community.moderator_names = set(("b",))
 
         request = testing.DummyRequest()
-        testing.registerAdapter(DummyEmailAlertAdapter,
-                                (IDummy, IProfile, IRequest), IAlert)
+        self.config.registry.registerAdapter(DummyEmailAlertAdapter,
+                                             (IDummy, IProfile, IRequest),
+                                             IAlert)
 
         tool = self._get_instance()
         tool.emit(context, request)
@@ -141,7 +143,7 @@ class TestAlerts(unittest.TestCase):
         self.assertEqual(2, len(profiles["a"]._pending_alerts))
         self.assertEqual(1, len(profiles["b"]._pending_alerts))
 
-        testing.registerDummyRenderer('karl.utilities:email_digest.pt')
+        self.config.testing_add_renderer('karl.utilities:email_digest.pt')
 
         tool.send_digests(site)
 

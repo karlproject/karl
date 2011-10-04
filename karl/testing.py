@@ -21,12 +21,70 @@ from zope.interface import implements
 from zope.interface import Interface
 
 from pyramid.testing import DummyModel
-from pyramid.testing import registerAdapter
-from pyramid.testing import registerDummyRenderer
-from pyramid.testing import registerUtility
+from pyramid.config import Configurator
+from pyramid.threadlocal import get_current_registry
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
+
+def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
+    """ Register a ZCA adapter component.
+
+    The ``impl`` argument specifies the implementation of the
+    component (often a class).  The ``for_`` argument implies the
+    ``for`` interface type used for this registration; it is
+    :class:`zope.interface.Interface` by default.  If ``for`` is not a
+    tuple or list, it will be converted to a one-tuple before being
+    passed to underlying :meth:`pyramid.registry.registerAdapter`
+    API.
+
+    The ``provides`` argument specifies the ZCA 'provides' interface,
+    :class:`zope.interface.Interface` by default.
+
+    The ``name`` argument is the empty string by default; it implies
+    the name under which the adapter is registered.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA adapters.
+    """
+    reg = get_current_registry()
+    if not isinstance(for_, (tuple, list)):
+        for_ = (for_,)
+    reg.registerAdapter(impl, for_, provides, name=name)
+    return impl
+
+def registerUtility(impl, iface=Interface, name=''):
+    """ Register a ZCA utility component.
+
+    The ``impl`` argument specifies the implementation of the utility.
+    The ``iface`` argument specifies the :term:`interface` which will
+    be later required to look up the utility
+    (:class:`zope.interface.Interface`, by default).  The ``name``
+    argument implies the utility name; it is the empty string by
+    default.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA utilities.
+    """
+    reg = get_current_registry()
+    reg.registerUtility(impl, iface, name=name)
+    return impl
+
+def registerDummyRenderer(path, renderer=None):
+    """ Register a template renderer at ``path`` (usually a relative
+    filename ala ``templates/foo.pt``) and return the renderer object.
+    If the ``renderer`` argument is None, a 'dummy' renderer will be
+    used.  This function is useful when testing code that calls the
+    :func:`pyramid.renderers.render` function or
+    :func:`pyramid.renderers.render_to_response` function or any
+    other ``render_*`` or ``get_*`` API of the
+    :mod:`pyramid.renderers` module.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_add_template(path, renderer)
+    config.commit()
+    return result
 
 class DummyCatalog(dict):
     def __init__(self, *maps):
