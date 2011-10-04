@@ -144,6 +144,26 @@ def registerEventListener(event_iface=None):
     config.commit()
     return result
 
+def registerModels(resources):
+    """ Registers a dictionary of :term:`resource` objects that can be
+    resolved via the :func:`pyramid.traversal.find_resource` API.
+
+    The :func:`pyramid.traversal.find_resource` API is called with a
+    path as one of its arguments.  If the dictionary you register when
+    calling this method contains that path as a string key
+    (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding value will
+    be returned to ``find_resource`` (and thus to your code) when
+    :func:`pyramid.traversal.find_resource` is called with an
+    equivalent path string or tuple.
+
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_resources(resources)
+    config.commit()
+    return result
+
+
 class DummyCatalog(dict):
     def __init__(self, *maps):
         self.document_map = DummyDocumentMap(*maps)
