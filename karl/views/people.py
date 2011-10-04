@@ -18,8 +18,8 @@
 import uuid
 
 import formish
-from pyramid.chameleon_zpt import get_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import get_renderer
+from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
@@ -695,18 +695,19 @@ def show_profile_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/profile.pt',
-        api=api,
-        profile=profile,
-        actions=get_profile_actions(context, request),
-        photo=photo,
-        head_data=convert_to_script(client_json_data),
-        communities=communities,
-        my_communities=my_communities,
-        preferred_communities=preferred_communities,
-        tags=tags,
-        recent_items=recent_items,
+        dict(api=api,
+             profile=profile,
+             actions=get_profile_actions(context, request),
+             photo=photo,
+             head_data=convert_to_script(client_json_data),
+             communities=communities,
+             my_communities=my_communities,
+             preferred_communities=preferred_communities,
+             tags=tags,
+             recent_items=recent_items),
+        request=request,
         )
 
 def profile_thumbnail(context, request):
@@ -732,11 +733,12 @@ def recent_content_view(context, request):
 
     page_title = "Content Added Recently by %s" % context.title
     api = TemplateAPI(context, request, page_title)
-    return render_template_to_response(
+    return render_to_response(
         'templates/profile_recent_content.pt',
-        api=api,
-        batch_info=batch,
-        recent_items=recent_items,
+        dict(api=api,
+             batch_info=batch,
+             recent_items=recent_items),
+        request=request,
         )
 
 def may_leave(userid, community):
@@ -819,13 +821,14 @@ def manage_communities_view(context, request):
     if len(communities) > 1:
         communities.sort(key=lambda x: x["title"])
 
-    return render_template_to_response(
+    return render_to_response(
         'karl.views:templates/manage_communities.pt',
-        api=api,
-        communities=communities,
-        post_url=request.url,
-        formfields=api.formfields,
-        attachments=context.alert_attachments,
+        dict(api=api,
+             communities=communities,
+             post_url=request.url,
+             formfields=api.formfields,
+             attachments=context.alert_attachments),
+        request=request,
     )
 
 def show_profiles_view(context, request):
@@ -854,11 +857,12 @@ def show_profiles_view(context, request):
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/profiles.pt',
-        api=api,
-        profiles=profiles,
-        letters=letter_info,
+        dict(api=api,
+             profiles=profiles,
+             letters=letter_info),
+        request=request,
         )
 
 
@@ -898,7 +902,7 @@ class ChangePasswordFormController(object):
         api = TemplateAPI(self.context, self.request, 'Change Password')
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
-        snippets = get_template('forms/templates/snippets.pt')
+        snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctime = xhtml
         blurb_macro = snippets.macros['change_password_blurb']
         return {'api': api, 'layout': layout, 'actions': [],

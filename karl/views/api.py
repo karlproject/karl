@@ -26,7 +26,6 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
-from pyramid.chameleon_zpt import get_template
 from pyramid.url import resource_url
 from pyramid.security import effective_principals
 from pyramid.traversal import quote_path_segment
@@ -35,6 +34,7 @@ from pyramid.location import lineage
 from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
+from pyramid.renderers import get_renderer
 from pyramid.interfaces import ISettings
 
 from repoze.lemonade.content import get_content_type
@@ -156,7 +156,8 @@ class TemplateAPI(object):
     @property
     def snippets(self):
         if self._snippets is None:
-            self._snippets = get_template('templates/snippets.pt')
+            r = get_renderer('templates/snippets.pt')
+            self._snippets = r.implementation()
             self._snippets.doctype = xhtml
         return self._snippets
 
@@ -236,26 +237,26 @@ class TemplateAPI(object):
     community_layout_fn = 'karl.views:templates/community_layout.pt'
     @property
     def community_layout(self):
-        macro_template = get_template(self.community_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.community_layout_fn)
+        return macro_template.implementation()
 
     anonymous_layout_fn = 'karl.views:templates/anonymous_layout.pt'
     @property
     def anonymous_layout(self):
-        macro_template = get_template(self.anonymous_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.anonymous_layout_fn)
+        return macro_template.implementation()
 
     generic_layout_fn = 'karl.views:templates/generic_layout.pt'
     @property
     def generic_layout(self):
-        macro_template = get_template(self.generic_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.generic_layout_fn)
+        return macro_template.implementation()
 
     formfields_fn = 'karl.views:templates/formfields.pt'
     @property
     def formfields(self):
-        macro_template = get_template(self.formfields_fn)
-        return macro_template
+        macro_template = get_renderer(self.formfields_fn)
+        return macro_template.implementation()
 
     @property
     def form_field_templates(self):

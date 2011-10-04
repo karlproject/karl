@@ -22,11 +22,11 @@ from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
 from pyramid.location import lineage
 from pyramid.interfaces import ILocation
-from pyramid.settings import get_settings
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from pyramid.security import principals_allowed_by_permission
 from pyramid.traversal import resource_path
+from pyramid.threadlocal import get_current_registry
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
@@ -357,7 +357,7 @@ def get_virtual(object, default):
 class RepozitoryEngineParams(object):
     @property
     def db_string(self):
-        return get_settings()['repozitory_db_string']
+        return get_current_registry().settings['repozitory_db_string']
 
     @property
     def kwargs(self):
@@ -396,7 +396,7 @@ class Site(Folder):
 
     @property
     def repo(self):
-        if get_settings().get('repozitory_db_string') is None:
+        if get_current_registry().settings.get('repozitory_db_string') is None:
             return None
 
         # Create self._repo on demand.

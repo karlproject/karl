@@ -19,7 +19,7 @@ from datetime import datetime
 from urllib import urlencode
 from urlparse import urljoin
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 
@@ -108,12 +108,13 @@ def login_view(context, request):
                                  request.params.get('came_from', request.url))
 
     api.status_message = request.params.get('reason', None)
-    response = render_template_to_response(
+    response = render_to_response(
         'templates/login.pt',
-        api=api,
-        came_from=came_from,
-        nothing='',
-        app_url=request.application_url,
+        dict(api=api,
+             came_from=came_from,
+             nothing='',
+             app_url=request.application_url),
+        request=request,
         )
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})

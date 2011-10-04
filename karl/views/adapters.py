@@ -1,6 +1,6 @@
 from zope.component import getUtility
 
-from pyramid.chameleon_zpt import render_template
+from pyramid.renderers import render
 from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 
@@ -60,9 +60,10 @@ class DefaultFooter(object):
         self.request = request
 
     def __call__(self, api):
-        return render_template(
+        return render(
             'templates/footer.pt',
-            api=api,
+            dict(api=api),
+            request=self.request,
             )
 
 def _parent_title(context, class_or_interface):
