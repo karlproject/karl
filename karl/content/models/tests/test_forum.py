@@ -17,7 +17,8 @@
 
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
+
+import karl.testing
 
 class ForumsFolderTests(unittest.TestCase):
     def _getTargetClass(self):
@@ -94,10 +95,10 @@ class ForumTopicTests(unittest.TestCase):
 
 class TestForumsToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.forum import forums_tool_factory
@@ -105,8 +106,8 @@ class TestForumsToolFactory(unittest.TestCase):
 
     def test_it(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest
         factory = self._makeOne()

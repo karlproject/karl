@@ -17,7 +17,8 @@
 
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
+
+import karl.testing
 
 class IntranetsFolderTests(unittest.TestCase):
     def _getTargetClass(self):
@@ -40,10 +41,10 @@ class IntranetsFolderTests(unittest.TestCase):
 
 class TestIntranetsToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.intranets import intranets_tool_factory
@@ -51,8 +52,8 @@ class TestIntranetsToolFactory(unittest.TestCase):
 
     def test_it(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest
         factory = self._makeOne()

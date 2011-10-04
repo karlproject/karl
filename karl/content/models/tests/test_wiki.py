@@ -16,17 +16,18 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 from pyramid import testing
+
+import karl.testing
 
 class WikiTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.wiki import Wiki
@@ -34,8 +35,8 @@ class WikiTests(unittest.TestCase):
 
     def _makeOne(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         return self._getTargetClass()('creator')
 
     def test_class_conforms_to_IWiki(self):
@@ -404,10 +405,10 @@ class WikiPageContainerVersionTests(unittest.TestCase):
 
 class TestWikiToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.wiki import wiki_tool_factory
@@ -415,8 +416,8 @@ class TestWikiToolFactory(unittest.TestCase):
 
     def test_factory(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest()
         factory = self._makeOne()
