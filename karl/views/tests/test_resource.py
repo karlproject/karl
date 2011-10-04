@@ -32,7 +32,7 @@ class TestDeleteResourceView(unittest.TestCase):
         return delete_resource_view(context, request, num_children)
 
     def _registerLayoutProvider(self, **kw):
-        from pyramid.testing import registerAdapter
+        from karl.testing import registerAdapter
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         registerAdapter(DummyLayoutProvider,
