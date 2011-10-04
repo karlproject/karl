@@ -5,17 +5,15 @@ import unittest
 from pyramid import testing
 from karl import testing as karltesting
 
-from zope.testing.cleanup import cleanUp
-
 class TestAdminView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_it(self):
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
         from karl.views.admin import admin_view
         site = DummyModel()
         request = testing.DummyRequest()
@@ -24,7 +22,7 @@ class TestAdminView(unittest.TestCase):
 
 class TestDeleteContentView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from datetime import datetime
         site = DummyModel()
@@ -57,12 +55,12 @@ class TestDeleteContentView(unittest.TestCase):
 
         from karl.views.admin import delete_content_view
         self.fut = delete_content_view
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer(
             'karl.views:templates/admin/content_select.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_render_form(self):
         request = testing.DummyRequest()
@@ -211,7 +209,7 @@ class TestDeleteContentView(unittest.TestCase):
 
 class TestMoveContentView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
@@ -261,11 +259,11 @@ class TestMoveContentView(unittest.TestCase):
 
         from karl.views.admin import move_content_view
         self.fut = move_content_view
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer(
             'karl.views:templates/admin/content_select.pt')
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_render_form(self):
         request = testing.DummyRequest()
@@ -387,12 +385,12 @@ class TestMoveContentView(unittest.TestCase):
 
 class TestSiteAnnouncementView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self.site = DummyModel()
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def call_fut(self, *arg, **kw):
         from karl.views.admin import site_announcement_view
@@ -429,12 +427,11 @@ class TestSiteAnnouncementView(unittest.TestCase):
 
 class TestEmailUsersView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
-        from karl.testing import DummyMailer
         from repoze.sendmail.interfaces import IMailDelivery
-        self.mailer = DummyMailer()
-        testing.registerUtility(self.mailer, IMailDelivery)
+        self.mailer = karltesting.DummyMailer()
+        karltesting.registerUtility(self.mailer, IMailDelivery)
 
         site = self.site = testing.DummyModel()
         profiles = site['profiles'] = testing.DummyModel()
@@ -462,7 +459,7 @@ class TestEmailUsersView(unittest.TestCase):
         }
 
         from pyramid.interfaces import ISettings
-        testing.registerUtility(karltesting.DummySettings(), ISettings)
+        karltesting.registerUtility(karltesting.DummySettings(), ISettings)
 
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
@@ -472,10 +469,10 @@ class TestEmailUsersView(unittest.TestCase):
         karltesting.registerAdapter(dummy_search_factory, Interface,
                                     ICatalogSearch)
         search.add_result([fred, barney, wilma])
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _make_one(self, context, request):
         from karl.views.admin import EmailUsersView
@@ -483,7 +480,7 @@ class TestEmailUsersView(unittest.TestCase):
 
     def test_render_form(self):
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('barney')
+        karltesting.registerDummySecurityPolicy('barney')
         view = self._make_one(self.site, request)
         result = view()
         self.assertEqual(result['to_groups'], view.to_groups)
@@ -501,7 +498,7 @@ class TestEmailUsersView(unittest.TestCase):
             'text': 'Foo walked into a bar...',
             'send_email': '1',
         }))
-        testing.registerDummySecurityPolicy('barney')
+        karltesting.registerDummySecurityPolicy('barney')
         view = self._make_one(self.site, request)
         response = view()
         self.assertEqual(response.location,
@@ -523,7 +520,7 @@ class TestEmailUsersView(unittest.TestCase):
             'text': 'Foo walked into a bar...',
             'send_email': '1',
         }))
-        testing.registerDummySecurityPolicy('barney')
+        karltesting.registerDummySecurityPolicy('barney')
         view = self._make_one(self.site, request)
         response = view()
         self.assertEqual(response.location,
@@ -541,7 +538,7 @@ class TestEmailUsersView(unittest.TestCase):
 
 class TestSyslogView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         import sys
@@ -551,19 +548,19 @@ class TestSyslogView(unittest.TestCase):
             syslog_view=os.path.join(here, 'test.log'),
             syslog_view_instances=['org1', 'org2'],
         )
-        testing.registerUtility(settings, ISettings)
+        karltesting.registerUtility(settings, ISettings)
 
         from karl.views.admin import syslog_view
         self.fut = syslog_view
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_no_syslog_path(self):
         from pyramid.interfaces import ISettings
         self.settings = settings = karltesting.DummySettings()
-        testing.registerUtility(settings, ISettings)
+        karltesting.registerUtility(settings, ISettings)
         request = testing.DummyRequest()
         result = self.fut(testing.DummyModel(), request)
         batch_info = result['batch_info']
@@ -617,7 +614,7 @@ class TestSyslogView(unittest.TestCase):
 
 class TestLogsView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         import sys
@@ -629,14 +626,14 @@ class TestLogsView(unittest.TestCase):
         settings = karltesting.DummySettings(
             logs_view=self.logs
         )
-        testing.registerUtility(settings, ISettings)
+        karltesting.registerUtility(settings, ISettings)
 
         from karl.views.admin import logs_view
         self.fut = logs_view
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_no_log(self):
         request = testing.DummyRequest()
@@ -673,7 +670,7 @@ class TestLogsView(unittest.TestCase):
 
 class TestStatisticsView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         import sys
@@ -685,14 +682,14 @@ class TestStatisticsView(unittest.TestCase):
         settings = karltesting.DummySettings(
             statistics_folder=here
         )
-        testing.registerUtility(settings, ISettings)
+        karltesting.registerUtility(settings, ISettings)
 
         from karl.views.admin import statistics_view
         self.fut = statistics_view
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_it(self):
         request = testing.DummyRequest()
@@ -701,7 +698,7 @@ class TestStatisticsView(unittest.TestCase):
 
 class TestStatisticsCSVView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         import sys
@@ -713,13 +710,13 @@ class TestStatisticsCSVView(unittest.TestCase):
         settings = karltesting.DummySettings(
             statistics_folder=here
         )
-        testing.registerUtility(settings, ISettings)
+        karltesting.registerUtility(settings, ISettings)
 
         from karl.views.admin import statistics_csv_view
         self.fut = statistics_csv_view
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_download_csv(self):
         import os
@@ -749,7 +746,7 @@ class TestStatisticsCSVView(unittest.TestCase):
 
 class TestUploadUsersView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         site = testing.DummyModel()
         site['profiles'] = DummyProfiles()
@@ -763,7 +760,7 @@ class TestUploadUsersView(unittest.TestCase):
 
         from repoze.workflow.testing import registerDummyWorkflow
         self.workflow = registerDummyWorkflow('security')
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
         self.search_results = {}
         class DummySearch(object):
@@ -778,10 +775,10 @@ class TestUploadUsersView(unittest.TestCase):
 
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
+        karltesting.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request, rename_user=None):
         from karl.views.admin import UploadUsersView as cls
@@ -1181,7 +1178,7 @@ class TestUploadUsersView(unittest.TestCase):
 class ErrorMonitorBase:
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import tempfile
         self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
@@ -1194,8 +1191,8 @@ class ErrorMonitorBase:
             'error_monitor_subsystems': ["blonde", "red", "head"],
             'postoffice.zodb_uri': 'zeo://localhost:9002',
             'postoffice.queue': 'queue'})
-        testing.registerUtility(settings, ISettings)
-        testing.registerDummyRenderer(
+        karltesting.registerUtility(settings, ISettings)
+        karltesting.registerDummyRenderer(
             'karl.views:templates/admin/menu.pt')
 
         from karl.views import admin
@@ -1209,7 +1206,7 @@ class ErrorMonitorBase:
             print >>f, message
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         import shutil
         shutil.rmtree(self.tmpdir)
@@ -1338,22 +1335,22 @@ class TestErrorMonitorStatusView(ErrorMonitorBase, unittest.TestCase):
 
 class TestPostofficeQuarantineView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.views import admin
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
         from pyramid.interfaces import ISettings
-        testing.registerUtility(
+        karltesting.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
-        testing.registerDummyRenderer('karl.views:templates/admin/menu.pt')
+        karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, params=None):
         from karl.views.admin import postoffice_quarantine_view as fut
@@ -1410,21 +1407,21 @@ class TestPostofficeQuarantineView(unittest.TestCase):
 
 class TestPostOfficeQuarantineStatusView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.views import admin
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
         from pyramid.interfaces import ISettings
-        testing.registerUtility(
+        karltesting.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantine_status_view as fut
@@ -1441,21 +1438,21 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
 
 class TestPostofficeQuarantinedMessageView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.views import admin
         self.queue = DummyPostofficeQueue()
         admin.open_queue = self.queue
 
         from pyramid.interfaces import ISettings
-        testing.registerUtility(
+        karltesting.registerUtility(
             karltesting.DummySettings(**{
                 'postoffice.zodb_uri': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantined_message_view as fut
@@ -1475,11 +1472,11 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
 
 class Test_rename_or_merge_user_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self.rename_user_calls = []
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _dummy_rename_user(self, context, old_name, new_name, merge, out):
         print >>out, 'Renamed user.'
