@@ -17,14 +17,14 @@
 
 import unittest
 
+import karl.testing
 
 class TestBase:
 
     def setUp(self):
         from pyramid.testing import cleanUp
         cleanUp()
-        from pyramid import testing
-        testing.registerTemplateRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/generic_layout.pt')
 
     def tearDown(self):
@@ -118,16 +118,15 @@ class FileHTMLTests(unittest.TestCase):
 
     def test___call__(self):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
-        from pyramid.testing import registerDummyRenderer
         from karl.content.views.interfaces import IFileInfo
         fileinfo = object()
         api = object()
         def _adapt(context, request):
             return fileinfo
-        registerAdapter(_adapt, (Interface, Interface), IFileInfo)
+        karl.testing.registerAdapter(_adapt, (Interface, Interface), IFileInfo)
         adapter = self._makeOne()
-        renderer = registerDummyRenderer('templates/inline_file.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/inline_file.pt')
         adapter(api)
         self.failUnless(renderer.api is api)
         self.failUnless(renderer.fileinfo is fileinfo)
@@ -162,13 +161,13 @@ class Test_getTree(TestBase, unittest.TestCase):
 
     def _registerAdapter(self, html, **kw):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
         from karl.content.interfaces import IReferenceManualHTML
         def _adapt(context, request):
             def _html(api):
                 return html % kw
             return _html
-        registerAdapter(_adapt, (Interface, Interface), IReferenceManualHTML)
+        karl.testing.registerAdapter(
+            _adapt, (Interface, Interface), IReferenceManualHTML)
 
     def test_empty(self):
         root = self._makeItem()
@@ -371,30 +370,29 @@ class ShowTestBase(TestBase):
 
     def _registerTagbox(self):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
         from karl.models.interfaces import ITagQuery
         from karl.testing import DummyTagQuery
 
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                        ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerAddables(self):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
         from karl.views.interfaces import IFolderAddables
         from karl.testing import DummyFolderAddables
 
-        registerAdapter(DummyFolderAddables, (Interface, Interface),
-                                IFolderAddables)
+        karl.testing.registerAdapter(
+            DummyFolderAddables, (Interface, Interface),
+            IFolderAddables)
 
     def _registerLayoutProvider(self):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
 
-        registerAdapter(DummyLayoutProvider, (Interface, Interface),
-                        ILayoutProvider)
+        karl.testing.registerAdapter(
+            DummyLayoutProvider, (Interface, Interface),
+            ILayoutProvider)
 
     def _callFUT(self, context=None, request=None):
         from pyramid.testing import DummyRequest
@@ -412,13 +410,13 @@ class ReferenceOutlineViewTests(ShowTestBase, unittest.TestCase):
         return reference_outline_view
 
     def test_it(self):
-        from pyramid.testing import registerDummyRenderer
         self._registerTagbox()
         self._registerAddables()
         self._registerLayoutProvider()
 
         # XXX
-        renderer = registerDummyRenderer('templates/show_referencemanual.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(renderer.tree, [])
@@ -431,13 +429,13 @@ class ReferenceViewallViewTests(ShowTestBase, unittest.TestCase):
         return reference_viewall_view
 
     def test_it(self):
-        from pyramid.testing import registerDummyRenderer
         self._registerTagbox()
         self._registerAddables()
         self._registerLayoutProvider()
 
         # XXX
-        renderer = registerDummyRenderer('templates/viewall_referencemanual.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/viewall_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(renderer.tree, [])
@@ -595,11 +593,10 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
 
     def _registerTags(self, site):
         from zope.interface import Interface
-        from pyramid.testing import registerAdapter
         from karl.models.interfaces import ITagQuery
         from karl.testing import DummyTagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                        ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from karl.testing import DummyTags
         site.tags = DummyTags()
 
