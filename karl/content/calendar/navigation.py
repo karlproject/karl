@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from pyramid.chameleon_zpt import get_template
+from pyramid.renderers import get_renderer
 
 
 class Navigation(object):
@@ -56,7 +56,7 @@ class Navigation(object):
     
     def _init_template(self):
         path = 'karl.content.views:templates/calendar_navigation.pt'
-        self._template = get_template(path)
+        self._template = get_renderer(path).implementation()
 
     @property
     def macros(self):

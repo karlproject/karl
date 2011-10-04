@@ -28,7 +28,7 @@ from zope.component import queryUtility
 from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -350,14 +350,15 @@ def show_wikitoc_view(context, request):
     repo = find_repo(context)
     show_trash = repo is not None and has_permission('edit', context, request)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_wikitoc.pt',
-        api=api,
-        actions=actions,
-        head_data=client_json_data,
-        feed_url=feed_url,
-        backto=backto,
-        show_trash=show_trash,
+        dict(api=api,
+             actions=actions,
+             head_data=client_json_data,
+             feed_url=feed_url,
+             backto=backto,
+             show_trash=show_trash),
+        request = request,
         )
 
 class EditWikiPageFormController(object):

@@ -29,9 +29,9 @@ from zope.component import getUtility
 from zope.interface import implements
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid.chameleon_zpt import get_template
-from pyramid.chameleon_zpt import render_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import get_renderer
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -505,7 +505,8 @@ def join_community_view(context, request):
         )
         mail["Subject"] = "Request to join %s community" % context.title
 
-        body_template = get_template("templates/email_join_community.pt")
+        body_template = get_renderer(
+            "templates/email_join_community.pt").implementation()
         profile_url = resource_url(profile, request)
         accept_url=resource_url(context, request, "members", "add_existing.html",
                              query={"user_id": user})
@@ -536,13 +537,14 @@ def join_community_view(context, request):
     # Show form
     page_title = "Join " + context.title
     api = TemplateAPI(context, request, page_title)
-    return render_template_to_response(
+    return render_to_response(
         "templates/join_community.pt",
-        api=api,
-        profile=profile,
-        community=context,
-        post_url=resource_url(context, request, "join.html"),
-        formfields=api.formfields,
+        dict(api=api,
+             profile=profile,
+             community=context,
+             post_url=resource_url(context, request, "join.html"),
+             formfields=api.formfields),
+        request=request,
     )
 
 def delete_community_view(context, request):
@@ -561,20 +563,24 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/delete_resource.pt',
-        api=api,
-        layout=layout,
-        num_children=0,
+        dict(api=api,
+             layout=layout,
+             num_children=0,),
+        request = request,
         )
 
 class CommunitySidebar(object):
     implements(ISidebar)
 
     def __init__(self, context, request):
-        pass
+        self.context = context
+        self.request = request
 
     def __call__(self, api):
-        return render_template(
+        return render(
             'templates/community_sidebar.pt',
-            api=api)
+            dict(api=api),
+            request=self.request
+            )

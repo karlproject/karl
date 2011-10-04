@@ -23,14 +23,14 @@ import re
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid.url import resource_url
-from pyramid.view import static
+from pyramid.static import static_view
 
 from karl.views.utils import get_user_home
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 # five year expires time
-static_view = static('static', cache_max_age=157680000)
+static_view = static_view('static', cache_max_age=157680000, use_subpath=True)
 
 version_match = re.compile(r'^r-?\d+$').match
 # version number is "r" plus an integer (possibly negative)

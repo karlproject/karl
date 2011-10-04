@@ -38,8 +38,8 @@ from zope.component import getAdapter
 from zope.component import getUtility
 from zope.interface import implements
 
-from pyramid.chameleon_zpt import get_template
-from pyramid.chameleon_zpt import render_template
+from pyramid.renderers import get_renderer
+from pyramid.renderers import render
 from pyramid.path import package_path
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
@@ -353,7 +353,7 @@ class BlogAlert(Alert):
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
-        body_template = get_template(self._template)
+        body_template = get_renderer(self._template).implementation()
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
         msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
@@ -507,7 +507,7 @@ class NonBlogAlert(Alert):
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
-        body_template = get_template(self._template)
+        body_template = get_renderer(self._template).implementation()
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
         msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
@@ -879,9 +879,10 @@ class FeedPortlet(object):
 
     @property
     def asHTML(self):
-        return render_template(
+        return render(
             'templates/feed.pt',
-            feed=self.context,
+            dict(feed=self.context),
+            request=self.request,
             )
 
 class DefaultLayoutProvider(object):
@@ -894,15 +895,18 @@ class DefaultLayoutProvider(object):
 
     @property
     def community_layout(self):
-        return get_template('karl.views:templates/community_layout.pt')
+        return get_renderer(
+            'karl.views:templates/community_layout.pt').implementation()
 
     @property
     def generic_layout(self):
-        return get_template('karl.views:templates/generic_layout.pt')
+        return get_renderer(
+            'karl.views:templates/generic_layout.pt').implementation()
 
     @property
     def intranet_layout(self):
-        layout = get_template('karl.content.views:templates/intranet_layout.pt')
+        layout = get_renderer(
+            'karl.content.views:templates/intranet_layout.pt').implementation()
         intranet = find_interface(self.context, IIntranet)
         if intranet:
             layout.navigation = intranet.navigation

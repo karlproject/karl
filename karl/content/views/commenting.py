@@ -27,7 +27,7 @@ from zope.component import queryUtility
 from schemaish.type import File as SchemaFile
 import schemaish
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.url import resource_url
@@ -107,14 +107,15 @@ def show_comment_view(context, request):
     else:
         attachments = ()
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_comment.pt',
-        api=api,
-        actions=actions,
-        byline_info=byline_info,
-        attachments=attachments,
-        backto=backto,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             byline_info=byline_info,
+             attachments=attachments,
+             backto=backto,
+             layout=layout),
+        request=request,
         )
 
 add_comment_field = schemaish.String(

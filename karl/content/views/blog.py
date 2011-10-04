@@ -31,8 +31,7 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.interface import implements
 
-from pyramid.chameleon_zpt import render_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render
 from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
 from pyramid.security import authenticated_userid
@@ -557,10 +556,11 @@ class BlogSidebar(object):
         activity_list = [MonthlyActivity(year, month, count)
             for ((year, month), count) in counts]
         blog_url = resource_url(self.context, self.request)
-        return render_template(
+        return render(
             'templates/blog_sidebar.pt',
-            api=api,
-            activity_list=activity_list,
-            blog_url=blog_url,
+            dict(api=api,
+                 activity_list=activity_list,
+                 blog_url=blog_url),
+            request = self.request,
             )
 

@@ -40,7 +40,7 @@ from zope.interface import implementedBy
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.exceptions import NotFound
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
@@ -338,15 +338,16 @@ def advanced_folder_view(context, request):
     else:
         selected = None
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/advanced_folder.pt',
-        api=api,
-        actions=[],
-        formfields=api.formfields,
-        post_url=resource_url(context, request, 'advanced.html'),
-        layout=layout,
-        fielderrors={},
-        selected=selected,
+        dict(api=api,
+             actions=[],
+             formfields=api.formfields,
+             post_url=resource_url(context, request, 'advanced.html'),
+             layout=layout,
+             fielderrors={},
+             selected=selected),
+        request = request,
         )
 
 
@@ -515,16 +516,18 @@ def show_file_view(context, request):
         if repo is not None and has_permission('edit', context, request):
             actions.append(('History', 'history.html'))
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_file.pt',
-        api=api,
-        actions=actions,
-        fileinfo=fileinfo,
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous_entry=previous,
-        next_entry=next,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             fileinfo=fileinfo,
+             head_data=convert_to_script(client_json_data),
+             backto=backto,
+             previous_entry=previous,
+             next_entry=next,
+             layout=layout
+             ),
+        request=request,
         )
 
 def preview_file(context, request):

@@ -34,7 +34,7 @@ from zope.component import queryAdapter
 
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
@@ -335,17 +335,19 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # render
     api = TemplateAPI(context, request, calendar.title)
     api.karl_client_data['calendar_selection'] = selection
-    response = render_template_to_response(
+    response = render_to_response(
         calendar.template_filename,
-        calendar_format_class = calendar_layout['calendar_format_class'],
-        calendar_layout_template = calendar_layout['calendar_layout_template'],
-        api=api,
-        setup_url=setup_url,
-        calendar=calendar,
-        selected_layer = selected_layer,
-        layers = layers,
-        quote = quote,
-        may_create = has_permission(CREATE, context, request),
+        dict(
+            calendar_format_class = calendar_layout['calendar_format_class'],
+            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            api=api,
+            setup_url=setup_url,
+            calendar=calendar,
+            selected_layer = selected_layer,
+            layers = layers,
+            quote = quote,
+            may_create = has_permission(CREATE, context, request)),
+        request=request,
     )
     return response
 
@@ -420,17 +422,19 @@ def show_list_view(context, request):
     # render
     api = TemplateAPI(context, request, calendar.title)
     api.karl_client_data['calendar_selection'] = selection
-    response = render_template_to_response(
+    response = render_to_response(
         calendar.template_filename,
-        calendar_format_class = calendar_layout['calendar_format_class'],
-        calendar_layout_template = calendar_layout['calendar_layout_template'],
-        api=api,
-        setup_url=setup_url,
-        calendar=calendar,
-        selected_layer = selected_layer,
-        layers = layers,
-        quote = quote,
-        may_create = has_permission(CREATE, context, request),
+        dict(
+            calendar_format_class = calendar_layout['calendar_format_class'],
+            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            api=api,
+            setup_url=setup_url,
+            calendar=calendar,
+            selected_layer = selected_layer,
+            layers = layers,
+            quote = quote,
+            may_create = has_permission(CREATE, context, request)),
+        request=request,
     )
     _set_calendar_cookies(response, selection)
     return response
@@ -775,24 +779,26 @@ def show_calendarevent_view(context, request):
     else:
         category_title = None
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_calendarevent.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(dict(
-            tagbox = get_tags_client_data(context, request),
-            )),
-        title=title,
-        startDate=startDate,
-        endDate=endDate,
-        attendees=attendees,
-        location=location,
-        contact_name=contact_name,
-        contact_email=contact_email,
-        category_title=category_title,
-        attachments=fetch_attachments(context['attachments'], request),
-        backto=backto,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(dict(
+                 tagbox = get_tags_client_data(context, request),
+                 )),
+             title=title,
+             startDate=startDate,
+             endDate=endDate,
+             attendees=attendees,
+             location=location,
+             contact_name=contact_name,
+             contact_email=contact_email,
+             category_title=category_title,
+             attachments=fetch_attachments(context['attachments'], request),
+             backto=backto,
+             layout=layout,
+             ),
+        request=request,
         )
 
 
@@ -963,19 +969,20 @@ def calendar_setup_view(context, request):
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=resource_url(context, request),
-        categories_url=resource_url(context, request, 'categories.html'),
-        layers_url=resource_url(context, request, 'layers.html'),
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        fielderrors_target = fielderrors_target,
-        api=api,
-        editable_categories = categories,
-        editable_layers = layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             formfields=api.formfields,
+             fielderrors=fielderrors,
+             fielderrors_target = fielderrors_target,
+             api=api,
+             editable_categories = categories,
+             editable_layers = layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS),
+        request = request,
         )
 
 
@@ -1130,18 +1137,19 @@ def calendar_setup_categories_view(context, request):
     page_title = 'Calendar Categories'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=resource_url(context, request),
-        categories_url=resource_url(context, request, 'categories.html'),
-        layers_url=resource_url(context, request, 'layers.html'),
-        fielderrors=fielderrors,
-        fielderrors_target = fielderrors_target,
-        api=api,
-        editable_categories = editable_categories,
-        editable_layers = editable_layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             fielderrors=fielderrors,
+             fielderrors_target = fielderrors_target,
+             api=api,
+             editable_categories = editable_categories,
+             editable_layers = editable_layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS),
+        request = request,
         )
 
 def calendar_setup_layers_view(context, request):
@@ -1271,19 +1279,20 @@ def calendar_setup_layers_view(context, request):
     page_title = 'Calendar Layers'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=resource_url(context, request),
-        categories_url=resource_url(context, request, 'categories.html'),
-        layers_url=resource_url(context, request, 'layers.html'),
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        fielderrors_target=fielderrors_target,
-        editable_categories = categories,
-        editable_layers = layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
-        api=api,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             formfields=api.formfields,
+             fielderrors=fielderrors,
+             fielderrors_target=fielderrors_target,
+             editable_categories = categories,
+             editable_layers = layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS,
+             api=api),
+        request=request,
         )
 
 def generate_name(context):

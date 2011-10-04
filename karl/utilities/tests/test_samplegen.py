@@ -17,15 +17,14 @@
 
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
 import karl.testing
 
 class SampleGenTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_get_sample_filename(self):
         import os
@@ -55,8 +54,8 @@ class SampleGenTests(unittest.TestCase):
 
         from zope.interface import Interface
         from karl.views.interfaces import IToolAddables
-        testing.registerAdapter(DummyToolAddables, (Interface, Interface),
-                                IToolAddables)
+        karl.testing.registerAdapter(DummyToolAddables, (Interface, Interface),
+                                     IToolAddables)
 
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import ICommunity
