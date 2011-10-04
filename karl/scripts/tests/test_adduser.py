@@ -1,12 +1,10 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
-
 from karl import testing
 
 class Test_adduser(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self.root = root = testing.DummyModel()
         root.users = testing.DummyUsers()
@@ -20,7 +18,7 @@ class Test_adduser(unittest.TestCase):
         self.wf = registerDummyWorkflow('security')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def fut(self):
         from karl.scripts.adduser import adduser
