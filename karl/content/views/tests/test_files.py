@@ -29,6 +29,8 @@ from karl.testing import DummyFolderAddables
 from karl.testing import DummyTagQuery
 from karl.testing import registerLayoutProvider
 
+import karl.testing
+
 class TestShowFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -43,30 +45,30 @@ class TestShowFolderView(unittest.TestCase):
 
     def _register(self, permissions=None):
         from karl.content.views.interfaces import IFileInfo
-        testing.registerAdapter(DummyFileInfo, (Interface, Interface),
-                                IFileInfo)
+        karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+                                     IFileInfo)
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         # Register dummy IFolderAddables
         from karl.views.interfaces import IFolderAddables
-        testing.registerAdapter(DummyFolderAddables, (Interface, Interface),
-                                IFolderAddables)
+        karl.testing.registerAdapter(DummyFolderAddables,
+                                     (Interface, Interface),
+                                     IFolderAddables)
 
         if permissions is not None:
             from pyramid.interfaces import IAuthenticationPolicy
             from pyramid.interfaces import IAuthorizationPolicy
-            from pyramid.testing import registerUtility
             policy = DummySecurityPolicy("userid", permissions=permissions)
-            registerUtility(policy, IAuthenticationPolicy)
-            registerUtility(policy, IAuthorizationPolicy)
+            karl.testing.registerUtility(policy, IAuthenticationPolicy)
+            karl.testing.registerUtility(policy, IAuthorizationPolicy)
 
     def _make_community(self):
         # Register dummy catalog search
         # (the folder view needs it for the reorganize widget)
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface, ),
+        karl.testing.registerAdapter(DummySearch, (Interface, ),
                                 ICatalogSearch)
 
         # factorize a fake community
@@ -186,13 +188,14 @@ class TestAddFolderFormController(unittest.TestCase):
     def _register(self):
         from pyramid import testing
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
 
         # Register dummy IFolderCustomizer
         from karl.content.views.interfaces import IFolderCustomizer
-        testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
-                                IFolderCustomizer)
+        karl.testing.registerAdapter(DummyFolderCustomizer,
+                                     (Interface, Interface),
+                                     IFolderCustomizer)
 
     def _makeOne(self, *arg, **kw):
         from karl.content.views.files import AddFolderFormController
@@ -254,7 +257,7 @@ class TestAddFolderFormController(unittest.TestCase):
         self._register()
         self._registerDummyWorkflow()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         context.tags = DummyTagEngine()
@@ -265,7 +268,7 @@ class TestAddFolderFormController(unittest.TestCase):
             }
         from karl.content.interfaces import ICommunityFolder
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyCommunityFolder,
+        karl.testing.registerAdapter(lambda *arg: DummyCommunityFolder,
                                 (ICommunityFolder,),
                                 IContentFactory)
         request = testing.DummyRequest()
@@ -319,25 +322,25 @@ class TestAddFileFormController(unittest.TestCase):
     def _register(self):
         from karl.models.interfaces import ITagQuery
         from karl.content.views.interfaces import IShowSendalert
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
-                                IShowSendalert)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
+        karl.testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                     IShowSendalert)
 
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        testing.registerUtility(self.mailer, IMailDelivery)
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         from karl.content.views.adapters import CommunityFileAlert
         from karl.content.interfaces import ICommunityFile
         from karl.models.interfaces import IProfile
         from pyramid.interfaces import IRequest
         from karl.utilities.interfaces import IAlert
-        testing.registerAdapter(CommunityFileAlert,
-                                (ICommunityFile, IProfile, IRequest),
-                                IAlert)
+        karl.testing.registerAdapter(CommunityFileAlert,
+                                     (ICommunityFile, IProfile, IRequest),
+                                     IAlert)
 
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
@@ -421,7 +424,7 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         self._register()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
         context.catalog = DummyCatalog()
         from schemaish.type import File as SchemaFile
@@ -445,7 +448,7 @@ class TestAddFileFormController(unittest.TestCase):
         from pyramid_formish import ValidationError
         self._register()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
         context.catalog = DummyCatalog()
         fs = SchemaFile('abc', 'filename', 'x/foo')
@@ -482,7 +485,7 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         self._register()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
         context.catalog = DummyCatalog()
         from schemaish.type import File as SchemaFile
@@ -506,7 +509,7 @@ class TestAddFileFormController(unittest.TestCase):
         from pyramid_formish import ValidationError
         self._register()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
         context.catalog = DummyCatalog()
         fs = SchemaFile('abc', r"C:\Documents and Settings\My Tests\filename",
@@ -542,7 +545,7 @@ class TestAddFileFormController(unittest.TestCase):
     def test_handle_submit_valid_alert(self):
         self._register()
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
 
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunity
@@ -573,7 +576,7 @@ class TestAddFileFormController(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
         controller = self._makeOne(context, request)
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/email_community_file_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/filename/')
@@ -593,7 +596,7 @@ class TestAddFileFormController(unittest.TestCase):
         def check_upload_size(*args):
             raise ValidationError(file='TEST VALIDATION ERROR')
 
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         context = self._makeContext()
         context.catalog = DummyCatalog()
         request = self._makeRequest()
@@ -636,15 +639,15 @@ class TestShowFileView(unittest.TestCase):
     def test_editable_wo_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         root = self._make_community()
         parent = root['files'] = testing.DummyModel(title='parent')
         context = parent['child'] = testing.DummyModel(title='thetitle')
         request = testing.DummyRequest()
-        renderer  = testing.registerDummyRenderer('templates/show_file.pt')
+        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
-        testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+        karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                 IFileInfo)
 
         self._callFUT(context, request)
@@ -657,17 +660,17 @@ class TestShowFileView(unittest.TestCase):
     def test_editable_w_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         root = self._make_community()
         root.repo = object()
         parent = root['files'] = testing.DummyModel(title='parent')
         context = parent['child'] = testing.DummyModel(title='thetitle')
         request = testing.DummyRequest()
-        renderer  = testing.registerDummyRenderer('templates/show_file.pt')
+        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
-        testing.registerAdapter(DummyFileInfo, (Interface, Interface),
-                                IFileInfo)
+        karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+                                     IFileInfo)
 
         self._callFUT(context, request)
         actions = renderer.actions
@@ -865,12 +868,12 @@ class TestEditFolderFormController(unittest.TestCase):
     def _register(self):
         from pyramid import testing
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
 
         # Register dummy IFolderCustomizer
         from karl.content.views.interfaces import IFolderCustomizer
-        testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
+        karl.testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
                                 IFolderCustomizer)
 
     def _makeOne(self, *arg, **kw):
@@ -945,8 +948,9 @@ class TestEditFolderFormController(unittest.TestCase):
             'security_state': 'private',
             'tags': ['thetesttag'],
             }
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
         msg = 'http://example.com/?status_message=Folder+changed'
@@ -981,16 +985,16 @@ class TestEditFileFormController(unittest.TestCase):
     def _register(self):
         from karl.models.interfaces import ITagQuery
         from karl.content.views.interfaces import IShowSendalert
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
-                                IShowSendalert)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
+        karl.testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                     IShowSendalert)
 
         # Register mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        testing.registerUtility(self.mailer, IMailDelivery)
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
     def _registerDummyWorkflow(self):
         # Register security workflow
@@ -1086,11 +1090,12 @@ class TestEditFileFormController(unittest.TestCase):
             'security_state': 'public',
             'tags': ['thetesttag'],
             }
-        testing.registerAdapter(lambda *arg: DummyCommunityFile,
-                                (ICommunityFile,),
-                                IContentFactory)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        karl.testing.registerAdapter(lambda *arg: DummyCommunityFile,
+                                     (ICommunityFile,),
+                                     IContentFactory)
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -1132,11 +1137,12 @@ class TestEditFileFormController(unittest.TestCase):
             'security_state': 'public',
             'tags': ['thetesttag'],
             }
-        testing.registerAdapter(lambda *arg: DummyCommunityFile,
+        karl.testing.registerAdapter(lambda *arg: DummyCommunityFile,
                                 (ICommunityFile,),
                                 IContentFactory)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -1178,10 +1184,10 @@ class TestEditFileFormController(unittest.TestCase):
             'security_state': 'public',
             'tags': ['thetesttag'],
             }
-        testing.registerAdapter(lambda *arg: DummyCommunityFile,
+        karl.testing.registerAdapter(lambda *arg: DummyCommunityFile,
                                 (ICommunityFile,),
                                 IContentFactory)
-        testing.registerDummySecurityPolicy('testeditor')
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         self.assertRaises(ValidationError, controller.handle_submit, converted)
@@ -1190,7 +1196,7 @@ class TestAdvancedFolderView(unittest.TestCase):
     def setUp(self):
         cleanUp()
         registerLayoutProvider()
-        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
+        karl.testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -1202,7 +1208,7 @@ class TestAdvancedFolderView(unittest.TestCase):
     def test_render(self):
         context = testing.DummyModel(title='Dummy')
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
@@ -1213,7 +1219,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, IReferencesFolder)
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
@@ -1225,7 +1231,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, INetworkNewsMarker)
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
@@ -1237,7 +1243,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         context = testing.DummyModel(title='Dummy')
         alsoProvides(context, INetworkEventsMarker)
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
@@ -1262,7 +1268,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'form.submitted': '1',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
@@ -1276,7 +1282,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'reference_manual',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1298,7 +1304,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_news',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1320,7 +1326,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_events',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1347,7 +1353,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'reference_manual',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1371,7 +1377,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_news',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1395,7 +1401,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_events',
                 })
             )
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1446,7 +1452,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_upload_ok(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1472,7 +1478,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
     def test_image_ok(self):
         # An image is somewhat special, so it's worth to test it.
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1497,7 +1503,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_mandatory_parameters(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1527,7 +1533,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_multiple(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1612,7 +1618,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_tolerate_doomed_retried_batch(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1642,7 +1648,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_security_assertions(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1723,7 +1729,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         file1 = context['TEMP']['PLUPLOAD-ABCDEF5']
 
         # the security credentials change during the batch: very very bad.
-        testing.registerDummySecurityPolicy('paul')
+        karl.testing.registerDummySecurityPolicy('paul')
 
         request = testing.DummyRequest(
             params={
@@ -1741,7 +1747,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_chunks_onechunk(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1768,7 +1774,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_chunks(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1842,7 +1848,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_chunking_parameters(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1876,7 +1882,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_chunking_inconsistency(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1908,7 +1914,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_lost_tempfile(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -1940,7 +1946,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_unique_filenames(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -2050,7 +2056,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
 
     def test_delete_one(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
         context['f1.txt'] = testing.DummyModel(title='a file')
@@ -2068,7 +2074,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
 
     def test_delete_zero(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
         request = testing.DummyRequest(
@@ -2085,7 +2091,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
 
     def test_delete_multiple(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
         context['f1.txt'] = testing.DummyModel(title='a file')
@@ -2107,7 +2113,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
 
     def test_tolerates_missing(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
         context['f1.txt'] = testing.DummyModel(title='a file')
@@ -2163,7 +2169,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_one(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2190,7 +2196,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_zero(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2217,7 +2223,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_multiple(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2246,7 +2252,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_mandatory_parameters(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2271,7 +2277,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_missing_file(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2296,7 +2302,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_cant_delete_file(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
 
@@ -2327,7 +2333,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_cant_add_file(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
 
@@ -2358,7 +2364,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_same_target(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2387,7 +2393,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_folder(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2416,7 +2422,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_folder_to_itself(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2442,7 +2448,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_move_folder_to_itself_deeply(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2469,7 +2475,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_canonical_names(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2496,7 +2502,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_unique_names(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
@@ -2536,7 +2542,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
     def test_unique_names_changes_properties(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
