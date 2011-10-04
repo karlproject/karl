@@ -24,9 +24,9 @@ def _checkCookie(request_or_response, target):
     from karl.views.communities import _VIEW_COOKIE
     header = ('Set-Cookie',
               '%s=%s; Path=/' % (_VIEW_COOKIE, target))
-    headerlist = getattr(request_or_response, 'headerlist', None)
-    if headerlist is None:
-        headerlist = getattr(request_or_response, 'response_headerlist')
+    if hasattr(request_or_response, 'response'):
+        response = request_or_response.response
+    headerlist = response.headerlist
     assert header in headerlist
 
 
@@ -76,11 +76,11 @@ class _Show_communities_helper:
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import ILetterManager
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyCommunityInfoAdapter,
+        karltesting.registerAdapter(DummyCommunityInfoAdapter,
                                 (Interface, Interface),
                                 ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
 
@@ -98,7 +98,7 @@ class Test_show_all_communities_view(_Show_communities_helper,
         profiles[None] = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         foo = testing.DummyModel()
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         request = testing.DummyRequest(
             params={'titlestartswith':'A'})
         info = self._callFUT(context, request)
@@ -111,7 +111,7 @@ class Test_show_all_communities_view(_Show_communities_helper,
 
     def test_w_groups(self):
         self._register()
-        testing.registerDummySecurityPolicy('admin',
+        karltesting.registerDummySecurityPolicy('admin',
                                             ['group.community:yum:bar'])
         context = testing.DummyModel()
         profiles = context['profiles'] = testing.DummyModel()
@@ -121,7 +121,7 @@ class Test_show_all_communities_view(_Show_communities_helper,
         yum.title = 'Yum!'
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         foo = testing.DummyModel()
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         request = testing.DummyRequest(
             params={'titlestartswith':'A'})
         info = self._callFUT(context, request)
@@ -169,7 +169,7 @@ class Test_show_active_communities_view(_Show_communities_helper,
                                       {1: '/foo', 2: '/bar'})
         foo = testing.DummyModel(content_modified=now - timedelta(1))
         bar = testing.DummyModel(content_modified=now - timedelta(32))
-        testing.registerModels({'/foo': foo,
+        karltesting.registerModels({'/foo': foo,
                                 '/bar': bar,
                                })
         request = testing.DummyRequest()
@@ -227,7 +227,7 @@ class Test_jquery_set_preferred_view(_Show_communities_helper, unittest.TestCase
         request = testing.DummyRequest()
         request.params = RequestParamsWithGetall()
         request.params['preferred[]'] = ['Yi']
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             [
             'group.community:yo:members',
@@ -235,7 +235,7 @@ class Test_jquery_set_preferred_view(_Show_communities_helper, unittest.TestCase
             'group.community:yi:moderators',
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['my_communities'][0].context, yi)
@@ -261,7 +261,7 @@ class Test_jquery_clear_preferred_view(_Show_communities_helper, unittest.TestCa
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = ['Yi']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -270,7 +270,7 @@ class Test_jquery_clear_preferred_view(_Show_communities_helper, unittest.TestCa
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], None)
@@ -297,7 +297,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = ['Yi']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -306,7 +306,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], ['Yi'])
@@ -327,7 +327,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = None
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -336,7 +336,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], None)
@@ -357,7 +357,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = []
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -366,7 +366,7 @@ class Test_jquery_list_preferred_view(_Show_communities_helper, unittest.TestCas
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], [])
@@ -393,7 +393,7 @@ class Test_jquery_edit_preferred_view(_Show_communities_helper, unittest.TestCas
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = ['Yi']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -402,7 +402,7 @@ class Test_jquery_edit_preferred_view(_Show_communities_helper, unittest.TestCas
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], ['Yi'])
@@ -429,7 +429,7 @@ class Test_jquery_list_my_communities_view(_Show_communities_helper, unittest.Te
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = ['Yi']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -438,7 +438,7 @@ class Test_jquery_list_my_communities_view(_Show_communities_helper, unittest.Te
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapterWithTitle, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result['preferred'], ['Yi'])
@@ -465,7 +465,7 @@ class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = ['yo']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -474,7 +474,7 @@ class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(len(result), 1)
@@ -493,7 +493,7 @@ class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase
         profiles = context['profiles'] = testing.DummyModel()
         foo = profiles['foo'] = testing.DummyModel()
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -502,7 +502,7 @@ class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(result, None)
@@ -528,7 +528,7 @@ class Test_set_preferred_communities(_Show_communities_helper, unittest.TestCase
         foo = profiles['foo'] = testing.DummyModel()
         foo.preferred_communities = None
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -537,7 +537,7 @@ class Test_set_preferred_communities(_Show_communities_helper, unittest.TestCase
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         communities = ['yi']
         self._callFUT(context, request, communities)
@@ -564,7 +564,7 @@ class Test_get_my_communities(_Show_communities_helper, unittest.TestCase):
         context['yo'] = yo
         context['yi'] = yi
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -573,7 +573,7 @@ class Test_get_my_communities(_Show_communities_helper, unittest.TestCase):
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(len(result), 2)
@@ -593,7 +593,7 @@ class Test_get_my_communities(_Show_communities_helper, unittest.TestCase):
         context['yo'] = yo
         context['yi'] = yi
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy(
+        karltesting.registerDummySecurityPolicy(
             'foo',
             groupids=[
             'group.community:yo:members',
@@ -602,7 +602,7 @@ class Test_get_my_communities(_Show_communities_helper, unittest.TestCase):
             'group.community:yang:moderators'
             ]
             )
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                 ICommunityInfo)
         result = self._callFUT(context, request)
         self.assertEqual(len(result), 2)
