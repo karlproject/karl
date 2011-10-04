@@ -22,6 +22,8 @@ import calendar
 
 from pyramid import testing
 
+import karl.testing
+
 from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for
 
@@ -30,7 +32,7 @@ class DayViewPresenterTests(unittest.TestCase):
     def setUp(self):
         calendar.setfirstweekday(calendar.SUNDAY)
         testing.setUp()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
 
     def tearDown(self):
