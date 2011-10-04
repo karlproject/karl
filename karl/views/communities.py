@@ -72,11 +72,8 @@ def show_communities_view(context, request):
 
 
 def _set_cookie_via_request(request, value):
-    header = ('Set-Cookie', '%s=%s; Path=/' %
-                    (_VIEW_COOKIE, value))
     request.cookies[_VIEW_COOKIE] = value
-    request.response.headerlist = [header]
-
+    request.response.set_cookie(_VIEW_COOKIE, value, path='/')
 
 def _show_communities_view_helper(context,
                                   request,
@@ -234,8 +231,7 @@ def get_preferred_communities(context, request):
     return preferred_communities
 
 def jquery_set_preferred_view(context, request):
-    request.response.headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = request.params.getall('preferred[]')
     set_preferred_communities(communities_folder, request, communities)
@@ -248,8 +244,7 @@ def jquery_set_preferred_view(context, request):
              'status_message': 'Set preferred communities.'}
 
 def jquery_clear_preferred_view(context, request):
-    request.response.headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     set_preferred_communities(communities_folder, request, None)
     updated_communities = get_my_communities(communities_folder, request)
@@ -261,8 +256,7 @@ def jquery_clear_preferred_view(context, request):
              'status_message': 'Cleared preferred communities.'}
 
 def jquery_list_preferred_view(context, request):
-    request.response.headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder, request)
     preferred = get_preferred_communities(communities_folder, request)
@@ -274,8 +268,7 @@ def jquery_list_preferred_view(context, request):
              'status_message': None}
 
 def jquery_edit_preferred_view(context, request):
-    request.response.headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder,
                                      request,
@@ -286,8 +279,7 @@ def jquery_edit_preferred_view(context, request):
              'preferred': preferred }
 
 def jquery_list_my_communities_view(context, request):
-    request.response.headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder,
                                      request,
