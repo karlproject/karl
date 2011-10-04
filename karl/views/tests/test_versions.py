@@ -1,15 +1,16 @@
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
+
+import karl.testing
 
 
 class Test_show_history(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
@@ -66,10 +67,10 @@ class Test_show_history(unittest.TestCase):
 class Test_revert(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import revert
@@ -121,10 +122,10 @@ class Test_revert(unittest.TestCase):
 class Test_show_trash(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_trash
@@ -256,14 +257,14 @@ class Test_show_trash(unittest.TestCase):
 class Test_undelete(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IContainerVersion
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import undelete
@@ -423,10 +424,10 @@ class Test_undelete(unittest.TestCase):
 class Test_show_history_lock(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
