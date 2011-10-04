@@ -1,5 +1,6 @@
 import unittest
 
+from karl.testing import registerUtility
 
 class SiteEventsTests(unittest.TestCase):
 
@@ -504,7 +505,6 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
 
     def test_w_nonesuch_community_group(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         event = self._makeEvent(site=site,
@@ -522,7 +522,6 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
 
     def test_w_community_group(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -609,7 +608,6 @@ class Test_user_left_community(_EventSubscriberTestsBase,
 
     def test_w_nonesuch_community_group(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         event = self._makeEvent(site=site,
@@ -628,7 +626,6 @@ class Test_user_left_community(_EventSubscriberTestsBase,
 
     def test_w_community_group(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -703,7 +700,6 @@ class Test_user_added_content(_EventSubscriberTestsBase,
 
     def test_added_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -746,7 +742,6 @@ class Test_user_added_content(_EventSubscriberTestsBase,
     def test_added_profile(self):
         from datetime import datetime
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
@@ -786,7 +781,6 @@ class Test_user_added_content(_EventSubscriberTestsBase,
     def test_added_content_inside_profile(self):
         from datetime import datetime
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
@@ -832,7 +826,6 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         from datetime import datetime
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerUtility
         from karl.models.interfaces import IPosts
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -883,7 +876,6 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         from datetime import datetime
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerUtility
         from karl.models.interfaces import IPosts
         from karl.models.interfaces import IComment
         NOW = datetime(2010, 7, 13, 12, 47, 12)
@@ -965,7 +957,6 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
 
     def test_modified_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1007,7 +998,6 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
 
     def test_modified_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1047,7 +1037,6 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
 
     def test_modified_content_inside_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1092,7 +1081,6 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
 
     def test_modified_non_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.testing import registerUtility
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
         self._setNow(lambda: NOW)
@@ -1163,7 +1151,6 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
     def test_tagged_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.testing import DummyRequest
-        from pyramid.testing import registerUtility
         from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
@@ -1215,7 +1202,6 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
     def test_tagged_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.testing import DummyRequest
-        from pyramid.testing import registerUtility
         from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
@@ -1265,7 +1251,6 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
     def test_tagged_non_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.testing import DummyRequest
-        from pyramid.testing import registerUtility
         from pyramid.threadlocal import manager
         from datetime import datetime
         NOW = datetime(2010, 7, 13, 12, 47, 12)
