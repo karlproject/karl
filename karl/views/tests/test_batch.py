@@ -16,16 +16,17 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 from pyramid import testing
 
+import karl.testing
+
 class TestGetCatalogBatch(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, **kw):
         from karl.views.batch import get_catalog_batch
@@ -42,8 +43,8 @@ class TestGetCatalogBatch(unittest.TestCase):
                 searchkw.update(kw)
                 return len(batch), batch, resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, (Interface),
+                                     ICatalogSearch)
         return searchkw
 
 
@@ -224,10 +225,10 @@ class TestGetCatalogBatch(unittest.TestCase):
 
 class TestGetCatalogBatchGrid(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.batch import get_catalog_batch_grid
@@ -244,8 +245,8 @@ class TestGetCatalogBatchGrid(unittest.TestCase):
                 searchkw.update(kw)
                 return len(batch), batch, resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, (Interface),
+                                     ICatalogSearch)
         return searchkw
 
     def test_defaults(self):
@@ -309,10 +310,10 @@ class TestGetCatalogBatchGrid(unittest.TestCase):
 
 class TestGetContainerBatch(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, **kw):
         from karl.views.batch import get_container_batch
@@ -424,10 +425,10 @@ class TestGetContainerBatch(unittest.TestCase):
 
 class TestGetFileLineBatch(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, fp, context, request, **kw):
         from karl.views.batch import get_fileline_batch
