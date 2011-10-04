@@ -22,6 +22,7 @@ import unittest
 from pyramid import testing
 from simplejson import JSONDecoder
 
+import karl.testing
 
 class Test_admin_contents(unittest.TestCase):
 
@@ -72,7 +73,7 @@ class Test_peopledirectory_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
     def test_empty(self):
@@ -84,7 +85,7 @@ class Test_peopledirectory_view(unittest.TestCase):
 
     def test_no_sections_allowed(self):
         from pyramid.exceptions import Forbidden
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         pd = testing.DummyModel()
         pd['s1'] = testing.DummyModel()
         pd.order = ('s1',)
@@ -93,7 +94,7 @@ class Test_peopledirectory_view(unittest.TestCase):
 
     def test_one_section_allowed(self):
         from pyramid.httpexceptions import HTTPFound
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         site = testing.DummyModel()
         pd = site['people'] = testing.DummyModel()
         pd['s1'] = testing.DummyModel()
@@ -107,7 +108,7 @@ class Test_peopledirectory_view(unittest.TestCase):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.threadlocal import get_current_registry
         from pyramid.httpexceptions import HTTPFound
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         authz_policy.permits = (lambda context, prin, perm:
@@ -265,7 +266,7 @@ class Test_get_tabs(unittest.TestCase):
     def test_skip_unauthorized(self):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.threadlocal import get_current_registry
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         authz_policy.permits = (lambda context, prin, perm:
@@ -369,14 +370,14 @@ class Test_get_admin_actions(unittest.TestCase):
         return pd
 
     def test_not_admin(self):
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
         self.assertEqual(len(actions), 0)
 
     def test_w_admin_no_marker(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
@@ -388,7 +389,7 @@ class Test_get_admin_actions(unittest.TestCase):
     def test_w_admin_w_marker(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         directlyProvides(context, IPeopleReport)
         request = testing.DummyRequest()
@@ -413,7 +414,7 @@ class Test_get_admin_actions(unittest.TestCase):
     def test_w_admin_w_marker_already_mailinglist(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         context['mailinglist'] = testing.DummyModel()
         directlyProvides(context, IPeopleReport)
@@ -447,14 +448,14 @@ class Test_get_actions(unittest.TestCase):
         return pd
 
     def test_not_admin(self):
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
         self.assertEqual(len(actions), 0)
 
     def test_w_admin_not_admin_html_view(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
@@ -468,7 +469,7 @@ class Test_get_actions(unittest.TestCase):
         self.assertEqual(action[1], 'http://example.com/profiles/add.html')
 
     def test_w_admin_and_admin_html_view(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         request.view_name = 'admin.html'
@@ -496,7 +497,7 @@ class Test_section_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
     def test_empty_column(self):
@@ -622,7 +623,7 @@ class Test_report_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         registerSettings(**kw)
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
+        karl.testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
 
     def test_unqualified_report_no_mailinglist(self):
         self._register()
@@ -804,7 +805,7 @@ class Test_picture_view(unittest.TestCase):
         from karl.testing import registerSettings
         registerSettings(**kw)
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
 
@@ -854,10 +855,10 @@ class Test_picture_view(unittest.TestCase):
 
         def search(*args, **kw):
             raise ParseError
-        testing.registerAdapter(search, (Interface, Interface),
+        karl.testing.registerAdapter(search, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(search, (Interface,), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(search, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
         pd, section, report = _makeReport()
@@ -978,9 +979,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 return (25, range(25), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -997,9 +998,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 return (25, range(25), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest({
@@ -1019,9 +1020,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 raise ParseError()
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -1097,9 +1098,9 @@ class Test_text_dump(unittest.TestCase):
             def search(**kw):
                 return (2, range(2), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -1143,9 +1144,9 @@ class Test_csv_view(unittest.TestCase):
             def search(**kw):
                 return (2, range(2), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
