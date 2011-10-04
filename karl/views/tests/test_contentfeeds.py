@@ -26,9 +26,12 @@ from zope.interface import taggedValue
 from pyramid.testing import cleanUp
 
 def _checkCookie(request_or_response, filterby):
+    from webob.cookies import Morsel
     from karl.views.contentfeeds import _FILTER_COOKIE
-    header = ('Set-Cookie',
-              '%s=%s; Path=/' % (_FILTER_COOKIE, filterby))
+    m = Morsel(_FILTER_COOKIE, str(filterby))
+    m.path = '/'
+    val = m.serialize()
+    header = ('Set-Cookie', val)
     response = getattr(request_or_response, 'response', request_or_response)
     headerlist = response.headerlist
     assert header in headerlist

@@ -24,11 +24,9 @@ def _checkCookie(request_or_response, target):
     from karl.views.communities import _VIEW_COOKIE
     header = ('Set-Cookie',
               '%s=%s; Path=/' % (_VIEW_COOKIE, target))
-    if hasattr(request_or_response, 'response'):
-        response = request_or_response.response
+    response = getattr(request_or_response, 'response', request_or_response)
     headerlist = response.headerlist
     assert header in headerlist
-
 
 class Test_show_communities_view(unittest.TestCase):
 

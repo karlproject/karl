@@ -39,7 +39,7 @@ def _get_criteria(request):
     # the no-filter button sticky.
     header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
     request.cookies[_FILTER_COOKIE] = filterby
-    request.response.headerlist = [header]
+    request.response.set_cookie(_FILTER_COOKIE, str(filterby), path='/')
 
     if filterby == 'mycommunities':
         principals = [x for x in principals if not x.startswith('group.Karl')]
