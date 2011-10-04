@@ -16,15 +16,16 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 from pyramid import testing
+
+import karl.testing
 
 class TestLoginView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.login import login_view
@@ -33,7 +34,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest({'came_from':'/login.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -42,7 +43,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/login.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -50,7 +51,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_logout_html_relative(self):
         request = testing.DummyRequest({'came_from':'/logout.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -59,7 +60,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/logout.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -67,7 +68,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_other_relative(self):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from,
                          'http://example.com/somewhere.html')
@@ -77,7 +78,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                          'http://example.com/somewhere.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from,
                          'http://example.com/somewhere.html')
@@ -88,7 +89,7 @@ class TestLoginView(unittest.TestCase):
         plugin = DummyAuthenticationPlugin()
         request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(dict(response.headers),
                          dict([('Content-Type', 'text/html; charset=UTF-8'),
@@ -355,10 +356,10 @@ _marker = object()
 
 class TestLogoutView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, reason=_marker):
         from karl.views.login import logout_view
