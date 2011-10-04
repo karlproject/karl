@@ -58,11 +58,126 @@ class CommunityFolderTests(unittest.TestCase):
         from karl.content.interfaces import ICommunityFolder
         verifyObject(ICommunityFolder, self._makeOne())
 
+    def test_ctor_wo_args(self):
+        folder = self._getTargetClass()()
+        self.assertEqual(folder.title, '')
+        self.assertEqual(folder.creator, '')
+
     def test_instance_has_valid_construction(self):
         instance = self._makeOne()
         self.assertEqual(instance.title, u'')
         self.assertEqual(instance.creator, u'admin')
         self.assertEqual(instance.modified_by, u'admin')
+
+    def test_revert(self):
+        o = self._makeOne()
+        class DummyVersion:
+            title = 'title'
+            description = None
+            created = 'created'
+            modified = 'modified'
+            docid = 5
+            path = '/path/to/folder'
+            attrs = {
+                'creator': 'creator',
+                'modified_by': 'modified_by',
+            }
+            user = 'user'
+        o.revert(DummyVersion)
+        self.assertEqual(o.docid, 5)
+        self.failUnless(type(o.docid) is int)
+        self.assertEqual(o.created, 'created')
+        self.assertEqual(o.title, 'title')
+        self.assertEqual(o.modified, 'modified')
+        self.assertEqual(o.creator, 'creator')
+        self.assertEqual(o.modified_by, 'user')
+
+
+class CommunityFolderObjectVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.content.models.files import CommunityFolderObjectVersion
+        return CommunityFolderObjectVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_wo_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        context = root['folder'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         created='CREATED',
+                                         modified_by=None,
+                                         modified='MODIFIED',
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest', 'modified_by': None})
+        self.failUnless(version.klass is Dummy)
+        self.assertEqual(version.user, 'unittest')
+        self.assertEqual(version.comment, None)
+
+    def test_w_modified_by(self):
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        context = root['folder'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         created='CREATED',
+                                         modified_by='otherbloke',
+                                         modified='MODIFIED',
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
+        self.assertEqual(version.description, None)
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest', 'modified_by': 'otherbloke'})
+        self.failUnless(version.klass is Dummy)
+        self.assertEqual(version.user, 'otherbloke')
+        self.assertEqual(version.comment, None)
+
+
+
+class CommunityFolderContainerVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from karl.content.models.files import CommunityFolderContainerVersion
+        return CommunityFolderContainerVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_container_version(self):
+        root = testing.DummyModel()
+        folder = root['folder'] = testing.DummyModel('folder')
+        folder.docid = 5
+        folder['one'] = testing.DummyModel(docid=6)
+        folder['two'] = testing.DummyModel(docid=7)
+        folder['three'] = testing.DummyModel(docid=8)
+        container = self._makeOne(folder)
+        self.assertEqual(container.container_id, 5)
+        self.assertEqual(container.path, '/folder')
+        self.assertEqual(container.map, {
+            'one': 6,
+            'two': 7,
+            'three': 8
+        })
+        self.assertEqual(container.ns_map, {})
+
 
 class CommunityFileTests(unittest.TestCase):
 
@@ -179,61 +294,86 @@ class CommunityFileTests(unittest.TestCase):
         self.assertEqual(o.modified_by, 'user')
         self.failUnless(o.is_image)
 
-    def test_version(self):
+
+class CommunityFileVersionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
         from karl.content.models.files import CommunityFileVersion
-        o = self._makeOne()
-        o.title = 'title'
-        o.created = 'created'
-        o.modified = 'modified'
-        o.docid = 'docid'
-        o.filename = 'filename'
-        o.creator = 'creator'
-        o.mimetype = 'mimetype'
-        o.modified_by = 'user'
-        site = testing.DummyModel()
-        site['foo'] = o
-        version = CommunityFileVersion(o)
-        self.assertEqual(version.title, 'title')
+        return CommunityFileVersion
+
+    def _makeOne(self, context):
+        return self._getTargetClass()(context)
+
+    def test_wo_modified_by(self):
+        OPEN_FILE = object()
+        class DummyBlobfile(object):
+            def open(self):
+                return OPEN_FILE
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        folder = root['folder'] = testing.DummyModel()
+        context = folder['file'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         created='CREATED',
+                                         modified_by=None,
+                                         modified='MODIFIED',
+                                         filename='FILENAME',
+                                         mimetype='MIMETYPE',
+                                         blobfile=DummyBlobfile(),
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
         self.assertEqual(version.description, None)
-        self.assertEqual(version.created, 'created')
-        self.assertEqual(version.modified, 'modified')
-        self.assertEqual(version.docid, 'docid')
-        self.assertEqual(version.path, '/foo')
-        self.assertEqual(version.attrs['filename'], 'filename')
-        self.assertEqual(version.attrs['creator'], 'creator')
-        self.assertEqual(version.attrs['mimetype'], 'mimetype')
-        self.assertEqual(version.blobs['blob'].read(), 'FAKECONTENT')
-        self.assertEqual(version.klass, type(o))
-        self.assertEqual(version.user, 'user')
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder/file')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest',
+                         'filename': 'FILENAME',
+                         'mimetype': 'MIMETYPE'})
+        self.assertEqual(version.blobs, {'blob': OPEN_FILE})
+        self.failUnless(version.klass is Dummy)
+        self.assertEqual(version.user, 'unittest')
         self.assertEqual(version.comment, None)
 
-    def test_version_no_modified_by(self):
-        from karl.content.models.files import CommunityFileVersion
-        o = self._makeOne()
-        o.title = 'title'
-        o.created = 'created'
-        o.modified = 'modified'
-        o.docid = 'docid'
-        o.filename = 'filename'
-        o.creator = 'creator'
-        o.mimetype = 'mimetype'
-        o.modified_by = None
-        site = testing.DummyModel()
-        site['foo'] = o
-        version = CommunityFileVersion(o)
-        self.assertEqual(version.title, 'title')
+    def test_w_modified_by(self):
+        OPEN_FILE = object()
+        class DummyBlobfile(object):
+            def open(self):
+                return OPEN_FILE
+        class Dummy(testing.DummyModel):
+            pass
+        root = testing.DummyModel()
+        folder = root['folder'] = testing.DummyModel()
+        context = folder['file'] = Dummy(title='Testing',
+                                         docid=42,
+                                         creator='unittest',
+                                         created='CREATED',
+                                         modified_by='otherbloke',
+                                         modified='MODIFIED',
+                                         filename='FILENAME',
+                                         mimetype='MIMETYPE',
+                                         blobfile=DummyBlobfile(),
+                                        )
+        version = self._makeOne(context)
+        self.assertEqual(version.title, 'Testing')
         self.assertEqual(version.description, None)
-        self.assertEqual(version.created, 'created')
-        self.assertEqual(version.modified, 'modified')
-        self.assertEqual(version.docid, 'docid')
-        self.assertEqual(version.path, '/foo')
-        self.assertEqual(version.attrs['filename'], 'filename')
-        self.assertEqual(version.attrs['creator'], 'creator')
-        self.assertEqual(version.attrs['mimetype'], 'mimetype')
-        self.assertEqual(version.blobs['blob'].read(), 'FAKECONTENT')
-        self.assertEqual(version.klass, type(o))
-        self.assertEqual(version.user, 'creator')
+        self.assertEqual(version.created, 'CREATED')
+        self.assertEqual(version.modified, 'MODIFIED')
+        self.assertEqual(version.docid, 42)
+        self.assertEqual(version.path, '/folder/file')
+        self.assertEqual(version.attrs,
+                        {'creator': 'unittest',
+                         'filename': 'FILENAME',
+                         'mimetype': 'MIMETYPE'})
+        self.assertEqual(version.blobs, {'blob': OPEN_FILE})
+        self.failUnless(version.klass is Dummy)
+        self.assertEqual(version.user, 'otherbloke')
         self.assertEqual(version.comment, None)
+
 
 class TestThumbnail(unittest.TestCase):
     def _getTargetClass(self):

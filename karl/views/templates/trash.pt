@@ -25,15 +25,20 @@
                 </td>
             </tr>
             <tr tal:repeat="v deleted" tal:condition="deleted">
-                <td>${v['title']}</td>
-                <td>${v['date']}</td>
+                <td><a tal:omit-tag="not v['url']" href="${v['url']}">
+                    ${v['title']}</a></td>
+                <td>${v.get('date', '-')}</td>
                 <td>
-                    <a href="${v['deleted_by']['url']}">
+                    <a tal:condition="v['deleted_by']"
+                       href="${v['deleted_by']['url']}">
                         ${v['deleted_by']['name']}
                     </a>
+                    <span tal:condition="not v['deleted_by']">-</span>
                 </td>
                 <td>
-                    <a href="${v['restore_url']}">Restore</a>
+                    <a tal:condition="v['restore_url']"
+                       href="${v['restore_url']}">Restore</a>
+                    <span tal:condition="not v['restore_url']">-</span>
                 </td>
             </tr>
         </table>

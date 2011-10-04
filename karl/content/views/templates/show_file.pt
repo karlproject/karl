@@ -5,14 +5,18 @@
 
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <div class="contentbar-wrapper view-show-file-actions">
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <span class="contentbar-menu">
+        <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
+      </span>
+    </div>
 
-    <div metal:use-macro="api.snippets.macros['backto_link']"/>
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
     <div class="kbody">
 

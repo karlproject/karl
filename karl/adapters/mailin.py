@@ -17,7 +17,8 @@
 import datetime
 import time
 from email.utils import getaddresses
-from email.utils import parsedate
+from email.utils import parsedate_tz
+from calendar import timegm
 
 import re
 
@@ -309,20 +310,27 @@ class MailinDispatcher(object):
         """
         info = {}
 
-        # Crack the date
-        datestr = message['Date']
-        if datestr:
-            # Per usual, the email module is broken. The documentation asserts
-            # that the tuple returned by parsedate is suitable for passing to
-            # time.mktime, but parsedate returns a time in GMT and time.mktime
-            # assumes a local time. There is no GMT equivalent to time.mktime
-            # in the time module, so we just manually subtract the timezone
-            # offset from the result of time.mktime.
-            timestamp = time.mktime(parsedate(datestr)) - time.timezone
-            timetuple = time.localtime(timestamp)
+        # Crack the date.
+        t = message.get('X-Postoffice-Date')
+        if t:
+            timetuple = time.localtime(int(t))
             info['date'] = datetime.datetime(*timetuple[:6])
         else:
-            info['date'] = datetime.datetime.now()
+            datestr = message['Date']
+            if datestr:
+                # Extract the fields of the date into 'parsed', a 10-tuple.
+                parsed = parsedate_tz(datestr)
+                # Set timestamp equal to the UTC epoch offset represented by
+                # 'parsed'.
+                timestamp = timegm(parsed[:9])
+                if parsed[9]:
+                    timestamp -= parsed[9]
+                # Compute the local time tuple for timestamp.
+                timetuple = time.localtime(timestamp)
+                # Store the local time when the message was sent as a datetime.
+                info['date'] = datetime.datetime(*timetuple[:6])
+            else:
+                info['date'] = datetime.datetime.now()
 
         # Get all necessary info for addressing a community. This is important
         # for allowing moderators to see all email addressed to their

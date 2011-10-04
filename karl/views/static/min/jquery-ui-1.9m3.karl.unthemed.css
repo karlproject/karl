@@ -18,6 +18,6 @@
 /*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.selectable.css");*/
 @import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.slider.css");
 /*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.spinner.css");*/
-/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.tabs.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.tabs.css");
 /*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.tooltip.css");*/
 

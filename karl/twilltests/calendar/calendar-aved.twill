@@ -20,7 +20,7 @@ catalog_find ${titleword} ${community_name}
 # Testing calendar's Edit
 go /communities/${community_name}/calendar/?year=2009&month=4
 find "${titleword}"
-follow "list.html"
+go /communities/${community_name}/calendar/?viewtype=list
 find "${titleword}"
 follow ${titleword}
 follow "Edit"

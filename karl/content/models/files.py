@@ -16,44 +16,86 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from cStringIO import StringIO
-import PIL.Image
 
-from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 
 from pyramid.traversal import resource_path
-from repoze.lemonade.content import create_content
+import PIL.Image
+from ZODB.blob import Blob
+from persistent import Persistent
+from repoze.folder import Folder
 
+from repoze.lemonade.content import create_content
 from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import noLongerProvides
-
-from karl.content.interfaces import IImage
-from karl.models.interfaces import IObjectVersion
-from karl.models.tool import ToolFactory
-from karl.models.interfaces import IToolFactory
 
 from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IEventContainer
+from karl.content.interfaces import IImage
+from karl.models.interfaces import IContainerVersion
+from karl.models.interfaces import IObjectVersion
+from karl.models.interfaces import IToolFactory
+from karl.models.tool import ToolFactory
 
-from repoze.folder import Folder
-from ZODB.blob import Blob
 
 class CommunityRootFolder(Folder):
     implements(ICommunityRootFolder, IEventContainer)
     title = u'Files'
 
+
 class CommunityFolder(Folder):
     implements(ICommunityFolder, IEventContainer)
     modified_by = None
 
-    def __init__(self, title, creator):
+    def __init__(self, title='', creator=''):
         super(CommunityFolder, self).__init__()
         self.title = unicode(title)
         self.creator = unicode(creator)
         self.modified_by = self.creator
+
+    def revert(self, version):
+        # catalog document map blows up if you feed it a long int
+        self.title = version.title
+        self.created = version.created
+        self.modified = version.modified
+        self.docid = int(version.docid)
+        self.creator = version.attrs['creator']
+        self.modified_by = version.user
+
+
+class CommunityFolderObjectVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, folder):
+        self.title = folder.title
+        self.description = None
+        self.created = folder.created
+        self.modified = folder.modified
+        self.docid = folder.docid
+        self.path = resource_path(folder)
+        self.attrs = dict((name, getattr(folder, name)) for name in [
+            'creator',
+            'modified_by',
+        ])
+        self.klass = folder.__class__ # repozitory can't detect we are a shim
+        self.user = folder.modified_by
+        if self.user is None:
+            self.user = folder.creator
+        self.comment = None
+
+
+class CommunityFolderContainerVersion(object):
+    implements(IContainerVersion)
+
+    def __init__(self, folder):
+        self.container_id = folder.docid
+        self.path = resource_path(folder)
+        self.map = dict((name, page.docid) for name, page in folder.items())
+        self.ns_map = {}
+
 
 class CommunityFile(Persistent):
     implements(ICommunityFile)
@@ -143,6 +185,7 @@ def upload_stream(stream, file):
         file.write(data)
     return size
 
+
 class Thumbnail(Persistent):
     mimetype = 'image/jpeg'
 
@@ -163,6 +206,7 @@ class Thumbnail(Persistent):
     def image(self):
         return PIL.Image.open(self.blobfile.open())
 
+
 def _thumb_size(orig_size, max_size):
     orig_x, orig_y = orig_size
     max_x, max_y = max_size
@@ -181,6 +225,7 @@ def _thumb_size(orig_size, max_size):
     assert x < max_x
     return x, y
 
+
 class CommunityFileVersion(object):
     implements(IObjectVersion)
 
@@ -197,11 +242,12 @@ class CommunityFileVersion(object):
             'creator',
         ])
         self.blobs = {'blob': file.blobfile.open()}
-        self.klass = type(file)
+        self.klass = file.__class__ # repozitory can't detect we are a shim
         self.user = file.modified_by
         if self.user is None:
             self.user = file.creator
         self.comment = None
+
 
 class FilesToolFactory(ToolFactory):
     implements(IToolFactory)

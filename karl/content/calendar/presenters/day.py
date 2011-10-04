@@ -22,9 +22,25 @@ from karl.content.calendar.presenters.base import BasePresenter
 from karl.content.calendar.presenters.base import BaseEvent
 from karl.content.calendar.utils import next_month
 from karl.content.calendar.utils import prior_month
-from karl.content.calendar.tests.presenters.test_base import DummyCatalogEvent
 
-class DayViewPresenter(BasePresenter):
+
+class DayEventHorizon(BasePresenter):
+    @property
+    def first_moment(self):
+        return datetime.datetime(self.focus_datetime.year, 
+                                 self.focus_datetime.month, 
+                                 self.focus_datetime.day, 
+                                 0, 0, 0)
+    
+    @property
+    def last_moment(self):
+        return datetime.datetime(self.focus_datetime.year, 
+                                 self.focus_datetime.month, 
+                                 self.focus_datetime.day, 
+                                 23, 59, 59)
+
+
+class DayViewPresenter(DayEventHorizon):
     name = 'day'
     
     def _initialize(self):
@@ -136,10 +152,15 @@ class DayViewPresenter(BasePresenter):
         mapping = self._map_catalog_events_to_slot_indices(events)
 
         for slot_index, catalog_events in enumerate(mapping):
-            if not catalog_events:
-                continue
 
-            for catalog_event in catalog_events:                         
+            # We only take the first event in one slot into consideration:
+            # the rest will thus start displaying in the next slot.
+            # It may happen so, that there are too many events for one slot
+            # consequently some events will not display at all.
+            if catalog_events:
+
+                catalog_event = catalog_events[0]
+
                 bubble = Bubble()
                 
                 bubble.event = EventOnDayView(self, catalog_event,
@@ -154,6 +175,7 @@ class DayViewPresenter(BasePresenter):
                         break
 
                 self.half_hour_slots[slot_index].bubbles.append(bubble)        
+            
 
     def _separate_all_day_events(self, events):
         all_day_events, other_events = [], []
@@ -205,20 +227,6 @@ class DayViewPresenter(BasePresenter):
             slot_index = i
         
         return slot_index
-
-    @property
-    def first_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 self.focus_datetime.day, 
-                                 0, 0, 0)
-    
-    @property
-    def last_moment(self):
-        return datetime.datetime(self.focus_datetime.year, 
-                                 self.focus_datetime.month, 
-                                 self.focus_datetime.day, 
-                                 23, 59, 59)
 
     @property
     def auto_scroll_class(self):

@@ -41,7 +41,10 @@ class Converter(BaseConverter):
         # convert to unicode
         if not encoding:
             mo = charset_reg.search(doc)
-            encoding = mo.group(1)
+            if mo:
+                encoding = mo.group(1)
+            else:
+                encoding = 'UTF-8' # UTF-8 is the new ASCII
         doc = unicode(doc, encoding, 'replace')
         doc = convert_entities(doc)
         result = convert_entities(html2text(doc))

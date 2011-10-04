@@ -51,6 +51,7 @@ var enableOldStyleDropdowns = function () {
 };
 
 
+
 // Custom jquery extensions
 
 $.widget('ui.karlstatusbox', {
@@ -1857,6 +1858,7 @@ $.widget('ui.karlquotablecomment', {
 $.widget('ui.karldatetimepicker', {
 
     options: {
+        zIndex: undefined
     },
 
     _create: function() {
@@ -1873,12 +1875,32 @@ $.widget('ui.karldatetimepicker', {
             .after(this.container);
         // Create the date and time inputs inside the container.
         this.dateinput = $('<input class="ui-karldatetimepicker-dateinput"></input>')
-            .appendTo(this.container)
+            .appendTo(this.container);
+        // fix the z-index
+        if (this.options.zIndex) {
+            // The component will always set $(input).zIndex() + 1
+            // as the z-index of the popup. However, for static
+            // elements zIndex is always 0. This means that the
+            // z-index will mostly be 1, which is a problem because
+            // we have higher z-indexes (3) on certain elements, like
+            // all old-style IE rounded corner hacks.
+            //
+            // So, we provide a way to set the z-index. But
+            // we have to actually set it on the input we just created.
+            // We also have to make it position relative, otherwise
+            // the popup will not pick up the index we want.
+            // Not very elegant.
+            this.dateinput
+                .css('position', 'relative')
+                .zIndex(this.options.zIndex - 1);
+        }
+        this.dateinput
             .datepicker({
             })
             .change(function(evt) {
                 self.setDate($(evt.target).val());
             });
+
         this.hourinput = $('<select class="ui-karldatetimepicker-hourinput"></input>')
             .appendTo(this.container)
             .change(function(evt) {
@@ -2344,6 +2366,57 @@ function initCalendar() {
     $("#cal_scroll .cal_hour_event .with_tooltip").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
   }
 
+  var here_url = $("#karl-here-url").eq(0).attr('content');
+  // calendar (new) buttonbar
+  $('.cal-buttonbar').karlcalendarbuttons({
+      selection: window.karl_client_data && karl_client_data.calendar_selection || null,
+      change: function(evt, selection) {
+            // For now, we submit to the correct url.
+            // In the future, we will want to do ajax here. 
+            var view_name;
+            var more = '';
+            if (selection.viewtype == 'list') {
+                view_name = 'list.html';
+                more = '&term=' + selection.term;
+            } else {
+                view_name = {
+                    month: 'month.html',
+                    week: 'week.html',
+                    day: 'day.html'
+                }[selection.term];
+            }
+            var url = here_url + view_name + 
+                '?year=' + selection.year +
+                '&month=' + selection.month +
+                '&day=' + selection.day +
+                more;
+            // user cannot click now, cue this
+            $(this).karlcalendarbuttons('disable');
+
+            document.location.href = url;
+      }
+
+
+  });
+
+  /* calendar print action */
+
+  $('.cal_actions a.cal_print').click(function() {
+        // I cannot seem to show the entire
+        // calendar from css, so to avoid
+        // scrolling / overflow, the height
+        // is manipulated directly here.
+        var inner =  $('.cal_scroll');
+        var outer = $('.cal_hours_scroll');
+        var fullheight = inner.height();
+        var oldheight = outer.height();
+        outer.height(fullheight);
+        window.focus();
+        window.print();
+        outer.height(oldheight);
+        return false;
+  });
+
   scrollToTime();
 }
 
@@ -2388,6 +2461,9 @@ function initNewEvent() {
 function initStartDatePicker() {
   $('#save-start_date')
       .karldatetimepicker({
+            // make sure the date select popup comes over everything
+            // most notably, buttons. A problem on IE7. */
+            zIndex: 20000
       })
       .bind('change.karldatetimepicker', function() {
           $('#save-end_date').karldatetimepicker('limitMinMax',
@@ -2400,6 +2476,9 @@ function initStartDatePicker() {
 function initEndDatePicker() {
   $('#save-end_date')
       .karldatetimepicker({
+            // make sure the date select popup comes over everything
+            // most notably, buttons. A problem on IE7. */
+            zIndex: 20000
       })
       .bind('change.karldatetimepicker', function() {
           $(this).karldatetimepicker('limitMinMax', $('#save-start_date').karldatetimepicker('getAsDate'), null);
@@ -2629,12 +2708,58 @@ $(document).ready(function() {
     // rounded corners in IE on tags
     DD_roundies.addRule('.bit-box', '6px');
     
+    // rounded corners in IE on global tabs
+    DD_roundies.addRule('ul#header-menu li a', '0 0 10px 10px');
+
+
+    // Search Community button
+    var searchCommunityButton = $('.search-community-button')
+        .button({
+        })
+        .css('verticalAlign', 'top');
+    var searchCommunityInput = $('.search-community-input');
+    // dynamically set height to match. This makes sure that
+    // the button is aligned to the input _always, on all browsers_.
+    var _height = searchCommunityButton.outerHeight();
+    var _searchCommunityInputWrapper = $('<span></span>');
+    _searchCommunityInputWrapper
+        .css('display', 'inline-block')
+        .css('margin', '0')
+        .css('padding', '0')
+        .css('border', '0')
+        .css('height', _height +'px')
+        .css('verticalAlign', 'top');
+    searchCommunityInput
+        .wrap(_searchCommunityInputWrapper)
+        .css('margin', '0')
+        .css('padding', '0 3px')
+        .css('height', '' + (_height - 2) + 'px')
+        .css('lineHeight', '' + (_height - 2) + 'px');
+    var _searchCommunityMarginTop = searchCommunityButton.css('marginTop');
+    // this  is essential _sometimes_ on WebKit
+    searchCommunityInput.css('marginTop', _searchCommunityMarginTop);
+    // hack IE7 that handles top margin differently
+    if ($.browser.msie && parseInt($.browser.version) == 7) {
+        searchCommunityButton.css('marginTop', '1px');
+    }
+    if ($.browser.msie && parseInt($.browser.version) == 8) {
+        searchCommunityButton.css('marginTop', '1px');
+    }
+
+    // rounded corners in IE
+    DD_roundies.addRule('.search-community-button', '4px');
+
+
+
     // add class to #center if there are no right portlets
-    rcol = $(".generic-layout .rightcol").text();
+    //
+    // XXX Would like to remove the code, but needed for the current layout.
+    rcol = $(".generic-layout .rightcol").html();
     if ($.trim(rcol) == '') {
         //console.log("true");
         $(".generic-layout #center").addClass("fill-width");
     }
+
 
     /** =CALENDAR ATTACH EVENTS
     ----------------------------------------------- */

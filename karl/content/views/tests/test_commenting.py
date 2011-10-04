@@ -140,8 +140,9 @@ class AddCommentFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         controller = self._makeOne(self.context, self.request)
-        from pyramid.httpexceptions import HTTPExpectationFailed
-        self.assertRaises(HTTPExpectationFailed, controller)
+        response = controller()
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/blog/foo/#addcomment')
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)

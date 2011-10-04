@@ -87,6 +87,7 @@ from base64 import decodestring
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
+from karl.utils import find_repo
 
 # This import is BBB for karl.evolve.zodb.evolve15
 from karl.content.views.utils import ie_types
@@ -106,6 +107,7 @@ from karl.views.tags import set_tags
 from karl.views.batch import get_container_batch
 
 from karl.views.utils import check_upload_size
+from karl.views.utils import copy_stream_to_tmpfile_and_iter
 
 from karl.views.forms.filestore import get_filestore
 
@@ -117,7 +119,6 @@ def show_folder_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     # Now get the data that goes with this
-
 
     # Actions
     backto = False
@@ -142,9 +143,15 @@ def show_folder_view(context, request):
             'title': context.__parent__.title,
             }
 
+    trash_url = None
+    if not find_interface(context, IIntranets):
+        repo = find_repo(context)
+        if repo is not None and has_permission('edit', context, request):
+            tool = find_interface(context, ICommunityRootFolder)
+            trash_url = resource_url(tool, request, 'trash')
+
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
-
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
@@ -174,6 +181,7 @@ def show_folder_view(context, request):
         backto=backto,
         layout=layout,
         feed_url=feed_url,
+        trash_url=trash_url,
         )
 
 
@@ -502,6 +510,11 @@ def show_file_view(context, request):
     else:
         layout = layout_provider('generic')
 
+    if not find_interface(context, IIntranets):
+        repo = find_repo(context)
+        if repo is not None and has_permission('edit', context, request):
+            actions.append(('History', 'history.html'))
+
     return render_template_to_response(
         'templates/show_file.pt',
         api=api,
@@ -513,6 +526,28 @@ def show_file_view(context, request):
         next_entry=next,
         layout=layout,
         )
+
+def preview_file(context, request):
+    # Just tell the AJAX that we want to do a direct file download rather than
+    # an in browser preview.
+    url = resource_url(context, request, 'download_preview',
+                       query={'version_num': request.params['version_num']})
+    return {'url': url}
+
+def download_file_preview(context, request):
+    version_num = int(request.params['version_num'])
+    repo = find_repo(context)
+    for version in repo.history(context.docid):
+        if version.version_num == version_num:
+            break
+    else:
+        raise NotFound("No such version: %d" % version_num)
+
+    size, stream = copy_stream_to_tmpfile_and_iter(version.blobs['blob'])
+    return Response(
+        content_type=version.attrs['mimetype'],
+        content_length=size,
+        app_iter=stream)
 
 def download_file_view(context, request):
     # To view image-ish files in-line, use thumbnail_view.
@@ -713,6 +748,8 @@ class EditFileFormController(object):
         f = converted['file']
 
         if f.filename:
+            # make sure file data is re-indexed
+            context._extracted_data = None
             context.mimetype = get_upload_mimetype(f)
             context.filename = f.filename
             context.upload(f.file)
@@ -1091,20 +1128,30 @@ def ajax_file_reorganize_moveto_view(context, request):
         for filename in filenames:
             try:
                 fileobj = context[filename]
-                file_path = get_file_folder_path(fileobj)
+            except KeyError, e:
+                msg = 'File %s not found in source folder (%r)' % (filename, e)
+                raise ErrorResponse(msg, filename=filename)
 
-                if target_folder.startswith(file_path):
-                    msg = 'Cannot move a folder into itself'
-                    raise ErrorResponse(msg, filename=filename)
+            file_path = get_file_folder_path(fileobj)
+            if target_folder.startswith(file_path):
+                msg = 'Cannot move a folder into itself'
+                raise ErrorResponse(msg, filename=filename)
+
+            try:
                 del context[filename]
+            except KeyError, e:
+                msg = 'Unable to delete file %s from source folder (%r)' % (filename, e)
+                raise ErrorResponse(msg, filename=filename)
 
-                # create a unique name of the -1, -2, ... style
-                # also change title and filename properties as needed
-                target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
+            # create a unique name of the -1, -2, ... style
+            # also change title and filename properties as needed
+            target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
 
+            try:
                 target_context[target_filename] = fileobj
-            except KeyError:
-                msg = 'Cannot move to target folder <a href="%s">%s</a>' % (target_folder_url, target_folder)
+            except KeyError, e:
+                msg = 'Cannot move to target folder <a href="%s">%s</a> (%r)' % (
+                    target_folder_url, target_folder, e)
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
 

@@ -107,6 +107,56 @@ class ConverterTests(unittest.TestCase):
         self.assertEqual(enc, 'utf-8')
         self.assertEqual(text, utf8doc)
 
+    def testHTML_no_encoding(self):
+        body = u'<html><body> alle Vögel Über Flügel und Tümpel</body></html>'
+        utf8doc = u'alle Vögel Über Flügel und Tümpel'.encode('utf-8')
+
+        import tempfile
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('utf-8'))
+        doc.flush()
+        from karl.utilities.converters import html
+        C = html.Converter()
+        stream, enc = C.convert(doc.name, None, 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+        import tempfile
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('utf-8'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'utf8', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+    def testHTML_encoding_in_meta_tag(self):
+        body = (u'<html><meta http-equiv="Content-Type" content="text/html; '
+                u'charset=iso-8859-15"><body> alle Vögel Über Flügel und '
+                u'Tümpel</body></html>')
+        utf8doc = u'alle Vögel Über Flügel und Tümpel'.encode('utf-8')
+
+        import tempfile
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('iso-8859-15'))
+        doc.flush()
+        from karl.utilities.converters import html
+        C = html.Converter()
+        stream, enc = C.convert(doc.name, None, 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
+        import tempfile
+        doc = tempfile.NamedTemporaryFile()
+        doc.write(body.encode('utf-8'))
+        doc.flush()
+        stream, enc = C.convert(doc.name, 'utf8', 'text/html')
+        text = stream.read().strip()
+        self.assertEqual(enc, 'utf-8')
+        self.assertEqual(text, utf8doc)
+
     def testHTMLWithEntities(self):
         body = (u'<html><body> alle V&ouml;gel &Uuml;ber Fl&uuml;gel '
                 u'und T&uuml;mpel</body></html>')

@@ -89,11 +89,6 @@ def communities_group_search(context, request, term):
     search = GroupSearch(context, request, [ICommunity], term)
     return search
 
-@groupsearchfactory(icon='building.png')
-def communities_group_search(context, request, term):
-    search = GroupSearch(context, request, [ICommunity], term)
-    return search
-
 @groupsearchfactory(livesearch=False, icon='referencemanual_icon.gif')
 def manuals_group_search(context, request, term):
     search = GroupSearch(context, request, [], term, [IReferenceManual])

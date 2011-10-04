@@ -1,3 +1,7 @@
+
+/* ... from karl_ie.css */
+
+
 .visual-portal-wrapper {
     width: 1003px;
 }
@@ -166,9 +170,11 @@ button {
 }
 button span {
     height: 22px;
-    line-height: 22px;
+/*    line-height: 22px;  */
     margin-bottom: -1px;
 }
+
+/*
 .primary_button,
 .primary_button:visited,
 ul.menubar #menubar-1.menubar-lastitem a {
@@ -228,6 +234,8 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     padding: 4px 5px 4px 10px;
     white-space: nowrap;
 }
+*/
+
 /* poll indicator */
 #poll-indicator.on,
 #poll-indicator.polling {
@@ -282,6 +290,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
 }
 
 /* calendar buttons, feed filters */
+/*
 .cal_buttons .menubar a,
 .cal_buttons .menubar a:hover,
 .cal_buttons .menubar a:active,
@@ -364,6 +373,7 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     background: transparent url(images/corners.png) no-repeat -10px -91px;
 }
 
+/*
 .cal_buttons .previous span,
 .cal_buttons .next span {
     border: none;
@@ -371,8 +381,15 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     top: -9px;
     font-weight: bold;
 }
+*/
+
+.cal_buttons .previous span,
+.cal_buttons .next span {
+    top: -3px;
+}
 
 /* sign in button */
+/*
 #login-wrapper .primary_button {
     line-height: 16px !important;
     height: 22px !important;
@@ -387,8 +404,11 @@ ul.menubar #menubar-1.menubar-lastitem a:active span {
     _height: 24px;
     _overflow: hidden;
 }
+*/
 
 /* edit - manage - delete - etc*/
+
+/*
 ul.menubar li a {
     background: transparent url(images/corners.png) no-repeat -10px -25px;
     line-height: 24px;
@@ -420,6 +440,7 @@ ul.menubar .menubar-lastitem a:hover {
 ul.menubar .menubar-lastitem a:active {
     background: transparent url(images/corners.png) no-repeat right -69px;
 }
+*/
 
 /* search button */
 #livesearch-button.primary_button {
@@ -430,6 +451,7 @@ ul.menubar .menubar-lastitem a:active {
 }
 
 /* add tag button */
+/*
 button.addtag-button,
 button.addtag-button:hover {
     background: transparent url(images/corners.png) no-repeat right -25px;
@@ -437,10 +459,12 @@ button.addtag-button:hover {
     padding-top: 1px;
     margin-top: 0px !important;
 }
+*/
 #tag-inputbox ul.autobox-hldr,
 #tags--field ul.autobox-hldr {
     overflow: visible;
 }
+/*
 button.addtag-button span,
 button.addtag-button:hover span {
     background: #ffffff url(images/corners.png) no-repeat left -21px;
@@ -452,18 +476,102 @@ button.addtag-button:hover span {
     height: 21px;
     z-index: 2;
 }
-    
+*/
+
 /* specific button color bg */
 .cheader button.normal_button span {
     background-color: #cedfef;
 }
+/*
 #login-wrapper .primary_button span {
     background-color: #e4e9ec;
 }
 .cal_new_event .primary_button span {
     background-color: #edf1f3;
 }
+*/
 #poll-indicator span {
     background-color: #e6e6f2 !important;
 }
 
+
+
+
+
+/* ... from karl_ie8.css */
+
+
+
+.cal div.hov_below {
+  background-color: #ecf2ff !important;
+}
+
+/*
+.addtag-button span {
+    line-height: 22px !important;
+    background-position: left -25px !important;
+    padding: 5px 5px 3px 10px !important;
+}
+.addtag-button span {
+    line-height: 22px !important;
+    background-position: left -25px !important;
+    padding: 5px 5px 3px 10px !important;
+    position: relative;
+    top: 0px !important;
+}
+*/
+
+#tag-inputbox input {
+    margin-top: 1px !important;
+}
+#tags--field input {
+    margin-top: 0px !important;
+}
+/*
+#tags--field .addtag-button,
+#save-tags--field .addtag-button {
+    background: #ffffff url(images/corners.png) no-repeat right -25px;
+}
+*/
+/*
+.cal_buttons .menubar .todayButton a,
+.cal_buttons .menubar .todayButton a:hover,
+.cal_buttons .menubar .todayButton a:active,
+.cal_buttons .menubar .todayButton a.disabled,
+.cal_buttons .menubar .todayButton a.disabled:hover,
+.cal_buttons .menubar .todayButton a.disabled:active {
+    padding: 4px 2px 6px 0;
+}
+.cal_buttons .previous span,
+.cal_buttons .next span {
+    top: 0px;
+}
+.cal_buttons .menubar li,
+#feed-filters ul li {
+    height: 21px;
+}
+*/
+#poll-indicator.on span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    padding: 7px 5px 1px 13px;
+    line-height: 24px;
+    height: 24px;
+}
+#poll-indicator.polling span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    padding: 8px 5px 0px 13px;
+    line-height: 22px;
+    height: 22px;
+}
+#poll-indicator.off span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    padding: 7px 5px 1px 13px;
+    line-height: 22px;
+    height: 22px;
+}
+#poll-indicator.error span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    padding: 8px 5px 0px 13px;
+    line-height: 23px;
+    height: 23px;
+}

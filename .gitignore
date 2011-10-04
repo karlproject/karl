@@ -5,4 +5,5 @@
 .coverage
 trace_file
 bottlecap
+.*.sw?
 dist

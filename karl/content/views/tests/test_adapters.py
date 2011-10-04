@@ -93,11 +93,11 @@ class TestFileInfo(unittest.TestCase):
 
         context.size = 345000
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.size, "336.9 KB")
+        self.assertEqual(adapter.size, "345.0 KB")
 
         context.size = 34500000
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.size, "32.9 MB")
+        self.assertEqual(adapter.size, "34.5 MB")
 
     def test_modified_by_title(self):
         request = testing.DummyRequest()

@@ -4,7 +4,7 @@
   metal:use-macro="api.community_layout.macros['master']">
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml" 
+    <link rel="alternate" type="application/atom+xml"
 	  title="${api.page_title}" href="${feed_url}"
 	  />
     <tal:resources condition="not api.js_devel_mode == 'true'">
@@ -37,10 +37,10 @@
       <span class="contentbar-menu">
           <a href="${api.here_url}">Front Page</a> |
           Index
+          <tal:block condition="show_trash"> |
+            <a href="${api.here_url}../trash">Trash</a>
+          </tal:block>
       </span>
-      <tal:block condition="show_trash"> |
-        <a href="${api.here_url}../trash.html">Trash</a>
-      </tal:block>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>

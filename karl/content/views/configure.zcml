@@ -385,6 +385,20 @@
     permission="view"
   />
 
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.preview_file"
+    permission="edit"
+    name="preview.html"
+    renderer="json"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.download_file_preview"
+    permission="edit"
+    name="download_preview"
+  />
 
   <formish:form
      controller=".files.EditFileFormController"
@@ -1108,6 +1122,13 @@
       provides="karl.views.interfaces.IIntranetPortlet"
       factory=".adapters.FeedPortlet"
     />
+
+  <adapter
+      for="karl.content.interfaces.ICalendar
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.CalendarPortlet"
+     />
 
   <view
     for="karl.content.views.interfaces.INetworkNewsMarker"

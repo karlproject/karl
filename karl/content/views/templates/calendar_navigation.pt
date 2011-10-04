@@ -1,6 +1,17 @@
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
   xmlns:metal="http://xml.zope.org/namespaces/metal">
 
+      <div class="cal_search_header" metal:define-macro="search"
+        tal:condition="python: calendar_format_class == 'karl-calendar-wide'">
+        <form id="kcommunitysearch" action="${api.community_info.url}calendar_searchresults.html">
+          <fieldset>
+            <input type="text" class="inp search-community-input" name="body"/>
+            <button type="submit" class="search-community-button">Search</button>
+          </fieldset>
+        </form>
+        <h1>Staff Calendar</h1>
+      </div>
+
       <div class="cal_header" metal:define-macro="header">
         <div class="cal_calendars clearafter" >
           <div class="cal_choose">
@@ -15,7 +26,7 @@
               <option
                       tal:repeat="layer layers"
                       tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
-                                      class 'color cal_' +layer.color;
+                                      class 'color cal_' + layer.color.strip();
                                       selected layer.__name__ == selected_layer"
                       >${layer.title}</option>
             </select>
@@ -31,54 +42,19 @@
           </div>
         </div>
 
-        <!-- buttons -->
-        <div class="cal_buttons clearafter">
-          <div class="cal_nav">
-            <!-- today, previous, next buttons -->
-            <ul class="cal_nav menubar">
-                <li class="todayButton">
-                    <a href="${calendar.navigation.today_url}"
-                       tal:attributes="class not(calendar.navigation.today_url) and 'disabled' or ''">
-                       <span>Today</span>
-                    </a>
-                </li>
-                <li class="firstItem">
-                    <a href="${calendar.navigation.prev_url}"
-                       tal:attributes="class not(calendar.navigation.prev_url) and 'disabled previous' or 'previous'">
-                       <span>&lt;</span>
-                    </a>
-                </li>
-                <li class="lastItem">
-                    <a href="${calendar.navigation.next_url}"
-                       tal:attributes="class not(calendar.navigation.next_url) and 'disabled next' or 'next'">
-                       <span>&gt;</span>
-                    </a>
-                </li>
-            </ul>
-          </div>
+          <!-- buttons -->
+          <div class="cal_buttons cal-buttonbar clearafter"></div>
 
-          <ul tal:attributes="class string:${calendar.navigation._presenter.name}-view cal_scope menubar">
-            <li class="firstItem">
-                <a class="day" href="${calendar.navigation.day_button_url}"><span>Day</span></a>
-            </li>
-            <li>
-                <a class="week" href="${calendar.navigation.week_button_url}"><span>Week</span></a>
-            </li>
-            <li>
-                <a class="month" href="${calendar.navigation.month_button_url}"><span>Month</span></a>
-            </li>
-            <li class="lastItem">
-                <a class="list" href="${calendar.navigation.list_button_url}"><span>List</span></a>
-            </li>
-          </ul>
-        </div>
       </div>
 
       <div class="cal_footer clearafter" metal:define-macro="footer">
         <!-- actions -->
         <div class="cal_actions">
            <!-- <a class="cal_download" href="#">Download</a> -->
-           <a class="cal_subscribe" href="${calendar.feed_url}">Subscribe</a>
+           <span><a class="cal_subscribe" href="${calendar.feed_url}">Subscribe</a></span>
+           <!--
+           <span><a class="cal_print" href="#">Print</a></span>
+           -->
         </div>
       </div>
 

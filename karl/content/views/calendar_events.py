@@ -19,6 +19,7 @@ import calendar
 calendar.setfirstweekday(calendar.SUNDAY)
 import datetime
 import time
+import copy
 
 from urllib import quote
 
@@ -86,8 +87,11 @@ from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import get_show_sendalert
 
 from karl.content.calendar.presenters.day import DayViewPresenter
+from karl.content.calendar.presenters.day import DayEventHorizon
 from karl.content.calendar.presenters.week import WeekViewPresenter
+from karl.content.calendar.presenters.week import WeekEventHorizon
 from karl.content.calendar.presenters.month import MonthViewPresenter
+from karl.content.calendar.presenters.month import MonthEventHorizon
 from karl.content.calendar.presenters.list import ListViewPresenter
 from karl.content.calendar.utils import is_all_day_event
 
@@ -106,19 +110,47 @@ def _now():
         return _NOW
     return datetime.datetime.now()
 
-def _date_requested(context, request):
-    if 'year' in request.GET:
-        year  = int(request.GET.get('year'))
-        month = int(request.GET.get('month'))
-        day   = int(request.GET.get('day'))
-        return year, month, day
 
-    cookie_data = request.cookies.get(KARL_CALENDAR_DATE_COOKIE, None)
-    if cookie_data is not None:
-        return map(int, cookie_data.split('-'))
+KARL_CALENDAR_COOKIE = 'karl.calendar.cookie'
 
+def _get_calendar_cookies(context, request):
     now = _now()
-    return now.year, now.month, now.day
+
+    # fetch the cookies
+    cookie = request.cookies.get(KARL_CALENDAR_COOKIE, '')
+    try:
+        viewtype, term, year, month, day = cookie.split(',')
+        year = int(year)
+        month = int(month)
+        day = int(day)
+    except (AttributeError, TypeError, ValueError), exc:
+        viewtype, term, year, month, day = '', '', now.year, now.month, now.day
+
+    # request parameters override the cookies
+    viewtype = request.GET.get('viewtype', viewtype)
+    term = request.GET.get('term', term)
+    year = int(request.GET.get('year', year))
+    month = int(request.GET.get('month', month))
+    day = int(request.GET.get('day', day))
+
+    return dict(
+        viewtype=viewtype,
+        term=term,
+        year=year,
+        month=month,
+        day=day,
+    )
+
+def _set_calendar_cookies(response, selection):
+    value = ','.join([
+        selection['viewtype'],
+        selection['term'],
+        str(selection['year']),
+        str(selection['month']),
+        str(selection['day']),
+    ])
+    response.set_cookie(KARL_CALENDAR_COOKIE, value)
+
 
 def _default_dates_requested(context, request):
     try:
@@ -165,13 +197,46 @@ def _get_catalog_events(calendar, request,
 
         for docid in docids:
             if docid not in docids_seen:
-                docids_seen.add(docid)
 
-                event = resolver(docid)
+                # We need to clone the event, because if an event is
+                # shown in multiple layers, then we want to show it multiple
+                # times.
+                # This also means that making the color and title
+                # volatile, serves no purpose any more. It used to serve
+                # a purpose when the same event could only have
+                # been displayed once.
+                #
+                # It's important to perform a shallow copy of the event. A deep
+                # copy can leak out and try to copy the entire database through
+                # the parent reference
+
+                event = copy.copy(resolver(docid))
                 event._v_layer_color = layer.color.strip()
                 event._v_layer_title = layer.title
 
+                # but... showing an event multiple times, for each
+                # layer it is in,
+                # currently only makes sense for all-day
+                # events. As, for normal events, this would make
+                # them undisplayable.
+                # So we only add the event to the seen ones, if
+                # it is a normal, and not an all-day event.
+                # A special case is list views when we want the normal
+                # events duplicated too. The characteristics of a list
+                # view is that the end date is open.
+                all_day = event.startDate.hour == 0 and \
+                    event.startDate.minute == 0 and \
+                    event.endDate.hour == 0 and \
+                    event.endDate.minute == 0
+                in_list_view = last_moment is None
+                if not in_list_view and not all_day:
+                    docids_seen.add(docid)
+
                 events.append(event)
+
+    # The result set needs to be sorted by start_date.
+    # XXX maybe we can do this directly from the catalog?
+    events.sort(key=lambda event: event.startDate)
 
     return events
 
@@ -199,6 +264,7 @@ def _paginate_catalog_events(calendar, request,
 
     return events, has_more
 
+# XXX XXX TODO: remove the session, make a cookie
 def _calendar_filter(context, request):
     filt = request.params.get('filter', None)
     if filt is None:
@@ -218,8 +284,33 @@ def _make_calendar_presenter_url_func(context, request):
         return resource_url(ctx, request, *args, **kargs)
     return url_for
 
-def _show_calendar_view(context, request, make_presenter):
-    year, month, day = _date_requested(context, request)
+
+def _select_calendar_layout(context, request):
+    # Check if we are in /offices/calendar.
+    # If yes, we will need to put a css marker class "karl-calendar-wide"
+    # on the outside of the template, and we will also use the generic
+    # layout instead of the community layout.
+    # XXX TODO we will also restrict permissions.
+    context_path = resource_path(context)
+    wide_calendar = context_path.startswith('/offices/calendar')
+    if wide_calendar:
+        calendar_format_class = 'karl-calendar-wide'
+        calendar_layout_template = 'generic_layout'
+    else:
+        calendar_format_class = None
+        calendar_layout_template = 'community_layout'
+    return dict(
+        wide_calendar = wide_calendar,
+        calendar_format_class = calendar_format_class,
+        calendar_layout_template = calendar_layout_template,
+    )
+
+
+def _show_calendar_view(context, request, make_presenter, selection):
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+
+    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
@@ -243,8 +334,11 @@ def _show_calendar_view(context, request, make_presenter):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
+    api.karl_client_data['calendar_selection'] = selection
     response = render_template_to_response(
         calendar.template_filename,
+        calendar_format_class = calendar_layout['calendar_format_class'],
+        calendar_layout_template = calendar_layout['calendar_layout_template'],
         api=api,
         setup_url=setup_url,
         calendar=calendar,
@@ -253,29 +347,39 @@ def _show_calendar_view(context, request, make_presenter):
         quote = quote,
         may_create = has_permission(CREATE, context, request),
     )
-    response.set_cookie(KARL_CALENDAR_DATE_COOKIE,
-                        '%04d-%02d-%02d' % (year, month, day))
-    if selected_layer:
-        response.set_cookie(KARL_CALENDAR_FILTER_COOKIE, selected_layer)
     return response
 
 def show_month_view(context, request):
-    response = _show_calendar_view(context, request, MonthViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'month')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'month'
+    response = _show_calendar_view(context, request, MonthViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_week_view(context, request):
-    response = _show_calendar_view(context, request, WeekViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'week')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'week'
+    response = _show_calendar_view(context, request, WeekViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_day_view(context, request):
-    response = _show_calendar_view(context, request, DayViewPresenter)
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'day')
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'calendar'
+    selection['term'] = 'day'
+    response = _show_calendar_view(context, request, DayViewPresenter, selection)
+    _set_calendar_cookies(response, selection)
     return response
 
 def show_list_view(context, request):
-    year, month, day = _date_requested(context, request)
+    selection = _get_calendar_cookies(context, request)
+    selection['viewtype'] = 'list'
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+
+    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = datetime.datetime(year, month, day)
     now_datetime   = _now()
 
@@ -287,13 +391,24 @@ def show_list_view(context, request):
     calendar = ListViewPresenter(focus_datetime,
                                  now_datetime,
                                  url_for)
+    # Also make an event horizon for the selected term
+    # (day, week or month)
+    if not selection['term']:
+        selection['term'] = 'day'
+    event_horizon = {
+        'day': DayEventHorizon,
+        'week': WeekEventHorizon,
+        'month': MonthEventHorizon,
+        }[selection['term']](focus_datetime,
+                                 now_datetime,
+                                 url_for)
 
     # find events and paint them on the calendar
     selected_layer = _calendar_filter(context, request)
 
     events, has_more = _paginate_catalog_events(context, request,
-                                           first_moment=now_datetime,
-                                           last_moment=None,
+                                           first_moment=event_horizon.first_moment,
+                                           last_moment=event_horizon.last_moment,
                                            layer_name=selected_layer,
                                            per_page=per_page,
                                            page=page)
@@ -304,8 +419,11 @@ def show_list_view(context, request):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
+    api.karl_client_data['calendar_selection'] = selection
     response = render_template_to_response(
         calendar.template_filename,
+        calendar_format_class = calendar_layout['calendar_format_class'],
+        calendar_layout_template = calendar_layout['calendar_layout_template'],
         api=api,
         setup_url=setup_url,
         calendar=calendar,
@@ -314,11 +432,7 @@ def show_list_view(context, request):
         quote = quote,
         may_create = has_permission(CREATE, context, request),
     )
-    response.set_cookie(KARL_CALENDAR_VIEW_COOKIE, 'list')
-    response.set_cookie(KARL_CALENDAR_DATE_COOKIE,
-                        '%04d-%02d-%02d' % (year, month, day))
-    if selected_layer:
-        response.set_cookie(KARL_CALENDAR_FILTER_COOKIE, selected_layer)
+    _set_calendar_cookies(response, selection)
     return response
 
 
@@ -329,14 +443,18 @@ def show_view(context, request):
 
     We do redirect in order to maintain the working of links.
     """
-    view_type = request.cookies.get(KARL_CALENDAR_VIEW_COOKIE, '')
-    view_name = {
-        'month': 'month.html',
-        'week': 'week.html',
-        'day': 'day.html',
-        'list': 'list.html',
-        }.get(view_type, 'day.html')
-    return HTTPFound(location=resource_url(context, request, view_name))
+    selection = _get_calendar_cookies(context, request)
+    if selection['viewtype'] == 'list':
+        view_name = 'list.html'
+    else:
+        view_name = {
+            'month': 'month.html',
+            'week': 'week.html',
+            'day': 'day.html',
+            }.get(selection['term'], 'day.html')
+    response = HTTPFound(location=resource_url(context, request, view_name))
+    _set_calendar_cookies(response, selection)
+    return response
 
 
 def redirect_to_add_form(context, request):

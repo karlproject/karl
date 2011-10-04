@@ -160,7 +160,7 @@ class FileInfo(object):
             powers = ["bytes", "KB", "MB", "GB", "TB"] # Future proof ;)
             size = self.context.size
             if size > 0:
-                power = int(math.log(size, 1024))
+                power = int(math.log(size, 1000))
                 assert power < len(powers), "File is larger than 999 TB"
             else:
                 power = 0
@@ -169,7 +169,7 @@ class FileInfo(object):
                 self._size = "%d %s" % (size, powers[0])
 
             else:
-                size = float(size) / (1 << (10 * power))
+                size = float(size) / (1000 ** power)
                 self._size = "%0.1f %s" % (size, powers[power])
 
         return self._size
@@ -826,6 +826,46 @@ class NetworkEventsPortlet(AbstractPortlet):
         more.set('class', 'more')
         more_a = SubElement(more, 'a', href=self.href)
         more_a.text = 'MORE ' + self.title
+
+        return tostring(portlet, pretty_print=True)
+
+
+class CalendarPortlet(NetworkEventsPortlet):
+    """ Adapter for showing calendar events """
+
+    @property
+    def asHTML(self):
+        # The network events portlet is different.  Everything is different.
+        portlet = fragment_fromstring('<div class="generic-portlet"/>')
+        heading = SubElement(portlet, 'h3')
+        heading.text = "Staff Calendar"
+
+        # Now the entries
+        entries = self.entries
+        if entries:
+            ul = SubElement(portlet, 'ul', id='calendar_portlet')
+            event_style = 'text-decoration:none'
+            date_format = '%m/%d/%Y' #'%A, %B %d, %Y %I:%M %p'
+            for entry in self.entries:
+                li = SubElement(ul, 'li')
+
+                span1 = SubElement(li, 'span')
+                span1.text = entry['startDate'].strftime(date_format)
+                span2 = SubElement(li, 'span')
+                span2.set('class', 'event_title')
+                a = SubElement(span2, 'a',
+                               href=entry['href'],
+                               style=event_style)
+                a.text = entry['title']
+        else:
+            msg = SubElement(portlet, 'p')
+            msg.text = "No entries found"
+
+        # Close out with the more link
+        more = SubElement(portlet, 'p')
+        more.set('class', 'more')
+        more_a = SubElement(more, 'a', href=self.href)
+        more_a.text = 'MORE' 
 
         return tostring(portlet, pretty_print=True)
 

@@ -60,6 +60,16 @@
     permission="view"
     name="searchresults.html"
   />
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".search.calendar_searchresults_view"
+    renderer="templates/searchresults.pt"
+    permission="view"
+    name="calendar_searchresults.html"
+  />
+
+
 
   <!-- Start global tagging related views -->
 
@@ -850,6 +860,15 @@
     view=".search.searchresults_view"
     permission="view"
   />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="calendar_searchresults.html"
+    renderer="templates/searchresults.pt"
+    view=".search.calendar_searchresults_view"
+    permission="view"
+  />
+
 
   <view
     for="karl.models.interfaces.ICommunity"
@@ -1772,7 +1791,7 @@
     for="repoze.folder.interfaces.IFolder"
     view=".versions.show_trash"
     permission="edit"
-    name="trash.html"
+    name="trash"
     renderer="templates/trash.pt"
     />
 

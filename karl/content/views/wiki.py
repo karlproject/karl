@@ -19,7 +19,6 @@ import formish
 import schemaish
 import transaction
 from validatish import validator
-from datetime import datetime
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPOk
@@ -43,6 +42,7 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ICatalogSearch
 
@@ -68,7 +68,6 @@ from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
-from karl.content.views.atom import WikiAtomFeed
 
 from karl.security.workflow import get_security_states
 
@@ -258,11 +257,11 @@ def show_wikipage_view(context, request):
     if has_permission('delete', context, request) and not is_front_page:
         actions.append(('Delete', 'delete.html'))
     repo = find_repo(context)
-    if repo is not None and has_permission('edit', context, request):
-        actions.append(('History', 'history.html'))
-        show_trash = True
-    else:
-        show_trash = False
+    show_trash = False
+    if not find_interface(context, IIntranets):
+        if repo is not None and has_permission('edit', context, request):
+            actions.append(('History', 'history.html'))
+            show_trash = True
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -286,7 +285,7 @@ def show_wikipage_view(context, request):
         )
 
 
-def preview_wikipage_view(context, request, WikiPage=WikiPage):
+def preview_wikipage_view(context, request, WikiPage=WikiPage, tz=None):
     version_num = int(request.params['version_num'])
     repo = find_repo(context)
     for version in repo.history(context.docid):
@@ -315,7 +314,7 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage):
     transaction.doom()
 
     return {
-        'date': format_local_date(version.archive_time),
+        'date': format_local_date(version.archive_time, tz),
         'author': author.title,
         'title': page_title,
         'body': page.cook(request),

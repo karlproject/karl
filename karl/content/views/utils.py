@@ -194,4 +194,3 @@ def get_upload_mimetype(upload):
         if guessed_type:
             mimetype = guessed_type
     return mimetype
-
