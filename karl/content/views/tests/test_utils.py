@@ -16,10 +16,9 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+from pyramid import testing
 
-from zope.testing.cleanup import cleanUp
-from karl import testing
-from pyramid import testing as bfgtesting
+import karl.testing
 
 class ExtractDescriptionTests(unittest.TestCase):
 
@@ -81,10 +80,10 @@ class ExtractDescriptionTests(unittest.TestCase):
 
 class Test_get_show_sendalert(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request):
         from karl.content.views.utils import get_show_sendalert
@@ -110,12 +109,12 @@ class Test_get_show_sendalert(unittest.TestCase):
 
         from zope.interface import Interface
         from karl.content.views.interfaces import IShowSendalert
-        bfgtesting.registerAdapter(
+        karl.testing.registerAdapter(
             DummyAdapter, (Interface, Interface), IShowSendalert
         )
 
         context = testing.DummyModel()
-        request = bfgtesting.DummyRequest()
+        request = testing.DummyRequest()
         self.assertEqual(self._call_fut(context, request), 'foo')
 
 class TestGetUploadMimetype(unittest.TestCase):
