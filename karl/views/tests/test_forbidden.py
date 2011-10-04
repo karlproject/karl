@@ -1,13 +1,14 @@
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
+
+import karl.testing
 
 class TestForbidden(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.forbidden import forbidden
@@ -18,7 +19,7 @@ class TestForbidden(unittest.TestCase):
         environ['repoze.who.identity'] = '1'
         request = testing.DummyRequest(environ=environ)
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/forbidden.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/forbidden.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(renderer.homepage_url, 'http://example.com/')
