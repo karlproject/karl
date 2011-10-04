@@ -22,7 +22,7 @@ class MailinRunnerTests(unittest.TestCase):
 
     def setUp(self):
         self.maildir_root = self._makeMaildir()
-        testing.cleanUp()
+        self.config = testing.cleanUp()
 
     def tearDown(self):
         import shutil
@@ -89,8 +89,6 @@ class MailinRunnerTests(unittest.TestCase):
 
     def test_processMessage_reply_no_attachments_community(self):
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerAdapter
-        from pyramid.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
         INFO = {'report': None,
                 'community': 'testing',
@@ -103,7 +101,8 @@ class MailinRunnerTests(unittest.TestCase):
         def _handlerFactory(context):
             handler.context = context
             return handler
-        registerAdapter(_handlerFactory, DummyModel, IMailinHandler)
+        self.config.registry.registerAdapter(
+            _handlerFactory, (DummyModel,), IMailinHandler)
         mailin = self._makeOne()
         catalog = mailin.root.catalog = DummyCatalog()
         cf = mailin.root['communities'] = DummyModel()
@@ -112,7 +111,8 @@ class MailinRunnerTests(unittest.TestCase):
         entry = tool['entry'] = DummyModel()
         comments = entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
-        registerModels({'/communities/testing/random/entry': entry})
+        self.config.testing_resources(
+            {'/communities/testing/random/entry': entry})
         message = DummyMessage()
         text = 'This entry stinks!'
         attachments = ()
@@ -125,8 +125,6 @@ class MailinRunnerTests(unittest.TestCase):
 
     def test_processMessage_reply_w_attachment_community(self):
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerAdapter
-        from pyramid.testing import registerModels
         from karl.adapters.interfaces import IMailinHandler
         INFO = {'report': None,
                 'community': 'testing',
@@ -139,7 +137,8 @@ class MailinRunnerTests(unittest.TestCase):
         def _handlerFactory(context):
             handler.context = context
             return handler
-        registerAdapter(_handlerFactory, DummyModel, IMailinHandler)
+        self.config.registry.registerAdapter(
+            _handlerFactory, (DummyModel,), IMailinHandler)
         mailin = self._makeOne()
         catalog = mailin.root.catalog = DummyCatalog()
         cf = mailin.root['communities'] = DummyModel()
@@ -148,7 +147,8 @@ class MailinRunnerTests(unittest.TestCase):
         entry = tool['entry'] = DummyModel()
         comments = entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
-        registerModels({'/communities/testing/random/entry': entry})
+        self.config.testing_resources(
+            {'/communities/testing/random/entry': entry})
         message = DummyMessage()
         text = 'This entry stinks!'
         attachments = [('foo.txt', 'text/plain', 'My attachment')]
@@ -162,7 +162,6 @@ class MailinRunnerTests(unittest.TestCase):
     def test_processMessage_report(self):
         from zope.interface import directlyProvides
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerAdapter
         from karl.adapters.interfaces import IMailinHandler
         from karl.models.interfaces import IPeopleDirectory
         INFO = {'report': 'section+testing',
@@ -175,7 +174,8 @@ class MailinRunnerTests(unittest.TestCase):
         def _handlerFactory(context):
             handler.context = context
             return handler
-        registerAdapter(_handlerFactory, DummyModel, IMailinHandler)
+        self.config.registry.registerAdapter(
+            _handlerFactory, (DummyModel,), IMailinHandler)
         mailin = self._makeOne()
         catalog = mailin.root.catalog = DummyCatalog()
         pd = mailin.root['people'] = DummyModel()
@@ -195,7 +195,7 @@ class MailinRunnerTests(unittest.TestCase):
 class MailinRunner2Tests(unittest.TestCase):
 
     def setUp(self):
-        testing.cleanUp()
+        self.config = testing.cleanUp()
 
     def tearDown(self):
         testing.cleanUp()
@@ -221,23 +221,22 @@ class MailinRunner2Tests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.adapters.interfaces import IMailinDispatcher
         from karl.adapters.interfaces import IMailinHandler
-        from pyramid.testing import registerAdapter
-        from pyramid.testing import registerUtility
 
         self.handlers = []
         def handler_factory(context):
             handler = DummyHandler(context)
             self.handlers.append(handler)
             return handler
-        registerAdapter(handler_factory, DummyModel, IMailinHandler)
-        registerAdapter(DummyDispatcher, DummyModel, IMailinDispatcher)
+        self.config.registry.registerAdapter(
+            handler_factory, (DummyModel,), IMailinHandler)
+        self.config.registry.registerAdapter(
+            DummyDispatcher, (DummyModel,), IMailinDispatcher)
 
         self.mailer = DummyMailer()
-        registerUtility(self.mailer, IMailDelivery)
+        self.config.registry.registerUtility(self.mailer, IMailDelivery)
 
     def test_one_message_reply_no_attachments(self):
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerModels
         info = {'targets': [{'report': None,
                             'community': 'testing',
                             'tool': 'random',
@@ -259,7 +258,8 @@ class MailinRunner2Tests(unittest.TestCase):
         entry = tool['entry'] = DummyModel()
         comments = entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
-        registerModels({'/communities/testing/random/entry': entry})
+        self.config.testing_resources(
+            {'/communities/testing/random/entry': entry})
 
         mailin()
         mailin.close()
@@ -273,7 +273,6 @@ class MailinRunner2Tests(unittest.TestCase):
 
     def test_process_message_reply_w_attachment(self):
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerModels
         info = {'targets': [{'report': None,
                              'community': 'testing',
                              'tool': 'random',
@@ -295,7 +294,8 @@ class MailinRunner2Tests(unittest.TestCase):
         entry = tool['entry'] = DummyModel()
         comments = entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
-        registerModels({'/communities/testing/random/entry': entry})
+        self.config.testing_resources(
+            {'/communities/testing/random/entry': entry})
 
         mailin()
         mailin.close()
@@ -377,7 +377,7 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.mailer), 1)
 
     def test_bounce_message_throttled(self):
-        testing.registerDummyRenderer(
+        self.config.testing_add_renderer(
             'karl.utilities:templates/bounce_email_throttled.pt')
         message = DummyMessage(None, 'Message body.', ())
         message['X-Postoffice-Rejected'] = 'Throttled'
@@ -397,7 +397,6 @@ class MailinRunner2Tests(unittest.TestCase):
 
     def test_quarantine_message(self):
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerModels
         info = {'targets': [{'community': 'testing',
                              'tool': 'random',
                              'in_reply_to': '7FFFFFFF', # token for docid 0
@@ -419,7 +418,8 @@ class MailinRunner2Tests(unittest.TestCase):
         entry = tool['entry'] = DummyModel()
         comments = entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
-        registerModels({'/communities/testing/random/entry': entry})
+        self.config.testing_resources(
+            {'/communities/testing/random/entry': entry})
 
         mailin()
         q_message, error = self.queue.quarantined[0]
