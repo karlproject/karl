@@ -70,6 +70,27 @@ def registerUtility(impl, iface=Interface, name=''):
     reg.registerUtility(impl, iface, name=name)
     return impl
 
+def registerSubscriber(subscriber, iface=Interface):
+    """ Register a ZCA subscriber component.
+
+    The ``subscriber`` argument specifies the implementation of the
+    subscriber component (often a function).
+
+    The ``iface`` argument is the interface type for which the
+    subscriber will be registered (:class:`zope.interface.Interface`
+    by default). If ``iface`` is not a tuple or list, it will be
+    converted to a one-tuple before being passed to the underlying ZCA
+    :meth:`pyramid.registry.registerHandler` method.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA subscribers.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry)
+    result = config.add_subscriber(subscriber, iface=iface)
+    config.commit()
+    return result
+
 def registerDummyRenderer(path, renderer=None):
     """ Register a template renderer at ``path`` (usually a relative
     filename ala ``templates/foo.pt``) and return the renderer object.
