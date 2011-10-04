@@ -18,12 +18,10 @@
 import unittest
 
 from zope.interface import Interface
-from zope.testing.cleanup import cleanUp
 
 from pyramid.testing import DummyModel
 from pyramid.testing import DummyRequest
-from pyramid.testing import registerAdapter
-from pyramid.testing import registerUtility
+from pyramid.testing import cleanUp
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyLayoutProvider
@@ -31,6 +29,8 @@ from karl.testing import DummySearchAdapter
 from karl.testing import DummyTagQuery
 from karl.testing import DummyFolderAddables
 from karl.testing import DummyUsers
+
+import karl.testing
 
 class TestShowNetworkEventsView(unittest.TestCase):
     def setUp(self):
@@ -54,43 +54,43 @@ class TestShowNetworkEventsView(unittest.TestCase):
 
     def _registerAddables(self):
         from karl.views.interfaces import IFolderAddables
-        registerAdapter(DummyFolderAddables, (Interface, Interface),
-                                IFolderAddables)
+        karl.testing.registerAdapter(
+            DummyFolderAddables, (Interface, Interface),
+            IFolderAddables)
 
     def _registerTagbox(self):
         from karl.models.interfaces import ITagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerKarlDates(self):
         d1 = 'Wednesday, January 28, 2009 08:32 AM'
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
-        registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
     def _registerCatalogSearch(self):
         from karl.models.interfaces import ICatalogSearch
-        registerAdapter(DummySearchAdapter, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(
+            DummySearchAdapter, (Interface), ICatalogSearch)
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
 
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
     def _registerSecurityPolicy(self, permissions):
         if permissions is None:
-            from pyramid.testing import registerDummySecurityPolicy
-            registerDummySecurityPolicy("userid")
+            karl.testing.registerDummySecurityPolicy("userid")
         else:
             from pyramid.interfaces import IAuthenticationPolicy
             from pyramid.interfaces import IAuthorizationPolicy
-            from pyramid.testing import registerUtility
             policy = DummySecurityPolicy("userid", permissions=permissions)
-            registerUtility(policy, IAuthenticationPolicy)
-            registerUtility(policy, IAuthorizationPolicy)
+            karl.testing.registerUtility(policy, IAuthenticationPolicy)
+            karl.testing.registerUtility(policy, IAuthorizationPolicy)
 
     def _register(self, permissions=None):
         self._registerAddables()
@@ -242,35 +242,37 @@ class TestShowNetworkNewsView(unittest.TestCase):
 
     def _registerAddables(self):
         from karl.views.interfaces import IFolderAddables
-        registerAdapter(DummyFolderAddables, (Interface, Interface),
-                                IFolderAddables)
+        karl.testing.registerAdapter(
+            DummyFolderAddables, (Interface, Interface),
+            IFolderAddables)
 
     def _registerTagbox(self):
         from karl.models.interfaces import ITagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerKarlDates(self):
         d1 = 'Wednesday, January 28, 2009 08:32 AM'
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
-        registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
     def _registerCatalogSearch(self):
         from karl.models.interfaces import ICatalogSearch
-        registerAdapter(DummySearchAdapter, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(DummySearchAdapter,
+                                     (Interface), ICatalogSearch)
 
     def _registerLayoutProvider(self):
         from karl.views.interfaces import ILayoutProvider
 
-        ad = registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        ad = karl.testing.registerAdapter(
+            DummyLayoutProvider,
+            (Interface, Interface),
+            ILayoutProvider)
 
     def _registerSecurityPolicy(self):
-        from pyramid.testing import registerDummySecurityPolicy
-        registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
 
     def _register(self):
         self._registerAddables()
