@@ -22,6 +22,7 @@ from zope.interface import Interface
 from pyramid import testing
 from pyramid.testing import cleanUp
 
+import karl.testing
 
 class LiveSearchEntryAdapterTests(unittest.TestCase):
     def setUp(self):
@@ -258,9 +259,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
-        testing.registerAdapter(DummyFileAdapter,
-                                (testing.DummyModel, testing.DummyRequest),
-                                IFileInfo)
+        karl.testing.registerAdapter(DummyFileAdapter,
+                                     (testing.DummyModel, testing.DummyRequest),
+                                     IFileInfo)
 
         from karl.views.adapters import file_livesearch_result
         result = file_livesearch_result(context, request)
@@ -280,9 +281,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      )
         def dummy_communityinfo_adapter(context, request):
             return context
-        testing.registerAdapter(dummy_communityinfo_adapter,
-                                (testing.DummyModel, testing.DummyRequest),
-                                ICommunityInfo)
+        karl.testing.registerAdapter(dummy_communityinfo_adapter,
+                                     (testing.DummyModel, testing.DummyRequest),
+                                     ICommunityInfo)
         request = testing.DummyRequest()
         from karl.views.adapters import community_livesearch_result
         result = community_livesearch_result(context, request)
@@ -363,8 +364,8 @@ class AdvancedSearchResultsDisplayTests(unittest.TestCase):
         request = testing.DummyRequest()
         from karl.views.adapters import AdvancedSearchResultsDisplayEvent
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(lambda x,y: "custom date string",
-                                IKarlDates)
+        karl.testing.registerUtility(lambda x,y: "custom date string",
+                                     IKarlDates)
         from datetime import datetime
         context.startDate = datetime(1900, 1, 1, 1, 1)
         context.endDate = datetime(1900, 1, 1, 2, 2)
@@ -385,9 +386,9 @@ class AdvancedSearchResultsDisplayTests(unittest.TestCase):
         request = testing.DummyRequest()
         from karl.views.adapters import AdvancedSearchResultsDisplayFile
         from karl.content.views.interfaces import IFileInfo
-        testing.registerAdapter(DummyFileAdapter,
-                                (Interface, Interface),
-                                IFileInfo)
+        karl.testing.registerAdapter(DummyFileAdapter,
+                                     (Interface, Interface),
+                                     IFileInfo)
         adapter = AdvancedSearchResultsDisplayFile(context, request)
         self.assertEqual('searchresults_file', adapter.macro)
         self.assertEqual('DummyFileAdapter',
