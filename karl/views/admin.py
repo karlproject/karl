@@ -14,7 +14,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from zope.component import getUtility
 
-from pyramid.chameleon_zpt import get_template
+from pyramid.renderers import get_renderer
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -81,7 +81,8 @@ class AdminTemplateAPI(TemplateAPI):
             self.offices_url = None
 
 def _menu_macro():
-    return get_template('templates/admin/menu.pt').macros['menu']
+    return get_renderer(
+        'templates/admin/menu.pt').implementation().macros['menu']
 
 def admin_view(context, request):
     return dict(
@@ -90,10 +91,12 @@ def admin_view(context, request):
     )
 
 def _content_selection_widget():
-    return get_template('templates/admin/content_select.pt').macros['widget']
+    return get_renderer(
+        'templates/admin/content_select.pt').implementation().macros['widget']
 
 def _content_selection_grid():
-    return get_template('templates/admin/content_select.pt').macros['grid']
+    return get_renderer(
+        'templates/admin/content_select.pt').implementation().macros['grid']
 
 def _format_date(d):
     return d.strftime("%m/%d/%Y %H:%M")

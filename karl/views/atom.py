@@ -21,7 +21,7 @@ from zope.component import getMultiAdapter
 
 from pyramid.response import Response
 from zope.interface import implements
-from pyramid.chameleon_zpt import render_template
+from pyramid.renderers import render
 from pyramid.url import resource_url
 
 from karl.utils import find_profiles
@@ -70,7 +70,7 @@ class AtomFeed(object):
         self._url = resource_url(context, request)
 
     def __call__(self):
-        xml = render_template(self._template, view=self)
+        xml = render(self._template, dict(view=self), request=self.request)
         response = Response(xml, content_type="application/atom+xml")
         return response
 

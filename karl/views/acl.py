@@ -17,7 +17,7 @@
 
 import re
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 
@@ -150,13 +150,15 @@ def edit_acl_view(context, request):
         local_acl.append(l_ace)
 
 
-    return render_template_to_response('templates/edit_acl.pt',
-                                       parent_acl=parent_acl or (),
-                                       local_acl=local_acl,
-                                       inheriting=inheriting,
-                                       security_state=security_state,
-                                       security_states=security_states,
-                                      )
+    return render_to_response(
+        'templates/edit_acl.pt',
+        dict(parent_acl=parent_acl or (),
+             local_acl=local_acl,
+             inheriting=inheriting,
+             security_state=security_state,
+             security_states=security_states),
+        request=request,
+        )
 
 def make_acls(node, request, acls=None, offset=0):
     if acls is None:
@@ -183,9 +185,10 @@ def make_acls(node, request, acls=None, offset=0):
 
 def acl_tree_view(context, request):
     acls = make_acls(context, request)
-    return render_template_to_response(
+    return render_to_response(
         'templates/acl_tree.pt',
-        acls = acls)
+        dict(acls = acls),
+        request=request)
 
 
 

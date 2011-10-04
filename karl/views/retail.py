@@ -18,8 +18,8 @@
 from zope.component import getMultiAdapter
 from zope.component import ComponentLookupError
 
-from pyramid.chameleon_zpt import render_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
 
 from pyramid.traversal import find_resource
 
@@ -43,18 +43,19 @@ def retail_view(context, request):
 
     # Rendering this separately gives us a chance later to think about
     # some kind of caching.
-    body = render_template(
+    body = render(
         'templates/intranethome_body.pt',
-        current_intranet=current_intranet,
-        feature=feature,
-        middle_portlet_html=middle_portlet_html,
-        right_portlet_html=right_portlet_html,
+        dict(current_intranet=current_intranet,
+             feature=feature,
+             middle_portlet_html=middle_portlet_html,
+             right_portlet_html=right_portlet_html),
+        request=request
         )
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/intranet_homepage.pt',
-        api=api,
-        body=body,
+        dict(api=api, body=body),
+        request=request,
         )
 
 def _get_portlet_html(context, request, portlet_ids):

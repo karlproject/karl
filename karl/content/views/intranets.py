@@ -34,7 +34,7 @@ from karl.views.api import TemplateAPI
 from karl.views.community import EditCommunityFormController
 from karl.views.forms import validators as karlvalidators
 from karl.views.utils import make_name
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
 from pyramid.security import authenticated_userid
 from pyramid.url import resource_url
@@ -54,11 +54,12 @@ def show_intranets_view(context, request):
         ]
 
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_intranets.pt',
-        api=api,
-        actions=actions,
-        intranets_info=api.intranets_info,
+        dict(api=api,
+             actions=actions,
+             intranets_info=api.intranets_info),
+        request=request,
         )
 
 

@@ -20,7 +20,8 @@ import transaction
 
 from zope.interface import implements
 
-from pyramid.settings import get_settings
+from pyramid.threadlocal import get_current_registry
+
 from repoze.lemonade.content import create_content
 from repoze.folder import Folder
 
@@ -89,7 +90,7 @@ class MailinTraceBlog(Folder):
     title = u'Mailin Trace Blog'
 
     def __setitem__(self, name, value):
-        path = get_settings()['mailin_trace_file']
+        path = get_current_registry().settings['mailin_trace_file']
         if not os.path.exists(path):
             folder, fname = os.path.split(path)
             if not os.path.exists(folder):

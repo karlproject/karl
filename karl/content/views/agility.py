@@ -18,7 +18,7 @@
 import simplejson as json
 from random import choice
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
@@ -112,9 +112,10 @@ def show_agility_view(context, request):
     ))
 
     feed_url = resource_url(context, request, "atom.xml")
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_agility2.pt',
-        api=api,
-        head_data=client_json_data,
-        backto=backto,
+        dict(api=api,
+             head_data=client_json_data,
+             backto=backto),
+        request=request,
         )

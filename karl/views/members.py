@@ -40,8 +40,8 @@ from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
-from pyramid.chameleon_zpt import render_template_to_response
-from pyramid.chameleon_zpt import get_template
+from pyramid.renderers import render_to_response
+from pyramid.renderers import get_renderer
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
 from pyramid.traversal import resource_path
@@ -184,15 +184,16 @@ def show_members_view(context, request):
             derived['href'] = resource_url(profile, request)
             moderator_info.append(derived)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_members.pt',
-        api=api,
-        actions=actions,
-        submenu=submenu,
-        moderators=moderator_info,
-        members=member_info,
-        batch_info=member_batch,
-        hide_pictures=hp,
+        dict(api=api,
+             actions=actions,
+             submenu=submenu,
+             moderators=moderator_info,
+             members=member_info,
+             batch_info=member_batch,
+             hide_pictures=hp),
+        request=request,
         )
 
 
@@ -205,7 +206,8 @@ def _send_moderators_changed_email(community,
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Change in moderators for %s'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_moderators_changed.pt')
+    body_template = get_renderer(
+        'templates/email_moderators_changed.pt').implementation()
 
     profiles = find_profiles(community)
     all_moderators = cur_moderators | prev_moderators
@@ -418,7 +420,8 @@ def _send_aeu_emails(community, community_href, profiles, text):
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'You have been added to the %s community'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_add_existing.pt')
+    body_template = get_renderer(
+        'templates/email_add_existing.pt').implementation()
     html_body = text
 
     mailer = getUtility(IMailDelivery)
@@ -715,7 +718,8 @@ def _send_ai_email(community, community_href, username, profile):
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Thank you for joining the %s community'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_accept_invitation.pt')
+    body_template = get_renderer(
+        'templates/email_accept_invitation.pt').implementation()
 
     mailer = getUtility(IMailDelivery)
     msg = Message()
@@ -869,7 +873,8 @@ def _send_invitation_email(request, community, community_href, invitation):
     subject_fmt = 'Please join the %s community at %s'
     info['subject'] = subject_fmt % (info['c_title'],
                                      info['system_name'])
-    body_template = get_template('templates/email_invite_new.pt')
+    body_template = get_renderer(
+        'templates/email_invite_new.pt').implementation()
 
     msg = Message()
     msg['From'] = info['mfrom']

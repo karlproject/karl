@@ -24,7 +24,7 @@ from validatish import validator
 import formish
 import schemaish
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 
 from pyramid.url import resource_url
 from pyramid.security import authenticated_userid
@@ -275,15 +275,16 @@ def show_page_view(context, request):
     else:
         layout = layout_provider('generic')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_page.pt',
-        api=api,
-        actions=actions,
-        attachments=fetch_attachments(context['attachments'], request),
-        formfields=api.formfields,
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous_entry=previous,
-        next_entry=next,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             attachments=fetch_attachments(context['attachments'], request),
+             formfields=api.formfields,
+             head_data=convert_to_script(client_json_data),
+             backto=backto,
+             previous_entry=previous,
+             next_entry=next,
+             layout=layout),
+        request = request,
         )

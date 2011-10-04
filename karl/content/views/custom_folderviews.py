@@ -21,7 +21,6 @@ import datetime
 from zope.index.text.parsetree import ParseError
 
 from pyramid.url import resource_url
-from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path

@@ -1,4 +1,4 @@
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
@@ -13,11 +13,12 @@ def forbidden(context, request):
         # the user is authenticated but he is not allowed to access this
         # resource
         api = TemplateAPI(context, request, 'Forbidden')
-        response =  render_template_to_response(
+        response =  render_to_response(
             'templates/forbidden.pt',
-            api=api,
-            login_form_url = resource_url(site, request, 'login.html'),
-            homepage_url = resource_url(site, request),
+            dict(api=api,
+                 login_form_url = resource_url(site, request, 'login.html'),
+                 homepage_url = resource_url(site, request)),
+            request=request,
             )
         response.status = '403 Forbidden'
         return response

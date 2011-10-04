@@ -25,8 +25,8 @@ from validatish import validator
 import formish
 import schemaish
 
-from pyramid.chameleon_zpt import render_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.url import resource_url
@@ -91,10 +91,12 @@ class FileHTML(object):
 
     def __call__(self, api):
         fileinfo = getMultiAdapter((self.context, self.request), IFileInfo)
-        return render_template('templates/inline_file.pt',
-                               api=api,
-                               fileinfo=fileinfo,
-                              )
+        return render(
+            'templates/inline_file.pt',
+            dict(api=api,
+                 fileinfo=fileinfo),
+            request=self.request,
+            )
 
 
 def getTree(root, request, api, _subpath_prefix='|'):
@@ -198,16 +200,17 @@ def reference_outline_view(context, request):
     previous, next = get_previous_next(context, request)
 
     api.status_message = status_message
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_referencemanual.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(client_json_data),
-        tree=getTree(context, request, api),
-        backto=backto,
-        layout=layout,
-        previous_entry=previous,
-        next_entry=next,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(client_json_data),
+             tree=getTree(context, request, api),
+             backto=backto,
+             layout=layout,
+             previous_entry=previous,
+             next_entry=next),
+        request=request,
         )
 
 
@@ -244,16 +247,17 @@ def reference_viewall_view(context, request):
 
     previous, next = get_previous_next(context, request, 'view_all.html')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/viewall_referencemanual.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(client_json_data),
-        tree=getTree(context, request, api),
-        backto=backto,
-        layout=layout,
-        previous_entry=previous,
-        next_entry=next,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(client_json_data),
+             tree=getTree(context, request, api),
+             backto=backto,
+             layout=layout,
+             previous_entry=previous,
+             next_entry=next),
+        request=request,
         )
 
 

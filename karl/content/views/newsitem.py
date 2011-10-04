@@ -24,7 +24,7 @@ import schemaish
 from schemaish.type import File as SchemaFile
 from validatish import validator
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 
 from pyramid_formish import ValidationError
 from pyramid.url import resource_url
@@ -214,18 +214,19 @@ def show_newsitem_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_newsitem.pt',
-        api=api,
-        actions=actions,
-        attachments=fetch_attachments(context['attachments'], request),
-        formfields=api.formfields,
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous=previous,
-        next=next,
-        layout=layout,
-        photo=photo,
+        dict(api=api,
+             actions=actions,
+             attachments=fetch_attachments(context['attachments'], request),
+             formfields=api.formfields,
+             head_data=convert_to_script(client_json_data),
+             backto=backto,
+             previous=previous,
+             next=next,
+             layout=layout,
+             photo=photo),
+        request=request,
         )
 
 class EditNewsItemFormController(AddNewsItemFormController):
