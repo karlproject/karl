@@ -43,7 +43,7 @@ class TestOfflineContextURL(unittest.TestCase):
     def test___call___app_url_trailing_slash(self):
         from pyramid.interfaces import ISettings
         from pyramid.testing import DummyModel
-        from pyramid.testing import registerUtility
+        from karl.testing import registerUtility
         class DummySettings(dict):
             offline_app_url = "http://offline.example.com/app/"
         registerUtility(DummySettings(), ISettings)
