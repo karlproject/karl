@@ -29,9 +29,8 @@ def _checkCookie(request_or_response, filterby):
     from karl.views.contentfeeds import _FILTER_COOKIE
     header = ('Set-Cookie',
               '%s=%s; Path=/' % (_FILTER_COOKIE, filterby))
-    headerlist = getattr(request_or_response, 'headerlist', None)
-    if headerlist is None:
-        headerlist = getattr(request_or_response, 'response_headerlist')
+    response = getattr(request_or_response, 'response', request_or_response)
+    headerlist = response.headerlist
     assert header in headerlist
 
 class NewestFeedItemsViewTests(unittest.TestCase):
