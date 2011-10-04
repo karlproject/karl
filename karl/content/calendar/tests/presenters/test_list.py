@@ -107,7 +107,7 @@ class ListViewPresenterTests(unittest.TestCase):
     def test_paints_event_of_three_full_days(self):
         focus_at = datetime.datetime(2010, 2, 15)
         now_at   = datetime.datetime.now()
-        
+
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
         event = DummyCatalogEvent(
                     title="Vacation",
