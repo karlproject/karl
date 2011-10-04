@@ -18,18 +18,17 @@
 import unittest
 from pyramid import testing
 from karl import testing as karltesting
-from zope.testing.cleanup import cleanUp
 from zope.interface import implements
 from karl.utilities.interfaces import ISpellChecker
 import simplejson
 
 class TinyMceSpellCheckViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
-        testing.registerUtility(DummySpellChecker, iface=ISpellChecker)
+        testing.cleanUp()
+        karltesting.registerUtility(DummySpellChecker, iface=ISpellChecker)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.spellcheck import tinymce_spellcheck_view
