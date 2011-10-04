@@ -19,6 +19,8 @@ import unittest
 
 from pyramid import testing
 
+import karl.testing
+
 _marker = object()
 
 
@@ -200,11 +202,10 @@ class TagsTests(unittest.TestCase):
             def _callable(item):
                 return name
             return _callable
-        testing.registerAdapter(_factory, Interface, ITagCommunityFinder)
+        karl.testing.registerAdapter(_factory, Interface, ITagCommunityFinder)
 
     def _registerEventsListener(self):
-        from pyramid.testing import registerEventListener
-        events = registerEventListener()
+        events = karl.testing.registerEventListener()
         del events[:]
         return events
 
@@ -1182,7 +1183,7 @@ class TagCommunityFinderTests(unittest.TestCase):
         commune = site['commune'] = testing.DummyModel()
         directlyProvides(commune, ICommunity)
         doc = commune['doc'] = testing.DummyModel()
-        testing.registerModels({'/commune/doc': doc})
+        karl.testing.registerModels({'/commune/doc': doc})
         catalog = site.catalog = testing.DummyModel()
         catalog.document_map = DummyDocumentMap({123: '/commune/doc'})
 
@@ -1197,7 +1198,7 @@ class TagCommunityFinderTests(unittest.TestCase):
         site = context.site = testing.DummyModel()
         profiles = site['profiles'] = testing.DummyModel()
         user1 = profiles['user1'] = testing.DummyModel()
-        testing.registerModels({'/profiles/user1': user1})
+        karl.testing.registerModels({'/profiles/user1': user1})
         catalog = site.catalog = testing.DummyModel()
         catalog.document_map = DummyDocumentMap({123: '/profiles/user1'})
 
