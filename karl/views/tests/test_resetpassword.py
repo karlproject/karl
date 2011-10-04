@@ -18,9 +18,11 @@
 import unittest
 from zope.interface import directlyProvides
 from pyramid import testing
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid.threadlocal import get_current_registry
 from karl.testing import DummySessions
+
+import karl.testing
 
 class ResetRequestFormControllerTests(unittest.TestCase):
     def setUp(self):
@@ -34,7 +36,8 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
-        testing.registerDummyRenderer('karl.views:forms/templates/snippets.pt')
+        karl.testing.registerDummyRenderer(
+            'karl.views:forms/templates/snippets.pt')
 
     def tearDown(self):
         testing.cleanUp()
@@ -76,12 +79,12 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         mailer = DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karl.testing.registerUtility(mailer, IMailDelivery)
 
         # fake catalog search
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             DummyProfileSearch, (Interface,), ICatalogSearch)
 
         # fake a staff user
@@ -91,7 +94,7 @@ class ResetRequestFormControllerTests(unittest.TestCase):
 
         # register dummy renderer for email template
         reg = get_current_registry()
-        config = Configurator(reg)
+        config = Configurator(reg, autocommit=True)
         renderer = config.testing_add_template(
             'templates/email_reset_password.pt')
 
@@ -108,7 +111,8 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         profile_search = DummyProfileSearch(context)
         def search_adapter(context):
             return profile_search
-        testing.registerAdapter(search_adapter, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(
+            search_adapter, (Interface,), ICatalogSearch)
 
         # convert to non-staff user and test again, email should
         # go out this time
@@ -145,7 +149,7 @@ class ResetSentViewTests(unittest.TestCase):
     def test_it(self):
         context = testing.DummyModel()
         request = testing.DummyRequest({'email': 'x@example.com'})
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/reset_sent.pt')
         self._callFUT(context, request)
         self.assertEqual(renderer.email, 'x@example.com')
@@ -161,7 +165,8 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         self.request = request
-        testing.registerDummyRenderer('karl.views:forms/templates/snippets.pt')
+        karl.testing.registerDummyRenderer(
+            'karl.views:forms/templates/snippets.pt')
 
     def tearDown(self):
         testing.cleanUp()
