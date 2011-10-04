@@ -19,8 +19,15 @@ import unittest
 
 from pyramid import testing
 
+import karl.testing
 
 class TestSiteView(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+        
     def _callFUT(self, context, request):
         from karl.views.site import site_view
         return site_view(context, request)
@@ -28,7 +35,7 @@ class TestSiteView(unittest.TestCase):
     def test_no_communities(self):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         context = c.__parent__.__parent__
         users = context.users = DummyUsers()
@@ -40,7 +47,7 @@ class TestSiteView(unittest.TestCase):
     def test_one_community(self):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         context = c.__parent__.__parent__
         users = context.users = DummyUsers()
@@ -54,7 +61,7 @@ class TestSiteView(unittest.TestCase):
     def test_multiple_communities(self):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         context = c.__parent__.__parent__
         users = context.users = DummyUsers()
@@ -72,7 +79,7 @@ class TestSiteView(unittest.TestCase):
         from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         site = c.__parent__.__parent__
         directlyProvides(site, IInterface)
@@ -80,7 +87,7 @@ class TestSiteView(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["userid"] = profile = DummyProfile()
         profile.home_path = "/communities/community/foo"
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory(foo), IInterface, ITraverserFactory
         )
         request = testing.DummyRequest()
@@ -94,7 +101,7 @@ class TestSiteView(unittest.TestCase):
         from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         site = c.__parent__.__parent__
         directlyProvides(site, IInterface)
@@ -102,7 +109,7 @@ class TestSiteView(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["userid"] = profile = DummyProfile()
         profile.home_path = "/communities/community/foo/some_view.html"
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory(foo, "some_view.html",), 
             IInterface, ITraverserFactory
         )
