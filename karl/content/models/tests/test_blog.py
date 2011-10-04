@@ -17,7 +17,8 @@
 
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
+
+import karl.testing
 
 class BlogTests(unittest.TestCase):
 
@@ -40,10 +41,10 @@ class BlogTests(unittest.TestCase):
 
 class BlogEntryTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.blog import BlogEntry
@@ -84,10 +85,10 @@ class BlogEntryTests(unittest.TestCase):
 
 class TestBlogToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.blog import blog_tool_factory
@@ -95,8 +96,8 @@ class TestBlogToolFactory(unittest.TestCase):
 
     def test_it(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest
         factory = self._makeOne()
@@ -108,7 +109,7 @@ class TestBlogToolFactory(unittest.TestCase):
 
 class TestMailinTracerBlog(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.content.models import blog
         self._save_os = blog.os
@@ -116,10 +117,10 @@ class TestMailinTracerBlog(unittest.TestCase):
         self._utime_called = None
         self._exists = set()
 
-        testing.registerSettings(mailin_trace_file='trace_file')
+        karl.testing.registerSettings(mailin_trace_file='trace_file')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.content.models import blog
         blog.os = self._save_os

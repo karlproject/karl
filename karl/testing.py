@@ -534,6 +534,8 @@ def registerSecurityWorkflow():
     return registerDummyWorkflow('security')
 
 def registerSettings(**kw):
+    registry = get_current_registry()
     from pyramid.interfaces import ISettings
     settings = DummySettings(**kw)
+    registry.settings = settings
     registerUtility(settings, ISettings)
