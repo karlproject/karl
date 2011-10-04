@@ -120,6 +120,30 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     config.commit()
     return result
 
+def registerEventListener(event_iface=None):
+    """ Registers an :term:`event` listener (aka :term:`subscriber`)
+    listening for events of the type ``event_iface``.  This method
+    returns a list object which is appended to by the subscriber
+    whenever an event is captured.
+
+    When an event is dispatched that matches ``event_iface``, that
+    event will be appended to the list.  You can then compare the
+    values in the list to expected event notifications.  This method
+    is useful when testing code that wants to call
+    :meth:`pyramid.registry.Registry.notify`,
+    :func:`zope.component.event.dispatch` or
+    :func:`zope.component.event.objectEventNotify`.
+
+    The default value of ``event_iface`` (``None``) implies a
+    subscriber registered for *any* kind of event.
+
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_add_subscriber(event_iface)
+    config.commit()
+    return result
+
 class DummyCatalog(dict):
     def __init__(self, *maps):
         self.document_map = DummyDocumentMap(*maps)

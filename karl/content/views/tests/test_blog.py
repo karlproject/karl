@@ -26,6 +26,8 @@ from karl.testing import DummySessions
 from karl.testing import DummyTags
 from karl.testing import DummyTagQuery
 
+import karl.testing
+
 class ShowBlogViewTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -52,7 +54,7 @@ class ShowBlogViewTests(unittest.TestCase):
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
         entry = testing.DummyModel(
             creator='dummy', title='Dummy Entry',
@@ -68,8 +70,8 @@ class ShowBlogViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
@@ -94,7 +96,7 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest()
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
         entry = testing.DummyModel(
             creator='dummy', title='Dummy Entry',
@@ -110,8 +112,8 @@ class ShowBlogViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
@@ -137,7 +139,7 @@ class ShowBlogViewTests(unittest.TestCase):
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
         entry = testing.DummyModel(
             creator='dummy', title='Dummy Entry',
@@ -152,8 +154,8 @@ class ShowBlogViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
@@ -179,7 +181,7 @@ class ShowBlogViewTests(unittest.TestCase):
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
         entry = testing.DummyModel(
             creator='dummy', title='Dummy Entry',
@@ -196,8 +198,8 @@ class ShowBlogViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
@@ -221,7 +223,7 @@ class ShowBlogViewTests(unittest.TestCase):
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
         entry = testing.DummyModel(
             creator='dummy', title='Dummy Entry',
@@ -237,8 +239,8 @@ class ShowBlogViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
@@ -260,9 +262,9 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.utilities.interfaces import IKarlDates
         from karl.models.interfaces import ITagQuery
-        testing.registerUtility(dummy, IKarlDates)
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
@@ -289,11 +291,11 @@ class ShowBlogEntryViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         self._register()
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['comments']), 1)
         c0 = response['comments'][0]
@@ -320,10 +322,10 @@ class ShowBlogEntryViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         self._register()
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
 
         response = self._callFUT(context, request)
 
@@ -349,11 +351,11 @@ class ShowBlogEntryViewTests(unittest.TestCase):
             return context
         from zope.interface import Interface
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         self._register()
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         response = self._callFUT(context, request)
         self.assertEqual(len(response['comments']), 2)
         self.assertEqual('before', response['comments'][0]['text'])
@@ -385,7 +387,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         from pyramid.threadlocal import manager
         from pyramid.registry import Registry
         manager.stack[0]['registry'] = Registry('testing')
-        testing.registerUtility(self.mailer, IMailDelivery)
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # Register BlogEntryAlert adapter
         from karl.models.interfaces import IProfile
@@ -393,11 +395,11 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         from karl.content.views.adapters import BlogEntryAlert
         from karl.utilities.interfaces import IAlert
         from pyramid.interfaces import IRequest
-        testing.registerAdapter(BlogEntryAlert,
-                                (IBlogEntry, IProfile, IRequest),
-                                IAlert)
+        karl.testing.registerAdapter(BlogEntryAlert,
+                                     (IBlogEntry, IProfile, IRequest),
+                                     IAlert)
 
-        testing.registerDummySecurityPolicy("a")
+        karl.testing.registerDummySecurityPolicy("a")
 
         # Create dummy site skel
         from karl.testing import DummyCommunity
@@ -447,8 +449,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from repoze.workflow.testing import registerDummyWorkflow
         return registerDummyWorkflow('security')
 
@@ -527,7 +529,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         registerContentFactory(DummyFile, ICommunityFile)
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/email_blog_entry_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -582,7 +584,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         registerContentFactory(DummyFile, ICommunityFile)
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/email_blog_entry_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -625,11 +627,10 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         return context
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
@@ -675,8 +676,8 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
     def test_form_widgets(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         self._registerDummyWorkflow()
         context = self._makeContext()
         request = self._makeRequest()
@@ -709,8 +710,8 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         from karl.content.interfaces import IBlogEntry
         from repoze.lemonade.testing import registerContentFactory
         from karl.testing import DummyCatalog
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         self._registerDummyWorkflow()
         context = DummyBlogEntry()
         context.sessions = DummySessions()
@@ -727,8 +728,9 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
                      'attachments':[SchemaFile(None, None, None)],
                      }
         registerContentFactory(DummyBlogEntry, IBlogEntry)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -750,8 +752,8 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         from karl.content.interfaces import IBlogEntry
         from repoze.lemonade.testing import registerContentFactory
         from karl.testing import DummyCatalog
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         self._registerDummyWorkflow()
         context = DummyBlogEntry()
         context.sessions = DummySessions()
@@ -768,8 +770,9 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
                      'attachments':[None],
                      }
         registerContentFactory(DummyBlogEntry, IBlogEntry)
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -802,7 +805,8 @@ class BlogSidebarTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = object()
-        renderer = testing.registerDummyRenderer('templates/blog_sidebar.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/blog_sidebar.pt')
         self._callFUT(context, request, api)
         self.assertEquals(renderer.api, api)
         self.assertEquals(len(renderer.activity_list), 0)
@@ -821,7 +825,8 @@ class BlogSidebarTests(unittest.TestCase):
         context['e2'] = e2
         request = testing.DummyRequest()
         api = object()
-        renderer = testing.registerDummyRenderer('templates/blog_sidebar.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/blog_sidebar.pt')
         self._callFUT(context, request, api)
         self.assertEquals(renderer.api, api)
         self.assertEquals(len(renderer.activity_list), 1)
@@ -842,7 +847,8 @@ class BlogSidebarTests(unittest.TestCase):
                 context['e%d-%d' % (month, day)] = e
         request = testing.DummyRequest()
         api = object()
-        renderer = testing.registerDummyRenderer('templates/blog_sidebar.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/blog_sidebar.pt')
         self._callFUT(context, request, api)
         self.assertEquals(len(renderer.activity_list), 10)
 
@@ -905,7 +911,7 @@ class Test_show_mailin_trace_blog(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
 
-        testing.registerSettings(mailin_trace_file='foo/bar')
+        karl.testing.registerSettings(mailin_trace_file='foo/bar')
 
         from karl.content.views import blog
         self._save_os = blog.os
