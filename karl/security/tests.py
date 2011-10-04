@@ -1,6 +1,8 @@
 import unittest
 from pyramid import testing
 
+import karl.testing
+
 class TestACLPathCache(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -278,7 +280,7 @@ class TestSecuredStateMachine(unittest.TestCase):
         machine = self._makeOne('state')
         machine.add('private', 'publish', 'public', None)
         machine.add('private', 'reject', 'rejected', None, permission='add')
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         request = testing.DummyRequest()
         context = testing.DummyModel()
         transitions = sorted(
@@ -292,7 +294,7 @@ class TestSecuredStateMachine(unittest.TestCase):
         machine = self._makeOne('state')
         machine.add('private', 'publish', 'public', None)
         machine.add('private', 'reject', 'rejected', None)
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         request = testing.DummyRequest()
         context = testing.DummyModel()
         transitions = machine.secured_transition_info(context, request,
@@ -314,7 +316,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                   ('pending', None): ('published', dummy,
                                       {'permission':'add'}),}
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         request = testing.DummyRequest()
         ob = testing.DummyModel()
         sm.secured_execute(ob, request, 'publish')
@@ -351,7 +353,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                                            {'permission':'add'}),}
 
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         request = testing.DummyRequest()
         ob = testing.DummyModel()
         from repoze.workflow.statemachine import StateMachineError
@@ -366,7 +368,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                                            {'permission':'add'}),}
 
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         ob = testing.DummyModel()
         sm.secured_execute(ob, None, 'publish')
         self.assertEqual(ob.state, 'published')
