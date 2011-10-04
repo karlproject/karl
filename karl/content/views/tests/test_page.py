@@ -23,8 +23,6 @@ from pyramid import testing
 
 from pyramid.testing import DummyModel
 from pyramid.testing import DummyRequest
-from pyramid.testing import registerDummyRenderer
-from pyramid.testing import registerAdapter
 
 from repoze.lemonade.testing import registerContentFactory
 
@@ -34,6 +32,8 @@ from karl.testing import DummyTagQuery
 from karl.testing import registerLayoutProvider
 
 from karl.content.interfaces import IPage
+
+import karl.testing
 
 class TestAddPageFormController(unittest.TestCase):
     def setUp(self):
@@ -169,8 +169,8 @@ class TestEditPageFormController(unittest.TestCase):
 
     def _registerTags(self, site):
         from karl.models.interfaces import ITagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                        ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from karl.testing import DummyTags
         site.tags = DummyTags()
 
@@ -260,7 +260,7 @@ class ShowPageViewTests(unittest.TestCase):
         self.context['attachments'] = DummyModel()
         self.parent['child'] = self.context
         self.parent.catalog = DummyCatalog()
-        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
+        karl.testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -271,8 +271,8 @@ class ShowPageViewTests(unittest.TestCase):
 
     def _registerTagbox(self):
         from karl.models.interfaces import ITagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def test_it(self):
         registerLayoutProvider()
@@ -281,7 +281,7 @@ class ShowPageViewTests(unittest.TestCase):
         context = self.context
         request = DummyRequest()
 
-        renderer = registerDummyRenderer(self.template_fn)
+        renderer = karl.testing.registerDummyRenderer(self.template_fn)
         self._callFUT(context, request)
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(len(renderer.actions), 3)
