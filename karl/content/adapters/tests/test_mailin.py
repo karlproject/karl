@@ -21,7 +21,7 @@ class MailinBase:
     """ Derived testcase classes must supply '_getTargetClass'.
     """
     def _cleanUp(self):
-        from zope.testing.cleanup import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def _makeOne(self, context):
@@ -45,13 +45,13 @@ class MailinBase:
         # hit and is somewhat useful.
         from karl.adapters.url import OfflineContextURL
         from pyramid.interfaces import IContextURL
-        from pyramid.testing import registerAdapter
+        from karl.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(OfflineContextURL, (Interface, Interface), IContextURL)
 
     def _registerAlerts(self):
         from karl.utilities.interfaces import IAlerts
-        from pyramid.testing import registerUtility
+        from karl.testing import registerUtility
         alerts = DummyAlerts()
         registerUtility(alerts, IAlerts)
         return alerts
