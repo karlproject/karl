@@ -22,6 +22,8 @@ from pyramid import testing
 from karl.testing import DummySessions
 from karl.testing import DummyUsers
 
+import karl.testing
+
 class TestShowIntranetsView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -38,7 +40,8 @@ class TestShowIntranetsView(unittest.TestCase):
         from zope.interface import alsoProvides
         from karl.models.interfaces import ISite
         from karl.models.interfaces import IIntranets
-        renderer = testing.registerDummyRenderer('templates/show_intranets.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_intranets.pt')
         context = testing.DummyModel(title='Intranets')
         directlyProvides(context, IIntranets)
         alsoProvides(context, ISite)
@@ -272,8 +275,8 @@ class EditIntranetRootFormControllerTests(unittest.TestCase):
             def adapter():
                 return addables
             return adapter
-        testing.registerAdapter(tool_adapter, (Interface, Interface),
-                                IToolAddables)
+        karl.testing.registerAdapter(tool_adapter, (Interface, Interface),
+                                     IToolAddables)
 
     def test_form_defaults(self):
         context = self.context
