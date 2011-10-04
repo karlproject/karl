@@ -348,7 +348,6 @@ class DummyMailer(list):
         self.append(self.DummyMessage(mto, msg))
 
 def registerDummyMailer():
-    from pyramid.testing import registerUtility
     from repoze.sendmail.interfaces import IMailDelivery
     mailer = DummyMailer()
     registerUtility(mailer, IMailDelivery)
