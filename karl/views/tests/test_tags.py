@@ -33,7 +33,7 @@ class AddTagsTests(unittest.TestCase):
         return add_tags(context, request, values)
 
     def test_w_no_values(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         tags = context.tags = DummyTags()
@@ -45,7 +45,7 @@ class AddTagsTests(unittest.TestCase):
         self.assertEqual(tags.updated, None)
 
     def test_w_string(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         tags = context.tags = DummyTags()
@@ -58,7 +58,7 @@ class AddTagsTests(unittest.TestCase):
         self.assertEqual(tags.updated, ('docid', 'userid', ['foo']))
 
     def test_no_existing_values(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         tags = context.tags = DummyTags()
@@ -72,7 +72,7 @@ class AddTagsTests(unittest.TestCase):
                          ('docid', 'userid', ['foo', 'bar']))
 
     def test_w_existing_values(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         tags = context.tags = DummyTags(tags=('baz',))
@@ -98,7 +98,7 @@ class SetTagsTests(unittest.TestCase):
         return set_tags(context, request, values)
 
     def test_w_normal_values(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
@@ -108,7 +108,7 @@ class SetTagsTests(unittest.TestCase):
         self.assertEqual(tags.updated, ('docid', 'userid', ['a', 'b']))
 
     def test_w_None(self):
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
@@ -146,7 +146,7 @@ class ShowTagViewTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         context = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/foo': context})
+        karltesting.registerModels({'/foo': context})
         directlyProvides(context, IDummyBlogEntry)
         registerContentFactory(testing.DummyModel, IDummyBlogEntry)
         tags = context.tags = DummyTags()
@@ -182,7 +182,7 @@ class ShowTagViewTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         context = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/foo': context})
+        karltesting.registerModels({'/foo': context})
         directlyProvides(context, IDummyBlogEntry)
         registerContentFactory(testing.DummyModel, IDummyBlogEntry)
         tags = context.tags = DummyTags(users=('dummy', 'dummy2'))
@@ -266,7 +266,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         root.catalog = karltesting.DummyCatalog({1:'/community'})
         context = root['community'] = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/community': context})
+        karltesting.registerModels({'/community': context})
         directlyProvides(context, ICommunity)
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
@@ -311,7 +311,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         root.catalog = karltesting.DummyCatalog({1:'/community'})
         context = root['community'] = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/community': context})
+        karltesting.registerModels({'/community': context})
         directlyProvides(context, ICommunity)
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
@@ -391,7 +391,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         profiles = root['profiles'] = testing.DummyModel()
         context = profiles['phred'] = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/profiles/phred': context})
+        karltesting.registerModels({'/profiles/phred': context})
         directlyProvides(context, IProfile)
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
@@ -439,7 +439,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         profiles = root['profiles'] = testing.DummyModel()
         context = profiles['phred'] = testing.DummyModel()
         context.title = 'title'
-        testing.registerModels({'/profiles/phred': context})
+        karltesting.registerModels({'/profiles/phred': context})
         directlyProvides(context, IProfile)
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
@@ -867,7 +867,7 @@ class TagUsersViewTests(unittest.TestCase):
         to = path['to'] = testing.DummyModel()
         target = to['item'] = testing.DummyModel()
         target.title = 'Target'
-        testing.registerModels({'/path/to/item': target})
+        karltesting.registerModels({'/path/to/item': target})
         request = testing.DummyRequest()
         request.params = {'tag': 'tag1', 'docid': '1'}
         context = testing.DummyModel()
@@ -890,7 +890,7 @@ class TagUsersViewTests(unittest.TestCase):
         to = path['to'] = testing.DummyModel()
         target = to['item'] = testing.DummyModel()
         target.title = 'Target'
-        testing.registerModels({'/path/to/item': target})
+        karltesting.registerModels({'/path/to/item': target})
         profiles = context['profiles'] = testing.DummyModel()
         p1 = profiles['phred'] = testing.DummyModel()
         p1.firstname, p1.lastname = 'J. Phred', 'Bloggs'
@@ -939,7 +939,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         context = root['community'] = testing.DummyModel()
         target = context['target'] = testing.DummyModel()
         target.title = 'Target'
-        testing.registerModels({'/community/target': target})
+        karltesting.registerModels({'/community/target': target})
         request = testing.DummyRequest()
         request.params = {'tag': 'tag1', 'docid': '1'}
 
@@ -956,7 +956,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         context = root['community'] = testing.DummyModel()
         target = context['target'] = testing.DummyModel()
         target.title = 'Target'
-        testing.registerModels({'/community/target': target})
+        karltesting.registerModels({'/community/target': target})
         tags = root.tags = DummyTags()
         def _getUsers(tags=None, items=None, community=None):
             assert list(tags) == ['tag1']
@@ -1226,8 +1226,8 @@ class TestJQueryTagSearchView(unittest.TestCase):
     def test_it(self):
         from karl.models.interfaces import ITagQuery
         from zope.interface import Interface
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                    ITagQuery)
         request = testing.DummyRequest(params={'val':'ignored'})
         context = testing.DummyModel()
         response = self._callFUT(context, request)
