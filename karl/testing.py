@@ -86,6 +86,40 @@ def registerDummyRenderer(path, renderer=None):
     config.commit()
     return result
 
+def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
+    """ Registers a pair of faux :app:`Pyramid` security policies:
+    a :term:`authentication policy` and a :term:`authorization
+    policy`.
+
+    The behavior of the registered :term:`authorization policy`
+    depends on the ``permissive`` argument.  If ``permissive`` is
+    true, a permissive :term:`authorization policy` is registered;
+    this policy allows all access.  If ``permissive`` is false, a
+    nonpermissive :term:`authorization policy` is registered; this
+    policy denies all access.
+
+    The behavior of the registered :term:`authentication policy`
+    depends on the values provided for the ``userid`` and ``groupids``
+    argument.  The authentication policy will return the userid
+    identifier implied by the ``userid`` argument and the group ids
+    implied by the ``groupids`` argument when the
+    :func:`pyramid.security.authenticated_userid` or
+    :func:`pyramid.security.effective_principals` APIs are used.
+
+    This function is most useful when testing code that uses the APIs named
+    :func:`pyramid.security.has_permission`,
+    :func:`pyramid.security.authenticated_userid`,
+    :func:`pyramid.security.unauthenticated_userid`,
+    :func:`pyramid.security.effective_principals`, and
+    :func:`pyramid.security.principals_allowed_by_permission`.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_securitypolicy(userid=userid, groupids=groupids,
+                                           permissive=permissive)
+    config.commit()
+    return result
+
 class DummyCatalog(dict):
     def __init__(self, *maps):
         self.document_map = DummyDocumentMap(*maps)
