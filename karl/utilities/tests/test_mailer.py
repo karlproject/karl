@@ -1,6 +1,6 @@
 import unittest
 from pyramid import testing
-
+import karl.testing
 
 class TestMailDeliveryFactory(unittest.TestCase):
     def setUp(self):
@@ -19,7 +19,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         from pyramid.interfaces import ISettings
         from karl.utilities.mailer import FakeMailDelivery
         settings = DummySettings()
-        testing.registerUtility(settings, ISettings)
+        karl.testing.registerUtility(settings, ISettings)
         os = FakeOS(SUPPRESS_MAIL='1')
         delivery = self._callFUT(os)
         self.assertEqual(delivery.__class__, FakeMailDelivery)
@@ -29,7 +29,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         import sys
         from pyramid.interfaces import ISettings
         settings = DummySettings()
-        testing.registerUtility(settings, ISettings)
+        karl.testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
         exe = sys.executable
         sandbox = os.path.dirname(os.path.dirname(os.path.abspath(exe)))
@@ -39,7 +39,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
     def test_mail_queue_path_specified(self):
         from pyramid.interfaces import ISettings
         settings = DummySettings(mail_queue_path='/var/tmp')
-        testing.registerUtility(settings, ISettings)
+        karl.testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
         self.assertEqual(delivery.queuePath, '/var/tmp')
 
@@ -50,7 +50,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         settings = DummySettings()
         f = NamedTemporaryFile()
         settings.mail_white_list = f.name
-        testing.registerUtility(settings, ISettings)
+        karl.testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
         self.assertEqual(delivery.__class__, WhiteListMailDelivery)
 
@@ -78,11 +78,10 @@ class TestWhiteListMailDelivery(unittest.TestCase):
 
     def _set_whitelist(self, white_list):
         import tempfile
-        from pyramid.testing import registerUtility
         from pyramid.interfaces import ISettings
         tmp = self.tmp_file = tempfile.NamedTemporaryFile()
         settings = DummySettings(mail_white_list=tmp.name)
-        registerUtility(settings, ISettings)
+        karl.testing.registerUtility(settings, ISettings)
 
         for email in white_list:
             print >>tmp, email
