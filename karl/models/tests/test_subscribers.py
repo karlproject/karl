@@ -16,16 +16,17 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 from pyramid import testing
 
+import karl.testing
+
 class TestPostorder(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, node):
         from karl.models.subscribers import postorder
@@ -74,10 +75,10 @@ class TestPostorder(unittest.TestCase):
 
 class TestIndexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import index_content
@@ -128,10 +129,10 @@ class TestIndexContent(unittest.TestCase):
 
 class TestUnindexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, docids):
         from karl.models.subscribers import unindex_content
@@ -153,10 +154,10 @@ class TestUnindexContent(unittest.TestCase):
 
 class TestCleanupContentTags(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, docids):
         from karl.models.subscribers import cleanup_content_tags
@@ -181,10 +182,10 @@ class TestCleanupContentTags(unittest.TestCase):
 
 class TestHandleContentRemoved(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import handle_content_removed
@@ -229,10 +230,10 @@ class TestHandleContentRemoved(unittest.TestCase):
 
 class TestReindexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import reindex_content
@@ -270,11 +271,11 @@ class Test_set_modified(unittest.TestCase,
                         _NOW_replacer,
                        ):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def _callFUT(self, object, event):
@@ -322,7 +323,7 @@ class Test_set_modified(unittest.TestCase,
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
         from karl.models.interfaces import IObjectVersion
-        testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
+        karl.testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
         model = testing.DummyModel()
         model.repo = DummyArchive()
         model.comment = None
@@ -335,11 +336,11 @@ class Test_set_created(unittest.TestCase,
                        _NOW_replacer,
                       ):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def _callFUT(self, object, event):
@@ -405,10 +406,10 @@ class Test_set_created(unittest.TestCase,
 
 class TestDeleteCommunity(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import delete_community
@@ -425,14 +426,14 @@ class TestDeleteCommunity(unittest.TestCase):
 
 class Test_add_to_repo(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IObjectVersion
-        testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import add_to_repo
@@ -453,7 +454,7 @@ class Test_add_to_repo(unittest.TestCase):
     def test_new_container(self):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
         parent = testing.DummyModel(docid=1)
         event = Dummy(parent=parent)
         model = testing.DummyModel(docid=2)
@@ -468,7 +469,7 @@ class Test_add_to_repo(unittest.TestCase):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
         parent = testing.DummyModel(docid=1)
         parent.repo = archive = DummyArchive()
         parent.comment = None
@@ -496,14 +497,14 @@ class Test_add_to_repo(unittest.TestCase):
 class Test_delete_in_repo(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IContainerVersion
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import delete_in_repo
@@ -536,10 +537,10 @@ class DummyUsers:
 
 class AlphaBase(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _registerAdapter(self):
         from zope.interface import implements
@@ -551,7 +552,8 @@ class AlphaBase(unittest.TestCase):
                 self.context = context
             def delta(self, how_many):
                 self.delta_called.append((self.context, how_many))
-        testing.registerAdapter(DummyLetterManager, provides=ILetterManager)
+        karl.testing.registerAdapter(DummyLetterManager,
+                                     provides=ILetterManager)
         return DummyLetterManager
 
 class AlphaAddedTests(AlphaBase):
@@ -623,10 +625,10 @@ class Test_remove_mailinglist(MLBase, unittest.TestCase):
 class ProfileAddedTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import profile_added
@@ -666,10 +668,10 @@ class ProfileAddedTests(unittest.TestCase):
 class ProfileRemovedTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import profile_removed
@@ -688,10 +690,10 @@ class ProfileRemovedTests(unittest.TestCase):
 
 class TestIndexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import index_profile
@@ -745,10 +747,10 @@ class TestIndexProfile(unittest.TestCase):
 
 class TestUnindexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import unindex_profile
@@ -776,10 +778,10 @@ class TestUnindexProfile(unittest.TestCase):
 
 class TestReindexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import reindex_profile
@@ -805,10 +807,10 @@ class TestReindexProfile(unittest.TestCase):
 class QueryLoggerTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.models.subscribers import QueryLogger
@@ -822,7 +824,7 @@ class QueryLoggerTests(unittest.TestCase):
 
     def test_configure_by_utility(self):
         from pyramid.interfaces import ISettings
-        testing.registerUtility(DummySettings(None), ISettings)
+        karl.testing.registerUtility(DummySettings(None), ISettings)
         logger = self._makeOne()
         self.assertEquals(logger._configured, False)
         logger(DummyQueryEvent())
