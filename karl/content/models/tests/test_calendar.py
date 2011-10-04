@@ -18,7 +18,6 @@
 import datetime
 import unittest
 from pyramid import testing
-from zope.testing.cleanup import cleanUp
 
 _NOW = datetime.datetime.now()
 
@@ -90,10 +89,10 @@ class CalendarEventTests(unittest.TestCase):
 
 class TestCalendarToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.calendar import calendar_tool_factory
