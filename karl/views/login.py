@@ -118,7 +118,7 @@ def login_view(context, request):
         )
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})
-        response.headers.update(forget_headers)
+        response.headers.extend(forget_headers)
     return response
 
 def logout_view(context, request, reason='Logged out'):

@@ -44,9 +44,8 @@ class TestOfflineContextURL(unittest.TestCase):
         from pyramid.interfaces import ISettings
         from pyramid.testing import DummyModel
         from karl.testing import registerUtility
-        class DummySettings(dict):
-            offline_app_url = "http://offline.example.com/app/"
-        registerUtility(DummySettings(), ISettings)
+        settings = dict(offline_app_url = "http://offline.example.com/app/")
+        registerUtility(settings, ISettings)
         parent = DummyModel()
         context = parent['foo'] = DummyModel()
         url = self._makeOne(context)

@@ -4,10 +4,10 @@ import os
 import sys
 
 from zope.interface import implements
-from zope.component import queryUtility
-from pyramid.interfaces import ISettings
 from repoze.sendmail.delivery import QueuedMailDelivery
 from repoze.sendmail.interfaces import IMailDelivery
+
+from karl.utils import get_settings
 
 def boolean(s):
     s = s.lower()
@@ -17,18 +17,18 @@ def mail_delivery_factory(os=os): # accepts 'os' for unit test purposes
     """Factory method for creating an instance of repoze.sendmail.IDelivery
     for use by this application.
     """
-    settings = queryUtility(ISettings)
+    settings = get_settings()
 
     # If settings utility not present, we are probably testing and should
     # suppress sending mail.  Can also be set explicitly in environment
     # variable
     suppress_mail = boolean(os.environ.get('SUPPRESS_MAIL', ''))
 
-    if settings is None or suppress_mail:
+    if not settings or suppress_mail:
         return FakeMailDelivery()
 
     md = KarlMailDelivery(settings)
-    if getattr(settings, "mail_white_list", None):
+    if settings.get("mail_white_list", None):
         md = WhiteListMailDelivery(md)
     return md
 
@@ -40,8 +40,8 @@ class KarlMailDelivery(QueuedMailDelivery):
     """
 
     def __init__(self, settings):
-        self.mfrom = getattr(settings, 'envelope_from_addr', None)
-        queue_path = getattr(settings, "mail_queue_path", None)
+        self.mfrom = settings.get('envelope_from_addr', None)
+        queue_path = settings.get("mail_queue_path", None)
         if queue_path is None:
             # Default to var/mail_queue
             # we assume that the console script lives in the 'bin' dir of a
@@ -78,8 +78,8 @@ class WhiteListMailDelivery(object):
 
     def __init__(self, md):
         self.md = md
-        settings = queryUtility(ISettings)
-        white_list_fn = getattr(settings, "mail_white_list", None)
+        settings = get_settings()
+        white_list_fn = settings.get("mail_white_list", None)
         if white_list_fn:
             with open(white_list_fn) as f:
                 self.white_list = set(

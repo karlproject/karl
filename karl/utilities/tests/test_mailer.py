@@ -49,7 +49,7 @@ class TestMailDeliveryFactory(unittest.TestCase):
         from karl.utilities.mailer import WhiteListMailDelivery
         settings = DummySettings()
         f = NamedTemporaryFile()
-        settings.mail_white_list = f.name
+        settings['mail_white_list'] = f.name
         karl.testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
         self.assertEqual(delivery.__class__, WhiteListMailDelivery)
@@ -158,11 +158,12 @@ class DummyMailDelivery(object):
             message=message,
         ))
 
-class DummySettings:
-    envelope_from_addr = 'karl@example.org'
-    def __init__(self, **kw):
-        for k, v in kw.items():
-            setattr(self, k, v)
+def DummySettings(**kw):
+    d = {}
+    d['envelope_from_addr'] = 'karl@example.org'
+    for k, v in kw.items():
+        d[k] = v
+    return d
 
 class FakeOS:
     def __init__(self, **environ):

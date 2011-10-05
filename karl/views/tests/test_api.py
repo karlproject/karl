@@ -216,8 +216,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         from pyramid.interfaces import ISettings
-        settings = karltesting.DummySettings()
-        settings.logo_path = 'mylogo.png'
+        settings = {'logo_path':'mylogo.png'}
         karltesting.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.logo_url, api.static_url + '/mylogo.png')
@@ -232,16 +231,17 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         from pyramid.interfaces import ISettings
-        settings = karltesting.DummySettings()
-        settings.kaltura_enabled = 'true'
         # kaltura_client_session missing
-        settings.kaltura_partner_id = '123456'
-        settings.kaltura_sub_partner_id = '12345600'
-        settings.kaltura_admin_secret = '123456789abcdef123456789abcdef12'
-        settings.kaltura_user_secret = '0123456789abcdef123456789abcdef1'
-        settings.kaltura_kcw_uiconf_id = '9999999'
-        settings.kaltura_player_uiconf_id = '8888888'
-        settings.kaltura_player_cache_st = '77777777'
+        settings = dict(
+            kaltura_enabled = 'true',
+            kaltura_partner_id = '123456',
+            kaltura_sub_partner_id = '12345600',
+            kaltura_admin_secret = '123456789abcdef123456789abcdef12',
+            kaltura_user_secret = '0123456789abcdef123456789abcdef1',
+            kaltura_kcw_uiconf_id = '9999999',
+            kaltura_player_uiconf_id = '8888888',
+            kaltura_player_cache_st = '77777777',
+            )
         karltesting.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
@@ -259,7 +259,7 @@ class TemplateAPITests(unittest.TestCase):
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
 
-        settings.kaltura_client_session = 'false'
+        settings['kaltura_client_session'] = 'false'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
             enabled = True,
@@ -276,7 +276,7 @@ class TemplateAPITests(unittest.TestCase):
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
 
-        settings.kaltura_client_session = 'true'
+        settings['kaltura_client_session'] = 'true'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
             enabled = True,

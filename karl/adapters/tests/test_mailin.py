@@ -500,9 +500,8 @@ class MailinDispatcherTests(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         from karl.testing import registerUtility
-        class DummySettings:
-            system_list_subdomain = 'lists.example.com'
-        registerUtility(DummySettings(), ISettings)
+        settings = dict(system_list_subdomain = 'lists.example.com')
+        registerUtility(settings, ISettings)
         context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
@@ -533,9 +532,8 @@ class MailinDispatcherTests(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         from karl.testing import registerUtility
-        class DummySettings:
-            system_list_subdomain = 'lists.example.com'
-        registerUtility(DummySettings(), ISettings)
+        settings = dict(system_list_subdomain = 'lists.example.com')
+        registerUtility(settings, ISettings)
         context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
