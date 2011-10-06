@@ -132,7 +132,7 @@ def logout_view(context, request, reason='Logged out'):
     auth_tkt = plugins.get('auth_tkt')
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})
-        redirect.headers.update(forget_headers)
+        redirect.headers.extend(forget_headers)
     return redirect
 
 

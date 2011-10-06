@@ -25,7 +25,7 @@ from traceback import format_exc
 
 from pyramid.request import Request
 
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 
 GENERAL_MESSAGE = """
 %(system_name)s encountered an application error.  Please click
@@ -81,14 +81,14 @@ class ErrorPageFilter(object):
                     'system_name': self._system_name}
                 traceback_info = format_exc()
 
-            resp = render_template_to_response(
+            resp = render_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
-                error_message=error_message,
-                error_text=error_text,
-                static_url=static_url,
-                errorlog_url=errorlog_url,
-                home_url=home_url,
-                traceback_info=traceback_info,
+                dict(error_message=error_message,
+                     error_text=error_text,
+                     static_url=static_url,
+                     errorlog_url=errorlog_url,
+                     home_url=home_url,
+                     traceback_info=traceback_info),
                 )
             resp.status = 500
             return resp(environ, start_response)
