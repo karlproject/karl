@@ -27,17 +27,17 @@ class Test_show_history(unittest.TestCase):
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
             Dummy(
-                docid=1,
-                user='ed',
-                archive_time=datetime(2010, 5, 12, 2, 42),
-                version_num=1,
-                current_version=2,
-            ),
-            Dummy(
                 docid=2,
                 user='ed',
                 archive_time=datetime(2010, 5, 13, 2, 42),
                 version_num=2,
+                current_version=2,
+            ),
+            Dummy(
+                docid=1,
+                user='ed',
+                archive_time=datetime(2010, 5, 12, 2, 42),
+                version_num=1,
                 current_version=2,
             ),
         ])

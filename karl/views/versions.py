@@ -48,8 +48,8 @@ def show_history(context, request, tz=None):
             'is_current': record.current_version == record.version_num,
         }
 
+    # newest to oldest
     history = map(display_record, repo.history(context.docid))
-    history.reverse()
 
     page_title = 'History for %s' % context.title
 
