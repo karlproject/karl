@@ -9,18 +9,18 @@ import os
 import re
 import transaction
 from paste.fileapp import FileApp
-from webob import Response
-from webob.exc import HTTPFound
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
 from zope.component import getUtility
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import find_model
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.renderers import get_renderer
+from pyramid.exceptions import NotFound
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.traversal import find_resource
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
@@ -76,12 +76,13 @@ class AdminTemplateAPI(TemplateAPI):
 
         site = find_site(context)
         if 'offices' in site:
-            self.offices_url = model_url(site['offices'], request)
+            self.offices_url = resource_url(site['offices'], request)
         else:
             self.offices_url = None
 
 def _menu_macro():
-    return get_template('templates/admin/menu.pt').macros['menu']
+    return get_renderer(
+        'templates/admin/menu.pt').implementation().macros['menu']
 
 def admin_view(context, request):
     return dict(
@@ -90,10 +91,12 @@ def admin_view(context, request):
     )
 
 def _content_selection_widget():
-    return get_template('templates/admin/content_select.pt').macros['widget']
+    return get_renderer(
+        'templates/admin/content_select.pt').implementation().macros['widget']
 
 def _content_selection_grid():
-    return get_template('templates/admin/content_select.pt').macros['grid']
+    return get_renderer(
+        'templates/admin/content_select.pt').implementation().macros['grid']
 
 def _format_date(d):
     return d.strftime("%m/%d/%Y %H:%M")
@@ -113,7 +116,7 @@ def _populate_content_selection_widget(context, request):
     for docid in docids:
         community = resolver(docid)
         communities.append(dict(
-            path=model_path(community),
+            path=resource_path(community),
             title=community.title,
         ))
 
@@ -130,11 +133,11 @@ def _grid_item(item, request):
     if creator is not None and creator in profiles:
         profile = profiles[creator]
         creator_name = profile.title
-        creator_url = model_url(profile, request)
+        creator_url = resource_url(profile, request)
 
     return dict(
-        path=model_path(item),
-        url=model_url(item, request),
+        path=resource_path(item),
+        url=resource_url(item, request),
         title=item.title,
         modified=_format_date(item.modified),
         creator_name=creator_name,
@@ -192,10 +195,10 @@ def delete_content_view(context, request):
         if paths:
             for path in paths:
                 try:
-                    content = find_model(context, path)
+                    content = find_resource(context, path)
                     del content.__parent__[content.__name__]
                 except KeyError:
-                    # Thrown by find_model if we've already deleted an
+                    # Thrown by find_resource if we've already deleted an
                     # ancestor of this node.  Can safely ignore becuase child
                     # node has been deleted along with ancestor.
                     pass
@@ -205,7 +208,7 @@ def delete_content_view(context, request):
             else:
                 status_message = 'Deleted %d content items.' % len(paths)
 
-            redirect_to = model_url(
+            redirect_to = resource_url(
                 context, request, request.view_name,
                 query=dict(status_message=status_message)
             )
@@ -235,8 +238,8 @@ def _find_dst_container(src_obj, dst_community):
     destination community.  In this example, the relative container path is
     'blog', so we the destination container is /communities/bar/blog.'
     """
-    src_container_path = model_path(src_obj.__parent__)
-    src_community_path = model_path(find_community(src_obj))
+    src_container_path = resource_path(src_obj.__parent__)
+    src_community_path = resource_path(find_community(src_obj))
     rel_container_path = src_container_path[len(src_community_path):]
     dst_container = dst_community
     for node_name in filter(None, rel_container_path.split('/')):
@@ -244,7 +247,7 @@ def _find_dst_container(src_obj, dst_community):
         if dst_container is None:
             raise _DstNotFound(
                 'Path does not exist in destination community: %s' %
-                model_path(dst_community) + rel_container_path
+                resource_path(dst_community) + rel_container_path
             )
     return dst_container
 
@@ -273,9 +276,9 @@ def move_content_view(context, request):
         else:
             try:
                 paths = request.params.getall('selected_content')
-                dst_community = find_model(context, to_community)
+                dst_community = find_resource(context, to_community)
                 for path in paths:
-                    obj = find_model(context, path)
+                    obj = find_resource(context, path)
                     dst_container = _find_dst_container(obj, dst_community)
                     name = make_unique_name(dst_container, obj.__name__)
                     del obj.__parent__[obj.__name__]
@@ -286,7 +289,7 @@ def move_content_view(context, request):
                 else:
                     status_message = 'Moved %d content items.' % len(paths)
 
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     context, request, request.view_name,
                     query=dict(status_message=status_message)
                 )
@@ -390,11 +393,11 @@ class EmailUsersView(object):
 
             status_message = "Sent message to %d users." % n
             if has_permission(ADMINISTER, context, request):
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     context, request, 'admin.html',
                     query=dict(status_message=status_message))
             else:
-                redirect_to = model_url(
+                redirect_to = resource_url(
                     find_communities(context), request, 'all_communities.html',
                     query=dict(status_message=status_message))
 
@@ -750,7 +753,7 @@ def error_monitor_view(context, request):
     states = {}
     urls = {}
     for subsystem in subsystems:
-        urls[subsystem] = model_url(context, request,
+        urls[subsystem] = resource_url(context, request,
                                     'error_monitor_subsystem.html',
                                     query={'subsystem': subsystem})
         states[subsystem] = _get_error_monitor_state(
@@ -786,14 +789,14 @@ def error_monitor_subsystem_view(context, request):
     if subsystem is None or subsystem not in subsystems:
         raise NotFound()
 
-    back_url = model_url(context, request, 'error_monitor.html')
+    back_url = resource_url(context, request, 'error_monitor.html')
     if 'clear' in request.params:
         path = os.path.join(error_monitor_dir, subsystem)
         os.remove(path)
         return HTTPFound(location=back_url)
 
 
-    clear_url = model_url(context, request, request.view_name,
+    clear_url = resource_url(context, request, request.view_name,
                           query={'clear': '1', 'subsystem': subsystem})
     entries = _get_error_monitor_state(error_monitor_dir, subsystem)
 
@@ -855,11 +858,11 @@ def mailin_monitor_view(context, request):
     if _mailin_monitor_app is None:
         # Keep imports local in hopes that this can be removed when BFG 1.3
         # comes out.
-        from repoze.bfg.authorization import ACLAuthorizationPolicy
-        from repoze.bfg.configuration import Configurator
+        from pyramid.authorization import ACLAuthorizationPolicy
+        from pyramid.configuration import Configurator
         from karl.models.mailin_monitor import KarlMailInMonitor
         from karl.security.policy import get_groups
-        from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
+        from pyramid.authentication import RepozeWho1AuthenticationPolicy
 
         authentication_policy = RepozeWho1AuthenticationPolicy(
             callback=get_groups
@@ -874,12 +877,12 @@ def mailin_monitor_view(context, request):
         _mailin_monitor_app = config.make_wsgi_app()
 
     # Dispatch to subapp
-    import webob
+    from pyramid.request import Request
     sub_environ = request.environ.copy()
-    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (model_path(context),
+    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (resource_path(context),
                                             request.view_name)
     sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
-    sub_request = webob.Request(sub_environ)
+    sub_request = Request(sub_environ)
     return sub_request.get_response(_mailin_monitor_app)
 
 def _get_postoffice_queue(context):
@@ -921,7 +924,7 @@ def postoffice_quarantine_view(request):
                     queue.add(message)
         closer.conn.transaction_manager.commit()
         return HTTPFound(
-            location=model_url(context, request, request.view_name)
+            location=resource_url(context, request, request.view_name)
         )
 
     messages = []

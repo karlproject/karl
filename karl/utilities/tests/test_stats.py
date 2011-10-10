@@ -1,17 +1,17 @@
 import unittest
-
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+import karl.testing
 
 class TestCommunityStats(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.utilities import stats
         self._save_datetime = stats.datetime
         stats.datetime = DummyDateTime()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.utilities import stats
         stats.datetime = self._save_datetime
@@ -169,21 +169,20 @@ class TestCommunityStats(unittest.TestCase):
 
 class TestProfileStats(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self.registerCatalogSearch()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def registerCatalogSearch(self):
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
         from zope.interface import Interface
-        registerAdapter(DummySearchAdapter, (Interface, Interface),
-                        ICatalogSearch)
-        registerAdapter(DummySearchAdapter, (Interface,),
-                        ICatalogSearch)
+        karl.testing.registerAdapter(DummySearchAdapter, (Interface, Interface),
+                                     ICatalogSearch)
+        karl.testing.registerAdapter(DummySearchAdapter, (Interface,),
+                                     ICatalogSearch)
 
     def _call_fut(self, context):
         from karl.utilities.stats import collect_profile_stats as fut
@@ -301,18 +300,18 @@ class TestProfileStats(unittest.TestCase):
 
 class TestUserActivityReport(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self._mk_site()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def registerCatalogSearch(self, search_adapter):
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
         from zope.interface import Interface
-        registerAdapter(search_adapter, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(search_adapter, (Interface,),
+                                     ICatalogSearch)
 
     def _mk_site(self):
         from karl.models.interfaces import ICommunity

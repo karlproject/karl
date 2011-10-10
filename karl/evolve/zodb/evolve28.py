@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.content.interfaces import ICommunityFile
 from karl.models.interfaces import ICatalogSearch
@@ -27,7 +27,7 @@ def evolve(root):
         doc = resolver(docid)
         mimetype = mimetypes.guess_type(doc.filename)[0]
         if mimetype is not None and mimetype != doc.mimetype:
-            addr = model_path(doc)
+            addr = resource_path(doc)
             print "Updating mimetype for %s: %s" % (addr, mimetype)
             doc.mimetype = mimetype
             mimetype_index.reindex_doc(docid_for_addr(addr), doc)

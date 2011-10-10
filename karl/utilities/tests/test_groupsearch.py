@@ -1,13 +1,12 @@
 import unittest
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
 
 class TestLiveSearchGroup(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        self.config = testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.utilities.groupsearch import GroupSearch
@@ -18,6 +17,7 @@ class TestLiveSearchGroup(unittest.TestCase):
                                       containment)
 
     def _register(self, batch):
+        import karl.testing
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         searchkw = {}
@@ -28,12 +28,12 @@ class TestLiveSearchGroup(unittest.TestCase):
                 searchkw.update(kw)
                 return len(batch), batch, resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, (Interface),
+                                     ICatalogSearch)
         return searchkw
 
     def test_makeCriteria(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('fred', ['group:foo', 'group:bar'])
         request = testing.DummyRequest()
         context = testing.DummyModel()
@@ -54,7 +54,7 @@ class TestLiveSearchGroup(unittest.TestCase):
 
     def test_makeCriteria_no_interfaces(self):
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('fred', ['group:foo', 'group:bar'])
         request = testing.DummyRequest()
         context = testing.DummyModel()

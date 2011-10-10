@@ -20,17 +20,17 @@
 import os
 import re
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.url import model_url
-from repoze.bfg.view import static
+from pyramid.url import resource_url
+from pyramid.static import static_view
 
 from karl.views.utils import get_user_home
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 # five year expires time
-static_view = static('static', cache_max_age=157680000)
+static_view = static_view('static', cache_max_age=157680000, use_subpath=True)
 
 version_match = re.compile(r'^r-?\d+$').match
 # version number is "r" plus an integer (possibly negative)
@@ -45,7 +45,7 @@ def versioning_static_view(context, request):
 
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)
-    return HTTPFound(location=model_url(home, request, *extra_path))
+    return HTTPFound(location=resource_url(home, request, *extra_path))
 
 class StaticRootFactory(object):
     def __init__(self, environ):

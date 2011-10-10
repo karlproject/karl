@@ -2,7 +2,7 @@ import unittest
 import schemaish
 from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 from repoze.who.plugins.zodb.users import get_sha_password
 
 class TestTagsWidget(unittest.TestCase):

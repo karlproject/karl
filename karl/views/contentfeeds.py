@@ -19,8 +19,8 @@
 from itertools import islice
 from urlparse import urljoin
 
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import authenticated_userid
 
 from karl.utils import find_events
 from karl.views.api import TemplateAPI
@@ -39,7 +39,7 @@ def _get_criteria(request):
     # the no-filter button sticky.
     header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
     request.cookies[_FILTER_COOKIE] = filterby
-    request.response_headerlist = [header]
+    request.response.set_cookie(_FILTER_COOKIE, str(filterby), path='/')
 
     if filterby == 'mycommunities':
         principals = [x for x in principals if not x.startswith('group.Karl')]

@@ -21,7 +21,7 @@ class MailinBase:
     """ Derived testcase classes must supply '_getTargetClass'.
     """
     def _cleanUp(self):
-        from zope.testing.cleanup import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def _makeOne(self, context):
@@ -30,7 +30,7 @@ class MailinBase:
     def _registerFactory(self, iface, factory=None):
         from repoze.lemonade.testing import registerContentFactory
         if factory is None:
-            from repoze.bfg.testing import DummyModel as factory
+            from pyramid.testing import DummyModel as factory
         registerContentFactory(factory, iface)
 
     def _registerSecurityWorkflow(self):
@@ -44,14 +44,14 @@ class MailinBase:
         # I think testing this minor integration point is not a performance
         # hit and is somewhat useful.
         from karl.adapters.url import OfflineContextURL
-        from repoze.bfg.interfaces import IContextURL
-        from repoze.bfg.testing import registerAdapter
+        from pyramid.interfaces import IContextURL
+        from karl.testing import registerAdapter
         from zope.interface import Interface
         registerAdapter(OfflineContextURL, (Interface, Interface), IContextURL)
 
     def _registerAlerts(self):
         from karl.utilities.interfaces import IAlerts
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         alerts = DummyAlerts()
         registerUtility(alerts, IAlerts)
         return alerts
@@ -67,7 +67,7 @@ class MailinBase:
 
     def test_instance_conforms_to_IMailinHandler(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.adapters.interfaces import IMailinHandler
         verifyObject(IMailinHandler, self._makeOne(DummyModel()))
 
@@ -84,7 +84,7 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         return BlogEntryMailinHandler
 
     def test_handle_no_email_attachments(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.interfaces import IComment
         import datetime
         self._registerFactory(IComment, DummyModel)
@@ -118,7 +118,7 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
 
     def test_handle_w_email_attachments(self):
         import datetime
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.interfaces import IComment
         from karl.content.interfaces import ICommunityFile
         self._registerFactory(IComment, DummyModel)
@@ -165,7 +165,7 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
 
     def test_handle_w_alert(self):
         import datetime
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.models.interfaces import IComment
         self._registerFactory(IComment, DummyModel)
         self._registerContextURL()
@@ -218,7 +218,7 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
 
     def test_handle_no_email_attachments(self):
         import datetime
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.content.interfaces import IBlogEntry
         self._set_NOW(datetime.datetime(2009, 01, 28, 10, 00, 00))
         self._registerFactory(IBlogEntry, _makeBlogEntryClass())
@@ -251,7 +251,7 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
 
     def test_handle_with_email_attachments_no_entry_attachments(self):
         import datetime
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.content.interfaces import IBlogEntry
         from karl.content.interfaces import ICommunityFile
         self._set_NOW(datetime.datetime(2009, 01, 28, 10, 00, 00))
@@ -299,7 +299,7 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
 
     def test_handle_with_email_attachments_w_entry_attachments(self):
         import datetime
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.content.interfaces import IBlogEntry
         from karl.content.interfaces import ICommunityFile
         self._set_NOW(datetime.datetime(2009, 01, 28, 10, 00, 00))
@@ -348,7 +348,7 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
 
 def _makeBlogEntryClass(init_attachments=True):
     from zope.interface import implements
-    from repoze.bfg.testing import DummyModel
+    from pyramid.testing import DummyModel
     from karl.models.interfaces import ICommunityContent
 
     class DummyBlogEntry(DummyModel):
@@ -370,8 +370,8 @@ class DummyAlerts(object):
         self.emissions = []
 
     def emit(self, context, request):
-        from repoze.bfg.url import model_url
-        url = model_url(context, request)
+        from pyramid.url import resource_url
+        url = resource_url(context, request)
         self.emissions.append((context, url))
 
 class DummySettings:

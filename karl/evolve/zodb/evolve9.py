@@ -1,5 +1,5 @@
-from repoze.bfg.authorization import Allow
-from repoze.bfg.traversal import model_path
+from pyramid.authorization import Allow
+from pyramid.traversal import resource_path
 
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
@@ -28,5 +28,5 @@ def evolve(site):
         obj = resolver(docid)
         if obj is None:
             continue # Work around catalog bug
-        print "Updating acl for %s" % model_path(obj)
+        print "Updating acl for %s" % resource_path(obj)
         update_acl(obj)

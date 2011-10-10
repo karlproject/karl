@@ -32,23 +32,23 @@ from karl.consts import countries
 import transaction
 
 from email.Message import Message
-from webob import Response
+from pyramid.response import Response
 from simplejson import JSONEncoder
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.security import has_permission
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.url import model_url
+from pyramid.renderers import render_to_response
+from pyramid.renderers import get_renderer
+from pyramid.security import has_permission
+from pyramid.security import effective_principals
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_interface
+from pyramid.url import resource_url
 
-from repoze.bfg.formish import ValidationError
+from pyramid_formish import ValidationError
 
 from repoze.workflow import get_workflow
 
@@ -106,7 +106,7 @@ def _get_common_email_info(community, community_href):
 def _member_profile_batch(context, request):
     community = find_interface(context, ICommunity)
     member_names = community.member_names
-    profiles_path = model_path(find_profiles(context))
+    profiles_path = resource_path(find_profiles(context))
     batch = get_catalog_batch(
         context, request,
         batch_size = 12,
@@ -130,7 +130,7 @@ def show_members_view(context, request):
 
     # Did we get the "show pictures" flag?
     hp = request.params.has_key('hide_pictures')
-    mu = model_url(context, request)
+    mu = resource_url(context, request)
     submenu = [
         {'label': 'Show Pictures',
          'href': mu, 'make_link': hp},
@@ -148,7 +148,7 @@ def show_members_view(context, request):
         derived = {}
         entry = member_entries[i]
         derived['title'] = entry.title
-        derived['href'] = model_url(entry, request)
+        derived['href'] = resource_url(entry, request)
         derived['position'] = entry.position
         derived['organization'] = entry.organization
         derived['phone'] = entry.phone
@@ -181,18 +181,19 @@ def show_members_view(context, request):
             if not has_permission('view', profile, request):
                 continue
             derived['title'] = profile.title
-            derived['href'] = model_url(profile, request)
+            derived['href'] = resource_url(profile, request)
             moderator_info.append(derived)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_members.pt',
-        api=api,
-        actions=actions,
-        submenu=submenu,
-        moderators=moderator_info,
-        members=member_info,
-        batch_info=member_batch,
-        hide_pictures=hp,
+        dict(api=api,
+             actions=actions,
+             submenu=submenu,
+             moderators=moderator_info,
+             members=member_info,
+             batch_info=member_batch,
+             hide_pictures=hp),
+        request=request,
         )
 
 
@@ -205,7 +206,8 @@ def _send_moderators_changed_email(community,
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Change in moderators for %s'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_moderators_changed.pt')
+    body_template = get_renderer(
+        'templates/email_moderators_changed.pt').implementation()
 
     profiles = find_profiles(community)
     all_moderators = cur_moderators | prev_moderators
@@ -341,12 +343,12 @@ class ManageMembersFormController(object):
                 'page_description':desc}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         results = []
         community = self.community
-        community_href = model_url(community, self.request)
+        community_href = resource_url(community, self.request)
         context = self.context
         request = self.request
         moderators = community.moderator_names # property
@@ -406,7 +408,7 @@ class ManageMembersFormController(object):
                                            cur_moderators, moderators)
         joined_result = ', '.join(results)
         status_message = 'Membership information changed: %s' % joined_result
-        location = model_url(context, request, "manage.html",
+        location = resource_url(context, request, "manage.html",
                              query={"status_message": status_message})
         return HTTPFound(location=location)
 
@@ -418,7 +420,8 @@ def _send_aeu_emails(community, community_href, profiles, text):
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'You have been added to the %s community'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_add_existing.pt')
+    body_template = get_renderer(
+        'templates/email_add_existing.pt').implementation()
     html_body = text
 
     mailer = getUtility(IMailDelivery)
@@ -513,7 +516,7 @@ class AddExistingUserFormController(object):
                                    converted['text'], request)
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
 def _add_existing_users(context, community, profiles, text, request):
     users = find_users(community)
@@ -524,7 +527,7 @@ def _add_existing_users(context, community, profiles, text, request):
 
     # Generate HTML and text mail messages and send a mail for
     # each user added to the community.
-    community_href = model_url(community, request)
+    community_href = resource_url(community, request)
     _send_aeu_emails(community, community_href, profiles, text)
 
     # We delivered invitation messages to each user.  Redirect to
@@ -535,7 +538,7 @@ def _add_existing_users(context, community, profiles, text, request):
     else:
         fmt = '%s members added and emails sent.'
         msg = fmt % len(profiles)
-    location = model_url(context, request, 'manage.html',
+    location = resource_url(context, request, 'manage.html',
                          query={'status_message': msg})
     return HTTPFound(location=location)
 
@@ -612,7 +615,7 @@ class AcceptInvitationFormController(object):
             'country':formish.SelectChoice(countries),
             'photo':karlwidgets.PhotoImageWidget(
                 filestore=self.filestore,
-                url_base=model_url(self.context, self.request, 'photo'),
+                url_base=resource_url(self.context, self.request, 'photo'),
                 image_thumbnail_default=default_icon),
             'websites': formish.TextArea(
                 rows=3,
@@ -638,7 +641,7 @@ class AcceptInvitationFormController(object):
         return widgets
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -658,7 +661,7 @@ class AcceptInvitationFormController(object):
         if username in profiles:
             raise ValidationError(username='Username already taken')
 
-        community_href = model_url(community, request)
+        community_href = resource_url(community, request)
         groups = [ community.members_group_name ]
         users.add(username, username, password, groups)
         plugin = request.environ['repoze.who.plugins']['auth_tkt']
@@ -689,7 +692,7 @@ class AcceptInvitationFormController(object):
             raise ValidationError(**e.error_dict)
 
         del context.__parent__[context.__name__]
-        url = model_url(community, request,
+        url = resource_url(community, request,
                         query={'status_message':'Welcome!'})
         _send_ai_email(community, community_href, username, profile)
         self.filestore.clear()
@@ -715,7 +718,8 @@ def _send_ai_email(community, community_href, username, profile):
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Thank you for joining the %s community'
     subject = subject_fmt % info['c_title']
-    body_template = get_template('templates/email_accept_invitation.pt')
+    body_template = get_renderer(
+        'templates/email_accept_invitation.pt').implementation()
 
     mailer = getUtility(IMailDelivery)
     msg = Message()
@@ -775,7 +779,7 @@ class InviteNewUsersFormController(object):
                 'page_description':desc}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -783,7 +787,7 @@ class InviteNewUsersFormController(object):
         community = self.community
         random_id = getUtility(IRandomId)
         members = community.member_names | community.moderator_names
-        community_href = model_url(community, request)
+        community_href = resource_url(community, request)
 
         search = ICatalogSearch(context)
 
@@ -858,7 +862,7 @@ class InviteNewUsersFormController(object):
             else:
                 status += '%d users already members.' % nignored
 
-        location = model_url(context, request, 'manage.html',
+        location = resource_url(context, request, 'manage.html',
                              query={'status_message': status})
 
         return HTTPFound(location=location)
@@ -869,7 +873,8 @@ def _send_invitation_email(request, community, community_href, invitation):
     subject_fmt = 'Please join the %s community at %s'
     info['subject'] = subject_fmt % (info['c_title'],
                                      info['system_name'])
-    body_template = get_template('templates/email_invite_new.pt')
+    body_template = get_renderer(
+        'templates/email_invite_new.pt').implementation()
 
     msg = Message()
     msg['From'] = info['mfrom']
@@ -881,7 +886,7 @@ def _send_invitation_email(request, community, community_href, invitation):
         community_name=info['c_title'],
         community_description=info['c_description'],
         personal_message=invitation.message,
-        invitation_url=model_url(invitation.__parent__, request,
+        invitation_url=resource_url(invitation.__parent__, request,
                                  invitation.__name__)
         )
 

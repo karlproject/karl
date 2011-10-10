@@ -24,18 +24,16 @@ import time
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
-from zope.component import queryUtility
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.url import model_url
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import quote_path_segment
+from pyramid.url import resource_url
+from pyramid.security import effective_principals
+from pyramid.traversal import quote_path_segment
 
-from repoze.bfg.location import lineage
-from repoze.bfg.traversal import model_path
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.interfaces import ISettings
+from pyramid.location import lineage
+from pyramid.traversal import resource_path
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.renderers import get_renderer
 
 from repoze.lemonade.content import get_content_type
 from repoze.lemonade.listitem import get_listitems
@@ -44,7 +42,7 @@ from karl.consts import countries
 from karl.utils import find_intranet
 from karl.utils import find_intranets
 from karl.utils import find_site
-from karl.utils import get_setting
+from karl.utils import get_settings
 from karl.utils import support_attachments
 from karl.views.utils import convert_to_script
 
@@ -60,7 +58,7 @@ from karl.views.interfaces import IFooter
 from karl.views.interfaces import ISidebar
 from karl.views.utils import get_user_home
 
-from repoze.bfg.traversal import find_interface
+from pyramid.traversal import find_interface
 
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
@@ -80,18 +78,17 @@ class TemplateAPI(object):
     _livesearch_options = None
 
     def __init__(self, context, request, page_title=None):
+        self.settings = get_settings() or {}
         site = find_site(context)
         self.context = context
         self.request = request
         self.userid = authenticated_userid(request)
         self.app_url = app_url = request.application_url
         self.profile_url = app_url + '/profiles/%s' % self.userid
-        self.here_url = self.context_url = model_url(context, request)
-        self.view_url = model_url(context, request, request.view_name)
-        settings = queryUtility(ISettings)
-        self.js_devel_mode = settings and getattr(settings,
-                                                  'js_devel_mode', None)
-        self.read_only = settings and getattr(settings, 'read_only', False)
+        self.here_url = self.context_url = resource_url(context, request)
+        self.view_url = resource_url(context, request, request.view_name)
+        self.js_devel_mode = self.settings.get('js_devel_mode', None)
+        self.read_only = self.settings.get('read_only', False)
         self.static_url = '%s/static/%s' % (app_url, _get_static_rev())
 
         # this data will be provided for the client javascript
@@ -100,7 +97,7 @@ class TemplateAPI(object):
         # Provide a setting in the INI to fully control the entire URL
         # to the static.  This is when the proxy runs a different port
         # number, or to "pipeline" resources on a different URL path.
-        full_static_path = getattr(settings, 'full_static_path', False)
+        full_static_path = self.settings.get('full_static_path', False)
         if full_static_path:
             if '%d' in full_static_path:
                 # XXX XXX note self._start_time is needed... and not _start_time
@@ -109,11 +106,11 @@ class TemplateAPI(object):
                 full_static_path = full_static_path % self._start_time
             self.static_url = full_static_path
         self.page_title = page_title
-        self.system_name = get_setting(context, 'system_name', 'KARL')
+        self.system_name = self.settings.get('system_name', 'KARL')
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
         self.can_administer = has_permission('administer', site, request)
         self.can_email = has_permission('email', site, request)
-        self.admin_url = model_url(site, request, 'admin.html')
+        self.admin_url = resource_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
         # XXX XXX XXX This will never work from peoples formish templates
         # XXX XXX XXX (edit_profile and derivates) because, in those form
@@ -125,19 +122,25 @@ class TemplateAPI(object):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
 
-        if settings:
+        if self.settings:
             self.kaltura_info = dict(
-                enabled =  getattr(settings, 'kaltura_enabled', False) in ('true', 'True'),
-                partner_id = getattr(settings, 'kaltura_partner_id', ''),
-                sub_partner_id = getattr(settings, 'kaltura_sub_partner_id', ''),
-                admin_secret = getattr(settings, 'kaltura_admin_secret', ''),
-                user_secret = getattr(settings, 'kaltura_user_secret', ''),
-                kcw_uiconf_id = getattr(settings, 'kaltura_kcw_uiconf_id', '1000741'),
-                player_uiconf_id = getattr(settings, 'kaltura_player_uiconf_id', ''),
-                player_cache_st = getattr(settings, 'kaltura_player_cache_st', ''),
+                enabled =  self.settings.get(
+                    'kaltura_enabled', False) in ('true', 'True'),
+                partner_id = self.settings.get('kaltura_partner_id', ''),
+                sub_partner_id = self.settings.get(
+                    'kaltura_sub_partner_id', ''),
+                admin_secret = self.settings.get('kaltura_admin_secret', ''),
+                user_secret = self.settings.get('kaltura_user_secret', ''),
+                kcw_uiconf_id = self.settings.get(
+                    'kaltura_kcw_uiconf_id', '1000741'),
+                player_uiconf_id = self.settings.get(
+                    'kaltura_player_uiconf_id', ''),
+                player_cache_st = self.settings.get(
+                    'kaltura_player_cache_st', ''),
                 local_user = self.userid,
             )
-            if not getattr(settings, 'kaltura_client_session', False) in ('true', 'True'):
+            if not self.settings.get(
+                'kaltura_client_session', False) in ('true', 'True'):
                 # Secrets will not be sent to client, instead session is handled on the server.
                 self.kaltura_info['session_url'] = app_url + '/' + 'kaltura_create_session.json'
         else:
@@ -156,7 +159,8 @@ class TemplateAPI(object):
     @property
     def snippets(self):
         if self._snippets is None:
-            self._snippets = get_template('templates/snippets.pt')
+            r = get_renderer('templates/snippets.pt')
+            self._snippets = r.implementation()
             self._snippets.doctype = xhtml
         return self._snippets
 
@@ -213,7 +217,7 @@ class TemplateAPI(object):
         if self._recent_items is None:
             community = find_interface(self.context, ICommunity)
             if community is not None:
-                community_path = model_path(community)
+                community_path = resource_path(community)
                 search = getAdapter(self.context, ICatalogSearch)
                 principals = effective_principals(self.request)
                 self._recent_items = []
@@ -236,26 +240,26 @@ class TemplateAPI(object):
     community_layout_fn = 'karl.views:templates/community_layout.pt'
     @property
     def community_layout(self):
-        macro_template = get_template(self.community_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.community_layout_fn)
+        return macro_template.implementation()
 
     anonymous_layout_fn = 'karl.views:templates/anonymous_layout.pt'
     @property
     def anonymous_layout(self):
-        macro_template = get_template(self.anonymous_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.anonymous_layout_fn)
+        return macro_template.implementation()
 
     generic_layout_fn = 'karl.views:templates/generic_layout.pt'
     @property
     def generic_layout(self):
-        macro_template = get_template(self.generic_layout_fn)
-        return macro_template
+        macro_template = get_renderer(self.generic_layout_fn)
+        return macro_template.implementation()
 
     formfields_fn = 'karl.views:templates/formfields.pt'
     @property
     def formfields(self):
-        macro_template = get_template(self.formfields_fn)
-        return macro_template
+        macro_template = get_renderer(self.formfields_fn)
+        return macro_template.implementation()
 
     @property
     def form_field_templates(self):
@@ -293,7 +297,7 @@ class TemplateAPI(object):
     def people_url(self):
         # Get a setting for what part is appended the the app_url for
         # this installation's people directory application.
-        people_path = get_setting(self.context, 'people_path', 'people')
+        people_path = self.settings.get('people_path', 'people')
         return self.app_url + "/" + people_path
 
     @property
@@ -312,7 +316,7 @@ class TemplateAPI(object):
                 # Maybe there aren't any intranets defined yet
                 return []
             request = self.request
-            intranets_url = model_url(intranets, request)
+            intranets_url = resource_url(intranets, request)
             for name, entry in intranets.items():
                 try:
                     content_iface = get_content_type(entry)
@@ -430,12 +434,8 @@ class TemplateAPI(object):
     def home_url(self):
         if self._home_url is None:
             target, extra_path = get_user_home(self.context, self.request)
-            self._home_url = model_url(target, self.request, *extra_path)
+            self._home_url = resource_url(target, self.request, *extra_path)
         return self._home_url
-
-    @property
-    def settings(self):
-        return SettingsReader(self.context)
 
     @property
     def support_attachments(self):
@@ -443,7 +443,7 @@ class TemplateAPI(object):
 
     @property
     def logo_url(self):
-        logo_path = get_setting(self.context, 'logo_path', 'images/logo.gif')
+        logo_path = self.settings.get('logo_path', 'images/logo.gif')
         return '%s/%s' % (self.static_url, logo_path)
 
     def render_karl_client_data(self, update_dict=None):
@@ -496,14 +496,6 @@ class TemplateAPI(object):
                 if item['component'].livesearch]
         return self._livesearch_options
 
-
-class SettingsReader:
-    """Convenience for reading settings in templates"""
-    def __init__(self, context):
-        self._context = context
-
-    def __getattr__(self, name):
-        return get_setting(self._context, name)
 
 _static_rev = None
 

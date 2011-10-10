@@ -17,10 +17,12 @@
 
 import unittest
 import datetime
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 from zope.interface import implements
 
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class TestRedirectToFrontPage(unittest.TestCase):
     def setUp(self):
@@ -48,7 +50,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -68,11 +70,11 @@ class TestAddWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
@@ -143,7 +145,7 @@ class TestAddWikiPageFormController(unittest.TestCase):
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
         registerContentFactory(DummyWikiPage, IWikiPage)
-        testing.registerDummySecurityPolicy('userid')
+        karl.testing.registerDummySecurityPolicy('userid')
         class Alerts(object):
             def __init__(self):
                 self.emitted = []
@@ -151,7 +153,7 @@ class TestAddWikiPageFormController(unittest.TestCase):
             def emit(self, context, request):
                 self.emitted.append((context, request))
         alerts = Alerts()
-        testing.registerUtility(alerts, IAlerts)
+        karl.testing.registerUtility(alerts, IAlerts)
         self._registerSecurityWorkflow()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -176,11 +178,11 @@ class TestShowWikipageView(unittest.TestCase):
         return show_wikipage_view(context, request)
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def test_frontpage(self):
         self._register()
@@ -198,7 +200,8 @@ class TestShowWikipageView(unittest.TestCase):
 
     def test_otherpage(self):
         self._register()
-        renderer = testing.registerDummyRenderer('templates/show_wikipage.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_wikipage.pt')
         context = testing.DummyModel(title='Other Page')
         context.__parent__ = testing.DummyModel(title='Front Page')
         context.__parent__.__name__ = 'front_page'
@@ -215,7 +218,8 @@ class TestShowWikipageView(unittest.TestCase):
 
     def test_otherpage_w_repo(self):
         self._register()
-        renderer = testing.registerDummyRenderer('templates/show_wikipage.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_wikipage.pt')
         context = testing.DummyModel(title='Other Page')
         context.__parent__ = testing.DummyModel(title='Front Page')
         context.__parent__.__name__ = 'front_page'
@@ -244,20 +248,21 @@ class TestShowWikitocView(unittest.TestCase):
         return show_wikitoc_view(context, request)
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface, ),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(DummySearch, (Interface, ),
+                                     ICatalogSearch)
 
 
     def test_frontpage(self):
         self._register()
-        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_wikitoc.pt')
         context = DummyWikiPage()
         context.__name__ = 'front_page'
         context.title = 'Page'
@@ -273,7 +278,8 @@ class TestShowWikitocView(unittest.TestCase):
 
     def test_otherpage(self):
         self._register()
-        renderer = testing.registerDummyRenderer('templates/show_wikitoc.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_wikitoc.pt')
         context = DummyWikiPage(title='Other Page')
         context.__name__ = 'other_page'
         from karl.testing import DummyCommunity
@@ -305,11 +311,11 @@ class TestEditWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from repoze.bfg import testing
+        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
@@ -325,10 +331,10 @@ class TestEditWikiPageFormController(unittest.TestCase):
         from karl.content.interfaces import IWikiPage
         from karl.content.views.adapters import WikiPageAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
-        testing.registerAdapter(WikiPageAlert,
-                                (IWikiPage, IProfile, IRequest),
-                                IAlert)
+        from pyramid.interfaces import IRequest
+        karl.testing.registerAdapter(WikiPageAlert,
+                                     (IWikiPage, IProfile, IRequest),
+                                     IAlert)
 
     def test_form_defaults(self):
         self._register()
@@ -401,8 +407,9 @@ class TestEditWikiPageFormController(unittest.TestCase):
         request = testing.DummyRequest()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
         self.assertEqual(L[0], context)
@@ -432,8 +439,9 @@ class TestEditWikiPageFormController(unittest.TestCase):
         request = testing.DummyRequest()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
         self.assertEqual(L[0], context)
@@ -541,7 +549,7 @@ class Test_preview_wikipage_view(unittest.TestCase):
         self.assertEqual(response['body'], 'COOKED: Reverted 2')
 
     def test_no_such_version(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         context = testing.DummyModel(docid=5)
         context.title = 'Foo'
         context.__name__ = 'foo'

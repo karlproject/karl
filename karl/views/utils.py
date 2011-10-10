@@ -26,9 +26,9 @@ from os.path import splitext
 
 from zope.interface import alsoProvides
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.threadlocal import get_current_request
-from repoze.bfg.traversal import traverse
+from pyramid.security import authenticated_userid
+from pyramid.threadlocal import get_current_request
+from pyramid.traversal import traverse
 from repoze.lemonade.content import create_content
 
 from karl.utils import find_communities
@@ -45,7 +45,7 @@ from karl.views.forms.filestore import get_filestore
 from simplejson import JSONEncoder
 from textwrap import dedent
 from PIL import Image
-from webob import Response
+from pyramid.response import Response
 import transaction
 
 _convert_to_dashes = re.compile(r"""[\s/:"']""") # ' damn you emacs

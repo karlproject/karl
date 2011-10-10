@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import ICalendarCategory
@@ -22,7 +22,7 @@ def evolve(context):
             continue
         if not getattr(event, 'calendar_category', ''):
             calendar = event.__parent__
-            default_path = model_path(calendar) + '/' + default_category_name
+            default_path = resource_path(calendar) + '/' + default_category_name
             event.calendar_category = default_path
             virtual.reindex_doc(docid, event)
             

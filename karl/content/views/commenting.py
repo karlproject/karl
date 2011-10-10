@@ -17,7 +17,8 @@
 
 import urllib
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
+
 from zope.component.event import objectEventNotify
 
 from zope.component import getMultiAdapter
@@ -26,10 +27,10 @@ from zope.component import queryUtility
 from schemaish.type import File as SchemaFile
 import schemaish
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.renderers import render_to_response
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 
 from karl.events import ObjectModifiedEvent
@@ -61,7 +62,7 @@ def redirect_comments_view(context, request):
     # easier to implement another redirect than re-implement the
     # delete view.
 
-    url = model_url(context.__parent__, request)
+    url = resource_url(context.__parent__, request)
     status_message = request.GET.get('status_message', False)
     if status_message:
         msg = '?status_message=' + status_message
@@ -93,7 +94,7 @@ def show_comment_view(context, request):
         # Comments can also be in forum topics
         container = find_interface(context, IForumTopic)
     backto = {
-        'href': model_url(container, request),
+        'href': resource_url(container, request),
         'title': container.title,
         }
 
@@ -106,14 +107,15 @@ def show_comment_view(context, request):
     else:
         attachments = ()
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_comment.pt',
-        api=api,
-        actions=actions,
-        byline_info=byline_info,
-        attachments=attachments,
-        backto=backto,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             byline_info=byline_info,
+             attachments=attachments,
+             backto=backto,
+             layout=layout),
+        request=request,
         )
 
 add_comment_field = schemaish.String(
@@ -161,14 +163,14 @@ class AddCommentFormController(object):
         # ways of calling this form directly, so better redirect to
         # add comment, which is what they seem to be trying anyway
         add_comment = "addcomment"
-        location = model_url(self.context.__parent__,
-                             self.request,
-                             anchor=add_comment)
+        location = resource_url(self.context.__parent__,
+                                self.request,
+                                anchor=add_comment)
         return HTTPFound(location=location)
 
 
     def handle_cancel(self):
-        location = model_url(self.context.__parent__, self.request)
+        location = resource_url(self.context.__parent__, self.request)
         return HTTPFound(location=location)
 
     def handle_submit(self, converted):
@@ -202,7 +204,7 @@ class AddCommentFormController(object):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(comment, request)
 
-        location = model_url(parent, request)
+        location = resource_url(parent, request)
         msg = 'Comment added'
         location = '%s?status_message=%s' % (location, urllib.quote(msg))
         self.filestore.clear()
@@ -254,7 +256,7 @@ class EditCommentFormController(object):
     def handle_cancel(self):
         context = self.context
         blogentry = find_interface(self.context, IBlogEntry)
-        return HTTPFound(location=model_url(blogentry, self.request))
+        return HTTPFound(location=resource_url(blogentry, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -274,6 +276,6 @@ class EditCommentFormController(object):
                                request)
         context.modified_by = creator
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         self.filestore.clear()
         return HTTPFound(location=location)

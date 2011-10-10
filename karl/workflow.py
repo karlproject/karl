@@ -1,8 +1,8 @@
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import Everyone
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import model_path
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import Everyone
+from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IUserAddedGroup
@@ -63,7 +63,7 @@ def _reindex_peopledir(profile):
     # The docid stored as an attribute on the profile is the docid for the main
     # site catalog.  The peopledir catalog has a different set of docids, so it
     # is necessary to consult the document map.
-    path = model_path(profile)
+    path = resource_path(profile)
     docid = catalog.document_map.docid_for_address(path)
     catalog.reindex_doc(docid, profile)
 
@@ -114,7 +114,7 @@ def community_to_private(ob, info):
     added, removed = acl_diff(community, acl)
     if added or removed:
         community.__acl__ = acl
-        msg = ts('community-private', model_path(community), added, removed)
+        msg = ts('community-private', resource_path(community), added, removed)
     _reindex(community)
     return msg
 
@@ -132,7 +132,7 @@ def community_to_public(ob, info):
     added, removed = acl_diff(community, acl)
     if added or removed:
         community.__acl__ = acl
-        msg = ts('community-public', model_path(community), added, removed)
+        msg = ts('community-public', resource_path(community), added, removed)
     _reindex(community)
     return msg
 
@@ -150,7 +150,7 @@ def community_to_intranet(ob, info):
     added, removed = acl_diff(community, acl)
     if added or removed:
         community.__acl__ = acl
-        msg = ts('community-intranet', model_path(community), added, removed)
+        msg = ts('community-intranet', resource_path(community), added, removed)
     _reindex(community)
     return msg
 
@@ -171,7 +171,7 @@ def blogentry_to_inherits(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('blogentry-inherits', model_path(ob), added, removed)
+        msg = ts('blogentry-inherits', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -188,7 +188,7 @@ def blogentry_to_private(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('blogentry-private', model_path(ob), added, removed)
+        msg = ts('blogentry-private', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -209,7 +209,7 @@ def comment_to_inherits(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('comment-inherits', model_path(ob), added, removed)
+        msg = ts('comment-inherits', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -224,7 +224,7 @@ def forum_to_inherits(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('forum-inherited', model_path(ob), added, removed)
+        msg = ts('forum-inherited', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -239,7 +239,7 @@ def forum_topic_to_inherits(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('forum-topic-inherited', model_path(ob), added, removed)
+        msg = ts('forum-topic-inherited', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -270,7 +270,7 @@ def to_profile_active(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('to-active', model_path(ob), added, removed)
+        msg = ts('to-active', resource_path(ob), added, removed)
     _reindex(ob, texts=True)
     _reindex_peopledir(ob)
     return msg
@@ -286,7 +286,7 @@ def to_profile_inactive(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('to-inactive', model_path(ob), added, removed)
+        msg = ts('to-inactive', resource_path(ob), added, removed)
     _reindex(ob, texts=True)
     _reindex_peopledir(ob)
     return msg
@@ -300,7 +300,7 @@ def content_to_inherits(ob, info):
     added, removed = acl_diff(ob, {})
     if hasattr(ob, '__acl__'):
         del ob.__acl__
-        msg =  ts('content-inherited', model_path(ob), added, removed)
+        msg =  ts('content-inherited', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 
@@ -317,7 +317,7 @@ def content_to_private(ob, info):
     added, removed = acl_diff(ob, acl)
     if added or removed:
         ob.__acl__ = acl
-        msg = ts('content-private', model_path(ob), added, removed)
+        msg = ts('content-private', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
 

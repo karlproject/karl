@@ -25,15 +25,15 @@ from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.forms import validators as karlvalidators
 from karl.views.forms import widgets as karlwidgets
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.url import model_url
+from pyramid.renderers import get_renderer
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
+from pyramid_formish import ValidationError
+from pyramid.url import resource_url
 from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
 from validatish import validator
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getAdapter
 from zope.component import getUtility
 import datetime
@@ -70,14 +70,14 @@ class ResetRequestFormController(object):
 
     def __call__(self):
         page_title = u"Forgot Password Request"
-        snippets = get_template('forms/templates/snippets.pt')
+        snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_request_blurb']
         api = TemplateAPI(self.context, self.request, page_title)
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -114,7 +114,7 @@ class ResetRequestFormController(object):
             forgot_password_url = get_setting(
                 context, 'forgot_password_url')
             if forgot_password_url:
-                came_from = model_url(context, request, "login.html")
+                came_from = resource_url(context, request, "login.html")
                 url = '%s?email=%s&came_from=%s' % (
                     forgot_password_url, urllib.quote_plus(address),
                     urllib.quote_plus(came_from))
@@ -122,7 +122,7 @@ class ResetRequestFormController(object):
 
         request_password_reset(user, profile, request)
 
-        url = model_url(context, request, 'reset_sent.html') + (
+        url = resource_url(context, request, 'reset_sent.html') + (
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
 
@@ -131,7 +131,7 @@ def request_password_reset(user, profile, request):
         str(random.random())).hexdigest()
     profile.password_reset_time = datetime.datetime.now()
     context = find_site(profile)
-    reset_url = model_url(
+    reset_url = resource_url(
         context, request, "reset_confirm.html",
         query=dict(key=profile.password_reset_key))
 
@@ -142,11 +142,12 @@ def request_password_reset(user, profile, request):
     mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
     mail["To"] = "%s <%s>" % (profile.title, profile.email)
     mail["Subject"] = "%s Password Reset Request" % system_name
-    body = render_template(
+    body = render(
         "templates/email_reset_password.pt",
-        login=user['login'],
-        reset_url=reset_url,
-        system_name=system_name,
+        dict(login=user['login'],
+             reset_url=reset_url,
+             system_name=system_name),
+        request=request,
     )
 
     if isinstance(body, unicode):
@@ -162,10 +163,11 @@ def request_password_reset(user, profile, request):
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'
     api = TemplateAPI(context, request, page_title)
-    return render_template_to_response(
+    return render_to_response(
         'templates/reset_sent.pt',
-        api=api,
-        email=request.params.get('email'),
+        dict(api=api,
+             email=request.params.get('email')),
+        request=request,
         )
 
 
@@ -197,16 +199,18 @@ class ResetConfirmFormController(object):
         if not key or len(key) != 40:
             api = TemplateAPI(self.context, self.request,
                               'Password Reset URL Problem')
-            return render_template_to_response('templates/reset_failed.pt',
-                                               api=api)
-        snippets = get_template('forms/templates/snippets.pt')
+            return render_to_response(
+                'templates/reset_failed.pt',
+                dict(api=api),
+                request=self.request)
+        snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_confirm_blurb']
         api = TemplateAPI(self.context, self.request, 'Reset Password')
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         try:
@@ -250,17 +254,20 @@ class ResetConfirmFormController(object):
 
             page_title = 'Password Reset Complete'
             api = TemplateAPI(context, request, page_title)
-            return render_template_to_response(
+            return render_to_response(
                 'templates/reset_complete.pt',
-                api=api,
-                login=converted['login'],
-                password=converted['password'],
+                dict(api=api,
+                     login=converted['login'],
+                     password=converted['password']),
+                request = request,
                 )
 
         except ResetFailed, e:
             api = TemplateAPI(context, request, e.page_title)
-            return render_template_to_response('templates/reset_failed.pt',
-                                               api=api)
+            return render_to_response(
+                'templates/reset_failed.pt',
+                dict(api=api),
+                request=request)
 
 class ResetFailed(Exception):
     pass

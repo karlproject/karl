@@ -18,12 +18,12 @@
 import datetime
 import re
 
-from repoze.bfg.security import has_permission
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.security import has_permission
+from pyramid.security import effective_principals
+from pyramid.security import authenticated_userid
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getMultiAdapter
 from zope.index.text.parsetree import ParseError
 
@@ -66,17 +66,14 @@ def show_communities_view(context, request):
     default = 'active'
     which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
-    target = model_url(context, request, urlname)
+    target = resource_url(context, request, urlname)
     response = HTTPFound(location=target)
     return response
 
 
 def _set_cookie_via_request(request, value):
-    header = ('Set-Cookie', '%s=%s; Path=/' %
-                    (_VIEW_COOKIE, value))
     request.cookies[_VIEW_COOKIE] = value
-    request.response_headerlist = [header]
-
+    request.response.set_cookie(_VIEW_COOKIE, value, path='/')
 
 def _show_communities_view_helper(context,
                                   request,
@@ -84,7 +81,7 @@ def _show_communities_view_helper(context,
                                   **kw
                                  ):
     # Grab the data for the two listings, main communities and portlet
-    communities_path = model_path(context)
+    communities_path = resource_path(context)
 
     query = dict(
         sort_index='title',
@@ -234,8 +231,7 @@ def get_preferred_communities(context, request):
     return preferred_communities
 
 def jquery_set_preferred_view(context, request):
-    request.response_headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = request.params.getall('preferred[]')
     set_preferred_communities(communities_folder, request, communities)
@@ -248,8 +244,7 @@ def jquery_set_preferred_view(context, request):
              'status_message': 'Set preferred communities.'}
 
 def jquery_clear_preferred_view(context, request):
-    request.response_headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     set_preferred_communities(communities_folder, request, None)
     updated_communities = get_my_communities(communities_folder, request)
@@ -261,8 +256,7 @@ def jquery_clear_preferred_view(context, request):
              'status_message': 'Cleared preferred communities.'}
 
 def jquery_list_preferred_view(context, request):
-    request.response_headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder, request)
     preferred = get_preferred_communities(communities_folder, request)
@@ -274,8 +268,7 @@ def jquery_list_preferred_view(context, request):
              'status_message': None}
 
 def jquery_edit_preferred_view(context, request):
-    request.response_headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder,
                                      request,
@@ -286,8 +279,7 @@ def jquery_edit_preferred_view(context, request):
              'preferred': preferred }
 
 def jquery_list_my_communities_view(context, request):
-    request.response_headerlist = [('Cache-Control',
-        'max-age=0, no-cache, no-store, private, must-revalidate')]
+    request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder,
                                      request,

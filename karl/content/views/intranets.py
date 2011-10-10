@@ -34,13 +34,13 @@ from karl.views.api import TemplateAPI
 from karl.views.community import EditCommunityFormController
 from karl.views.forms import validators as karlvalidators
 from karl.views.utils import make_name
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.url import model_url
+from pyramid.renderers import render_to_response
+from pyramid_formish import ValidationError
+from pyramid.security import authenticated_userid
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.lemonade.listitem import get_listitems
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 
@@ -54,11 +54,12 @@ def show_intranets_view(context, request):
         ]
 
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_intranets.pt',
-        api=api,
-        actions=actions,
-        intranets_info=api.intranets_info,
+        dict(api=api,
+             actions=actions,
+             intranets_info=api.intranets_info),
+        request=request,
         )
 
 
@@ -124,7 +125,7 @@ class AddIntranetFormController(object):
         return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -201,7 +202,7 @@ class AddIntranetFormController(object):
 
         # Adding a community should take you to the Add Existing
         # User screen, so the moderator can include some users.
-        location = model_url(context, request)
+        location = resource_url(context, request)
         location = location + "?status_message=Intranet%20added"
 
         return HTTPFound(location=location)
@@ -272,7 +273,7 @@ class EditIntranetFormController(AddIntranetFormController):
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context.__parent__['intranets'], request)
+        location = resource_url(context.__parent__['intranets'], request)
         return HTTPFound(location=location)
 
 feature_field = schemaish.String(
@@ -354,7 +355,7 @@ class EditIntranetRootFormController(EditCommunityFormController):
 
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         return HTTPFound(location=location)
 
 

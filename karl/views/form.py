@@ -1,6 +1,6 @@
-from repoze.bfg.chameleon_zpt import renderer_factory
+from pyramid.chameleon_zpt import renderer_factory
 
-from webob import Response
+from pyramid.response import Response
 
 def render_form_to_response(template_path, schema, fieldvalues,
                             form_id='contentform',

@@ -22,9 +22,9 @@ from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.traversal import find_root
-from repoze.bfg.traversal import find_interface
+from pyramid.interfaces import ISettings
+from pyramid.traversal import find_root
+from pyramid.traversal import find_interface
 from repoze.lemonade.content import get_content_type
 
 from karl.models.interfaces import ICatalogSearch
@@ -97,7 +97,12 @@ def find_peopledirectory_catalog(context):
 def get_setting(context, setting_name, default=None):
     # Grab a setting from ISettings.  (context is ignored.)
     settings = queryUtility(ISettings)
-    return getattr(settings, setting_name, default)
+    if settings is not None:
+        return settings.get(setting_name, default)
+    return default
+
+def get_settings():
+    return queryUtility(ISettings)
 
 def get_content_type_name(resource):
     content_iface = get_content_type(resource)

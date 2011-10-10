@@ -19,9 +19,10 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from simplejson import JSONDecoder
 
+import karl.testing
 
 class Test_admin_contents(unittest.TestCase):
 
@@ -72,19 +73,19 @@ class Test_peopledirectory_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
     def test_empty(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         pd = testing.DummyModel()
         pd.order = ()
         request = testing.DummyRequest()
         self.assertRaises(Forbidden, self._callFUT, pd, request)
 
     def test_no_sections_allowed(self):
-        from repoze.bfg.exceptions import Forbidden
-        testing.registerDummySecurityPolicy(permissive=False)
+        from pyramid.exceptions import Forbidden
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         pd = testing.DummyModel()
         pd['s1'] = testing.DummyModel()
         pd.order = ('s1',)
@@ -92,8 +93,8 @@ class Test_peopledirectory_view(unittest.TestCase):
         self.assertRaises(Forbidden, self._callFUT, pd, request)
 
     def test_one_section_allowed(self):
-        from webob.exc import HTTPFound
-        testing.registerDummySecurityPolicy(permissive=True)
+        from pyramid.httpexceptions import HTTPFound
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         site = testing.DummyModel()
         pd = site['people'] = testing.DummyModel()
         pd['s1'] = testing.DummyModel()
@@ -104,10 +105,10 @@ class Test_peopledirectory_view(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/people/s1/')
 
     def test_first_section_not_allowed(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
-        from webob.exc import HTTPFound
-        testing.registerDummySecurityPolicy(permissive=True)
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.httpexceptions import HTTPFound
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         authz_policy.permits = (lambda context, prin, perm:
@@ -179,7 +180,7 @@ class Test_upload_peopledirectory_xml(unittest.TestCase):
 
     def test_w_submit_empty_clears_existing(self):
         from StringIO import StringIO
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         XML = """<?xml version="1.0"?>
@@ -263,9 +264,9 @@ class Test_get_tabs(unittest.TestCase):
         self.failUnless(tab['selected'])
 
     def test_skip_unauthorized(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
-        testing.registerDummySecurityPolicy(permissive=True)
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.threadlocal import get_current_registry
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         reg = get_current_registry() # b/c
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         authz_policy.permits = (lambda context, prin, perm:
@@ -369,14 +370,14 @@ class Test_get_admin_actions(unittest.TestCase):
         return pd
 
     def test_not_admin(self):
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
         self.assertEqual(len(actions), 0)
 
     def test_w_admin_no_marker(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
@@ -388,7 +389,7 @@ class Test_get_admin_actions(unittest.TestCase):
     def test_w_admin_w_marker(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         directlyProvides(context, IPeopleReport)
         request = testing.DummyRequest()
@@ -413,7 +414,7 @@ class Test_get_admin_actions(unittest.TestCase):
     def test_w_admin_w_marker_already_mailinglist(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         context['mailinglist'] = testing.DummyModel()
         directlyProvides(context, IPeopleReport)
@@ -447,14 +448,14 @@ class Test_get_actions(unittest.TestCase):
         return pd
 
     def test_not_admin(self):
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
         self.assertEqual(len(actions), 0)
 
     def test_w_admin_not_admin_html_view(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         actions = self._callFUT(context, request)
@@ -468,7 +469,7 @@ class Test_get_actions(unittest.TestCase):
         self.assertEqual(action[1], 'http://example.com/profiles/add.html')
 
     def test_w_admin_and_admin_html_view(self):
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         context = self._makeContext()
         request = testing.DummyRequest()
         request.view_name = 'admin.html'
@@ -496,7 +497,7 @@ class Test_section_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from zope.interface import Interface
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
     def test_empty_column(self):
@@ -591,7 +592,7 @@ class Test_section_view(unittest.TestCase):
         # when a section contains only a single report, redirect to that report
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         self._register()
         pd, section, report = _makeReport()
         directlyProvides(report, IPeopleReport)
@@ -622,7 +623,7 @@ class Test_report_view(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         registerSettings(**kw)
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
+        karl.testing.registerAdapter(DummyLetterManager, Interface, ILetterManager)
 
     def test_unqualified_report_no_mailinglist(self):
         self._register()
@@ -804,7 +805,7 @@ class Test_picture_view(unittest.TestCase):
         from karl.testing import registerSettings
         registerSettings(**kw)
         registerCatalogSearch()
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
 
@@ -854,10 +855,10 @@ class Test_picture_view(unittest.TestCase):
 
         def search(*args, **kw):
             raise ParseError
-        testing.registerAdapter(search, (Interface, Interface),
+        karl.testing.registerAdapter(search, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(search, (Interface,), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
+        karl.testing.registerAdapter(search, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(DummyLetterManager, Interface,
                                 ILetterManager)
 
         pd, section, report = _makeReport()
@@ -978,9 +979,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 return (25, range(25), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -997,9 +998,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 return (25, range(25), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest({
@@ -1019,9 +1020,9 @@ class Test_get_grid_data(unittest.TestCase):
             def search(**kw):
                 raise ParseError()
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -1097,9 +1098,9 @@ class Test_text_dump(unittest.TestCase):
             def search(**kw):
                 return (2, range(2), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -1143,9 +1144,9 @@ class Test_csv_view(unittest.TestCase):
             def search(**kw):
                 return (2, range(2), resolve)
             return search
-        testing.registerAdapter(searcher, (Interface, Interface),
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
             ICatalogSearch)
-        testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
@@ -1214,7 +1215,7 @@ class Test_redirector_view(unittest.TestCase):
         return redirector_view(context, request)
 
     def test_w_absolute_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         context.target_url = 'http://other.example.com/'
         request = testing.DummyRequest()
@@ -1223,7 +1224,7 @@ class Test_redirector_view(unittest.TestCase):
         self.assertEqual(response.location, 'http://other.example.com/')
 
     def test_w_site_relative_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         context.target_url = '/somewhere/over/the/rainbow'
         request = testing.DummyRequest()
@@ -1233,7 +1234,7 @@ class Test_redirector_view(unittest.TestCase):
                          'http://example.com/somewhere/over/the/rainbow')
 
     def test_w_relative_url(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         grandparent = testing.DummyModel()
         parent = grandparent['parent'] = testing.DummyModel()
         context = parent['context'] = testing.DummyModel()
@@ -1257,7 +1258,7 @@ class Test_redirector_admin_view(unittest.TestCase):
         return redirector_admin_view(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)

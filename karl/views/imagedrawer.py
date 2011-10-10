@@ -20,13 +20,13 @@ from simplejson import JSONEncoder
 import transaction
 import urlparse
 import os
-from webob import Response
+from pyramid.response import Response
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import traverse
-from repoze.bfg.url import model_url
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.traversal import resource_path
+from pyramid.traversal import traverse
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 
@@ -148,7 +148,7 @@ def breadcrumbs(doc, request):
             for ancestor in visit(node.__parent__):
                 yield ancestor
 
-        yield dict(title=title_or_id(node), href=model_url(node, request))
+        yield dict(title=title_or_id(node), href=resource_url(node, request))
 
     return list(visit(doc))
 
@@ -215,7 +215,7 @@ def batch_images(context, request,
         creator = None
         community = find_community(context)
         # batching api requires the community path
-        community_path = model_path(community)
+        community_path = resource_path(community)
     else:               # All Karl
         creator = None
         community_path = None

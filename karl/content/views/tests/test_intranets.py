@@ -16,11 +16,13 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl.testing import DummySessions
 from karl.testing import DummyUsers
+
+import karl.testing
 
 class TestShowIntranetsView(unittest.TestCase):
     def setUp(self):
@@ -38,7 +40,8 @@ class TestShowIntranetsView(unittest.TestCase):
         from zope.interface import alsoProvides
         from karl.models.interfaces import ISite
         from karl.models.interfaces import IIntranets
-        renderer = testing.registerDummyRenderer('templates/show_intranets.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_intranets.pt')
         context = testing.DummyModel(title='Intranets')
         directlyProvides(context, IIntranets)
         alsoProvides(context, ISite)
@@ -127,7 +130,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
         self.failUnless('?status_message=Intranet%20added' in response.location)
 
         # now try again, same values, make sure it fails on name check
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError,
                           controller.handle_submit, converted)
 
@@ -272,8 +275,8 @@ class EditIntranetRootFormControllerTests(unittest.TestCase):
             def adapter():
                 return addables
             return adapter
-        testing.registerAdapter(tool_adapter, (Interface, Interface),
-                                IToolAddables)
+        karl.testing.registerAdapter(tool_adapter, (Interface, Interface),
+                                     IToolAddables)
 
     def test_form_defaults(self):
         context = self.context

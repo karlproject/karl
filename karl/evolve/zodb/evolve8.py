@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl.utils import find_catalog
@@ -16,5 +16,5 @@ def evolve(context):
         if obj is None:
             continue # Work around catalog bug
         if obj.website and obj.website.startswith('www.'):
-            print "Prepend 'http://' to profile website URL: %s" % model_path(obj)
+            print "Prepend 'http://' to profile website URL: %s" % resource_path(obj)
             obj.website = "http://%s" % obj.website

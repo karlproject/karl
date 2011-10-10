@@ -19,10 +19,10 @@
 Reindex if necessary.
 """
 from lxml import etree
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import DENY_ALL
-from repoze.bfg.traversal import model_path
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import DENY_ALL
+from pyramid.traversal import resource_path
 from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
@@ -419,7 +419,7 @@ def parse_section(people, section_elem):
 def clear_mailinglist_aliases(peopledir):
     site = find_site(peopledir)
     aliases = site.list_aliases
-    pd_path = model_path(peopledir)
+    pd_path = resource_path(peopledir)
     for k, v in list(aliases.items()): # avoid mutating-while-iterating
         if v.startswith(pd_path):
             del aliases[k]
@@ -444,7 +444,7 @@ def find_mailinglist_aliases(peopledir):
         short_address = mailinglist.short_address
         if short_address in aliases:
             raise ValueError('Duplicate short_address: %s' % short_address)
-        aliases[short_address] = model_path(mailinglist.__parent__)
+        aliases[short_address] = resource_path(mailinglist.__parent__)
 
 
 def peopleconf(peopledir, tree, force_reindex=False):

@@ -16,8 +16,9 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 class FlexibleTextIndexDataTests(unittest.TestCase):
 
@@ -126,10 +127,10 @@ class Test_makeFlexibleTextIndexData(unittest.TestCase):
 
 class TestTitleAndDescriptionIndexData(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.adapters import TitleAndDescriptionIndexData
@@ -167,10 +168,10 @@ class TestTitleAndDescriptionIndexData(unittest.TestCase):
 
 class TestTitleAndTextIndexData(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.adapters import TitleAndTextIndexData
@@ -208,10 +209,10 @@ class TestTitleAndTextIndexData(unittest.TestCase):
 
 class TestWikiTextIndexData(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.adapters import WikiTextIndexData as cls
@@ -251,10 +252,10 @@ class TestWikiTextIndexData(unittest.TestCase):
 
 class TestFileTextIndexData(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.adapters import FileTextIndexData
@@ -284,7 +285,7 @@ class TestFileTextIndexData(unittest.TestCase):
     def test_with_converter(self):
         from karl.utilities.converters.interfaces import IConverter
         converter = DummyConverter('stuff')
-        testing.registerUtility(converter, IConverter, 'mimetype')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
         context = testing.DummyModel()
         context.title = 'Some Title'
         context.mimetype = 'mimetype'
@@ -295,7 +296,7 @@ class TestFileTextIndexData(unittest.TestCase):
     def test_cache_with_converter(self):
         from karl.utilities.converters.interfaces import IConverter
         converter = DummyConverter('stuff')
-        testing.registerUtility(converter, IConverter, 'mimetype')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
         context = testing.DummyModel()
         context.title = 'Some Title'
         context.mimetype = 'mimetype'
@@ -310,7 +311,7 @@ class TestFileTextIndexData(unittest.TestCase):
     def test_cache_with_converter_context_edited(self):
         from karl.utilities.converters.interfaces import IConverter
         converter = DummyConverter('stuff')
-        testing.registerUtility(converter, IConverter, 'mimetype')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
         context = testing.DummyModel()
         context.title = 'Some Title'
         context.mimetype = 'mimetype'
@@ -327,7 +328,7 @@ class TestFileTextIndexData(unittest.TestCase):
     def test_cache_with_converter_empty_string(self):
         from karl.utilities.converters.interfaces import IConverter
         converter = DummyConverter('')
-        testing.registerUtility(converter, IConverter, 'mimetype')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
         context = testing.DummyModel()
         context.title = 'Some Title'
         context.mimetype = 'mimetype'
@@ -341,10 +342,10 @@ class TestFileTextIndexData(unittest.TestCase):
 
 class TestCalendarEventCategoryData(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.content.models.adapters import CalendarEventCategoryData
@@ -369,10 +370,10 @@ class Test_extract_text_from_html(unittest.TestCase):
     # XXX It would be nice if the extracter didn't add extra whitespace.
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, html):
         from karl.content.models.adapters import extract_text_from_html as fut

@@ -18,8 +18,10 @@
 import datetime
 import unittest
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 class EasternTimeZone(datetime.tzinfo):
     """'The datetime module does not supply any concrete subclasses of tzinfo.'
@@ -60,16 +62,16 @@ class BlogAtomFeedTests(unittest.TestCase):
         # Register dummy catalog
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(dummy_catalog_search, Interface,
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, Interface,
+                                     ICatalogSearch)
 
         # Register blog entry adapter
         from karl.views.interfaces import IAtomEntry
         from karl.content.interfaces import IBlogEntry
         from karl.views.atom import GenericAtomEntry
-        testing.registerAdapter(GenericAtomEntry, (IBlogEntry, Interface),
-                                IAtomEntry)
-        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
+        karl.testing.registerAdapter(GenericAtomEntry, (IBlogEntry, Interface),
+                                     IAtomEntry)
+        karl.testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_blog_entries(self, count=1,
                                    creator="chris",
@@ -183,15 +185,16 @@ class CalendarAtomFeedTests(unittest.TestCase):
         # Register dummy catalog
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(dummy_catalog_search, Interface,
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, Interface,
+                                     ICatalogSearch)
 
         # Register atom entry adapter
         from karl.views.interfaces import IAtomEntry
         from karl.content.views.atom import CalendarEventAtomEntry
-        testing.registerAdapter(CalendarEventAtomEntry, (Interface, Interface),
-                                IAtomEntry)
-        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
+        karl.testing.registerAdapter(CalendarEventAtomEntry,
+                                     (Interface, Interface),
+                                     IAtomEntry)
+        karl.testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_calendar_events(self, count=1,
                                       creator="chris",
@@ -313,15 +316,15 @@ class WikiAtomFeedTests(unittest.TestCase):
         # Register dummy catalog
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(dummy_catalog_search, Interface,
-                                ICatalogSearch)
+        karl.testing.registerAdapter(dummy_catalog_search, Interface,
+                                     ICatalogSearch)
 
         # Register atom entry adapter
         from karl.views.interfaces import IAtomEntry
         from karl.views.atom import GenericAtomEntry
-        testing.registerAdapter(GenericAtomEntry, (Interface, Interface),
-                                IAtomEntry)
-        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
+        karl.testing.registerAdapter(GenericAtomEntry, (Interface, Interface),
+                                     IAtomEntry)
+        karl.testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_wiki_pages(self, count=1,
                                    creator="chris",
@@ -434,15 +437,16 @@ class CommunityFilesAtomFeedTests(unittest.TestCase):
         # Register dummy catalog
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(dummy_catalog_search, Interface,
+        karl.testing.registerAdapter(dummy_catalog_search, Interface,
                                 ICatalogSearch)
 
         # Register atom entry adapter
         from karl.views.interfaces import IAtomEntry
         from karl.content.views.atom import CommunityFileAtomEntry
-        testing.registerAdapter(CommunityFileAtomEntry, (Interface, Interface),
-                                IAtomEntry)
-        testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
+        karl.testing.registerAdapter(
+            CommunityFileAtomEntry, (Interface, Interface),
+            IAtomEntry)
+        karl.testing.registerDummyRenderer('karl.views:templates/atomfeed.pt')
 
     def _create_dummy_files(self, count=1,
                             creator="chris",

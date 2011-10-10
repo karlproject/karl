@@ -1,7 +1,7 @@
 from zope.component import getUtility
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.url import model_url
+from pyramid.renderers import render
+from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 
 from karl.content.interfaces import IBlogEntry
@@ -60,9 +60,10 @@ class DefaultFooter(object):
         self.request = request
 
     def __call__(self, api):
-        return render_template(
+        return render(
             'templates/footer.pt',
-            api=api,
+            dict(api=api),
+            request=self.request,
             )
 
 def _parent_title(context, class_or_interface):
@@ -85,7 +86,7 @@ def _community_title(context):
 def livesearch_dict(context, request, **kwargs):
     """helper to add some common elements to the livesearch result"""
     common_elts = dict(title=getattr(context, 'title', '<No Title>'),
-                       url=model_url(context, request))
+                       url=resource_url(context, request))
     return dict(common_elts, **kwargs)
 
 @implementer(ILiveSearchEntry)

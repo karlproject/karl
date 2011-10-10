@@ -9,7 +9,7 @@ from zope.event import notify
 from zope.interface import implements
 from zope.component import queryUtility
 
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_resource
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.interfaces import ICatalog
 
@@ -175,7 +175,7 @@ def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
             continue
         output and output('reindexing %s' % path)
         try:
-            model = find_model(context, path)
+            model = find_resource(context, path)
         except KeyError:
             output and output('error: %s not found' % path)
             continue

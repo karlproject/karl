@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from zope.testing.cleanup import cleanUp
 
@@ -275,7 +275,7 @@ class TestAdvancedFormController(unittest.TestCase):
 
     def test_handle_submit_lock(self):
         import datetime
-        from repoze.bfg import testing
+        from pyramid import testing
         context = testing.DummyModel()
         request = testing.DummyRequest()
         lock_time = datetime.datetime.now() - datetime.timedelta(seconds=1)

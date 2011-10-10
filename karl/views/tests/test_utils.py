@@ -16,9 +16,10 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class TestClientJsonData(unittest.TestCase):
 
@@ -182,14 +183,14 @@ class TestBasenameOfFilepath(unittest.TestCase):
 
 class TestGetUserHome(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_not_logged_in(self):
         from karl.views.utils import get_user_home
-        testing.registerDummySecurityPolicy()
+        karl.testing.registerDummySecurityPolicy()
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         request = testing.DummyRequest()
@@ -201,7 +202,7 @@ class TestGetUserHome(unittest.TestCase):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         profiles = context["profiles"] = testing.DummyModel()
@@ -217,7 +218,7 @@ class TestGetUserHome(unittest.TestCase):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         community = communities["community"] = testing.DummyModel()
@@ -235,7 +236,7 @@ class TestGetUserHome(unittest.TestCase):
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         profiles = context["profiles"] = testing.DummyModel()
@@ -252,10 +253,10 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         site = c.__parent__.__parent__
         directlyProvides(site, Interface)
@@ -263,7 +264,7 @@ class TestGetUserHome(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["userid"] = profile = DummyProfile()
         profile.home_path = "/communities/community/foo"
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
 
@@ -283,10 +284,10 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path_w_view(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         site = c.__parent__.__parent__
         directlyProvides(site, Interface)
@@ -294,7 +295,7 @@ class TestGetUserHome(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["userid"] = profile = DummyProfile()
         profile.home_path = "/communities/community/foo/view.html"
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
 
@@ -314,10 +315,10 @@ class TestGetUserHome(unittest.TestCase):
     def test_user_home_path_w_subpath(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         c = DummyCommunity()
         site = c.__parent__.__parent__
         directlyProvides(site, Interface)
@@ -325,7 +326,7 @@ class TestGetUserHome(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["userid"] = profile = DummyProfile()
         profile.home_path = "/communities/community/foo/bar/baz"
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
 
@@ -344,18 +345,18 @@ class TestGetUserHome(unittest.TestCase):
 
     def test_space_as_home_path(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import ITraverserFactory
+        from pyramid.interfaces import ITraverserFactory
         from karl.views.utils import get_user_home
         from karl.testing import DummyUsers
         from karl.testing import DummyProfile
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         context = testing.DummyModel()
         communities = context["communities"] = testing.DummyModel()
         community = communities["community"] = testing.DummyModel()
         profiles = context["profiles"] = testing.DummyModel()
         profile = profiles["userid"] = DummyProfile()
         profile.home_path = ' '
-        testing.registerAdapter(
+        karl.testing.registerAdapter(
             dummy_traverser_factory, Interface, ITraverserFactory
         )
 
@@ -382,7 +383,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -411,7 +412,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -481,7 +482,7 @@ class TestHandlePhotoUpload(unittest.TestCase):
         from cStringIO import StringIO
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        testing.registerDummySecurityPolicy("userid")
+        karl.testing.registerDummySecurityPolicy("userid")
         def make_image(title, stream, mimetype, filename, creator):
             res = testing.DummyModel()
             res.title = title
@@ -542,8 +543,8 @@ class DummyUpload:
         self.type = type
 
 def dummy_traverser_factory(root):
-    def traverser(environ):
-        parts = environ["PATH_INFO"][1:].split("/")
+    def traverser(request):
+        parts = request.environ["PATH_INFO"][1:].split("/")
         node = root
         name = None
         left_over = ()

@@ -1,6 +1,6 @@
 from datetime import datetime
 from karl.utils import find_profiles
-from repoze.bfg.url import model_url
+from pyramid.url import resource_url
 
 LOCK_TIMEOUT_SECONDS = 30 * 60
 
@@ -64,7 +64,7 @@ def lock_info_for_view(context, request, from_time=None):
         if profile is not None:
             return dict(
                 is_locked = True,
-                url = model_url(profile, request),
+                url = resource_url(profile, request),
                 name = '%s %s' % (profile.firstname,
                                             profile.lastname),
                 email = profile.email,
@@ -72,7 +72,7 @@ def lock_info_for_view(context, request, from_time=None):
         else:
             return dict(
                 is_locked = True,
-                url = model_url(profiles, request),
+                url = resource_url(profiles, request),
                 name = 'Unknown',
                 email = '',
                 )

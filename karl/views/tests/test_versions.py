@@ -1,15 +1,16 @@
 import unittest
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 
 class Test_show_history(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history
@@ -26,17 +27,17 @@ class Test_show_history(unittest.TestCase):
         profiles['ed'] = testing.DummyModel(title='Ed')
         context.repo = DummyArchive([
             Dummy(
-                docid=1,
-                user='ed',
-                archive_time=datetime(2010, 5, 12, 2, 42),
-                version_num=1,
-                current_version=2,
-            ),
-            Dummy(
                 docid=2,
                 user='ed',
                 archive_time=datetime(2010, 5, 13, 2, 42),
                 version_num=2,
+                current_version=2,
+            ),
+            Dummy(
+                docid=1,
+                user='ed',
+                archive_time=datetime(2010, 5, 12, 2, 42),
+                version_num=1,
                 current_version=2,
             ),
         ])
@@ -66,10 +67,10 @@ class Test_show_history(unittest.TestCase):
 class Test_revert(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import revert
@@ -121,10 +122,10 @@ class Test_revert(unittest.TestCase):
 class Test_show_trash(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_trash
@@ -256,14 +257,14 @@ class Test_show_trash(unittest.TestCase):
 class Test_undelete(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IContainerVersion
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import undelete
@@ -423,10 +424,10 @@ class Test_undelete(unittest.TestCase):
 class Test_show_history_lock(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.versions import show_history

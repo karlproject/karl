@@ -29,8 +29,8 @@ import sys
 import traceback
 import transaction
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.traversal import find_model
+from pyramid.renderers import render
+from pyramid.traversal import find_resource
 from repoze.mailin.maildir import MaildirStore
 from repoze.mailin.pending import PendingQueue
 from repoze.postoffice.message import Message
@@ -103,7 +103,7 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
         report_name = info.get('report')
         if report_name is not None:
             pd = find_peopledirectory(self.root)
-            target = find_model(pd, report_name.split('+'))
+            target = find_resource(pd, report_name.split('+'))
         else:
             community = find_communities(self.root)[info['community']]
             target = tool = community[info['tool']]
@@ -113,7 +113,7 @@ class MailinRunner: # pragma NO COVERAGE (deprecated)
                 docid = int(hex_to_docid(info['in_reply_to']))
                 catalog = find_catalog(target)
                 path = catalog.document_map.address_for_docid(docid)
-                item = find_model(self.root, path)
+                item = find_resource(self.root, path)
                 target = item
 
         IMailinHandler(target).handle(message, info, text, attachments)
@@ -255,7 +255,7 @@ class MailinRunner2(object):
         report_name = target.get('report')
         if report_name is not None:
             pd = find_peopledirectory(self.root)
-            context = find_model(pd, report_name.split('+'))
+            context = find_resource(pd, report_name.split('+'))
         else:
             community = find_communities(self.root)[target['community']]
             context = tool = community[target['tool']]
@@ -264,7 +264,7 @@ class MailinRunner2(object):
                 docid = int(hex_to_docid(target['in_reply_to']))
                 catalog = find_catalog(context)
                 path = catalog.document_map.address_for_docid(docid)
-                item = find_model(self.root, path)
+                item = find_resource(self.root, path)
                 context = item
 
         IMailinHandler(context).handle(message, info, text, attachments)
@@ -287,11 +287,12 @@ class MailinRunner2(object):
         bounce_message['To'] = message['From']
         bounce_message['Subject'] = 'Your submission to Karl has bounced.'
         bounce_message.set_type('text/html')
-        bounce_message.set_payload(render_template(
+        bounce_message.set_payload(render(
             'templates/bounce_email_throttled.pt',
-            subject=message.get('Subject'),
-            system_name=get_setting(self.root, 'system_name', 'KARL'),
-            admin_email=get_setting(self.root, 'admin_email'),
+            dict(subject=message.get('Subject'),
+                 system_name=get_setting(self.root, 'system_name', 'KARL'),
+                 admin_email=get_setting(self.root, 'admin_email'),
+                 ),
         ).encode('UTF-8'), 'UTF-8')
 
         self.queue.bounce(

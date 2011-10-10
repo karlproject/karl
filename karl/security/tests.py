@@ -1,5 +1,7 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class TestACLPathCache(unittest.TestCase):
 
@@ -11,13 +13,13 @@ class TestACLPathCache(unittest.TestCase):
         return self._getTargetClass()()
 
     def _makeACE(self, allow=True, principal='phreddy', permission='testing'):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
+        from pyramid.security import Allow
+        from pyramid.security import Deny
         action = allow and Allow or Deny
         return (action, principal, permission)
 
     def _makeModel(self, name=None, parent=None, principals=('phreddy',)):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         model = DummyModel()
         if parent is not None:
             parent[name] = model
@@ -89,7 +91,7 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 0)
 
     def test_lookup_root_uncached_w_acl_no_permission(self):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         cache = self._makeOne()
         root = self._makeModel()
 
@@ -99,7 +101,7 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 1)
 
     def test_lookup_root_cached_w_acl_no_permission(self):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         cache = self._makeOne()
         root = self._makeModel()
         cache.index(root)
@@ -111,7 +113,7 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 1)
 
     def test_lookup_nonroot(self):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         cache = self._makeOne()
         root = self._makeModel()
         child = self._makeModel('child', root, principals=('bob',))
@@ -135,7 +137,7 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 3)
 
     def test_lookup_nonroot_sparse(self):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         cache = self._makeOne()
         root = self._makeModel()
         child = self._makeModel('child', root, principals=('bob',))
@@ -158,7 +160,7 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 2)
 
     def test_lookup_nonroot_sparse_w_permission_w_all(self):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.security.policy import ALL
         cache = self._makeOne()
         root = self._makeModel()
@@ -172,8 +174,8 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 3)
 
     def test_lookup_nonroot_sparse_w_allow_everyone(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Everyone
         cache = self._makeOne()
         root = self._makeModel()
         child = self._makeModel('child', root, principals=())
@@ -187,9 +189,9 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(len(cache._index), 2)
 
     def test_lookup_nonroot_sparse_w_deny_everyone(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
         cache = self._makeOne()
         root = self._makeModel()
         child = self._makeModel('child', root, principals=())
@@ -213,7 +215,7 @@ class TestACLChecker(unittest.TestCase):
         return self._getTargetClass()(principals, permission)
 
     def test_it(self):
-        from repoze.bfg.security import Allow, Deny, Everyone
+        from pyramid.security import Allow, Deny, Everyone
         from karl.security.policy import ALL
         acl_one = ((Allow, 'a', 'view'), (Allow, 'b', 'view'))
         acl_two = ((Allow, 'c', 'view'), (Allow, 'd', 'view'),)
@@ -278,7 +280,7 @@ class TestSecuredStateMachine(unittest.TestCase):
         machine = self._makeOne('state')
         machine.add('private', 'publish', 'public', None)
         machine.add('private', 'reject', 'rejected', None, permission='add')
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         request = testing.DummyRequest()
         context = testing.DummyModel()
         transitions = sorted(
@@ -292,7 +294,7 @@ class TestSecuredStateMachine(unittest.TestCase):
         machine = self._makeOne('state')
         machine.add('private', 'publish', 'public', None)
         machine.add('private', 'reject', 'rejected', None)
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         request = testing.DummyRequest()
         context = testing.DummyModel()
         transitions = machine.secured_transition_info(context, request,
@@ -314,7 +316,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                   ('pending', None): ('published', dummy,
                                       {'permission':'add'}),}
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=True)
+        karl.testing.registerDummySecurityPolicy(permissive=True)
         request = testing.DummyRequest()
         ob = testing.DummyModel()
         sm.secured_execute(ob, request, 'publish')
@@ -351,7 +353,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                                            {'permission':'add'}),}
 
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         request = testing.DummyRequest()
         ob = testing.DummyModel()
         from repoze.workflow.statemachine import StateMachineError
@@ -366,7 +368,7 @@ class TestSecuredStateMachine(unittest.TestCase):
                                            {'permission':'add'}),}
 
         sm = self._makeOne('state', states=states, initial_state='pending')
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
         ob = testing.DummyModel()
         sm.secured_execute(ob, None, 'publish')
         self.assertEqual(ob.state, 'published')

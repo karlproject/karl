@@ -1,10 +1,8 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
-from zope.testing.cleanup import cleanUp
-
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.config import Configurator
+from pyramid.threadlocal import get_current_registry
 
 from karl.views.interfaces import IToolAddables
 from karl.models.interfaces import IToolFactory
@@ -16,13 +14,13 @@ class TestPopulate(unittest.TestCase):
     XXX Integration test.
     """
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         os.environ['SUPPRESS_MAIL'] = 'true'
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         import os
         del os.environ['SUPPRESS_MAIL']
@@ -31,12 +29,14 @@ class TestPopulate(unittest.TestCase):
         # Install a bit of configuration that make_app() usually
         # does for us.
         reg = get_current_registry()
-        config = Configurator(reg)
+        config = Configurator(reg, autocommit=True)
         config.setup_registry()
+        config.include('pyramid_zcml')
         config.load_zcml('karl.includes:configure.zcml')
         from zope.interface import Interface
-        testing.registerAdapter(DummyToolAddables, (Interface, Interface),
-                                IToolAddables)
+        config.registry.registerAdapter(DummyToolAddables,
+                                        (Interface, Interface),
+                                        IToolAddables)
 
     def _callFUT(self, root, do_transaction_begin=True):
         from karl.bootstrap.bootstrap import populate

@@ -19,17 +19,17 @@ import math
 import re
 from simplejson import JSONEncoder
 
-from webob.exc import HTTPFound
-from webob.exc import HTTPBadRequest
-from webob import Response
+from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.response import Response
 
 from zope.component import getMultiAdapter
 
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
 
 from karl.models.interfaces import ITagQuery
 
@@ -72,7 +72,7 @@ def add_tags(context, request, values):
     if values:
         if isinstance(values, basestring):
             values = [values]
-        path = model_path(context)
+        path = resource_path(context)
         catalog = find_catalog(context)
         docid = catalog.document_map.docid_for_address(path)
         username = authenticated_userid(request)
@@ -87,7 +87,7 @@ def del_tags(context, request, values):
     """ Delete the specified tags.
     """
     username = authenticated_userid(request)
-    path = model_path(context)
+    path = resource_path(context)
     catalog = find_catalog(context)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(context)
@@ -101,7 +101,7 @@ def set_tags(context, request, values):
     if values is None:
         values = ()
     username = authenticated_userid(request)
-    path = model_path(context)
+    path = resource_path(context)
     catalog = find_catalog(context)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(context)
@@ -162,7 +162,7 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
     # and do a redirect.
     jump_tag = request.params.get('jumptag', False)
     if jump_tag:
-        location = model_url(context, request, request.view_name, jump_tag)
+        location = resource_url(context, request, request.view_name, jump_tag)
         return HTTPFound(location=location)
 
     # Our strategy is to support tag URLs that are like this:
@@ -199,7 +199,7 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             address = dm.address_for_docid(int(docid))
             if address is None:
                 raise KeyError(docid)
-            resource = find_model(context, address)
+            resource = find_resource(context, address)
 
             # Skip documents which aren't viewable by authenticated user
             if not has_permission('view', resource, request):
@@ -214,12 +214,12 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             else:
                 tuh = '%s people' % len(users)
 
-            tuhref = model_url(context, request, 'tagusers.html',
+            tuhref = resource_url(context, request, 'tagusers.html',
                                query={'tag': tag, 'docid': docid})
             entry = {
                 'title': resource.title,
                 'description': getattr(resource, 'description', ''),
-                'href': model_url(resource, request),
+                'href': resource_url(resource, request),
                 'type': get_content_type_name(resource),
                 'tagusers_href': tuhref,
                 'tagusers_count': tuh,
@@ -402,7 +402,7 @@ def tag_users_view(context, request):
     profiles = find_profiles(context)
     catalog = find_catalog(context)
     address = catalog.document_map.address_for_docid(docid)
-    target = find_model(context, address)
+    target = find_resource(context, address)
     if tags is not None and profiles is not None:
         users = []
         for userid in tags.getUsers(tags=[tag], items=[docid]):
@@ -421,7 +421,7 @@ def tag_users_view(context, request):
     return dict(
         api=api,
         tag=tag,
-        url=model_url(target, request),
+        url=resource_url(target, request),
         title=target.title,
         users=users,
         )
@@ -443,7 +443,7 @@ def community_tag_users_view(context, request):
     profiles = find_profiles(context)
     catalog = find_catalog(context)
     address = catalog.document_map.address_for_docid(docid)
-    target = find_model(context, address)
+    target = find_resource(context, address)
     if tags is not None and profiles is not None:
         users = []
         for userid in tags.getUsers(tags=[tag], items=[docid],
@@ -464,7 +464,7 @@ def community_tag_users_view(context, request):
     return dict(
         api=api,
         tag=tag,
-        url=model_url(target, request),
+        url=resource_url(target, request),
         title=target.title,
         users=users,
         )
@@ -485,7 +485,7 @@ def manage_tags_view(context, request):
     address_for_docid = catalog.document_map.address_for_docid
     def get_doc(docid):
         path = address_for_docid(docid)
-        return find_model(context, path)
+        return find_resource(context, path)
 
     if 'form.rename' in request.POST and 'old_tag' in request.POST:
         old_tag = request.POST['old_tag']

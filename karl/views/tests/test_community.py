@@ -17,18 +17,16 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
-
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl import testing as karltesting
 
 class RedirectCommunityViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.community import redirect_community_view
@@ -55,10 +53,10 @@ class RedirectCommunityViewTests(unittest.TestCase):
 
 class ShowCommunityViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _register(self):
         from zope.interface import Interface
@@ -67,13 +65,14 @@ class ShowCommunityViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                    ITagQuery)
+        karltesting.registerAdapter(DummyGridEntryAdapter,
+                                    (Interface, Interface),
+                                    IGridEntryInfo)
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
+                                    ICommunityInfo)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def _callFUT(self, context, request):
         from karl.views.community import show_community_view
@@ -87,12 +86,12 @@ class ShowCommunityViewTests(unittest.TestCase):
         directlyProvides(community, ICommunity)
         foo = testing.DummyModel(__name__='foo')
         catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         community.catalog = catalog
         return community
 
     def test_not_a_member(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
@@ -104,7 +103,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Advanced', 'advanced.html'),
                          ])
         self.assertEqual(info['feed_url'],
-                         model_url(context, request, "atom.xml"))
+                         resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
         self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
 
@@ -113,7 +112,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         context = self._makeCommunity()
         context.member_names = set(('userid',))
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
@@ -123,19 +122,20 @@ class ShowCommunityViewTests(unittest.TestCase):
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(
+            DummyGridEntryAdapter, (Interface, Interface),
+            IGridEntryInfo)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def _callFUT(self, context, request):
         from karl.views.community import community_recent_items_ajax_view
@@ -148,7 +148,7 @@ class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
         directlyProvides(community, ICommunity)
         foo = testing.DummyModel(__name__='foo')
         catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         community.catalog = catalog
         return community
 
@@ -162,19 +162,20 @@ class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
 
 class CommunityMembersAjaxViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(
+            DummyGridEntryAdapter, (Interface, Interface),
+            IGridEntryInfo)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def _callFUT(self, context, request):
         from karl.views.community import community_members_ajax_view
@@ -191,10 +192,10 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
         phred = testing.DummyModel(__name__='phred')
         bharney = testing.DummyModel(__name__='bharney')
         wylma = testing.DummyModel(__name__='wylma')
-        testing.registerModels({'/profiles/phred':phred,
-                                '/profiles/bharney':bharney,
-                                '/profiles/wylma':wylma,
-                               })
+        karltesting.registerModels({'/profiles/phred':phred,
+                                    '/profiles/bharney':bharney,
+                                    '/profiles/wylma':wylma,
+                                    })
         community.catalog = catalog
         community.member_names = set(['phred', 'bharney', 'wylma'])
         community.moderator_names = set(['bharney'])
@@ -213,10 +214,10 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
 
 class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.community import related_communities_ajax_view
@@ -227,9 +228,10 @@ class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(
+            DummyGridEntryAdapter, (Interface, Interface),
+            IGridEntryInfo)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def _makeCommunity(self, results=None):
         from zope.interface import directlyProvides
@@ -260,10 +262,10 @@ class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
 
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
@@ -276,12 +278,12 @@ class FormControllerTestBase(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        from repoze.bfg.formish import IFormishRenderer
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        from pyramid_formish import IFormishRenderer
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                    ITagQuery)
         def renderer(template, args):
             return ''
-        testing.registerUtility(renderer, IFormishRenderer)
+        karltesting.registerUtility(renderer, IFormishRenderer)
 
     def _registerAddables(self, addables):
         from karl.views.interfaces import IToolAddables
@@ -290,8 +292,8 @@ class FormControllerTestBase(unittest.TestCase):
             def adapter():
                 return addables
             return adapter
-        testing.registerAdapter(tool_adapter, (Interface, Interface),
-                                IToolAddables)
+        karltesting.registerAdapter(tool_adapter, (Interface, Interface),
+                                    IToolAddables)
 
 class AddCommunityFormControllerTests(FormControllerTestBase):
     def _makeOne(self, context, request):
@@ -359,11 +361,11 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         def _update(item, user, tags):
             _tagged.append((item, user, tags))
         tags.update = _update
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         workflow = self._registerDummyWorkflow()
-        testing.registerAdapter(lambda *arg: DummyCommunity,
-                                (ICommunity,),
-                                IContentFactory)
+        karltesting.registerAdapter(lambda *arg: DummyCommunity,
+                                    (ICommunity,),
+                                    IContentFactory)
         dummy_tool_factory = DummyToolFactory()
         self._registerAddables([{'name':'blog', 'title':'blog',
                                  'component':dummy_tool_factory}])
@@ -474,9 +476,9 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
             title='oldtitle', description='oldescription',
             default_tool='overview')
         request = testing.DummyRequest()
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        L2 = testing.registerEventListener((Interface,
-                                            IObjectWillBeModifiedEvent))
+        L = karltesting.registerEventListener((Interface, IObjectModifiedEvent))
+        L2 = karltesting.registerEventListener((Interface,
+                                                IObjectWillBeModifiedEvent))
         self._register()
         view = self._makeOne(context, request)
         converted = {'title':u'Thetitle yo',
@@ -492,7 +494,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(len(L2), 2)
 
     def test_handle_submit_propchanges(self):
-        testing.registerDummySecurityPolicy('user2')
+        karltesting.registerDummySecurityPolicy('user2')
         context = testing.DummyModel(
             title='oldtitle', description='oldescription',
             default_tool='overview', modified_by = 'user1')
@@ -532,9 +534,8 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_handle_submit_sharingchange(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
         from karl.testing import DummyCatalog
-        registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         context = testing.DummyModel(
             title='oldtitle', description='oldescription',
             default_tool='overview')
@@ -601,10 +602,10 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
 
 class JoinCommunityViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.community import join_community_view
@@ -615,10 +616,11 @@ class JoinCommunityViewTests(unittest.TestCase):
         site = c.__parent__.__parent__
         profiles = site["profiles"] = testing.DummyModel()
         profiles["user"] = karltesting.DummyProfile()
-        renderer = testing.registerDummyRenderer("templates/join_community.pt")
-        testing.registerDummySecurityPolicy("user")
+        renderer = karltesting.registerDummyRenderer(
+            "templates/join_community.pt")
+        karltesting.registerDummySecurityPolicy("user")
         request = testing.DummyRequest()
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/formfields.pt')
         self._callFUT(c, request)
         self.assertEqual(renderer.profile, profiles["user"])
@@ -630,7 +632,7 @@ class JoinCommunityViewTests(unittest.TestCase):
 
     def test_submit_form(self):
         from repoze.sendmail.interfaces import IMailDelivery
-        testing.registerDummyRenderer("templates/join_community.pt")
+        karltesting.registerDummyRenderer("templates/join_community.pt")
 
         c = karltesting.DummyCommunity()
         c.moderator_names = set(["moderator1", "moderator2"])
@@ -641,14 +643,14 @@ class JoinCommunityViewTests(unittest.TestCase):
         profiles["moderator2"] = karltesting.DummyProfile()
 
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
 
-        testing.registerDummySecurityPolicy("user")
+        karltesting.registerDummySecurityPolicy("user")
         request = testing.DummyRequest({
             "form.submitted": "1",
             "message": "Message text.",
         })
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_join_community.pt')
         response = self._callFUT(c, request)
 
@@ -664,10 +666,10 @@ class JoinCommunityViewTests(unittest.TestCase):
 
 class DeleteCommunityViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.community import delete_community_view
@@ -678,9 +680,9 @@ class DeleteCommunityViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICatalogSearch
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(DummyAdapter, (Interface, Interface),
-                                ICommunityInfo)
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
+                                    ICommunityInfo)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
 
     def test_not_confirmed(self):
         from karl.testing import registerLayoutProvider
@@ -691,7 +693,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         context.__name__  = 'thename'
         context.catalog = karltesting.DummyCatalog({})
         context.users = karltesting.DummyUsers({})
-        testing.registerDummyRenderer('templates/delete_resource.pt')
+        karltesting.registerDummyRenderer('templates/delete_resource.pt')
         self._register()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '200 OK')
@@ -703,9 +705,9 @@ class DeleteCommunityViewTests(unittest.TestCase):
         parent['thename'] = context
         parent.catalog = karltesting.DummyCatalog({})
         parent.users = karltesting.DummyUsers({})
-        testing.registerDummyRenderer('templates/delete_resource.pt')
+        karltesting.registerDummyRenderer('templates/delete_resource.pt')
         self._register()
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         response = self._callFUT(context, request)
         self.assertEqual(parent.deleted, 'thename')
         self.assertEqual(response.location, 'http://example.com/')

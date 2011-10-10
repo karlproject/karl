@@ -20,13 +20,170 @@ from cStringIO import StringIO
 from zope.interface import implements
 from zope.interface import Interface
 
-from repoze.bfg.testing import DummyModel
-from repoze.bfg.testing import registerAdapter
-from repoze.bfg.testing import registerDummyRenderer
-from repoze.bfg.testing import registerUtility
+from pyramid.testing import DummyModel
+from pyramid.config import Configurator
+from pyramid.threadlocal import get_current_registry
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
+
+def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
+    """ Register a ZCA adapter component.
+
+    The ``impl`` argument specifies the implementation of the
+    component (often a class).  The ``for_`` argument implies the
+    ``for`` interface type used for this registration; it is
+    :class:`zope.interface.Interface` by default.  If ``for`` is not a
+    tuple or list, it will be converted to a one-tuple before being
+    passed to underlying :meth:`pyramid.registry.registerAdapter`
+    API.
+
+    The ``provides`` argument specifies the ZCA 'provides' interface,
+    :class:`zope.interface.Interface` by default.
+
+    The ``name`` argument is the empty string by default; it implies
+    the name under which the adapter is registered.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA adapters.
+    """
+    reg = get_current_registry()
+    if not isinstance(for_, (tuple, list)):
+        for_ = (for_,)
+    reg.registerAdapter(impl, for_, provides, name=name)
+    return impl
+
+def registerUtility(impl, iface=Interface, name=''):
+    """ Register a ZCA utility component.
+
+    The ``impl`` argument specifies the implementation of the utility.
+    The ``iface`` argument specifies the :term:`interface` which will
+    be later required to look up the utility
+    (:class:`zope.interface.Interface`, by default).  The ``name``
+    argument implies the utility name; it is the empty string by
+    default.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA utilities.
+    """
+    reg = get_current_registry()
+    reg.registerUtility(impl, iface, name=name)
+    return impl
+
+def registerSubscriber(subscriber, iface=Interface):
+    """ Register a ZCA subscriber component.
+
+    The ``subscriber`` argument specifies the implementation of the
+    subscriber component (often a function).
+
+    The ``iface`` argument is the interface type for which the
+    subscriber will be registered (:class:`zope.interface.Interface`
+    by default). If ``iface`` is not a tuple or list, it will be
+    converted to a one-tuple before being passed to the underlying ZCA
+    :meth:`pyramid.registry.registerHandler` method.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA subscribers.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry)
+    result = config.add_subscriber(subscriber, iface=iface)
+    config.commit()
+    return result
+
+def registerDummyRenderer(path, renderer=None):
+    """ Register a template renderer at ``path`` (usually a relative
+    filename ala ``templates/foo.pt``) and return the renderer object.
+    If the ``renderer`` argument is None, a 'dummy' renderer will be
+    used.  This function is useful when testing code that calls the
+    :func:`pyramid.renderers.render` function or
+    :func:`pyramid.renderers.render_to_response` function or any
+    other ``render_*`` or ``get_*`` API of the
+    :mod:`pyramid.renderers` module.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_add_template(path, renderer)
+    config.commit()
+    return result
+
+def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
+    """ Registers a pair of faux :app:`Pyramid` security policies:
+    a :term:`authentication policy` and a :term:`authorization
+    policy`.
+
+    The behavior of the registered :term:`authorization policy`
+    depends on the ``permissive`` argument.  If ``permissive`` is
+    true, a permissive :term:`authorization policy` is registered;
+    this policy allows all access.  If ``permissive`` is false, a
+    nonpermissive :term:`authorization policy` is registered; this
+    policy denies all access.
+
+    The behavior of the registered :term:`authentication policy`
+    depends on the values provided for the ``userid`` and ``groupids``
+    argument.  The authentication policy will return the userid
+    identifier implied by the ``userid`` argument and the group ids
+    implied by the ``groupids`` argument when the
+    :func:`pyramid.security.authenticated_userid` or
+    :func:`pyramid.security.effective_principals` APIs are used.
+
+    This function is most useful when testing code that uses the APIs named
+    :func:`pyramid.security.has_permission`,
+    :func:`pyramid.security.authenticated_userid`,
+    :func:`pyramid.security.unauthenticated_userid`,
+    :func:`pyramid.security.effective_principals`, and
+    :func:`pyramid.security.principals_allowed_by_permission`.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_securitypolicy(userid=userid, groupids=groupids,
+                                           permissive=permissive)
+    config.commit()
+    return result
+
+def registerEventListener(event_iface=None):
+    """ Registers an :term:`event` listener (aka :term:`subscriber`)
+    listening for events of the type ``event_iface``.  This method
+    returns a list object which is appended to by the subscriber
+    whenever an event is captured.
+
+    When an event is dispatched that matches ``event_iface``, that
+    event will be appended to the list.  You can then compare the
+    values in the list to expected event notifications.  This method
+    is useful when testing code that wants to call
+    :meth:`pyramid.registry.Registry.notify`,
+    :func:`zope.component.event.dispatch` or
+    :func:`zope.component.event.objectEventNotify`.
+
+    The default value of ``event_iface`` (``None``) implies a
+    subscriber registered for *any* kind of event.
+
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_add_subscriber(event_iface)
+    config.commit()
+    return result
+
+def registerModels(resources):
+    """ Registers a dictionary of :term:`resource` objects that can be
+    resolved via the :func:`pyramid.traversal.find_resource` API.
+
+    The :func:`pyramid.traversal.find_resource` API is called with a
+    path as one of its arguments.  If the dictionary you register when
+    calling this method contains that path as a string key
+    (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding value will
+    be returned to ``find_resource`` (and thus to your code) when
+    :func:`pyramid.traversal.find_resource` is called with an
+    equivalent path string or tuple.
+
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    result = config.testing_resources(resources)
+    config.commit()
+    return result
+
 
 class DummyCatalog(dict):
     def __init__(self, *maps):
@@ -191,7 +348,6 @@ class DummyMailer(list):
         self.append(self.DummyMessage(mto, msg))
 
 def registerDummyMailer():
-    from repoze.bfg.testing import registerUtility
     from repoze.sendmail.interfaces import IMailDelivery
     mailer = DummyMailer()
     registerUtility(mailer, IMailDelivery)
@@ -442,6 +598,8 @@ def registerSecurityWorkflow():
     return registerDummyWorkflow('security')
 
 def registerSettings(**kw):
-    from repoze.bfg.interfaces import ISettings
+    registry = get_current_registry()
+    from pyramid.interfaces import ISettings
     settings = DummySettings(**kw)
+    registry.settings = settings
     registerUtility(settings, ISettings)

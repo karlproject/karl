@@ -30,7 +30,7 @@ from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.interface import implements
 
-from repoze.bfg.chameleon_zpt import get_template
+from pyramid.renderers import get_renderer
 from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.models.interfaces import IProfile
@@ -96,7 +96,7 @@ class Alerts(object):
         from_addr = "%s <%s>" % (system_name, sent_from)
         subject = "[%s] Your alerts digest" % system_name
 
-        template = get_template("email_digest.pt")
+        template = get_renderer("email_digest.pt")
         for profile in find_profiles(context).values():
             if not profile._pending_alerts:
                 continue
@@ -115,8 +115,8 @@ class Alerts(object):
                 msg["Subject"] = subject
 
                 body_text = template(
-                    system_name=system_name,
-                    alerts=profile._pending_alerts,
+                    dict(system_name=system_name,
+                         alerts=profile._pending_alerts),
                 )
 
                 if isinstance(body_text, unicode):

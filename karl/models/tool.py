@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from repoze.bfg.url import model_url
+from pyramid.url import resource_url
 
 class ToolFactory(object):
     name = None
@@ -42,5 +42,5 @@ class ToolFactory(object):
     def tab_url(self, context, request):
         if not self.name:
             raise NotImplementedError
-        return model_url(context, request, self.name)
+        return resource_url(context, request, self.name)
     

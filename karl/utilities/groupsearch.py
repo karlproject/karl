@@ -1,7 +1,7 @@
 from zope.interface import directlyProvides
 from zope.interface import implements
 
-from repoze.bfg.security import effective_principals
+from pyramid.security import effective_principals
 from repoze.lemonade.interfaces import IContent
 
 from karl.content.interfaces import IBlogEntry

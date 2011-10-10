@@ -16,16 +16,17 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class TestPostorder(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, node):
         from karl.models.subscribers import postorder
@@ -74,10 +75,10 @@ class TestPostorder(unittest.TestCase):
 
 class TestIndexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import index_content
@@ -91,9 +92,9 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IContent)
         catalog = DummyCatalog()
         model.catalog = catalog
@@ -106,9 +107,9 @@ class TestIndexContent(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IContent)
         catalog = DummyCatalog()
         model.catalog = catalog
@@ -128,10 +129,10 @@ class TestIndexContent(unittest.TestCase):
 
 class TestUnindexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, docids):
         from karl.models.subscribers import unindex_content
@@ -153,10 +154,10 @@ class TestUnindexContent(unittest.TestCase):
 
 class TestCleanupContentTags(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, docids):
         from karl.models.subscribers import cleanup_content_tags
@@ -181,10 +182,10 @@ class TestCleanupContentTags(unittest.TestCase):
 
 class TestHandleContentRemoved(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import handle_content_removed
@@ -196,10 +197,10 @@ class TestHandleContentRemoved(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object_w_catalog_no_tags(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         catalog = model.catalog = DummyCatalog({1: path,
                                                 2: '%s/foo' % path,
                                                 3: '%s/bar' % path,
@@ -209,10 +210,10 @@ class TestHandleContentRemoved(unittest.TestCase):
         self.assertEqual(catalog.document_map.removed, [1, 2, 3])
 
     def test_content_object_w_catalog_w_tags(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         tags = model.tags = DummyTags()
         catalog = model.catalog = DummyCatalog({1: path,
                                                 2: '%s/foo' % path,
@@ -229,10 +230,10 @@ class TestHandleContentRemoved(unittest.TestCase):
 
 class TestReindexContent(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import reindex_content
@@ -243,10 +244,10 @@ class TestReindexContent(unittest.TestCase):
         self._callFUT(model, None) # doesnt blow up
 
     def test_content_object(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         from karl.testing import DummyCatalog
         model = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         catalog = DummyCatalog({1:path})
         model.catalog = catalog
         self._callFUT(model, None)
@@ -270,11 +271,11 @@ class Test_set_modified(unittest.TestCase,
                         _NOW_replacer,
                        ):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def _callFUT(self, object, event):
@@ -322,7 +323,7 @@ class Test_set_modified(unittest.TestCase,
         from zope.interface import directlyProvides
         from repoze.lemonade.interfaces import IContent
         from karl.models.interfaces import IObjectVersion
-        testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
+        karl.testing.registerAdapter(DummyAdapter, IContent, IObjectVersion)
         model = testing.DummyModel()
         model.repo = DummyArchive()
         model.comment = None
@@ -335,11 +336,11 @@ class Test_set_created(unittest.TestCase,
                        _NOW_replacer,
                       ):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
         self._set_NOW(None)
 
     def _callFUT(self, object, event):
@@ -405,10 +406,10 @@ class Test_set_created(unittest.TestCase,
 
 class TestDeleteCommunity(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import delete_community
@@ -425,14 +426,14 @@ class TestDeleteCommunity(unittest.TestCase):
 
 class Test_add_to_repo(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IObjectVersion
-        testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IObjectVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import add_to_repo
@@ -453,7 +454,7 @@ class Test_add_to_repo(unittest.TestCase):
     def test_new_container(self):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
         parent = testing.DummyModel(docid=1)
         event = Dummy(parent=parent)
         model = testing.DummyModel(docid=2)
@@ -468,7 +469,7 @@ class Test_add_to_repo(unittest.TestCase):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
         parent = testing.DummyModel(docid=1)
         parent.repo = archive = DummyArchive()
         parent.comment = None
@@ -496,14 +497,14 @@ class Test_add_to_repo(unittest.TestCase):
 class Test_delete_in_repo(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from zope.interface import Interface
         from karl.models.interfaces import IContainerVersion
-        testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import delete_in_repo
@@ -536,10 +537,10 @@ class DummyUsers:
 
 class AlphaBase(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _registerAdapter(self):
         from zope.interface import implements
@@ -551,7 +552,8 @@ class AlphaBase(unittest.TestCase):
                 self.context = context
             def delta(self, how_many):
                 self.delta_called.append((self.context, how_many))
-        testing.registerAdapter(DummyLetterManager, provides=ILetterManager)
+        karl.testing.registerAdapter(DummyLetterManager,
+                                     provides=ILetterManager)
         return DummyLetterManager
 
 class AlphaAddedTests(AlphaBase):
@@ -594,12 +596,12 @@ class Test_add_mailinglist(MLBase, unittest.TestCase):
         return add_mailinglist(obj, event)
 
     def test_event(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         aliases, mlist = self._makeMailinglist()
         self.failIf(aliases)
         self._callFUT(mlist, None)
         self.assertEqual(aliases.items(),
-                         [('alias', model_path(mlist.__parent__))])
+                         [('alias', resource_path(mlist.__parent__))])
 
 
 class Test_remove_mailinglist(MLBase, unittest.TestCase):
@@ -608,9 +610,9 @@ class Test_remove_mailinglist(MLBase, unittest.TestCase):
         return remove_mailinglist(obj, event)
 
     def test_event(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         aliases, mlist = self._makeMailinglist()
-        aliases[mlist.short_address] = model_path(mlist.__parent__)
+        aliases[mlist.short_address] = resource_path(mlist.__parent__)
         self._callFUT(mlist, None)
         self.failIf(aliases)
 
@@ -623,10 +625,10 @@ class Test_remove_mailinglist(MLBase, unittest.TestCase):
 class ProfileAddedTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import profile_added
@@ -666,10 +668,10 @@ class ProfileAddedTests(unittest.TestCase):
 class ProfileRemovedTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import profile_removed
@@ -688,10 +690,10 @@ class ProfileRemovedTests(unittest.TestCase):
 
 class TestIndexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import index_profile
@@ -705,10 +707,10 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IProfile)
         catalog = DummyCatalog()
         model['people'].catalog = catalog
@@ -721,10 +723,10 @@ class TestIndexProfile(unittest.TestCase):
         from karl.testing import DummyCatalog
         from zope.interface import directlyProvides
         from karl.models.interfaces import IProfile
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        path = model_path(model)
+        path = resource_path(model)
         directlyProvides(model, IProfile)
         catalog = DummyCatalog()
         model['people'].catalog = catalog
@@ -745,10 +747,10 @@ class TestIndexProfile(unittest.TestCase):
 
 class TestUnindexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import unindex_profile
@@ -761,8 +763,8 @@ class TestUnindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from repoze.bfg.traversal import model_path
-        path = model_path(model)
+        from pyramid.traversal import resource_path
+        path = resource_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
         model['people'].catalog = catalog
@@ -776,10 +778,10 @@ class TestUnindexProfile(unittest.TestCase):
 
 class TestReindexProfile(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, event):
         from karl.models.subscribers import reindex_profile
@@ -792,8 +794,8 @@ class TestReindexProfile(unittest.TestCase):
     def test_content_object(self):
         model = testing.DummyModel()
         model['people'] = testing.DummyModel()
-        from repoze.bfg.traversal import model_path
-        path = model_path(model)
+        from pyramid.traversal import resource_path
+        path = resource_path(model)
         from karl.testing import DummyCatalog
         catalog = DummyCatalog({1:path})
         model['people'].catalog = catalog
@@ -805,10 +807,10 @@ class TestReindexProfile(unittest.TestCase):
 class QueryLoggerTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.models.subscribers import QueryLogger
@@ -821,18 +823,12 @@ class QueryLoggerTests(unittest.TestCase):
         self.assertEquals(logger.log_dir, None)
 
     def test_configure_by_utility(self):
-        from repoze.bfg.interfaces import ISettings
-        testing.registerUtility(DummySettings(None), ISettings)
+        from pyramid.interfaces import ISettings
+        karl.testing.registerUtility(DummySettings(None), ISettings)
         logger = self._makeOne()
         self.assertEquals(logger._configured, False)
         logger(DummyQueryEvent())
         self.assertEquals(logger._configured, True)
-        self.assertEquals(logger.log_dir, None)
-
-    def test_log_without_settings(self):
-        logger = self._makeOne()
-        logger(DummyQueryEvent())
-        self.assertEquals(logger._configured, False)
         self.assertEquals(logger.log_dir, None)
 
     def test_log(self):

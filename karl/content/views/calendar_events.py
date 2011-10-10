@@ -32,17 +32,17 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
+from pyramid.renderers import render_to_response
+from pyramid_formish import ValidationError
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
 
-from repoze.bfg.url import model_url
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 
 from repoze.lemonade.content import create_content
@@ -268,7 +268,7 @@ def _calendar_filter(context, request):
 
 def _calendar_setup_url(context, request):
     if has_permission('moderate', context, request):
-        setup_url = model_url(context, request, 'setup.html')
+        setup_url = resource_url(context, request, 'setup.html')
     else:
         setup_url = None
     return setup_url
@@ -276,7 +276,7 @@ def _calendar_setup_url(context, request):
 def _make_calendar_presenter_url_func(context, request):
     def url_for(*args, **kargs):
         ctx = kargs.pop('context', context)
-        return model_url(ctx, request, *args, **kargs)
+        return resource_url(ctx, request, *args, **kargs)
     return url_for
 
 
@@ -286,7 +286,7 @@ def _select_calendar_layout(context, request):
     # on the outside of the template, and we will also use the generic
     # layout instead of the community layout.
     # XXX TODO we will also restrict permissions.
-    context_path = model_path(context)
+    context_path = resource_path(context)
     wide_calendar = context_path.startswith('/offices/calendar')
     if wide_calendar:
         calendar_format_class = 'karl-calendar-wide'
@@ -330,17 +330,19 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # render
     api = TemplateAPI(context, request, calendar.title)
     api.karl_client_data['calendar_selection'] = selection
-    response = render_template_to_response(
+    response = render_to_response(
         calendar.template_filename,
-        calendar_format_class = calendar_layout['calendar_format_class'],
-        calendar_layout_template = calendar_layout['calendar_layout_template'],
-        api=api,
-        setup_url=setup_url,
-        calendar=calendar,
-        selected_layer = selected_layer,
-        layers = layers,
-        quote = quote,
-        may_create = has_permission(CREATE, context, request),
+        dict(
+            calendar_format_class = calendar_layout['calendar_format_class'],
+            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            api=api,
+            setup_url=setup_url,
+            calendar=calendar,
+            selected_layer = selected_layer,
+            layers = layers,
+            quote = quote,
+            may_create = has_permission(CREATE, context, request)),
+        request=request,
     )
     return response
 
@@ -415,17 +417,19 @@ def show_list_view(context, request):
     # render
     api = TemplateAPI(context, request, calendar.title)
     api.karl_client_data['calendar_selection'] = selection
-    response = render_template_to_response(
+    response = render_to_response(
         calendar.template_filename,
-        calendar_format_class = calendar_layout['calendar_format_class'],
-        calendar_layout_template = calendar_layout['calendar_layout_template'],
-        api=api,
-        setup_url=setup_url,
-        calendar=calendar,
-        selected_layer = selected_layer,
-        layers = layers,
-        quote = quote,
-        may_create = has_permission(CREATE, context, request),
+        dict(
+            calendar_format_class = calendar_layout['calendar_format_class'],
+            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            api=api,
+            setup_url=setup_url,
+            calendar=calendar,
+            selected_layer = selected_layer,
+            layers = layers,
+            quote = quote,
+            may_create = has_permission(CREATE, context, request)),
+        request=request,
     )
     _set_calendar_cookies(response, selection)
     return response
@@ -447,14 +451,14 @@ def show_view(context, request):
             'week': 'week.html',
             'day': 'day.html',
             }.get(selection['term'], 'day.html')
-    response = HTTPFound(location=model_url(context, request, view_name))
+    response = HTTPFound(location=resource_url(context, request, view_name))
     _set_calendar_cookies(response, selection)
     return response
 
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=model_url(context, request, 'add_calendarevent.html'))
+            location=resource_url(context, request, 'add_calendarevent.html'))
 
 
 def _get_calendar_categories(context):
@@ -467,7 +471,7 @@ def _get_calendar_layers(context):
         for path in layer.paths:
             category = {}
             try:
-                calendar = find_model(context, path)
+                calendar = find_resource(context, path)
                 title = _calendar_category_title(calendar)
                 category['title'] = title
                 layer._v_categories.append(category)
@@ -488,7 +492,7 @@ def _get_all_calendar_categories(context, request):
 
         for docid in docids:
             ob = resolver(docid)
-            path = model_path(ob)
+            path = resource_path(ob)
             folder = path.rsplit('/', 1)[0]
             title = _calendar_category_title(ob)
             calendar_categories.append({'title':title, 'path':path,
@@ -563,7 +567,7 @@ class CalendarEventFormControllerBase(object):
         if calendar:
             default_category_name = ICalendarCategory.getTaggedValue('default_name')
             for category in _get_calendar_categories(calendar):
-                category_tuple = (model_path(category), category.title)
+                category_tuple = (resource_path(category), category.title)
                 if category.__name__ == default_category_name:
                     default_category = category_tuple
                 else:
@@ -607,7 +611,7 @@ class CalendarEventFormControllerBase(object):
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         # first do the start / end date validation
@@ -721,7 +725,7 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
             alerts.emit(calendar_event, request)
 
         self.filestore.clear()
-        return HTTPFound(location=model_url(calendar_event, request))
+        return HTTPFound(location=resource_url(calendar_event, request))
 
 
 def show_calendarevent_view(context, request):
@@ -740,7 +744,7 @@ def show_calendarevent_view(context, request):
 
     container  = context.__parent__
     backto = {
-        'href': model_url(container, request),
+        'href': resource_url(container, request),
         'title': container.title,
         }
 
@@ -765,29 +769,31 @@ def show_calendarevent_view(context, request):
     if calendar is not None:
         titles = {}
         for cat in _get_calendar_categories(calendar):
-            titles[model_path(cat)] = cat.title
+            titles[resource_path(cat)] = cat.title
         category_title = titles.get(context.calendar_category)
     else:
         category_title = None
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_calendarevent.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(dict(
-            tagbox = get_tags_client_data(context, request),
-            )),
-        title=title,
-        startDate=startDate,
-        endDate=endDate,
-        attendees=attendees,
-        location=location,
-        contact_name=contact_name,
-        contact_email=contact_email,
-        category_title=category_title,
-        attachments=fetch_attachments(context['attachments'], request),
-        backto=backto,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(dict(
+                 tagbox = get_tags_client_data(context, request),
+                 )),
+             title=title,
+             startDate=startDate,
+             endDate=endDate,
+             attendees=attendees,
+             location=location,
+             contact_name=contact_name,
+             contact_email=contact_email,
+             category_title=category_title,
+             attachments=fetch_attachments(context['attachments'], request),
+             backto=backto,
+             layout=layout,
+             ),
+        request=request,
         )
 
 
@@ -828,7 +834,7 @@ def show_calendarevent_ics_view(context, request):
         event.add('attendee', name)
 
     for f in context['attachments'].values():
-        attachment = vUri(model_url(f, request))
+        attachment = vUri(resource_url(f, request))
         attachment.params['fmttype'] = f.mimetype
         event.add('attach', attachment)
 
@@ -929,7 +935,7 @@ class EditCalendarEventFormController(CalendarEventFormControllerBase):
         objectEventNotify(ObjectModifiedEvent(context))
 
         self.filestore.clear()
-        location = model_url(context, request)
+        location = resource_url(context, request)
         msg = "?status_message=Calendar%20Event%20edited"
         return HTTPFound(location='%s%s' % (location, msg))
 
@@ -958,19 +964,20 @@ def calendar_setup_view(context, request):
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=model_url(context, request),
-        categories_url=model_url(context, request, 'categories.html'),
-        layers_url=model_url(context, request, 'layers.html'),
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        fielderrors_target = fielderrors_target,
-        api=api,
-        editable_categories = categories,
-        editable_layers = layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             formfields=api.formfields,
+             fielderrors=fielderrors,
+             fielderrors_target = fielderrors_target,
+             api=api,
+             editable_categories = categories,
+             editable_layers = layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS),
+        request = request,
         )
 
 
@@ -1002,7 +1009,7 @@ def convert_to_unicode(value, field_name, encoding='utf-8'):
 def calendar_setup_categories_view(context, request):
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     default_category = context[default_category_name]
-    default_category_path = model_path(default_category)
+    default_category_path = resource_path(default_category)
     categories = _get_calendar_categories(context)
     editable_categories = filter(lambda x: x.__name__ != default_category_name,
                                  categories)
@@ -1021,7 +1028,7 @@ def calendar_setup_categories_view(context, request):
         elif category_name and category_name in category_names:
             categ = context[category_name]
             title = categ.title
-            categ_path = model_path(categ)
+            categ_path = resource_path(categ)
             if categ_path in default_layer.paths:
                 default_layer.paths.remove(categ_path)
                 default_layer._p_changed = True
@@ -1044,7 +1051,7 @@ def calendar_setup_categories_view(context, request):
         else:
             message = 'Category is invalid'
 
-        location = model_url(context, request, 'categories.html',
+        location = resource_url(context, request, 'categories.html',
                              query={'status_message': message})
         return HTTPFound(location=location)
 
@@ -1055,14 +1062,14 @@ def calendar_setup_categories_view(context, request):
         category_name = request.POST['category__name__']
 
         if category_name == default_category_name:
-            location = model_url(
+            location = resource_url(
                 context,
                 request, 'categories.html',
                 query={'status_message':'Cannot edit default category'})
             return HTTPFound(location=location)
 
         if not category_name or not category_name in category_names:
-            location = model_url(
+            location = resource_url(
                 context,
                 request, 'categories.html',
                 query={'status_message':'Could not find category to edit'})
@@ -1083,7 +1090,7 @@ def calendar_setup_categories_view(context, request):
 
             else:
                 category.title = title
-                location = model_url(
+                location = resource_url(
                     context, request,
                     'categories.html',
                     query={'status_message':'Calendar category updated'})
@@ -1108,10 +1115,10 @@ def calendar_setup_categories_view(context, request):
 
             category = create_content(ICalendarCategory, title)
             context[name] = category
-            default_layer.paths.append(model_path(category))
+            default_layer.paths.append(resource_path(category))
             default_layer._p_changed = True
 
-            location = model_url(
+            location = resource_url(
                 context, request,
                 'categories.html',
                 query={'status_message':'Calendar category added'})
@@ -1125,18 +1132,19 @@ def calendar_setup_categories_view(context, request):
     page_title = 'Calendar Categories'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=model_url(context, request),
-        categories_url=model_url(context, request, 'categories.html'),
-        layers_url=model_url(context, request, 'layers.html'),
-        fielderrors=fielderrors,
-        fielderrors_target = fielderrors_target,
-        api=api,
-        editable_categories = editable_categories,
-        editable_layers = editable_layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             fielderrors=fielderrors,
+             fielderrors_target = fielderrors_target,
+             api=api,
+             editable_categories = editable_categories,
+             editable_layers = editable_layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS),
+        request = request,
         )
 
 def calendar_setup_layers_view(context, request):
@@ -1161,7 +1169,7 @@ def calendar_setup_layers_view(context, request):
         else:
             message = 'Layer is invalid'
 
-        location = model_url(context, request, 'layers.html',
+        location = resource_url(context, request, 'layers.html',
                              query={'status_message': message})
         return HTTPFound(location=location)
 
@@ -1196,7 +1204,7 @@ def calendar_setup_layers_view(context, request):
                                    layer_title, layer_color, category_paths)
             context[layer_name] = layer
 
-            location = model_url(
+            location = resource_url(
                 context, request,
                 'layers.html',
                 query={'status_message':'Calendar layer added'})
@@ -1210,14 +1218,14 @@ def calendar_setup_layers_view(context, request):
         layer_name = request.POST['layer__name__']
 
         if layer_name == default_layer_name:
-            location = model_url(
+            location = resource_url(
                 context,
                 request, 'layers.html',
                 query={'status_message':'Cannot edit default layer'})
             return HTTPFound(location=location)
 
         if not layer_name or not layer_name in layer_names:
-            location = model_url(
+            location = resource_url(
                 context,
                 request, 'layers.html',
                 query={'status_message':'Could not find layer to edit'})
@@ -1252,7 +1260,7 @@ def calendar_setup_layers_view(context, request):
                 layer.paths = category_paths
                 layer.color = layer_color
 
-                location = model_url(
+                location = resource_url(
                     context, request,
                     'layers.html',
                     query={'status_message':'Calendar layer updated'})
@@ -1266,19 +1274,20 @@ def calendar_setup_layers_view(context, request):
     page_title = 'Calendar Layers'
     api = TemplateAPI(context, request, page_title)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/calendar_setup.pt',
-        back_to_calendar_url=model_url(context, request),
-        categories_url=model_url(context, request, 'categories.html'),
-        layers_url=model_url(context, request, 'layers.html'),
-        formfields=api.formfields,
-        fielderrors=fielderrors,
-        fielderrors_target=fielderrors_target,
-        editable_categories = categories,
-        editable_layers = layers,
-        all_categories = _get_all_calendar_categories(context, request),
-        colors = _COLORS,
-        api=api,
+        dict(back_to_calendar_url=resource_url(context, request),
+             categories_url=resource_url(context, request, 'categories.html'),
+             layers_url=resource_url(context, request, 'layers.html'),
+             formfields=api.formfields,
+             fielderrors=fielderrors,
+             fielderrors_target=fielderrors_target,
+             editable_categories = categories,
+             editable_layers = layers,
+             all_categories = _get_all_calendar_categories(context, request),
+             colors = _COLORS,
+             api=api),
+        request=request,
         )
 
 def generate_name(context):

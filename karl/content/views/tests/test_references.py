@@ -17,18 +17,18 @@
 
 import unittest
 
+import karl.testing
 
 class TestBase:
 
     def setUp(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
-        from repoze.bfg import testing
-        testing.registerTemplateRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/generic_layout.pt')
 
     def tearDown(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
 
@@ -38,8 +38,8 @@ class DescriptionHTMLTests(unittest.TestCase):
         return DescriptionHTML
 
     def _makeOne(self, context=None, request=None):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         if context is None:
             context = DummyModel(description='dummy')
         if request is None:
@@ -68,8 +68,8 @@ class TextHTMLTests(unittest.TestCase):
         return TextHTML
 
     def _makeOne(self, context=None, request=None):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         if context is None:
             context = DummyModel(text='<p>dummy</p>')
         if request is None:
@@ -98,8 +98,8 @@ class FileHTMLTests(unittest.TestCase):
         return FileHTML
 
     def _makeOne(self, context=None, request=None):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         if context is None:
             context = DummyModel()
         if request is None:
@@ -118,16 +118,15 @@ class FileHTMLTests(unittest.TestCase):
 
     def test___call__(self):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
-        from repoze.bfg.testing import registerDummyRenderer
         from karl.content.views.interfaces import IFileInfo
         fileinfo = object()
         api = object()
         def _adapt(context, request):
             return fileinfo
-        registerAdapter(_adapt, (Interface, Interface), IFileInfo)
+        karl.testing.registerAdapter(_adapt, (Interface, Interface), IFileInfo)
         adapter = self._makeOne()
-        renderer = registerDummyRenderer('templates/inline_file.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/inline_file.pt')
         adapter(api)
         self.failUnless(renderer.api is api)
         self.failUnless(renderer.fileinfo is fileinfo)
@@ -136,7 +135,7 @@ class FileHTMLTests(unittest.TestCase):
 class Test_getTree(TestBase, unittest.TestCase):
 
     def _callFUT(self, context, request=None, api=None):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         from karl.content.views.references import getTree
         if request is None:
             request = DummyRequest()
@@ -146,7 +145,7 @@ class Test_getTree(TestBase, unittest.TestCase):
 
     def _makeItem(self, ifaces=(), **kw):
         from zope.interface import directlyProvides
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
 
         class _DummyOrdering:
             # The one in karl.testing doesn't have a working sync.
@@ -162,13 +161,13 @@ class Test_getTree(TestBase, unittest.TestCase):
 
     def _registerAdapter(self, html, **kw):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
         from karl.content.interfaces import IReferenceManualHTML
         def _adapt(context, request):
             def _html(api):
                 return html % kw
             return _html
-        registerAdapter(_adapt, (Interface, Interface), IReferenceManualHTML)
+        karl.testing.registerAdapter(
+            _adapt, (Interface, Interface), IReferenceManualHTML)
 
     def test_empty(self):
         root = self._makeItem()
@@ -253,7 +252,7 @@ class Test_move_subpath(unittest.TestCase):
         return move_subpath(context, subpath, direction)
 
     def _makeItem(self, **kw):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
 
         class _DummyOrdering:
             # The one in karl.testing doesn't have a working sync.
@@ -354,7 +353,7 @@ class Test_move_subpath(unittest.TestCase):
 class ShowTestBase(TestBase):
 
     def _makeContext(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         from karl.testing import DummyOrdering
         parent = DummyModel(title='dummyparent',
@@ -371,33 +370,32 @@ class ShowTestBase(TestBase):
 
     def _registerTagbox(self):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
         from karl.models.interfaces import ITagQuery
         from karl.testing import DummyTagQuery
 
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                        ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def _registerAddables(self):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
         from karl.views.interfaces import IFolderAddables
         from karl.testing import DummyFolderAddables
 
-        registerAdapter(DummyFolderAddables, (Interface, Interface),
-                                IFolderAddables)
+        karl.testing.registerAdapter(
+            DummyFolderAddables, (Interface, Interface),
+            IFolderAddables)
 
     def _registerLayoutProvider(self):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
 
-        registerAdapter(DummyLayoutProvider, (Interface, Interface),
-                        ILayoutProvider)
+        karl.testing.registerAdapter(
+            DummyLayoutProvider, (Interface, Interface),
+            ILayoutProvider)
 
     def _callFUT(self, context=None, request=None):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         if context is None:
             parent, context = self._makeContext()
         if request is None:
@@ -412,13 +410,13 @@ class ReferenceOutlineViewTests(ShowTestBase, unittest.TestCase):
         return reference_outline_view
 
     def test_it(self):
-        from repoze.bfg.testing import registerDummyRenderer
         self._registerTagbox()
         self._registerAddables()
         self._registerLayoutProvider()
 
         # XXX
-        renderer = registerDummyRenderer('templates/show_referencemanual.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(renderer.tree, [])
@@ -431,13 +429,13 @@ class ReferenceViewallViewTests(ShowTestBase, unittest.TestCase):
         return reference_viewall_view
 
     def test_it(self):
-        from repoze.bfg.testing import registerDummyRenderer
         self._registerTagbox()
         self._registerAddables()
         self._registerLayoutProvider()
 
         # XXX
-        renderer = registerDummyRenderer('templates/viewall_referencemanual.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/viewall_referencemanual.pt')
         self._callFUT()
         self.assertEqual(renderer.api.page_title, 'dummytitle')
         self.assertEqual(renderer.tree, [])
@@ -450,8 +448,8 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         return AddReferenceFCBase
 
     def _makeOne(self, context=None, request=None):
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         if context is None:
             context = DummyModel()
         if request is None:
@@ -462,7 +460,7 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         return base
 
     def _registerFactory(self, controller):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from repoze.lemonade.testing import registerContentFactory
         from zope.interface import Interface
         class IDummy(Interface):
@@ -502,7 +500,7 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/')
 
     def test_handle_submit_context_wo_ordering(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         from karl.testing import DummyTags
         context = DummyModel(tags = DummyTags(),
@@ -524,7 +522,7 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
                          [u'foo', u'bar'])
 
     def test_handle_submit(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         from karl.testing import DummyOrdering
         from karl.testing import DummyTags
@@ -570,7 +568,7 @@ class AddReferenceSectionFormControllerTests(TestBase, unittest.TestCase):
 class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
 
     def _makeOne(self, context=None, request=None):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         from karl.content.views.references import EditReferenceFCBase
         if context is None:
             parent, context = self._makeContext()
@@ -582,7 +580,7 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
         return base
 
     def _makeContext(self):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         parent = DummyModel(title='dummyparent',
                             catalog=DummyCatalog(),
@@ -595,11 +593,10 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
 
     def _registerTags(self, site):
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
         from karl.models.interfaces import ITagQuery
         from karl.testing import DummyTagQuery
-        registerAdapter(DummyTagQuery, (Interface, Interface),
-                        ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         from karl.testing import DummyTags
         site.tags = DummyTags()
 

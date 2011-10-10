@@ -1,4 +1,5 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://namespaces.repoze.org/bfg"
+           xmlns:pyramid="http://pylonshq.com/pyramid">
   <include package="repoze.workflow" file="meta.zcml"/>
 
   <workflow type="security"
@@ -8,7 +9,7 @@
             content_types="karl.models.interfaces.ICommunity"
             initial_state="public"
             state_attr="security_state"
-            permission_checker="repoze.bfg.security.has_permission"
+            permission_checker="pyramid.security.has_permission"
             >
 
       <state name="public" title="Public"
@@ -239,11 +240,11 @@
 
   </workflow>
 
-  <subscriber
+  <pyramid:subscriber
       for="karl.models.interfaces.IUserAddedGroup"
       handler="karl.workflow.reset_profile"/>
 
-  <subscriber
+  <pyramid:subscriber
       for="karl.models.interfaces.IUserRemovedGroup"
       handler="karl.workflow.reset_profile"/>
 

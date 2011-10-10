@@ -5,7 +5,7 @@ import sys
 
 from zope.component import getUtilitiesFor
 from zope.component import getSiteManager
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.threadlocal import get_current_registry
 
 from repoze.evolution import IEvolutionManager
 from repoze.evolution import evolve_to_latest

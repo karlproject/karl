@@ -17,17 +17,17 @@
 """Tests of karl.utilities.peopleconf"""
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 
 class Test_dump_peopledir(unittest.TestCase):
 
     def setUp(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def tearDown(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def _callFUT(self, elem):
@@ -118,7 +118,7 @@ class Test_dump_peopledir(unittest.TestCase):
                         '/peopledirectory/sections/testing/acl/no-inherit'))
 
     def test_section_acl_wo_inherit(self):
-        from repoze.bfg.security import DENY_ALL
+        from pyramid.security import DENY_ALL
         pd = self._makeContext(order=('testing',))
         pd['testing'] = testing.DummyModel(
                             title='Testing',
@@ -145,7 +145,7 @@ class Test_dump_peopledir(unittest.TestCase):
         self.assertEqual(len(a_nodes), 0)
 
     def test_section_acl_w_redirector(self):
-        from repoze.bfg.security import DENY_ALL
+        from pyramid.security import DENY_ALL
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleRedirector
         pd = self._makeContext(order=('testing',))
@@ -673,11 +673,11 @@ class Test_parse_report(unittest.TestCase):
 class Test_parse_report_group(unittest.TestCase):
 
     def setUp(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def tearDown(self):
-        from repoze.bfg.testing import cleanUp
+        from pyramid.testing import cleanUp
         cleanUp()
 
     def _callFUT(self, peopledir, elem):

@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
@@ -61,7 +61,7 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
     for docid in docids:
         doc = resolver(docid)
         if out is not None:
-            print >>out, "Updating creator for %s." % model_path(doc)
+            print >>out, "Updating creator for %s." % resource_path(doc)
         doc.creator = new_name
         index.reindex_doc(docid, doc)
 
@@ -70,6 +70,6 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
     for docid in docids:
         doc = resolver(docid)
         if out is not None:
-            print >>out, "Updating modified_by for %s." % model_path(doc)
+            print >>out, "Updating modified_by for %s." % resource_path(doc)
         doc.modified_by = new_name
         index.reindex_doc(docid, doc)

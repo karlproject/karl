@@ -1,10 +1,9 @@
 import formish
 import schemaish
 
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
-from zope.component import queryAdapter
+from pyramid.traversal import find_interface
+from pyramid.url import resource_url
+from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
@@ -138,7 +137,7 @@ class AdvancedFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, params):
         context = self.context
@@ -168,5 +167,5 @@ class AdvancedFormController(object):
             lock.clear(context)
 
         objectEventNotify(ObjectModifiedEvent(context))
-        return HTTPFound(location=model_url(self.context, self.request,
+        return HTTPFound(location=resource_url(self.context, self.request,
                     query={'status_message': 'Advanced settings changed.'}))

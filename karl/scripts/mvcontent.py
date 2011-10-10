@@ -38,8 +38,8 @@ from karl.views.utils import make_unique_name
 from optparse import OptionParser
 from karl.scripting import get_default_config
 from karl.scripting import open_root
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type
 from repoze.workflow import get_workflow
@@ -67,13 +67,13 @@ def postorder(startnode):
 
 def move_content(root, src, dst, wf_state):
     try:
-        context = find_model(root, src)
+        context = find_resource(root, src)
     except KeyError:
         print >>sys.stderr, "Source content not found: %s" % src
         sys.exit(-1)
 
     try:
-        dest_folder = find_model(root, dst)
+        dest_folder = find_resource(root, dst)
     except KeyError:
         print >>sys.stderr, "Destination folder not found: %s" % dst
         sys.exit(-1)
@@ -95,7 +95,7 @@ def move_content(root, src, dst, wf_state):
     src_folder = context.__parent__
     name = context.__name__
 
-    log.info("Moving %s", model_path(context))
+    log.info("Moving %s", resource_path(context))
     for obj in postorder(context):
         if hasattr(obj, 'docid'):
             docid = obj.docid
@@ -117,7 +117,7 @@ def move_content(root, src, dst, wf_state):
     for obj in postorder(context):
         if hasattr(obj, 'docid'):
             docid = obj.docid
-            catalog.document_map.add(model_path(obj), docid)
+            catalog.document_map.add(resource_path(obj), docid)
             catalog.index_doc(docid, obj)
 
     if wf_state is not None:

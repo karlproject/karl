@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 
@@ -33,12 +33,12 @@ def evolve(root):
             count, docids, resolver = search(creator=userid)
             for docid in docids:
                 doc = resolver(docid)
-                print "Updating 'creator' for", model_path(doc)
+                print "Updating 'creator' for", resource_path(doc)
                 doc.creator = former_id
 
 
             count, docids, resolver = search(modified_by=userid)
             for docid in docids:
                 doc = resolver(docid)
-                print "Updating 'modified_by' for", model_path(doc)
+                print "Updating 'modified_by' for", resource_path(doc)
                 doc.modified_by = former_id

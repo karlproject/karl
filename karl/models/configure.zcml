@@ -1,4 +1,4 @@
-<configure xmlns="http://namespaces.repoze.org/bfg"
+<configure xmlns="http://pylonshq.com/pyramid"
     xmlns:lemonade="http://namespaces.repoze.org/lemonade">
 
   <include package="repoze.lemonade.includes" file="meta.zcml" />
@@ -204,7 +204,7 @@
 
   <adapter
     for=".interfaces.ICommunity
-          repoze.bfg.interfaces.IRequest"
+          pyramid.interfaces.IRequest"
     provides=".interfaces.ICommunityInfo"
     factory=".adapters.CommunityInfo"
   />
@@ -214,7 +214,7 @@
            following being the preferred way to get a CatalogSearch. -->
   <adapter
     for="zope.interface.Interface
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides=".interfaces.ICatalogSearch"
     factory=".adapters.CatalogSearch"
   />
@@ -228,7 +228,7 @@
   <!-- XXX This should also be deprecated -->
   <adapter
     for=".interfaces.IPeopleReport
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides="karl.models.interfaces.ICatalogSearch"
     factory=".adapters.PeopleDirectoryCatalogSearch"
   />
@@ -253,14 +253,14 @@
 
   <adapter
     for="zope.interface.Interface
-         repoze.bfg.interfaces.IRequest"
+         pyramid.interfaces.IRequest"
     provides=".interfaces.ITagQuery"
     factory=".adapters.TagQuery"
   />
 
   <adapter
     for="repoze.lemonade.interfaces.IContent
-          repoze.bfg.interfaces.IRequest"
+          pyramid.interfaces.IRequest"
     provides=".interfaces.IGridEntryInfo"
     factory=".adapters.GridEntryInfo"
   />

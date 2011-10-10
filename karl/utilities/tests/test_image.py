@@ -1,15 +1,14 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 import karl.testing
-from zope.testing.cleanup import cleanUp
 
 class Test_thumb_url(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_it(self):
         from zope.interface import directlyProvides
@@ -23,10 +22,10 @@ class Test_thumb_url(unittest.TestCase):
 
 class Test_get_images_batch(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request, **search_params):
         from karl.utilities.image import get_images_batch
@@ -53,7 +52,7 @@ class Test_get_images_batch(unittest.TestCase):
 
     def test_non_defaults(self):
         from karl.content.interfaces import IImage
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = testing.DummyModel()
         community = context['community'] = testing.DummyModel()
         request = testing.DummyRequest()
@@ -86,10 +85,10 @@ class Test_get_images_batch(unittest.TestCase):
 
 class Test_relocated_temp_images(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request):
         from karl.utilities.image import relocate_temp_images

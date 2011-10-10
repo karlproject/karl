@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 from repoze.lemonade.content import create_content
 
 from karl.content.interfaces import ICommunityFile
@@ -26,7 +26,7 @@ def evolve(site):
             continue # Work around catalog bug
         for name in old_names:
             if name in obj:
-                print "Updating photo for %s" % model_path(obj)
+                print "Updating photo for %s" % resource_path(obj)
                 old_photo = obj.get('source_photo')
                 if old_photo is None:
                     old_photo = obj[name]

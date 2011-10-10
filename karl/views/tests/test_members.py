@@ -17,7 +17,7 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 class ShowMembersViewTests(unittest.TestCase):
@@ -51,13 +51,13 @@ class ShowMembersViewTests(unittest.TestCase):
                 searchkw.update(kw)
                 return 2, [1,2], resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface),
+        karltesting.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
         request = testing.DummyRequest(params={'hide_pictures':True})
-        renderer = testing.registerDummyRenderer('templates/show_members.pt')
+        renderer = karltesting.registerDummyRenderer('templates/show_members.pt')
         self._callFUT(context, request)
         actions = [('Manage Members', 'manage.html'),
                    ('Add Existing', 'add_existing.html'),
@@ -122,9 +122,9 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest({"user_id": "admin"})
         context = self._getContext()
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
         controller = self._makeOne(context, request)
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
         response = controller()
         self.assertEqual(context.users.added_groups, [('admin','members')])
@@ -133,7 +133,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
             response.location.startswith('http://example.com/manage.html'))
 
     def test_handle_submit_badprofile(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         request = testing.DummyRequest()
         context = self._getContext()
         controller = self._makeOne(context, request)
@@ -145,10 +145,10 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         context = self._getContext()
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
         controller = self._makeOne(context, request)
         converted = {'users': (u'admin',), 'text':'some_text'}
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(context.users.added_groups, [('admin','members')])
@@ -209,9 +209,9 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
     def test_form_fields_w_tos_and_privacy_statement_adapter(self):
         from karl.views.interfaces import IInvitationBoilerplate
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
-        registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
-                        IInvitationBoilerplate)
+        karltesting.registerAdapter(
+            DummyInvitationBoilerPlate, (Interface, Interface),
+            IInvitationBoilerplate)
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
@@ -245,9 +245,9 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
     def test_form_widgets_w_tos_and_privacty_policy(self):
         from karl.views.interfaces import IInvitationBoilerplate
         from zope.interface import Interface
-        from repoze.bfg.testing import registerAdapter
-        registerAdapter(DummyInvitationBoilerPlate, (Interface, Interface),
-                        IInvitationBoilerplate)
+        karltesting.registerAdapter(
+            DummyInvitationBoilerPlate, (Interface, Interface),
+            IInvitationBoilerplate)
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
@@ -257,7 +257,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.failUnless('accept_privacy_policy' in widgets)
 
     def test_handle_submit_password_mismatch(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
@@ -265,7 +265,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_username_exists(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeContext()
         request = self._makeRequest()
         profiles = testing.DummyModel()
@@ -284,7 +284,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         from zope.interface import directlyProvides
         workflow = registerDummyWorkflow('security')
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
         registerContentFactory(DummyContent, IProfile)
         class DummyWhoPlugin(object):
             def remember(self, environ, identity):
@@ -316,7 +316,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                      'country':'country', 'websites':['website'],
                      'languages':'languages',
                      }
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_accept_invitation.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -347,7 +347,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
     def _registerMailer(self):
         from repoze.sendmail.interfaces import IMailDelivery
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
         return mailer
 
     def _makeCommunity(self):
@@ -406,7 +406,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch()
         def nonrandom(size=6):
             return 'A' * size
-        testing.registerUtility(nonrandom, IRandomId)
+        karltesting.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
         controller = self._makeOne(context, request)
         converted = {
@@ -414,7 +414,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             'text': u'some text',
             }
 
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_invite_new.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -438,14 +438,14 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch(results={'email=d@x.org': [profile,]})
         def nonrandom(size=6):
             return 'A' * size
-        testing.registerUtility(nonrandom, IRandomId)
+        karltesting.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
         controller = self._makeOne(context, request)
         converted = {
             'email_addresses': [u'd@x.org'],
             'text': u'some text',
             }
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -468,16 +468,16 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch(results={'email=d@x.org': [profile,]})
         def nonrandom(size=6):
             return 'A' * size
-        testing.registerUtility(nonrandom, IRandomId)
+        karltesting.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
         controller = self._makeOne(context, request)
         converted = {
             'email_addresses': [u'd@x.org'],
             'text': u'some text',
             }
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_already_in_community(self):
@@ -493,7 +493,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch(results={'email=a@x.org': [profile,]})
         def nonrandom(size=6):
             return 'A' * size
-        testing.registerUtility(nonrandom, IRandomId)
+        karltesting.registerUtility(nonrandom, IRandomId)
         registerContentFactory(DummyInvitation, IInvitation)
         controller = self._makeOne(context, request)
         converted = {
@@ -525,7 +525,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
     def _registerMailer(self):
         from repoze.sendmail.interfaces import IMailDelivery
         mailer = karltesting.DummyMailer()
-        testing.registerUtility(mailer, IMailDelivery)
+        karltesting.registerUtility(mailer, IMailDelivery)
         return mailer
 
     def _makeCommunity(self):
@@ -612,7 +612,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
                          'http://example.com/communities/community/')
 
     def test_handle_submit_remove_sole_moderator(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -626,7 +626,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_deop_sole_moderator(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
@@ -695,7 +695,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
                          'Removed+moderator+buz')
 
     def test_handle_submit_resend(self):
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/email_invite_new.pt')
         context = self._makeCommunity()
         context.title = 'community'
@@ -769,7 +769,7 @@ class TestJqueryMemberSearchView(unittest.TestCase):
             def search(**kw):
                 return 3, [1,2,3], resolver
             return search
-        testing.registerAdapter(dummy_catalog_search, (Interface),
+        karltesting.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
         self.assertEqual(
@@ -839,10 +839,10 @@ class DummyInvitationBoilerPlate(object):
         pass
 
 def registerCatalogSearch(results={}):
-    from repoze.bfg.testing import registerAdapter
     from zope.interface import Interface
     from karl.models.interfaces import ICatalogSearch
-    registerAdapter(dummy_search(results), (Interface,), ICatalogSearch)
+    karltesting.registerAdapter(
+        dummy_search(results), (Interface,), ICatalogSearch)
 
 class DummySessions(dict):
     def get(self, name, default=None):

@@ -17,15 +17,15 @@
 
 import unittest
 
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
 
 class CommunityTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.community import Community

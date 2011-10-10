@@ -1,8 +1,8 @@
 from zope.component import queryUtility
 from zope.interface import implements
 
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Authenticated
+from pyramid.security import Allow
+from pyramid.security import Authenticated
 
 from karl.bootstrap.interfaces import IInitialData
 from karl.bootstrap.interfaces import IInitialOfficeData

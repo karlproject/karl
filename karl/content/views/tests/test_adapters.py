@@ -16,11 +16,11 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from datetime import datetime
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 
 class TestFileInfo(unittest.TestCase):
@@ -73,7 +73,7 @@ class TestFileInfo(unittest.TestCase):
         def m(mimetype):
             return 123
         from karl.utilities.interfaces import IMimeInfo
-        testing.registerUtility(m, IMimeInfo)
+        karltesting.registerUtility(m, IMimeInfo)
         context = testing.DummyModel(mimetype='abc')
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
@@ -159,7 +159,7 @@ class TestBylineInfo(unittest.TestCase):
         d1 = 'Wednesday, January 28, 2009 08:32 AM'
         def dummy(date, flavor):
             return d1
-        testing.registerUtility(dummy, IKarlDates)
+        karltesting.registerUtility(dummy, IKarlDates)
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date, context.posted_date)
@@ -335,7 +335,7 @@ class TestBlogCommentAlert(unittest.TestCase):
 
     def test_alert(self):
         from repoze.postoffice.message import Message
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
@@ -355,7 +355,7 @@ class TestBlogCommentAlert(unittest.TestCase):
 
     def test_digest(self):
         from repoze.postoffice.message import Message
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         renderer.string_response = "<body>Dummy message body.</body>"
 
@@ -379,7 +379,7 @@ class TestBlogCommentAlert(unittest.TestCase):
             comments.append(
                 self._add_comment(self.blogentry, "comment%d" % i))
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
@@ -573,7 +573,8 @@ class TestForumPortlet(unittest.TestCase):
     def _register(self):
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
-        testing.registerAdapter(DummySearchAdapter, Interface, ICatalogSearch)
+        karltesting.registerAdapter(
+            DummySearchAdapter, Interface, ICatalogSearch)
 
     def _getTargetClass(self):
         from karl.content.views.adapters import ForumPortlet

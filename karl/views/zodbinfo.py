@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import time
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from pyramid.renderers import render_to_response
 
 class ConnectionInfo:
 
@@ -51,6 +51,7 @@ def show_zodbinfo(context, request):
             'name': database_name,
             'connections': connections,
             })
-    return render_template_to_response(
+    return render_to_response(
         'templates/zodbinfo.pt',
-        dbinfo=dbinfo)
+        dict(dbinfo=dbinfo),
+        request=request)

@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
 _marker = object()
 class UpdateFeedsScriptTests(unittest.TestCase):
@@ -30,7 +29,7 @@ class UpdateFeedsScriptTests(unittest.TestCase):
 
     def _callFUT(self, args=[]):
         from karl.scripts.update_feeds import main
-        from repoze.bfg import testing
+        from pyramid import testing
         argv = ['update_feeds'] + args
         res = []
         tx = DummyTransaction()

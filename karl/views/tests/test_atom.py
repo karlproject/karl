@@ -19,7 +19,7 @@ import datetime
 from zope.interface import directlyProvides
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl import testing as karltesting
 from karl.views.tests.test_community import DummyTagQuery
@@ -34,12 +34,12 @@ class CommunityAtomViewTests(unittest.TestCase):
     def _register(self):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                    ITagQuery)
 
         from karl.views.interfaces import IAtomEntry
-        testing.registerAdapter(DummyAtomEntry, (Interface, Interface),
-                                IAtomEntry)
+        karltesting.registerAdapter(DummyAtomEntry, (Interface, Interface),
+                                    IAtomEntry)
 
     def _callFUT(self, context, request):
         from karl.views.atom import community_atom_view
@@ -57,14 +57,14 @@ class CommunityAtomViewTests(unittest.TestCase):
         foo = testing.DummyModel()
         foo.modified = datetime.datetime(2009, 9, 2, 10, 28, 0)
         request = testing.DummyRequest()
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/atomfeed.pt')
         from karl.models.interfaces import ICatalogSearch
         from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo'})
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         context.catalog = catalog
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
         self._callFUT(context, request)
 
 class DummyAtomEntry(object):

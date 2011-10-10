@@ -27,16 +27,16 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 from zope.interface import implements
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import effective_principals
-from repoze.bfg.security import has_permission
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.renderers import get_renderer
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
+from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
+from pyramid.security import has_permission
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 
 from repoze.sendmail.interfaces import IMailDelivery
 
@@ -78,7 +78,7 @@ def get_recent_items_batch(community, request, size=10):
     batch = get_catalog_batch_grid(
         community, request, interfaces=[ICommunityContent],
         sort_index="modified_date", reverse=True, batch_size=size,
-        path={'query': model_path(community)},
+        path={'query': resource_path(community)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
     )
     return batch
@@ -89,7 +89,7 @@ def redirect_community_view(context, request):
     default_tool = getattr(context, 'default_tool', None)
     if not default_tool:
         default_tool = 'view.html'
-    return HTTPFound(location=model_url(context, request, default_tool))
+    return HTTPFound(location=resource_url(context, request, default_tool))
 
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
@@ -126,7 +126,7 @@ def show_community_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    feed_url = model_url(context, request, "atom.xml")
+    feed_url = resource_url(context, request, "atom.xml")
 
     return {'api': api,
             'actions': actions,
@@ -317,7 +317,7 @@ class AddCommunityFormController(object):
         return {'api':api}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -365,7 +365,7 @@ class AddCommunityFormController(object):
         set_tags(community, request, converted['tags'])
         # Adding a community should take you to the Add Existing
         # User screen, so the moderator can include some users.
-        location = model_url(community, request,
+        location = resource_url(community, request,
                              'members', 'add_existing.html',
                              query={'status_message':'Community added'})
         return HTTPFound(location=location)
@@ -439,7 +439,7 @@ class EditCommunityFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -475,7 +475,7 @@ class EditCommunityFormController(object):
 
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         return HTTPFound(location=location)
 
     def _get_security_states(self):
@@ -505,9 +505,10 @@ def join_community_view(context, request):
         )
         mail["Subject"] = "Request to join %s community" % context.title
 
-        body_template = get_template("templates/email_join_community.pt")
-        profile_url = model_url(profile, request)
-        accept_url=model_url(context, request, "members", "add_existing.html",
+        body_template = get_renderer(
+            "templates/email_join_community.pt").implementation()
+        profile_url = resource_url(profile, request)
+        accept_url=resource_url(context, request, "members", "add_existing.html",
                              query={"user_id": user})
         body = body_template(
             message=message,
@@ -528,7 +529,7 @@ def join_community_view(context, request):
         mailer.send(recipients, mail)
 
         status_message = "Your request has been sent to the moderators."
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={"status_message": status_message})
 
         return HTTPFound(location=location)
@@ -536,13 +537,14 @@ def join_community_view(context, request):
     # Show form
     page_title = "Join " + context.title
     api = TemplateAPI(context, request, page_title)
-    return render_template_to_response(
+    return render_to_response(
         "templates/join_community.pt",
-        api=api,
-        profile=profile,
-        community=context,
-        post_url=model_url(context, request, "join.html"),
-        formfields=api.formfields,
+        dict(api=api,
+             profile=profile,
+             community=context,
+             post_url=resource_url(context, request, "join.html"),
+             formfields=api.formfields),
+        request=request,
     )
 
 def delete_community_view(context, request):
@@ -554,27 +556,31 @@ def delete_community_view(context, request):
     if confirm == '1':
         name = context.__name__
         del context.__parent__[name]
-        location = model_url(context.__parent__, request)
+        location = resource_url(context.__parent__, request)
         return HTTPFound(location=location)
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/delete_resource.pt',
-        api=api,
-        layout=layout,
-        num_children=0,
+        dict(api=api,
+             layout=layout,
+             num_children=0,),
+        request = request,
         )
 
 class CommunitySidebar(object):
     implements(ISidebar)
 
     def __init__(self, context, request):
-        pass
+        self.context = context
+        self.request = request
 
     def __call__(self, api):
-        return render_template(
+        return render(
             'templates/community_sidebar.pt',
-            api=api)
+            dict(api=api),
+            request=self.request
+            )

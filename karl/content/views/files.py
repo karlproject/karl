@@ -37,19 +37,19 @@ from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 from zope.interface import implementedBy
 
-from webob import Response
-from webob.exc import HTTPFound
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.traversal import model_path
+from pyramid.renderers import render_to_response
+from pyramid.exceptions import NotFound
+from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
-from repoze.bfg.formish import ValidationError
+from pyramid_formish import ValidationError
 
 from repoze.lemonade.content import create_content
 
@@ -139,7 +139,7 @@ def show_folder_view(context, request):
             actions.append(('Delete', 'delete.html'))
 
         backto = {
-            'href': model_url(context.__parent__, request),
+            'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
             }
 
@@ -148,14 +148,14 @@ def show_folder_view(context, request):
         repo = find_repo(context)
         if repo is not None and has_permission('edit', context, request):
             tool = find_interface(context, ICommunityRootFolder)
-            trash_url = model_url(tool, request, 'trash')
+            trash_url = resource_url(tool, request, 'trash')
 
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
-        feed_url = model_url(context, request, "atom.xml")
+        feed_url = resource_url(context, request, "atom.xml")
     else:
         feed_url = None
 
@@ -187,7 +187,7 @@ def show_folder_view(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=model_url(context, request, 'add_file.html'))
+            location=resource_url(context, request, 'add_file.html'))
 
 title_field = schemaish.String(
     validator=validator.All(
@@ -259,7 +259,7 @@ class AddFolderFormController(object):
         return {'api':api, 'actions':(), 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -289,7 +289,7 @@ class AddFolderFormController(object):
             for interface in customizer.markers:
                 alsoProvides(folder, interface)
 
-        location = model_url(folder, request)
+        location = resource_url(folder, request)
         return HTTPFound(location=location)
 
 def delete_folder_view(context, request,
@@ -303,7 +303,7 @@ def advanced_folder_view(context, request):
     api = TemplateAPI(context, request, page_title)
 
     if 'form.cancel' in request.POST:
-        return HTTPFound(location=model_url(context, request))
+        return HTTPFound(location=resource_url(context, request))
 
     if 'form.submitted' in request.POST:
         marker = request.POST.get('marker', False)
@@ -321,7 +321,7 @@ def advanced_folder_view(context, request):
             noLongerProvides(context, INetworkNewsMarker)
 
         if marker:
-            location = model_url(context, request, query=
+            location = resource_url(context, request, query=
                                  {'status_message': 'Marker changed'})
             return HTTPFound(location=location)
 
@@ -338,15 +338,16 @@ def advanced_folder_view(context, request):
     else:
         selected = None
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/advanced_folder.pt',
-        api=api,
-        actions=[],
-        formfields=api.formfields,
-        post_url=model_url(context, request, 'advanced.html'),
-        layout=layout,
-        fielderrors={},
-        selected=selected,
+        dict(api=api,
+             actions=[],
+             formfields=api.formfields,
+             post_url=resource_url(context, request, 'advanced.html'),
+             layout=layout,
+             fielderrors={},
+             selected=selected),
+        request = request,
         )
 
 
@@ -416,7 +417,7 @@ class AddFileFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -465,7 +466,7 @@ class AddFileFormController(object):
             alerts.emit(file, request)
 
         self.filestore.clear()
-        location = model_url(file, request)
+        location = resource_url(file, request)
         return HTTPFound(location=location)
 
 def show_file_view(context, request):
@@ -488,14 +489,14 @@ def show_file_view(context, request):
     # If we are in an attachments folder, the backto skips the
     # attachments folder and goes up to the grandparent
     from karl.models.interfaces import IAttachmentsFolder
-    from repoze.bfg.traversal import find_interface
+    from pyramid.traversal import find_interface
     attachments = find_interface(context, IAttachmentsFolder)
     if attachments is not None:
         up_to = context.__parent__.__parent__
     else:
         up_to = context.__parent__
     backto = {
-        'href': model_url(up_to, request),
+        'href': resource_url(up_to, request),
         'title': up_to.title,
         }
 
@@ -515,23 +516,25 @@ def show_file_view(context, request):
         if repo is not None and has_permission('edit', context, request):
             actions.append(('History', 'history.html'))
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_file.pt',
-        api=api,
-        actions=actions,
-        fileinfo=fileinfo,
-        head_data=convert_to_script(client_json_data),
-        backto=backto,
-        previous_entry=previous,
-        next_entry=next,
-        layout=layout,
+        dict(api=api,
+             actions=actions,
+             fileinfo=fileinfo,
+             head_data=convert_to_script(client_json_data),
+             backto=backto,
+             previous_entry=previous,
+             next_entry=next,
+             layout=layout
+             ),
+        request=request,
         )
 
 def preview_file(context, request):
     # Just tell the AJAX that we want to do a direct file download rather than
     # an in browser preview.
-    url = model_url(context, request, 'download_preview',
-                    query={'version_num': request.params['version_num']})
+    url = resource_url(context, request, 'download_preview',
+                       query={'version_num': request.params['version_num']})
     return {'url': url}
 
 def download_file_preview(context, request):
@@ -641,7 +644,7 @@ class EditFolderFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -664,7 +667,7 @@ class EditFolderFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request, query=
+        location = resource_url(context, request, query=
                              {'status_message':'Folder changed'})
         return HTTPFound(location=location)
 
@@ -729,7 +732,7 @@ class EditFileFormController(object):
                 'layout':layout}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -767,7 +770,7 @@ class EditFileFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         self.filestore.clear()
-        location = model_url(context, request,
+        location = resource_url(context, request,
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
 
@@ -974,8 +977,8 @@ def traverse_file_folder(context, folder):
 def get_file_folder_path(context):
     # Return the absolute path to the fileobjext in context, relative
     # to the community.
-    context_path = model_path(context)
-    root_path = model_path(find_root_folder(context))
+    context_path = resource_path(context)
+    root_path = resource_path(find_root_folder(context))
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
 
@@ -994,14 +997,14 @@ def get_target_folders(context):
     #
     catalog = find_catalog(context)
     root_folder = find_root_folder(context)
-    root_path = model_path(root_folder)
+    root_path = resource_path(root_folder)
 
     # Check if we are in the files section
     # for example, we are in /offices/nyc/referencemanuals which is a folder but
     # not inside the files tool /offices/nyc/files.
     # In this case we will return None as a velue, and the client should
     # detect this value and disable the reorganize features.
-    context_path = model_path(context)
+    context_path = resource_path(context)
     if not context_path.startswith(root_path):
         return None
 
@@ -1046,9 +1049,9 @@ def get_target_folders(context):
 def get_current_folder(context):
     # Calculate the current folder in the same format as the results
     # from get_target_folders (relative to community)
-    root_path = model_path(find_root_folder(context))
+    root_path = resource_path(find_root_folder(context))
 
-    context_path = model_path(context)
+    context_path = resource_path(context)
 
     if not context_path.startswith(root_path):
         # we are not in the files tool, there will be no reorganize
@@ -1122,7 +1125,7 @@ def ajax_file_reorganize_moveto_view(context, request):
         except KeyError:
             msg = 'Cannot find target folder "%s"' % (target_folder, )
             raise ErrorResponse(msg, filename="*")
-        target_folder_url = model_url(target_context, request)
+        target_folder_url = resource_url(target_context, request)
 
         moved = 0
         for filename in filenames:

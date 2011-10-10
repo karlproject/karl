@@ -20,20 +20,21 @@ import schemaish
 import transaction
 from validatish import validator
 
-from webob.exc import HTTPFound
-from webob.exc import HTTPOk
+from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPOk
+
 from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.renderers import render_to_response
+from pyramid.exceptions import NotFound
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
 from repoze.workflow import get_workflow
-from repoze.bfg.traversal import model_path
+from pyramid.traversal import resource_path
 
 from repoze.lemonade.content import create_content
 
@@ -89,13 +90,13 @@ security_field = schemaish.String(
 def redirect_to_front_page(context, request):
 
     front_page = context['front_page']
-    location = model_url(front_page, request)
+    location = resource_url(front_page, request)
     return HTTPFound(location=location)
 
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=model_url(context, request, 'add_wikipage.html'))
+            location=resource_url(context, request, 'add_wikipage.html'))
 
 
 class AddWikiPageFormController(object):
@@ -162,7 +163,7 @@ class AddWikiPageFormController(object):
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -196,7 +197,7 @@ class AddWikiPageFormController(object):
             alerts.emit(wikipage, request)
 
         msg = '?status_message=Wiki%20Page%20created'
-        location = model_url(wikipage, request) + msg
+        location = resource_url(wikipage, request) + msg
         return HTTPFound(location=location)
 
 
@@ -204,7 +205,7 @@ def get_wikitoc_data(context, request):
     wikiparent = context.__parent__
     search = getAdapter(context, ICatalogSearch)
     count, docids, resolver = search(
-        path = model_path(wikiparent),
+        path = resource_path(wikiparent),
         interfaces = [IWikiPage,]
     )
     items = []
@@ -214,7 +215,7 @@ def get_wikitoc_data(context, request):
         tags = getMultiAdapter((entry, request), ITagQuery).tagswithcounts
         author = entry.creator
         profile = profiles.get(author, None)
-        profile_url = model_url(profile, request)
+        profile_url = resource_url(profile, request)
         if profile is not None:
             author_name = '%s %s' % (profile.firstname, profile.lastname)
         else:
@@ -246,7 +247,7 @@ def show_wikipage_view(context, request):
     else:
         page_title = context.title
         backto = {
-            'href': model_url(context.__parent__, request),
+            'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
             }
 
@@ -271,8 +272,7 @@ def show_wikipage_view(context, request):
         ))
 
     wiki = find_interface(context, IWiki)
-    feed_url = model_url(wiki, request, "atom.xml")
-
+    feed_url = resource_url(wiki, request, "atom.xml")
     return dict(
         api=api,
         actions=actions,
@@ -331,7 +331,7 @@ def show_wikitoc_view(context, request):
     else:
         page_title = context.title
         backto = {
-            'href': model_url(context.__parent__, request),
+            'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
             }
 
@@ -346,18 +346,19 @@ def show_wikitoc_view(context, request):
         ))
 
     wiki = find_interface(context, IWiki)
-    feed_url = model_url(wiki, request, "atom.xml")
+    feed_url = resource_url(wiki, request, "atom.xml")
     repo = find_repo(context)
     show_trash = repo is not None and has_permission('edit', context, request)
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_wikitoc.pt',
-        api=api,
-        actions=actions,
-        head_data=client_json_data,
-        feed_url=feed_url,
-        backto=backto,
-        show_trash=show_trash,
+        dict(api=api,
+             actions=actions,
+             head_data=client_json_data,
+             feed_url=feed_url,
+             backto=backto,
+             show_trash=show_trash),
+        request = request,
         )
 
 class EditWikiPageFormController(object):
@@ -437,7 +438,7 @@ class EditWikiPageFormController(object):
     def handle_cancel(self):
         if lock.owns_lock(self.context, self.userid):
             lock.clear(self.context)
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         if lock.owns_lock(self.context, self.userid):
@@ -466,7 +467,7 @@ class EditWikiPageFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = model_url(context, request)
+        location = resource_url(context, request)
         msg = "?status_message=Wiki%20Page%20edited"
         return HTTPFound(location=location+msg)
 
@@ -478,4 +479,4 @@ def unlock_wiki_view(context, request, userid=None):
         if lock.owns_lock(context, userid):
             lock.clear(context)
         return HTTPOk(body='')
-    return HTTPFound(location=model_url(context, request))
+    return HTTPFound(location=resource_url(context, request))

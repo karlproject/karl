@@ -16,8 +16,9 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 class ForumsFolderTests(unittest.TestCase):
     def _getTargetClass(self):
@@ -94,10 +95,10 @@ class ForumTopicTests(unittest.TestCase):
 
 class TestForumsToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.forum import forums_tool_factory
@@ -105,8 +106,8 @@ class TestForumsToolFactory(unittest.TestCase):
 
     def test_it(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest
         factory = self._makeOne()

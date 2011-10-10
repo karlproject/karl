@@ -6,9 +6,9 @@ import webob
 
 from zope.component import queryUtility
 
-from repoze.bfg.router import make_app as bfg_make_app
-from repoze.bfg.scripting import get_root
-from repoze.bfg.traversal import model_path
+from pyramid_zcml import make_app as bfg_make_app
+from pyramid.scripting import get_root
+from pyramid.traversal import resource_path
 from repoze.who.plugins.zodb.users import Users
 from repoze.zodbconn.finder import PersistentApplicationFinder
 

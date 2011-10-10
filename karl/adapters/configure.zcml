@@ -1,9 +1,9 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://pylonshq.com/pyramid">
 
   <adapter
     for="zope.interface.Interface
          karl.adapters.url.OfflineRequest"
-    provides="repoze.bfg.interfaces.IContextURL"
+    provides="pyramid.interfaces.IContextURL"
     factory="karl.adapters.url.OfflineContextURL"
     />
 

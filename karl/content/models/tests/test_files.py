@@ -16,8 +16,9 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class CommunityRootFolderTests(unittest.TestCase):
 
@@ -403,10 +404,10 @@ class TestThumbnail(unittest.TestCase):
 
 class TestFilesToolFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self):
         from karl.content.models.files import files_tool_factory
@@ -414,8 +415,8 @@ class TestFilesToolFactory(unittest.TestCase):
 
     def test_factory(self):
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
-                                IContentFactory)
+        karl.testing.registerAdapter(lambda *arg, **kw: DummyContent, (None,),
+                                     IContentFactory)
         context = testing.DummyModel()
         request = testing.DummyRequest
         factory = self._makeOne()

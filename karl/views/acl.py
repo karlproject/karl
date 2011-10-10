@@ -17,9 +17,9 @@
 
 import re
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.renderers import render_to_response
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import get_content_type
@@ -150,19 +150,21 @@ def edit_acl_view(context, request):
         local_acl.append(l_ace)
 
 
-    return render_template_to_response('templates/edit_acl.pt',
-                                       parent_acl=parent_acl or (),
-                                       local_acl=local_acl,
-                                       inheriting=inheriting,
-                                       security_state=security_state,
-                                       security_states=security_states,
-                                      )
+    return render_to_response(
+        'templates/edit_acl.pt',
+        dict(parent_acl=parent_acl or (),
+             local_acl=local_acl,
+             inheriting=inheriting,
+             security_state=security_state,
+             security_states=security_states),
+        request=request,
+        )
 
 def make_acls(node, request, acls=None, offset=0):
     if acls is None:
         acls = []
-    path = model_path(node)
-    url = model_url(node, request)
+    path = resource_path(node)
+    url = resource_url(node, request)
     acl = getattr(node, '__acl__', None)
     folderish = IFolder.providedBy(node)
     name = node.__name__ or '/'
@@ -183,9 +185,10 @@ def make_acls(node, request, acls=None, offset=0):
 
 def acl_tree_view(context, request):
     acls = make_acls(context, request)
-    return render_template_to_response(
+    return render_to_response(
         'templates/acl_tree.pt',
-        acls = acls)
+        dict(acls = acls),
+        request=request)
 
 
 

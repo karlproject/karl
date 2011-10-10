@@ -17,9 +17,9 @@
 
 """Catalog results batching functions"""
 
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
-from repoze.bfg.url import urlencode
+from pyramid.security import has_permission
+from pyramid.url import resource_url
+from pyramid.url import urlencode
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
 
@@ -96,7 +96,7 @@ def _add_link_data(batch_info, context, request):
             newquery['sort_index'] = batch_info['sort_index']
         if 'reverse' in batch_info:
             newquery['reverse'] = str(int(batch_info['reverse']))
-        return model_url(context, request, request.view_name, query=newquery)
+        return resource_url(context, request, request.view_name, query=newquery)
 
     previous_start = batch_start - batch_size
     if previous_start < 0:

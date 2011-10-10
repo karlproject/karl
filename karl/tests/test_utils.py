@@ -17,7 +17,8 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
+import karl.testing
 
 class TestUtilFunctions(unittest.TestCase):
     def test_find_users(self):
@@ -152,7 +153,7 @@ class TestDebugSearch(unittest.TestCase):
             def search(**kw):
                 return 1, [1], lambda *arg: None
             return search
-        testing.registerAdapter(searcher, provides=ICatalogSearch)
+        karl.testing.registerAdapter(searcher, provides=ICatalogSearch)
         context = testing.DummyModel()
         result = self._callFUT(context)
         self.assertEqual(result, (1, [None]))

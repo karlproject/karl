@@ -1,4 +1,4 @@
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_resource
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 
 from karl.models.site import get_containment
@@ -18,6 +18,6 @@ def evolve(site):
     catalog['containment'] = index
     for docid, address in catalog.document_map.docid_to_address.items():
         print 'Indexing containment: %s' % address
-        model = find_model(site, address)
+        model = find_resource(site, address)
         index.index_doc(docid, model)
         model._p_deactivate()

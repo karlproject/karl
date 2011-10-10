@@ -2,10 +2,11 @@ from collections import deque
 import datetime
 import time
 
+from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
+from pyramid.url import resource_url
 from sqlalchemy.orm.exc import NoResultFound
-from webob.exc import HTTPFound
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.url import model_url
+
 from karl.models.interfaces import IContainerVersion
 from karl.content.interfaces import ICommunityFile
 
@@ -36,24 +37,24 @@ def show_history(context, request, tz=None):
             'date': format_local_date(record.archive_time, tz),
             'editor': {
                 'name': editor.title,
-                'url': model_url(editor, request),
+                'url': resource_url(editor, request),
                 },
-            'preview_url': model_url(
+            'preview_url': resource_url(
                 context, request, preview_view,
                 query={'version_num': str(record.version_num)}),
-            'restore_url': model_url(
+            'restore_url': resource_url(
                 context, request, 'revert',
                 query={'version_num': str(record.version_num)}),
             'is_current': record.current_version == record.version_num,
         }
 
+    # newest to oldest
     history = map(display_record, repo.history(context.docid))
-    history.reverse()
 
     page_title = 'History for %s' % context.title
 
     backto = {
-        'href': model_url(context, request),
+        'href': resource_url(context, request),
         'title': context.title
     }
 
@@ -78,7 +79,7 @@ def revert(context, request):
     repo.reverted(context.docid, version_num)
     catalog = find_catalog(context)
     catalog.reindex_doc(context.docid, context)
-    return HTTPFound(location=model_url(context, request))
+    return HTTPFound(location=resource_url(context, request))
 
 
 def show_trash(context, request, tz=None):
@@ -89,7 +90,7 @@ def show_trash(context, request, tz=None):
         deleted_item = tree_node.deleted_item
         version = repo.history(docid, only_current=True)[0]
         if tree_node:
-            url = model_url(context, request, 'trash', query={
+            url = resource_url(context, request, 'trash', query={
                 'subfolder': str(docid)})
         else:
             url = None
@@ -99,9 +100,9 @@ def show_trash(context, request, tz=None):
                 'date': format_local_date(deleted_item.deleted_time, tz),
                 'deleted_by': {
                     'name': deleted_by.title,
-                    'url': model_url(deleted_by, request),
+                    'url': resource_url(deleted_by, request),
                     },
-                'restore_url': model_url(
+                'restore_url': resource_url(
                     context, request, 'restore',
                     query={'docid': str(deleted_item.docid),
                            'name': deleted_item.name}),
@@ -252,11 +253,9 @@ def undelete(context, request):
     repo.archive_container(IContainerVersion(parent),
                            authenticated_userid(request))
     index_content(parent, None)
-    return HTTPFound(location=model_url(parent, request))
-
+    return HTTPFound(location=resource_url(parent, request))
 
 epoch = datetime.datetime.utcfromtimestamp(0)
-
 
 def format_local_date(date, tz=None, time_module=time):
     """Format a UTC datetime for the local time zone."""

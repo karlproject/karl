@@ -19,9 +19,9 @@ from datetime import datetime
 from urllib import urlencode
 from urlparse import urljoin
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.url import model_url
-from webob.exc import HTTPFound
+from pyramid.renderers import render_to_response
+from pyramid.url import resource_url
+from pyramid.httpexceptions import HTTPFound
 
 from karl.utils import find_profiles
 from karl.utils import find_site
@@ -108,22 +108,23 @@ def login_view(context, request):
                                  request.params.get('came_from', request.url))
 
     api.status_message = request.params.get('reason', None)
-    response = render_template_to_response(
+    response = render_to_response(
         'templates/login.pt',
-        api=api,
-        came_from=came_from,
-        nothing='',
-        app_url=request.application_url,
+        dict(api=api,
+             came_from=came_from,
+             nothing='',
+             app_url=request.application_url),
+        request=request,
         )
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})
-        response.headers.update(forget_headers)
+        response.headers.extend(forget_headers)
     return response
 
 def logout_view(context, request, reason='Logged out'):
     site = find_site(context)
-    site_url = model_url(site, request)
-    login_url = model_url(site, request, 'login.html', query={
+    site_url = resource_url(site, request)
+    login_url = resource_url(site, request, 'login.html', query={
         'reason': reason, 'came_from': site_url})
 
     redirect = HTTPFound(location=login_url)
@@ -131,7 +132,7 @@ def logout_view(context, request, reason='Logged out'):
     auth_tkt = plugins.get('auth_tkt')
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})
-        redirect.headers.update(forget_headers)
+        redirect.headers.extend(forget_headers)
     return redirect
 
 

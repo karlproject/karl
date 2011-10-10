@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 
 class TemplateAPITests(unittest.TestCase):
@@ -38,7 +38,7 @@ class TemplateAPITests(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICommunity
-        testing.registerAdapter(DummyAdapter,
+        karltesting.registerAdapter(DummyAdapter,
                                 (Interface, Interface), ICommunityInfo)
         context = testing.DummyModel()
         directlyProvides(context, ICommunity)
@@ -53,11 +53,11 @@ class TemplateAPITests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
-        testing.registerAdapter(DummySearchAdapter, Interface, ICatalogSearch)
-        testing.registerAdapter(DummyAdapter,
+        karltesting.registerAdapter(DummySearchAdapter, Interface, ICatalogSearch)
+        karltesting.registerAdapter(DummyAdapter,
                                 (Interface, Interface), IGridEntryInfo)
         f = testing.DummyModel()
-        testing.registerModels({'/communities/1/file':f})
+        karltesting.registerModels({'/communities/1/file':f})
         context = testing.DummyModel()
         directlyProvides(context, ICommunity)
         context.searchresults = [f]
@@ -71,7 +71,7 @@ class TemplateAPITests(unittest.TestCase):
     def test_tag_users(self):
         from karl.models.interfaces import ITagQuery
         from zope.interface import Interface
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
         context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -91,7 +91,7 @@ class TemplateAPITests(unittest.TestCase):
         self.assertEqual(api.status_message, 'abc')
 
     def test_generic_layout(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'karl.views:templates/generic_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -100,7 +100,7 @@ class TemplateAPITests(unittest.TestCase):
         renderer.assert_(a=1)
 
     def test_anonymous_layout(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'karl.views:templates/anonymous_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -109,7 +109,7 @@ class TemplateAPITests(unittest.TestCase):
         renderer.assert_(a=1)
 
     def test_community_layout(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'karl.views:templates/community_layout.pt')
         context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -139,7 +139,7 @@ class TemplateAPITests(unittest.TestCase):
                 _called_with.append(api)
                 return 'SIDEBAR'
             return _render
-        testing.registerAdapter(_factory, (Interface, Interface), ISidebar)
+        karltesting.registerAdapter(_factory, (Interface, Interface), ISidebar)
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         self.assertEqual(api.render_sidebar(), 'SIDEBAR')
@@ -158,7 +158,7 @@ class TemplateAPITests(unittest.TestCase):
                 _called_with.append(api)
                 return 'SIDEBAR'
             return _render
-        testing.registerAdapter(_factory, (ICommunity, Interface), ISidebar)
+        karltesting.registerAdapter(_factory, (ICommunity, Interface), ISidebar)
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         self.assertEqual(api.render_sidebar(), 'SIDEBAR')
@@ -167,7 +167,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/footer.pt')
         api.render_footer()
         renderer.assert_(api=api)
@@ -182,7 +182,7 @@ class TemplateAPITests(unittest.TestCase):
                 _called_with.append(api)
                 return 'FOOTER'
             return _render
-        testing.registerAdapter(_factory, (Interface, Interface), IFooter)
+        karltesting.registerAdapter(_factory, (Interface, Interface), IFooter)
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         self.assertEqual(api.render_footer(), 'FOOTER')
@@ -201,7 +201,7 @@ class TemplateAPITests(unittest.TestCase):
                 _called_with.append(api)
                 return 'FOOTER'
             return _render
-        testing.registerAdapter(_factory, (ICommunity, Interface), IFooter)
+        karltesting.registerAdapter(_factory, (ICommunity, Interface), IFooter)
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         self.assertEqual(api.render_footer(), 'FOOTER')
@@ -215,10 +215,9 @@ class TemplateAPITests(unittest.TestCase):
     def test_custom_logo_url(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings()
-        settings.logo_path = 'mylogo.png'
-        testing.registerUtility(settings, ISettings)
+        from pyramid.interfaces import ISettings
+        settings = {'logo_path':'mylogo.png'}
+        karltesting.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.logo_url, api.static_url + '/mylogo.png')
 
@@ -226,23 +225,24 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info, {'enabled': False})
+        self.assertEqual(api.kaltura_info['enabled'],  False)
 
     def test_kaltura_info(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        from repoze.bfg.interfaces import ISettings
-        settings = karltesting.DummySettings()
-        settings.kaltura_enabled = 'true'
+        from pyramid.interfaces import ISettings
         # kaltura_client_session missing
-        settings.kaltura_partner_id = '123456'
-        settings.kaltura_sub_partner_id = '12345600'
-        settings.kaltura_admin_secret = '123456789abcdef123456789abcdef12'
-        settings.kaltura_user_secret = '0123456789abcdef123456789abcdef1'
-        settings.kaltura_kcw_uiconf_id = '9999999'
-        settings.kaltura_player_uiconf_id = '8888888'
-        settings.kaltura_player_cache_st = '77777777'
-        testing.registerUtility(settings, ISettings)
+        settings = dict(
+            kaltura_enabled = 'true',
+            kaltura_partner_id = '123456',
+            kaltura_sub_partner_id = '12345600',
+            kaltura_admin_secret = '123456789abcdef123456789abcdef12',
+            kaltura_user_secret = '0123456789abcdef123456789abcdef1',
+            kaltura_kcw_uiconf_id = '9999999',
+            kaltura_player_uiconf_id = '8888888',
+            kaltura_player_cache_st = '77777777',
+            )
+        karltesting.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
             enabled = True,
@@ -259,7 +259,7 @@ class TemplateAPITests(unittest.TestCase):
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
 
-        settings.kaltura_client_session = 'false'
+        settings['kaltura_client_session'] = 'false'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
             enabled = True,
@@ -276,7 +276,7 @@ class TemplateAPITests(unittest.TestCase):
         # secrets are not sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
 
-        settings.kaltura_client_session = 'true'
+        settings['kaltura_client_session'] = 'true'
         api = self._makeOne(context, request)
         self.assertEqual(api.kaltura_info, dict(
             enabled = True,

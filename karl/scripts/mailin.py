@@ -27,7 +27,7 @@ import sys
 import transaction
 
 from paste.deploy import loadapp
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 from repoze.mailin.scripts.draino import Draino
 
 from karl.log import set_subsystem

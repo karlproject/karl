@@ -17,19 +17,18 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from zope.interface import Interface
-from zope.testing.cleanup import cleanUp
 
 from karl import testing as karltesting
 
 class TestDeprecatedCatalogSearch(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import CatalogSearch
@@ -58,15 +57,15 @@ class TestDeprecatedCatalogSearch(unittest.TestCase):
         self.assertEqual(list(docids), [])
 
     def test_unfound_model(self):
-        from repoze.bfg.interfaces import ILogger
+        from pyramid.interfaces import IDebugLogger
         class DummyLogger:
             def warn(self, msg):
                 self.msg = msg
         logger = DummyLogger()
-        testing.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        karltesting.registerUtility(logger, IDebugLogger)
         a = testing.DummyModel()
         b = testing.DummyModel()
-        testing.registerModels({'/a':a})
+        karltesting.registerModels({'/a':a})
         context = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/a', 2:'/b'})
         request = testing.DummyRequest()
@@ -90,10 +89,10 @@ class TestDeprecatedCatalogSearch(unittest.TestCase):
 class TestCatalogSearch(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import CatalogSearch
@@ -112,15 +111,15 @@ class TestCatalogSearch(unittest.TestCase):
         self.assertEqual(list(docids), [])
 
     def test_unfound_model(self):
-        from repoze.bfg.interfaces import ILogger
+        from pyramid.interfaces import IDebugLogger
         class DummyLogger:
             def warn(self, msg):
                 self.msg = msg
         logger = DummyLogger()
-        testing.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        karltesting.registerUtility(logger, IDebugLogger)
         a = testing.DummyModel()
         b = testing.DummyModel()
-        testing.registerModels({'/a':a})
+        karltesting.registerModels({'/a':a})
         context = testing.DummyModel()
         context.catalog = karltesting.DummyCatalog({1:'/a', 2:'/b'})
         adapter = self._makeOne(context)
@@ -142,10 +141,10 @@ class TestCatalogSearch(unittest.TestCase):
 class TestPeopleDirectoryCatalogSearch(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import PeopleDirectoryCatalogSearch
@@ -358,10 +357,10 @@ class TestGridEntryInfo(unittest.TestCase):
 class TestTagQuery(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import TagQuery
@@ -587,7 +586,7 @@ class TestCommunityInfo(unittest.TestCase):
         context = self._makeCommunity()
         context.member_names = ['dummy', 'foo']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('dummy')
+        karltesting.registerDummySecurityPolicy('dummy')
         adapter = self._makeOne(context, request)
 
         self.assertEqual(adapter.member, True)
@@ -596,7 +595,7 @@ class TestCommunityInfo(unittest.TestCase):
         context = self._makeCommunity()
         context.member_names = ['a_group', 'foo']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('dummy', ['a_group'])
+        karltesting.registerDummySecurityPolicy('dummy', ['a_group'])
         adapter = self._makeOne(context, request)
 
         self.assertEqual(adapter.member, True)
@@ -605,7 +604,7 @@ class TestCommunityInfo(unittest.TestCase):
         context = self._makeCommunity()
         context.member_names = ['foo', 'bar']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('dummy')
+        karltesting.registerDummySecurityPolicy('dummy')
         adapter = self._makeOne(context, request)
 
         self.assertEqual(adapter.member, False)
@@ -614,7 +613,7 @@ class TestCommunityInfo(unittest.TestCase):
         context = self._makeCommunity()
         context.moderator_names = ['dummy', 'foo']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('dummy')
+        karltesting.registerDummySecurityPolicy('dummy')
         adapter = self._makeOne(context, request)
 
         self.assertEqual(adapter.moderator, True)
@@ -623,7 +622,7 @@ class TestCommunityInfo(unittest.TestCase):
         context = self._makeCommunity()
         context.moderator_names = ['foo', 'bar']
         request = testing.DummyRequest()
-        testing.registerDummySecurityPolicy('dummy')
+        karltesting.registerDummySecurityPolicy('dummy')
         adapter = self._makeOne(context, request)
 
         self.assertEqual(adapter.moderator, False)
@@ -631,10 +630,10 @@ class TestCommunityInfo(unittest.TestCase):
 
 class TestLetterManager(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import LetterManager
@@ -752,10 +751,10 @@ class TestLetterManager(unittest.TestCase):
 
 class TestPeopleReportLetterManager(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import PeopleReportLetterManager
@@ -867,10 +866,10 @@ class TestPeopleReportLetterManager(unittest.TestCase):
 
 class TestPeopleReportMailinHandler(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.adapters import PeopleReportMailinHandler
@@ -889,7 +888,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
             def send(self, to, message):
                 self._sent.append((to, message))
         md = DummyMailDelivery()
-        testing.registerUtility(md, IMailDelivery)
+        karltesting.registerUtility(md, IMailDelivery)
         return md
 
     def _registerCatalogSearch(self, docids):
@@ -906,7 +905,7 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
                 _called_with.append(kw)
                 return len(docids), docids, _find_profile
             return _inner
-        testing.registerAdapter(_search, Interface, ICatalogSearch)
+        karltesting.registerAdapter(_search, Interface, ICatalogSearch)
         return _called_with
 
     def _makeMessage(self, frm='sender@example.com',

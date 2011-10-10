@@ -1,26 +1,26 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
 
-from karl import testing
+import karl.testing
 
 class Test_adduser(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self.root = root = testing.DummyModel()
-        root.users = testing.DummyUsers()
+        root.users = karl.testing.DummyUsers()
         root['profiles'] = testing.DummyModel()
 
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import IProfile
-        registerContentFactory(testing.DummyProfile, IProfile)
+        registerContentFactory(karl.testing.DummyProfile, IProfile)
 
         from repoze.workflow.testing import registerDummyWorkflow
         self.wf = registerDummyWorkflow('security')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def fut(self):
         from karl.scripts.adduser import adduser
@@ -49,5 +49,5 @@ class Test_adduser(unittest.TestCase):
 
     def test_add_existing_profile(self):
         root = self.root
-        root['profiles']['chris'] = testing.DummyProfile()
+        root['profiles']['chris'] = karl.testing.DummyProfile()
         self.assertRaises(ValueError, self.fut(), root, 'chris', 'secret')

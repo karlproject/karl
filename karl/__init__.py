@@ -23,7 +23,29 @@ __import__('pkg_resources').declare_namespace(__name__)
 
 try:
     import zope.testing.cleanup
-    from repoze.bfg.testing import setUp
+    from pyramid.testing import setUp
     zope.testing.cleanup.addCleanUp(setUp)
 except ImportError:
     pass
+
+# for pickles that referred to bfg; conditionalized because buildout
+# imports our __init__ during pkg_resource scanning, causing a race
+try:
+    import pyramid.security
+    import pyramid.interfaces
+    import sys
+    sys.modules['repoze.bfg.security'] = pyramid.security
+    sys.modules['repoze.bfg.interfaces'] = pyramid.interfaces
+except ImportError:
+    pass
+
+# formish 0.8.5.2 needs to import UnicodeMultiDict from webob; webob 1.0+
+# moved it; pyramid doesn't work with any webob < 1.0; conditionalized because
+# buildout imports our __init__ during resource scanning causing a race
+try:
+    from webob.multidict import UnicodeMultiDict
+    import webob
+    webob.UnicodeMultiDict = UnicodeMultiDict
+except ImportError:
+    pass
+

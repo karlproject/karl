@@ -17,12 +17,14 @@
 
 from zope.interface import implements
 import unittest
-from repoze.bfg import testing
-from repoze.bfg.formish import ValidationError
-from repoze.bfg.testing import cleanUp
+from pyramid import testing
+from pyramid_formish import ValidationError
+from pyramid.testing import cleanUp
 from karl.content.interfaces import ICalendarEvent
 
 from karl.testing import registerLayoutProvider
+
+import karl.testing
 
 d1 = 'Thursday, October 7, 2010 04:20 PM'
 def dummy(date, flavor):
@@ -36,7 +38,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         return redirect_to_add_form(context, request)
 
     def test_it(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         context = testing.DummyModel()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -75,7 +77,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         self.profiles["c"] = DummyProfile()
         for profile in self.profiles.values():
             profile["alerts"] = testing.DummyModel()
-        testing.registerDummySecurityPolicy('a')
+        karl.testing.registerDummySecurityPolicy('a')
         registerLayoutProvider()
 
     def tearDown(self):
@@ -95,37 +97,37 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
         # tags
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         # mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from repoze.bfg.threadlocal import manager
-        from repoze.bfg.registry import Registry
-        manager.stack[0]['registry'] = Registry('testing')
-        testing.registerUtility(self.mailer, IMailDelivery)
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
+        #manager.stack[0]['registry'] = Registry('testing')
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
         from karl.models.interfaces import IProfile
         from karl.content.interfaces import ICalendarEvent
         from karl.content.views.adapters import CalendarEventAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
-        testing.registerAdapter(CalendarEventAlert,
-                                (ICalendarEvent, IProfile, IRequest),
-                                IAlert)
+        from pyramid.interfaces import IRequest
+        karl.testing.registerAdapter(CalendarEventAlert,
+                                     (ICalendarEvent, IProfile, IRequest),
+                                     IAlert)
 
         # IKarlDates
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
         # content factories
         from repoze.lemonade.testing import registerContentFactory
@@ -258,7 +260,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
                      'attachments': [attachment1, attachment2],
                      'sendalert': True,
                      }
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/email_calendar_event_alert.pt')
 
         controller.handle_submit(converted)
@@ -313,7 +315,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
                      'attachments': [attachment1, attachment2],
                      'sendalert': True,
                      }
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/email_calendar_event_alert.pt')
         controller.handle_submit(converted)
         self.failUnless('event-title' in context)
@@ -394,7 +396,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         self.profiles["c"] = DummyProfile()
         for profile in self.profiles.values():
             profile["alerts"] = testing.DummyModel()
-        testing.registerDummySecurityPolicy('a')
+        karl.testing.registerDummySecurityPolicy('a')
 
     def tearDown(self):
         cleanUp()
@@ -414,37 +416,37 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
         # tags
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         # mail utility
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from repoze.bfg.threadlocal import manager
-        from repoze.bfg.registry import Registry
-        manager.stack[0]['registry'] = Registry('testing')
-        testing.registerUtility(self.mailer, IMailDelivery)
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
+        #manager.stack[0]['registry'] = Registry('testing')
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
         from karl.models.interfaces import IProfile
         from karl.content.interfaces import ICalendarEvent
         from karl.content.views.adapters import CalendarEventAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
-        testing.registerAdapter(CalendarEventAlert,
-                                (ICalendarEvent, IProfile, IRequest),
-                                IAlert)
+        from pyramid.interfaces import IRequest
+        karl.testing.registerAdapter(CalendarEventAlert,
+                                     (ICalendarEvent, IProfile, IRequest),
+                                     IAlert)
 
         # IKarlDates
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
         # content factories
         from repoze.lemonade.testing import registerContentFactory
@@ -508,8 +510,8 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         # need to register so tag lookup will work
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         controller = self._makeOne(self.context, self.request)
         widgets = controller.form_widgets({})
         self.failUnless('title' in widgets)
@@ -638,8 +640,8 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         from datetime import datetime
         from icalendar import Calendar
         from icalendar import UTC
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         community = DummyModel()
         community.__name__ = 'testing'
         community['calendar'] = tool = DummyModel()
@@ -683,8 +685,8 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         from datetime import datetime
         from icalendar import Calendar
         from icalendar import UTC
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyModel
+        from pyramid.testing import DummyRequest
         community = DummyModel()
         community.__name__ = 'testing'
         community['calendar'] = tool = DummyModel()
@@ -740,7 +742,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
@@ -756,7 +758,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context[default_name] = DummyCalendarCategory(default_name)
 
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
@@ -767,18 +769,18 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -788,53 +790,53 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Cannot delete default category'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Category is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_category_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Category is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_category_name(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
 
         event = testing.DummyModel()
         results = 1, [1], lambda *arg: event
         search = DummySearchAdapter(results)
-        testing.registerAdapter(search, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(search, (Interface), ICatalogSearch)
 
         context = DummyCalendar()
         context['_default_layer_'].paths = ['/foo']
         context['foo'] = DummyCalendarCategory('foo-title')
-        testing.registerModels({'/foo':context['foo']})
+        karl.testing.registerModels({'/foo':context['foo']})
 
         request = testing.DummyRequest(post={'form.delete': 'foo'})
         response = self._callFUT(context, request)
 
         self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'foo-title category removed'})
         self.assertEqual(response.location, expected)
         self.failIf('foo' in context)
@@ -848,7 +850,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context = DummyCalendar()
         context['foo'] = DummyCalendarCategory('foo')
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
@@ -864,7 +866,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     def test_submit_fails_if_title_is_missing(self):
         context = DummyCalendar()
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
@@ -878,11 +880,11 @@ class CalendarCategoriesViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarCategory
         context = DummyCalendar()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.submitted': 1,
@@ -896,7 +898,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         name, ann = find_nondefault(context)
         self.assertEqual(ann.arg, ('Announcements',))
 
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                              query={'status_message':'Calendar category added'})
         self.assertEqual(response.location, expected)
         self.assertEqual(context['_default_layer_'].paths, ['/'+name])
@@ -905,7 +907,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
     # edit an existing category
 
     def test_edit_does_not_allow_editing_the_default_category(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarCategory.getTaggedValue('default_name')
@@ -918,12 +920,12 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Cannot edit default category'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -932,12 +934,12 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Could not find category to edit'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_category_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -946,7 +948,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'categories.html',
+        expected = resource_url(context, request, 'categories.html',
                    query={'status_message':'Could not find category to edit'})
         self.assertEqual(response.location, expected)
 
@@ -954,7 +956,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context = DummyCalendar()
         context['foo'] = DummyCalendarCategory('foo')
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -974,7 +976,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarCategory('foo')
         context['bar'] = DummyCalendarCategory('bar')
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1016,7 +1018,7 @@ END:VCALENDAR
 class CalendarLayersViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
+        karl.testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -1030,7 +1032,7 @@ class CalendarLayersViewTests(unittest.TestCase):
     def test_notsubmitted(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
@@ -1046,7 +1048,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context[default_name] = DummyCalendarLayer(default_name)
 
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
@@ -1057,18 +1059,18 @@ class CalendarLayersViewTests(unittest.TestCase):
     def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         response = self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     # delete
 
     def test_delete_does_not_allow_deletion_of_default_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarLayer
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1078,34 +1080,34 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Cannot delete default layer'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': ''})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Layer is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_reports_invalid_when_layer_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={'form.delete': 'invalid'})
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Layer is invalid'})
         self.assertEqual(response.location, expected)
 
     def test_delete_will_delete_a_valid_layer_name(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         context['foo'] = DummyCalendarLayer('foo-title')
 
@@ -1114,7 +1116,7 @@ class CalendarLayersViewTests(unittest.TestCase):
 
         self.assertEqual(context.get('foo'), None)
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'foo-title layer removed'})
         self.assertEqual(response.location, expected)
 
@@ -1125,7 +1127,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context['foo'] = DummyCalendarLayer('foo')
         context['bar'] = DummyCalendarLayer('bar')
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         post = MultiDict({
@@ -1149,7 +1151,7 @@ class CalendarLayersViewTests(unittest.TestCase):
     def test_submit_fails_if_title_is_missing(self):
         context = DummyCalendar()
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
@@ -1167,7 +1169,7 @@ class CalendarLayersViewTests(unittest.TestCase):
     def test_submit_fails_if_color_is_missing(self):
         context = DummyCalendar()
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
@@ -1183,11 +1185,11 @@ class CalendarLayersViewTests(unittest.TestCase):
                          'Please enter a value')
 
     def test_submit_adds_a_new_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
@@ -1206,14 +1208,14 @@ class CalendarLayersViewTests(unittest.TestCase):
         self.assertEqual(ann.arg,
                          ('Announcements', 'blue', ['/path']))
 
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                              query={'status_message':'Calendar layer added'})
         self.assertEqual(response.location, expected)
 
     # edit an existing layer
 
     def test_edit_does_not_allow_editing_the_default_layer(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
@@ -1226,12 +1228,12 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Cannot edit default layer'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_empty(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1240,12 +1242,12 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Could not find layer to edit'})
         self.assertEqual(response.location, expected)
 
     def test_edit_reports_not_found_when_layer_name_is_invalid(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         context = DummyCalendar()
         request = testing.DummyRequest(post={
             'form.edit': 1,
@@ -1254,7 +1256,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
-        expected = model_url(context, request, 'layers.html',
+        expected = resource_url(context, request, 'layers.html',
                    query={'status_message':'Could not find layer to edit'})
         self.assertEqual(response.location, expected)
 
@@ -1262,7 +1264,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         context = DummyCalendar()
         context['foo'] = DummyCalendarLayer('foo')
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
@@ -1292,40 +1294,40 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
-        self.assertEqual(model_url(context, request),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request),
                          renderer.back_to_calendar_url)
 
     def test_sets_categories_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
-        self.assertEqual(model_url(context, request, 'categories.html'),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request, 'categories.html'),
                          renderer.categories_url)
 
     def test_sets_layers_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.views:templates/formfields.pt')
         self._callFUT(context, request)
 
-        from repoze.bfg.url import model_url
-        self.assertEqual(model_url(context, request, 'layers.html'),
+        from pyramid.url import resource_url
+        self.assertEqual(resource_url(context, request, 'layers.html'),
                          renderer.layers_url)
 
 class Test__get_catalog_events(unittest.TestCase):
@@ -1355,9 +1357,9 @@ class Test__get_catalog_events(unittest.TestCase):
         event = testing.DummyModel()
         results = 1, [1], lambda *arg: event
         search = DummySearchAdapter(results)
-        testing.registerAdapter(search, (Interface), ICatalogSearch)
+        karl.testing.registerAdapter(search, (Interface), ICatalogSearch)
         event = DummyCalendarEvent('foo')
-        testing.registerModels({'/foo/bar':event})
+        karl.testing.registerModels({'/foo/bar':event})
         result = self._callFUT(calendar, request,
                                first_moment=now,
                                last_moment=now,
@@ -1397,27 +1399,30 @@ class ShowCalendarViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = testing.registerAdapter(DummyLayoutProvider,
-                             (Interface, Interface),
-                             ILayoutProvider)
+        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+                                          (Interface, Interface),
+                                          ILayoutProvider)
 
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
         from karl.models.interfaces import ICatalogSearch
         from karl.models.adapters import CatalogSearch
-        testing.registerAdapter(CatalogSearch, (Interface, ), ICatalogSearch)
+        karl.testing.registerAdapter(CatalogSearch, (Interface, ),
+                                     ICatalogSearch)
 
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
 
     def assert_cookie(self, response, cookie_name, cookie_value):
+        from webob.cookies import Morsel
         for name, value in response.headerlist:
             if name == 'Set-Cookie' and value.startswith(cookie_name):
-                self.assertEqual(
-                    value, '%s=%s; Path=/' % (cookie_name, cookie_value))
+                m = Morsel(cookie_name, cookie_value)
+                m.path = '/'
+                self.assertEqual(value, m.serialize())
                 break
         else:
             raise AssertionError('Cookie not set: %s' % cookie_name)
@@ -1433,9 +1438,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_day.pt')
         self._registerSecurityWorkflow()
 
@@ -1456,9 +1461,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_week.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
         self._registerSecurityWorkflow()
 
@@ -1479,9 +1484,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_month.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
         self._registerSecurityWorkflow()
 
@@ -1502,9 +1507,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_list.pt')
         self._registerSecurityWorkflow()
 
@@ -1524,9 +1529,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_list.pt')
         self._registerSecurityWorkflow()
 
@@ -1546,9 +1551,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_navigation.pt')
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/calendar_list.pt')
         self._registerSecurityWorkflow()
 
@@ -1575,9 +1580,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the default view, which is 'day'.
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'day.html'))
 
     def test_default_day(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1597,9 +1602,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'day.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'day.html'))
 
     def test_default_week(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1619,9 +1624,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'week.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'week.html'))
 
     def test_default_month(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1641,9 +1646,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'month.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'month.html'))
 
     def test_default_list(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1663,9 +1668,9 @@ class ShowCalendarViewTests(unittest.TestCase):
         response = show_view(context, request)
 
         # Redirect is expected to the sticky view
-        from repoze.bfg.url import model_url
+        from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, model_url(context, request, 'list.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'list.html'))
 
 
 class DummyContentFactory:

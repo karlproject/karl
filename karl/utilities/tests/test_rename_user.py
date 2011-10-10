@@ -1,12 +1,11 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
-from repoze.bfg import testing
+from pyramid import testing
 import karl.testing as karltesting
 
 class Test_rename_user(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self.root = root = karltesting.DummyModel()
         root['profiles'] = profiles = karltesting.DummyModel()
@@ -29,9 +28,9 @@ class Test_rename_user(unittest.TestCase):
 
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearchAdapter, (Interface, Interface),
+        karltesting.registerAdapter(DummySearchAdapter, (Interface, Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchAdapter, (Interface,),
+        karltesting.registerAdapter(DummySearchAdapter, (Interface,),
                                 ICatalogSearch)
 
         root.catalog = catalog = karltesting.DummyModel()
@@ -39,7 +38,7 @@ class Test_rename_user(unittest.TestCase):
         catalog['modified_by'] =  DummyCatalogIndex()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def call_fut(self, old_name, new_name, merge=False, out=None):
         from karl.utilities.rename_user import rename_user as fut

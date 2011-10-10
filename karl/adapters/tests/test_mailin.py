@@ -1,10 +1,10 @@
 import unittest
+from pyramid import testing
 
 class MailinDispatcherTests(unittest.TestCase):
 
     def setUp(self):
-        from zope.testing.cleanup import cleanUp
-        cleanUp()
+        testing.cleanUp()
 
         import datetime
         from karl.adapters import mailin
@@ -21,8 +21,7 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin.datetime = DummyDateTime()
 
     def tearDown(self):
-        from zope.testing.cleanup import cleanUp
-        cleanUp()
+        testing.cleanUp()
 
         from karl.adapters import mailin
         mailin.datetime = self._save_datetime
@@ -38,7 +37,7 @@ class MailinDispatcherTests(unittest.TestCase):
         return self._getTargetClass()(context)
 
     def _makeContext(self, **kw):
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         return DummyModel(**kw)
 
     def _makeRoot(self):
@@ -132,7 +131,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failUnless(mailin.isReport('section+extant'))
 
     def test_isReport_alias(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         context = self._makeRoot()
@@ -140,7 +139,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['alias'] = model_path(extant)
+        context.list_aliases['alias'] = resource_path(extant)
         mailin = self._makeOne(context)
         self.failUnless(mailin.isReport('alias'))
 
@@ -471,7 +470,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failIf(info.get('in_reply_to'), info)
 
     def test_getMessageTarget_report_alias(self):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         context = self._makeRoot()
@@ -479,7 +478,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['alias'] = model_path(extant)
+        context.list_aliases['alias'] = resource_path(extant)
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('alias@example.com',)
@@ -496,14 +495,13 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failIf(info.get('in_reply_to'), info)
 
     def test_getMessageTarget_report_alias_doesnt_shadow_community(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.traversal import model_path
+        from pyramid.interfaces import ISettings
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        class DummySettings:
-            system_list_subdomain = 'lists.example.com'
-        registerUtility(DummySettings(), ISettings)
+        from karl.testing import registerUtility
+        settings = dict(system_list_subdomain = 'lists.example.com')
+        registerUtility(settings, ISettings)
         context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
@@ -511,7 +509,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['testing'] = model_path(extant)
+        context.list_aliases['testing'] = resource_path(extant)
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -529,14 +527,13 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_report_alias_w_subdomain(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.testing import registerUtility
-        from repoze.bfg.traversal import model_path
+        from pyramid.interfaces import ISettings
+        from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        class DummySettings:
-            system_list_subdomain = 'lists.example.com'
-        registerUtility(DummySettings(), ISettings)
+        from karl.testing import registerUtility
+        settings = dict(system_list_subdomain = 'lists.example.com')
+        registerUtility(settings, ISettings)
         context = self._makeRoot()
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
@@ -544,7 +541,7 @@ class MailinDispatcherTests(unittest.TestCase):
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
         extant = section['extant'] = self._makeContext()
-        context.list_aliases['testing'] = model_path(extant)
+        context.list_aliases['testing'] = resource_path(extant)
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('testing@lists.example.com',)
@@ -628,7 +625,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
     def test_checkPermission_community_miss(self):
         from karl.testing import DummyUsers
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=False)
         context = self._makeRoot()
         communities = context['communities'] = self._makeContext()
@@ -653,7 +650,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
     def test_checkPermission_community_hit(self):
         from karl.testing import DummyUsers
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=True)
         context = self._makeRoot()
         communities = context['communities'] = self._makeContext()
@@ -674,7 +671,7 @@ class MailinDispatcherTests(unittest.TestCase):
 
     def test_checkPermission_report_miss(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         from karl.models.interfaces import IPeopleDirectory
         from karl.testing import DummyUsers
         registerDummySecurityPolicy('phred', permissive=False)
@@ -700,7 +697,7 @@ class MailinDispatcherTests(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
         from karl.testing import DummyUsers
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('phred', permissive=True)
         context = self._makeRoot()
         pd = context['people'] = self._makeContext()
@@ -859,7 +856,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_crackHeaders_permission_denied(self):
-        from repoze.bfg.testing import registerDummySecurityPolicy
+        from karl.testing import registerDummySecurityPolicy
         registerDummySecurityPolicy('someuser', permissive=False)
         from karl.testing import DummyUsers
         context = self._makeRoot()
@@ -903,7 +900,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(len(attachments), 0)
 
     def test_crackPayload_single_with_scrubber(self):
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
         def _fooScrubber(text, text_mimetype=None, is_reply=False):
@@ -926,7 +923,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_single_with_scrubber_is_reply(self):
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
         def _fooScrubber(text, text_mimetype=None, is_reply=False):
@@ -1053,7 +1050,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(data, '0123456789abcdef')
 
     def test_crackPayload_multiple_w_text(self):
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
         def _fooScrubber(text, text_mimetype=None, is_reply=False):
@@ -1087,7 +1084,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_w_multiple_text(self):
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
         def _fooScrubber(text, text_mimetype=None, is_reply=False):
@@ -1125,7 +1122,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(_called_with[0][2], False)
 
     def test_crackPayload_w_forwarded_message(self):
-        from repoze.bfg.testing import registerUtility
+        from karl.testing import registerUtility
         from karl.utilities.interfaces import IMailinTextScrubber
         _called_with = []
         def _fooScrubber(text, text_mimetype=None, is_reply=False):

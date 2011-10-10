@@ -35,14 +35,14 @@ from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
-from repoze.bfg.security import effective_principals
-from repoze.bfg.traversal import model_path
-from repoze.bfg.url import model_url
+from pyramid.security import effective_principals
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
 from repoze.lemonade.content import get_content_types
 from simplejson import JSONEncoder
-from webob.exc import HTTPBadRequest
-from webob import Response
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.response import Response
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -136,7 +136,7 @@ def get_batch(context, request):
     terms = ()
     query, terms = make_query(context, request)
     if terms:
-        context_path = model_path(context)
+        context_path = resource_path(context)
         if context_path and context_path != '/':
             query['path'] = {'query': context_path}
         batch = get_catalog_batch_grid(context, request, **query)
@@ -177,7 +177,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             # We are either in /communities, or in /offices. In the first case:
             # we use the community layout. For offices: we need the wide layout
             # with the generic layout.
-            context_path = model_path(context)
+            context_path = resource_path(context)
             wide = context_path.startswith('/offices')
             if wide:
                 layout = api.generic_layout
@@ -213,7 +213,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             'name': kind,
             'title': o['title'],
             'icon': component.icon,
-            'url': model_url(context, request, request.view_name,
+            'url': resource_url(context, request, request.view_name,
                              query=query),
             'selected': kind == selected_kind,
         })
@@ -225,7 +225,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         'title': 'All Content',
         'description': 'All Content',
         'icon': None,
-        'url': model_url(context, request, request.view_name, query=query),
+        'url': resource_url(context, request, request.view_name, query=query),
         'selected': not selected_kind,
     })
 
@@ -238,7 +238,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             query['since'] = id
         elif 'since' in query:
             del query['since']
-        option['url'] = model_url(context, request, request.view_name,
+        option['url'] = resource_url(context, request, request.view_name,
                                   query=query)
         option['selected'] = id == selected_since
         since_knob.append(option)
@@ -272,7 +272,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             result = {
                 'title': getattr(doc, 'title', '<No Title>'),
                 'description': description,
-                'url': model_url(doc, request),
+                'url': resource_url(doc, request),
                 'type': type_name,
                 'icon': icon,
                 'timeago': doc.modified.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -284,7 +284,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             if result_community is not None:
                 result['community'] = {
                     'title': result_community.title,
-                    'url': model_url(result_community, request),
+                    'url': resource_url(result_community, request),
                 }
             else:
                 result['community'] = None
@@ -294,7 +294,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
                 if author is not None:
                     result['author'] = {
                         'name': author.title,
-                        'url': model_url(author, request),
+                        'url': resource_url(author, request),
                     }
 
             results.append(result)

@@ -16,7 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from simplejson import JSONEncoder
-from webob import Response
+from pyramid.response import Response
 import transaction
 
 from karl.views.api import TemplateAPI

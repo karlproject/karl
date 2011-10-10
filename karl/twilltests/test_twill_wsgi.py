@@ -18,7 +18,7 @@
 import os
 import shutil
 import twill
-from repoze.bfg.paster import get_app
+from pyramid.paster import get_app
 
 def _rm(path):
     """ grrr. """

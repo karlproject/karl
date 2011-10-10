@@ -20,13 +20,13 @@ import re
 
 from BTrees.OOBTree import OOBTree
 from persistent.mapping import PersistentMapping
-from repoze.bfg.location import lineage
-from repoze.bfg.interfaces import ILocation
-from repoze.bfg.settings import get_settings
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import principals_allowed_by_permission
-from repoze.bfg.traversal import model_path
+from pyramid.location import lineage
+from pyramid.interfaces import ILocation
+from pyramid.security import Allow
+from pyramid.security import Authenticated
+from pyramid.security import principals_allowed_by_permission
+from pyramid.traversal import resource_path
+from pyramid.threadlocal import get_current_registry
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
@@ -171,7 +171,7 @@ def get_containment(object, defaults):
     return ifaces
 
 def get_path(object, default):
-    return model_path(object)
+    return resource_path(object)
 
 def _get_texts(object, default):
     if IPhoto.providedBy(object):
@@ -211,7 +211,7 @@ else: #pragma NO COVERAGE
         implements(IWeightedText)
 
 def get_object_tags(obj):
-    path = model_path(obj)
+    path = resource_path(obj)
     catalog = find_catalog(obj)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(obj)
@@ -357,7 +357,7 @@ def get_virtual(object, default):
 class RepozitoryEngineParams(object):
     @property
     def db_string(self):
-        return get_settings()['repozitory_db_string']
+        return get_current_registry().settings['repozitory_db_string']
 
     @property
     def kwargs(self):
@@ -396,7 +396,7 @@ class Site(Folder):
 
     @property
     def repo(self):
-        if get_settings().get('repozitory_db_string') is None:
+        if get_current_registry().settings.get('repozitory_db_string') is None:
             return None
 
         # Create self._repo on demand.

@@ -83,7 +83,7 @@ def collect_community_stats(context):
         active_users = {}
 
         def count(node):
-            from repoze.bfg.traversal import model_path
+            from pyramid.traversal import resource_path
             if IWikiPage.providedBy(node):
                 stats['wiki_pages'] += 1
             elif IBlogEntry.providedBy(node):

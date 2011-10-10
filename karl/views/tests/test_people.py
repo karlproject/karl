@@ -16,9 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 from karl import testing as karltesting
 from karl.testing import DummySessions
 
@@ -84,7 +83,7 @@ class TestEditProfileFormController(unittest.TestCase):
                    'biography']
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         sessions = DummySessions()
         context = DummyProfile(sessions=sessions)
         context.title = 'title'
@@ -96,7 +95,7 @@ class TestEditProfileFormController(unittest.TestCase):
         request.environ['repoze.who.identity'] = self.user_info
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         from karl.views.people import EditProfileFormController
@@ -174,10 +173,10 @@ class TestEditProfileFormController(unittest.TestCase):
             form.errors['websites'].message, 'You made a boo boo.')
 
     def test_admin_redirected(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
-        testing.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
+        karltesting.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
         response = controller()
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location,
@@ -192,8 +191,9 @@ class TestEditProfileFormController(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from karl.testing import DummyUpload
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
-                                IContentFactory)
+        karltesting.registerAdapter(
+            lambda *arg: DummyImageFile, (ICommunityFile,),
+            IContentFactory)
         controller = self._makeOne(self.context, self.request)
         converted = {'photo': DummyUpload(filename='test.jpg',
                                          mimetype='image/jpeg',
@@ -217,8 +217,9 @@ class TestEditProfileFormController(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
         from karl.testing import DummyUpload
         from repoze.lemonade.interfaces import IContentFactory
-        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
-                                IContentFactory)
+        karltesting.registerAdapter(
+            lambda *arg: DummyImageFile, (ICommunityFile,),
+            IContentFactory)
         controller = self._makeOne(self.context, self.request)
         converted = {'photo': DummyUpload(filename='test.jpg',
                                          mimetype='x-application/not a jpeg',
@@ -229,7 +230,7 @@ class TestEditProfileFormController(unittest.TestCase):
                 continue
             converted[fieldname] = value
 
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_w_websites_no_scheme(self):
@@ -275,7 +276,7 @@ class TestEditProfileFormController(unittest.TestCase):
 
 class TestAdminEditProfileFormController(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         self.sessions = sessions = DummySessions()
         context = DummyProfile(sessions=sessions)
         context.title = 'title'
@@ -287,7 +288,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         karltesting.registerSettings()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request, active=True):
         # create the site and the users infrastructure first
@@ -443,7 +444,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
 
     def test_handle_submit_existing_login(self):
         # try w/ a login already in use
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -457,7 +458,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
                           converted)
 
     def test_handle_submit_w_login_raising_ValidationError(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -486,7 +487,7 @@ class AddUserFormControllerTests(unittest.TestCase):
     def setUp(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunity
-        cleanUp()
+        testing.cleanUp()
         sessions = self.sessions = DummySessions()
         context = testing.DummyModel(sessions=sessions)
         context.title = 'profiles'
@@ -518,10 +519,10 @@ class AddUserFormControllerTests(unittest.TestCase):
 
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
+        karltesting.registerAdapter(DummySearch, (Interface,), ICatalogSearch)
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         site = self.site = testing.DummyModel(sessions=self.sessions)
@@ -555,7 +556,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.request.form = DummyForm()
         controller = self._makeOne(self.context, self.request)
         karltesting.registerLayoutProvider()
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:forms/templates/snippets.pt')
         response = controller()
         self.failUnless('api' in response)
@@ -593,8 +594,9 @@ class AddUserFormControllerTests(unittest.TestCase):
         from karl.models.profile import Profile
         from karl.testing import DummyUpload
         # register defaults
-        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
-                                IContentFactory)
+        karltesting.registerAdapter(
+            lambda *arg: DummyImageFile, (ICommunityFile,),
+            IContentFactory)
         workflow = registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
@@ -642,8 +644,9 @@ class AddUserFormControllerTests(unittest.TestCase):
             2, [invite1, invite2], lambda x: x)
 
         # register defaults
-        testing.registerAdapter(lambda *arg: DummyImageFile, (ICommunityFile,),
-                                IContentFactory)
+        karltesting.registerAdapter(
+            lambda *arg: DummyImageFile, (ICommunityFile,),
+            IContentFactory)
         workflow = registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
@@ -668,7 +671,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.failIf('invite' in self.community2)
 
     def test_handle_submit_duplicate_id(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = testing.DummyModel(
@@ -685,7 +688,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         self.assertEqual(controller.reactivate_user, None)
 
     def test_handle_submit_duplicate_id_inactive_user(self):
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = testing.DummyModel(
@@ -705,7 +708,7 @@ class AddUserFormControllerTests(unittest.TestCase):
 
     def test_handle_submit_duplicate_email(self):
         from karl.models.interfaces import IProfile
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = existing = testing.DummyModel(
@@ -727,7 +730,7 @@ class AddUserFormControllerTests(unittest.TestCase):
     def test_handle_submit_duplicate_email_inactive_user(self):
         from karl.models.interfaces import IProfile
         from karl.models.interfaces import IProfile
-        from repoze.bfg.formish import ValidationError
+        from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
         self.context['existing'] = existing = testing.DummyModel(
@@ -805,10 +808,10 @@ class AddUserFormControllerTests(unittest.TestCase):
 
 class GetGroupOptionsTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self):
         from karl.views.people import get_group_options
@@ -824,7 +827,7 @@ class GetGroupOptionsTests(unittest.TestCase):
 
 class FilestorePhotoViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         sessions = DummySessions()
         context = self.context = testing.DummyModel(sessions=sessions)
         request = self.request = testing.DummyRequest()
@@ -832,7 +835,7 @@ class FilestorePhotoViewTests(unittest.TestCase):
         request.subpath = ('sub', 'path', 'parts')
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_edit_profile_filestore_photo_view(self):
         from karl.testing import DummyUpload
@@ -874,10 +877,10 @@ class FilestorePhotoViewTests(unittest.TestCase):
 
 class ShowProfileTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import show_profile_view
@@ -896,8 +899,8 @@ class ShowProfileTests(unittest.TestCase):
         self._registerCatalogSearch()
 
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy('userid')
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        karltesting.registerDummySecurityPolicy('userid')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'userid'
@@ -917,8 +920,8 @@ class ShowProfileTests(unittest.TestCase):
         self._registerCatalogSearch()
 
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy('userid')
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        karltesting.registerDummySecurityPolicy('userid')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'chris'
@@ -934,10 +937,10 @@ class ShowProfileTests(unittest.TestCase):
         self._registerTagbox()
         self._registerCatalogSearch()
 
-        from repoze.bfg.testing import DummyModel
+        from pyramid.testing import DummyModel
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
@@ -971,12 +974,11 @@ class ShowProfileTests(unittest.TestCase):
         self._registerTagbox()
         self._registerCatalogSearch()
 
-        from repoze.bfg.testing import DummyModel
-        from repoze.bfg.testing import registerDummySecurityPolicy
-        registerDummySecurityPolicy(permissive=False)
+        from pyramid.testing import DummyModel
+        karltesting.registerDummySecurityPolicy(permissive=False)
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
@@ -1003,7 +1005,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         self._registerTagbox()
         self._registerCatalogSearch()
-        testing.registerDummySecurityPolicy('eddie')
+        karltesting.registerDummySecurityPolicy('eddie')
         TAGS = {'beaver': 1, 'wally': 3}
         context = DummyProfile()
         context.title = "Eddie"
@@ -1027,7 +1029,7 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
 
         response = self._callFUT(context, request)
 
@@ -1039,7 +1041,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         self._registerTagbox()
         self._registerCatalogSearch()
-        testing.registerDummySecurityPolicy('eddie')
+        karltesting.registerDummySecurityPolicy('eddie')
         TAGS = {'alpha': 1,
                 'bravo': 2,
                 'charlie': 3,
@@ -1074,7 +1076,7 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
 
         response = self._callFUT(context, request)
 
@@ -1096,16 +1098,16 @@ class ShowProfileTests(unittest.TestCase):
                 return len(docids), docids, lambda docid: docid
             return search
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
         from zope.interface import Interface
-        registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karltesting.registerAdapter(searcher, (Interface,), ICatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
+        karltesting.registerAdapter(
+            DummyGridEntryAdapter, (Interface, Interface),
+            IGridEntryInfo)
 
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy('userid')
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        karltesting.registerDummySecurityPolicy('userid')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'chris'
@@ -1126,8 +1128,8 @@ class ShowProfileTests(unittest.TestCase):
         self._registerCatalogSearch()
 
         from karl.testing import DummyUsers
-        testing.registerDummySecurityPolicy('userid')
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        karltesting.registerDummySecurityPolicy('userid')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'admin'
@@ -1144,7 +1146,7 @@ class ShowProfileTests(unittest.TestCase):
         self._registerCatalogSearch()
 
         from karl.testing import DummyUsers
-        renderer = testing.registerDummyRenderer('templates/profile.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'userid'
@@ -1159,10 +1161,10 @@ class ShowProfileTests(unittest.TestCase):
 
 class ProfileThumbnailTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import profile_thumbnail
@@ -1187,10 +1189,10 @@ class ProfileThumbnailTests(unittest.TestCase):
 
 class RecentContentTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import recent_content_view
@@ -1200,7 +1202,7 @@ class RecentContentTests(unittest.TestCase):
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/profile_recent_content.pt')
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
@@ -1220,17 +1222,17 @@ class RecentContentTests(unittest.TestCase):
                 return len(docids), docids, lambda docid: docid
             return search
         from karl.models.interfaces import ICatalogSearch
-        from repoze.bfg.testing import registerAdapter
         from zope.interface import Interface
-        registerAdapter(searcher, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(searcher, (Interface), ICatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
-        testing.registerAdapter(DummyGridEntryAdapter, (Interface, Interface),
-                                IGridEntryInfo)
+        karltesting.registerAdapter(
+            DummyGridEntryAdapter, (Interface, Interface),
+            IGridEntryInfo)
 
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/profile_recent_content.pt')
         self._callFUT(context, request)
         self.assert_(renderer.api is not None)
@@ -1241,7 +1243,7 @@ class RecentContentTests(unittest.TestCase):
 
 class ManageCommunitiesTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.testing import DummyUsers
 
@@ -1279,16 +1281,16 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.profile.alert_attachments = 'link'
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import manage_communities_view
         return manage_communities_view(context, request)
 
     def test_show_form(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'karl.views:templates/manage_communities.pt')
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:templates/formfields.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1316,7 +1318,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertFalse(community2["may_leave"])
 
     def test_cancel(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1326,7 +1328,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertEqual("http://example.com/profiles/a/", response.location)
 
     def test_submit_alert_prefs(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1352,7 +1354,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             response.location)
 
     def test_leave_community(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1370,7 +1372,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             response.location)
 
     def test_leave_community_sole_moderator(self):
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1400,10 +1402,10 @@ class ManageCommunitiesTests(unittest.TestCase):
 
 class ShowProfilesViewTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import show_profiles_view
@@ -1415,16 +1417,16 @@ class ShowProfilesViewTests(unittest.TestCase):
         from karl.models.interfaces import ILetterManager
         from karl.models.adapters import CatalogSearch
         catalog = karltesting.DummyCatalog({1:'/foo', 2:'/bar'})
-        testing.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
-        testing.registerAdapter(DummyLetterManager, Interface,
-                                ILetterManager)
+        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummyLetterManager, Interface,
+                                    ILetterManager)
         context = testing.DummyModel()
         context.catalog = catalog
         foo = testing.DummyModel()
-        testing.registerModels({'/foo':foo})
+        karltesting.registerModels({'/foo':foo})
         request = testing.DummyRequest(
             params={'titlestartswith':'A'})
-        renderer = testing.registerDummyRenderer('templates/profiles.pt')
+        renderer = karltesting.registerDummyRenderer('templates/profiles.pt')
         self._callFUT(context, request)
         profiles = list(renderer.profiles)
         self.assertEqual(len(profiles), 1)
@@ -1433,7 +1435,7 @@ class ShowProfilesViewTests(unittest.TestCase):
 
 class ChangePasswordFormControllerTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
         karltesting.registerSettings()
         from karl.testing import DummyUsers
         # Set up dummy skel
@@ -1445,7 +1447,7 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         self.request = testing.DummyRequest()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _makeOne(self, context, request):
         from karl.views.people import ChangePasswordFormController
@@ -1468,7 +1470,7 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
     def test___call__(self):
         controller = self._makeOne(self.context, self.request)
         karltesting.registerLayoutProvider()
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'karl.views:forms/templates/snippets.pt')
         response = controller()
         self.failUnless('api' in response)
@@ -1509,10 +1511,10 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
 
 class TestDeactivateProfileView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.people import deactivate_profile_view
@@ -1522,7 +1524,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         context = DummyProfile(firstname='Mori', lastname='Turi')
         context.title = 'Context'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/deactivate_profile.pt')
         response = self._callFUT(context, request)
         self.assertEqual(sorted(response.keys()), ['api', 'myself'])
@@ -1540,7 +1542,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
-        testing.registerDummySecurityPolicy('admin')
+        karltesting.registerDummySecurityPolicy('admin')
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)
@@ -1563,7 +1565,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
-        testing.registerDummySecurityPolicy('admin')
+        karltesting.registerDummySecurityPolicy('admin')
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)
@@ -1586,7 +1588,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
-        testing.registerDummySecurityPolicy('userid')
+        karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)
@@ -1603,12 +1605,12 @@ class TestDeactivateProfileView(unittest.TestCase):
 
 class TestReactivateProfileView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         self.reset_password_calls = []
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _dummy_reset_password(self, user, profile, request):
         self.reset_password_calls.append((user, profile, request))
@@ -1621,7 +1623,7 @@ class TestReactivateProfileView(unittest.TestCase):
         context = DummyProfile(firstname='Mori', lastname='Turi')
         context.title = 'Context'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer(
+        renderer = karltesting.registerDummyRenderer(
             'templates/reactivate_profile.pt')
         response = self._callFUT(context, request)
         self.assertEqual(sorted(response.keys()), ['api'])
@@ -1634,7 +1636,7 @@ class TestReactivateProfileView(unittest.TestCase):
         workflow = registerDummyWorkflow('security')
         context = DummyProfile()
         parent['userid'] = context
-        testing.registerDummySecurityPolicy('admin')
+        karltesting.registerDummySecurityPolicy('admin')
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)

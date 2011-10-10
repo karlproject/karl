@@ -18,11 +18,13 @@
 from cStringIO import StringIO
 
 from BTrees.OOBTree import OOBTree
+
+from pyramid.traversal import resource_path
 import PIL.Image
 from ZODB.blob import Blob
 from persistent import Persistent
-from repoze.bfg.traversal import model_path
 from repoze.folder import Folder
+
 from repoze.lemonade.content import create_content
 from zope.interface import alsoProvides
 from zope.interface import implements
@@ -73,7 +75,7 @@ class CommunityFolderObjectVersion(object):
         self.created = folder.created
         self.modified = folder.modified
         self.docid = folder.docid
-        self.path = model_path(folder)
+        self.path = resource_path(folder)
         self.attrs = dict((name, getattr(folder, name)) for name in [
             'creator',
             'modified_by',
@@ -90,7 +92,7 @@ class CommunityFolderContainerVersion(object):
 
     def __init__(self, folder):
         self.container_id = folder.docid
-        self.path = model_path(folder)
+        self.path = resource_path(folder)
         self.map = dict((name, page.docid) for name, page in folder.items())
         self.ns_map = {}
 
@@ -233,7 +235,7 @@ class CommunityFileVersion(object):
         self.created = file.created
         self.modified = file.modified
         self.docid = file.docid
-        self.path = model_path(file)
+        self.path = resource_path(file)
         self.attrs = dict((name, getattr(file, name)) for name in [
             'mimetype',
             'filename',

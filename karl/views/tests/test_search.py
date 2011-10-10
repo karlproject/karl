@@ -17,11 +17,13 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import taggedValue
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
+
+import karl.testing as karltesting
 
 class JQueryLivesearchViewTests(unittest.TestCase):
     def setUp(self):
@@ -39,7 +41,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '400 Bad Request')
@@ -89,7 +91,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         def dummy_adapter(context, request):
             return dict(title=context.title)
         from karl.views.interfaces import ILiveSearchEntry
-        testing.registerAdapter(dummy_adapter,
+        karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
         response = self._callFUT(context, request)
@@ -118,7 +120,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         def dummy_adapter(context, request):
             return dict(title=context.title)
         from karl.views.interfaces import ILiveSearchEntry
-        testing.registerAdapter(dummy_adapter,
+        karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
         response = self._callFUT(context, request)
@@ -164,7 +166,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         def dummy_adapter(context, request):
             return dict(title=context.title)
         from karl.views.interfaces import ILiveSearchEntry
-        testing.registerAdapter(dummy_adapter,
+        karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
         response = self._callFUT(context, request)
@@ -191,7 +193,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         def dummy_adapter(context, request):
             return dict(title=context.title)
         from karl.views.interfaces import ILiveSearchEntry
-        testing.registerAdapter(dummy_adapter,
+        karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
         response = self._callFUT(context, request)
@@ -206,8 +208,8 @@ class SearchResultsViewBase(object):
 
     def setUp(self):
         cleanUp()
-        testing.registerDummyRenderer('karl.views:templates/generic_layout.pt')
-        testing.registerDummyRenderer(
+        karltesting.registerDummyRenderer('karl.views:templates/generic_layout.pt')
+        karltesting.registerDummyRenderer(
             'karl.views:templates/community_layout.pt')
 
     def tearDown(self):
@@ -218,7 +220,7 @@ class SearchResultsViewBase(object):
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict())
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummyEmptySearch, (Interface),
+        karltesting.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
         result = self._callFUT(context, request)
         self.assertEqual(result['terms'], [])
@@ -230,8 +232,8 @@ class SearchResultsViewBase(object):
             params=MultiDict({'kind':'unknown', 'body':'yo'}))
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
-        from webob.exc import HTTPBadRequest
-        testing.registerAdapter(DummyEmptySearch, (Interface),
+        from pyramid.httpexceptions import HTTPBadRequest
+        karltesting.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
         self.assertRaises(HTTPBadRequest, self._callFUT, context, request)
 
@@ -247,9 +249,9 @@ class SearchResultsViewBase(object):
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -270,7 +272,7 @@ class SearchResultsViewBase(object):
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         result = self._callFUT(context, request)
         self.failIf('batch' in result['kind_knob'][0]['url'])
@@ -287,9 +289,9 @@ class SearchResultsViewBase(object):
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -314,9 +316,9 @@ class SearchResultsViewBase(object):
             modified = datetime.datetime(2010, 5, 12, 2, 42)
         class LocalDummySearch(DummySearch):
             content = LocalDummyContent()
-        testing.registerAdapter(LocalDummySearch, (Interface),
+        karltesting.registerAdapter(LocalDummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -333,7 +335,7 @@ class SearchResultsViewBase(object):
             return DummySearchFactory(content)
         search_factory.icon = 'foo.jpg'
         search_factory.advanced_search = True
-        testing.registerUtility(
+        karltesting.registerUtility(
             search_factory, IGroupSearchFactory, name='People')
         context = testing.DummyModel()
         context.catalog = {}
@@ -344,9 +346,9 @@ class SearchResultsViewBase(object):
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -363,7 +365,7 @@ class SearchResultsViewBase(object):
             return DummySearchFactory(content)
         search_factory.icon = 'foo.jpg'
         search_factory.advanced_search = True
-        testing.registerUtility(
+        karltesting.registerUtility(
             search_factory, IGroupSearchFactory, name='People')
         context = testing.DummyModel()
         context.catalog = {}
@@ -374,9 +376,9 @@ class SearchResultsViewBase(object):
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -399,9 +401,9 @@ class SearchResultsViewBase(object):
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -417,7 +419,7 @@ class SearchResultsViewBase(object):
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(ParseErrorSearch, (Interface),
+        karltesting.registerAdapter(ParseErrorSearch, (Interface),
                                 ICatalogSearch)
         result = self._callFUT(context, request)
         self.assertEqual(len(result['terms']), 0)
@@ -439,9 +441,9 @@ class SearchResultsViewBase(object):
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
         registerContentFactory(DummyContent, IBlogEntry)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
         result = self._callFUT(context, request)
@@ -477,9 +479,9 @@ class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
 
@@ -539,9 +541,9 @@ class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyContent, IDummyContent)
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
-        testing.registerAdapter(DummySearchResultsDisplay,
+        karltesting.registerAdapter(DummySearchResultsDisplay,
                                 (Interface, Interface),
                                 IAdvancedSearchResultsDisplay)
 
@@ -591,7 +593,7 @@ class GetBatchTests(unittest.TestCase):
     def test_without_kind_with_terms(self):
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo'}))
@@ -602,7 +604,7 @@ class GetBatchTests(unittest.TestCase):
     def test_without_kind_with_path(self):
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo'}))
@@ -615,7 +617,7 @@ class GetBatchTests(unittest.TestCase):
     def test_without_kind_without_terms(self):
         from webob.multidict import MultiDict
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearch, (Interface),
+        karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         request = testing.DummyRequest(params=MultiDict({}))
         context = testing.DummyModel()
@@ -632,7 +634,7 @@ class GetBatchTests(unittest.TestCase):
             return DummySearchFactory(content)
         registerListItem(IGroupSearchFactory, search_factory, 'dummy1',
                          title='Dummy1', sort_key=1)
-        testing.registerAdapter(DummySearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummySearch, (Interface), ICatalogSearch)
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'dummy1'}))
         context = testing.DummyModel()
@@ -641,7 +643,7 @@ class GetBatchTests(unittest.TestCase):
 
     def test_bad_kind_with_body(self):
         from webob.multidict import MultiDict
-        from webob.exc import HTTPBadRequest
+        from pyramid.httpexceptions import HTTPBadRequest
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'doesntexist'}))
         context = testing.DummyModel()
@@ -659,7 +661,7 @@ class GetBatchTests(unittest.TestCase):
             return results
         registerListItem(IGroupSearchFactory, dummy_factory, 'dummy1',
                          title='Dummy1', sort_key=1)
-        testing.registerAdapter(DummySearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(DummySearch, (Interface), ICatalogSearch)
         request = testing.DummyRequest(
             params=MultiDict({'kind':'dummy1'}))
         context = testing.DummyModel()
@@ -716,7 +718,7 @@ class MakeQueryTests(unittest.TestCase):
                 searched_for.update(kw)
                 return 1, [1], lambda x: profile
 
-        testing.registerAdapter(ProfileSearch, (Interface),
+        karltesting.registerAdapter(ProfileSearch, (Interface),
                                 ICatalogSearch)
         query, terms = self._callFUT({'creator': 'Ad'})
         self.assertEquals(searched_for,

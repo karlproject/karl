@@ -1,7 +1,7 @@
 from zope.interface import Interface
 from zope.interface import implements
-from repoze.bfg.location import lineage
-from repoze.bfg.security import Everyone
+from pyramid.location import lineage
+from pyramid.security import Everyone
 from karl.security.policy import AllPermissionsList
 
 class IACLPathCache(Interface):

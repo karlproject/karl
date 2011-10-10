@@ -17,7 +17,11 @@
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
+
+from karl.testing import registerDummyRenderer
 
 class Test_edit_acl_view(unittest.TestCase):
     def setUp(self):
@@ -32,7 +36,7 @@ class Test_edit_acl_view(unittest.TestCase):
 
     def _makeACL(self, admins=(), moderators=(), members=(), guests=(),
                  no_inherit=True):
-        from repoze.bfg.security import Allow
+        from pyramid.security import Allow
         from karl.security.policy import ADMINISTRATOR_PERMS
         from karl.security.policy import GUEST_PERMS
         from karl.security.policy import MEMBER_PERMS
@@ -54,7 +58,7 @@ class Test_edit_acl_view(unittest.TestCase):
     def test_not_submitted_no_local_acl_no_parent(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -66,7 +70,7 @@ class Test_edit_acl_view(unittest.TestCase):
         context = testing.DummyModel()
         context.__acl__ = self._makeACL(members=('bharney',))
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -78,7 +82,7 @@ class Test_edit_acl_view(unittest.TestCase):
         parent = testing.DummyModel()
         context = parent['child'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -92,7 +96,7 @@ class Test_edit_acl_view(unittest.TestCase):
         context = parent['child'] = testing.DummyModel()
         context.__acl__ = self._makeACL(guests=('bharney',), no_inherit=False)
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -107,7 +111,7 @@ class Test_edit_acl_view(unittest.TestCase):
         parent.__acl__ = self._makeACL(admins=('phred',))
         context = parent['child'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -123,7 +127,7 @@ class Test_edit_acl_view(unittest.TestCase):
         parent = grand['child'] = testing.DummyModel()
         context = parent['grandchild'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -140,7 +144,7 @@ class Test_edit_acl_view(unittest.TestCase):
         parent.__acl__ = self._makeACL(members=('bharney',), no_inherit=False)
         context = parent['grandchild'] = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
 
         self._callFUT(context, request)
 
@@ -151,7 +155,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(renderer.inheriting, 'enabled')
 
     def test_submitted_move_up_at_top_unchanged_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -163,7 +167,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl)
 
     def test_submitted_move_up_not_at_top_moves_up_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -175,7 +179,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[1:2] + acl[0:1] + acl[2:])
 
     def test_submitted_move_up_at_top_unchanged_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -195,13 +199,13 @@ class Test_edit_acl_view(unittest.TestCase):
         request.POST['form.move_up'] = '^'
         request.POST['index'] = 1
 
-        testing.registerDummyRenderer('karl.views:templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('karl.views:templates/edit_acl.pt')
         self._callFUT(context, request)
 
         self.assertEqual(context.__acl__, acl[1:2] + acl[0:1] + acl[2:])
 
     def test_submitted_move_down_at_bottom_unchanged_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -213,7 +217,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl)
 
     def test_submitted_move_down_not_at_bottom_moves_down_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -225,7 +229,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[1:2] + acl[0:1] + acl[2:])
 
     def test_submitted_move_down_at_bottom_unchanged_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -238,7 +242,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl)
 
     def test_submitted_move_down_not_at_bottom_moves_down_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -251,7 +255,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[1:2] + acl[0:1] + acl[2:])
 
     def test_submitted_remove_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -263,7 +267,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[1:])
 
     def test_submitted_remove_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -276,7 +280,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[:1])
 
     def test_submitted_add_no_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -291,7 +295,7 @@ class Test_edit_acl_view(unittest.TestCase):
                          acl[:-1] + [('Allow', 'wylma', ('view',))] + acl[-1:])
 
     def test_submitted_add_inherit(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -307,7 +311,7 @@ class Test_edit_acl_view(unittest.TestCase):
                          acl + [('Allow', 'wylma', ('view',))])
 
     def test_submitted_add_mulitple_permissions(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -323,7 +327,7 @@ class Test_edit_acl_view(unittest.TestCase):
                          acl + [('Allow', 'wylma', ('view', 'comment'))])
 
     def test_submitted_inherit_enabled_inherited(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
                                               no_inherit=False)
@@ -336,7 +340,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl)
 
     def test_submitted_inherit_enabled_not_inherited(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -348,7 +352,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl[:-1])
 
     def test_submitted_inherit_disabled_inherited(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         from karl.security.policy import NO_INHERIT
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'),
@@ -362,7 +366,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl + [NO_INHERIT])
 
     def test_submitted_inherit_disabled_not_inherited(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         acl = context.__acl__ = self._makeACL(admins=('phred', 'bharney'))
         request = testing.DummyRequest()
@@ -374,7 +378,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, acl)
 
     def test_submitted_at_root_reindexes_acl(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         context.docid = 1
         catalog = context.catalog = DummyCatalog()
@@ -393,7 +397,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.failUnless(catalog._invalidated)
 
     def test_submitted_not_at_root_reindexes_acl(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         parent = testing.DummyModel()
         context = parent['child'] = testing.DummyModel()
         context.docid = 1
@@ -413,7 +417,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.failUnless(catalog._invalidated)
 
     def test_submitted_sets___custom_acl__(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         context.docid = 1
         catalog = context.catalog = DummyCatalog()
@@ -430,7 +434,7 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(context.__acl__, expected)
 
     def test_submitted_reindexes_children(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         context = testing.DummyModel()
         context.docid = 1
         child = context['child'] = testing.DummyModel()
@@ -452,7 +456,7 @@ class Test_edit_acl_view(unittest.TestCase):
     def test_show_no_workflow(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
         self._callFUT(context, request)
         self.assertEqual(renderer.security_state, None)
         self.assertEqual(renderer.security_states, None)
@@ -476,7 +480,7 @@ class Test_edit_acl_view(unittest.TestCase):
             context.state = 'foo'
             directlyProvides(Interface)
             request = testing.DummyRequest()
-            renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+            renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
             self._callFUT(context, request)
             self.assertEqual(renderer.security_state, 'foo')
             self.assertEqual(renderer.security_states, ['foo', 'bar'])
@@ -503,7 +507,7 @@ class Test_edit_acl_view(unittest.TestCase):
             context.__custom_acl__ = []
             directlyProvides(Interface)
             request = testing.DummyRequest()
-            renderer = testing.registerDummyRenderer('templates/edit_acl.pt')
+            renderer = karl.testing.registerDummyRenderer('templates/edit_acl.pt')
             self._callFUT(context, request)
             self.assertEqual(renderer.security_state, 'CUSTOM')
             self.assertEqual(renderer.security_states, ['CUSTOM', 'foo', 'bar'])
@@ -511,7 +515,7 @@ class Test_edit_acl_view(unittest.TestCase):
             karl.views.acl.get_context_workflow = old_f
 
     def test_workflow_transition(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        registerDummyRenderer('templates/edit_acl.pt')
         from repoze.workflow.testing import DummyWorkflow
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -538,7 +542,7 @@ class Test_edit_acl_view(unittest.TestCase):
             karl.views.acl.get_context_workflow = old_f
 
     def test_workflow_transition_from_custom(self):
-        testing.registerDummyRenderer('templates/edit_acl.pt')
+        registerDummyRenderer('templates/edit_acl.pt')
         from repoze.workflow.testing import DummyWorkflow
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -591,7 +595,7 @@ class Test_acl_tree_view(unittest.TestCase):
         context = DummyModel()
         context['context2'] = context2
         directlyProvides(context, IFolder)
-        renderer = testing.registerDummyRenderer('templates/acl_tree.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/acl_tree.pt')
         self._callFUT(context, request)
         self.assertEqual(len(renderer.acls), 2)
         context_acl = renderer.acls[0]

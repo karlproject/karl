@@ -24,11 +24,11 @@ from pprint import pformat
 from zope.component import queryAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.threadlocal import get_current_request
-from repoze.bfg.traversal import model_path
-from repoze.bfg.traversal import find_interface
+from pyramid.interfaces import ISettings
+from pyramid.security import authenticated_userid
+from pyramid.threadlocal import get_current_request
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_interface
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.content import is_content
 
@@ -68,7 +68,7 @@ def index_content(obj, event):
     if catalog is not None:
         for node in postorder(obj):
             if is_content(obj):
-                path = model_path(node)
+                path = resource_path(node)
                 docid = getattr(node, 'docid', None)
                 if docid is None:
                     docid = node.docid = catalog.document_map.add(path)
@@ -98,7 +98,7 @@ def handle_content_removed(obj, event):
     """
     catalog = find_catalog(obj)
     if catalog is not None:
-        path = model_path(obj)
+        path = resource_path(obj)
         num, docids = catalog.search(path={'query': path,
                                            'include_path': True})
         unindex_content(obj, docids)
@@ -109,7 +109,7 @@ def reindex_content(obj, event):
     IObjectModifed event subscriber """
     catalog = find_catalog(obj)
     if catalog is not None:
-        path = model_path(obj)
+        path = resource_path(obj)
         docid = catalog.document_map.docid_for_address(path)
         catalog.reindex_doc(docid, obj)
 
@@ -242,7 +242,7 @@ def alpha_removed(obj, event):
 
 def add_mailinglist(obj, event):
     aliases = find_site(obj).list_aliases
-    aliases[obj.short_address] = model_path(obj.__parent__)
+    aliases[obj.short_address] = resource_path(obj.__parent__)
 
 def remove_mailinglist(obj, event):
     aliases = find_site(obj).list_aliases
@@ -276,7 +276,7 @@ def index_profile(obj, event):
     if catalog is not None:
         for node in postorder(obj):
             if IProfile.providedBy(node):
-                path = model_path(node)
+                path = resource_path(node)
                 docid = getattr(node, 'docid', None)
                 if docid is None:
                     docid = node.docid = catalog.document_map.add(path)
@@ -288,7 +288,7 @@ def unindex_profile(obj, event):
     """ Unindex profile (an IObjectWillBeRemovedEvent subscriber) """
     catalog = find_peopledirectory_catalog(obj)
     if catalog is not None:
-        path = model_path(obj)
+        path = resource_path(obj)
         path_docid = catalog.document_map.docid_for_address(path)
         num, docids = catalog.search(path=path)
         for docid in docids:
@@ -305,7 +305,7 @@ def reindex_profile(obj, event):
     IObjectModifed event subscriber """
     catalog = find_peopledirectory_catalog(obj)
     if catalog is not None:
-        path = model_path(obj)
+        path = resource_path(obj)
         docid = catalog.document_map.docid_for_address(path)
         catalog.unindex_doc(docid)
         catalog.index_doc(docid, obj)
@@ -318,7 +318,7 @@ def reindex_profile_after_group_change(event):
     if profile is not None:
         catalog = find_peopledirectory_catalog(profile)
         if catalog is not None:
-            path = model_path(profile)
+            path = resource_path(profile)
             docid = catalog.document_map.docid_for_address(path)
             catalog.unindex_doc(docid)
             catalog.index_doc(docid, profile)

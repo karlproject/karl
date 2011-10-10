@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component.event import objectEventNotify
@@ -25,11 +25,11 @@ from validatish import validator
 import formish
 import schemaish
 
-from repoze.bfg.chameleon_zpt import render_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import authenticated_userid
-from repoze.bfg.security import has_permission
-from repoze.bfg.url import model_url
+from pyramid.renderers import render
+from pyramid.renderers import render_to_response
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 
 from karl.content.interfaces import IReferenceManual
@@ -91,10 +91,12 @@ class FileHTML(object):
 
     def __call__(self, api):
         fileinfo = getMultiAdapter((self.context, self.request), IFileInfo)
-        return render_template('templates/inline_file.pt',
-                               api=api,
-                               fileinfo=fileinfo,
-                              )
+        return render(
+            'templates/inline_file.pt',
+            dict(api=api,
+                 fileinfo=fileinfo),
+            request=self.request,
+            )
 
 
 def getTree(root, request, api, _subpath_prefix='|'):
@@ -125,7 +127,7 @@ def getTree(root, request, api, _subpath_prefix='|'):
         html = html_adapter and html_adapter(api) or '<p>Unknown type</p>'
         item = {'name': name,
                 'title': child.title,
-                'href': model_url(child, request),
+                'href': resource_url(child, request),
                 'html': html,
                 'subpath': subpath,
                 'items': items,
@@ -167,7 +169,7 @@ def reference_outline_view(context, request):
         status_message = move_subpath(context, subpath, direction)
 
     backto = {
-        'href': model_url(context.__parent__, request),
+        'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 
@@ -198,23 +200,24 @@ def reference_outline_view(context, request):
     previous, next = get_previous_next(context, request)
 
     api.status_message = status_message
-    return render_template_to_response(
+    return render_to_response(
         'templates/show_referencemanual.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(client_json_data),
-        tree=getTree(context, request, api),
-        backto=backto,
-        layout=layout,
-        previous_entry=previous,
-        next_entry=next,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(client_json_data),
+             tree=getTree(context, request, api),
+             backto=backto,
+             layout=layout,
+             previous_entry=previous,
+             next_entry=next),
+        request=request,
         )
 
 
 def reference_viewall_view(context, request):
 
     backto = {
-        'href': model_url(context.__parent__, request),
+        'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 
@@ -244,16 +247,17 @@ def reference_viewall_view(context, request):
 
     previous, next = get_previous_next(context, request, 'view_all.html')
 
-    return render_template_to_response(
+    return render_to_response(
         'templates/viewall_referencemanual.pt',
-        api=api,
-        actions=actions,
-        head_data=convert_to_script(client_json_data),
-        tree=getTree(context, request, api),
-        backto=backto,
-        layout=layout,
-        previous_entry=previous,
-        next_entry=next,
+        dict(api=api,
+             actions=actions,
+             head_data=convert_to_script(client_json_data),
+             tree=getTree(context, request, api),
+             backto=backto,
+             layout=layout,
+             previous_entry=previous,
+             next_entry=next),
+        request=request,
         )
 
 
@@ -268,7 +272,7 @@ def _get_ordered_listing(context, request):
         child = context.get(name, False)
         entries.append({
                 'title': child.title,
-                'href': model_url(child, request),
+                'href': resource_url(child, request),
                 })
     return entries
 
@@ -309,7 +313,7 @@ class AddReferenceFCBase(object):
         return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         request = self.request
@@ -333,7 +337,7 @@ class AddReferenceFCBase(object):
         # save the tags
         set_tags(reference_object, request, converted['tags'])
 
-        location = model_url(reference_object, request)
+        location = resource_url(reference_object, request)
         return HTTPFound(location=location)
 
 
@@ -391,7 +395,7 @@ class EditReferenceFCBase(object):
         return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_cancel(self):
-        return HTTPFound(location=model_url(self.context, self.request))
+        return HTTPFound(location=resource_url(self.context, self.request))
 
     def handle_submit(self, converted):
         context = self.context
@@ -407,7 +411,7 @@ class EditReferenceFCBase(object):
         # modified
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
-        location = model_url(context, request)
+        location = resource_url(context, request)
         msg = "?status_message=%s" % self.success_msg
         return HTTPFound(location='%s%s' % (location, msg))
 

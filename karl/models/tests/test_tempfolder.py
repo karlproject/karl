@@ -1,15 +1,15 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
-from zope.testing.cleanup import cleanUp
+import karl.testing
 
 class TestTempFolder(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _target_class(self):
         from karl.models.tempfolder import TempFolder
@@ -30,8 +30,8 @@ class TestTempFolder(unittest.TestCase):
 
     def test_ctor(self):
         import datetime
-        from repoze.bfg.authorization import Allow
-        from repoze.bfg.authorization import Everyone
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Everyone
         obj = self._make_one()
         self.assertEqual(obj.__acl__, [(Allow, Everyone, ('view',))])
         self.assertEqual(obj.LIFESPAN, datetime.timedelta(hours=24))
@@ -62,7 +62,7 @@ class TestTempFolder(unittest.TestCase):
         self.failIf('two' in obj)
 
     def test___setitem___emits_no_events(self):
-        events = testing.registerEventListener()
+        events = karl.testing.registerEventListener()
         del events[:]
         obj = self._make_one()
         obj['foo'] = testing.DummyModel()
@@ -71,7 +71,7 @@ class TestTempFolder(unittest.TestCase):
     def test___delitem___emits_no_events(self):
         obj = self._make_one()
         obj['foo'] = testing.DummyModel()
-        events = testing.registerEventListener()
+        events = karl.testing.registerEventListener()
         del events[:]
         del obj['foo']
         self.failIf(events)

@@ -21,7 +21,7 @@
 """
 
 import sys
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_resource
 
 from karl.scripting import get_default_config
 from karl.scripting import open_root
@@ -51,7 +51,7 @@ def main():
         config = get_default_config()
 
     root, closer = open_root(config)
-    model = find_model(root, path)
+    model = find_resource(root, path)
 
     def out(msg):
         sys.stderr.write(msg)

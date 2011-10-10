@@ -21,12 +21,14 @@ from zope.interface import Interface
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyProfile
 from karl.testing import registerLayoutProvider
+
+import karl.testing
 
 class TestShowForumsView(unittest.TestCase):
     def setUp(self):
@@ -44,7 +46,7 @@ class TestShowForumsView(unittest.TestCase):
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
 
     def test_it_empty(self):
@@ -52,7 +54,8 @@ class TestShowForumsView(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'abc'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/show_forums.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_forums.pt')
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(actions[0][0], 'Add Forum')
@@ -60,14 +63,15 @@ class TestShowForumsView(unittest.TestCase):
     def test_it_full(self):
         self._register()
         from karl.models.interfaces import ICatalogSearch
-        testing.registerAdapter(DummySearchAdapter, (Interface),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(DummySearchAdapter, (Interface),
+                                     ICatalogSearch)
         context = testing.DummyModel()
         context['forum'] = testing.DummyModel()
         context['forum'].title = 'forum'
         context.title = 'abc'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/show_forums.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_forums.pt')
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(actions[0][0], 'Add Forum')
@@ -89,15 +93,15 @@ class TestShowForumView(unittest.TestCase):
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
 
     def test_it(self):
         self._register()
         registerLayoutProvider()
         from karl.models.interfaces import ICatalogSearch
         from karl.content.interfaces import IForumsFolder
-        testing.registerAdapter(DummySearchAdapter, (Interface),
-                                ICatalogSearch)
+        karl.testing.registerAdapter(DummySearchAdapter, (Interface),
+                                     ICatalogSearch)
         context = testing.DummyModel(title='abc')
         alsoProvides(context, IForumsFolder)
         from karl.models.interfaces import IIntranets
@@ -105,7 +109,8 @@ class TestShowForumView(unittest.TestCase):
         directlyProvides(intranets, IIntranets)
         intranets['forums'] = context
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/show_forum.pt')
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_forum.pt')
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(actions[0][0], 'Add Forum Topic')
@@ -317,7 +322,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
 class ShowForumTopicViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        testing.registerDummyRenderer('karl.views:templates/formfields.pt')
+        karl.testing.registerDummyRenderer('karl.views:templates/formfields.pt')
 
     def tearDown(self):
         cleanUp()
@@ -331,10 +336,10 @@ class ShowForumTopicViewTests(unittest.TestCase):
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
-        testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerUtility(dummy, IKarlDates)
         from karl.models.interfaces import ITagQuery
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
     def test_no_security_policy(self):
         self._register()
@@ -362,9 +367,9 @@ class ShowForumTopicViewTests(unittest.TestCase):
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
-        renderer = testing.registerDummyRenderer(
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
+        renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum_topic.pt')
         self._callFUT(context, request)
         self.assertEqual(len(renderer.comments), 1)
@@ -400,12 +405,12 @@ class ShowForumTopicViewTests(unittest.TestCase):
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
         self._register()
-        testing.registerDummySecurityPolicy(permissive=False)
+        karl.testing.registerDummySecurityPolicy(permissive=False)
 
-        renderer = testing.registerDummyRenderer(
+        renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum_topic.pt')
         self._callFUT(context, request)
 
@@ -447,9 +452,9 @@ class ShowForumTopicViewTests(unittest.TestCase):
         def dummy_byline_info(context, request):
             return context
         from karl.content.views.interfaces import IBylineInfo
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
-        renderer = testing.registerDummyRenderer(
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
+        renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum_topic.pt')
         self._callFUT(context, request)
 
@@ -536,8 +541,9 @@ class TestEditForumFormController(unittest.TestCase):
             title='oldtitle', description='olddescription')
         context.catalog = DummyCatalog()
         from karl.models.interfaces import IObjectModifiedEvent
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
-        testing.registerDummySecurityPolicy('testeditor')
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
+        karl.testing.registerDummySecurityPolicy('testeditor')
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -613,8 +619,8 @@ class EditForumTopicFormController(unittest.TestCase):
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
         widgets = controller.form_widgets({'security_state':True})
         self.failUnless('security_state' in widgets)
         self.failUnless('attachments.*' in widgets)
@@ -663,7 +669,8 @@ class EditForumTopicFormController(unittest.TestCase):
         context.catalog = DummyCatalog()
         context.sessions = DummySessions()
         from karl.models.interfaces import IObjectModifiedEvent
-        L = testing.registerEventListener((Interface, IObjectModifiedEvent))
+        L = karl.testing.registerEventListener(
+            (Interface, IObjectModifiedEvent))
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         controller = self._makeOne(context, request)

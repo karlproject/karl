@@ -1,14 +1,15 @@
 import unittest
 
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 class TestCachingCatalog(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.catalog import CachingCatalog
@@ -29,7 +30,7 @@ class TestCachingCatalog(unittest.TestCase):
 
     def _registerCache(self, cache):
         from karl.models.interfaces import ICatalogSearchCache
-        testing.registerUtility(cache, ICatalogSearchCache)
+        karl.testing.registerUtility(cache, ICatalogSearchCache)
 
     def test_clear(self):
         cache = DummyCache({1:1})
@@ -175,7 +176,7 @@ class TestCachingCatalog(unittest.TestCase):
     def test_notify_on_query(self):
         handled = []
         from karl.models.interfaces import ICatalogQueryEvent
-        testing.registerSubscriber(handled.append, ICatalogQueryEvent)
+        karl.testing.registerSubscriber(handled.append, ICatalogQueryEvent)
         catalog = self._makeOne()
         catalog['dummy'] = DummyIndex()
         catalog.index_doc(1,1)
@@ -207,7 +208,7 @@ class TestReindexCatalog(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import ISite
         a = testing.DummyModel()
-        testing.registerModels({'a':a})
+        karl.testing.registerModels({'a':a})
         L = []
         output = L.append
         site = testing.DummyModel()
@@ -232,7 +233,7 @@ class TestReindexCatalog(unittest.TestCase):
         from karl.models.interfaces import ISite
         a = testing.DummyModel()
         b = testing.DummyModel()
-        testing.registerModels({'a':a, 'b':b})
+        karl.testing.registerModels({'a':a, 'b':b})
         L = []
         output = L.append
         site = testing.DummyModel()
@@ -257,7 +258,7 @@ class TestReindexCatalog(unittest.TestCase):
         from karl.models.interfaces import ISite
         a = testing.DummyModel()
         b = testing.DummyModel()
-        testing.registerModels({'a':a, 'b':b})
+        karl.testing.registerModels({'a':a, 'b':b})
         L = []
         output = L.append
         site = testing.DummyModel()
@@ -283,7 +284,7 @@ class TestReindexCatalog(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import ISite
         a = testing.DummyModel()
-        testing.registerModels({'a':a})
+        karl.testing.registerModels({'a':a})
         L = []
         output = L.append
         site = testing.DummyModel()

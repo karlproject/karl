@@ -16,16 +16,17 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from repoze.bfg import testing
-from zope.testing.cleanup import cleanUp
+from pyramid import testing
+
+import karl.testing
 
 class KARLUsersTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _getTargetClass(self):
         from karl.models.site import KARLUsers
@@ -36,7 +37,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_add_fires_IUserAdded(self):
         from karl.models.interfaces import IUserAdded
-        events = testing.registerEventListener(IUserAdded)
+        events = karl.testing.registerEventListener(IUserAdded)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1',))
         self.assertEqual(len(events), 1)
@@ -48,7 +49,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_remove_fires_IUserRemoved(self):
         from karl.models.interfaces import IUserRemoved
-        events = testing.registerEventListener(IUserRemoved)
+        events = karl.testing.registerEventListener(IUserRemoved)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1',))
         ku.remove('userid')
@@ -62,7 +63,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_add_group_fires_IUserAddedGroup(self):
         from karl.models.interfaces import IUserAddedGroup
-        events = testing.registerEventListener(IUserAddedGroup)
+        events = karl.testing.registerEventListener(IUserAddedGroup)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1',))
         ku.add_group('userid', 'group_2')
@@ -80,7 +81,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_add_group_unchanged_does_not_fire_IUserAddedGroup(self):
         from karl.models.interfaces import IUserAddedGroup
-        events = testing.registerEventListener(IUserAddedGroup)
+        events = karl.testing.registerEventListener(IUserAddedGroup)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1',))
         ku.add_group('userid', 'group_1')
@@ -88,7 +89,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_remove_group_fires_IUserRemovedGroup(self):
         from karl.models.interfaces import IUserRemovedGroup
-        events = testing.registerEventListener(IUserRemovedGroup)
+        events = karl.testing.registerEventListener(IUserRemovedGroup)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1', 'group_2'))
         ku.remove_group('userid', 'group_2')
@@ -106,7 +107,7 @@ class KARLUsersTests(unittest.TestCase):
 
     def test_remove_group_unchanged_does_not_fire_IUserRemovedGroup(self):
         from karl.models.interfaces import IUserRemovedGroup
-        events = testing.registerEventListener(IUserRemovedGroup)
+        events = karl.testing.registerEventListener(IUserRemovedGroup)
         ku = self._makeOne(self)
         ku.add('userid', 'login_name', 'password', ('group_1', 'group_2'))
         ku.remove_group('userid', 'nonesuch')
@@ -115,14 +116,14 @@ class KARLUsersTests(unittest.TestCase):
 class SiteTests(unittest.TestCase):
 
     def setUp(self):
-        cleanUp()
+        self.config = testing.cleanUp()
 
         from karl.models import site
         self._save_Archive = site.Archive
         site.Archive = DummyArchive
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.models import site
         site.Archive = self._save_Archive
@@ -134,7 +135,7 @@ class SiteTests(unittest.TestCase):
     def _registerUtilities(self):
         from karl.models.interfaces import ICatalogSearchCache
         cache = DummyCache()
-        testing.registerUtility(cache, ICatalogSearchCache)
+        karl.testing.registerUtility(cache, ICatalogSearchCache)
         from repoze.lemonade.testing import registerContentFactory
         from karl.models.interfaces import ICommunities
         from karl.models.interfaces import IProfiles
@@ -188,13 +189,13 @@ class SiteTests(unittest.TestCase):
         self.failUnless('people' in site)
 
     def test_no_repo(self):
-        testing.registerSettings({})
+        self.config.add_settings({})
         self._registerUtilities()
         site = self._makeOne()
         self.assertEqual(site.repo, None)
 
     def test_repo(self):
-        testing.registerSettings({'repozitory_db_string': 'dbstring'})
+        self.config.add_settings({'repozitory_db_string': 'dbstring'})
         self._registerUtilities()
         site = self._makeOne()
         archive = site.repo
@@ -205,10 +206,10 @@ class SiteTests(unittest.TestCase):
 
 class TestGetTextRepr(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, object, default):
         from karl.models.site import get_textrepr
@@ -232,7 +233,7 @@ class TestGetTextRepr(unittest.TestCase):
                 self.context = context
             def __call__(self):
                 return 'stuff'
-        testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
+        karl.testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, 'stuff')
 
@@ -275,14 +276,14 @@ class TestGetTextRepr(unittest.TestCase):
 
 class TestGetWeightedTextReprOldPgtextIndex(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.models import site
         self._save_WeightedText = site.WeightedText
         site.WeightedText = None
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.models import site
         site.WeightedText = self._save_WeightedText
@@ -309,7 +310,7 @@ class TestGetWeightedTextReprOldPgtextIndex(unittest.TestCase):
                 self.context = context
             def __call__(self):
                 return 'stuff'
-        testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
+        karl.testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, ['stuff',])
 
@@ -332,7 +333,7 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
     tags = []
 
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         class DummyWeightedText(unicode):
             pass
@@ -356,7 +357,7 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
         context.users = DummyUsers()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
         from karl.models import site
         site.WeightedText = self._save_WeightedText
@@ -440,7 +441,7 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
                 self.context = context
             def __call__(self):
                 return 'stuff'
-        testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
+        karl.testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
         self.assertEqual(textrepr, 'stuff')
 
@@ -689,7 +690,7 @@ class TestGetVirtual(unittest.TestCase):
                 self.context = context
             def __call__(self):
                 return 'stuff'
-        testing.registerAdapter(DummyAdapter, (None,), IVirtualData)
+        karl.testing.registerAdapter(DummyAdapter, (None,), IVirtualData)
         data = self._callFUT(context, None)
         self.assertEqual(data, 'stuff')
 

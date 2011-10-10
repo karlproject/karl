@@ -1,6 +1,6 @@
 import unittest
 from karl import testing as karltesting
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestLock(unittest.TestCase):
     def setUp(self):

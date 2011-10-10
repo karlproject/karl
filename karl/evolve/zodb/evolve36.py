@@ -1,4 +1,4 @@
-from repoze.bfg.security import Allow
+from pyramid.security import Allow
 from karl.security.policy import EMAIL
 
 

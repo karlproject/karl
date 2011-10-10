@@ -16,15 +16,16 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-from zope.testing.cleanup import cleanUp
-from repoze.bfg import testing
+from pyramid import testing
+
+import karl.testing
 
 class TestLoginView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.login import login_view
@@ -33,7 +34,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest({'came_from':'/login.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -42,7 +43,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/login.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -50,7 +51,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_logout_html_relative(self):
         request = testing.DummyRequest({'came_from':'/logout.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -59,7 +60,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/logout.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
@@ -67,7 +68,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_other_relative(self):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from,
                          'http://example.com/somewhere.html')
@@ -77,7 +78,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest({'came_from':
                                          'http://example.com/somewhere.html'})
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from,
                          'http://example.com/somewhere.html')
@@ -88,7 +89,7 @@ class TestLoginView(unittest.TestCase):
         plugin = DummyAuthenticationPlugin()
         request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
         context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/login.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(dict(response.headers),
                          dict([('Content-Type', 'text/html; charset=UTF-8'),
@@ -97,7 +98,7 @@ class TestLoginView(unittest.TestCase):
                          (request.environ, {}))
 
     def test_POST_no_login_in_form(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['password'] = 'password'
@@ -107,7 +108,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/login.html')
 
     def test_POST_no_password_in_form(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -117,7 +118,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/login.html')
 
     def test_POST_no_authentication_plugins(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
         try:
             from urlparse import parse_qsl
@@ -137,7 +138,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(query['reason'], 'No authenticatable users')
 
     def test_POST_w_plugins_miss(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
         try:
             from urlparse import parse_qsl
@@ -171,7 +172,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_POST_w_plugins_zodb_hit_no_came_from_w_profile(self):
         from datetime import datetime
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -210,7 +211,7 @@ class TestLoginView(unittest.TestCase):
         self.failUnless(before <= profile.last_login_time <= after)
 
     def test_POST_w_plugins_impostor_hit_w_came_from_no_profile(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -250,7 +251,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -287,7 +288,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age_unicode(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -324,7 +325,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
     def test_POST_w_zodb_hit_w_max_age_no_auth_tkt_plugin(self):
-        from webob.exc import HTTPFound
+        from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -355,10 +356,10 @@ _marker = object()
 
 class TestLogoutView(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _callFUT(self, context, request, reason=_marker):
         from karl.views.login import logout_view

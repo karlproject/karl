@@ -16,13 +16,13 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-from webob.exc import HTTPFound
-from repoze.bfg.url import model_url
+from pyramid.httpexceptions import HTTPFound
+from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
 
 def redirect_up_view(context, request):
-    location = model_url(context.__parent__, request)
+    location = resource_url(context.__parent__, request)
     return HTTPFound(location=location)
 
 def redirect_favicon(context, request):
@@ -31,5 +31,5 @@ def redirect_favicon(context, request):
     return HTTPFound(location=location)
 
 def redirect_rss_view_xml(context, request):
-    location = model_url(context, request, 'atom.xml')
+    location = resource_url(context, request, 'atom.xml')
     return HTTPFound(location=location)

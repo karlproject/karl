@@ -2,7 +2,7 @@ import datetime
 import re
 
 from lxml.html.clean import clean_html
-from repoze.bfg.traversal import find_model
+from pyramid.traversal import find_resource
 from repoze.who.plugins.zodb.users import get_sha_password
 from validatish import validate
 from validatish.validator import Validator
@@ -71,7 +71,7 @@ class PathExists(Validator):
             return
         site = find_site(self.context)
         try:
-            target = find_model(site, v)
+            target = find_resource(site, v)
         except KeyError, e:
             raise Invalid("Path not found: %s" % v)
         else:

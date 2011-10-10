@@ -21,9 +21,9 @@ import unittest
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from karl.content.interfaces import IBlogEntry
 from karl.models.interfaces import IComment
@@ -32,6 +32,8 @@ from karl.testing import DummyFile
 from karl.testing import DummySessions
 from karl.testing import registerLayoutProvider
 
+import karl.testing
+
 class AddCommentFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -39,17 +41,17 @@ class AddCommentFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        testing.registerUtility(self.mailer, IMailDelivery)
+        karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # Register BlogCommentAlert adapter
         from karl.models.interfaces import IProfile
         from karl.models.interfaces import IComment
         from karl.content.views.adapters import BlogCommentAlert
         from karl.utilities.interfaces import IAlert
-        from repoze.bfg.interfaces import IRequest
-        testing.registerAdapter(BlogCommentAlert,
-                                (IComment, IProfile, IRequest),
-                                IAlert)
+        from pyramid.interfaces import IRequest
+        karl.testing.registerAdapter(BlogCommentAlert,
+                                     (IComment, IProfile, IRequest),
+                                     IAlert)
 
         # Register IShowSendAlert adapter
         self.show_sendalert = True
@@ -58,8 +60,8 @@ class AddCommentFormControllerTests(unittest.TestCase):
             def __init__(myself, context, request):
                 myself.show_sendalert = self.show_sendalert
 
-        testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
-                                IShowSendalert)
+        karl.testing.registerAdapter(DummyShowSendalert, (Interface, Interface),
+                                     IShowSendalert)
 
         # Create dummy site skel
         from karl.testing import DummyCommunity
@@ -188,7 +190,7 @@ class AddCommentFormControllerTests(unittest.TestCase):
                      'attachments': [],
                      'sendalert': True,
                      'security_state': 'public'}
-        testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'karl.content.views:templates/email_blog_comment_alert.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location, location)
@@ -341,9 +343,10 @@ class ShowCommentViewTests(unittest.TestCase):
         from karl.content.views.interfaces import IBylineInfo
         from karl.content.interfaces import IBlogEntry
         alsoProvides(context, IBlogEntry)
-        testing.registerAdapter(dummy_byline_info, (Interface, Interface),
-                                IBylineInfo)
-        renderer = testing.registerDummyRenderer('templates/show_comment.pt')
+        karl.testing.registerAdapter(dummy_byline_info, (Interface, Interface),
+                                     IBylineInfo)
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/show_comment.pt')
         response =self._callFUT(context, request)
         self.assertEqual(renderer.byline_info, context)
 

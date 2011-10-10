@@ -1,14 +1,14 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
-from zope.testing.cleanup import cleanUp
+import karl.testing
 
 class Test_breadcrumbs(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, obj, request):
         from karl.views.imagedrawer import breadcrumbs
@@ -40,10 +40,10 @@ class Test_breadcrumbs(unittest.TestCase):
 
 class Test_get_image_info(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def test_it(self):
         import datetime
@@ -90,7 +90,7 @@ class Test_get_image_info(unittest.TestCase):
 
 class Test_batch_images(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         batch = [
             testing.DummyModel(title='A'),
@@ -115,7 +115,7 @@ class Test_batch_images(unittest.TestCase):
         self.make_record = dummy_get_info
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request):
         from karl.views.imagedrawer import batch_images
@@ -163,7 +163,7 @@ class Test_batch_images(unittest.TestCase):
         )
 
     def test_search_by_creator(self):
-        testing.registerDummySecurityPolicy('admin')
+        karl.testing.registerDummySecurityPolicy('admin')
         request = testing.DummyRequest(params={'source': 'myrecent'}) # My Recent
         context = testing.DummyModel()
         batch = self._call_fut(context, request)
@@ -211,10 +211,10 @@ class Test_batch_images(unittest.TestCase):
 
 class Test_drawer_dialog_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def dummy_batcher(self, context, request):
         return ['foo', 'bar']
@@ -283,7 +283,7 @@ class Test_drawer_dialog_view(unittest.TestCase):
 
 class Test_drawer_data_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         batch = [
             testing.DummyModel(title='foo'),
@@ -314,7 +314,7 @@ class Test_drawer_data_view(unittest.TestCase):
 
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _call_fut(self, context, request):
         from karl.views.imagedrawer import drawer_data_view
@@ -525,7 +525,7 @@ class Test_drawer_data_view(unittest.TestCase):
 
 class Test_drawer_upload_view(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.cleanUp()
 
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICommunityFile
@@ -547,7 +547,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         pass
 
     def tearDown(self):
-        cleanUp()
+        testing.cleanUp()
 
     def _make_context(self):
         context = testing.DummyModel()
@@ -565,7 +565,7 @@ class Test_drawer_upload_view(unittest.TestCase):
 
     def test_upload_ok(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -589,7 +589,7 @@ class Test_drawer_upload_view(unittest.TestCase):
 
     def test_upload_notitle_ok(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -612,7 +612,7 @@ class Test_drawer_upload_view(unittest.TestCase):
 
     def test_upload_tempfolder(self):
         import simplejson
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params={
@@ -638,7 +638,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_no_upload(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -657,7 +657,7 @@ class Test_drawer_upload_view(unittest.TestCase):
         """Input is missing from the posted form"""
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
@@ -674,7 +674,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_no_filename(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params = {
@@ -693,7 +693,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_wrong_mimetype(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params = {
@@ -713,7 +713,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_wrong_imagedata(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params = {
@@ -733,7 +733,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_duplicate_filename(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris')
+        karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         context['test.jpg'] = testing.DummyModel()
         request = testing.DummyRequest(
@@ -752,7 +752,7 @@ class Test_drawer_upload_view(unittest.TestCase):
     def test_no_permission(self):
         import simplejson
         import transaction
-        testing.registerDummySecurityPolicy('chris', permissive=False)
+        karl.testing.registerDummySecurityPolicy('chris', permissive=False)
         context = self._make_context()
         request = testing.DummyRequest(
             params={
