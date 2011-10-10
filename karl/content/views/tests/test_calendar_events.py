@@ -1390,7 +1390,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         # This is the cookie that stores the sticky state of the view
         from karl.content.views import calendar_events
         self.view_cookie = calendar_events.KARL_CALENDAR_COOKIE
-        self.date_cookie = calendar_events.KARL_CALENDAR_DATE_COOKIE
 
     def tearDown(self):
         cleanUp()
@@ -1596,7 +1595,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'day' view selected as sticky
-        request.cookies[self.view_cookie] = 'day'
+        request.cookies[self.view_cookie] = 'day,,2010,5,12'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)

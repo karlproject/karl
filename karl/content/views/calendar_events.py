@@ -95,12 +95,6 @@ from karl.content.calendar.presenters.month import MonthEventHorizon
 from karl.content.calendar.presenters.list import ListViewPresenter
 from karl.content.calendar.utils import is_all_day_event
 
-# The name of the cookie that makes the calendar view sticky.
-# Possible cookie values are 'day', 'week', 'month', 'list'.
-# In case of no value or unknown value, 'day' is considered
-# as default.
-KARL_CALENDAR_VIEW_COOKIE = 'karl.calendar_view'
-
 _NOW = None
 
 def _now():
