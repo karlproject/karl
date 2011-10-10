@@ -100,8 +100,6 @@ from karl.content.calendar.utils import is_all_day_event
 # In case of no value or unknown value, 'day' is considered
 # as default.
 KARL_CALENDAR_VIEW_COOKIE = 'karl.calendar_view'
-KARL_CALENDAR_DATE_COOKIE = 'karl.calendar.date'
-KARL_CALENDAR_FILTER_COOKIE = 'karl.calendar.filter'
 
 _NOW = None
 
@@ -264,11 +262,8 @@ def _paginate_catalog_events(calendar, request,
 
     return events, has_more
 
-# XXX XXX TODO: remove the session, make a cookie
 def _calendar_filter(context, request):
     filt = request.params.get('filter', None)
-    if filt is None:
-        filt = request.cookies.get(KARL_CALENDAR_FILTER_COOKIE, None)
     return filt
 
 def _calendar_setup_url(context, request):
