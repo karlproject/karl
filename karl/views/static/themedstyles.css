@@ -944,8 +944,8 @@ ul#peopledir-tabs li.selected a {
 
 /** =COMMUNITY HEADER (H1, SEARCH)
 ----------------------------------------------- */
-.community_view {
-  background-color: #CEDFEF !important;
+.community_view, #center.community_view {
+  background-color: #CEDFEF;
 }
 .community_view .cheader {
   margin-bottom: 25px;

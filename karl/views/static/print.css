@@ -62,7 +62,7 @@ margin-top:0px;
 }
 
 html, body#login-wrapper {
-background:#FFFFFF;
+background:#FFFFFF !important;
 height:95%;
 }
 
@@ -78,13 +78,32 @@ width:50%;
 
 /* Calendar trim down. */
 
-.cal_header,
-.cal_footer,
-.cal_actions,
-.ui-selectmenu-menu {
-    display: none;
-    height: 0;
-    width: 0;
+.karl-calendar-printing .rightcol,
+.karl-calendar-printing .cal_header,
+.karl-calendar-printing .cal_footer,
+.karl-calendar-printing .cal_actions,
+.karl-calendar-printing .ui-selectmenu-menu {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+.karl-calendar-printing #cheader,
+.karl-calendar-printing #cwrapper,
+.karl-calendar-printing .ccontent,
+.karl-calendar-printing #main,
+.karl-calendar-printing #center {
+    background-color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+.karl-calendar-printing .karl-calendar-wide,
+.karl-calendar-printing .karl-calendar-narrow {
+    border-bottom: 1px solid #CECECE !important;
 }
 
+.karl-calendar-printing .ccontent,
+.karl-calendar-printing #cwrapper {
+    width: auto !important;
+}
 

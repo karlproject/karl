@@ -286,7 +286,7 @@ def _select_calendar_layout(context, request):
         calendar_format_class = 'karl-calendar-wide'
         calendar_layout_template = 'generic_layout'
     else:
-        calendar_format_class = None
+        calendar_format_class = 'karl-calendar-narrow'
         calendar_layout_template = 'community_layout'
     return dict(
         wide_calendar = wide_calendar,
