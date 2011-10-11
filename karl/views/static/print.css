@@ -87,6 +87,14 @@ width:50%;
     height: 0 !important;
     width: 0 !important;
 }
+.karl-calendar-printing .visual-portal-wrapper {
+    background-color: white !important;
+    margin: 0 20px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: auto !important;
+}
+.karl-calendar-printing #cleftcol,
 .karl-calendar-printing #cheader,
 .karl-calendar-printing #cwrapper,
 .karl-calendar-printing .ccontent,
@@ -96,14 +104,10 @@ width:50%;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
+    width: auto !important;
 }
 .karl-calendar-printing .karl-calendar-wide,
 .karl-calendar-printing .karl-calendar-narrow {
     border-bottom: 1px solid #CECECE !important;
-}
-
-.karl-calendar-printing .ccontent,
-.karl-calendar-printing #cwrapper {
-    width: auto !important;
 }
 
