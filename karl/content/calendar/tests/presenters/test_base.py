@@ -15,15 +15,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
-import sys
-import datetime
-import time
-import calendar
 from pyramid import testing
+import calendar
+import datetime
+import unittest
 
 
-class BasePresenterTests(unittest.TestCase):     
+class BasePresenterTests(unittest.TestCase):
     def setUp(self):
         calendar.setfirstweekday(calendar.SUNDAY)
 
@@ -68,6 +66,41 @@ class BasePresenterTests(unittest.TestCase):
         self.assertEqual(presenter.focus_datetime, focus_at)
         self.assertEqual(presenter.now_datetime, now_at)
 
+    def test_navigation_without_nav_params(self):
+        focus_at = datetime.datetime(2009, 8, 26)
+        now_at = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        presenter.prev_datetime = datetime.datetime(2009, 8, 25)
+        presenter.next_datetime = datetime.datetime(2009, 8, 27)
+        presenter._is_today_shown = lambda: False
+
+        presenter._init_navigation()
+        nav = presenter.navigation
+        self.assertEqual(nav.prev_url,
+            'http://example.com/abstract.html?year=2009&month=8&day=25')
+        self.assertEqual(nav.next_url,
+            'http://example.com/abstract.html?year=2009&month=8&day=27')
+
+    def test_navigation_with_nav_params(self):
+        focus_at = datetime.datetime(2009, 8, 26)
+        now_at = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for,
+            nav_params={'filter': 'X Y'})
+        presenter.prev_datetime = datetime.datetime(2009, 8, 25)
+        presenter.next_datetime = datetime.datetime(2009, 8, 27)
+        presenter._is_today_shown = lambda: False
+
+        presenter._init_navigation()
+        nav = presenter.navigation
+        self.assertEqual(nav.prev_url,
+            'http://example.com/abstract.html?year=2009&month=8&day=25'
+            '&filter=X+Y')
+        self.assertEqual(nav.next_url,
+            'http://example.com/abstract.html?year=2009&month=8&day=27'
+            '&filter=X+Y')
+
     # helpers
 
     def _makeOne(self, *args, **kargs):
@@ -84,7 +117,7 @@ class BaseEventTests(unittest.TestCase):
     def test_has_title_location_description_from_catalog_event(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent(
-                            title='foo', 
+                            title='foo',
                             description='bar',
                             location='baz'
                         )
@@ -95,28 +128,25 @@ class BaseEventTests(unittest.TestCase):
         self.assertEquals(event.description, catalog_event.description)
 
     # show_url
-    
+
     def test_show_url_defaults_to_pound(self):
-        day_on_listview = self._makeDay(2009, 9, 7) 
+        day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent()
-        
-        first_moment = datetime.datetime(2009, 9, 7)
-        last_moment  = datetime.datetime(2009, 9, 7)
 
         event = self._makeEvent(day_on_listview, catalog_event)
         self.assertEquals(event.show_url, '#')
 
     def test_show_url_can_be_assigned(self):
         day_on_listview = self._makeDay(2009, 9, 7)
-        catalog_event = DummyCatalogEvent() 
+        catalog_event = DummyCatalogEvent()
 
         event = self._makeEvent(day_on_listview, catalog_event,
-                                show_url='http://somewhere'  
+                                show_url='http://somewhere'
                                )
         self.assertEquals(event.show_url, 'http://somewhere')
-    
+
     # edit_url
-    
+
     def test_edit_url_defaults_to_pound(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent()
@@ -127,44 +157,44 @@ class BaseEventTests(unittest.TestCase):
     def test_edit_url_can_be_assigned(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent()
-        
-        event = self._makeEvent(day_on_listview, catalog_event, 
-                                edit_url='http://somewhere'  
+
+        event = self._makeEvent(day_on_listview, catalog_event,
+                                edit_url='http://somewhere'
                                )
         self.assertEquals(event.edit_url, 'http://somewhere')
-        
+
     # delete_url
-    
+
     def test_delete_url_defaults_to_pound(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent()
 
-        event = self._makeEvent(day_on_listview, catalog_event) 
+        event = self._makeEvent(day_on_listview, catalog_event)
         self.assertEquals(event.delete_url, '#')
 
     def test_delete_url_can_be_assigned(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent()
 
-        event = self._makeEvent(day_on_listview, catalog_event, 
-                                delete_url='http://somewhere'  
+        event = self._makeEvent(day_on_listview, catalog_event,
+                                delete_url='http://somewhere'
                                )
         self.assertEquals(event.delete_url, 'http://somewhere')
-        
+
     # first and last moment
-    
+
     def test_assigns_constrains_catalog_event_first_moment_within_day(self):
-        day_on_listview = self._makeDay(2009, 9, 7)                
-        
+        day_on_listview = self._makeDay(2009, 9, 7)
+
         starts_before_day = datetime.datetime(2009, 9, 5)
         catalog_event = DummyCatalogEvent(startDate=starts_before_day)
-        
+
         event = self._makeEvent(day_on_listview, catalog_event)
         self.assertEqual(event.first_moment, day_on_listview.first_moment)
 
     def test_assigns_constrains_catalog_event_last_moment_within_day(self):
         day_on_listview = self._makeDay(2009, 9, 7)
-        
+
         ends_after_day = datetime.datetime(2009, 9, 9)
         catalog_event = DummyCatalogEvent(endDate=ends_after_day)
 
@@ -174,38 +204,38 @@ class BaseEventTests(unittest.TestCase):
     # time_in_words
 
     def test_time_in_words_shows_all_day_for_events_over_entire_day(self):
-        day_on_list = self._makeDay(2009, 9, 7)                
+        day_on_list = self._makeDay(2009, 9, 7)
         catalog_event = DummyCatalogEvent(startDate=day_on_list.first_moment,
                                           endDate=day_on_list.last_moment)
-        
+
         event = self._makeEvent(day_on_list, catalog_event)
         self.assertEqual(event.time_in_words, 'all-day')
-    
+
     def test_time_in_words_shows_start_end_times_with_hh_colon_mm(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         starts_at = datetime.datetime(2009, 9, 7, 15, 15, 0) # 3:15pm
         ends_at   = datetime.datetime(2009, 9, 7, 15, 30, 0) # 3:30pm
-                        
+
         catalog_event = DummyCatalogEvent(startDate=starts_at,
                                           endDate=ends_at)
-        
+
         event = self._makeEvent(day_on_listview, catalog_event)
         self.assertEqual(event.time_in_words, '3:15pm - 3:30pm')
 
-    
+
     def test_time_in_words_shows_times_ending_in_00_without_00(self):
         day_on_listview = self._makeDay(2009, 9, 7)
         starts_at = datetime.datetime(2009, 9, 7, 15, 00, 0) # 3:00pm
         ends_at   = datetime.datetime(2009, 9, 7, 16, 00, 0) # 4:00pm
-                        
+
         catalog_event = DummyCatalogEvent(startDate=starts_at,
                                           endDate=ends_at)
-        
+
         event = self._makeEvent(day_on_listview, catalog_event)
         self.assertEqual(event.time_in_words, '3pm - 4pm')
-    
+
     # helpers
-    
+
     def _makeEvent(self, *args, **kargs):
         from karl.content.calendar.presenters.base import BaseEvent
         return BaseEvent(*args, **kargs)
@@ -234,15 +264,15 @@ class DummyCatalogEvent(object):
         self.title = title
         self.location = location
         self.description = description
-        
+
         if startDate is None:
             startDate = datetime.datetime.now()
         self.startDate = startDate
 
-        if endDate is None:       
+        if endDate is None:
             endDate = datetime.datetime.now()
         self.endDate = endDate
-        
+
         self._v_layer_color = 'blue'
         self._v_layer_title = 'Vacation'
-            
+

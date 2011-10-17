@@ -115,7 +115,7 @@ def _get_calendar_cookies(context, request):
         year = int(year)
         month = int(month)
         day = int(day)
-    except (AttributeError, TypeError, ValueError), exc:
+    except (AttributeError, TypeError, ValueError):
         viewtype, term, year, month, day = '', '', now.year, now.month, now.day
 
     # request parameters override the cookies
@@ -183,7 +183,7 @@ def _get_catalog_events(calendar, request,
         if layer_name and layer.__name__ != layer_name:
             continue
 
-        total, docids, resolver = searcher(
+        _total, docids, resolver = searcher(
             virtual={'query':layer.paths, 'operator':'or'},
             **search_params)
 
@@ -377,11 +377,19 @@ def show_list_view(context, request):
     page     = int(request.GET.get('page', 1))
     per_page = int(request.GET.get('per_page', 20))
 
+    nav_params = {}
+    filt = _calendar_filter(context, request)
+    if filt:
+        nav_params['filter'] = filt
+
     # make the calendar presenter for this view
     url_for = _make_calendar_presenter_url_func(context, request)
-    calendar = ListViewPresenter(focus_datetime,
-                                 now_datetime,
-                                 url_for)
+    calendar = ListViewPresenter(
+        focus_datetime,
+        now_datetime,
+        url_for,
+        nav_params,
+    )
     # Also make an event horizon for the selected term
     # (day, week or month)
     if not selection['term']:
@@ -478,7 +486,7 @@ def _get_all_calendar_categories(context, request):
 
     searcher = queryAdapter(context, ICatalogSearch)
     if searcher is not None:
-        total, docids, resolver = searcher(
+        _total, docids, resolver = searcher(
             allowed={'query': effective_principals(request), 'operator': 'or'},
             interfaces={'query':[ICalendarCategory],'operator':'or'},
             reverse=False,
@@ -1034,7 +1042,7 @@ def calendar_setup_categories_view(context, request):
                 virtual = categ_path,
                 )
             searcher = ICatalogSearch(context)
-            total, docids, resolver = searcher(**query)
+            _total, docids, resolver = searcher(**query)
             for event in [ resolver(x) for x in docids ]:
                 event.calendar_category = default_category_path
                 objectEventNotify(ObjectModifiedEvent(event))

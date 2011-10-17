@@ -16,12 +16,12 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import sys
 import datetime
 import calendar
 from pyramid import testing
 from karl.content.calendar.tests.presenters.test_base import dummy_url_for
-import karl.testing 
+import karl.testing
+
 
 class CalendarNavigationTests(unittest.TestCase):
     def setUp(self):
@@ -45,7 +45,7 @@ class CalendarNavigationTests(unittest.TestCase):
         self.assert_(navigation.today_url is None)
         self.assert_(navigation.next_url is None)
         self.assert_(navigation.prev_url is None)
-        
+
     # helpers
 
     def _makePresenter(self, *args, **kargs):
@@ -55,5 +55,4 @@ class CalendarNavigationTests(unittest.TestCase):
     def _makeNavigation(self, *args, **kargs):
         from karl.content.calendar.navigation import Navigation
         return Navigation(*args, **kargs)
-
 

@@ -10,12 +10,14 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from karl.content.calendar.navigation import Navigation 
+from karl.content.calendar.navigation import Navigation
+from pyramid.encode import urlencode
+
 
 class BasePresenter(object):
     '''
@@ -25,33 +27,39 @@ class BasePresenter(object):
     are used by the template.
 
     Constructor Arguments
-    
+
     ``focus_datetime``
 
-       A ``datetime`` containing the moment in time that the 
-       calendar will focus around.
+        A ``datetime`` containing the moment in time that the
+        calendar will focus around.
 
     ``now_datetime``
-    
-       A ``datetime`` containing the moment of "now".  
-     
+
+        A ``datetime`` containing the moment of "now".
+
     ``url_for``
-       
-       A function wrapping ``repoze.bfg.url.resource_url``, where the current 
-       context and request are already set.  A presenter often needs to
-       generate URLs, but the context and request are not its concern.
+
+        A function wrapping ``repoze.bfg.url.resource_url``, where the current
+        context and request are already set.  A presenter often needs to
+        generate URLs, but the context and request are not its concern.
+
+    ``nav_params``
+
+        An optional mapping (or list of two-item tuples) containing the
+        URL parameters that should be in all navigation links.
     '''
 
     name = 'abstract'
     title = ''
-    
-    def __init__(self, focus_datetime, now_datetime, url_for):
-        self.focus_datetime = focus_datetime
-        self.now_datetime   = now_datetime
 
-        self.url_for        = url_for
-        self.add_event_url  = self.url_for('add_calendarevent.html')
-        
+    def __init__(self, focus_datetime, now_datetime, url_for,
+            nav_params=None):
+        self.focus_datetime = focus_datetime
+        self.now_datetime = now_datetime
+        self.url_for = url_for
+        self.nav_params = nav_params
+
+        self.add_event_url = self.url_for('add_calendarevent.html')
         self._initialize()
 
     def _initialize(self):
@@ -105,33 +113,41 @@ class BasePresenter(object):
 
         # left side
         url = self.url_for(self.name + '.html')
-        format = '%s?year=%d&month=%d&day=%d'
+        fmt = '%s?year=%d&month=%d&day=%d%s'
 
-        nav.prev_url = format % (url, self.prev_datetime.year, 
+        if self.nav_params:
+            extra = '&%s' % urlencode(self.nav_params)
+        else:
+            extra = ''
+
+        nav.prev_url = fmt % (url, self.prev_datetime.year,
                                       self.prev_datetime.month,
-                                      self.prev_datetime.day)
+                                      self.prev_datetime.day,
+                                      extra)
 
-        nav.next_url = format % (url, self.next_datetime.year, 
+        nav.next_url = fmt % (url, self.next_datetime.year,
                                       self.next_datetime.month,
-                                      self.next_datetime.day)
-        
-        if not self._is_today_shown():                                      
-            nav.today_url = format % (url, self.now_datetime.year,
+                                      self.next_datetime.day,
+                                      extra)
+
+        if not self._is_today_shown():
+            nav.today_url = fmt % (url, self.now_datetime.year,
                                            self.now_datetime.month,
-                                           self.now_datetime.day)
-                                                      
+                                           self.now_datetime.day,
+                                           extra)
+
         self.navigation = nav
 
 
 class BaseEvent(object):
-    def __init__(self, day, catalog_event, 
+    def __init__(self, day, catalog_event,
                  show_url='#', edit_url='#', delete_url='#'):
 
-        self._day = day # DayOnListView                               
-        self._catalog_event = catalog_event # ICalendarEvent                               
+        self._day = day # DayOnListView
+        self._catalog_event = catalog_event # ICalendarEvent
 
-        self.color = catalog_event._v_layer_color 
-        self.layer = catalog_event._v_layer_title 
+        self.color = catalog_event._v_layer_color
+        self.layer = catalog_event._v_layer_title
 
         self.show_url = show_url
         self.edit_url = edit_url
@@ -145,7 +161,7 @@ class BaseEvent(object):
         self.title       = self._catalog_event.title
         self.location    = self._catalog_event.location
         self.description = self._catalog_event.description
-    
+
     def _init_first_moment(self):
         if self._catalog_event.startDate < self._day.first_moment:
             self.first_moment = self._day.first_moment
@@ -162,13 +178,13 @@ class BaseEvent(object):
     def time_in_words(self):
         same_first = (self.first_moment == self._day.first_moment)
         same_last  = (self.last_moment  == self._day.last_moment)
-        if same_first and same_last: 
+        if same_first and same_last:
             return 'all-day'
 
         starts = self._format_time_of_day(self.first_moment)
         ends   = self._format_time_of_day(self.last_moment)
         return '%s - %s' % (starts, ends) #=> "3pm - 3:30pm"
-   
+
     def _format_time_of_day(self, dt):
         ''' Format a time like "2pm" or "3:15pm". '''
         fmt = dt.strftime('%l:%M%p').lstrip(' ')

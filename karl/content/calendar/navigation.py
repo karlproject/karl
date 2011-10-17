@@ -10,12 +10,13 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from pyramid.renderers import get_renderer
+from pyramid.decorator import reify
 
 
 class Navigation(object):
@@ -24,12 +25,10 @@ class Navigation(object):
     '''
     def __init__(self, calendar_presenter):
         self._presenter = calendar_presenter
-        
+
         self._init_left_side()
         self._init_right_side()
 
-        self._init_template()
-    
     def _init_left_side(self):
         ''' [ Today ]  [ < ]  [ > ] '''
         self.today_url = None
@@ -38,25 +37,24 @@ class Navigation(object):
 
     def _init_right_side(self):
         ''' [ Day ]  [ Week ]  [ Month ]  [ List ] '''
-        format = '%s?year=%d&month=%d&day=%d' 
+        fmt = '%s?year=%d&month=%d&day=%d'
 
         for view_name in ('day', 'week', 'month', 'list'):
             url = self._presenter.url_for('%s.html' % view_name)
-            sub = (url, self._presenter.focus_datetime.year, 
-                        self._presenter.focus_datetime.month, 
+            sub = (url, self._presenter.focus_datetime.year,
+                        self._presenter.focus_datetime.month,
                         self._presenter.focus_datetime.day)
-            setattr(self, '%s_button_url' % view_name, 
-                    format % sub)
-            setattr(self, '%s_button_img' % view_name, 
-                    '%s_up.png' % view_name)
-            
+            setattr(self, '%s_button_url' % view_name, fmt % sub)
+            setattr(self, '%s_button_img' % view_name, '%s_up.png' % view_name)
+
         # Depress active button
-        setattr(self, '%s_button_img' % self._presenter.name, 
+        setattr(self, '%s_button_img' % self._presenter.name,
                       '%s_down.png'   % self._presenter.name)
-    
-    def _init_template(self):
+
+    @reify
+    def _template(self):
         path = 'karl.content.views:templates/calendar_navigation.pt'
-        self._template = get_renderer(path).implementation()
+        return get_renderer(path).implementation()
 
     @property
     def macros(self):

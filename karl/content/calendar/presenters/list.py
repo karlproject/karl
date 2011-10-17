@@ -10,35 +10,30 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import calendar
 import datetime
-import time
 from karl.content.calendar.presenters.base import BasePresenter
-from karl.content.calendar.presenters.base import BaseEvent
-from karl.content.calendar.navigation import Navigation  
-from karl.content.calendar.utils import MonthSkeleton
-from karl.content.calendar.utils import next_month
-from karl.content.calendar.utils import prior_month                   
+from karl.content.calendar.navigation import Navigation
 from karl.content.calendar.utils import is_all_day_event
+from pyramid.encode import urlencode
 
 class ListViewPresenter(BasePresenter):
     name = 'list'
-    
-    def _initialize(self):               
-        monthname = calendar.month_name[self.focus_datetime.month]
+
+    def _initialize(self):
+        # monthname = calendar.month_name[self.focus_datetime.month]
         self.title = "Upcoming Events"
-        self.feed_url = self.url_for('atom.xml')  
+        self.feed_url = self.url_for('atom.xml')
 
         self.events = []
         self.has_more = False
         self.per_page = 20
         self.page = 1
-        
+
     def _init_navigation(self):
         nav = Navigation(self)
 
@@ -47,7 +42,10 @@ class ListViewPresenter(BasePresenter):
                      self.focus_datetime.year,
                      self.focus_datetime.month,
                      self.focus_datetime.day,
-                     self.per_page)      
+                     self.per_page)
+
+        if self.nav_params:
+            base_url += '&%s' % urlencode(self.nav_params)
 
         # today_url
         if self.page == 1:
@@ -58,7 +56,7 @@ class ListViewPresenter(BasePresenter):
         # prev_url
         if self.page == 1:
             nav.prev_url = None
-        else:                                                
+        else:
             prev_page = self.page - 1
             nav.prev_url = base_url + ("&page=%d" % prev_page)
 
@@ -68,36 +66,36 @@ class ListViewPresenter(BasePresenter):
         else:
             next_page = self.page + 1
             nav.next_url = base_url + ("&page=%d" % next_page)
-            
-        self.navigation = nav    
 
-    
+        self.navigation = nav
+
+
     def paint_events(self, events):
         for event in events:
-            format = '%s?year=%d&month=%d&day=%d'
+            fmt = '%s?year=%d&month=%d&day=%d'
             dt = event.startDate
-            start_day_url = format % (self.url_for('day.html'),
+            start_day_url = fmt % (self.url_for('day.html'),
                                       dt.year, dt.month, dt.day)
 
             dt = event.endDate
-            end_day_url = format % (self.url_for('day.html'),
+            end_day_url = fmt % (self.url_for('day.html'),
                                     dt.year, dt.month, dt.day)
-            
+
             listed_event = Event(catalog_event=event,
                                  show_url=self.url_for(context=event),
                                  start_day_url=start_day_url,
                                  end_day_url=end_day_url
                            )
-            self.events.append(listed_event)          
+            self.events.append(listed_event)
 
     def paint_paginated_events(self, events, has_more, per_page, page):
         self.paint_events(events)
-        self.has_more = has_more                     
+        self.has_more = has_more
         self.per_page = per_page
         self.page = page
-        
-        self._init_navigation()    
-            
+
+        self._init_navigation()
+
 
     @property
     def template_filename(self):
@@ -105,11 +103,11 @@ class ListViewPresenter(BasePresenter):
 
 
 class Event(object):
-    def __init__(self, catalog_event, 
+    def __init__(self, catalog_event,
                  show_url='#', edit_url='#', delete_url='#',
                  start_day_url='#', end_day_url='#'):
 
-        self._catalog_event = catalog_event # ICalendarEvent                               
+        self._catalog_event = catalog_event # ICalendarEvent
 
         self.show_url = show_url
         self.edit_url = edit_url
@@ -120,17 +118,17 @@ class Event(object):
         self._init_properties()
         self._init_layer_properties()
         self._init_date_and_time_properties()
- 
+
     def _init_properties(self):
         self.title       = self._catalog_event.title
         self.location    = self._catalog_event.location
         self.description = self._catalog_event.description
 
     def _init_layer_properties(self):
-        self.color = self._catalog_event._v_layer_color 
+        self.color = self._catalog_event._v_layer_color
         self.layer = self._catalog_event._v_layer_title
-        
-    def _init_date_and_time_properties(self):    
+
+    def _init_date_and_time_properties(self):
         start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
         start_time = self._format_time_of_day(self._catalog_event.startDate)
 
@@ -145,7 +143,7 @@ class Event(object):
         else:
             if is_all_day_event(self._catalog_event):
                 one_day = datetime.timedelta(days=1)
-                ends_at = self._catalog_event.endDate - one_day 
+                ends_at = self._catalog_event.endDate - one_day
                 end_day = ends_at.strftime("%a, %b %e")
 
                 self.first_line_day   = start_day
