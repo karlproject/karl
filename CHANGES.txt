@@ -4,7 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed LP #874519: Clicking 'More Events' Resets Layer Selection
 
+- Fixed a series of IE bugs by restoring the doctype declaration
+  at the top of every page.
 
 3.72 (2011-09-29)
 -----------------

@@ -1,9 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal" 
-      metal:define-macro="master">
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
@@ -13,7 +12,7 @@
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
   <body id="login-wrapper">
-    <img src="${api.static_url}/images/login_gradient.gif" 
+    <img src="${api.static_url}/images/login_gradient.gif"
 	 id="login-gradient" alt="" />
     <div id="header-user-menu"></div>
     <div id="outer">

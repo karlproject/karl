@@ -1,8 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:define-macro="master">
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
   <head>
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
     <metal:resources use-macro="api.snippets.macros['css_resources']"/>
@@ -43,9 +42,9 @@
              tal:define="my_communities my_communities|();
                          tags tags|();
                         ">
-            
+
             <metal:portlets define-slot="portlets"></metal:portlets>
-            
+
             <div class="generic-portlet" id="popular-tags-portlet"
                  tal:condition="tags">
                 <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
@@ -62,10 +61,10 @@
                  >All ${profile.firstname}'s tags</a>
                 </div>
               </div>
-              
+
               <div tal:condition="my_communities and my_communities is not None"
                    metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
-              
+
               <div metal:define-macro="my_communities_portlet" class="generic-portlet"
                    tal:condition="my_communities is None" id="my-communities-portlet">
                 <h3>${profile.firstname}'s Communities</h3>
@@ -82,7 +81,7 @@
                 </div>
               </div>
         </div>
-          
+
         <div id="center" class="clearafter">
           <div metal:define-slot="content"> Content goes here. </div>
         </div>

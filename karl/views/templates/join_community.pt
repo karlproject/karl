@@ -1,6 +1,6 @@
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
   xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="api.community_layout.macros['master']">
+  metal:use-macro="api.community_layout">
 
   <div metal:fill-slot="content">
 

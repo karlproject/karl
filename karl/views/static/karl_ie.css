@@ -1,7 +1,7 @@
 .visual-portal-wrapper {
     width: 1003px;
 }
-img { 
+img {
     -ms-interpolation-mode:bicubic;
 }
 /* using bicubic for the login gradient causes a style issue */
@@ -39,23 +39,23 @@ img#login-gradient {
 * html #footer {
     width: 952px;
 }
-.portalMessage, 
-.portalWarningMessage, 
-.portalStopMessage, 
-.system-message, 
+.portalMessage,
+.portalWarningMessage,
+.portalStopMessage,
+.system-message,
 #error-handling,
 .kstatus_message {
     height: 1%;
     width: 600px;
 }
-* html .portalMessage, 
-* html .portalWarningMessage, 
-* html .portalStopMessage, 
-* html .system-message, 
+* html .portalMessage,
+* html .portalWarningMessage,
+* html .portalStopMessage,
+* html .system-message,
 * html #error-handling,
 * html .kstatus_message {
     width: 50em;
-}  
+}
 * html #inner .portalMessage {
     width: 478px;
 }
@@ -127,7 +127,7 @@ ul.karldropdown-menu {
 
 ol#references-listing li a.topLevelItem {
   margin-left: 8px;
-} 
+}
 
 /* feeds */
 .feedOptions {
@@ -452,7 +452,7 @@ button.addtag-button:hover span {
     height: 21px;
     z-index: 2;
 }
-    
+
 /* specific button color bg */
 .cheader button.normal_button span {
     background-color: #cedfef;

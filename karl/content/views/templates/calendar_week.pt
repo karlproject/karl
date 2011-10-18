@@ -1,6 +1,6 @@
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
   xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="getattr(api, calendar_layout_template).macros['master']">
+  metal:use-macro="getattr(api, calendar_layout_template)">
 
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">

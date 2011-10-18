@@ -1528,6 +1528,10 @@ span.loginLabelWrapper label {
 input#username {
   width: 370px;
 }
+input#password {
+  width: 200px;
+  margin-right: 8px;
+}
 
 /** =FORUMS
 ----------------------------------------------- */

@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
   xmlns:tal="http://xml.zope.org/namespaces/tal"
   xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="api.community_layout.macros['master']">
+  metal:use-macro="api.community_layout">
 
   <span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
       <a href="${api.here_url}wikitoc.html">Contents</a> |
