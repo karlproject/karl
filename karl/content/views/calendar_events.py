@@ -109,21 +109,27 @@ def _get_calendar_cookies(context, request):
     now = _now()
 
     # fetch the cookies
-    cookie = request.cookies.get(KARL_CALENDAR_COOKIE, '')
+    cookie = request.cookies.get(KARL_CALENDAR_COOKIE, ',,,,')
     try:
+        # cookie values are default if present
         viewtype, term, year, month, day = cookie.split(',')
+        # request parameters override the cookie values
+        viewtype = request.GET.get('viewtype', viewtype)
+        term = request.GET.get('term', term)
+        year = request.GET.get('year', year)
+        month = request.GET.get('month', month)
+        day = request.GET.get('day', day)
+        # conversions
         year = int(year)
         month = int(month)
         day = int(day)
+        # let's see if this is a real date
+        focus_datetime = datetime.datetime(year, month, day)
     except (AttributeError, TypeError, ValueError):
+        # If any error happened, today is assumed.
+        # Viewtype, term are set to '' meaning that the view will select it.
         viewtype, term, year, month, day = '', '', now.year, now.month, now.day
-
-    # request parameters override the cookies
-    viewtype = request.GET.get('viewtype', viewtype)
-    term = request.GET.get('term', term)
-    year = int(request.GET.get('year', year))
-    month = int(request.GET.get('month', month))
-    day = int(request.GET.get('day', day))
+        focus_datetime = now
 
     return dict(
         viewtype=viewtype,
@@ -131,6 +137,11 @@ def _get_calendar_cookies(context, request):
         year=year,
         month=month,
         day=day,
+        # focus_datetime and now_datetime are provided,
+        # because we have them already. Some functions use it.
+        # But it will not be updated or written to the cookie.
+        focus_datetime = focus_datetime,
+        now_datetime = now,
     )
 
 def _set_calendar_cookies(response, selection):
@@ -300,8 +311,8 @@ def _show_calendar_view(context, request, make_presenter, selection):
     calendar_layout = _select_calendar_layout(context, request)
 
     year, month, day = selection['year'], selection['month'], selection['day']
-    focus_datetime = datetime.datetime(year, month, day)
-    now_datetime   = _now()
+    focus_datetime = selection['focus_datetime']
+    now_datetime   = selection['now_datetime']
 
     # make the calendar presenter for this view
     url_for = _make_calendar_presenter_url_func(context, request)

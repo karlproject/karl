@@ -1562,6 +1562,58 @@ class ShowCalendarViewTests(unittest.TestCase):
         # check if calendar view has been made sticky
         self.assert_cookie(response, self.view_cookie, 'list,day,2010,5,12')
 
+
+    def test_list_request_illegal_date(self):
+        from karl.content.views import calendar_events
+        calendar_events._NOW = datetime.datetime(1969, 9, 23)
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest(params={
+            'year': '2010', 'month': '5', 'day': '35'})  # there is no such date
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        karl.testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        karl.testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_list.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_list_view
+        response = show_list_view(context, request)
+
+        # check if calendar view fell back to today after the error
+        self.assert_cookie(response, self.view_cookie, 'list,day,1969,9,23')
+
+
+    def test_list_cookie_illegal_date(self):
+        from karl.content.views import calendar_events
+        calendar_events._NOW = datetime.datetime(1969, 9, 23)
+        context = DummyCalendar(sessions=DummySessions())
+        context['1'] = DummyCalendarCategory('1')
+        context.catalog = self.site.catalog
+        request = testing.DummyRequest()
+        request.cookies[self.view_cookie] = 'calendar,,2010,5,35'    # No such date
+        request.environ['repoze.browserid'] = '1'
+        from webob.multidict import MultiDict
+        request.POST = MultiDict()
+        self._register()
+        karl.testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_navigation.pt')
+        karl.testing.registerDummyRenderer(
+            'karl.content.views:templates/calendar_list.pt')
+        self._registerSecurityWorkflow()
+
+        from karl.content.views.calendar_events import show_list_view
+        response = show_list_view(context, request)
+
+        # check if calendar view fell back to today after the error
+        self.assert_cookie(response, self.view_cookie, 'list,day,1969,9,23')
+
+
+
     def test_default(self):
         context = DummyCalendar(sessions=DummySessions())
         context['1'] = DummyCalendarCategory('1')
