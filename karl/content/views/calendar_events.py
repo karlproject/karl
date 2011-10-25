@@ -334,6 +334,9 @@ def _show_calendar_view(context, request, make_presenter, selection):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
+    # Remove the date fields from the selection: cannot serialize
+    del selection['focus_datetime']
+    del selection['now_datetime']
     api.karl_client_data['calendar_selection'] = selection
     response = render_to_response(
         calendar.template_filename,
@@ -429,6 +432,9 @@ def show_list_view(context, request):
 
     # render
     api = TemplateAPI(context, request, calendar.title)
+    # Remove the date fields from the selection: cannot serialize
+    del selection['focus_datetime']
+    del selection['now_datetime']
     api.karl_client_data['calendar_selection'] = selection
     response = render_to_response(
         calendar.template_filename,
