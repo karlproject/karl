@@ -382,8 +382,8 @@ def show_list_view(context, request):
     calendar_layout = _select_calendar_layout(context, request)
 
     year, month, day = selection['year'], selection['month'], selection['day']
-    focus_datetime = datetime.datetime(year, month, day)
-    now_datetime   = _now()
+    focus_datetime = selection['focus_datetime']
+    now_datetime   = selection['now_datetime']
 
     page     = int(request.GET.get('page', 1))
     per_page = int(request.GET.get('per_page', 20))
