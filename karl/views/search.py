@@ -121,7 +121,7 @@ def make_query(context, request):
         terms.append(option['name'])
 
     sort = params.get('sort')
-    if since:
+    if sort:
         option = sort_options[sort]
         query['sort_index'] = option['sort_index']
         query['reverse'] = option['reverse']
