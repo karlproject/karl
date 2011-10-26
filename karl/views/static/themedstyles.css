@@ -2694,7 +2694,8 @@ body .ui-state-default .karl-icon-loading {
 }
 
 /* layout without tools tab */
-.generic-layout .contentbar-wrapper {
+.generic-layout .contentbar-wrapper,
+.intranet-layout .contentbar-wrapper {
     margin-top: -8px;
 }
 
