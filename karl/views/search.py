@@ -120,6 +120,13 @@ def make_query(context, request):
         query['creation_date'] = (coarse_datetime_repr(since), None)
         terms.append(option['name'])
 
+    sort = params.get('sort')
+    if since:
+        option = sort_options[sort]
+        query['sort_index'] = option['sort_index']
+        query['reverse'] = option['reverse']
+        terms.append(option['name'])
+
     return query, terms
 
 
@@ -240,6 +247,20 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         option['selected'] = id == selected_since
         since_knob.append(option)
 
+    sort_knob = []
+    selected_sort = params.get('sort')
+    for id in sort_order:
+        option = sort_options[id].copy()
+        query = params.copy()
+        if id is not None:
+            query['sort'] = id
+        elif 'sort' in query:
+            del query['sort']
+        option['url'] = resource_url(context, request, request.view_name,
+                                  query=query)
+        option['selected'] = id == selected_sort
+        sort_knob.append(option)
+
     start_time = time.time()
     try:
         batch, terms = get_batch(context, request)
@@ -315,6 +336,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         batch_info=batch,
         kind_knob=kind_knob,
         since_knob=since_knob,
+        sort_knob=sort_knob,
         params=params,
         elapsed='%0.2f' % elapsed
         )
@@ -413,6 +435,28 @@ since_options = {
 
 since_order = (
     None, 'hour', 'day', 'week', 'month', 'year',
+)
+
+sort_options = {
+    None: {
+        'name': 'Default (by relevancy)',
+        'sort_index': None,
+        'reverse': False,
+    },
+    'newest': {
+        'name': 'Newest First',
+        'sort_index': 'creation_date',
+        'reverse': True,
+    },
+    'oldest': {
+        'name': 'Oldest First',
+        'sort_index': 'creation_date',
+        'reverse': False,
+    },
+}
+
+sort_order = (
+    None, 'newest', 'oldest',
 )
 
 facet_display_text = {

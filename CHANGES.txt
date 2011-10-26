@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- LP #824640:  Add sorting facets to advanced search view.
+
 - Fixed LP #874519: Clicking 'More Events' Resets Layer Selection
 
 - Fixed a series of IE bugs by restoring the doctype declaration
