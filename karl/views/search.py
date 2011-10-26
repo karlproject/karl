@@ -14,8 +14,23 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
 """Site and community search views"""
+import datetime
+import logging
+import time
+
+from dateutil.relativedelta import relativedelta
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.response import Response
+from pyramid.traversal import resource_path
+from pyramid.url import resource_url
+from repoze.lemonade.listitem import get_listitems
+from simplejson import JSONEncoder
+from zope.component import getMultiAdapter
+from zope.component import queryAdapter
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+from zope.index.text.parsetree import ParseError
 
 from karl.models.adapters import ZopeTextIndexContextualSummarizer
 from karl.models.interfaces import ICatalogSearch
@@ -24,10 +39,8 @@ from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
 from karl.utilities.groupsearch import default_group_search
-from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
-from karl.utils import get_content_type_name
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import get_content_type_name_and_icon
@@ -35,24 +48,8 @@ from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import ILiveSearchEntry
-from pyramid.security import effective_principals
-from pyramid.traversal import resource_path
-from pyramid.url import resource_url
-from repoze.lemonade.listitem import get_listitems
-from repoze.lemonade.content import get_content_types
-from simplejson import JSONEncoder
-from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
-from zope.component import queryAdapter
-from zope.component import queryMultiAdapter
-from zope.component import queryUtility
-from zope.component import getMultiAdapter
-from zope.index.text.parsetree import ParseError
-import datetime
-from dateutil.relativedelta import relativedelta
-import time
 
-import logging
+
 log = logging.getLogger(__name__)
 
 def _iter_userids(context, request, profile_text):
