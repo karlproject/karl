@@ -1,0 +1,221 @@
+<!DOCTYPE html> 
+<html> 
+ <head>
+ <meta charset="utf-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1"/> 
+ <title>Mobile KARL</title> 
+ <link rel="stylesheet"
+       href="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.css"
+       />  
+ <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+ <script src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>
+ <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+</head> 
+<body> 
+
+ <div id="home" data-role="page" class="type-index">
+
+  <div data-role="header" data-theme="f">
+   <h1>Pages</h1>
+  </div><!-- /header -->
+
+  <div data-role="content">
+
+   <ul data-role="listview" data-inset="true">
+    <li><a href="#communities">My Communities</a></li>
+    <li><a href="#feeds">Feeds</a></li>
+   </ul>
+
+  </div><!-- content -->	
+
+ </div><!-- #home -->
+
+ <div id="communities" data-role="page" class="type-index">
+
+  <div data-role="header" data-theme="f">
+   <h1>Communities</h1>
+  </div><!-- /header -->
+
+  <div data-role="content">
+    <p> communities here </p>
+  </div><!-- content -->	
+
+ </div><!-- #communities -->
+
+ <div id="feeds" data-role="page" class="type-index">
+
+  <div data-role="header" data-theme="f">
+   <h1>Feeds</h1>
+  </div><!-- /header -->
+
+  <div data-role="content">
+   <ul id="feed-events" data-role="listview">
+   </ul>
+  
+  </div><!-- content -->	
+
+ </div><!-- #feeds -->
+
+
+<script type="text/javascript">
+
+var kmobile = function () {
+
+    var
+        // ================================================================
+        // Module constants
+        // ================================================================
+        // ----------------------------------------------------------------
+        // Constant:    API_URL_PREFIX
+        //
+        // This value is rewritten to a blank string when the page is served
+        // from the Pyramid host/port.
+        // ----------------------------------------------------------------
+        //API_URL_PREFIX = 'http://karl.sorosny.org/', 
+        API_URL_PREFIX = 'http://localhost:6543/pg/', 
+
+        // ================================================================
+        // Module variables
+        // ================================================================
+
+        last_gen = -1,
+        last_index = -1,
+        //earliest_gen = 0,
+        //earliest_index = 0,
+
+        jqxhr_error = jqxhr_error_factory(),
+
+        xxx = null; // avoid trailing comma
+
+    // ====================================================================
+    // JSON query handlers
+    // ====================================================================
+
+    // --------------------------------------------------------------------
+    // Centralized jqxhr error handler factory
+    // --------------------------------------------------------------------
+
+    function jqxhr_error_factory(exception_msg, offline_msg, callback) {
+
+        if (!exception_msg) {
+            exception_msg = 'KARL server returned an exception';
+        }
+
+        if (!offline_msg) {
+            offline_msg = 'You are offline and KARL needs information ' +
+                          'from the internet; try again when you have a data ' +
+                          'connection';
+        }
+
+        var karl_down_msg = 'Could not retrieve data; a server used ' +
+                              'by KARL may be temporarily down, ' +
+                              'please try again later';
+
+        function handler(xhr, st, error) {
+            var online = window.navigator.onLine,
+                status_code = xhr.status,
+                msg;
+
+            if (!online) {
+                msg = offline_msg;
+            }
+            else if (status_code === 0) {
+                msg = karl_down_msg;
+            }
+            else {
+                msg = exception_msg;
+                msg = msg + ' (status: ' + status_code + ', ' + error + ')';
+            }
+
+            console.log(msg);
+
+            if (callback) {
+                callback();
+            }
+
+        } 
+
+        return handler;
+    }
+    // --------------------------------------------------------------------
+    // Fetch "latest" feed info.
+    // --------------------------------------------------------------------
+    function latest_feed_events(with_events) {
+        var api_url = API_URL_PREFIX + '/newest_feed_items.json' +
+                      '?newer_than=' + last_gen + ':' + last_index;
+                      
+        $.getJSON(api_url, function (data) {
+            last_gen = data[0];
+            last_index = data[1];
+            //earliest_gen = data[2];
+            //earliest_index = data[3];
+            with_events(data[4]);
+        }).error(jqxhr_error);
+    }
+
+    // ====================================================================
+    // View handlers and related utilities
+    // ====================================================================
+
+    function communities_create(div) {
+    }
+
+    function communities_show(div) {
+    }
+
+    function feeds_create(div) {
+    }
+
+    function feeds_show(div) {
+        var ul = $('#feed-events');
+        ul.listview().empty().listview('refresh');
+        latest_feed_events(function (events) {
+            $.each(events, function (i, q) {
+                var item = $('<li>' +
+                             '<img src="' + q.thumbnail + '" />' + 
+                             q.operation + ' '
+                             + q.content_type + ' ' +
+                             '<abbr class="timeago" title="' + q.timeago +
+                                '">XXX</abbr>' +
+                             '</li>');
+                ul.append(item);
+            });
+        });
+	    $('abbr.timeago').timeago();
+    }
+
+    // ====================================================================
+    // "Module" API (for consumtion by HTML script snippets.
+    //
+    // One API function per top-level "page" div per "pagecreate" or
+    // "pageshow", to be bound by the template.
+    // ====================================================================
+    return {
+        'communities_create': communities_create,
+        'communities_show': communities_show,
+        'feeds_create': feeds_create,
+        'feeds_show': feeds_show,
+        '_sentinel': null // avoid trailing comma
+    };
+
+}();
+
+$('#communities').bind('pagecreate', function () {
+    kmobile.communities_create($(this));
+});
+
+$('#communities').bind('pageshow', function () {
+    kmobile.communities_show($(this));
+});
+
+$('#feeds').bind('pagecreate', function () {
+    kmobile.feeds_create($(this));
+});
+
+$('#feeds').bind('pageshow', function () {
+    kmobile.feeds_show($(this));
+});
+
+</script>
+</body>
+</html>

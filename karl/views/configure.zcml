@@ -1802,6 +1802,16 @@
     name="restore"
     />
 
+  <!-- Mobile UI -->
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".mobile.home"
+    permission="view"
+    name="mobile.html"
+    renderer="templates/mobile.pt"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent
