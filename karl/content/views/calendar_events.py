@@ -167,32 +167,10 @@ def _default_dates_requested(context, request):
         endDate   = startDate + datetime.timedelta(hours=1)
     return startDate, endDate
 
-def _get_catalog_events(calendar, request,
-                        first_moment, last_moment, layer_name=None):
 
-    searcher = ICatalogSearch(calendar)
-    search_params = dict(
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-        interfaces=[ICalendarEvent],
-        sort_index='start_date',
-        reverse=False,
-        )
 
-    if first_moment:
-        end_date = (coarse_datetime_repr(first_moment), None)
-        search_params['end_date'] = end_date
-
-    if last_moment:
-        start_date = (None, coarse_datetime_repr(last_moment))
-        search_params['start_date'] = start_date
-
-    docids_seen = set()
-
-    events = []
-
-    for layer in _get_calendar_layers(calendar):
-        if layer_name and layer.__name__ != layer_name:
-            continue
+def _iterate_events_in_layer(layer, searcher, search_params,
+        docids_seen, docids_all, last_moment):
 
         _total, docids, resolver = searcher(
             virtual={'query':layer.paths, 'operator':'or'},
@@ -208,7 +186,7 @@ def _get_catalog_events(calendar, request,
                 # volatile, serves no purpose any more. It used to serve
                 # a purpose when the same event could only have
                 # been displayed once.
-                #
+
                 # It's important to perform a shallow copy of the event. A deep
                 # copy can leak out and try to copy the entire database through
                 # the parent reference
@@ -234,8 +212,53 @@ def _get_catalog_events(calendar, request,
                 in_list_view = last_moment is None
                 if not in_list_view and not all_day:
                     docids_seen.add(docid)
+                docids_all.add(docid)
 
-                events.append(event)
+                yield event
+
+
+
+def _get_catalog_events(calendar, request,
+                        first_moment, last_moment, layer_name=None):
+
+    searcher = ICatalogSearch(calendar)
+    search_params = dict(
+        allowed={'query': effective_principals(request), 'operator': 'or'},
+        interfaces=[ICalendarEvent],
+        sort_index='start_date',
+        reverse=False,
+        )
+
+    if first_moment:
+        end_date = (coarse_datetime_repr(first_moment), None)
+        search_params['end_date'] = end_date
+
+    if last_moment:
+        start_date = (None, coarse_datetime_repr(last_moment))
+        search_params['start_date'] = start_date
+
+    docids_seen = set()
+    docids_all = set()
+
+    events = []
+
+    this_calendar_layer = None
+    for layer in _get_calendar_layers(calendar):
+        if layer_name and layer.__name__ != layer_name:
+            continue
+        if layer.__name__ == '_default_layer_':
+            # We process this calendar's events in a separate
+            # run, after the whole cycle with the other layers has finished.
+            this_calendar_layer = layer
+            continue
+        events.extend(_iterate_events_in_layer(layer, searcher, search_params,
+            docids_seen, docids_all, last_moment))
+    # Default layer is always processed last
+    # because we do not want to add any event that has already
+    # been added in any other layer in the previous cycle.
+    if this_calendar_layer is not None:
+        events.extend(_iterate_events_in_layer(this_calendar_layer, searcher, search_params,
+            docids_all, set(), last_moment))
 
     # The result set needs to be sorted by start_date.
     # XXX maybe we can do this directly from the catalog?
