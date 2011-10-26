@@ -359,6 +359,10 @@ $.widget('karl.karlcalendarbuttons', {
                 }
             }
         });
+        // re-set the margin for this newly created element
+        this.element.find('a.ui-selectmenu').each(function () {
+                $(this).css('margin-top', '-4px');
+        });
 
     },
 
