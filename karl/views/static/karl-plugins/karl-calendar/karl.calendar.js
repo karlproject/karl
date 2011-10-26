@@ -268,16 +268,16 @@ $.widget('karl.karlcalendarbuttons', {
                 this.options.selection.year += 1;
             }
         } else if (term == 'week') {
-            d1 = new Date(selection.year, selection.month, selection.day);
+            d1 = new Date(selection.year, selection.month - 1, selection.day);
             d2 = new Date(d1.getTime() + direction * 7 * msecsInADay);
             this.options.selection.year = d2.getFullYear();
-            this.options.selection.month = d2.getMonth();
+            this.options.selection.month = d2.getMonth() + 1;
             this.options.selection.day = d2.getDate();
         } else if (term == 'day') {
-            d1 = new Date(selection.year, selection.month, selection.day);
+            d1 = new Date(selection.year, selection.month - 1, selection.day);
             d2 = new Date(d1.getTime() + direction * msecsInADay);
             this.options.selection.year = d2.getFullYear();
-            this.options.selection.month = d2.getMonth();
+            this.options.selection.month = d2.getMonth() + 1;
             this.options.selection.day = d2.getDate();
         }
         return this._change(evt);
