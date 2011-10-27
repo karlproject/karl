@@ -1014,5 +1014,50 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       </div>
     </metal:lock>
 
+
+    <metal:macro define-macro="show_referencemanual_tree">
+      <tal:items tal:repeat="item tree">
+        <li>
+          <span class="sortingArrows">
+            <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=up"
+            ><img width="9" height="6" border="0" alt="Move up" 
+                 src="${api.static_url}/images/arrowUp.gif" /></a>
+            <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=down"
+            ><img width="9" height="6" border="0" alt="Move down" 
+                 src="${api.static_url}/images/arrowDown.gif" /></a>
+          </span>
+          <a href="${item['href']}" 
+            class="topLevelItem">${item['title']}</a>
+          <tal:setup tal:define="ol_type_index ol_type_index + 1;">
+            <ol type="${ol_types[ol_type_index]}"
+                tal:condition="item['items']"
+                tal:define="tree item['items']">
+              <li metal:use-macro="api.snippets.macros['show_referencemanual_tree']" />
+            </ol>
+          </tal:setup>
+        </li>
+      </tal:items>
+    </metal:macro>
+
+
+    <metal:macro define-macro="viewall_referencemanual_tree">
+      <tal:items tal:repeat="item tree">
+      <li>
+        <strong>${item['title']}</strong>
+        <div class="kbody">
+          <span tal:replace="structure item['html']"/>
+        </div>
+        <tal:setup tal:define="ol_type_index ol_type_index + 1;">
+        <ol type="${ol_types[ol_type_index]}"
+            tal:condition="item['items']"
+            tal:define="tree item['items']">
+          <li metal:use-macro="api.snippets.macros['viewall_referencemanual_tree']" />
+        </ol>
+        </tal:setup>
+      </li>
+      </tal:items>
+    </metal:macro>
+
+
   </body>
 </html>
