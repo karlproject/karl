@@ -105,17 +105,17 @@ class ErrorPageFilter(object):
                 )
             error_text = NOTFOUND_MESSAGE if status == 404 else GENERAL_MESSAGE
             error_text %= {'system_name': self._system_name}
-            resp = render_template_to_response(
+            resp = render_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
-                error_message='Not Found',
-                static_url=static_url,
-                error_text=error_text,
-                home_url=home_url,
-                errorlog_url=errorlog_url,
-                traceback_info=None,
+                dict(error_message='Not Found',
+                     static_url=static_url,
+                     error_text=error_text,
+                     home_url=home_url,
+                     errorlog_url=errorlog_url,
+                     traceback_info=None)
                 )
             resp.status = status
             return resp(environ, start_response)
-
+        
         return resp(environ, start_response)
 
