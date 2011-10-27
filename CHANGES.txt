@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.73 (2011-10-27)
+-----------------
 
 - Fixed LP #874519: Clicking 'More Events' Resets Layer Selection
 
