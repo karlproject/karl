@@ -49,6 +49,7 @@ from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import IPhoto
 from karl.content.models.adapters import FlexibleTextIndexData
 from karl.models.catalog import CachingCatalog
+from karl.models.catalog import GranularIndex
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import IIndexFactory
 from karl.models.interfaces import IPeopleDirectory
@@ -56,11 +57,11 @@ from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ISite
 from karl.models.interfaces import ITextIndexData
-from karl.models.interfaces import IVirtualData
 from karl.models.interfaces import IUserAdded
 from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
+from karl.models.interfaces import IVirtualData
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
 from karl.utilities.groupsearch import WeightedQuery
@@ -425,12 +426,12 @@ class Site(Folder):
             'texts': CatalogTextIndex(get_textrepr),
             'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
             'allowed':CatalogKeywordIndex(get_allowed_to_view),
-            'creation_date': CatalogFieldIndex(get_creation_date),
-            'modified_date': CatalogFieldIndex(get_modified_date),
-            'content_modified': CatalogFieldIndex(get_content_modified_date),
-            'start_date': CatalogFieldIndex(get_start_date),
-            'end_date': CatalogFieldIndex(get_end_date),
-            'publication_date': CatalogFieldIndex(get_publication_date),
+            'creation_date': GranularIndex(get_creation_date),
+            'modified_date': GranularIndex(get_modified_date),
+            'content_modified': GranularIndex(get_content_modified_date),
+            'start_date': GranularIndex(get_start_date),
+            'end_date': GranularIndex(get_end_date),
+            'publication_date': GranularIndex(get_publication_date),
             'mimetype': CatalogFieldIndex(get_mimetype),
             'creator': CatalogFieldIndex(get_creator),
             'modified_by': CatalogFieldIndex(get_modified_by),
@@ -439,7 +440,7 @@ class Site(Folder):
             'lastfirst': CatalogFieldIndex(get_lastfirst),
             'member_name': CatalogTextIndex(get_member_name),
             'virtual':CatalogFieldIndex(get_virtual),
-            }
+        }
 
         for name, utility in getUtilitiesFor(IIndexFactory):
             indexes[name] = utility()
