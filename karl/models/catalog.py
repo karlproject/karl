@@ -337,7 +337,7 @@ class GranularIndex(CatalogFieldIndex):
             # Try to fill the range using coarse buckets first.
             # Use only buckets that completely fill the range.
             # For example, if start is 2 and level is 10, then we can't
-            # use bucket 0 only buckets 1 and greater are useful.
+            # use bucket 0; only buckets 1 and greater are useful.
             # Similarly, if end is 18 and level is 10, then we can't use
             # bucket 1; only buckets 0 and less are useful.
             if min is not None:
@@ -364,17 +364,21 @@ class GranularIndex(CatalogFieldIndex):
 
 
 def convert_to_granular(index, levels=(1000,)):
-    """Create a GranularIndex from a FieldIndex."""
+    """Create a GranularIndex from a FieldIndex.
+
+    Copies the data without resolving the objects.
+    """
     g = GranularIndex(index.discriminator, levels=levels)
-    g._fwd_index.update(index._fwd_index)
-    g._rev_index.update(index._rev_index)
-    g._num_docs.value = index._num_docs()
-    for value, docids in g._fwd_index.iteritems():
+    treeset = g.family.IF.TreeSet
+    for value, docids in index._fwd_index.iteritems():
+        g._fwd_index[value] = treeset(docids)
         for level, ndx in g._granular_indexes:
             v = value // level
             set = ndx.get(v)
             if set is None:
-                set = g.family.IF.TreeSet()
+                set = treeset()
                 ndx[v] = set
             set.update(docids)
+    g._rev_index.update(index._rev_index)
+    g._num_docs.value = index._num_docs()
     return g
