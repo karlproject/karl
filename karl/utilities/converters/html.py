@@ -15,19 +15,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+""" a stupid HTML to Ascii converter
 """
-a stupid HTML to Ascii converter
-
-$Id: html.py 1470 2006-03-04 16:12:51Z ajung $
-"""
-
+from encodings.aliases import aliases
 import re
 import StringIO
+
 from karl.utilities.converters.baseconverter import BaseConverter
 from karl.utilities.converters.entities import convert_entities
 from karl.utilities.converters.stripogram import html2text
 
+# See https://bugs.launchpad.net/karl3/+bug/877364
+if 'macintosh' not in aliases:
+    aliases['macintosh'] = aliases['macroman']
+
 charset_reg = re.compile('text/html.*?charset=(.*?)"', re.I|re.M)
+
 
 class Converter(BaseConverter):
 
