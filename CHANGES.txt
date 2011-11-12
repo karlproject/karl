@@ -7,7 +7,9 @@ Unreleased
 - Fixed LP #877364:  tolerate 'macintosh' encoding (ancient OS9-ism) when
   converting HTML to text.
 
-
+- Fixed LP #824631: Sped up search results involving a large time span
+  (such as "past year") using a new kind of index with multiple levels
+  of granularity. Also added an evolve script to perform the conversion.
 
 3.73 (2011-10-27)
 -----------------
