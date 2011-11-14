@@ -162,6 +162,17 @@ def searchresults_view(context, request):
         show_search_knobs=True,
         )
 
+def _author_profile_data(profiles, doc, docattr, request):
+    """helper for search results view to return author data"""
+    userid = getattr(doc, docattr, None)
+    if userid is not None:
+        author = profiles.get(userid)
+        if author is not None:
+            return {
+                'name': author.title,
+                'url': resource_url(author, request),
+                }
+
 def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
 
@@ -286,13 +297,10 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             else:
                 result['community'] = None
 
-            if hasattr(doc, 'creator'):
-                author = profiles.get(doc.creator)
-                if author is not None:
-                    result['author'] = {
-                        'name': author.title,
-                        'url': resource_url(author, request),
-                    }
+            # try modified by for author, and then try creator
+            result['author'] = (
+                _author_profile_data(profiles, doc, 'modified_by', request) or
+                _author_profile_data(profiles, doc, 'creator', request))
 
             results.append(result)
 
