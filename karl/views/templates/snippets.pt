@@ -985,9 +985,6 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     </div>
 
     <ul id="header-menu" metal:define-macro="header-menu">
-        <li id="header-calendar" tal:condition="False and api.user_is_staff">
-          <a href="${api.app_url}/offices/calendar">Calendar</a>
-        </li>
         <li>
           <a href="${api.app_url}/contentfeeds.html">Feeds</a>
         </li>
@@ -996,6 +993,9 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
         </li>
         <li id="header-people">
           <a href="${api.people_url}">People</a>
+        </li>
+        <li id="header-calendar" tal:condition="api.user_is_staff">
+          <a href="${api.app_url}/offices/calendar">Calendar</a>
         </li>
         <li id="header-tags" tal:condition="api.user_is_staff">
           <a href="${api.app_url}/tagcloud.html">Tags</a>
