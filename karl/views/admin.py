@@ -326,7 +326,7 @@ def site_announcement_view(context, request):
     if 'remove-site-announcement' in request.params:
         site = find_site(context)
         site.site_announcement = u''
-    api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
+    api = AdminTemplateAPI(context, request, 'Admin UI: Site Announcement')
     return dict(
         api=api,
         menu=_menu_macro()
@@ -600,7 +600,7 @@ class UploadUsersView(object):
         if errors:
             transaction.doom()
 
-        api = AdminTemplateAPI(context, request)
+        api = AdminTemplateAPI(context, request, 'Admin UI: Upload Users')
         api.error_message = '\n'.join(errors)
         api.status_message = '\n'.join(messages)
 
@@ -971,7 +971,7 @@ def rename_or_merge_user_view(request, rename_user=rename_user):
     Rename or merge users.
     """
     context = request.context
-    api=AdminTemplateAPI(context, request)
+    api=AdminTemplateAPI(context, request, 'Admin UI: Rename or Merge Users')
     old_username = request.params.get('old_username')
     new_username = request.params.get('new_username')
     if old_username and new_username:
