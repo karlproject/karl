@@ -838,7 +838,7 @@ class CalendarPortlet(NetworkEventsPortlet):
         # The network events portlet is different.  Everything is different.
         portlet = fragment_fromstring('<div class="generic-portlet"/>')
         heading = SubElement(portlet, 'h3')
-        heading.text = "Staff Calendar"
+        heading.text = self.context.title
 
         # Now the entries
         entries = self.entries
