@@ -13,6 +13,8 @@ Unreleased
 
 - Show staff calendar tab
 
+- Fixed LP #890419: show last modified not creator on search results
+
 3.73 (2011-10-27)
 -----------------
 
