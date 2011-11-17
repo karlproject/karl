@@ -11,9 +11,11 @@ Unreleased
   (such as "past year") using a new kind of index with multiple levels
   of granularity. Also added an evolve script to perform the conversion.
 
-- Show staff calendar tab
+- Show staff calendar tab.
 
-- Fixed LP #890419: show last modified not creator on search results
+- Fixed LP #890419: show last modified not creator on search results.
+
+- Change default calendar view from day -> month.
 
 3.73 (2011-10-27)
 -----------------

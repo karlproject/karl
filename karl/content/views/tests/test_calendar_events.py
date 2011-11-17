@@ -1630,10 +1630,10 @@ class ShowCalendarViewTests(unittest.TestCase):
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)
 
-        # Redirect is expected to the default view, which is 'day'.
+        # Redirect is expected to the default view, which is 'month'.
         from pyramid.url import resource_url
         self.assertEqual(response.status, '302 Found')
-        self.assertEqual(response.location, resource_url(context, request, 'day.html'))
+        self.assertEqual(response.location, resource_url(context, request, 'month.html'))
 
     def test_default_day(self):
         context = DummyCalendar(sessions=DummySessions())
@@ -1647,7 +1647,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         self._registerSecurityWorkflow()
 
         # Test with 'day' view selected as sticky
-        request.cookies[self.view_cookie] = 'day,,2010,5,12'
+        request.cookies[self.view_cookie] = 'calendar,day,2010,5,12'
 
         from karl.content.views.calendar_events import show_view
         response = show_view(context, request)

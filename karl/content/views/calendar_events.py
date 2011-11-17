@@ -494,7 +494,7 @@ def show_view(context, request):
             'month': 'month.html',
             'week': 'week.html',
             'day': 'day.html',
-            }.get(selection['term'], 'day.html')
+            }.get(selection['term'], 'month.html')
     response = HTTPFound(location=resource_url(context, request, view_name))
     _set_calendar_cookies(response, selection)
     return response
