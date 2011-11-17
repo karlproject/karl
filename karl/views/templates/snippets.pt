@@ -994,7 +994,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
         <li id="header-people">
           <a href="${api.people_url}">People</a>
         </li>
-        <li id="header-calendar" tal:condition="api.user_is_staff">
+        <li id="header-calendar" tal:condition="api.should_show_calendar_tab">
           <a href="${api.app_url}/offices/calendar">Calendar</a>
         </li>
         <li id="header-tags" tal:condition="api.user_is_staff">

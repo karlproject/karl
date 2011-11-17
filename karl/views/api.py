@@ -30,6 +30,7 @@ from pyramid.security import effective_principals
 from pyramid.traversal import quote_path_segment
 
 from pyramid.location import lineage
+from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -76,10 +77,11 @@ class TemplateAPI(object):
     countries = countries
     _form_field_templates = None
     _livesearch_options = None
+    _should_show_calendar_tab = None
 
     def __init__(self, context, request, page_title=None):
         self.settings = get_settings() or {}
-        site = find_site(context)
+        self.site = site = find_site(context)
         self.context = context
         self.request = request
         self.userid = authenticated_userid(request)
@@ -189,6 +191,23 @@ class TemplateAPI(object):
             if self._identity:
                 self._isStaff = gn in self._identity.get('groups')
         return self._isStaff
+
+    @property
+    def should_show_calendar_tab(self):
+        """whether to show the calendar tab in the header menu
+
+        user must be staff, and the calendar object must exist"""
+        if self._should_show_calendar_tab is None:
+            if not self.user_is_staff:
+                self._should_show_calendar_tab = False
+            else:
+                calendar_path = '/offices/calendar'
+                try:
+                    calendar = find_resource(self.site, calendar_path)
+                    self._should_show_calendar_tab = True
+                except KeyError:
+                    self._should_show_calendar_tab = False
+        return self._should_show_calendar_tab
 
     @property
     def current_intranet(self):

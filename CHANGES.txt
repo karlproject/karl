@@ -11,6 +11,8 @@ Unreleased
   (such as "past year") using a new kind of index with multiple levels
   of granularity. Also added an evolve script to perform the conversion.
 
+- Show staff calendar tab
+
 3.73 (2011-10-27)
 -----------------
 

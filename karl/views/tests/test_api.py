@@ -293,6 +293,33 @@ class TemplateAPITests(unittest.TestCase):
         # secrets are sent to client
         self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"kaltura": {"admin_secret": "123456789abcdef123456789abcdef12", "user_secret": "0123456789abcdef123456789abcdef1", "sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456"}};\n</script>')
 
+    def test_calendar_tab(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+
+        # not shown without staffness or calendar object
+        api = self._makeOne(context, request)
+        self.failIf(api.should_show_calendar_tab)
+
+        # not shown without calendar object
+        api._isStaff = True
+        delattr(api, '_should_show_calendar_tab')
+        self.failIf(api.should_show_calendar_tab)
+
+        # not shown without staffness
+        api._isStaff = False
+        delattr(api, '_should_show_calendar_tab')
+        offices = testing.DummyModel()
+        context['offices'] = offices
+        calendar = testing.DummyModel()
+        offices['calendar'] = calendar
+        self.failIf(api.should_show_calendar_tab)
+
+        # shown if calendar exists and user is staff
+        delattr(api, '_should_show_calendar_tab')
+        api._isStaff = True
+        self.failUnless(api.should_show_calendar_tab)
+
 
 class DummyTagQuery:
     def __init__(self, context, request):
