@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.74 (2011-11-17)
+-----------------
 
 - Fixed LP #877364:  tolerate 'macintosh' encoding (ancient OS9-ism) when
   converting HTML to text.
