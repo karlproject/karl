@@ -332,14 +332,15 @@ class ManageMembersFormController(object):
         context = self.context
         request = self.request
 
-        api = TemplateAPI(context, request)
+        page_title = u'Manage Community Members'
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         desc = ('Use the form below to remove members or to resend invites '
                 'to people who have not accepted your invitation to join '
                 'this community.')
         return {'api':api,
                 'actions':actions,
-                'page_title':'Manage Community Members',
+                'page_title':page_title,
                 'page_description':desc}
 
     def handle_cancel(self):
@@ -489,7 +490,8 @@ class AddExistingUserFormController(object):
 
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        api = TemplateAPI(context, request)
+        page_title = u'Add Existing %s Users' % system_name
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         desc = ('Type the first few letters of the name of the person you '
                 'would like to add to this community, select their name, '
@@ -497,7 +499,7 @@ class AddExistingUserFormController(object):
                 'along with the text of your invite.')
         return {'api':api,
                 'actions':actions,
-                'page_title':'Add Existing %s Users' % system_name,
+                'page_title':page_title,
                 'page_description':desc}
 
     def handle_submit(self, converted):
@@ -768,14 +770,15 @@ class InviteNewUsersFormController(object):
         request = self.request
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        api = TemplateAPI(context, request)
+        page_title = u'Invite New %s Users' % system_name
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         desc = ('Type email addresses (one per line) of people you would '
                 'like to add to your community. The short message below is '
                 'included along with the text of your invite.')
         return {'api':api,
                 'actions':actions,
-                'page_title':'Invite New %s Users' % system_name,
+                'page_title':page_title,
                 'page_description':desc}
 
     def handle_cancel(self):

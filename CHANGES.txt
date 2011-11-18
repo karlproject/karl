@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-
+- Fixed LP #883250: display proper page titles on member management pages.
 
 3.74 (2011-11-17)
 -----------------
