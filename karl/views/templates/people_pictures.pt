@@ -35,7 +35,7 @@
                      repeat['cell'].end and ' photoProfileEndRow' or '')">
               <div class="photoProfileImage">
                 <a title="${profile.title}" href="${cell['url']}">
-                  <img height="100" width="75" alt="${profile.title}" src="${cell['photo_url']}"/>
+                  <img alt="${profile.title}" src="${cell['photo_url']}"/>
                 </a>
               </div>
               <div class="profileInfoBox">

@@ -4,7 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
-- Fixed LP #883250: display proper page titles on member management pages.
+- Fixed LP #883250: display proper page titles on member management
+  pages.
+
+- resolve distorted pictures on people page #892357
+
 
 3.74 (2011-11-17)
 -----------------

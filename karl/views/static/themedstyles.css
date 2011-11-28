@@ -1427,11 +1427,11 @@ div.search_utility_bar {
   float: left;
   display: inline;
   margin: 10px;
+  height: 100px;
+  width: 75px;
 }
 .photoProfileImage img {
   border: none;
-  height: 100px;
-  width: 75px;
   -ms-interpolation-mode: bicubic; /* ie 7 */
 }
 .profileInfoBox {
