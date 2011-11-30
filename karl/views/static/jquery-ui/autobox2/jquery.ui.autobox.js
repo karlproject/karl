@@ -317,7 +317,7 @@ $.widget('ui.autobox3', {
         var holder=$('<ul class="autobox-hldr ui-helper-clearfix"></ul>')
             .append($('<li class="autobox-input"></li>')
             .append(input));
-        $.fn.resizableTextbox(input, $.extend(this.options.resizable, { min: input.attr('offsetWidth'), max: holder.width() }));
+        $.fn.resizableTextbox(input, $.extend(this.options.resizable, { min: input.outerWidth(), max: holder.width() }));
         return holder;
     },
 
