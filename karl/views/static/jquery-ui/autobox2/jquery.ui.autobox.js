@@ -317,7 +317,7 @@ $.widget('ui.autobox3', {
         var holder=$('<ul class="autobox-hldr ui-helper-clearfix"></ul>')
             .append($('<li class="autobox-input"></li>')
             .append(input));
-        $.fn.resizableTextbox(input, $.extend(this.options.resizable, { min: input.attr('offsetWidth'), max: holder.width() }));
+        $.fn.resizableTextbox(input, $.extend(this.options.resizable, { min: input.outerWidth(), max: holder.width() }));
         return holder;
     },
 
@@ -435,7 +435,7 @@ $.widget('ui.autobox3', {
             return;
         }
         this._unsetActive();
-        var el = $(el)
+        el = $(el);
         this.hovered = el;
         // Find the active parent, which is the li containing the hovered element
         this.active = el.is('li') ? el : el.parents('li').eq(0);
@@ -444,7 +444,7 @@ $.widget('ui.autobox3', {
         this.active.addClass('active');
         // do the selection
         this.input.trigger("itemSelected.autobox", [$.data(this.active[0], "originalObject")]);
-        this._handleActive()
+        this._handleActive();
     },
 
     _handleActive: function() {

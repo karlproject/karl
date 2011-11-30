@@ -237,7 +237,9 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             this.typed = typed;
             this.pre_match = this.text;
             this.match = this.post_match = '';
-            if (!this.ajax && !typed || typed.length == 0) { return true; }
+            if (!this.ajax && !typed || typed.length === 0) {
+                return true;
+            }
             var match_at = this.text.search(new RegExp("\\b" + typed, "i"));
             if (match_at != -1) {
                 this.pre_match = this.text.slice(0,match_at);
@@ -348,7 +350,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
 
     _validateTag: function(tag) {
         if (this.options.validateRegexp) {
-            if (tag.match(this.options.validateRegexp) == null) {
+            if (tag.match(this.options.validateRegexp) === null) {
                 return 'Value contains characters that are not allowed in a tag.';
             }
         }
@@ -477,8 +479,8 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
     _appendStatusWithBubble: function(message, bubble) {
         // clone the bubble and remove the input from it
         // to avoid collision in case it gets submitted in form
-        bubble = $(bubble).clone()
-        bubble.find('input').remove()
+        bubble = $(bubble).clone();
+        bubble.find('input').remove();
         var fullmessage = $('<span class="message-span"></span><span class="bubble-span"></span>');
         fullmessage.eq(0).text(message);
         fullmessage.eq(1).append(bubble);
@@ -512,7 +514,9 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
 
 
         // populate additional methods from options
-        if (this.options.validateTag) this._validateTag = this.options.validateTag;
+        if (this.options.validateTag) {
+            this._validateTag = this.options.validateTag;
+        }
     },
 
     _updateList: function(list){
@@ -521,10 +525,11 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         $.ui.autobox3.prototype._updateList.call(this, list);
         if (this.options.selectFirst) {
             // is there at least one selectable in the list?
-            if ($("> *", this.container).length > 0) {
+            var children = $("> *", this.container);
+            if (children.length > 0) {
                 // Select the first element
-                this.selected = 0;
-                this._select();
+                this.active = children.eq(0);
+                this.active.addClass('active');
             }
         }
     },
@@ -571,16 +576,18 @@ $.widget('ui.karlmemberbox', $.extend({}, $.ui.karltagbox.prototype, {
                 id: record.id
             };
         },
-        getBoxOnEnter: function() {return this._getBoxFromSelection()},
+        getBoxOnEnter: function() {
+            return this._getBoxFromSelection();
+        },
         snippets: Karl.makeSnippets({
             '': 
-                '<li id="<%= _wid %>" class="bit-box">'
-                + '<span>'
-                + '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>'
-                + '<a href="#" class="closebutton"></a>'
-                + '<input type="hidden" name="<%= _name %>" value="<%= id %>" />'
-                + '</span>'
-                + '</li>'
+                '<li id="<%= _wid %>" class="bit-box">' +
+                '<span>' +
+                '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
+                '<a href="#" class="closebutton"></a>' +
+                '<input type="hidden" name="<%= _name %>" value="<%= id %>" />' +
+                '</span>' +
+                '</li>'
         })
 
     })
