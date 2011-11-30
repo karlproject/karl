@@ -525,10 +525,11 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         $.ui.autobox3.prototype._updateList.call(this, list);
         if (this.options.selectFirst) {
             // is there at least one selectable in the list?
-            if ($("> *", this.container).length > 0) {
+            var children = $("> *", this.container);
+            if (children.length > 0) {
                 // Select the first element
-                this.selected = 0;
-                this._select();
+                this.active = children.eq(0);
+                this.active.addClass('active');
             }
         }
     },
