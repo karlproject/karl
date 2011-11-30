@@ -38,7 +38,7 @@ requires = [
     'lxml',
     'markdown2',
     'python-dateutil',
-    'PILwoTk',
+    'Pillow',
     'pyramid',
     'pyramid_zcml',
     'pyramid_formish',
