@@ -1008,17 +1008,23 @@ def get_target_folders(context):
     if not context_path.startswith(root_path):
         return None
 
-
     query = ICatalogSearch(context)
     total, docids, resolver = query(
         path = root_path,
         interfaces = (ICommunityFolder, ),
         )
-    target_items = [
-        dict(
-            path = catalog.document_map.address_for_docid(docid),
-            title = resolver(docid).title,    # XXX rather use metadata here??
-            ) for docid in docids]
+    target_items = []
+    for docid in docids:
+        path = catalog.document_map.address_for_docid(docid)
+        # XXX rather use metadata here?? (for performance)
+        # also, we tolerate and log each possible catalog hiccup
+        title = getattr(resolver(docid), 'title', None)
+        if title is None:
+            #log.error('get_target_folders catalog hiccup, docid=%r, path=%r, request_url=%r' %
+            #    (docid, path, context_path))
+            continue
+        target_items.append(dict(path=path, title=title))
+
     # sorting is important for the client visualization
     target_items.sort(key=lambda item: item['path'])
 
