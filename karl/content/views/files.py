@@ -945,7 +945,7 @@ def ajax_file_reorganize_delete_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error('ajax_file_reorganize_delete_view error at filename="%s": %s' %
+        log.warning('ajax_file_reorganize_delete_view error at filename="%s": %s' %
             (exc.filename, str(exc)))
         transaction.doom()
     finally:
