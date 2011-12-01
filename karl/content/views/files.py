@@ -1020,8 +1020,8 @@ def get_target_folders(context):
         # also, we tolerate and log each possible catalog hiccup
         title = getattr(resolver(docid), 'title', None)
         if title is None:
-            #log.error('get_target_folders catalog hiccup, docid=%r, path=%r, request_url=%r' %
-            #    (docid, path, context_path))
+            log.warn('get_target_folders catalog hiccup, docid=%r, path=%r, request_url=%r' %
+                (docid, path, context_path))
             continue
         target_items.append(dict(path=path, title=title))
 
