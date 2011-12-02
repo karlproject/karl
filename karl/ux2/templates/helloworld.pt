@@ -1,0 +1,206 @@
+<metal:block use-macro="lm.layout('community')">
+    <metal:content fill-slot="content">
+
+        <header>
+            <h1>A Very Important Page</h1>
+            <small>
+                <time datetime="2011-11-15" pubdate="">Tuesday, November 15th, 2011</time> by <a href="#" title="Posts by Paul Everit" rel="author">Paul Everit</a>.
+            </small>
+            <tal:actions_menu
+                    tal:content="lm.component('bottlecap.actions_menu')">
+        </header>
+        <p class="description">
+            Cras justo odio, dapibus ac facilisis in, egestas eget
+            quam.
+            Nullam quis risus eget urna mollis ornare vel eu leo.
+            Praesent
+            commodo cursus magna, vel scelerisque nisl consectetur et.
+        </p>
+        <div>
+            <tal:actions_menu
+                    tal:content="lm.component('helloworld.test_component')">
+        </div>
+        <div class="contentText">
+
+            <section>
+                <h2>Notifications</h2>
+                <div class="notification info">
+                    The <code>notification</code> CSS class, can also contain <a href="#">links</a> - used to
+                    give the user temporary status messages.
+                    <p>
+                        This is <code>info</code> notification type.
+                    </p>
+                </div>
+                <div class="notification alert">
+                    This is <code>alert</code> notification type.
+                </div>
+            </section>
+
+            <section>
+                <h1>Headline h1</h1>
+                <figure class="image-left">
+                    <img src="http://lorempixum.com/251/155/people" alt="" />
+                    <figcaption>Just a test caption</figcaption>
+                </figure>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+                <h2>Headline h2</h2>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+                <h3>Headline h3</h3>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+                <h4>Headline h4</h4>
+                <figure class="image-right">
+                    <img src="http://lorempixum.com/155/251/nature" alt="" />
+                </figure>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+                <h5>Headline h5</h5>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+                <h6>Headline h6</h6>
+                <aside>
+                    This is an aside block with tangible information, related
+                    to the main content, but that can easily be tossed away
+                    without the text loosing it's meaning.<br/>
+                    Donec sed odio dui. Aenean lacinia bibendum nulla sed
+                    consectetur.
+                    Nullam quis risus eget urna mollis ornare vel eu leo. Cum
+                    sociis.
+                </aside>
+                <p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+                esse molestie consequat, vel illum dolore eu feugiat nulla
+                facilisis at vero eros et accumsan et iusto odio dignissim qui
+                blandit praesent luptatum zzril delenit augue duis dolore te
+                feugait nulla facilisi.</p>
+            </section>
+
+            <section>
+                <h2>Lists</h2>
+                <ul>
+                    <li>Unordered list element 1
+                        <ul>
+                            <li>Unordered list subelement 1</li>
+                        </ul>
+                    </li>
+                    <li>Unordered list element 2</li>
+                    <li>Unordered list element 3</li>
+                </ul>
+
+                <ol>
+                    <li>Ordered list element 1
+                        <ol><li>Ordered list subelement 1</li></ol>
+                    </li>
+                    <li>Ordered list element 2</li>
+                    <li>Ordered list element 3</li>
+                </ol>
+
+                <dl>
+                    <dt>Definition list term</dt>
+                    <dd>Definition List description, Lorem ipsum dolor sit
+                    amet, consectetuer adipiscing elit. Quisque odio sem,
+                    aliquam ut, suscipit at, aliquet non, justo. </dd>
+                    <dt>Another Definition list term</dt>
+                    <dd>Another Definition List description, Lorem ipsum dolor
+                    sit amet, consectetuer adipiscing elit. Quisque odio sem,
+                    aliquam ut, suscipit at, aliquet non, justo. </dd>
+                </dl>
+            </section>
+
+            <section>
+                <h2>Tables</h2>
+
+                <table class="listing" id="someid" summary="">
+                    <thead>
+                        <tr>
+                            <th>Table heading</th>
+                            <th>Another heading</th>
+                            <th>Another heading</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="odd">
+                            <td>Odd table item</td>
+                            <td>Item 1</td>
+                            <td>Another item</td>
+                        </tr>
+                        <tr class="even">
+                            <td>Even table item</td>
+                            <td>Item 2</td>
+                            <td>Yet another item</td>
+                        </tr>
+                        <tr class="odd">
+                            <td>Odd table item</td>
+                            <td>Item 3</td>
+                            <td>And one more item</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>A form</h2>
+
+                <form>
+                    <fieldset>
+                        <legend>Fieldset legend</legend>
+
+                        <div class="field">
+                            <label for="onefield">Text field</label>
+                            <span class="formHelp">
+                                This is the help for this form field. And <a href="#">links are also possible</a>.
+                            </span>
+                            <input type="text" id="onefield" required="required" placeholder="Some content">
+                        </div>
+
+                        <div class="field">
+                            <label for="anotherfield">Text area</label>
+                            <textarea name="anotherfield" id="anotherfield">
+                                Duis autem vel eum iriure dolor in hendrerit in
+                                vulputate velit esse molestie consequat, vel illum
+                                dolore eu feugiat nulla facilisis at vero eros et
+                                accumsan et iusto odio dignissim qui blandit praesent
+                                luptatum zzril delenit augue duis dolore te feugait
+                                nulla facilisi.
+                            </textarea>
+                        </div>
+                        <div class="formControls">
+                            <input type="submit" value="Submit" />
+                            <input type="cancel" value="Cancel" />
+                            <button type="submit">Submit button</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </section>
+        </div>
+        <footer>
+            <ul class="keywords">
+                <li><a href="#">flyers</a></li>
+                <li><a href="#">park</a></li>
+                <li><a href="#">volunteer</a></li>
+            </ul>
+            <form action="#" class="addKeyword">
+                <fieldset>
+                    <input type="text" name="keyword" placeholder="A keyword to add" />
+                    <button type="submit">Add keyword</button>
+                </fieldset>
+            </form>
+        </footer>
+    </metal:content>
+</metal:block>

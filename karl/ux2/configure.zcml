@@ -1,0 +1,31 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <view
+    for="*"
+    view=".helloworld.helloworld_view"
+    name="helloworld.html"
+    renderer="templates/helloworld.pt"
+  />
+
+  <view
+    for="*"
+    view=".helloworld.testpage_view"
+    name="test"
+    renderer="templates/testpage_view.pt"
+    />
+
+  <view
+    for="*"
+    view=".helloworld.test_component"
+    name="helloworld.test_component"
+    renderer="templates/testcomponent.pt"
+    />
+
+  <view
+    for="*"
+    view=".layout.global_nav"
+    name="global_nav"
+    renderer="templates/global_nav.pt"
+    />
+
+</configure>

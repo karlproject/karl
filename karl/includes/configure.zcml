@@ -2,6 +2,7 @@
 
   <include package="pyramid_zcml" />
   <include package="karl.views" />
+  <include package="karl.ux2" />
   <include package="karl.models"/>
   <include package="karl.utilities"/>
   <include package="karl.security"/>

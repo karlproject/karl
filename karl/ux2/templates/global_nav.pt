@@ -1,0 +1,42 @@
+<nav>
+    <h1 class="sitetitle">
+        <a href="#" title="KARL home page">
+            <img src="${lm.bottlecap_static}img/logo.png"
+                 width="25" height="26" alt="KARL logo" />
+            KARL
+        </a>
+    </h1>
+    <div data-quickpanel="quickpanel" class="topNavIconWrapper">
+        <h2 id="navigation-toggle" class="quickpanel-toggle ir">Navigation</h2>
+        <ul id="global-nav" class="quickpanel">
+            <li tal:repeat="menu lm.global_nav_menus"
+                    tal:attributes="class menu.selected">
+                <a href="#">${menu.title}</a>
+            </li>
+            <li data-quickpanel="quickpanel">
+                <a href="#" class="quickpanel-toggle ir">More</a>
+                <div class="quickpanel">
+                    <figure>
+                        <img src="http://lorempixum.com/64/64/" alt="" />
+                    </figure>
+                    <p>The dropdowns can contain any information you
+                    want, including images, lists and plain text.</p>
+                    <ul>
+                        <li><a href="#">Cursus Ridiculus Nibh</a></li>
+                        <li><a href="#">Pellentesque Ligula</a></li>
+                        <li><a href="#">Dapibus Etiam Sollicitudin Tristique</a></li>
+                        <li><a href="#">Cursus</a></li>
+                    </ul>
+                    <p>Morbi leo risus, porta ac consectetur ac,
+                    vestibulum at eros. <a href="#">Curabitur</a> blandit tempus
+                    porttitor. Cras mattis consectetur purus sit amet
+                    fermentum. Aenean lacinia bibendum nulla sed
+                    consectetur.</p>
+                    <div class="quickpanel-footer">
+                        The footer area of the dropdown.
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
