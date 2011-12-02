@@ -33,6 +33,7 @@ except IOError:
 
 requires = [
     'appendonly',
+    'Chameleon>=2.0',
     'feedparser',
     'icalendar',
     'lxml',
