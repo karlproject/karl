@@ -37,6 +37,7 @@ from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 
 from karl.consts import countries
+from karl.consts import cultures
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import ICatalogSearch
@@ -100,6 +101,7 @@ websites_field = schemaish.Sequence(
 languages_field = schemaish.String()
 photo_field = schemaish.File()
 biography_field = schemaish.String()
+date_format_field = schemaish.String(title='Preferred Date Format')
 
 class EditProfileFormController(object):
     """
@@ -123,6 +125,7 @@ class EditProfileFormController(object):
         "office",
         "room_no",
         "biography",
+        "date_format",
     ]
 
     def __init__(self, context, request):
@@ -154,7 +157,8 @@ class EditProfileFormController(object):
                   ('websites', websites_field),
                   ('languages', languages_field),
                   ('biography', biography_field),
-                  ('photo', photo_field)]
+                  ('photo', photo_field),
+                  ('date_format', date_format_field)]
         return fields
 
     def form_widgets(self, fields):
@@ -182,6 +186,7 @@ class EditProfileFormController(object):
                        image_thumbnail_default=default_icon,
                        show_remove_checkbox=show_remove_checkbox),
                    'biography': karlwidgets.RichTextWidget(empty=''),
+                   'date_format': formish.SelectChoice(options=cultures),
                    }
         return widgets
 
@@ -202,6 +207,7 @@ class EditProfileFormController(object):
                     'languages': context.languages,
                     'photo': self.photo,
                     'biography': context.biography,
+                    'date_format': context.date_format,
                     }
         return defaults
 

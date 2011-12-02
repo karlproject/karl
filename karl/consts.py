@@ -276,3 +276,9 @@ countries = Countries([
     ('ZM', 'Zambia'),
     ('ZW', 'Zimbabwe'),
 ])
+
+cultures = Countries([
+    ('en-US', 'US'),
+    ('en-GB', 'European'),
+])
+
