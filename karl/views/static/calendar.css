@@ -929,9 +929,9 @@ select.category_paths {
 .tooltip {
   display: none;
   font-size: 110%;
-  height: 71px;
-  width: 150px;
-  padding: 5px;
+  height: 56px;
+  width: 140px;
+  padding: 5px 5px 20px;
   color: #333;
   z-index: 100;
   line-height: 1.2em;

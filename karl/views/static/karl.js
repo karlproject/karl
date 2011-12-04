@@ -2332,6 +2332,24 @@ function scrollToTime() {
   $("#cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
 }
 
+
+/* My tooltip: add a wrapper so we can handle 
+ * the overflow correctly */
+$.fn.myTooltip = function(options) {
+    return this.each(function() {
+        var el = $(this);
+        var tt = el.next();
+        var wrapper = $('<div></div>')
+            .height(tt.height())
+            .css('overflow', 'hidden');
+        tt.wrapInner(wrapper);
+        el.tooltip(options);
+    });
+};
+
+
+
+
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
@@ -2358,7 +2376,7 @@ function initCalendar() {
 
   // MONTH VIEW - hover to show (+) icon to add events
   $("#cal_month td").hover(mouseOverDay, mouseOutDay);
-  $("#cal_month .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
+  $("#cal_month .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
 
   // WEEK/DAY VIEW - 
   var scrollHours = $("#cal_hours_scroll");
@@ -2369,8 +2387,8 @@ function initCalendar() {
   // Week tooltips
   var calScroll = $("#cal_scroll");
   if (calScroll.hasClass('cal_week')) {
-    $("#all_day .with_tooltip").tooltip({ tip: '.tooltip', offset: [8, -48], predelay: 250});
-    $("#cal_scroll .cal_hour_event .with_tooltip").tooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
+    $("#all_day .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, -48], predelay: 250});
+    $("#cal_scroll .cal_hour_event .with_tooltip").myTooltip({ tip: '.tooltip', offset: [12, 5], predelay: 250});
   }
 
   var here_url = $("#karl-here-url").eq(0).attr('content');
