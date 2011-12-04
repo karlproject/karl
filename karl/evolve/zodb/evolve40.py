@@ -12,4 +12,5 @@ def evolve(site):
             'start_date', 'end_date', 'publication_date']:
         index = catalog[name]
         if not isinstance(index, GranularIndex):
+            print "Converting field index '%s' to GranularIndex..." % name
             catalog[name] = convert_to_granular(index)
