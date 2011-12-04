@@ -254,10 +254,11 @@ def _get_user_home_path(context, request):
     return target, subpath
 
 def get_user_date_format(context, request):
-    default_date_format = "en-US"
+    default_date_format= get_setting(context, 'date_format', 'en-US')
+
     userid = authenticated_userid(request)
     if userid is None:
-        return None, None
+        return default_date_format
 
     site = find_site(context)
     profiles = find_profiles(site)
