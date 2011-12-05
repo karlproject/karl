@@ -499,6 +499,11 @@ def show_list_view(context, request):
     del selection['focus_datetime']
     del selection['now_datetime']
     api.karl_client_data['calendar_selection'] = selection
+    may_create = has_permission(CREATE, context, request)
+    if may_create:
+        mailto_create_event_href = None
+    else:
+        mailto_create_event_href = _get_mailto_create_event_href()
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -511,7 +516,9 @@ def show_list_view(context, request):
             selected_layer = selected_layer,
             layers = layers,
             quote = quote,
-            may_create = has_permission(CREATE, context, request)),
+            may_create = may_create,
+            mailto_create_event_href = mailto_create_event_href,
+            ),
         request=request,
     )
     _set_calendar_cookies(response, selection)
