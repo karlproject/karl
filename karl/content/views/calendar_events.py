@@ -73,6 +73,7 @@ from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
+from karl.views.utils import format_mailto_href
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
@@ -329,6 +330,27 @@ def _select_calendar_layout(context, request):
     )
 
 
+def _get_mailto_create_event_href():
+    mailto_info = dict(
+        subject = 'Add event request',
+        to = 'admin@foo.bar',
+        body = """\
+Dear Administrator,
+
+Please create the following event:
+
+====================
+ADD INFORMATION HERE
+====================
+
+
+Thank you
+""",
+        )
+
+    return format_mailto_href(mailto_info)
+
+
 def _show_calendar_view(context, request, make_presenter, selection):
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
@@ -361,6 +383,11 @@ def _show_calendar_view(context, request, make_presenter, selection):
     del selection['focus_datetime']
     del selection['now_datetime']
     api.karl_client_data['calendar_selection'] = selection
+    may_create = has_permission(CREATE, context, request)
+    if may_create:
+        mailto_create_event_href = None
+    else:
+        mailto_create_event_href = _get_mailto_create_event_href()
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -373,7 +400,9 @@ def _show_calendar_view(context, request, make_presenter, selection):
             selected_layer = selected_layer,
             layers = layers,
             quote = quote,
-            may_create = has_permission(CREATE, context, request)),
+            may_create = may_create,
+            mailto_create_event_href=mailto_create_event_href,
+            ),
         request=request,
     )
     return response
