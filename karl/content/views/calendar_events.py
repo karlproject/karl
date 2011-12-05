@@ -332,19 +332,29 @@ def _select_calendar_layout(context, request):
 
 def _get_mailto_create_event_href():
     mailto_info = dict(
-        subject = 'Add event request',
+        subject = 'Global Staff Calendar Event Request',
         to = 'admin@foo.bar',
         body = """\
-Dear Administrator,
+Use the form below to submit your Global Staff Calendar event request. Please
+include as much information as possible. Fields with the asterisk (*) are
+required.
 
-Please create the following event:
+Title (*):
 
-====================
-ADD INFORMATION HERE
-====================
+Start Date and Time (*):
 
+End Date and Time (*):
 
-Thank you
+Location:
+
+Description:
+
+Attendees:
+
+Contact Name:
+
+Contact Email:
+
 """,
         )
 
