@@ -40,7 +40,7 @@
           <div class="cal_new_event" tal:condition="may_create">
             <a class="primary_button" href="${calendar.add_event_url}"><span>Add Event</span></a>
           </div>
-          <div class="cal_new_event" tal:condition="not may_create">
+          <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
             <a class="primary_button" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
           </div>
         </div>

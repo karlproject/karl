@@ -330,10 +330,19 @@ def _select_calendar_layout(context, request):
     )
 
 
-def _get_mailto_create_event_href():
+def _get_mailto_create_event_href(context, request):
+    # Is the mail To address specified in the calendar?
+    # XXX Currently this parameter is missing an UI, so
+    # changing it is possible from evolve or from pdb.
+    to_address = getattr(context, 'calendar_admin_email', None)
+
+    if to_address is None:
+        # Just return None, in case an email is not specified.
+        return
+
     mailto_info = dict(
         subject = 'Global Staff Calendar Event Request',
-        to = 'admin@foo.bar',
+        to = to_address,
         body = """\
 Use the form below to submit your Global Staff Calendar event request. Please
 include as much information as possible. Fields with the asterisk (*) are
@@ -397,7 +406,7 @@ def _show_calendar_view(context, request, make_presenter, selection):
     if may_create:
         mailto_create_event_href = None
     else:
-        mailto_create_event_href = _get_mailto_create_event_href()
+        mailto_create_event_href = _get_mailto_create_event_href(context, request)
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -503,7 +512,7 @@ def show_list_view(context, request):
     if may_create:
         mailto_create_event_href = None
     else:
-        mailto_create_event_href = _get_mailto_create_event_href()
+        mailto_create_event_href = _get_mailto_create_event_href(context, request)
     response = render_to_response(
         calendar.template_filename,
         dict(
