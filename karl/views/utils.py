@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import tempfile
+import urllib
 
 from cStringIO import StringIO
 from os.path import splitext
@@ -637,4 +638,9 @@ def copy_stream_to_tmpfile_and_iter(stream, blocksize=1<<20):
     size = f.tell()
     f.seek(0, 0)
     return size, stream_iter(f, blocksize)
+
+
+def format_mailto_href(d):
+    # ... We do it ourselves because urlencode uses quote_plus, meaning space -> +
+    return 'mailto:?' + '&'.join(['%s=%s' % (key, urllib.quote(value)) for key, value in d.iteritems()])
 
