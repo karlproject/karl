@@ -210,6 +210,13 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
 
     kind_knob = []
     selected_kind = params.get('kind')
+
+    # In case we have a calendar search:
+    # we will use events only as the content type.
+    if calendar_search and selected_kind is None:
+        # This means: filter events only in the result.
+        selected_kind = 'events'
+
     for o in get_listitems(IGroupSearchFactory):
         component = o['component']
         if not component.advanced_search:
