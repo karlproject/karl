@@ -123,7 +123,7 @@ _DUMP_XML =  """\
              title="${item.title}"
              link-title="${item.link_title}"
              class="${item.css_class}">
-      <tal:loop tal:repeat="info in report_filter_items(item)">
+      <tal:loop tal:repeat="info report_filter_items(item)">
        <filter tal:condition="info['type'] == 'category'"
                name="${info['name']}"
                type="${info['type']}"
@@ -423,7 +423,7 @@ def clear_mailinglist_aliases(peopledir):
     for k, v in list(aliases.items()): # avoid mutating-while-iterating
         if v.startswith(pd_path):
             del aliases[k]
-    
+
 
 def find_mailinglist_aliases(peopledir):
 
