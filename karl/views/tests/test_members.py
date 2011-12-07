@@ -204,7 +204,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 16)
+        self.assertEqual(len(fields), 17)
 
     def test_form_fields_w_tos_and_privacy_statement_adapter(self):
         from karl.views.interfaces import IInvitationBoilerplate
@@ -217,7 +217,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 18)
+        self.assertEqual(len(fields), 19)
         self.assertEqual(fields[-2][0], "terms_and_conditions")
         self.assertEqual(fields[-1][0], "accept_privacy_policy")
 
@@ -229,7 +229,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 18)
+        self.assertEqual(len(fields), 19)
         self.assertEqual(fields[-2][0], "terms_and_conditions")
         self.assertEqual(fields[-1][0], "accept_privacy_policy")
 
@@ -314,7 +314,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                      'department':'department', 'position':'position',
                      'organization':'organization', 'location':'location',
                      'country':'country', 'websites':['website'],
-                     'languages':'languages',
+                     'languages':'languages', 'date_format':'en-US',
                      }
         karltesting.registerDummyRenderer(
             'karl.views:templates/email_accept_invitation.pt')

@@ -111,6 +111,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         self._register()
         context = self._makeCommunity()
         context.member_names = set(('userid',))
+        context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
@@ -705,6 +706,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         parent['thename'] = context
         parent.catalog = karltesting.DummyCatalog({})
         parent.users = karltesting.DummyUsers({})
+        parent['profiles'] = testing.DummyModel()
         karltesting.registerDummyRenderer('templates/delete_resource.pt')
         self._register()
         karltesting.registerDummySecurityPolicy('userid')

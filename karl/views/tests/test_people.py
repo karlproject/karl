@@ -38,6 +38,7 @@ profile_data = {
     'organization': 'organization',
     'location': 'location',
     'country': 'CH',
+    'date_format': None,
     'websites': ['http://example.com'],
     'languages': 'englishy',
     'photo': None,
@@ -47,6 +48,7 @@ profile_data = {
 class DummyProfile(testing.DummyModel):
     websites = ()
     title = 'firstname lastname'
+    date_format = None
     def __setitem__(self, name, value):
         """Simulate Folder behavior"""
         if self.get(name, None) is not None:
@@ -87,6 +89,8 @@ class TestEditProfileFormController(unittest.TestCase):
         sessions = DummySessions()
         context = DummyProfile(sessions=sessions)
         context.title = 'title'
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
         self.context = context
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
@@ -928,6 +932,8 @@ class ShowProfileTests(unittest.TestCase):
         context.users = DummyUsers()
         context.users.add("userid", "userlogin", "password", [])
         context.users.add("chris", "chrislogin", "password", [])
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 2)
         self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
@@ -1114,6 +1120,8 @@ class ShowProfileTests(unittest.TestCase):
         context.users = DummyUsers()
         context.users.add("userid", "userid", "password", [])
         context.users.add("chris", "chris", "password", [])
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
         self._callFUT(context, request)
         self.assertEqual(search_args['limit'], 5)
         self.assertEqual(search_args['creator'], 'chris')
@@ -1136,6 +1144,8 @@ class ShowProfileTests(unittest.TestCase):
         context.users = DummyUsers()
         context.users.add("userid", "userlogin", "password", [])
         context.users.add("chris", "chrislogin", "password", [])
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(len(renderer.actions), 2)

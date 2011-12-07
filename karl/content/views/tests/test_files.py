@@ -113,6 +113,7 @@ class TestShowFolderView(unittest.TestCase):
     def test_read_only(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context: ('view',),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -121,6 +122,7 @@ class TestShowFolderView(unittest.TestCase):
     def test_editable_wo_repo(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -131,6 +133,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root.repo = object()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -140,6 +143,7 @@ class TestShowFolderView(unittest.TestCase):
     def test_deletable(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -148,6 +152,7 @@ class TestShowFolderView(unittest.TestCase):
     def test_delete_is_for_children_not_container(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
@@ -156,6 +161,7 @@ class TestShowFolderView(unittest.TestCase):
     def test_creatable(self):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
+        root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'create'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
