@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+
+
+
 3.75 (2011-12-07)
 -----------------
 
@@ -8,7 +14,6 @@ karl package Changelog
   pages.
 
 - resolve distorted pictures on people page #892357
-
 
 3.74 (2011-11-17)
 -----------------
