@@ -105,6 +105,8 @@ class Profile(Folder):
         self.office = office
         self.room_no = room_no
         self.biography = biography
+        if date_format not in cultures.as_dict:
+            date_format = None
         self.date_format = date_format
         self.home_path = home_path
         self._alert_prefs = PersistentMapping()
