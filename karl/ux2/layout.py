@@ -1,5 +1,7 @@
-from bottlecap.layout import LayoutManager as BaseLayoutManager
+from pyramid.decorator import reify
+from pyramid.renderers import get_renderer
 
+from bottlecap.layout import LayoutManager as BaseLayoutManager
 
 class LayoutManager(BaseLayoutManager):
 
@@ -13,6 +15,11 @@ class LayoutManager(BaseLayoutManager):
             dict(title="Explore", selected=None),
             ]
         return menu_items
+
+    @reify
+    def snippets(self):
+        template = get_renderer('karl:views/templates/snippets.pt')
+        return template.implementation()
 
 
 def global_nav(context, request):
