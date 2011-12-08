@@ -4,8 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-
-
+- Fixed LP #891278: Some links to the wiki trash were incorrect.
 
 3.75 (2011-12-07)
 -----------------

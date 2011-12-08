@@ -38,7 +38,7 @@
           <a href="${api.here_url}">Front Page</a> |
           Index
           <tal:block condition="show_trash"> |
-            <a href="${api.here_url}../trash">Trash</a>
+            <a href="${api.here_url}trash">Trash</a>
           </tal:block>
       </span>
     </div>
