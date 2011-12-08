@@ -7,12 +7,12 @@
     renderer="templates/helloworld.pt"
   />
 
-  <view
+  <!--view
     for="*"
     view=".helloworld.testpage_view"
     name="test"
     renderer="templates/testpage_view.pt"
-    />
+    /-->
 
   <view
     for="*"
@@ -24,7 +24,7 @@
   <view
     for="*"
     view=".layout.global_nav"
-    name="global_nav"
+    name="bottlecap.global_nav"
     renderer="templates/global_nav.pt"
     />
 

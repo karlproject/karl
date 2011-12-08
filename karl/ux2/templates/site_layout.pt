@@ -36,7 +36,7 @@
 <div id="top-bar">
     <div class="container">
         <tal:actions_menu
-                tal:content="lm.component('layout.global_nav')">
+                tal:content="lm.component('bottlecap.global_nav')">
         <tal:actions_menu
                 tal:content="lm.component('bottlecap.personal_tools')">
     </div>
