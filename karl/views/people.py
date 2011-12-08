@@ -186,7 +186,9 @@ class EditProfileFormController(object):
                        image_thumbnail_default=default_icon,
                        show_remove_checkbox=show_remove_checkbox),
                    'biography': karlwidgets.RichTextWidget(empty=''),
-                   'date_format': formish.SelectChoice(options=cultures),
+                   'date_format': karlwidgets.VerticalRadioChoice(
+                       options=cultures,
+                       none_option=None),
                    }
         return widgets
 
