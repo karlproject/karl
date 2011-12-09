@@ -888,7 +888,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
                 entry.title,
                 entry.url,
                 ),
-            entry.modified,
+            '<span class="globalize-short-date">%s</span>' % entry.modified,
             ]
         if has_selection_column:
             record.insert(0, entry.name)      # MUST hold the file name (id) for the select column.

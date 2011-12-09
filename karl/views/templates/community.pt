@@ -40,7 +40,7 @@
         </thead>
         <tbody>
           <tr tal:repeat="ri in recent_items">
-            <td class="cldate">${ri.modified}</td>
+            <td class="cldate globalize-short-date">${ri.modified}</td>
             <td class="cltitle">
               <a href="${ri.url}">${ri.title}</a>
             </td>

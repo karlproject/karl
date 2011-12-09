@@ -254,6 +254,25 @@ def _get_user_home_path(context, request):
 
     return target, subpath
 
+def get_user_date_format(context, request):
+    default_date_format= get_setting(context, 'date_format', 'en-US')
+
+    userid = authenticated_userid(request)
+    if userid is None:
+        return default_date_format
+
+    site = find_site(context)
+    profiles = find_profiles(site)
+    profile =  profiles.get(userid, None)
+    if profile is None:
+        return default_date_format
+
+    date_format = getattr(profile, 'date_format', None)
+    if date_format is None:
+        date_format = default_date_format
+
+    return date_format
+
 def get_user_community_names(context, request):
     userid = authenticated_userid(request)
     if userid is None:

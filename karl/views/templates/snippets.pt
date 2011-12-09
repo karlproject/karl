@@ -613,7 +613,7 @@
             <a href="${peopleinfo.url}">
               <span tal:repeat="word peopleinfo.type.split(' ')">${word}</span>
             </a>
-            <span class="modified">(${peopleinfo.modified})</span>
+            <span class="modified">(<span class="globalize-short-date">${peopleinfo.modified}</span>)</span>
           </div>
     </div>
 

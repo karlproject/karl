@@ -115,6 +115,18 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne(country='XY')
         self.assertEqual(inst.country, 'XX')
 
+    def test_empty_date_format(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.date_format, None)
+
+    def test_invalid_date_format(self):
+        inst = self._makeOne(date_format='XY')
+        self.assertEqual(inst.date_format, None)
+
+    def test_valid_date_format(self):
+        inst = self._makeOne(date_format='en-US')
+        self.assertEqual(inst.date_format, 'en-US')
+
     def test_valid_country(self):
         inst = self._makeOne(country='HT')
         self.assertEqual(inst.country, 'HT')

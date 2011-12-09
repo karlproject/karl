@@ -175,6 +175,8 @@ class IProfile(IFolder, IPeople):
     room_no = Attribute(u"User's room number.")
     biography = Attribute(u"User's biography.")
 
+    date_format = Attribute(u"User's preferred date format.")
+
     home_path = Attribute(u"Path to user's home model, possibly including "
                           u"view.  May be None.")
     categories = Attribute(

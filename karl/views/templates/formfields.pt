@@ -545,6 +545,28 @@
       <div style="clear: both;"/>
     </fieldset>
 
+    <fieldset metal:define-macro="date_format-field"
+	      tal:define="error fielderrors['date_format']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="date_format-field">
+      <label>Preferred Date Format</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <div class="inputs">
+        <div class="karlselectionradiofield">
+        <tal:block repeat="c api.cultures">
+          <input id="date_format-${c[0]}"
+                 class="noborder"
+                 type="radio"
+                 value="${c[0]}"
+                 name="date_format">
+          <label for="date_format-${c[0]}">${c[1]}</label>
+          <br>
+        </tal:block>
+        </div>
+      </div>
+    </fieldset>
+
     <fieldset metal:define-macro="caption-field"
 	      tal:define="error fielderrors['caption']|None"
 	      class="${error and 'fieldError' or ''}"

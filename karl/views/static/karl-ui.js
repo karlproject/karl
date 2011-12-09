@@ -28,5 +28,10 @@
 * Bottlecap livesearch:
 *     @depends bottlecap-wire/livesearch-all.js
 *
+* i10n
+*     @depends l10n/globalize.js
+*     @depends l10n/globalize.cultures.js
+*     @depends l10n/globalize.actions.js
+*
 */
 

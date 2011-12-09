@@ -181,6 +181,49 @@ class TestBasenameOfFilepath(unittest.TestCase):
             'myimage.jpg')
 
 
+class TestGetUserDateFormat(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def test_not_logged_in(self):
+        from karl.views.utils import get_user_date_format
+        karl.testing.registerDummySecurityPolicy()
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        date_format = get_user_date_format(context, request)
+        self.assertEqual(date_format, 'en-US')
+
+    def test_no_profile(self):
+        from karl.views.utils import get_user_date_format
+        from karl.testing import DummyUsers
+        karl.testing.registerDummySecurityPolicy("userid")
+        context = testing.DummyModel()
+        profiles = context["profiles"] = testing.DummyModel()
+        users = context.users = DummyUsers()
+        users.add("userid", "userid", "password", [])
+        request = testing.DummyRequest()
+        date_format = get_user_date_format(context, request)
+        self.assertEqual(date_format, 'en-US')
+
+    def test_from_profile(self):
+        from karl.views.utils import get_user_date_format
+        from karl.testing import DummyUsers
+        from karl.testing import DummyProfile
+        karl.testing.registerDummySecurityPolicy("userid")
+        context = testing.DummyModel()
+        profiles = context["profiles"] = testing.DummyModel()
+        profile = profiles["userid"] = DummyProfile()
+        profiles["userid"].date_format = 'en-CA'
+        users = context.users = DummyUsers()
+        users.add("userid", "userid", "password", [])
+        request = testing.DummyRequest()
+        date_format = get_user_date_format(context, request)
+        self.assertEqual(date_format, 'en-CA')
+
+
 class TestGetUserHome(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()

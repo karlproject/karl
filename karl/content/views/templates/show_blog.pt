@@ -22,7 +22,7 @@
           	<a href="${entry['href']}">${entry['title']}</a>
         	</h2>
 
-			<div class="kbyline">${entry['byline_info'].posted_date}</div>
+			<div class="kbyline globalize-full-date">${entry['byline_info'].posted_date}</div>
 
         	<tal:block condition="entry['description']">
         		<div tal:content="structure entry['description']"/>

@@ -45,6 +45,7 @@
           <fieldset metal:use-macro="formfields.macros['languages-field']"/>
           <fieldset metal:use-macro="formfields.macros['biography-field']"/>
           <fieldset metal:use-macro="formfields.macros['photo-field']"/>
+          <fieldset metal:use-macro="formfields.macros['date_format-field']"/>
           <fieldset metal:use-macro="formfields.macros['terms_and_conditions-field']"/>
           <fieldset metal:use-macro="formfields.macros['accept_privacy_policy-field']"/>
           <fieldset metal:use-macro="formfields.macros['form-submit']"/>

@@ -28,6 +28,7 @@ from karl.views.forms import validators as karlvalidators
 from karl.views.forms.filestore import get_filestore
 from karl.views.utils import Invalid
 from karl.consts import countries
+from karl.consts import cultures
 
 import transaction
 
@@ -589,6 +590,8 @@ class AcceptInvitationFormController(object):
             ('languages', schemaish.String()),
             ('biography', schemaish.String()),
             ('photo', schemaish.File()),
+            ('date_format', schemaish.String(
+                validator=validator.OneOf(cultures.as_dict.keys()))),
             ]
 
         r = queryMultiAdapter((self.context, self.request),
@@ -619,6 +622,7 @@ class AcceptInvitationFormController(object):
                 filestore=self.filestore,
                 url_base=resource_url(self.context, self.request, 'photo'),
                 image_thumbnail_default=default_icon),
+            'date_format':formish.SelectChoice(cultures),
             'websites': formish.TextArea(
                 rows=3,
                 converter_options={'delimiter':'\n'}),
@@ -682,6 +686,7 @@ class AcceptInvitationFormController(object):
             location=converted['location'],
             country=converted['country'],
             websites=converted['websites'],
+            date_format=converted['date_format'],
             languages=converted['languages']
             )
         profiles[username] = profile

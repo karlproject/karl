@@ -40,6 +40,7 @@ from repoze.lemonade.content import get_content_type
 from repoze.lemonade.listitem import get_listitems
 
 from karl.consts import countries
+from karl.consts import cultures
 from karl.utils import find_intranet
 from karl.utils import find_intranets
 from karl.utils import find_site
@@ -58,6 +59,7 @@ from karl.views.adapters import DefaultFooter
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ISidebar
 from karl.views.utils import get_user_home
+from karl.views.utils import get_user_date_format
 
 from pyramid.traversal import find_interface
 
@@ -75,6 +77,7 @@ class TemplateAPI(object):
     _snippets = None
     _start_time = int(time.time())
     countries = countries
+    cultures = cultures
     _form_field_templates = None
     _livesearch_options = None
     _should_show_calendar_tab = None
@@ -114,6 +117,8 @@ class TemplateAPI(object):
         self.can_email = has_permission('email', site, request)
         self.admin_url = resource_url(site, request, 'admin.html')
         self.site_announcement = getattr(site, 'site_announcement', '')
+        date_format = get_user_date_format(context, request)
+        self.karl_client_data['date_format'] = date_format
         # XXX XXX XXX This will never work from peoples formish templates
         # XXX XXX XXX (edit_profile and derivates) because, in those form
         # XXX XXX XXX controllers, the api is instantiated from __init__,

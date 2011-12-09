@@ -436,6 +436,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
     def _makeContext(self):
         sessions = DummySessions()
         context = testing.DummyModel(sessions=sessions)
+        context['profiles'] = testing.DummyModel()
         return context
 
     def _registerDummyWorkflow(self):

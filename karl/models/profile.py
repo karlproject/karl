@@ -24,6 +24,7 @@ from zope.component import adapter
 
 from repoze.folder import Folder
 from karl.consts import countries
+from karl.consts import cultures
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
@@ -36,6 +37,7 @@ class Profile(Folder):
     fax = '' # BBB
     _websites = ()
     last_login_time = None # BBB
+    date_format = None # BBB
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -78,6 +80,7 @@ class Profile(Folder):
                  office='',
                  room_no='',
                  biography='',
+                 date_format=None,
                  data=None,
                  home_path=None,
                  preferred_communities = None,
@@ -102,6 +105,9 @@ class Profile(Folder):
         self.office = office
         self.room_no = room_no
         self.biography = biography
+        if date_format not in cultures.as_dict:
+            date_format = None
+        self.date_format = date_format
         self.home_path = home_path
         self._alert_prefs = PersistentMapping()
         self._pending_alerts = PersistentList()
