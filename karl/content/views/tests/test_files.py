@@ -644,6 +644,7 @@ class TestShowFileView(unittest.TestCase):
         root = self._make_community()
         parent = root['files'] = testing.DummyModel(title='parent')
         context = parent['child'] = testing.DummyModel(title='thetitle')
+        context.filename = 'thefilename'
         request = testing.DummyRequest()
         renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
@@ -666,6 +667,7 @@ class TestShowFileView(unittest.TestCase):
         root.repo = object()
         parent = root['files'] = testing.DummyModel(title='parent')
         context = parent['child'] = testing.DummyModel(title='thetitle')
+        context.filename = 'thefilename'
         request = testing.DummyRequest()
         renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
 

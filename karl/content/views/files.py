@@ -18,6 +18,7 @@
 from simplejson import JSONEncoder
 import datetime
 import transaction
+from urllib import quote_plus
 from cStringIO import StringIO
 from simplejson import JSONDecoder
 from os.path import splitext
@@ -525,7 +526,8 @@ def show_file_view(context, request):
              backto=backto,
              previous_entry=previous,
              next_entry=next,
-             layout=layout
+             layout=layout,
+             filename=quote_plus(context.filename),
              ),
         request=request,
         )

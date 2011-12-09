@@ -402,10 +402,10 @@
         <img width="32" height="32" border="0" alt="."
           src="${api.static_url}/images/${fileinfo.mimeinfo.large_icon_name}"/>
         <a style="padding-left: 0.2em;"
-          href="${api.here_url}dl/${api.context.filename}?save=True">Click here
+          href="${api.here_url}dl/${filename}?save=True">Click here
           to download the file</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a style="padding-left: 0.2em;"
-          href="${api.here_url}dl/${api.context.filename}">Click here to view
+          href="${api.here_url}dl/${filename}">Click here to view
           the file</a>
       </div>
       <div style="padding: 0.3em 0 0 3.3em;">Size: ${fileinfo.size} - File type:
