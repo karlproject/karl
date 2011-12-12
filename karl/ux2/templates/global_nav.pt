@@ -1,0 +1,18 @@
+<nav>
+    <h1 class="sitetitle">
+        <a href="${api.app_url}/communities/ux2_communities.html" title="KARL home page">
+            <img src="${lm.bottlecap_static}img/logo.png"
+                 width="25" height="26" alt="KARL logo" />
+            KARL
+        </a>
+    </h1>
+    <div data-quickpanel="quickpanel" class="topNavIconWrapper">
+        <h2 id="navigation-toggle" class="quickpanel-toggle ir">Navigation</h2>
+        <ul id="global-nav" class="quickpanel">
+            <li tal:repeat="menu lm.global_nav_menus"
+                    tal:attributes="class menu.selected">
+                <a href="${menu.url}">${menu.title}</a>
+            </li>
+        </ul>
+    </div>
+</nav>

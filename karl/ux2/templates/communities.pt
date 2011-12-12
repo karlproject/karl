@@ -1,0 +1,76 @@
+<metal:block use-macro="lm.layout('site')">
+
+    <metal:slot metal:fill-slot="extra-headers">
+        <style type="text/css">
+         .ui-tabs .ui-tabs-hide {
+           display: none;
+         }
+         .communityEntry {
+              overflow-y: auto;
+         }
+         .community-tabs {
+              float:right;
+              width: 25em;
+              margin-left: 0.5em;
+              font-size: x-small;
+         }
+        </style>
+    </metal:slot>
+
+    <metal:content fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    
+    <tal:actions_menu tal:content="lm.component('ux2.actions_menu')">
+
+    <div id="communities-content-wrapper">
+
+    <div metal:use-macro="api.snippets.macros['communities-listing-head']"/>
+
+    <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
+
+    <div tal:condition="error" tal:content="error" />
+
+    <metal:script
+        metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+    <table tal:condition="batch_info['batching_required']" width="100%">
+      <tr class="ui-grid-footer">
+        <th class="ui-widget-header">
+          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          </div>
+        </th>
+      </tr>
+    </table>
+
+    <div class="communityEntry"
+         tal:repeat="community communities">
+
+      <div class="klisting_header">
+        <a href="${community.url}ux2_view.html">${community.title}</a>
+        <span tal:condition="not api.has_staff_acl(community.context)"
+          metal:use-macro="api.snippets.macros['privacy_badge']"/>
+        <span tal:condition="community.moderator"
+          metal:use-macro="api.snippets.macros['moderator_badge']"/>
+      </div>
+
+      <p>${community.description}</p>
+      <div class="documentByLine">
+        <span>${community.number_of_members} Member(s)</span>
+        <span> | </span>
+        <span>Last Activity: ${community.last_activity_date}</span>
+      </div>
+    </div>
+
+    <table tal:condition="batch_info['batching_required']" width="100%">
+      <tr class="ui-grid-footer">
+        <th class="ui-widget-header">
+          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          </div>
+        </th>
+      </tr>
+    </table>
+
+  </div>
+
+    </metal:content>
+</metal:block>

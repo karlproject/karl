@@ -1,0 +1,70 @@
+.contentWrapper {
+    font-size: 0.9em;
+}
+
+.portlet, .generic-portlet {
+    font-size: 0.8em;
+}
+
+#community-filters {
+    width: 280px;
+    float: left;
+    padding-top: 1.7em;
+}
+
+#community-filters ul {
+    line-height: 32px;
+}
+
+#community-filters ul li {
+    display: inline;
+    padding-left: 12px;
+}
+
+#communitiy-search-box-wrapper {
+    float: left;
+    padding: 9px 8px 8px;
+    width: 240px;
+}
+
+#footer .osi-logo {
+    float: left;
+}
+
+#footer .extra {
+    float: right;
+}
+
+ul.horListing li {
+    display: inline;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.autobox-hldr li {
+    float: left;
+    list-style-type: none;
+    margin-right: 5px;
+    padding: 0 5px 4px 0;
+}
+li.bit-box {
+    padding: 1px 15px 2px 5px !important;
+}
+li.bit-box {
+    padding-right: 15px;
+    position: relative;
+}
+li.bit-box {
+    background: none repeat scroll 0 0 #CEBEAA;
+    margin-bottom: 3px;
+    padding: 1px 5px 2px;
+}
+.bit-box {
+    margin-top: 2px;
+}
+
+.koverview_body {
+    clear: left;
+    padding-top: 25px;
+}

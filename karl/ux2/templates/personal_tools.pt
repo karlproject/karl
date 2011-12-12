@@ -1,0 +1,13 @@
+<ul id="members-info">
+    <li tal:condition="api.can_email and not api.user_is_admin">
+        <a href="${api.app_url}/email_users.html">Email</a> |
+    </li>
+    <li tal:condition="api.user_is_admin">
+        <a href="${api.admin_url}">Admin</a> |
+    </li>
+    <li><a href="${api.home_url}">Home</a> | </li>
+    <li><a href="${api.profile_url}">My Profile</a> | </li>
+    <li class="noborder">
+      <a href="${api.app_url}/logout.html">Logout</a>
+    </li>
+</ul>
