@@ -587,13 +587,23 @@ class TestFormatMailtoHref(unittest.TestCase):
         from karl.views.utils import format_mailto_href as fut
         return fut(d)
 
-    def test_it(self):
+    def test_to(self):
+        d = {
+            'subject': 'ABC DEF=G',
+            'body': 'ABC DEF=G\nIJK\n\nLMO',
+            'to': 'abc@example.com',
+            }
+        result = self.call_fut(d)
 
+        self.assertEqual(result,
+            'mailto:abc@example.com?body=ABC%20DEF%3DG%0AIJK%0A%0ALMO&subject=ABC%20DEF%3DG'
+            )
+
+    def test_no_to(self):
         d = {
             'subject': 'ABC DEF=G',
             'body': 'ABC DEF=G\nIJK\n\nLMO',
             }
-
         result = self.call_fut(d)
 
         self.assertEqual(result,
