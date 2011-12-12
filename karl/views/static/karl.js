@@ -408,8 +408,6 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             cachedrecord.count--;
             this._updateBox(cached);
         } else {
-            // hide first to work with rounded corners in IE (using DD_roundies)
-            li.css("display", "none");
 
             // Else proceed with deletion 
             $.ui.autobox3.prototype._delBox.call(this, li);
@@ -2335,20 +2333,6 @@ function scrollToTime() {
 /** =CALENDAR INIT JAVASCRIPT
 ----------------------------------------------- */
 function initCalendar() {
-  // rounded corners (monthly)
-  if ($("#cal_month").length > 0) {
-    DD_roundies.addRule('#cal_month .cal_event_pos_full a', '5px');
-    DD_roundies.addRule('#cal_month .cal_event_pos_left a', '5px 0 0 5px');
-    DD_roundies.addRule('#cal_month .cal_event_pos_right a', '0 5px 5px 0');
-  }
-
-  // rounded corners (daily/weekly)
-  if ($("#all_day").length > 0) {
-    DD_roundies.addRule('#all_day .cal_event_pos_full a', '5px');
-    DD_roundies.addRule('#all_day .cal_event_pos_left a', '5px 0 0 5px');
-    DD_roundies.addRule('#all_day .cal_event_pos_right a', '0 5px 5px 0');
-    DD_roundies.addRule('#cal_scroll .cal_hour_event .cal_event_block', '7px');
-  }
 
   // ALL VIEWS - calendar layer switcher
   $("#cal_picker").change(function() {
@@ -2727,13 +2711,6 @@ $(document).ready(function() {
       });
     }
 
-    // rounded corners in IE on tags
-    DD_roundies.addRule('.bit-box', '6px');
-    
-    // rounded corners in IE on global tabs
-    DD_roundies.addRule('ul#header-menu li a', '0 0 10px 10px');
-
-
     // Search Community button
     var searchCommunityButton = $('.search-community-button')
         .button({
@@ -2767,10 +2744,6 @@ $(document).ready(function() {
     if ($.browser.msie && parseInt($.browser.version) == 8) {
         searchCommunityButton.css('marginTop', '1px');
     }
-
-    // rounded corners in IE
-    DD_roundies.addRule('.search-community-button', '4px');
-
 
 
     // add class to #center if there are no right portlets

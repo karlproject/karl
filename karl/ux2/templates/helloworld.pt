@@ -1,4 +1,4 @@
-<metal:block use-macro="lm.layout('community')">
+<metal:block use-macro="lm.layout('site')">
     <metal:content fill-slot="content">
 
         <header>
@@ -7,7 +7,7 @@
                 <time datetime="2011-11-15" pubdate="">Tuesday, November 15th, 2011</time> by <a href="#" title="Posts by Paul Everit" rel="author">Paul Everit</a>.
             </small>
             <tal:actions_menu
-                    tal:content="lm.component('bottlecap.actions_menu')">
+                    tal:content="lm.component('helloworld.test_component')">
         </header>
         <p class="description">
             Cras justo odio, dapibus ac facilisis in, egestas eget

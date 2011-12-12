@@ -7,4 +7,62 @@
     renderer="templates/helloworld.pt"
   />
 
+  <view
+    for="karl.models.interfaces.ICommunities"
+    view=".views.communities"
+    name="ux2_communities.html"
+    renderer="templates/communities.pt"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view=".views.community"
+    name="ux2_view.html"
+    renderer="templates/community.pt"
+    permission="view"
+  />
+
+  <view
+    for="*"
+    view=".views.global_nav"
+    name="ux2.global_nav"
+    renderer="templates/global_nav.pt"
+  />
+
+  <view
+    for="*"
+    view=".views.personal_tools"
+    name="ux2.personal_tools"
+    renderer="templates/personal_tools.pt"
+  />
+
+  <view
+    for="*"
+    view=".views.search"
+    name="ux2.search"
+    renderer="templates/search.pt"
+  />
+
+  <view
+    for="*"
+    view=".views.context_tools"
+    name="ux2.context_tools"
+    renderer="templates/context_tools.pt"
+  />
+
+  <view
+    for="*"
+    view=".views.actions_menu"
+    name="ux2.actions_menu"
+    renderer="templates/actions_menu.pt"
+  />
+
+  <view
+    for="*"
+    view=".views.column_one"
+    name="ux2.column_one"
+    renderer="templates/column_one.pt"
+  />
+
 </configure>

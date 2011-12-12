@@ -71,7 +71,7 @@
         <script src="${api.static_url}/karl-plugins/karl-captionedimage/karl.captionedimage.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl-plugins/karl-slider/karl.slider.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl-plugins/karl-buttonset/karl.buttonset.js" type="text/javascript">//</script>
-        <script src="${api.static_url}/jquery-plugins/DD_roundies.src.js" type="text/javascript">//</script>
+        <!-- script src="${api.static_url}/jquery-plugins/DD_roundies.src.js" type="text/javascript">//</script -->
         <script src="${api.static_url}/jquery-plugins/jquery.scrollTo.src.js" type="text/javascript">//</script>
         <script src="${api.static_url}/jquery-plugins/jquery.tools.js" type="text/javascript">//</script>
 
