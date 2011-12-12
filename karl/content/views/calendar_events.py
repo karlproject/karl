@@ -345,8 +345,8 @@ def _get_mailto_create_event_href(context, request):
         to = to_address,
         body = """\
 Use the form below to submit your Global Staff Calendar event request. Please
-include as much information as possible. Fields with the asterisk (*) are
-required.
+include as much information as possible. Fields marked with the asterisk (*)
+are required.
 
 Title (*):
 
