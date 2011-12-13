@@ -3,11 +3,10 @@ from pyramid.events import BeforeRender
 from karl.ux2.layout import LayoutManager
 from karl.views.api import TemplateAPI
 
+
 def add_renderer_globals(event):
     request = event['request']
     context = request.context
-    settings = request.registry.settings
-    bc = settings['bc']
     api = TemplateAPI(context, request)
     event['api'] = api
 
