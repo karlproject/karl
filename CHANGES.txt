@@ -8,6 +8,8 @@ Unreleased
 
 - Fixed LP #897435: File content needed to be reindexed on revert.
 
+- LP #824640:  Add sorting facets to advanced search view.
+
 3.75 (2011-12-07)
 -----------------
 
