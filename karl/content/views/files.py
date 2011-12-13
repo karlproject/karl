@@ -1016,13 +1016,7 @@ def get_target_folders(context):
     target_items = []
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
-        # XXX rather use metadata here?? (for performance)
-        # also, we tolerate and log each possible catalog hiccup
         item = resolver(docid)
-        if item is None:
-            log.warn('get_target_folders catalog hiccup, docid=%r, path=%r, request_url=%r' %
-                (docid, path, context_path))
-            continue
         title = item.title
         target_items.append(dict(path=path, title=title))
 
