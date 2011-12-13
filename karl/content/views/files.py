@@ -151,6 +151,7 @@ def show_folder_view(context, request):
             tool = find_interface(context, ICommunityRootFolder)
             trash_url = resource_url(tool, request, 'trash')
 
+    actions.append(('Multi Upload', ''))
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 

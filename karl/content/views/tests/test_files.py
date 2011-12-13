@@ -89,7 +89,7 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         actions = response['actions']
-        self.assertEqual(len(actions), 5)
+        self.assertEqual(len(actions), 6)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
         self.assertEqual(actions[2][1], 'edit.html')
@@ -106,7 +106,7 @@ class TestShowFolderView(unittest.TestCase):
         directlyProvides(context, ICommunityRootFolder)
         response = self._callFUT(context, request)
         actions = response['actions']
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
 
@@ -117,7 +117,7 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context: ('view',),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [])
+        self.assertEqual(response['actions'], [('Multi Upload', '')])
 
     def test_editable_wo_repo(self):
         root = self._make_community()
@@ -126,7 +126,8 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Edit', 'edit.html')])
+        self.assertEqual(response['actions'], [
+            ('Edit', 'edit.html'), ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], None)
 
     def test_editable_w_repo(self):
@@ -137,7 +138,8 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Edit', 'edit.html'),])
+        self.assertEqual(response['actions'], [('Edit', 'edit.html'),
+                                               ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], 'http://example.com/trash')
 
     def test_deletable(self):
@@ -147,7 +149,8 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Delete', 'delete.html')])
+        self.assertEqual(response['actions'], [
+            ('Delete', 'delete.html'), ('Multi Upload', '')])
 
     def test_delete_is_for_children_not_container(self):
         root = self._make_community()
@@ -156,7 +159,7 @@ class TestShowFolderView(unittest.TestCase):
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [])
+        self.assertEqual(response['actions'], [('Multi Upload', '')])
 
     def test_creatable(self):
         root = self._make_community()
@@ -166,7 +169,8 @@ class TestShowFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
-            ('Add Folder', 'add_folder.html'), ('Add File', 'add_file.html')])
+            ('Add Folder', 'add_folder.html'), ('Add File', 'add_file.html'),
+            ('Multi Upload', '')])
 
 class Test_redirect_to_add_form(unittest.TestCase):
 

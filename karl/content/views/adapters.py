@@ -604,7 +604,6 @@ class DefaultFolderAddables(object):
         _addlist = [
             ('Add Folder', 'add_folder.html'),
             ('Add File', 'add_file.html'),
-            ('Multi Upload', ''),
             ]
 
         # Intranet folders by default get Add Page
