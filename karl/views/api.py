@@ -203,7 +203,7 @@ class TemplateAPI(object):
             else:
                 calendar_path = '/offices/calendar'
                 try:
-                    calendar = find_resource(self.site, calendar_path)
+                    find_resource(self.site, calendar_path)
                     self._should_show_calendar_tab = True
                 except KeyError:
                     self._should_show_calendar_tab = False
@@ -259,7 +259,6 @@ class TemplateAPI(object):
     community_layout_fn = 'karl.views:templates/community_layout.pt'
     @property
     def community_layout(self):
-        import pdb; pdb.set_trace()
         macro_template = get_renderer(self.community_layout_fn)
         return macro_template.implementation()
 
@@ -286,7 +285,9 @@ class TemplateAPI(object):
         if self._form_field_templates is None:
             # calculate and cache value
             if hasattr(self.request, 'form'):
-                self._form_field_templates =  [field.widget.template for field in self.request.form.allfields]
+                self._form_field_templates =  [
+                    field.widget.template for field in
+                    self.request.form.allfields]
             else:
                 self._form_field_templates = []
         return self._form_field_templates
