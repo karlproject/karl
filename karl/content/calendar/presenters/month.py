@@ -77,11 +77,17 @@ class MonthEventHorizon(BasePresenter):
                 show_url = format % (self.url_for('day.html'),
                                      dt.year, dt.month, dt.day)  
                 
+                # url for the more button goes to day listing view
+                more_url = '%s?year=%d&month=%d&day=%d&term=day' % (
+                    self.url_for('list.html'), dt.year, dt.month, dt.day)  
+                
                 day = DayOnMonthView(dt.year, dt.month, dt.day,
                                      current_month=is_focus_month,
                                      current_day=is_today,
                                      add_event_url=add_event_url,
-                                     show_day_url=show_url)
+                                     show_day_url=show_url,
+                                     more_url=more_url,
+                                     )
 
                 week[d] = day
         self.weeks = weeks                                          
@@ -209,7 +215,7 @@ class MonthViewPresenter(MonthEventHorizon):
 class DayOnMonthView(object):   
     def __init__(self, year, month, day, 
                  current_month=True, current_day=False, 
-                 add_event_url='#', show_day_url='#'):
+                 add_event_url='#', show_day_url='#', more_url='#'):
         self.year = year
         self.month = month
         self.day = day
@@ -217,6 +223,7 @@ class DayOnMonthView(object):
         self.current_day = current_day
         self.add_event_url = add_event_url
         self.show_day_url = show_day_url
+        self.more_url = more_url
 
         self.event_slots = [None]*5
 
