@@ -28,6 +28,9 @@
 
   <div tal:attributes="class python:'label ' + ('faded','')[day.current_month]">
     <a class="add" href="${day.add_event_url}" tal:condition="may_create"><img src="${api.static_url}/images/cal_icons_plus.png" /></a>
+    <a class="calmore" href="${day.more_url}" tal:define="more_events len(day.overflowed_events)" tal:condition="more_events">
+      <span tal:replace="more_events">0</span> more
+    </a>
     <a class="num" href="${day.show_day_url}">${day.day}</a>
   </div>
 

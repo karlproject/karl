@@ -587,10 +587,12 @@ body .cal_hour_event .cal_event_block .time {
   float: right;
   padding: 3px 3px 3px 10px;
 }
-.cal_month .hov .label .num:hover {
+.cal_month .hov .label .num:hover,
+.cal_month .hov .label .calmore:hover {
     color: #333;
 }
-.cal_month .label .add {
+.cal_month .label .add,
+.cal_month .label .calmore {
   float: left;
   padding: 3px 10px 4px 3px;
 }
