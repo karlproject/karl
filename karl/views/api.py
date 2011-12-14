@@ -220,7 +220,7 @@ class TemplateAPI(object):
         if key == 'form_field_templates':
             # Allow this, for ZPT's sake!
             return self.form_field_templates
-        raise ValueError, "ZPT attempted to fetch %s" % key
+        raise KeyError(key)
 
     @property
     def community_info(self):
@@ -259,6 +259,7 @@ class TemplateAPI(object):
     community_layout_fn = 'karl.views:templates/community_layout.pt'
     @property
     def community_layout(self):
+        import pdb; pdb.set_trace()
         macro_template = get_renderer(self.community_layout_fn)
         return macro_template.implementation()
 
