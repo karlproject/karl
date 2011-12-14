@@ -121,7 +121,7 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
-        self.assertRaises(ValueError, api.__getitem__, 'a')
+        self.assertRaises(KeyError, api.__getitem__, 'a')
 
     def test_render_sidebar_no_adapter(self):
         context = testing.DummyModel()
