@@ -6,15 +6,10 @@ from pyramid.events import BeforeRender
 
 import karl.ux2
 from karl.ux2.layout import LayoutManager
-from karl.views.api import TemplateAPI
-
 
 def add_renderer_globals(event):
     request = event['request']
     context = request.context
-    api = TemplateAPI(context, request)
-    event['api'] = api
-
 
 def configure_karl(config, load_zcml=True):
     config.include('bottlecap')

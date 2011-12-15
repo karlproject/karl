@@ -46,7 +46,7 @@
          tal:repeat="community communities">
 
       <div class="klisting_header">
-        <a href="${community.url}ux2_view.html">${community.title}</a>
+        <a href="${community.url}">${community.title}</a>
         <span tal:condition="not api.has_staff_acl(community.context)"
           metal:use-macro="api.snippets.macros['privacy_badge']"/>
         <span tal:condition="community.moderator"
