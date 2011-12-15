@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.76 (2011-12-15)
+-----------------
 
 - Fixed LP #891278: Some links to the wiki trash were incorrect.
 
