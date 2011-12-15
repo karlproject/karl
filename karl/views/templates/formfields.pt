@@ -559,9 +559,9 @@
                  class="noborder"
                  type="radio"
                  value="${c[0]}"
-                 name="date_format">
+                 name="date_format" />
           <label for="date_format-${c[0]}">${c[1]}</label>
-          <br>
+          <br />
         </tal:block>
         </div>
       </div>
