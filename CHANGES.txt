@@ -1,11 +1,13 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.77 (2011-12-16)
+-----------------
 
-- Fixed bug in show file view where unicode filenames could cause an error.
+- Fixed tag error on manage communities page.
 
+- Fixed bug in show file view where unicode filenames could cause an
+  error.
 
 3.76 (2011-12-15)
 -----------------
