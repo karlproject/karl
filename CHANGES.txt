@@ -4,6 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed bug in show file view where unicode filenames could cause an error.
 
 
 3.76 (2011-12-15)

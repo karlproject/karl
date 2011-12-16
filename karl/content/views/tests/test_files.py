@@ -668,6 +668,28 @@ class TestShowFileView(unittest.TestCase):
         self.assertEqual(actions[1][1], 'delete.html')
         self.assertEqual(actions[2][1], 'advanced.html')
 
+    def test_unicode_filename(self):
+        from karl.content.views.interfaces import IFileInfo
+        from karl.models.interfaces import ITagQuery
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
+        root = self._make_community()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
+        context.filename = u'Bases T\xe9cnicas y anexos.pdf'
+        request = testing.DummyRequest()
+        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
+
+        karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
+                                IFileInfo)
+
+        self._callFUT(context, request)
+        actions = renderer.actions
+        self.assertEqual(len(actions), 3)
+        self.assertEqual(actions[0][1], 'edit.html')
+        self.assertEqual(actions[1][1], 'delete.html')
+        self.assertEqual(actions[2][1], 'advanced.html')
+
     def test_editable_w_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery

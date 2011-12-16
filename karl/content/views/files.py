@@ -518,6 +518,9 @@ def show_file_view(context, request):
         if repo is not None and has_permission('edit', context, request):
             actions.append(('History', 'history.html'))
 
+    filename = context.filename
+    if isinstance(filename, unicode):
+        filename = filename.encode('UTF-8')
     return render_to_response(
         'templates/show_file.pt',
         dict(api=api,
@@ -528,7 +531,7 @@ def show_file_view(context, request):
              previous_entry=previous,
              next_entry=next,
              layout=layout,
-             filename=quote_plus(context.filename),
+             filename=quote_plus(filename),
              ),
         request=request,
         )
