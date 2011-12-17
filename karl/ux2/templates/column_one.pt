@@ -5,6 +5,8 @@
 
             <metal:portlets define-slot="portlets"></metal:portlets>
 
+            <div tal:content="structure api.render_sidebar()"></div>
+
             <div class="portlet" id="popular-tags-portlet"
                  tal:condition="tags">
                 <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>

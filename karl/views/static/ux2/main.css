@@ -68,9 +68,13 @@ li.bit-box {
     margin-top: 2px;
 }
 
+.kscreentitle {
+    margin: 0 0 20px;
+}
+
 .koverview_body {
     clear: left;
-    padding-top: 25px;
+    padding-top: 15px;
 }
 
 #peopledir-letterbox-wrapper {
@@ -140,5 +144,13 @@ li.bit-box {
 .kmoderator_badge, .kprivacy_badge {
     font-size: 0.7em;
     color: red;
+}
+
+.portlet-table {
+    background: none;
+}
+
+td.num, td.name {
+    border-top: none;
 }
 
