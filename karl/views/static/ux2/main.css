@@ -7,9 +7,13 @@
 }
 
 #community-filters {
-    width: 280px;
     float: left;
-    padding-top: 1.7em;
+    padding-top: 1em;
+    width: 280px;
+}
+
+#community-filters label {
+    width: 130px;
 }
 
 #community-filters ul {
@@ -22,9 +26,9 @@
 }
 
 #communitiy-search-box-wrapper {
-    float: left;
-    padding: 9px 8px 8px;
-    width: 240px;
+    float: right;
+    width: 360px;
+    padding-right: 10px;
 }
 
 #footer .osi-logo {
@@ -68,3 +72,73 @@ li.bit-box {
     clear: left;
     padding-top: 25px;
 }
+
+#peopledir-letterbox-wrapper {
+    margin: 15px 0 0;
+    padding: 5px 20px;
+    font-size: 0.9em;
+    background: none repeat scroll 0 0 #D7C09D;
+    box-shadow: 0 0 0 2px #EADECC, 0 0 0 3px #DBC7A8;
+}
+
+.communityOptions {
+    background-color: white;
+    clear: both;
+    height: 70px;
+    margin: 5px 0 10px;
+    padding: 0 5px;
+    box-shadow: 0 0 0 2px #EADECC, 0 0 0 3px #DBC7A8;
+}
+
+#communities-content-wrapper h3 {
+    clear: both;
+}
+
+.field input[type="submit"] {
+    background-color: #47798F;
+    background-image: -moz-linear-gradient(center top , #7298A8, #47798F);
+    background-repeat: repeat-x;
+    border-color: #47798F #47798F #2E4E5C;
+    color: #FFFFFF;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.ui-grid-footer-text {
+    float: left;
+}
+
+.ui-grid-pagination {
+    float: right;
+    padding: 0px 10px;
+}
+
+.ui-grid-pagination-icon {
+    float: left;
+    padding: 0px 5px;
+}
+
+.ui-state-default {
+    float: left;
+    padding: 0px 3px;
+}
+
+.ui-state-active {
+    float: left;
+    padding: 0px 3px;
+}
+
+.communityEntry {
+    padding: 15px 0;
+    border-bottom: 1px dotted;
+}
+
+.documentByLine {
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.kmoderator_badge, .kprivacy_badge {
+    font-size: 0.7em;
+    color: red;
+}
+

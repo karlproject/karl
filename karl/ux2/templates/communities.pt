@@ -1,22 +1,5 @@
 <metal:block use-macro="lm.layout('site')">
 
-    <metal:slot metal:fill-slot="extra-headers">
-        <style type="text/css">
-         .ui-tabs .ui-tabs-hide {
-           display: none;
-         }
-         .communityEntry {
-              overflow-y: auto;
-         }
-         .community-tabs {
-              float:right;
-              width: 25em;
-              margin-left: 0.5em;
-              font-size: x-small;
-         }
-        </style>
-    </metal:slot>
-
     <metal:content fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
