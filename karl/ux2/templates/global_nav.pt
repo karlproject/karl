@@ -1,6 +1,6 @@
 <nav>
     <h1 class="sitetitle">
-        <a href="${api.app_url}/communities/ux2_communities.html" title="KARL home page">
+        <a href="${api.app_url}" title="KARL home page">
             <img src="${lm.bottlecap_static}img/logo.png"
                  width="25" height="26" alt="KARL logo" />
             KARL

@@ -33,6 +33,8 @@
     <link rel="stylesheet" href="${lm.bottlecap_static}main.css"/>
     <link rel="stylesheet" href="${api.static_url}/ux2/main.css"/>
 
+    <metal:resources use-macro="api.snippets.macros['js_resources']"/>
+
     <script src="${lm.bottlecap_static}/js/modernizr-2.0.6.min.js"></script>
 
     <metal:headslot metal:define-slot="extra-headers"/>
@@ -77,8 +79,6 @@
 <footer>
     <tal:footer content="structure api.render_footer()" />
 </footer>
-
-<metal:resources use-macro="api.snippets.macros['js_resources']"/>
 
 <script type="text/javascript" defer
         src="${lm.bottlecap_static}/js/bottlecap.js"></script>
