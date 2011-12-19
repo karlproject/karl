@@ -4,7 +4,8 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     
-    <tal:actions_menu tal:content="lm.component('ux2.actions_menu')">
+    <tal:actions_menu 
+        content="lm.panel('ux2.actions_menu', api=api, actions=actions)">
 
     <div id="communities-content-wrapper">
 

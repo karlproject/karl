@@ -1,58 +1,54 @@
-<configure xmlns="http://pylonshq.com/pyramid">
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:bc="http://pylonshq.com/bottlecap">
+
+  <include package="bottlecap" file="meta.zcml"/>
 
   <view
-    for="*"
-    view=".helloworld.helloworld_view"
-    name="helloworld.html"
-    renderer="templates/helloworld.pt"
+    context="karl.models.interfaces.ISite"
+    name="ux"
+    view=".switcher.switch_ui"
   />
 
-  <view
-    for="*"
-    view=".components.global_nav"
+  <bc:panel
+    context="*"
+    panel=".panels.global_nav"
     name="ux2.global_nav"
     renderer="templates/global_nav.pt"
   />
 
-  <view
-    for="*"
-    view=".components.personal_tools"
+  <bc:panel
+    context="*"
+    panel=".panels.personal_tools"
     name="ux2.personal_tools"
     renderer="templates/personal_tools.pt"
   />
 
-  <view
-    for="*"
-    view=".components.search"
+  <bc:panel
+    context="*"
+    panel=".panels.search"
     name="ux2.search"
     renderer="templates/search.pt"
   />
 
-  <view
-    for="*"
-    view=".components.context_tools"
+  <bc:panel
+    context="*"
+    panel=".panels.context_tools"
     name="ux2.context_tools"
     renderer="templates/context_tools.pt"
   />
 
-  <view
-    for="*"
-    view=".components.actions_menu"
+  <bc:panel
+    context="*"
+    panel=".panels.actions_menu"
     name="ux2.actions_menu"
     renderer="templates/actions_menu.pt"
   />
 
-  <view
-    for="*"
-    view=".components.column_one"
+  <bc:panel
+    context="*"
+    panel=".panels.column_one"
     name="ux2.column_one"
     renderer="templates/column_one.pt"
-  />
-
-  <view
-    for="karl.models.interfaces.ISite"
-    name="ux"
-    view=".switcher.switch_ui"
   />
 
 </configure>

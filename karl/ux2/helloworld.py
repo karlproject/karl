@@ -1,2 +1,6 @@
+from karl.views.api import TemplateAPI
+
+
 def helloworld_view(context, request):
-    return {"project": "Some Project"}
+    return {"api": TemplateAPI(context, request),
+            "project": "Some Project"}
