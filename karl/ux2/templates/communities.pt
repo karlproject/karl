@@ -5,7 +5,7 @@
     <div metal:use-macro="layout.snippets.macros['status_message']"/>
     
     <tal:actions_menu 
-        content="panel('ux2.actions_menu', actions=actions)">
+        content="panel('popper.actions_menu', actions=actions)">
 
     <div id="communities-content-wrapper">
 

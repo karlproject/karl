@@ -52,38 +52,38 @@
   <bc:panel
     context="*"
     panel=".panels.global_nav"
-    name="ux2.global_nav"
+    name="popper.global_nav"
     renderer="templates/global_nav.pt"
   />
 
   <bc:panel
     context="*"
-    name="ux2.personal_tools"
+    name="popper.personal_tools"
     renderer="templates/personal_tools.pt"
   />
 
   <bc:panel
     context="*"
-    name="ux2.search"
+    name="popper.search"
     renderer="templates/search.pt"
   />
 
   <bc:panel
     context="*"
-    name="ux2.context_tools"
+    name="popper.context_tools"
     renderer="templates/context_tools.pt"
   />
 
   <bc:panel
     context="*"
     panel=".panels.actions_menu"
-    name="ux2.actions_menu"
+    name="popper.actions_menu"
     renderer="templates/actions_menu.pt"
   />
 
   <bc:panel
     context="*"
-    name="ux2.column_one"
+    name="popper.column_one"
     renderer="templates/column_one.pt"
   />
 
