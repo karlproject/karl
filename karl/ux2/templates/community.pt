@@ -11,7 +11,7 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     
     <tal:actions_menu 
-        content="lm.panel('ux2.actions_menu', api=api, actions=actions)">
+        content="panel('ux2.actions_menu', api=api, actions=actions)">
 
     <h1 class="kscreentitle">Overview</h1>
 
