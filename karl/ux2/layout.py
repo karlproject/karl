@@ -1,11 +1,12 @@
 from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
 
-from bottlecap.layout import LayoutManager as BaseLayoutManager
+from bottlecap.layouts.popper.layout import PopperLayout
 
 from karl.views.api import TemplateAPI
 
-class LayoutManager(BaseLayoutManager):
+
+class Layout(PopperLayout):
 
     @property
     def global_nav_menus(self):

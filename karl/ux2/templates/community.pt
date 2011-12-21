@@ -1,4 +1,4 @@
-<metal:block use-macro="lm.layout('site')">
+<metal:block use-macro="main_template">
 
     <metal:slot metal:fill-slot="extra-headers">
         <link rel="alternate" type="application/atom+xml" 

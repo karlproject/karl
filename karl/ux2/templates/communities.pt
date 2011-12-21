@@ -1,4 +1,4 @@
-<metal:block use-macro="lm.layout('site')">
+<metal:block use-macro="main_template">
 
     <metal:content fill-slot="content">
 

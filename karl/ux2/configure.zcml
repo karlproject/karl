@@ -9,6 +9,46 @@
     view=".switcher.switch_ui"
   />
 
+  <!-- Default layout -->
+  <bc:layout
+    layout=".layout.Layout"
+    template="templates/site_layout.pt"
+  />
+
+  <!-- 
+      Other layouts can also be defined which use different main templates and
+      are used in different parts of the site.  An example might be to define a
+      community layout which uses the containment option to apply the community
+      layout to all content that is inside of a community:
+
+      <bc:layout
+        layout=".layout.Layout"
+        template="templates/community_layout.pt"
+        containment="karl.models.interfaces.ICommunity"
+        />
+
+      It's conceivable you could do the same thing to define the intranet 
+      layout.  Intranets, though, derive from communities, so it's possible 
+      that the containment predicate might accidentally choose the community
+      layout, since an intranet is also a community.  I'm honestly not sure
+      what it would do.  To be on the safe side, instead of using containment,
+      we might just provide a name for the intranet layout: 
+
+      <bc:layout
+        layout=".layout.Layout"
+        template="templates/intranet_layout.pt"
+        name="intranet"
+        />
+
+      If a view needs to use a named layout, it just need to tell the
+      layout manager the name of the layout it wants to use:
+
+      def my_view(context, request):
+          ...
+          request.layout_manager.use_layout('intranet')
+          return {...}
+  -->
+
   <bc:panel
     context="*"
     panel=".panels.global_nav"

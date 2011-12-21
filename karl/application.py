@@ -2,20 +2,12 @@ import pkg_resources
 
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.renderers import RendererHelper
-from pyramid.events import BeforeRender
 
 import karl.ux2
-from karl.ux2.layout import LayoutManager
 
-def add_renderer_globals(event):
-    request = event['request']
-    context = request.context
 
 def configure_karl(config, load_zcml=True):
     config.include('bottlecap')
-    config.add_bc_layout({'site': 'karl.ux2:templates/site_layout.pt'})
-    config.add_bc_layoutmanager_factory(LayoutManager)
-    config.add_subscriber(add_renderer_globals, BeforeRender)
     config.add_renderer('.pt', ux2_metarenderer_factory)
 
     if load_zcml:

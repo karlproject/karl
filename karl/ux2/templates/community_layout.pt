@@ -25,10 +25,10 @@
         <meta name="viewport"
               content="width=device-width,initial-scale=1">
 
-        <link rel="stylesheet" href="${lm.bottlecap_static}main.css"/>
+        <link rel="stylesheet" href="${layout.static_url}main.css"/>
 
-        <script src="${lm.bottlecap_static}js/modernizr-2.0.6.min.js"></script>
-        <script src="${lm.bottlecap_static}js/respond.min.js"></script>
+        <script src="${layout.static_url}js/modernizr-2.0.6.min.js"></script>
+        <script src="${layout.static_url}js/respond.min.js"></script>
 
 
         <metal:headslot metal:define-slot="head_slot"/>
@@ -77,16 +77,16 @@
     
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="${lm.bottlecap_static}js/jquery-1.6.3.min.js"><\/script>')</script>
+    <script>window.jQuery || document.write('<script src="${layout.static_url}js/jquery-1.6.3.min.js"><\/script>')</script>
     <!--[if (gte IE 6)&(lte IE 8)]>
-    <script type="text/javascript" src="${lm.bottlecap_static}js/jquery-extra-selectors.min.js"></script>        
-    <script type="text/javascript" src="${lm.bottlecap_static}js/selectivizr-min.js"></script>
+    <script type="text/javascript" src="${layout.static_url}js/jquery-extra-selectors.min.js"></script>        
+    <script type="text/javascript" src="${layout.static_url}js/selectivizr-min.js"></script>
     <![endif]-->
 
     <script type="text/javascript" defer
-            src="${lm.bottlecap_static}js/bottlecap.js"></script>
+            src="${layout.static_url}js/bottlecap.js"></script>
     <script type="text/javascript"
-            src="${lm.bottlecap_static}js/dropdown.js"></script>
+            src="${layout.static_url}js/dropdown.js"></script>
 
     <metal:tailslot metal:define-slot="tail_slot"/>
 
