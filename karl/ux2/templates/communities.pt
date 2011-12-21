@@ -2,25 +2,25 @@
 
     <metal:content fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="layout.snippets.macros['status_message']"/>
     
     <tal:actions_menu 
-        content="panel('ux2.actions_menu', api=api, actions=actions)">
+        content="panel('ux2.actions_menu', actions=actions)">
 
     <div id="communities-content-wrapper">
 
-    <div metal:use-macro="api.snippets.macros['communities-listing-head']"/>
+    <div metal:use-macro="layout.snippets.macros['communities-listing-head']"/>
 
     <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
 
     <div tal:condition="error" tal:content="error" />
 
     <metal:script
-        metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
+        metal:use-macro="layout.snippets.macros['gridstyle_batching_script']" />
     <table tal:condition="batch_info['batching_required']" width="100%">
       <tr class="ui-grid-footer">
         <th class="ui-widget-header">
-          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          <div metal:use-macro="layout.snippets.macros['gridstyle_batching']">
           </div>
         </th>
       </tr>
@@ -31,10 +31,10 @@
 
       <div class="klisting_header">
         <a href="${community.url}">${community.title}</a>
-        <span tal:condition="not api.has_staff_acl(community.context)"
-          metal:use-macro="api.snippets.macros['privacy_badge']"/>
+        <span tal:condition="not layout.has_staff_acl(community.context)"
+          metal:use-macro="layout.snippets.macros['privacy_badge']"/>
         <span tal:condition="community.moderator"
-          metal:use-macro="api.snippets.macros['moderator_badge']"/>
+          metal:use-macro="layout.snippets.macros['moderator_badge']"/>
       </div>
 
       <p>${community.description}</p>
@@ -48,7 +48,7 @@
     <table tal:condition="batch_info['batching_required']" width="100%">
       <tr class="ui-grid-footer">
         <th class="ui-widget-header">
-          <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
+          <div metal:use-macro="layout.snippets.macros['gridstyle_batching']">
           </div>
         </th>
       </tr>

@@ -1,18 +1,18 @@
 
-def global_nav(context, request, api):
-    return {'api': api}
+def global_nav(context, request):
+    return {}
 
-def personal_tools(context, request, api):
-    return {'api': api}
+def personal_tools(context, request):
+    return {}
 
-def search(context, request, api):
-    return {'api': api}
+def search(context, request):
+    return {}
 
-def context_tools(context, request, api):
-    return {'api': api}
+def context_tools(context, request):
+    return {}
 
-def actions_menu(context, request, api, actions):
-    return {'api': api, 'actions': actions}
+def actions_menu(context, request, actions):
+    return {'actions': actions}
 
-def column_one(context, request, api):
-    return {'api': api}
+def column_one(context, request):
+    return {}

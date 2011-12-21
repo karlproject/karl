@@ -5,7 +5,7 @@
 
             <metal:portlets define-slot="portlets"></metal:portlets>
 
-            <div tal:content="structure api.render_sidebar()"></div>
+            <div tal:content="structure layout.render_sidebar()"></div>
 
             <div class="portlet" id="popular-tags-portlet"
                  tal:condition="tags">
@@ -16,16 +16,16 @@
                 </div>
                 <div class="portlet-item" tal:repeat="tag tags">
                  ${tag.count}&nbsp;
-                 <a href="${api.here_url}showtag/${tag.name}">${tag.name}</a>
+                 <a href="${layout.here_url}showtag/${tag.name}">${tag.name}</a>
                 </div>
                 <div class="portlet-item">
-                 <a href="${api.here_url}taglisting.html"
+                 <a href="${layout.here_url}taglisting.html"
                  >All ${profile.firstname}'s tags</a>
                 </div>
               </div>
 
               <div tal:condition="my_communities and my_communities is not None"
-                   metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+                   metal:use-macro="layout.snippets.macros['my_communities_portlet']"/>
 
               <div metal:define-macro="my_communities_portlet" class="portlet"
                    tal:condition="my_communities is None" id="my-communities-portlet">

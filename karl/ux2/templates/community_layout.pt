@@ -37,9 +37,9 @@
     <div id="top-bar">
         <div class="container">
 	        <tal:actions_menu
-	                tal:content="panel('bottlecap.global_nav', api=api)">
+	                tal:content="panel('bottlecap.global_nav')">
 	        <tal:actions_menu
-	                tal:content="panel('bottlecap.personal_tools'), api=api">
+	                tal:content="panel('bottlecap.personal_tools')">
 	    </div>
     </div>
 
@@ -47,14 +47,14 @@
         <div class="container">
 	        <nav class="search">
 	            <tal:actions_menu
-	                    tal:content="panel('bottlecap.search', api=api)">
+	                    tal:content="panel('bottlecap.search')">
 	        </nav>
 	        <section>
 	            <header>
 	                <h2>${project}</h2>
 	            </header>
 	            <tal:actions_menu
-	                 tal:content="panel('bottlecap.context_tools'), api=api">
+	                 tal:content="panel('bottlecap.context_tools')">
 	        </section>
 	    </div>
     </div>
@@ -66,7 +66,7 @@
 
         <aside class="column">
 	        <tal:actions_menu
-	                tal:content="panel('bottlecap.column_one', api=api)">
+	                tal:content="panel('bottlecap.column_one')">
 	    </aside>
     </div>
 
