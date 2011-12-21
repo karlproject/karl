@@ -30,12 +30,12 @@
 
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
 
-    <link rel="stylesheet" href="${layout.static_url}main.css"/>
+    <link rel="stylesheet" href="${layout.popper_static_url}main.css"/>
     <link rel="stylesheet" href="${api.static_url}/ux2/main.css"/>
 
     <metal:resources use-macro="api.snippets.macros['js_resources']"/>
 
-    <script src="${layout.static_url}/js/modernizr-2.0.6.min.js"></script>
+    <script src="${layout.popper_static_url}/js/modernizr-2.0.6.min.js"></script>
 
     <metal:headslot metal:define-slot="extra-headers"/>
 </head>
@@ -81,9 +81,9 @@
 </footer>
 
 <script type="text/javascript" defer
-        src="${layout.static_url}/js/bottlecap.js"></script>
+        src="${layout.popper_static_url}/js/bottlecap.js"></script>
 <script type="text/javascript"
-        src="${layout.static_url}/js/dropdown.js"></script>
+        src="${layout.popper_static_url}/js/dropdown.js"></script>
 
 <metal:tailslot metal:define-slot="tail_slot"/>
 
