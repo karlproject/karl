@@ -58,21 +58,18 @@
 
   <bc:panel
     context="*"
-    panel=".panels.personal_tools"
     name="ux2.personal_tools"
     renderer="templates/personal_tools.pt"
   />
 
   <bc:panel
     context="*"
-    panel=".panels.search"
     name="ux2.search"
     renderer="templates/search.pt"
   />
 
   <bc:panel
     context="*"
-    panel=".panels.context_tools"
     name="ux2.context_tools"
     renderer="templates/context_tools.pt"
   />
@@ -86,7 +83,6 @@
 
   <bc:panel
     context="*"
-    panel=".panels.column_one"
     name="ux2.column_one"
     renderer="templates/column_one.pt"
   />
