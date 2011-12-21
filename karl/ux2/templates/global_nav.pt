@@ -9,9 +9,9 @@
     <div data-quickpanel="quickpanel" class="topNavIconWrapper">
         <h2 id="navigation-toggle" class="quickpanel-toggle ir">Navigation</h2>
         <ul id="global-nav" class="quickpanel">
-            <li tal:repeat="menu layout.global_nav_menus"
-                    tal:attributes="class menu.selected">
-                <a href="${menu.url}">${menu.title}</a>
+            <li tal:repeat="item nav_menu"
+                    tal:attributes="class item.selected">
+                <a href="${item.url}">${item.title}</a>
             </li>
         </ul>
     </div>
