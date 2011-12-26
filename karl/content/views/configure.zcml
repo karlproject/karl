@@ -1235,32 +1235,6 @@
     name="new_query_file.json"
   />
 
-
-  <!-- Agility -->
-
-    <view
-      for="karl.content.interfaces.IWiki"
-      view=".agility.show_agility_view"
-      permission="view"
-      name="agility.html"
-    />
-
-    <view
-      for="karl.content.interfaces.IWiki"
-      view=".agility.get_agility_data"
-      permission="view"
-      name="get_agility_data.json"
-      renderer="json"
-      />
-
-    <view
-      for="karl.content.interfaces.IWiki"
-      view=".agility.set_agility_data"
-      permission="view"
-      name="set_agility_data.json"
-      renderer="json"
-      />
-
   <formish:form
      controller=".advanced.AdvancedFormController"
      name="advanced.html"
