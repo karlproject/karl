@@ -1,5 +1,5 @@
 <div class="karlselectionradiofield">
-  <tal:block condition="field.widget.none_option" class="karlselectionradiofield">
+  <tal:block condition="field.widget.none_option">
     <input type="radio" name="${field.name}" id="${field.cssname}-noneoption"
            value="${field.widget.get_none_option_value(field)}" />
     <label for="${field.cssname}-noneoption">${field.widget.none_option[1]}</label>
