@@ -10,6 +10,18 @@ KARL. The listing will be removed as the Selenium2 tests get filled in,
 making the Selenium2 tests the official listing of KARL "screens". (The
 reflect a priority on test writing, 1 being highest and 5 being lowest.)
 
+Usage
+=====
+
+#. Download from ``selenium-server-standalone-2.15.0.jar`` from
+   ``http://code.google.com/p/selenium/downloads/list``
+
+#. Run ``java -jar ./selenium-server-standalone-2.15.0.jar``
+
+#. In a virtualenv,  easy_install ``selenium`` and ``nose``
+
+#. ``/path/to/virtualenv/bin/nosetests ./test_karl.py``
+
 blog
 ====
 
