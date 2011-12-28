@@ -1,7 +1,6 @@
 <fieldset>
   <span id="${field.cssname}"></span>
   <script language="javascript" type="text/javascript">
-    //<![CDATA[
         var tagdata = ${field.widget.json_taginfo(field.value)};
         $(document).ready(function() {
             if (! tagdata.records) {
@@ -25,6 +24,5 @@
                 name: "${field.name}"
             });
         });
-        //]]>
   </script>
 </fieldset>
