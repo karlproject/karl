@@ -22,7 +22,7 @@
               });
           var feedlist = $('#feedlist')
               .karlcontentfeeds({
-                  ajax_url: '${api.app_url}/newest_feed_items.json',
+                  ajax_url: $('#karl-app-url').attr('content') + '/newest_feed_items.json',
                   filter: $('#filter').text()
               })
               .bind('changed.karlcontentfeeds', function(evt, summary_info) {
