@@ -34,7 +34,9 @@ $.widget('karl.karlcontentfeeds', {
     destroy: function() {
         $.Widget.prototype.destroy.call( this );
         // be paranoid about IE memory leaks
-        this._active_request && this._active_request.abort();
+        if (this._active_request) {
+            this._active_request.abort();
+        }
         this._active_request = null;
     },
 
@@ -47,7 +49,9 @@ $.widget('karl.karlcontentfeeds', {
         this._gen_feed_url();
         
         // dump active requests at this point
-        this._active_request && this._active_request.abort();
+        if (this._active_request) {
+            this._active_request.abort();
+        }
         // re-set the throbber
         this.setAjaxState(this._ajax_base_state, {notify: true});
 
@@ -71,7 +75,7 @@ $.widget('karl.karlcontentfeeds', {
         if (jQuery.inArray(self._ajax_state, states) > -1) {
             log('bailout: ' + self._ajax_state);
             return;
-        };
+        }
 
         self.setAjaxState('polling', {notify: true});
         this._active_request = jQuery.ajax({
@@ -80,7 +84,7 @@ $.widget('karl.karlcontentfeeds', {
                 success: function(data) {
                     // XXX It seems, that IE bumps us
                     // here on abort(), with data=null.
-                    if (data != null) {
+                    if (data !== null) {
                         self._ajaxSuccess(data);
                     }
                 },
@@ -98,7 +102,7 @@ $.widget('karl.karlcontentfeeds', {
         var self = this;
 
         var template = self._templates[key];
-        if (template == null) {
+        if (! template) {
             template = tmpl(key);
             self._templates[key] = template;
         }
@@ -137,7 +141,7 @@ $.widget('karl.karlcontentfeeds', {
         if (i.earliest_gen !== undefined) {
             earliest_gen = Math.min(i.earliest_gen, earliest_gen);
             earliest_index = Math.min(i.earliest_index, earliest_index);
-        };
+        }
         var now = this._now(); 
         this._summary_info = {
             last_gen: last_gen,
@@ -160,6 +164,12 @@ $.widget('karl.karlcontentfeeds', {
     },
 
     _animate: function(nr) {
+
+        // XXX The animation is broken on IE8 for some reason.
+        // Temporarily disabled.
+        if ($.browser.msie) {
+            return;
+        }
         
         // sum the full height, to see how large we need to go.
         // (XXX hmmm... should there be a better way?)
@@ -177,7 +187,7 @@ $.widget('karl.karlcontentfeeds', {
         // because it breaks the animation.
         var clear = this.element.css('clear'); 
         var wrapper = $('<div></div>')
-            .css({overflow: 'hidden', 'clear': clear})
+            .css({overflow: 'hidden', 'clear': clear});
         this.element
             .wrap(wrapper)
             .css({marginTop: -full_height, 'clear': 'none'});
@@ -324,8 +334,8 @@ $.widget('karl.karlcontentfeeds_polling', {
         });
         $('body').click(function(evt) {
             // close the info details it if clicked outside of it.
-            if (self.info_active && ! (self.infoButton[0] == evt.target) &&
-                    ! (self.detailsInfo[0] == evt.target) &&
+            if (self.info_active && (self.infoButton[0] !== evt.target) &&
+                    (self.detailsInfo[0] !== evt.target) &&
                     ! jQuery.contains(self.detailsInfo[0], evt.target)) {
                 self._closeDetailsInfo();
             }
