@@ -44,10 +44,10 @@
         tal:attributes="class python:('cal_%s','cal_%s_all')[event.bubbled] % event.color">
 
   <tal:block condition="event.bubbled">
-    ${event.bubble_title}
+    ${structure: event.bubble_title}
   </tal:block>
   <tal:block condition="not(event.bubbled)">
-    &middot; ${event.title}
+    &middot; ${structure: event.title}
   </tal:block>
 
   </a>
