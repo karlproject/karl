@@ -1,3 +1,0 @@
-# Verify files page exist
-go /communities/${community_name}/files
-code 200

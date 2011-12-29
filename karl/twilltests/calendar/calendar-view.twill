@@ -1,2 +1,0 @@
-go /communities/${community_name}/calendar
-find "new event"
