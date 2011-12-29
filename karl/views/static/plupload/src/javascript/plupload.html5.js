@@ -6,6 +6,11 @@
  *
  * License: http://www.plupload.com/license
  * Contributing: http://www.plupload.com/contributing
+ *
+ *
+ * 2011-12-04 Balazs Ree <ree@greenfinity.hu>:
+ *    - Apply html5 (FireFox) fix from forward version 1.5
+ *
  */
 
 // JSLint defined globals
@@ -202,7 +207,8 @@
 					html5files[id] = file;
 
 					// Expose id, name and size
-					files.push(new plupload.File(id, file.fileName, file.fileSize || file.size)); // File.fileSize depricated
+                                        // XXX RB fix backported from later version 1.5
+					files.push(new plupload.File(id, file.fileName || file.name, file.fileSize || file.size)); // File.fileSize depricated
 				}
 
 				// Trigger FilesAdded event if we added any
