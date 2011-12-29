@@ -208,7 +208,7 @@ class TemplateAPI(object):
             else:
                 calendar_path = '/offices/calendar'
                 try:
-                    calendar = find_resource(self.site, calendar_path)
+                    find_resource(self.site, calendar_path)
                     self._should_show_calendar_tab = True
                 except KeyError:
                     self._should_show_calendar_tab = False
@@ -225,7 +225,7 @@ class TemplateAPI(object):
         if key == 'form_field_templates':
             # Allow this, for ZPT's sake!
             return self.form_field_templates
-        raise ValueError, "ZPT attempted to fetch %s" % key
+        raise KeyError(key)
 
     @property
     def community_info(self):
@@ -290,7 +290,9 @@ class TemplateAPI(object):
         if self._form_field_templates is None:
             # calculate and cache value
             if hasattr(self.request, 'form'):
-                self._form_field_templates =  [field.widget.template for field in self.request.form.allfields]
+                self._form_field_templates =  [
+                    field.widget.template for field in
+                    self.request.form.allfields]
             else:
                 self._form_field_templates = []
         return self._form_field_templates

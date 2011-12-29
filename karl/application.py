@@ -1,82 +1,49 @@
-import logging
-import os
-import sys
-import transaction
-import webob
+import pkg_resources
 
-from zope.component import queryUtility
+from pyramid.chameleon_zpt import renderer_factory
+from pyramid.renderers import RendererHelper
 
-from pyramid_zcml import make_app as bfg_make_app
-from pyramid.scripting import get_root
-from pyramid.traversal import resource_path
-from repoze.who.plugins.zodb.users import Users
-from repoze.zodbconn.finder import PersistentApplicationFinder
-
-from karl.log import configure_log
-from karl.log import get_logger
-from karl.log import set_subsystem
-from karl.views.utils import get_user_home
-from karl.utils import asbool
-from karl.bootstrap.bootstrap import populate
-from karl.bootstrap.interfaces import IBootstrapper
-
-def appmaker(root):
-    bootstrapper = queryUtility(IBootstrapper, default=populate)
-    if not root.has_key('site'):
-        bootstrapper(root)
-        transaction.commit()
-    return root['site']
-
-def make_app(global_config, **kw):
-    config = global_config.copy()
-    config.update(kw)
-
-    # paster app config callback
-    zodb_uri = config.get('zodb_uri')
-    if zodb_uri is None:
-        raise ValueError('zodb_uri must not be None')
-    get_root = PersistentApplicationFinder(zodb_uri, appmaker)
-
-    # Coerce a value out of the [app:karl] section in the INI file
-    jquery_dev_mode = config.get('jquery_dev_mode', False)
-    config['jquery_dev_mode'] = asbool(jquery_dev_mode)
-    config['read_only'] = asbool(config.get('read_only', False))
-
-    # Set up logging
-    configure_log(**config)
-    set_subsystem('karl')
-
-    # Set up logging admin view (coerce instances to list)
-    if 'logs_view' in config:
-        config['logs_view'] = map(os.path.abspath, config['logs_view'].split())
-
-    for key in ('syslog_view_instances', 'error_monitor_subsystems'):
-        if key in config:
-            config[key] = config[key].split()
-
-    # Make BFG app
-    pkg_name = config.get('package', None)
-    if pkg_name is not None:
-        __import__(pkg_name)
-        package = sys.modules[pkg_name]
-        app = bfg_make_app(get_root, package, options=config)
-    else:
-        filename = 'karl.includes:standalone.zcml'
-        app = bfg_make_app(get_root, filename=filename, options=config)
-
-    return app
+import karl.ux2
 
 
-def find_users(root):
-    # Called by repoze.who
-    if not 'site' in root:
-        return Users()
-    return root['site'].users
+def configure_karl(config, load_zcml=True):
+    config.include('bottlecap')
+    config.add_renderer('.pt', ux2_metarenderer_factory)
+
+    if load_zcml:
+        config.hook_zca()
+        config.include('pyramid_zcml')
+        config.load_zcml('standalone.zcml')
 
 
-def unconditional_veto(environ, status, headers):
+def ux2_metarenderer_factory(info):
     """
-    Can be used in read-only mode to avoid attempting to commit any
-    transactions.
+    Use a custom renderer to choose between 'classic' and 'ux2' UI.
     """
-    return True
+    # Don't use metarenderer if we're specifcally already looking for
+    # something in karl.ux2.  Also don't use metarender for any of the layouts.
+    # We want those to be explicitly chosen from one UI or the other at the
+    # point where they are used.
+    if info.name.endswith('_layout.pt') or info.package is karl.ux2:
+        return renderer_factory(info)
+
+    # Does this template exist in ux2?
+    name = info.name
+    if ':' in name:
+        name = name[name.index(':') + 1:]
+    if not pkg_resources.resource_exists('karl.ux2', name):
+        # There's not a UX2 version, so just return the same old renderer
+        # you would normally use
+        return renderer_factory(info)
+
+    # Return a renderer that chooses classic versus ux2 based on cookie
+    # in request.
+    classic_renderer = renderer_factory(info)
+    ux2_renderer = renderer_factory(RendererHelper(
+        name, karl.ux2, info.registry))
+    def metarenderer(value, system):
+        use_ux2 = system['request'].cookies.get('ux2') == 'true'
+        if use_ux2:
+            return ux2_renderer(value, system)
+        return classic_renderer(value, system)
+    return metarenderer

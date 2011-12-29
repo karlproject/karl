@@ -1,0 +1,8 @@
+<ul class="sectionTools" tal:condition="layout.community_info">
+    <li tal:repeat="tab layout.community_info.tabs" class="${tab.css_class=='curr' and 'selected' or ''}">
+        <a href="${tab.url}">${tab.name}</a>
+    </li>
+    <li><a href="${layout.community_info.url}members">Members</a></li>
+    <li><a href="${layout.community_info.url}tagcloud.html">Tags</a></li>
+</ul>
+<div tal:condition="not:layout.community_info"><p>&nbsp;</p><p>&nbsp;</p></div>

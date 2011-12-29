@@ -1,0 +1,25 @@
+<ul class="actionsMenu">
+    <tal:block repeat="action layout.actions_to_menu(actions)">
+        <li data-quickpanel="dropdown"
+            tal:condition="action[2]">
+            <a href="${layout.here_url}${action[1]}" class="dropdown-toggle"
+               tal:condition="not action[1].startswith('http')">${action[0]}</a>
+            <a href="${action[1]}" class="dropdown-toggle"
+               tal:condition="action[1].startswith('http')">${action[0]}</a>
+            <ul class="dropdown" >
+                <li tal:repeat="subaction action[2]">
+                    <a href="${layout.here_url}${subaction[1]}" class="dropdown-toggle"
+                       tal:condition="not subaction[1].startswith('http')">${subaction[0]}</a>
+                    <a href="${subaction[1]}" class="dropdown-toggle"
+                       tal:condition="subaction[1].startswith('http')">${subaction[0]}</a>
+                </li>
+            </ul>
+        </li>
+        <li tal:condition="not:action[2]">
+            <a href="${layout.here_url}${action[1]}"
+               tal:condition="not action[1].startswith('http')">${action[0]}</a>
+            <a href="${action[1]}"
+               tal:condition="action[1].startswith('http')">${action[0]}</a>
+        </li>
+    </tal:block>
+</ul>

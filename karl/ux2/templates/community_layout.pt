@@ -1,0 +1,94 @@
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js ie6 oldie" lang="en"> <![endif]-->
+    <!--[if IE 7]>
+    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+    <!--[if IE 8]>
+    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+    <!--[if gt IE 8]><!-->
+    <html class="no-js" lang="en"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8"/>
+
+        <!-- Use the .htaccess and remove these lines to avoid edge case issues.
+     More info: h5bp.com/b/378 -->
+        <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> -->
+
+        <metal:titleslot metal:define-slot="title_slot">
+            <title>${project} Application</title>
+        </metal:titleslot>
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1">
+
+        <link rel="stylesheet" href="${layout.popper_static_url}main.css"/>
+
+        <script src="${layout.popper_static_url}js/modernizr-2.0.6.min.js"></script>
+        <script src="${layout.popper_static_url}js/respond.min.js"></script>
+
+
+        <metal:headslot metal:define-slot="head_slot"/>
+    </head>
+    <body>
+    <div id="top-bar">
+        <div class="container">
+	        <tal:actions_menu
+	                tal:content="panel('bottlecap.global_nav')">
+	        <tal:actions_menu
+	                tal:content="panel('bottlecap.personal_tools')">
+	    </div>
+    </div>
+
+    <div class="sectionContainer">
+        <div class="container">
+	        <nav class="search">
+	            <tal:actions_menu
+	                    tal:content="panel('bottlecap.search')">
+	        </nav>
+	        <section>
+	            <header>
+	                <h2>${project}</h2>
+	            </header>
+	            <tal:actions_menu
+	                 tal:content="panel('bottlecap.context_tools')">
+	        </section>
+	    </div>
+    </div>
+
+    <div class="contentWrapper">
+        <section class="main">
+            <metal:content define-slot="content"/>
+        </section>
+
+        <aside class="column">
+	        <tal:actions_menu
+	                tal:content="panel('bottlecap.column_one')">
+	    </aside>
+    </div>
+
+    <footer>
+        <div class="container">Footer with some relevant information.
+        </div>
+    </footer>
+    
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="${layout.popper_static_url}js/jquery-1.6.3.min.js"><\/script>')</script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <script type="text/javascript" src="${layout.popper_static_url}js/jquery-extra-selectors.min.js"></script>        
+    <script type="text/javascript" src="${layout.popper_static_url}js/selectivizr-min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" defer
+            src="${layout.popper_static_url}js/bottlecap.js"></script>
+    <script type="text/javascript"
+            src="${layout.popper_static_url}js/dropdown.js"></script>
+
+    <metal:tailslot metal:define-slot="tail_slot"/>
+
+    </body>
+</html>

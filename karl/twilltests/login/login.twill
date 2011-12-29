@@ -1,4 +1,0 @@
-#  change user & admin accounts under karl3.conf, not here
-#  used by multiple suites
-
-login ${cur_user}
