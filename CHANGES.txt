@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-
+- Switch to Chameleon 2.
 
 3.77 (2011-12-16)
 -----------------
