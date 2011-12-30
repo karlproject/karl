@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.79 (2011-12-30)
+-----------------
 
 - Fix Chameleon 2 incompatility bugs in email_blog_entry.pt.
 
