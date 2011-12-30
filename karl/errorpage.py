@@ -103,11 +103,16 @@ class ErrorPageFilter(object):
                 errorlog_url = req.relative_url(
                     self._errorlog_url, to_application=True
                 )
-            error_text = NOTFOUND_MESSAGE if status == 404 else GENERAL_MESSAGE
+            if status == 404:
+                error_message = 'Not Found'
+                error_text = NOTFOUND_MESSAGE
+            else:
+                error_message = 'General Error'
+                error_text = GENERAL_MESSAGE
             error_text %= {'system_name': self._system_name}
             resp = render_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
-                dict(error_message='Not Found',
+                dict(error_message=error_message,
                      static_url=static_url,
                      error_text=error_text,
                      home_url=home_url,
@@ -116,6 +121,6 @@ class ErrorPageFilter(object):
                 )
             resp.status = status
             return resp(environ, start_response)
-        
+
         return resp(environ, start_response)
 
