@@ -35,6 +35,12 @@ class TestErrorPage(unittest.TestCase):
         response = request.get_response(self.make_one())
         self.assertTrue('General Error' in response.body)
 
+    def test_general_error_w_template_and_unicode(self):
+        self.error = Exception(u'Happy\xa0Times'.encode('utf8'))
+        request = Request.blank('/')
+        response = request.get_response(self.make_one())
+        self.assertTrue('General Error' in response.body)
+
     def test_readonly_error(self):
         from ZODB.POSException import ReadOnlyError
         self.error = ReadOnlyError()

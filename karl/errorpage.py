@@ -79,7 +79,7 @@ class ErrorPageFilter(object):
                 error_message = 'General Error'
                 error_text = GENERAL_MESSAGE % {
                     'system_name': self._system_name}
-                traceback_info = format_exc()
+                traceback_info = unicode(format_exc(), 'UTF-8')
 
             resp = render_to_response(
                 'karl.views:templates/wsgi_errormsg.pt',
