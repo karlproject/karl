@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-
+- Fix Chameleon 2 incompatility bugs in these templates: email_blog_entry, ...
 
 3.78 (2011-12-29)
 -----------------
