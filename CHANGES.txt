@@ -4,7 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
-- Fix Chameleon 2 incompatility bugs in these templates: email_blog_entry, ...
+- Fix Chameleon 2 incompatility bugs in email_blog_entry.pt.
+
+- Fix problem with non-ascii characters in exception error messages in both
+  the error page view and the postoffice quarantine view.
 
 3.78 (2011-12-29)
 -----------------
