@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+3.80 (2012-01-04)
+-----------------
+
+- removed extra tal:attributes from template that caused wrong
+  selected values to display
+
 3.79 (2011-12-30)
 -----------------
 
