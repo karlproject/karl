@@ -29,8 +29,8 @@
     <td>
       <select name="alerts_pref_${c.name}">
     <option tal:repeat="o c.alerts_pref"
-      value="${o.value}" selected="${o.selected}"
-    tal:attributes="selected o.selected">
+    value="${o.value}" selected="${o.selected}">
+    
     ${o.label}
     </option>
       </select>
