@@ -43,6 +43,9 @@ class IntranetsToolFactory(ToolFactory):
         # Mark the context (e.g. /osi) as providing IIntranets
         alsoProvides(context, IIntranets)
 
+        # Since context now provides IIntranets it needs a feature
+        context.feature = u''
+
     def remove(self, context, request):
         del context['intranets']
         

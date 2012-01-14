@@ -59,6 +59,8 @@ class TestIntranetsToolFactory(unittest.TestCase):
         factory = self._makeOne()
         factory.add(context, request)
         self.failUnless(context['intranets'])
+        feature = getattr(context, 'feature', None)
+        self.assertEqual(feature, u'')
         self.failUnless(factory.is_present(context, request))
         factory.remove(context, request)
         self.failIf(factory.is_present(context, request))
