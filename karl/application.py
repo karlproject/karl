@@ -4,6 +4,14 @@ from pyramid.chameleon_zpt import renderer_factory
 from pyramid.renderers import RendererHelper
 
 import karl.ux2
+from karl.utils import asbool
+
+
+try:
+    import pyramid_debugtoolbar
+    pyramid_debugtoolbar  # pyflakes stfu
+except ImportError:
+    pyramid_debugtoolbar = None
 
 
 def configure_karl(config, load_zcml=True):
@@ -14,6 +22,10 @@ def configure_karl(config, load_zcml=True):
         config.hook_zca()
         config.include('pyramid_zcml')
         config.load_zcml('standalone.zcml')
+
+    debug = asbool(config.registry.settings.get('debug', 'false'))
+    if debug and pyramid_debugtoolbar:
+        config.include(pyramid_debugtoolbar)
 
 
 def ux2_metarenderer_factory(info):
