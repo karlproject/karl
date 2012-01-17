@@ -10,7 +10,7 @@ def global_nav(context, request):
     menu_items = [
         dict(title="Communities",
              url=request.resource_url(site, 'communities'),
-             selected='selected'),
+             selected=None),
         dict(title="People",
              url=layout.people_url,
              selected=None),
