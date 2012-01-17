@@ -8,19 +8,19 @@
 
     <metal:content fill-slot="content">
 
-    <div metal:use-macro="layout.snippets.macros['status_message']"/>
+    ${panel('status_message')}
     
     <tal:actions_menu 
         content="panel('popper.actions_menu', actions=actions)">
 
     <h1 class="kscreentitle">Overview</h1>
 
-    <div metal:use-macro="layout.snippets.macros['list_tags']"/>
+    <div metal:use-macro="layout.macros['list_tags']"/>
     <div class="koverview_body" 
          tal:condition="layout.context.text != u''">
       <span tal:replace="structure layout.context.text"/>
     </div>
-    <metal:script metal:use-macro="layout.snippets.macros['gridstyle_batching_script']" />
+    <metal:script metal:use-macro="layout.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper">
       <h3>Recent Activity</h3>
       <table class="content-listing">
@@ -59,7 +59,7 @@
       </table>
     </div>
 
-    <div metal:use-macro="layout.snippets.macros['rss_icon']"/>
+    <div metal:use-macro="layout.macros['rss_icon']"/>
 
 
     </metal:content>

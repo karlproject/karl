@@ -1,0 +1,36 @@
+<metal:macros>
+
+  <div class="tagbox" metal:define-macro="list_tags">
+    <strong class="label-tags" >Tags:</strong>
+    <form id="tag-inputbox" action="javascript://return false;">
+      <input name="taglist" id="tagsearch-input" value=""/>
+    </form>
+  </div>
+
+  <script metal:define-macro="gridstyle_batching_script" 
+          language="javascript" type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+          // make the pager bar ui styles alive
+          $('.content-listing a.ui-state-default')
+              .hover(
+                  function() {
+                      $(this).addClass('ui-state-hover');
+                  },
+                  function() {
+                      $(this).removeClass('ui-state-hover');
+                  }
+              );
+      });
+      //]]>
+  </script>
+
+   <div metal:define-macro="rss_icon" class="rss-icon"
+       tal:condition="feed_url|None">
+    <a href="${feed_url}">
+      <img src="${layout.karl_static}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+        id="RSSIcon"/>
+    </a>
+  </div>
+ 
+</metal:macros>

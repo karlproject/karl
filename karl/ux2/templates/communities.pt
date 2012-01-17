@@ -2,7 +2,7 @@
 
     <metal:content fill-slot="content">
 
-    <div metal:use-macro="layout.snippets.macros['status_message']"/>
+    ${panel('status_message')}
     
     <tal:actions_menu 
         content="panel('popper.actions_menu', actions=actions)">

@@ -1,4 +1,7 @@
+from cgi import escape
+from pyramid.security import authenticated_userid
 from karl.utils import find_intranets
+from karl.utils import find_profiles
 
 
 def global_nav(context, request):
@@ -32,4 +35,42 @@ def global_nav(context, request):
 
 
 def actions_menu(context, request, actions):
-    return {'actions': actions}
+    # Karl has traditionally used a list of tuples (title, view_name) to
+    # represent actions.  Popper layout expects a list of dicts.  Actions
+    # are passed to the renderer by individual views which then pass them
+    # to the panel.
+    if not actions:
+        return '' # short circuit renderer
+
+    converted = []
+    addables = []
+    for title, url in actions:
+        if title.startswith('Add '):
+            addables.append((title, url))
+        else:
+            converted.append({'title': title[4:], 'url': url})
+
+    if len(addables) > 2:
+        converted.insert(0, {
+            'title': 'Add',
+            'subactions': [{'title': title[4:], 'url': url}
+                            for title, url in addables]})
+    else:
+        converted = [{'title': title, 'url': url}
+                     for title, url in addables] + converted
+
+    return {'actions': converted}
+
+
+def personal_tools(context, request):
+    profiles = find_profiles(context)
+    name = authenticated_userid(request)
+    return {'profile_name': profiles[name].title}
+
+
+def status_message(context, request):
+    message = request.params.get('status_message')
+    if message:
+        return '<div class="portalMessage">%s</div>' % escape(message)
+    return ''
+

@@ -12,7 +12,7 @@
   <!-- Default layout -->
   <bc:layout
     layout=".layout.Layout"
-    template="templates/site_layout.pt"
+    template="bottlecap.layouts.popper:templates/popper_layout.pt"
   />
 
   <!-- 
@@ -50,41 +50,26 @@
   -->
 
   <bc:panel
-    context="*"
-    panel=".panels.global_nav"
     name="popper.global_nav"
-    renderer="templates/global_nav.pt"
+    panel=".panels.global_nav"
+    renderer="bottlecap.layouts.popper:templates/global_nav.pt"
   />
 
   <bc:panel
-    context="*"
     name="popper.personal_tools"
-    renderer="templates/personal_tools.pt"
+    panel=".panels.personal_tools"
+    renderer="bottlecap.layouts.popper:templates/personal_tools.pt"
   />
 
   <bc:panel
-    context="*"
-    name="popper.search"
-    renderer="templates/search.pt"
-  />
+    name="status_message"
+    panel=".panels.status_message"
+    />
 
   <bc:panel
-    context="*"
-    name="popper.context_tools"
-    renderer="templates/context_tools.pt"
-  />
-
-  <bc:panel
-    context="*"
-    panel=".panels.actions_menu"
     name="popper.actions_menu"
-    renderer="templates/actions_menu.pt"
-  />
-
-  <bc:panel
-    context="*"
-    name="popper.column_one"
-    renderer="templates/column_one.pt"
-  />
+    panel=".panels.actions_menu"
+    renderer="bottlecap.layouts.popper:templates/actions_menu.pt"
+    />
 
 </configure>
