@@ -362,6 +362,10 @@ class CommunityInfo(object):
         username = authenticated_userid(self.request)
         return username in self.context.moderator_names
 
+    @property
+    def public(self):
+        return getattr(self.context, 'security_state', 'inherits') == 'public'
+
 
 class LetterManager(object): # abstract adapter class, requires iface attr
     implements(ILetterManager)

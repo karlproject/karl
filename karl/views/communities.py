@@ -114,6 +114,8 @@ def _show_communities_view_helper(context,
         adapted = getMultiAdapter((community, request), ICommunityInfo)
         communities.append(adapted)
 
+    # XXX No need to generate letter box info here in UX2.  Can remove code
+    # once migration to UX2 is complete.
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
 

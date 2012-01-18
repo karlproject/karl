@@ -1,5 +1,6 @@
 from cgi import escape
 from pyramid.security import authenticated_userid
+from karl.models.interfaces import ILetterManager
 from karl.utils import find_intranets
 from karl.utils import find_profiles
 
@@ -48,7 +49,7 @@ def actions_menu(context, request, actions):
         if title.startswith('Add '):
             addables.append((title, url))
         else:
-            converted.append({'title': title[4:], 'url': url})
+            converted.append({'title': title, 'url': url})
 
     if len(addables) > 2:
         converted.insert(0, {
@@ -73,4 +74,9 @@ def status_message(context, request):
     if message:
         return '<div class="portalMessage">%s</div>' % escape(message)
     return ''
+
+
+def letter_box(context, request):
+    letters = request.registry.getAdapter(context, ILetterManager)
+    return {'letters': letters.get_info(request)}
 

@@ -72,4 +72,10 @@
     renderer="bottlecap.layouts.popper:templates/actions_menu.pt"
     />
 
+  <bc:panel
+    name="popper.letter_box"
+    panel=".panels.letter_box"
+    renderer="bottlecap.layouts.popper:templates/letter_box.pt"
+    />
+
 </configure>

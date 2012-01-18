@@ -33,4 +33,8 @@
     </a>
   </div>
  
+  <span metal:define-macro="privacy_badge" class="kprivacy_badge">Private</span>
+
+  <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
+
 </metal:macros>
