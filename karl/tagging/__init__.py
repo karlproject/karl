@@ -445,6 +445,9 @@ class Tags(Persistent):
                 res = set()
                 if seq is not None:
                     for item in seq:
+                        # seems like in some cases docid is None
+                        if item is None:
+                            continue
                         res.update(bt.get(item, set()))
                     if result is not None:
                         result = result.intersection(res)

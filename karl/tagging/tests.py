@@ -298,6 +298,15 @@ class TagsTests(unittest.TestCase):
         objects = engine.getTagObjects(community='nonesuch')
         self.assertEqual(len(objects), 0)
 
+    def test_getTagObjects_bad_key(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        objects = engine.getTagObjects(items=(13,None,15))
+        self.assertEqual(len(objects), 4)
+
     def test_getCloud_w_items_as_int(self):
         self._registerCommunityFinder()
         engine = self._makeOne()
