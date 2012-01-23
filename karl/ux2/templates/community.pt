@@ -20,16 +20,10 @@
          tal:condition="layout.context.text != u''">
       <span tal:replace="structure layout.context.text"/>
     </div>
-    <metal:script metal:use-macro="layout.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper">
       <h3>Recent Activity</h3>
       <table class="content-listing">
         <thead>
-          <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
-              <div metal:use-macro="layout.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
           <tr>
             <th class="cldate">Date</th>
             <th class="cltitle">Title</th>
@@ -49,14 +43,8 @@
             </td>
           </tr>
         </tbody>
-        <tfoot tal:condition="batch_info.batching_required">
-          <tr class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
-              <div metal:use-macro="layout.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
-        </tfoot>
       </table>
+      ${panel('popper.grid_footer', batch=batch_info)}
     </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>
