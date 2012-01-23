@@ -77,11 +77,6 @@ def status_message(context, request):
     return ''
 
 
-def letter_box(context, request):
-    letters = request.registry.getAdapter(context, ILetterManager)
-    return {'letters': letters.get_info(request)}
-
-
 def global_logo(context, request):
     home_context, home_path = get_user_home(context, request)
     return {'logo_title': request.registry.settings.get('system_name', 'KARL'),

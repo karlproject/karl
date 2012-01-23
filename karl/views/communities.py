@@ -114,8 +114,6 @@ def _show_communities_view_helper(context,
         adapted = getMultiAdapter((community, request), ICommunityInfo)
         communities.append(adapted)
 
-    # XXX No need to generate letter box info here in UX2.  Can remove code
-    # once migration to UX2 is complete.
     mgr = ILetterManager(context)
     letter_info = mgr.get_info(request)
 
@@ -125,7 +123,8 @@ def _show_communities_view_helper(context,
         classes.append({'name': name,
                         'title': title,
                         'description': description,
-                        'href': urlname,
+                        'href': urlname, # deprecated for UX2
+                        'url': request.resource_url(context, urlname),
                         'selected': name == view_cookie,
                        })
 

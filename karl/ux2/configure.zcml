@@ -73,12 +73,6 @@
     />
 
   <bc:panel
-    name="popper.letter_box"
-    panel=".panels.letter_box"
-    renderer="bottlecap.layouts.popper:templates/letter_box.pt"
-    />
-
-  <bc:panel
     name="popper.global_logo"
     panel=".panels.global_logo"
     renderer="bottlecap.layouts.popper:templates/global_logo.pt"

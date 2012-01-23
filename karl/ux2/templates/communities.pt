@@ -1,63 +1,40 @@
 <metal:block use-macro="main_template">
 
+    <metal:head fill-slot="head_slot">
+        <style type="text/css">
+            /* Place holder styles.  Temporary for development. */
+            /* Styles for the 'All|Active' communities filters. */
+            .filterOptions {
+                float: right;
+            }
+            .filterOptions li a {
+                display: inline;
+            }
+            .filterOptions li {
+                display: inline;
+            }
+            .filterOption {
+                list-style: none;
+                clear: none;
+                margin: 0;
+                padding: 0;
+                line-height: 26px;
+                float: right;
+            }
+        </style>
+    </metal:head>
+
     <metal:content fill-slot="content">
 
     ${panel('status_message')}
     
-    <tal:actions_menu 
-        content="panel('popper.actions_menu', actions=actions)">
-
-    <div id="communities-content-wrapper">
-
-    <div id="communities-listing-head">
-      <div id="peopledir-letterbox-wrapper">
-        ${panel('popper.letter_box')}
-      </div>
-      <div class="communityOptions">
-        <div id="community-filters">
-          <label>Community Filters:</label>
-          <ul>
-            <li tal:repeat="option community_tabs"
-            class="${'%s%s%s' % (option['selected'] and 'current' or '',
-                               repeat['option'].start and ' firstItem' or '',
-                               repeat['option'].end and ' lastItem' or '',)}" >
-                <a href="${option['href']}" title="${option['description']}">
-                  <span>${option['title']}</span>
-                </a>
-            </li>
-          </ul>
-        </div>
-        <div id="communitiy-search-box-wrapper">
-          <div id="communitiy-search-box">
-            <form method="get" action="${api.view_url}">
-              <fieldset>
-                <div class="field">
-                  <input type="text" name="body" value="" />
-                  <input type="submit" value="Search" />
-                </div>
-              </fieldset>
-            </form>
-          </div>
-        </div>
-      <div class="visualClear"><!-- --></div>
-      </div>
-    </div>
-
+    ${panel('popper.actions_menu', actions=actions)}
 
     <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
 
     <div tal:condition="error" tal:content="error" />
 
-    <metal:script
-        metal:use-macro="layout.macros['gridstyle_batching_script']" />
-    <table tal:condition="batch_info['batching_required']" width="100%">
-      <tr class="ui-grid-footer">
-        <th class="ui-widget-header">
-          <div metal:use-macro="layout.snippets.macros['gridstyle_batching']">
-          </div>
-        </th>
-      </tr>
-    </table>
+    ${panel('popper.grid_header', letters=letters, filters=community_tabs)} 
 
     <div class="communityEntry"
          tal:repeat="community communities">
@@ -78,16 +55,7 @@
       </div>
     </div>
 
-    <table tal:condition="batch_info['batching_required']" width="100%">
-      <tr class="ui-grid-footer">
-        <th class="ui-widget-header">
-          <div metal:use-macro="layout.snippets.macros['gridstyle_batching']">
-          </div>
-        </th>
-      </tr>
-    </table>
-
-  </div>
+    ${panel('popper.grid_footer', batch=batch_info)}
 
     </metal:content>
 </metal:block>
