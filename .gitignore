@@ -4,6 +4,5 @@
 *.html.py
 .coverage
 trace_file
-bottlecap
 .*.sw?
 dist
