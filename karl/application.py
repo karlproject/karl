@@ -56,6 +56,8 @@ def ux2_metarenderer_factory(info):
     def metarenderer(value, system):
         use_ux2 = system['request'].cookies.get('ux2') == 'true'
         if use_ux2:
+            if 'api' in value:
+                del value['api']
             return ux2_renderer(value, system)
         return classic_renderer(value, system)
     return metarenderer
