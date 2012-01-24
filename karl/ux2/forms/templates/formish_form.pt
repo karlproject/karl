@@ -1,0 +1,17 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    ${panel('status_message')}
+
+    <h1 class="kscreentitle">${layout.page_title}</h1>
+
+      <span tal:content="structure request.form()" tal:omit-tag=""/>
+    
+  </div>
+  
+</div>
+

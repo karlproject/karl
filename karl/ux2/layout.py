@@ -19,6 +19,7 @@ from karl.utils import find_site
 
 
 class Layout(PopperLayout):
+    page_title = 'Page Title'
 
     def __init__(self, context, request):
         super(Layout, self).__init__(context, request)
