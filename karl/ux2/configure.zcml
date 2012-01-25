@@ -84,4 +84,9 @@
     renderer="templates/my_communities.pt"
     />
 
+  <!-- Assets -->
+  <asset
+    to_override="bottlecap.layouts.popper:static/img/favicon.ico"
+    override_with="karl.views:static/ux2/favicon.ico"
+  />
 </configure>
