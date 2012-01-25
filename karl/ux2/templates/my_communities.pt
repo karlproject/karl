@@ -1,0 +1,43 @@
+<section class="portlet sectionRelated" id="my-communities-portlet">
+  <div id="my-communities-list">
+    <h3>My Communities</h3>
+    <div class="portlet-item" tal:repeat="my_community my_communities">
+      <strong tal:omit-tag="not my_community.moderator">
+        <a href="${my_community.url}">
+          ${my_community.title}
+        </a>
+      </strong>
+    </div>
+    <div class="portlet-buttons">
+      <a tal:condition="preferred_communities is None"
+         class="primary_button"
+         title="Personalize the list of communities that appear on this list"
+         href="${layout.app_url}/jquery_edit_preferred.html">
+         <span>Set preferred</span>
+      </a>
+      <a tal:condition="preferred_communities is not None"
+         class="primary_button"
+         title="Edit your personalized list of communities"
+         href="${layout.app_url}/jquery_edit_preferred.html">
+         <span>Edit preferred</span>
+      </a>
+      <a tal:condition="preferred_communities is not None"
+         class="primary_button"
+         title="Show all of your communities now"
+         href="${layout.app_url}/jquery_list_my_communities.html">
+         <span>Show all</span>
+      </a>
+    </div>
+  </div>
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        $('.portlet-buttons a').click(function(e) {
+          $('#my-communities-list').load($(this).attr('href'));
+          window.scrollTo(0,0);
+          return false;
+        });
+    });
+    //]]>
+  </script>
+</section>

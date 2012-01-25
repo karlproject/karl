@@ -136,16 +136,17 @@ def _show_communities_view_helper(context,
     page_title = '%s%s Communities' % (prefix, system_name)
 
     my_communities = get_my_communities(context, request)
-
     preferred_communities = get_preferred_communities(context, request)
+    layout = request.layout_manager.layout
+    layout.add_portlet('my_communities', my_communities, preferred_communities)
 
     return {'communities': communities,
             'batch_info': batch_info,
             'letters': letter_info,
             'community_tabs': classes,
             'actions': actions,
-            'my_communities': my_communities,
-            'preferred_communities': preferred_communities,
+            'my_communities': my_communities, # deprecated in ux2
+            'preferred_communities': preferred_communities, # deprecated in ux2
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
             'qualifiers': qualifiers,

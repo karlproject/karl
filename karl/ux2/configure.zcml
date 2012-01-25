@@ -78,4 +78,10 @@
     renderer="bottlecap.layouts.popper:templates/global_logo.pt"
     />
 
+  <bc:panel
+    name="my_communities"
+    panel=".panels.my_communities"
+    renderer="templates/my_communities.pt"
+    />
+
 </configure>

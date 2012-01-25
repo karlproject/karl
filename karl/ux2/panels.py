@@ -1,6 +1,5 @@
 from cgi import escape
 from pyramid.security import authenticated_userid
-from karl.models.interfaces import ILetterManager
 from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.views.utils import get_user_home
@@ -81,3 +80,8 @@ def global_logo(context, request):
     home_context, home_path = get_user_home(context, request)
     return {'logo_title': request.registry.settings.get('system_name', 'KARL'),
             'logo_href': request.resource_url(home_context, *home_path)}
+
+def my_communities(context, request, my_communities, preferred_communities):
+    return {
+        'my_communities': my_communities,
+        'preferred_communities': preferred_communities}
