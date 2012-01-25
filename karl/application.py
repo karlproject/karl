@@ -2,6 +2,10 @@ import pkg_resources
 
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.renderers import RendererHelper
+from pyramid.threadlocal import get_current_request
+
+from pyramid_formish import IFormishRenderer
+from pyramid_formish import ZPTRenderer as FormishZPTRenderer
 
 import karl.ux2
 from karl.utils import asbool
@@ -17,6 +21,7 @@ except ImportError:
 def configure_karl(config, load_zcml=True):
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
+    config.registry.registerUtility(FormishZPTMetaRenderer(), IFormishRenderer)
 
     if load_zcml:
         config.hook_zca()
@@ -61,3 +66,37 @@ def ux2_metarenderer_factory(info):
             return ux2_renderer(value, system)
         return classic_renderer(value, system)
     return metarenderer
+
+
+class FormishZPTMetaRenderer(FormishZPTRenderer):
+
+    def __init__(self):
+        self.initialized = False
+
+    def initialize(self):
+        super(FormishZPTMetaRenderer, self).__init__()
+        ux1_loader = self.loader
+        search_path = ux1_loader.search_path
+        ux2_path = pkg_resources.resource_filename(
+            'karl.ux2', 'forms/templates')
+        TemplateLoader = type(ux1_loader)
+        ux2_loader = TemplateLoader([ux2_path] + search_path,
+                                    ux1_loader.auto_reload)
+
+        class MetaLoader(object):
+            def load(self, filename):
+                request = get_current_request()
+                use_ux2 = request.cookies.get('ux2') == 'true'
+                if use_ux2:
+                    template = ux2_loader.load(filename)
+                else:
+                    template = ux1_loader.load(filename)
+                return template
+
+        self.loader = MetaLoader()
+        self.initialized = True
+
+    def __call__(self, template, args):
+        if not self.initialized:
+            self.initialize()
+        return super(FormishZPTMetaRenderer, self).__call__(template, args)
