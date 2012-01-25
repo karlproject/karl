@@ -125,7 +125,7 @@ def show_trash(context, request, tz=None):
     contents_deleted = contents.deleted
     deleted_container_children = set(repo.filter_container_ids(
         item.docid for item in contents_deleted))
-    for item in contents.deleted:
+    for item in contents_deleted:
         is_container = item.docid in deleted_container_children
         deleted.append(display_deleted_item(item.docid, item, is_container))
 
