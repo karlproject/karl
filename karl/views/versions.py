@@ -86,14 +86,10 @@ def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
-    def display_deleted_item(docid, tree_node):
-        deleted_item = tree_node.deleted_item
+    def display_deleted_item(docid, deleted_item):
         version = repo.history(docid, only_current=True)[0]
-        if tree_node:
-            url = resource_url(context, request, 'trash', query={
-                'subfolder': str(docid)})
-        else:
-            url = None
+        url = resource_url(context, request, 'trash', query={
+            'subfolder': str(docid)})
         if deleted_item:
             deleted_by = profiles[deleted_item.deleted_by]
             return {
@@ -116,13 +112,20 @@ def show_trash(context, request, tz=None):
                 'title': version.title,
                 'url': url}
 
-    trash = generate_trash_tree(repo, context.docid)
     subfolder = request.params.get('subfolder')
-    if subfolder:
-        trash = trash.find(int(subfolder))
+    if not subfolder:
+        subfolder = context.docid
 
-    deleted = [display_deleted_item(docid, trash[docid])
-               for docid, item in trash.items()]
+    contents = repo.container_contents(subfolder)
+    deleted = []
+
+    for item in contents.deleted:
+        deleted.append(display_deleted_item(item.docid, item))
+
+    child_container_ids = repo.which_contain_deleted(contents.map.values())
+    for docid in child_container_ids:
+        deleted.append(display_deleted_item(docid, None))
+
     deleted.sort(key=lambda x: x['title'])
 
     return {
@@ -132,6 +135,10 @@ def show_trash(context, request, tz=None):
 
 
 def generate_trash_tree(repo, docid):
+
+    # Download the container hierarchy all at once.
+    hierarchy = dict((contents.container_id, contents) for contents in
+        repo.iter_hierarchy(docid, follow_deleted=True))
 
     class FakeDeletedItem(object):
         """
@@ -167,9 +174,8 @@ def generate_trash_tree(repo, docid):
 
     def visit(docid, path, tree, deleted_branch=None):
         paths[docid] = tuple(path)
-        try:
-            contents = repo.container_contents(docid)
-        except NoResultFound:
+        contents = hierarchy.get(docid)
+        if contents is None:
             return
 
         for deleted_item in contents.deleted:
