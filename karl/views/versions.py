@@ -86,10 +86,13 @@ def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
-    def display_deleted_item(docid, deleted_item):
+    def display_deleted_item(docid, deleted_item, is_container):
         version = repo.history(docid, only_current=True)[0]
-        url = resource_url(context, request, 'trash', query={
-            'subfolder': str(docid)})
+        if is_container:
+            url = resource_url(context, request, 'trash', query={
+                'subfolder': str(docid)})
+        else:
+            url = None
         if deleted_item:
             deleted_by = profiles[deleted_item.deleted_by]
             return {
@@ -119,12 +122,15 @@ def show_trash(context, request, tz=None):
     contents = repo.container_contents(subfolder)
     deleted = []
 
+    contents_deleted = contents.deleted
+    deleted_container_children = set(repo.filter_container_ids(
+        item.docid for item in contents_deleted))
     for item in contents.deleted:
-        deleted.append(display_deleted_item(item.docid, item))
+        is_container = item.docid in deleted_container_children
+        deleted.append(display_deleted_item(item.docid, item, is_container))
 
-    child_container_ids = repo.which_contain_deleted(contents.map.values())
-    for docid in child_container_ids:
-        deleted.append(display_deleted_item(docid, None))
+    for docid in repo.which_contain_deleted(contents.map.values()):
+        deleted.append(display_deleted_item(docid, None, True))
 
     deleted.sort(key=lambda x: x['title'])
 
