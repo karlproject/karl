@@ -17,6 +17,7 @@ from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
+import json
 
 
 def show_history(context, request, tz=None):
@@ -82,14 +83,52 @@ def revert(context, request):
     return HTTPFound(location=resource_url(context, request))
 
 
+def traverse_subfolders(context, subfolder_path):
+    """Yield (docid, exists) for each element in a JSON subfolder path.
+
+    Raises ValueError if the path is not valid.
+    """
+    if not subfolder_path:
+        return
+
+    repo = find_repo(context)
+    parts = json.loads(subfolder_path)  # May raise ValueError
+    container_id = context.docid
+
+    for name, docid in parts:
+        docid = int(docid)
+        try:
+            contents = repo.container_contents(container_id)
+        except NoResultFound:
+            raise ValueError("Document %d is not a container." % container_id)
+        if contents.map.get(name) == docid:
+            yield docid, True
+            container_id = docid
+            continue
+
+        for item in contents.deleted:
+            if item.name == name and item.docid == docid:
+                yield docid, False
+                break
+        else:
+            raise ValueError("Subfolder %s (docid %d) not found in trash."
+                % (repr(name), docid))
+
+
+def get_subfolder_id(context, subfolder_path):
+    docid = context.docid
+    for docid, _exists in traverse_subfolders(context, subfolder_path):
+        pass
+    return docid
+
+
 def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
 
-    def display_deleted_item(docid, tree_node):
-        deleted_item = tree_node.deleted_item
+    def display_deleted_item(docid, deleted_item, is_container):
         version = repo.history(docid, only_current=True)[0]
-        if tree_node:
+        if is_container:
             url = resource_url(context, request, 'trash', query={
                 'subfolder': str(docid)})
         else:
@@ -116,13 +155,23 @@ def show_trash(context, request, tz=None):
                 'title': version.title,
                 'url': url}
 
-    trash = generate_trash_tree(repo, context.docid)
     subfolder = request.params.get('subfolder')
-    if subfolder:
-        trash = trash.find(int(subfolder))
+    if not subfolder:
+        subfolder = context.docid
 
-    deleted = [display_deleted_item(docid, trash[docid])
-               for docid, item in trash.items()]
+    contents = repo.container_contents(subfolder)
+    deleted = []
+
+    contents_deleted = contents.deleted
+    deleted_container_children = set(repo.filter_container_ids(
+        item.docid for item in contents_deleted))
+    for item in contents_deleted:
+        is_container = item.docid in deleted_container_children
+        deleted.append(display_deleted_item(item.docid, item, is_container))
+
+    for docid in repo.which_contain_deleted(contents.map.values()):
+        deleted.append(display_deleted_item(docid, None, True))
+
     deleted.sort(key=lambda x: x['title'])
 
     return {
@@ -132,6 +181,10 @@ def show_trash(context, request, tz=None):
 
 
 def generate_trash_tree(repo, docid):
+
+    # Download the container hierarchy all at once.
+    hierarchy = dict((contents.container_id, contents) for contents in
+        repo.iter_hierarchy(docid, follow_deleted=True))
 
     class FakeDeletedItem(object):
         """
@@ -167,9 +220,8 @@ def generate_trash_tree(repo, docid):
 
     def visit(docid, path, tree, deleted_branch=None):
         paths[docid] = tuple(path)
-        try:
-            contents = repo.container_contents(docid)
-        except NoResultFound:
+        contents = hierarchy.get(docid)
+        if contents is None:
             return
 
         for deleted_item in contents.deleted:
