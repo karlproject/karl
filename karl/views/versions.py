@@ -19,11 +19,8 @@ from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
-<<<<<<< HEAD
 
 log = logging.getLogger(__name__)
-=======
->>>>>>> parent of 3b3f4f8... Checkpoint.
 
 
 def show_history(context, request, tz=None):
@@ -89,7 +86,6 @@ def revert(context, request):
     return HTTPFound(location=resource_url(context, request))
 
 
-<<<<<<< HEAD
 def decode_trash_path(s):
     """Decode a string into a trash path (a list of (name, docid) pairs).
 
@@ -243,18 +239,6 @@ class ShowTrash(object):
         if is_container:
             url = resource_url(self.context, self.request, 'trash', query={
                 'subfolder': item_path})
-=======
-def show_trash(context, request, tz=None):
-    repo = find_repo(context)
-    profiles = find_profiles(context)
-
-    def display_deleted_item(docid, tree_node):
-        deleted_item = tree_node.deleted_item
-        version = repo.history(docid, only_current=True)[0]
-        if tree_node:
-            url = resource_url(context, request, 'trash', query={
-                'subfolder': str(docid)})
->>>>>>> parent of 3b3f4f8... Checkpoint.
         else:
             url = None
 
@@ -278,96 +262,11 @@ def show_trash(context, request, tz=None):
                 'deleted_by': None,
                 'restore_url': None,
                 'title': version.title,
-<<<<<<< HEAD
                 'url': url,
             })
 
 
 def _restore(repo, parent, docid, name):
-=======
-                'url': url}
-
-    trash = generate_trash_tree(repo, context.docid)
-    subfolder = request.params.get('subfolder')
-    if subfolder:
-        trash = trash.find(int(subfolder))
-
-    deleted = [display_deleted_item(docid, trash[docid])
-               for docid, item in trash.items()]
-    deleted.sort(key=lambda x: x['title'])
-
-    return {
-        'api': TemplateAPI(context, request, 'Trash'),
-        'deleted': deleted,
-    }
-
-
-def generate_trash_tree(repo, docid):
-
-    class FakeDeletedItem(object):
-        """
-        Show descendents of deleted folders as having been deleted themselves
-        in trash UI.
-        """
-        def __init__(self, docid, deleted_branch):
-            self.docid = docid
-            self.name = deleted_branch.name
-            self.deleted_by = deleted_branch.deleted_by
-            self.deleted_time = deleted_branch.deleted_time
-
-    class TreeNode(dict):
-        deleted_item = None
-        paths = None
-
-        def find(self, docid):
-            node = self
-            for child_docid in self.paths[docid]:
-                node = node[child_docid]
-            return node
-
-    paths = {}
-
-    def add_item_to_tree(deleted_item, path, tree):
-        node = tree
-        for node_docid in path:
-            next_node = node.get(node_docid)
-            if next_node is None:
-                node[node_docid] = next_node = TreeNode()
-            node = next_node
-        node.deleted_item = deleted_item
-
-    def visit(docid, path, tree, deleted_branch=None):
-        paths[docid] = tuple(path)
-        try:
-            contents = repo.container_contents(docid)
-        except NoResultFound:
-            return
-
-        for deleted_item in contents.deleted:
-            if deleted_item.new_container_ids:
-                continue
-
-            path.append(deleted_item.docid)
-            add_item_to_tree(deleted_item, path, tree)
-            visit(deleted_item.docid, path, tree, deleted_item)
-            path.pop()
-
-        for child_docid in contents.map.values():
-            path.append(child_docid)
-            if deleted_branch:
-                add_item_to_tree(FakeDeletedItem(child_docid, deleted_branch),
-                                 path, tree)
-            visit(child_docid, path, tree, deleted_branch)
-            path.pop()
-
-    trash = TreeNode()
-    visit(docid, deque(), trash)
-    trash.paths = paths
-    return trash
-
-
-def _undelete(repo, parent, docid, name, restore_children):
->>>>>>> parent of 3b3f4f8... Checkpoint.
     version = repo.history(docid, only_current=True)[0]
     doc = version.klass()
     doc.revert(version)
