@@ -60,7 +60,7 @@
     permission="view"
     name="searchresults.html"
   />
-    
+
   <view
     for="karl.models.interfaces.ISite"
     view=".search.calendar_searchresults_view"
@@ -1789,7 +1789,7 @@
 
   <view
     for="repoze.folder.interfaces.IFolder"
-    view=".versions.show_trash"
+    view=".versions.ShowTrash"
     permission="edit"
     name="trash"
     renderer="templates/trash.pt"
