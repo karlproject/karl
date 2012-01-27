@@ -1,5 +1,7 @@
-from collections import deque
+
 import datetime
+import logging
+import re
 import time
 
 from pyramid.httpexceptions import HTTPFound
@@ -17,6 +19,8 @@ from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
+
+log = logging.getLogger(__name__)
 
 
 def show_history(context, request, tz=None):
@@ -82,133 +86,190 @@ def revert(context, request):
     return HTTPFound(location=resource_url(context, request))
 
 
-def show_trash(context, request, tz=None):
-    repo = find_repo(context)
-    profiles = find_profiles(context)
+def decode_trash_path(s):
+    """Decode a string into a trash path (a list of (name, docid) pairs).
 
-    def display_deleted_item(docid, tree_node):
-        deleted_item = tree_node.deleted_item
-        version = repo.history(docid, only_current=True)[0]
-        if tree_node:
-            url = resource_url(context, request, 'trash', query={
-                'subfolder': str(docid)})
+    Unlike normal paths, a trash path can descend into deleted containers
+    and deleted items. The docid of each path segment can be None, causing
+    the path to be ambiguous but still useful.
+    """
+    res = []
+    for part in s.split('/'):
+        mo = re.match(r'{([0-9\-]+)}(.+)', part)
+        if mo is not None:
+            # docid specified.
+            res.append((mo.group(2), int(mo.group(1))))
+        else:
+            # No docid specified.
+            res.append((part, None))
+    return res
+
+
+def encode_trash_path(path):
+    """Encode a trash path as a string."""
+    parts = []
+    for name, docid in path:
+        if docid is not None:
+            parts.append('{%d}%s' % (docid, name))
+        else:
+            parts.append(name)
+    return '/'.join(parts)
+
+
+def traverse_trash(context, path):
+    """Yield (name, docid, deleted_item or None) for elements in a trash path.
+
+    A trash path is a list of (name, docid) pairs. The docid of each path
+    segment can be None, causing the path to be ambiguous; this function
+    will react by choosing the first match it finds.
+
+    Raises ValueError if an element of the path is not found or is not
+    valid. The ValueError may indicate a security violation attempt,
+    since invalid trash paths could be a way to expose sensitive info.
+    """
+    repo = find_repo(context)
+    container_id = context.docid
+    for name, docid in path:
+        try:
+            contents = repo.container_contents(container_id)
+        except NoResultFound:
+            raise ValueError("Document %d is not a container." % container_id)
+
+        if docid is not None:
+            docid = int(docid)
+        else:
+            docid = contents.map.get(name)
+
+        if contents.map.get(name) == docid:
+            yield name, docid, None
+            container_id = docid
+            continue
+
+        for item in contents.deleted:
+            if (item.name == name
+                    and (docid is None or item.docid == docid)
+                    and not item.new_container_ids):
+                yield name, item.docid, item
+                container_id = item.docid
+                break
+        else:
+            raise ValueError("Subfolder not found in trash: %s (docid %s)"
+                % (name, docid))
+
+
+class ShowTrash(object):
+    """View that shows one folder of trash."""
+
+    def __init__(self, context, request, tz=None):
+        self.context = context
+        self.request = request
+        self.tz = tz
+        self.repo = find_repo(context)
+        self.profiles = find_profiles(context)
+        self.deleted_branch = None
+        self.container_id = context.docid
+        self.error = None
+        self.deleted = []
+        self.subfolder_path = []
+
+        subfolder = self.request.params.get('subfolder')
+        if subfolder:
+            try:
+                path = decode_trash_path(subfolder)
+                for name, container_id, deleted_item in traverse_trash(
+                        self.context, path):
+                    if deleted_item is not None:
+                        self.deleted_branch = deleted_item
+                    self.container_id = container_id
+                    self.subfolder_path.append((name, container_id))
+            except (ValueError, TypeError), e:
+                log.exception("Invalid trash subfolder: %s", subfolder)
+                self.error = e
+
+    def __call__(self):
+        tapi = TemplateAPI(self.context, self.request, 'Trash')
+        if self.error is None:
+            self.fill_deleted()
+        else:
+            tapi.set_status_message(unicode(self.error))
+        return {'api': tapi, 'deleted': self.deleted}
+
+    def fill_deleted(self):
+        """Fill self.deleted."""
+        try:
+            contents = self.repo.container_contents(self.container_id)
+        except NoResultFound:
+            # Not a container.
+            return
+
+        # Show items deleted (but not moved) from this container.
+        contents_deleted = contents.deleted
+        container_ids = set(self.repo.filter_container_ids(
+            item.docid for item in contents_deleted))
+        for item in contents_deleted:
+            if item.new_container_ids:
+                continue
+            is_container = item.docid in container_ids
+            self.add(item.name, item.docid, item, is_container)
+
+        if self.deleted_branch is not None:
+            # This container has been deleted, so show
+            # all items in this container as deleted items.
+            container_ids = set(self.repo.filter_container_ids(
+                contents.map.values()))
+            for name, docid in contents.map.items():
+                is_container = docid in container_ids
+                self.add(name, docid, self.deleted_branch, is_container)
+
+        else:
+            # Show child containers that contain something deleted.
+            which_contain_deleted = set(
+                self.repo.which_contain_deleted(contents.map.values()))
+            for name, docid in contents.map.items():
+                if docid in which_contain_deleted:
+                    self.add(name, docid, None, True)
+
+        self.deleted.sort(key=lambda x: x['title'])
+
+    def add(self, name, docid, deleted_item, is_container):
+        """Add an item to self.deleted."""
+        version = self.repo.history(docid, only_current=True)[0]
+        item_path = encode_trash_path(self.subfolder_path + [(name, docid)])
+
+        if is_container:
+            url = resource_url(self.context, self.request, 'trash', query={
+                'subfolder': item_path})
         else:
             url = None
-        if deleted_item:
-            deleted_by = profiles[deleted_item.deleted_by]
-            return {
-                'date': format_local_date(deleted_item.deleted_time, tz),
+
+        if deleted_item is not None:
+            deleted_by = self.profiles[deleted_item.deleted_by]
+            self.deleted.append({
+                'date': format_local_date(deleted_item.deleted_time, self.tz),
                 'deleted_by': {
                     'name': deleted_by.title,
-                    'url': resource_url(deleted_by, request),
-                    },
+                    'url': resource_url(deleted_by, self.request),
+                },
                 'restore_url': resource_url(
-                    context, request, 'restore',
-                    query={'docid': str(deleted_item.docid),
-                           'name': deleted_item.name}),
+                    self.context, self.request, 'restore',
+                    query={'path': item_path}),
                 'title': version.title,
-                'url': url}
+                'url': url,
+            })
         else:
-            return {
+            self.deleted.append({
                 'date': None,
                 'deleted_by': None,
                 'restore_url': None,
                 'title': version.title,
-                'url': url}
-
-    trash = generate_trash_tree(repo, context.docid)
-    subfolder = request.params.get('subfolder')
-    if subfolder:
-        trash = trash.find(int(subfolder))
-
-    deleted = [display_deleted_item(docid, trash[docid])
-               for docid, item in trash.items()]
-    deleted.sort(key=lambda x: x['title'])
-
-    return {
-        'api': TemplateAPI(context, request, 'Trash'),
-        'deleted': deleted,
-    }
+                'url': url,
+            })
 
 
-def generate_trash_tree(repo, docid):
-
-    class FakeDeletedItem(object):
-        """
-        Show descendents of deleted folders as having been deleted themselves
-        in trash UI.
-        """
-        def __init__(self, docid, deleted_branch):
-            self.docid = docid
-            self.name = deleted_branch.name
-            self.deleted_by = deleted_branch.deleted_by
-            self.deleted_time = deleted_branch.deleted_time
-
-    class TreeNode(dict):
-        deleted_item = None
-        paths = None
-
-        def find(self, docid):
-            node = self
-            for child_docid in self.paths[docid]:
-                node = node[child_docid]
-            return node
-
-    paths = {}
-
-    def add_item_to_tree(deleted_item, path, tree):
-        node = tree
-        for node_docid in path:
-            next_node = node.get(node_docid)
-            if next_node is None:
-                node[node_docid] = next_node = TreeNode()
-            node = next_node
-        node.deleted_item = deleted_item
-
-    def visit(docid, path, tree, deleted_branch=None):
-        paths[docid] = tuple(path)
-        try:
-            contents = repo.container_contents(docid)
-        except NoResultFound:
-            return
-
-        for deleted_item in contents.deleted:
-            if deleted_item.new_container_ids:
-                continue
-
-            path.append(deleted_item.docid)
-            add_item_to_tree(deleted_item, path, tree)
-            visit(deleted_item.docid, path, tree, deleted_item)
-            path.pop()
-
-        for child_docid in contents.map.values():
-            path.append(child_docid)
-            if deleted_branch:
-                add_item_to_tree(FakeDeletedItem(child_docid, deleted_branch),
-                                 path, tree)
-            visit(child_docid, path, tree, deleted_branch)
-            path.pop()
-
-    trash = TreeNode()
-    visit(docid, deque(), trash)
-    trash.paths = paths
-    return trash
-
-
-def _undelete(repo, parent, docid, name, restore_children):
+def _restore(repo, parent, docid, name):
     version = repo.history(docid, only_current=True)[0]
     doc = version.klass()
     doc.revert(version)
-
-    if restore_children:
-        try:
-            container = repo.container_contents(docid)
-        except NoResultFound:
-            container = None
-
-        if container is not None:
-            for child_name, child_docid in container.map.items():
-                _undelete(repo, doc, child_docid, child_name, True)
 
     if name in parent:
         # Choose a non-conflicting name to restore to. (LP #821206)
@@ -218,41 +279,40 @@ def _undelete(repo, parent, docid, name, restore_children):
     return doc
 
 
+def _restore_subtree(repo, parent, request):
+    try:
+        contents = repo.container_contents(parent.docid)
+    except NoResultFound:
+        pass
+    else:
+        for child_name, child_docid in contents.map.items():
+            doc = _restore(repo, parent, child_docid, child_name)
+            _restore_subtree(repo, doc, request)
+        repo.archive_container(IContainerVersion(parent),
+                               authenticated_userid(request))
+    index_content(parent, None)
+
+
 def undelete(context, request):
     repo = find_repo(context)
-    docid = int(request.params['docid'])
-    name = request.params['name']
-
-    # Find parent folder to restore file into
-    trash = generate_trash_tree(repo, context.docid)
+    path = decode_trash_path(request.params['path'])
     parent = context
-    for child_docid in trash.paths[docid][:-1]:
-        for child in parent.values():
-            if child.docid == child_docid:
-                next_parent = child
-                break
-        else:
-            # Need to restore a folder in order to place file in proper place
-            # in tree.
-            container = repo.container_contents(parent.docid)
-            for deleted_item in container.deleted:
-                if deleted_item.docid == child_docid:
-                    next_parent = _undelete(repo, parent, child_docid,
-                                            deleted_item.name, False)
-                    repo.archive_container(IContainerVersion(parent),
-                                           authenticated_userid(request))
-                    break
-            else: #pragma NO COVERAGE
-                # Will only get here in case of programmer error or db
-                # corruption (due to programmer error)
-                raise RuntimeError("Cannot find container to restore: %d" %
-                                   child_docid)
-        parent = next_parent
+    for name, docid, _ in traverse_trash(context, path):
+        try:
+            doc = parent[name]
+        except KeyError:
+            doc = None
+        if doc is None or doc.docid != docid:
+            # Restore this item.
+            doc = _restore(repo, parent, docid, name)
+            repo.archive_container(IContainerVersion(parent),
+                                   authenticated_userid(request))
+            index_content(parent, None)
+        parent = doc
 
-    doc = _undelete(repo, parent, docid, name, True)
-    repo.archive_container(IContainerVersion(parent),
-                           authenticated_userid(request))
-    index_content(parent, None)
+    # If the user undeleted a container, restore everything it contained.
+    _restore_subtree(repo, parent, request)
+
     return HTTPFound(location=resource_url(parent, request))
 
 epoch = datetime.datetime.utcfromtimestamp(0)
