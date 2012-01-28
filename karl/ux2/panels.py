@@ -85,3 +85,54 @@ def my_communities(context, request, my_communities, preferred_communities):
     return {
         'my_communities': my_communities,
         'preferred_communities': preferred_communities}
+
+
+
+# --
+# XXX This used to belong to "api". Now, we need it from the footer
+# panel. In case the same info is needed from other panels, there
+# is a choice to reuse this method from that panel, or, if generic
+# enough, move it to "layout".
+
+from pyramid.url import resource_url
+from pyramid.traversal import quote_path_segment
+from repoze.lemonade.content import get_content_type
+
+from karl.models.interfaces import ICommunity
+
+
+def intranets_info(context, request):
+    """Get information for the footer and intranets listing"""
+    intranets_info = []
+    intranets = find_intranets(context)
+    if intranets:
+        intranets_url = resource_url(intranets, request)
+        for name, entry in intranets.items():
+            try:
+                content_iface = get_content_type(entry)
+            except ValueError:
+                continue
+            href = '%s%s/' % (intranets_url, quote_path_segment(name))
+            if content_iface == ICommunity:
+                intranets_info.append({
+                        'title': entry.title,
+                        'intranet_href': href,
+                        'edit_href': href + '/edit_intranet.html',
+                        })
+        # Sort the list
+        def intranet_sort(x, y):
+            if x['title'] > y['title']:
+                return 1
+            else:
+                return -1
+        intranets_info.sort(intranet_sort)
+    return intranets_info
+
+
+def footer(context, request):
+    return {
+        'intranets_info': intranets_info(context, request),
+        }
+
+
+

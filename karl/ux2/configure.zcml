@@ -84,6 +84,12 @@
     renderer="templates/my_communities.pt"
     />
 
+  <bc:panel
+    name="popper.footer"
+    panel=".panels.footer"
+    renderer="templates/footer.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
