@@ -218,6 +218,18 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     kind_knob = []
     selected_kind = params.get('kind')
 
+    # There is a mapping needed between the livesearch
+    # and the advanced search "kind" identifiers. This artifact is
+    # a bit of annoyance but it's the easiest to do this
+    # transformation here. Previously this was done from js.
+    # Currently, if you click on livesearch results to
+    # get into the advanced search, the livesearch kinds
+    # will be submitted: which is why we convert from here.
+    selected_kind = {
+        'pages': 'wiki',
+        'posts': 'blog',
+        }.get(selected_kind, selected_kind)
+
     # In case we have a calendar search:
     # we will use events only as the content type.
     if calendar_search and selected_kind is None:

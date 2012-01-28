@@ -1,0 +1,90 @@
+<nav class="search">
+    <div data-quickpanel="quickpanel" class="topNavIconWrapper">
+        <h2 id="search-toggle" class="dropdown-toggle ir">Search</h2>
+
+        <form action="#" class="dropdown" id="search-form">
+            <label for="searchfor">
+                Search for:
+                <select name="searchfor" id="searchfor">
+                    <option value="all_content">all content</option>
+                    <option value="people">people</option>
+                    <option value="pages">pages</option>
+                    <option value="posts">posts</option>
+                    <option value="events">events</option>
+                    <option value="communities">communities</option>
+                </select>
+            </label>
+            <label for="searchwhere">
+                in
+                <select name="searchwhere" id="searchwhere">
+                    <option value="search_all">all KARL</option>
+                    <option value="search_this_section">this community
+                    </option>
+                </select>
+            </label>
+            <fieldset>
+                <div class="searchInputWrapper">
+                    <input class="float-left search-site-box" type="search"
+                           name="SearchTextBox"
+                           title="Search this site"
+                           accesskey="4" size="15"
+                           placeholder="What to search for?"/>
+                    <button class="searchButton ir" type="submit">Search
+                    </button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <script type="text/javascript" deferred>
+    //<![CDATA[
+        $(function() {
+            var appUrl = window.head_data.app_url;
+
+            // Handle the initial selection of the "kind" selector
+            // XXX (I have the feeling that this secion would not be needed...
+            // ... provided we code the menus to assure the initial value)
+            var defaultOption = $('select#searchfor option').eq(0);
+            var defaultKind = defaultOption.attr('value');
+            var defaultLabel = defaultOption.text();
+            // let's start with the default 'all content', as kind.
+            var initialKind = defaultKind;
+            $('select#searchfor')
+                  .val(initialKind);
+                  //.next().text(initialKind);
+
+            // wire the livesearch component
+            $('#search-form .search-site-box').livesearch({
+                livesearchUrl: appUrl + '/jquery_livesearch',
+                advancedSearchUrl: appUrl + '/searchresults.html',
+                kind:  initialKind,
+                defaultKind: defaultKind,
+                resetKind: function(evt) {
+                    $('select#searchfor')
+                        .val(defaultKind)
+                        .next().text(defaultLabel);
+                },
+                position: {
+                    my: 'right top',
+                    at: 'right bottom',
+                    of: $('#search-form .searchInputWrapper'),
+                    collision: 'none'
+                }
+            });
+
+            // ui interaction: the "kind" selector change notifies the component
+            $('select#searchfor').change(function(evt) {
+                  var value = $(this).find('option:selected').attr('value');
+                  $('.search-site-box').livesearch('option', 'kind', value);
+            });
+
+            // ui interaction: search icon clicked: trigger a search.
+            $('#search-form .searchButton').click(function(evt) {
+                $('#search-form .search-site-box').livesearch('searchButtonClicked', evt);   
+                return false;
+            });
+
+        });
+    //]]>
+    </script>    
+
+</nav>
