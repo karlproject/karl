@@ -45,7 +45,7 @@ class Test_show_history(unittest.TestCase):
         history = result['history']
         self.assertEqual(len(history), 2)
         self.assertEqual(len(history[0]), 5)
-        self.assertEqual(history[0]['date'], '2010-05-12 21:42')
+        self.assertEqual(history[0]['date'], '05/12/2010 21:42:00')
         self.assertEqual(history[0]['editor'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[0]['preview_url'],
@@ -54,7 +54,7 @@ class Test_show_history(unittest.TestCase):
                          'http://example.com/revert?version_num=2')
         self.assertEqual(history[0]['is_current'], True)
         self.assertEqual(len(history[1]), 5)
-        self.assertEqual(history[1]['date'], '2010-05-11 21:42')
+        self.assertEqual(history[1]['date'], '05/11/2010 21:42:00')
         self.assertEqual(history[1]['editor'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[1]['preview_url'],
@@ -174,7 +174,7 @@ class Test_show_trash(unittest.TestCase):
         history = result['deleted']
         self.assertEqual(len(history), 2)
         self.assertEqual(len(history[0]), 5)
-        self.assertEqual(history[0]['date'], '2010-05-11 21:42')
+        self.assertEqual(history[0]['date'], '05/11/2010 21:42:00')
         self.assertEqual(history[0]['deleted_by'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[0]['restore_url'],
@@ -182,7 +182,7 @@ class Test_show_trash(unittest.TestCase):
         self.assertEqual(history[0]['title'], 'Title 2')
         self.assertEqual(history[0]['url'], None)
         self.assertEqual(len(history[1]), 5)
-        self.assertEqual(history[1]['date'], '2010-05-12 21:42')
+        self.assertEqual(history[1]['date'], '05/12/2010 21:42:00')
         self.assertEqual(history[1]['deleted_by'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[1]['restore_url'],
@@ -234,7 +234,7 @@ class Test_show_trash(unittest.TestCase):
         history = result['deleted']
         self.assertEqual(len(history), 1)
         self.assertEqual(len(history[0]), 5)
-        self.assertEqual(history[0]['date'], '2010-05-11 21:42')
+        self.assertEqual(history[0]['date'], '05/11/2010 21:42:00')
         self.assertEqual(history[0]['deleted_by'], {
             'name': 'Ed', 'url': 'http://example.com/profiles/ed/'})
         self.assertEqual(history[0]['restore_url'],
@@ -463,7 +463,7 @@ class Test_format_local_date(unittest.TestCase):
         import datetime
         dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
         s = self._callFUT(dt, 7 * 3600)
-        self.assertEqual(s, '2011-08-30 00:30')
+        self.assertEqual(s, '08/30/2011 00:30:15')
 
     def _make_time_module(self, daylight=0, isdst=False):
         # Make an object simulates the time module.
@@ -487,21 +487,21 @@ class Test_format_local_date(unittest.TestCase):
         import datetime
         dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
         s = self._callFUT(dt, time_module=self._make_time_module(daylight=0))
-        self.assertEqual(s, '2011-08-30 01:30')
+        self.assertEqual(s, '08/30/2011 01:30:15')
 
     def test_with_daylight_savings_in_effect(self):
         import datetime
         dt = datetime.datetime(2011, 8, 30, 7, 30, 15)
         s = self._callFUT(dt,
             time_module=self._make_time_module(daylight=1, isdst=True))
-        self.assertEqual(s, '2011-08-30 00:30')
+        self.assertEqual(s, '08/30/2011 00:30:15')
 
     def test_with_daylight_savings_not_in_effect(self):
         import datetime
         dt = datetime.datetime(2011, 1, 30, 7, 30, 15)
         s = self._callFUT(dt,
             time_module=self._make_time_module(daylight=1, isdst=False))
-        self.assertEqual(s, '2011-01-30 01:30')
+        self.assertEqual(s, '01/30/2011 01:30:15')
 
 
 class DummyArchive(object):

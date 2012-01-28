@@ -442,7 +442,7 @@
 
     <div metal:define-macro="byline" class="kbyline">Posted
       by <a href="${byline_info.author_url}">${byline_info.author_name}</a>
-      on ${byline_info.posted_date}</div>
+      on <span class="globalize-full-date">${byline_info.posted_date}</span></div>
 
     <div metal:define-macro="searchresults">
       <div class="searchresult_entry" tal:repeat="entry entries">

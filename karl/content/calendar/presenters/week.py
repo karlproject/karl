@@ -276,9 +276,9 @@ class DayOnWeekView(object):
                                    self.first_moment.day)
         day_abbr = calendar.day_abbr[day_idx]                               
 
-        self.heading = '%s %d/%d' % (day_abbr, 
-                                     self.last_moment.month,
-                                     self.last_moment.day)
+        self.heading = '%d/%d/%d' % ( self.last_moment.month,
+                                     self.last_moment.day,
+                                     self.last_moment.year)
 
         self.css_day_abbr = self._css_day_abbr[day_idx]
 

@@ -21,7 +21,7 @@
       <tr class="cal_dates">
         <th>${calendar.week[0].year}</th>
         <th class="cal_${day.css_day_abbr}" tal:repeat="day calendar.week">
-          <a href="${day.show_url}">${day.heading}</a>
+          <a class="globalize-calendar-abbr" href="${day.show_url}">${day.heading}</a>
         </th>
         <th class="last">&nbsp;</th>
       </tr>

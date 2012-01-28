@@ -21,7 +21,7 @@
       <!-- days -->
       <tr class="cal_dates">
         <th>${calendar.title_year}</th>
-        <th class="date">${calendar.title}</th>
+        <th class="date globalize-calendar-full">${calendar.title}</th>
         <th class="last">&nbsp;</th>
       </tr>
       <tr id="all_day" class="all_day">

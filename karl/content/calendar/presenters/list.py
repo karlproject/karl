@@ -129,10 +129,10 @@ class Event(object):
         self.layer = self._catalog_event._v_layer_title
 
     def _init_date_and_time_properties(self):
-        start_day  = self._catalog_event.startDate.strftime("%a, %b %e")
+        start_day  = self._catalog_event.startDate.strftime("%m/%d/%Y")
         start_time = self._format_time_of_day(self._catalog_event.startDate)
 
-        end_day  = self._catalog_event.endDate.strftime("%a, %b %e")
+        end_day  = self._catalog_event.endDate.strftime("%m/%d/%Y")
         end_time = self._format_time_of_day(self._catalog_event.endDate)
 
         if start_day == end_day:
@@ -144,7 +144,7 @@ class Event(object):
             if is_all_day_event(self._catalog_event):
                 one_day = datetime.timedelta(days=1)
                 ends_at = self._catalog_event.endDate - one_day
-                end_day = ends_at.strftime("%a, %b %e")
+                end_day = ends_at.strftime("%m/%d/%Y")
 
                 self.first_line_day   = start_day
                 self.first_line_time  = 'all-day'

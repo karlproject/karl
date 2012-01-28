@@ -435,7 +435,7 @@ class DayOnWeekViewTests(unittest.TestCase):
     
     def test_has_a_heading_used_at_the_top_of_calendar_columns(self):
         day = self._makeOne(2009, 9, 4)
-        self.assertEqual(day.heading, 'Fri 9/4')
+        self.assertEqual(day.heading, '9/4/2009')
      
     def test_has_a_css_day_abbr_purposely_not_localized(self):
         day = self._makeOne(2009, 9, 4)

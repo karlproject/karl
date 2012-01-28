@@ -804,6 +804,7 @@ class NetworkEventsPortlet(AbstractPortlet):
                 #td.set('class', 'event_title')
                 span1 = SubElement(li, 'span')
                 span1.text = entry['startDate'].strftime(date_format)
+                span1.set('class', 'globalize-short-date')
                 span2 = SubElement(li, 'span')
                 span2.set('class', 'event_title')
                 a = SubElement(span2, 'a',
