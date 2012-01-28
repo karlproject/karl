@@ -138,6 +138,7 @@ def _show_communities_view_helper(context,
     my_communities = get_my_communities(context, request)
     preferred_communities = get_preferred_communities(context, request)
     layout = request.layout_manager.layout
+    layout.section_style = "none"
     layout.add_portlet('my_communities', my_communities, preferred_communities)
 
     return {'communities': communities,

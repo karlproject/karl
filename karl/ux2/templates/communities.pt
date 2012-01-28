@@ -27,8 +27,10 @@
     <metal:content fill-slot="content">
 
     ${panel('status_message')}
-    
     ${panel('popper.actions_menu', actions=actions)}
+    <header>
+        <h1>Community Listing</h1>
+    </header>
 
     <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
 
