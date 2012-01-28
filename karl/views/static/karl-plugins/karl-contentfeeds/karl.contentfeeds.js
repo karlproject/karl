@@ -91,6 +91,7 @@ $.widget('karl.karlcontentfeeds', {
                 error: function(xhr, textStatus, errorThrow) {
                     self._ajaxError(xhr, textStatus, errorThrow);
                 },
+                cache: false,
                 dataType: 'json'
         });
 
