@@ -1,4 +1,4 @@
-<div id="skinswitcher" condition="layout.user_is_staff">
+<div id="skinswitcher" condition="layout.user_is_admin">
   <!-- Currently included from the footer, this panel
        can provide a skinswitcher link that admins can use.
        The link can switch between the "legacy" and the "ux2"

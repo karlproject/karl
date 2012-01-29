@@ -48,6 +48,10 @@ class Layout(PopperLayout):
         return 'group.KarlStaff' in effective_principals(self.request)
 
     @reify
+    def user_is_admin(self):
+        return 'group.KarlAdmin' in effective_principals(self.request)
+
+    @reify
     def macros(self):
         return get_renderer('templates/macros.pt').implementation().macros
 

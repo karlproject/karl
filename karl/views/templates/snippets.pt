@@ -1061,7 +1061,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     <metal:macro define-macro="skinswitcher">
       <!-- Switch skins to UX2. 
            The counterpart is in the 'skinswitcher' panel in ux2. -->
-      <div id="skinswitcher" condition="api.user_is_staff">
+      <div id="skinswitcher" condition="api.user_is_admin">
         <a href="#">Switch to UX2 skin</a>
         <style type="text/css">
             #skinswitcher a {
