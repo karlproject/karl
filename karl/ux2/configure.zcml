@@ -90,6 +90,13 @@
     renderer="templates/footer.pt"
     />
 
+  <bc:panel
+    name="skinswitcher"
+    panel=".panels.skinswitcher"
+    renderer="templates/skinswitcher.pt"
+    />
+
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"

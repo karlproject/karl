@@ -135,4 +135,10 @@ def footer(context, request):
         }
 
 
-
+def skinswitcher(context, request):
+    using_ux2 = request.cookies.get('ux2') == 'true'
+    return {
+        'skinswitcher': dict(value='false', label='LEGACY') \
+            if using_ux2 \
+            else dict(value='true', label='UX2'),
+        }
