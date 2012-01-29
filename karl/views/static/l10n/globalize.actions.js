@@ -38,6 +38,46 @@ Globalize.perform_actions = function() {
         $(this).text(d)
     });
 
+    $('.globalize-calendar-abbr').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            'c',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
+    $('.globalize-calendar-full').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            'C',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
+    $('.globalize-calendar-list').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            'l',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
+    $('.globalize-calendar-long').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            'L',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
+    $('.globalize-date-time').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            's',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
 };
 
 }( this ));

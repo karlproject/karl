@@ -20,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr tal:repeat="ri in recent_items">
+          <tr tal:repeat="ri recent_items">
             <td class="cldate">${ri.created}</td>
             <td class="cltitle">
               <a href="${ri.url}">${ri.title}</a>

@@ -935,7 +935,7 @@ def postoffice_quarantine_view(request):
         )
         messages.append(
             dict(url=url, message_id=message['Message-Id'], po_id=po_id,
-                 error=error)
+                 error=unicode(error, 'UTF-8'))
         )
 
     return dict(

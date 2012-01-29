@@ -258,6 +258,7 @@ class TestBlogEntryAlert(unittest.TestCase):
 class TestBlogCommentAlert(unittest.TestCase):
 
     def setUp(self):
+        import datetime
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
 
@@ -276,6 +277,8 @@ class TestBlogCommentAlert(unittest.TestCase):
         community["blog"] = testing.DummyModel()
 
         blogentry = testing.DummyModel(text="This is a test")
+        blogentry.created = datetime.datetime(2010, 5, 12, 2, 42)
+        blogentry.creator = 'member'
         community["blog"]["blogentry"] = blogentry
         blogentry["attachments"] = testing.DummyModel()
         blogentry.title = "Blog Entry"
@@ -352,6 +355,12 @@ class TestBlogCommentAlert(unittest.TestCase):
         messages, n = renderer.history
         self.assertEqual(n, 1)
         self.assertEqual(messages[0], self.blogentry)
+
+    def test_alert_template(self):
+        from repoze.postoffice.message import Message
+        request = testing.DummyRequest()
+        alert = self._makeOne(self.comment, self.profile, request)
+        self.failUnless(isinstance(alert.message, Message))
 
     def test_digest(self):
         from repoze.postoffice.message import Message

@@ -33,8 +33,7 @@
     ---------------------------------------------------------------
       </div>
 
-      <div tal:define="original history[0][0];
-                       comments history[0][1:]">
+      <div tal:define="original history[0][0]; comments history[0][1:]">
         <div tal:define="creator profiles[original.creator]">
           <h3>Original Blog Entry</h3>
           <div><b>From:</b> ${creator.title}</div>

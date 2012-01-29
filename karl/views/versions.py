@@ -276,4 +276,4 @@ def format_local_date(date, tz=None, time_module=time):
                 tz = time_module.timezone
 
     local = date - datetime.timedelta(seconds=tz)
-    return local.strftime('%Y-%m-%d %H:%M')
+    return local.strftime('%m/%d/%Y %H:%M:%S')

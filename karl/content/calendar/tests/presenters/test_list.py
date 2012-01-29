@@ -68,7 +68,7 @@ class ListViewPresenterTests(unittest.TestCase):
         self.assertEqual(painted_event.title,
                          event.title)                           # Meeting
         self.assertEqual(painted_event.first_line_day,
-                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+                         event.startDate.strftime("%m/%d/%Y")) # Mon, Feb 15
         self.assertEqual(painted_event.second_line_day, '')
 
         starts = painted_event._format_time_of_day(event.startDate)
@@ -95,7 +95,7 @@ class ListViewPresenterTests(unittest.TestCase):
                          event.title)                           # Vacation
 
         self.assertEqual(painted_event.first_line_day,
-                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+                         event.startDate.strftime("%m/%d/%Y")) # Mon, Feb 15
         self.assertEqual(painted_event.first_line_time, 'all-day')
 
         self.assertEqual(painted_event.second_line_day, '')     # empty second line
@@ -119,12 +119,12 @@ class ListViewPresenterTests(unittest.TestCase):
                          event.title)                           # Vacation
 
         self.assertEqual(painted_event.first_line_day,
-                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+                         event.startDate.strftime("%m/%d/%Y")) # Mon, Feb 15
         self.assertEqual(painted_event.first_line_time, 'all-day')
 
         ends_at = event.endDate - datetime.timedelta(days=1)
         self.assertEqual(painted_event.second_line_day,
-                         ends_at.strftime("%a, %b %e"))         # Wed, Feb 17
+                         ends_at.strftime("%m/%d/%Y"))         # Wed, Feb 17
         self.assertEqual(painted_event.second_line_time, '')
 
     def test_paints_event_of_three_days_with_partial_days(self):
@@ -145,13 +145,13 @@ class ListViewPresenterTests(unittest.TestCase):
                          event.title)                           # Travel
 
         self.assertEqual(painted_event.first_line_day,
-                         event.startDate.strftime("%a, %b %e")) # Mon, Feb 15
+                         event.startDate.strftime("%m/%d/%Y")) # Mon, Feb 15
         starts = painted_event._format_time_of_day(event.startDate)
         desc   = "%s - " % (starts)
         self.assertEqual(painted_event.first_line_time, desc)   # 1pm -
 
         self.assertEqual(painted_event.second_line_day,
-                         event.endDate.strftime("%a, %b %e"))   # Wed, Feb 17
+                         event.endDate.strftime("%m/%d/%Y"))   # Wed, Feb 17
         ends = painted_event._format_time_of_day(event.endDate)
         self.assertEqual(painted_event.second_line_time, ends)   # 4pm
 

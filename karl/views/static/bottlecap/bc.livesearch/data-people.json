@@ -1,0 +1,28 @@
+[
+    {"category": "profile",
+     "type": "profile",
+     "title": "Paul Everitt",
+     "thumbnail": "headshot.jpg",
+     "department": "Human Resources",
+     "extension": "7984",
+     "email": "paul@example.com",
+     "url": "/profile/paul"},
+
+    {"category": "profile",
+     "type": "profile",
+     "title": "Robert Marianski",
+     "thumbnail": "headshot.jpg",
+     "department": "Human Resources",
+     "extension": "7984",
+     "email": "rob@example.com",
+     "url": "/profile/rob"},
+
+    {"category": "profile",
+     "type": "profile",
+     "title": "Chris Rossi",
+     "thumbnail": "headshot.jpg",
+     "department": "Human Resources",
+     "extension": "7984",
+     "email": "chris@example.com",
+     "url": "/profile/chris"}
+]

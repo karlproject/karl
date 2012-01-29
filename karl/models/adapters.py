@@ -308,7 +308,7 @@ class CommunityInfo(object):
             overview_css_class = ''
 
             if ( ICommunity.providedBy(self.request.context) and
-                 self.request.view_name in ['','view.html'] ):
+                 self.request.view_name in ['','view.html','ux2_view.html'] ):
                 overview_css_class = 'curr'
                 found_current = True
 

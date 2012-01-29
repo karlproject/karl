@@ -71,7 +71,7 @@
         <script src="${api.static_url}/karl-plugins/karl-captionedimage/karl.captionedimage.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl-plugins/karl-slider/karl.slider.js" type="text/javascript">//</script>
         <script src="${api.static_url}/karl-plugins/karl-buttonset/karl.buttonset.js" type="text/javascript">//</script>
-        <script src="${api.static_url}/jquery-plugins/DD_roundies.src.js" type="text/javascript">//</script>
+        <!-- script src="${api.static_url}/jquery-plugins/DD_roundies.src.js" type="text/javascript">//</script -->
         <script src="${api.static_url}/jquery-plugins/jquery.scrollTo.src.js" type="text/javascript">//</script>
         <script src="${api.static_url}/jquery-plugins/jquery.tools.js" type="text/javascript">//</script>
 
@@ -442,7 +442,7 @@
 
     <div metal:define-macro="byline" class="kbyline">Posted
       by <a href="${byline_info.author_url}">${byline_info.author_name}</a>
-      on ${byline_info.posted_date}</div>
+      on <span class="globalize-full-date">${byline_info.posted_date}</span></div>
 
     <div metal:define-macro="searchresults">
       <div class="searchresult_entry" tal:repeat="entry entries">

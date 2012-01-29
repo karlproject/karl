@@ -27,7 +27,7 @@
                 </td>
             </tr>
             <tr tal:repeat="v history" tal:condition="history">
-                <td>${v['date']}</td>
+                <td class="globalize-date-time">${v['date']}</td>
                 <td>
                     <a href="${v['editor']['url']}">
                         ${v['editor']['name']}

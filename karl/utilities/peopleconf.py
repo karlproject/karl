@@ -55,10 +55,10 @@ _DUMP_XML =  """\
 <peopledirectory>
  <categories>
   <category tal:repeat="(c_id, category) sorted(categories.items())"
-            name="$c_id"
+            name="${c_id}"
             title="${category.title}">
    <value tal:repeat="(v_id, value) sorted(category_items(category))"
-            name="$v_id"
+            name="${v_id}"
             title="${value.title}"
             tal:content="structure value.description">DESCRIPTION</value>
   </category>
@@ -71,14 +71,14 @@ _DUMP_XML =  """\
    <acl tal:define="info acl_info(section)">
     <tal:loop tal:repeat="(verb, principal, permissions) info['aces']">
      <allow tal:condition="verb == 'allow'"
-            principal="$principal">
+            principal="${principal}">
       <permission tal:repeat="permission permissions"
-      >$permission</permission>
+      >${permission}</permission>
      </allow>
      <deny tal:condition="verb == 'deny'"
-           principal="$principal">
+           principal="${principal}">
       <permission tal:repeat="permission permissions"
-      >$permission</permission>
+      >${permission}</permission>
      </deny>
     </tal:loop>
     <no-inherit tal:condition="not info['inherit']"/>
@@ -123,7 +123,7 @@ _DUMP_XML =  """\
              title="${item.title}"
              link-title="${item.link_title}"
              class="${item.css_class}">
-      <tal:loop tal:repeat="info in report_filter_items(item)">
+      <tal:loop tal:repeat="info report_filter_items(item)">
        <filter tal:condition="info['type'] == 'category'"
                name="${info['name']}"
                type="${info['type']}"
@@ -423,7 +423,7 @@ def clear_mailinglist_aliases(peopledir):
     for k, v in list(aliases.items()): # avoid mutating-while-iterating
         if v.startswith(pd_path):
             del aliases[k]
-    
+
 
 def find_mailinglist_aliases(peopledir):
 

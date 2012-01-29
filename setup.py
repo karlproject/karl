@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '3.76dev'
+__version__ = '3.81dev'
 import os
 
 from ez_setup import use_setuptools
@@ -33,7 +33,7 @@ except IOError:
 
 requires = [
     'appendonly',
-    'Chameleon<=1.99999',
+    'Chameleon>=2.0',
     'feedparser',
     'icalendar',
     'lxml',
@@ -43,6 +43,7 @@ requires = [
     'pyramid',
     'pyramid_zcml',
     'pyramid_formish',
+    'pyramid_bottlecap',
     'formish<0.9'
     'repoze.browserid',
     'repoze.catalog',

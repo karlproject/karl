@@ -461,10 +461,13 @@ table.cal_scroll {
 
 /* events */
 .cal_event_pos_full a {
+  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
 .cal_event_pos_left a {
+  border-radius-topleft: 5px;
+  border-radius-bottomleft: 5px;
   -moz-border-radius-topleft: 5px;
   -moz-border-radius-bottomleft: 5px;
   -webkit-border-top-left-radius: 5px;
@@ -472,6 +475,8 @@ table.cal_scroll {
 }
 .cal_event_pos_right a {
   width: 92px;
+  border-radius-topright: 5px;
+  border-radius-bottomright: 5px;
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-top-right-radius: 5px;
@@ -508,6 +513,7 @@ body .cal_event_pos_right .cal_event_block {
   border-left-width: 0;
 }
 body .cal_hour_event .cal_event_block {
+  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   z-index: 1;
@@ -587,10 +593,12 @@ body .cal_hour_event .cal_event_block .time {
   float: right;
   padding: 3px 3px 3px 10px;
 }
-.cal_month .hov .label .num:hover {
+.cal_month .hov .label .num:hover,
+.cal_month .hov .label .calmore:hover {
     color: #333;
 }
-.cal_month .label .add {
+.cal_month .label .add,
+.cal_month .label .calmore {
   float: left;
   padding: 3px 10px 4px 3px;
 }

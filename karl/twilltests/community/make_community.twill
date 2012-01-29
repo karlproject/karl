@@ -1,2 +1,0 @@
-# Makes a community using function in twillcommands
-make_community "$community_name"

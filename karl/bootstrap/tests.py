@@ -28,11 +28,11 @@ class TestPopulate(unittest.TestCase):
     def _registerComponents(self):
         # Install a bit of configuration that make_app() usually
         # does for us.
+        from karl.application import configure_karl
         reg = get_current_registry()
-        config = Configurator(reg, autocommit=True)
+        config = Configurator(reg, autocommit=True, package='karl.includes')
         config.setup_registry()
-        config.include('pyramid_zcml')
-        config.load_zcml('karl.includes:configure.zcml')
+        configure_karl(config)
         from zope.interface import Interface
         config.registry.registerAdapter(DummyToolAddables,
                                         (Interface, Interface),

@@ -1369,13 +1369,13 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         self.assertEqual(message['url'], 'http://example.com/po_quarantine/0')
         self.assertEqual(message['message_id'], 'Message 1')
         self.assertEqual(message['po_id'], '0')
-        self.assertEqual(message['error'], 'Error 1')
+        self.assertEqual(unicode(message['error']), u'Error 1')
 
         message = messages.pop(0)
         self.assertEqual(message['url'], 'http://example.com/po_quarantine/1')
         self.assertEqual(message['message_id'], 'Message 2')
         self.assertEqual(message['po_id'], '1')
-        self.assertEqual(message['error'], 'Error 2')
+        self.assertEqual(unicode(message['error']), u'Error\xa02')
 
     def test_requeue_message(self):
         response = self._call_fut(params={'requeue_0': 1})
@@ -1567,7 +1567,7 @@ class DummyPostofficeQueue(object):
           'body': 'An urgent message for Obi Wan.'}, "Error 1"),
         ({'Message-Id': "Message 2",
           'X-Postoffice-Id': '1',
-          'body': 'Help me Obi Wan Kenobi.'}, "Error 2"),
+          'body': 'Help me Obi Wan Kenobi.'}, u"Error\xa02".encode('UTF8')),
     ]
 
     def __init__(self):

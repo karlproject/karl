@@ -21,7 +21,6 @@
 *     @depends karl-plugins/karl-buttonset/karl.buttonset.js
 *
 * Additional JQuery plugins:
-*     @depends jquery-plugins/DD_roundies.src.js
 *     @depends jquery-plugins/jquery.scrollTo.src.js
 *     @depends jquery-plugins/jquery.tools.js
 *

@@ -151,6 +151,7 @@ def show_folder_view(context, request):
             tool = find_interface(context, ICommunityRootFolder)
             trash_url = resource_url(tool, request, 'trash')
 
+    actions.append(('Multi Upload', ''))
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
@@ -517,6 +518,9 @@ def show_file_view(context, request):
         if repo is not None and has_permission('edit', context, request):
             actions.append(('History', 'history.html'))
 
+    filename = context.filename
+    if isinstance(filename, unicode):
+        filename = filename.encode('UTF-8')
     return render_to_response(
         'templates/show_file.pt',
         dict(api=api,
@@ -527,7 +531,7 @@ def show_file_view(context, request):
              previous_entry=previous,
              next_entry=next,
              layout=layout,
-             filename=quote_plus(context.filename),
+             filename=quote_plus(filename),
              ),
         request=request,
         )
@@ -1016,13 +1020,7 @@ def get_target_folders(context):
     target_items = []
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
-        # XXX rather use metadata here?? (for performance)
-        # also, we tolerate and log each possible catalog hiccup
         item = resolver(docid)
-        if item is None:
-            log.warn('get_target_folders catalog hiccup, docid=%r, path=%r, request_url=%r' %
-                (docid, path, context_path))
-            continue
         title = item.title
         target_items.append(dict(path=path, title=title))
 

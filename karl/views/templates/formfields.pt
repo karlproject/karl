@@ -559,9 +559,9 @@
                  class="noborder"
                  type="radio"
                  value="${c[0]}"
-                 name="date_format">
+                 name="date_format" />
           <label for="date_format-${c[0]}">${c[1]}</label>
-          <br>
+          <br />
         </tal:block>
         </div>
       </div>
@@ -735,7 +735,7 @@
     <fieldset metal:define-macro="calendar-category-field"
               tal:define="error fielderrors['calendar_category']|None"
               class="${error and 'fieldError' or ''}"
-              tal:attributes="style (not calendar_categories) and 'display: none;' or None"
+              tal:attributes="style (not calendar_categories) and 'display: none;;' or None"
               id="calendar-category-field">
       <label>Category</label>
       <div class="fieldHelp"></div>

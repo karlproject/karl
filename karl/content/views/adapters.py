@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 from __future__ import with_statement
 
-from os.path import join
 import datetime
 import math
 
@@ -40,7 +39,6 @@ from zope.interface import implements
 
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
-from pyramid.path import package_path
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.url import resource_url
@@ -120,7 +118,6 @@ class FileInfo(object):
     @property
     def modified_by_title(self):
         if self._modified_by_title is None:
-            profiles = find_profiles(self.context)
             profile_name = self.context.modified_by or self.context.creator
             profile = self._find_profile(profile_name)
             self._modified_by_title = profile and profile.title
@@ -129,7 +126,6 @@ class FileInfo(object):
     @property
     def modified_by_url(self):
         if self._modified_by_url is None:
-            profiles = find_profiles(self.context)
             profile_name = self.context.modified_by or self.context.creator
             profile = self._find_profile(profile_name)
             self._modified_by_url = profile and resource_url(profile,
@@ -503,7 +499,6 @@ class NonBlogAlert(Alert):
         model_href = resource_url(model, request)
         manage_preferences_href = resource_url(profile, request)
         system_name = get_setting(self.context, "system_name", "KARL")
-        system_email_domain = get_setting(self.context, "system_email_domain")
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
@@ -609,7 +604,6 @@ class DefaultFolderAddables(object):
         _addlist = [
             ('Add Folder', 'add_folder.html'),
             ('Add File', 'add_file.html'),
-            ('Multi Upload', ''),
             ]
 
         # Intranet folders by default get Add Page
@@ -810,6 +804,7 @@ class NetworkEventsPortlet(AbstractPortlet):
                 #td.set('class', 'event_title')
                 span1 = SubElement(li, 'span')
                 span1.text = entry['startDate'].strftime(date_format)
+                span1.set('class', 'globalize-short-date')
                 span2 = SubElement(li, 'span')
                 span2.set('class', 'event_title')
                 a = SubElement(span2, 'a',
@@ -877,7 +872,7 @@ class CalendarPortlet(NetworkEventsPortlet):
         more = SubElement(portlet, 'p')
         more.set('class', 'more')
         more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE' 
+        more_a.text = 'MORE'
 
         return tostring(portlet, pretty_print=True)
 

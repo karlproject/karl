@@ -22,7 +22,27 @@ if ( typeof require !== "undefined"
 
 Globalize.addCultureInfo( "en-US", "default", {
 	name: "en-US",
-	englishName: "English (United States)"
+	englishName: "English (United States)",
+	calendars: {
+		standard: {
+			firstDay: 1,
+			patterns: {
+				d: "MM/dd/yyyy",
+				D: "MMMM dd yyyy",
+				t: "HH:mm",
+				T: "HH:mm:ss",
+				f: "dddd, MMMM dd yyyy HH:mm",
+				F: "dddd, MMMM dd yyyy HH:mm:ss",
+                l: "ddd, MMM d",
+                L: "dddd, MMMM d",
+                c: "ddd M/d",
+                C: "dddd M/d",
+				M: "MMMM dd",
+				Y: "MMMM yyyy",
+                s: "M/d/yyyy HH:mm"
+			}
+		}
+	}
 });
 
 Globalize.addCultureInfo( "en-GB", "default", {
@@ -45,8 +65,13 @@ Globalize.addCultureInfo( "en-GB", "default", {
 				T: "HH:mm:ss",
 				f: "dddd, dd MMMM yyyy HH:mm",
 				F: "dddd, dd MMMM yyyy HH:mm:ss",
+                l: "ddd, d MMM",
+                L: "dddd, d MMMM",
+                c: "ddd d/M",
+                C: "dddd d/M",
 				M: "dd MMMM",
-				Y: "MMMM yyyy"
+				Y: "MMMM yyyy",
+                s: "d/M/yyyy HH:mm"
 			}
 		}
 	}

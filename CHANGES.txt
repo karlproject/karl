@@ -4,9 +4,45 @@ karl package Changelog
 Unreleased
 ----------
 
+
+
+3.80 (2012-01-04)
+-----------------
+
+- removed extra tal:attributes from template that caused wrong
+  selected values to display
+
+3.79 (2011-12-30)
+-----------------
+
+- Fix Chameleon 2 incompatility bugs in email_blog_entry.pt.
+
+- Fix problem with non-ascii characters in exception error messages in both
+  the error page view and the postoffice quarantine view.
+
+3.78 (2011-12-29)
+-----------------
+
+- Switch to Chameleon 2.
+
+3.77 (2011-12-16)
+-----------------
+
+- Fixed tag error on manage communities page.
+
+- Fixed bug in show file view where unicode filenames could cause an
+  error.
+
+3.76 (2011-12-15)
+-----------------
+
 - Fixed LP #891278: Some links to the wiki trash were incorrect.
 
 - Fixed LP #897435: File content needed to be reindexed on revert.
+
+- LP #824640: Add sorting facets to advanced search view.
+
+- LP #893767: Move 'Multi Upload' out of folder addables.
 
 3.75 (2011-12-07)
 -----------------

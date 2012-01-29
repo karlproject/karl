@@ -12,6 +12,11 @@
 * 
 * Just want the PNG fixing effect for IE6, and don't want to also use the DD_belatedPNG library?  Don't give any additional arguments after the CSS selector.
 * DD_roundies.addRule('.your .example img');
+*
+*
+* 2011-12-10 Balazs Ree <ree@greenfinity.hu>:
+*     - Fix an IE8 regression that caused the one pixel offset difference on IE
+*
 **/
 
 var DD_roundies = {
@@ -223,13 +228,14 @@ var DD_roundies = {
 		}
 		assign(el.vmlBox, false);
 		
-		if (DD_roundies.IE8) {
-			el.vml.stroke.style.margin = '-1px';
-			if (typeof el.bW == 'undefined') {
-				this.vmlStrokeWeight(el);
-			}
-			el.vml.color.style.margin = (el.bW.Top-1) + 'px ' + (el.bW.Left-1) + 'px';
-		}
+                // ##RB#
+		//if (DD_roundies.IE8) {
+		//	el.vml.stroke.style.margin = '-1px';
+		//	if (typeof el.bW == 'undefined') {
+		//		this.vmlStrokeWeight(el);
+		//	}
+		//	el.vml.color.style.margin = (el.bW.Top-1) + 'px ' + (el.bW.Left-1) + 'px';
+		//}
 	},
 	
 	vmlPath: function(el) {

@@ -1,3 +1,0 @@
-# Verify blog exist
-go /communities/${community_name}/blog
-find "Add Blog Entry"

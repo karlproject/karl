@@ -1,3 +1,0 @@
-# Verify forums
-go /communities/${community_name}/forums
-code 200

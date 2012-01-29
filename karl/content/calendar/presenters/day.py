@@ -61,9 +61,9 @@ class DayViewPresenter(DayEventHorizon):
                                    self.focus_datetime.day)
         day_name = calendar.day_name[day_num]                                   
 
-        self.title = "%s %d/%d" % (day_name, 
-                                   self.focus_datetime.month,
-                                   self.focus_datetime.day)
+        self.title = "%d/%d/%d" % ( self.focus_datetime.month,
+                                   self.focus_datetime.day,
+                                   self.focus_datetime.year)
 
         self.title_year = self.focus_datetime.year
 

@@ -44,7 +44,7 @@ class DayViewPresenterTests(unittest.TestCase):
 
         presenter = self._makeOne(focus_at, now_at, dummy_url_for)
 
-        self.assertEqual(presenter.title, 'Saturday 8/1')
+        self.assertEqual(presenter.title, '8/1/2009')
 
     def test_has_a_feed_url(self):
         focus_at = datetime.datetime(2009, 8, 1) 

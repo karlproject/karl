@@ -63,6 +63,16 @@
             </ul>
         </div>
 
+        <div class="sras-searchknobgroup">
+            <ul>
+                <li tal:repeat="o sort_knob">
+                    <a href="${o['url']}" tal:omit-tag="o['selected']">
+                        <strong tal:omit-tag="not o['selected']">
+                            ${o['name']}</strong></a>
+                </li>
+            </ul>
+        </div>
+
         <div class="sras-searchknobgroup last">
             <form method="GET">
                 <tal:block repeat="name params" omit-tag="">
