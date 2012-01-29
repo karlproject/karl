@@ -839,6 +839,11 @@ class CalendarPortlet(NetworkEventsPortlet):
         portlet = fragment_fromstring('<div class="generic-portlet"/>')
         heading = SubElement(portlet, 'h3')
         heading.text = self.context.title
+        # Today's date is used to avoid display dates in the past.
+        # If a multi-day event started in the past, we still only
+        # want to display it from today.
+        today = datetime.date.today()
+        today_start = datetime.datetime.combine(today, datetime.time())
 
         # Now the entries
         entries = self.entries
@@ -850,7 +855,14 @@ class CalendarPortlet(NetworkEventsPortlet):
                 li = SubElement(ul, 'li')
 
                 span1 = SubElement(li, 'span')
-                span1.text = entry['startDate'].strftime(date_format)
+
+                # To show multi-day events starting from today (and not
+                # in the past), we take the minimum date of today and the
+                # event's date.
+                start_date = max(entry['startDate'], today_start)
+
+                span1.text = start_date.strftime(date_format)
+
                 span2 = SubElement(li, 'span')
                 span2.set('class', 'event_title')
                 a = SubElement(span2, 'a',
