@@ -1,29 +1,5 @@
 <metal:block use-macro="main_template">
 
-    <metal:head fill-slot="head_slot">
-        <style type="text/css">
-            /* Place holder styles.  Temporary for development. */
-            /* Styles for the 'All|Active' communities filters. */
-            .filterOptions {
-                float: right;
-            }
-            .filterOptions li a {
-                display: inline;
-            }
-            .filterOptions li {
-                display: inline;
-            }
-            .filterOption {
-                list-style: none;
-                clear: none;
-                margin: 0;
-                padding: 0;
-                line-height: 26px;
-                float: right;
-            }
-        </style>
-    </metal:head>
-
     <metal:content fill-slot="content">
 
     ${panel('status_message')}
@@ -36,28 +12,46 @@
 
     <div tal:condition="error" tal:content="error" />
 
-    ${panel('popper.grid_header', letters=letters, filters=community_tabs)} 
-
-    <div class="communityEntry"
-         tal:repeat="community communities">
-
-      <div class="klisting_header">
-        <a href="${community.url}">${community.title}</a>
-        <span tal:condition="not community.public"
-          metal:use-macro="layout.macros['privacy_badge']"/>
-        <span tal:condition="community.moderator"
-          metal:use-macro="layout.macros['moderator_badge']"/>
-      </div>
-
-      <p>${community.description}</p>
-      <div class="documentByLine">
-        <span>${community.number_of_members} Member(s)</span>
-        <span> | </span>
-        <span>Last Activity: ${community.last_activity_date}</span>
-      </div>
-    </div>
-
     ${panel('popper.grid_footer', batch=batch_info)}
+
+    <div class="contentText">
+            ${panel('popper.grid_header', letters=letters, filters=community_tabs)}
+
+            <table class="filtered sortable" id="someid" summary="">
+                <!--
+                   .filtered means the table is filtered and has filter bar above (used for a specific styling for this case)
+                   .sortable indicates that the table rows are sortable by clicking a column's header
+                -->
+                <thead>
+                <tr>
+                    <!-- Anchors within TH are required in .sortable -->
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr tal:repeat="community communities" class="ui-grid-row ${'odd' if repeat.community.odd else 'even'">
+                    <td>
+                        <h3><a href="${community.url}">${community.title}</a></h3>
+                        <p>
+                            <span tal:condition="not community.public" 
+                                metal:use-macro="layout.macros['privacy_badge']"/>
+                            <span tal:condition="community.moderator" 
+                                metal:use-macro="layout.macros['moderator_badge']"/>
+                        </p>
+                        <p class="footer-line">
+                            <span>${community.number_of_members} Member(s)</span>
+                            <span> | </span>
+                            <span>Last Activity: ${community.last_activity_date}</span>
+                        </p>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            ${panel('popper.grid_footer', batch=batch_info)}
+
+        </div>
 
     </metal:content>
 </metal:block>
