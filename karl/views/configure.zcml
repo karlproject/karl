@@ -1802,6 +1802,13 @@
     name="restore"
     />
 
+  <view
+    for="repoze.folder.interfaces.IFolder"
+    view=".versions.shred"
+    permission="moderate"
+    name="shred"
+    />
+
   <!-- livesearch entries -->
   <adapter
     for="repoze.lemonade.interfaces.IContent

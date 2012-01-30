@@ -295,6 +295,7 @@ class TestShowTrash(unittest.TestCase):
             'date': None,
             'deleted_by': None,
             'restore_url': None,
+            'shred_url': None,
             'title': 'Child 3 (archived)',
             'url': 'http://example.com/trash?subfolder=%7B3%7Dchild',
         }])
@@ -314,7 +315,9 @@ class TestShowTrash(unittest.TestCase):
                 'url': 'http://example.com/profiles/ed/',
             },
             'restore_url':
-                'http://example.com/restore?'
+                'http://example.com/@@restore?'
+                'path=%7B3%7Dchild%2F%7B5%7Dgrandchild5',
+            'shred_url': 'http://example.com/@@shred?'
                 'path=%7B3%7Dchild%2F%7B5%7Dgrandchild5',
             'title': 'Grand 5 (archived)',
             'url':
@@ -336,7 +339,9 @@ class TestShowTrash(unittest.TestCase):
                 'name': 'Mr. Ed',
                 'url': 'http://example.com/profiles/ed/',
             },
-            'restore_url': 'http://example.com/restore?path='
+            'restore_url': 'http://example.com/@@restore?path='
+                '%7B3%7Dchild%2F%7B5%7Dgrandchild5%2F%7B6%7Dgrandchild6',
+            'shred_url': 'http://example.com/@@shred?path='
                 '%7B3%7Dchild%2F%7B5%7Dgrandchild5%2F%7B6%7Dgrandchild6',
             'title': 'Grand 6 (archived)',
             'url': None
@@ -520,6 +525,96 @@ class Test_undelete(unittest.TestCase):
         ])
 
 
+class Test_shred(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _call(self, context, request):
+        from karl.views.versions import shred
+        return shred(context, request)
+
+    def _make_context(self):
+        context = testing.DummyModel(
+            docid=2,
+            title='Top 2',
+        )
+        context['child'] = testing.DummyModel(
+            docid=3,
+            title='Child 3',
+        )
+        self.deleted_grandchild = Dummy(
+            docid=5,
+            name="grandchild5",
+            title="Grand 5",
+            new_container_ids=[],
+        )
+        context.repo = DummyArchive(
+            [
+                Dummy(docid=2,
+                    title="Top 2 (archived)",
+                    deleted=[],
+                    map={'child': 3, 'doc': 7},
+                ),
+                Dummy(docid=3,
+                    title="Child 3 (archived)",
+                    deleted=[self.deleted_grandchild],
+                    map={},
+                ),
+                Dummy(docid=5,
+                    title="Grand 5 (archived)",
+                    deleted=[],
+                    map={'grandchild6': 6},
+                ),
+                Dummy(
+                    docid=6,
+                    title="Grand 6 (archived)",
+                    deleted=[],
+                ),
+            ],
+        )
+        return context
+
+    def test_with_one_object(self):
+        request = testing.DummyRequest({
+            'path': '{3}child/{5}grandchild5/{6}grandchild6',
+        })
+        context = self._make_context()
+        result = self._call(context, request)
+        self.assertEqual(result.location, 'http://example.com/@@trash?path='
+            '%7B3%7Dchild%2F%7B5%7Dgrandchild5')
+
+        self.assertEqual(set(context.repo.shredded_docids), set([6]))
+        self.assertEqual(set(context.repo.shredded_container_ids), set([]))
+
+    def test_with_subtree_containing_a_normal_item(self):
+        request = testing.DummyRequest({
+            'path': '{3}child/{5}grandchild5',
+        })
+        context = self._make_context()
+        result = self._call(context, request)
+        self.assertEqual(
+            result.location, 'http://example.com/@@trash?path=%7B3%7Dchild')
+
+        self.assertEqual(set(context.repo.shredded_docids), set([5, 6]))
+        self.assertEqual(set(context.repo.shredded_container_ids), set([5]))
+
+    def test_with_subtree_containing_a_deleted_item(self):
+        request = testing.DummyRequest({
+            'path': '{3}child',
+        })
+        context = self._make_context()
+        result = self._call(context, request)
+        self.assertEqual(
+            result.location, 'http://example.com/@@trash?path=')
+
+        self.assertEqual(set(context.repo.shredded_docids), set([3, 5, 6]))
+        self.assertEqual(set(context.repo.shredded_container_ids), set([3, 5]))
+
+
 class Test_format_local_date(unittest.TestCase):
 
     def _callFUT(self, date, tz=None, time_module=None):
@@ -615,6 +710,27 @@ class DummyArchive(object):
 
     def which_contain_deleted(self, container_ids):
         return list(self.contain_deleted.intersection(set(container_ids)))
+
+    def iter_hierarchy(self, top_container_id, follow_deleted=False,
+            follow_moved=False):
+        if follow_moved:
+            raise NotImplementedError()
+        contents = self._docs.get(top_container_id)
+        if contents is None or not hasattr(contents, 'map'):
+            return
+        yield contents
+        for docid in contents.map.values():
+            for res in self.iter_hierarchy(docid, follow_deleted):
+                yield res
+        if follow_deleted and hasattr(contents, 'deleted'):
+            for item in contents.deleted:
+                if not getattr(item, 'new_container_ids', ()):
+                    for res in self.iter_hierarchy(item.docid, follow_deleted):
+                        yield res
+
+    def shred(self, docids, container_ids):
+        self.shredded_docids = docids
+        self.shredded_container_ids = container_ids
 
 
 class Dummy(object):

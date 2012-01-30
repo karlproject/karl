@@ -6,6 +6,9 @@ Unreleased
 
 - Fixed lp:920668: more efficient trash UI for deep file hierarchies.
 
+- Implemented lp:897428: allow community moderators to delete files
+  and wiki pages permanently.
+
 3.80 (2012-01-04)
 -----------------
 

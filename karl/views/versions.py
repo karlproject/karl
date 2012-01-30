@@ -6,6 +6,7 @@ import time
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
 from pyramid.url import resource_url
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -19,6 +20,7 @@ from karl.utils import find_repo
 from karl.utils import find_profiles
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
+from karl.security.policy import MODERATE
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ def decode_trash_path(s):
     """
     res = []
     for part in s.split('/'):
-        mo = re.match(r'{([0-9\-]+)}(.+)', part)
+        mo = re.match(r'{(-?[0-9]+)}(.+)', part)
         if mo is not None:
             # docid specified.
             res.append((mo.group(2), int(mo.group(1))))
@@ -106,7 +108,7 @@ def decode_trash_path(s):
 
 
 def encode_trash_path(path):
-    """Encode a trash path as a string."""
+    """Encode a trash path as a '{docid}name/...' string."""
     parts = []
     for name, docid in path:
         if docid is not None:
@@ -171,6 +173,7 @@ class ShowTrash(object):
         self.error = None
         self.deleted = []
         self.subfolder_path = []
+        self.can_shred = has_permission(MODERATE, context, request)
 
         subfolder = self.request.params.get('subfolder')
         if subfolder:
@@ -244,6 +247,12 @@ class ShowTrash(object):
 
         if deleted_item is not None:
             deleted_by = self.profiles[deleted_item.deleted_by]
+            if self.can_shred:
+                shred_url = resource_url(
+                    self.context, self.request, '@@shred',
+                    query={'path': item_path})
+            else:
+                shred_url = None
             self.deleted.append({
                 'date': format_local_date(deleted_item.deleted_time, self.tz),
                 'deleted_by': {
@@ -251,8 +260,9 @@ class ShowTrash(object):
                     'url': resource_url(deleted_by, self.request),
                 },
                 'restore_url': resource_url(
-                    self.context, self.request, 'restore',
+                    self.context, self.request, '@@restore',
                     query={'path': item_path}),
+                'shred_url': shred_url,
                 'title': version.title,
                 'url': url,
             })
@@ -261,6 +271,7 @@ class ShowTrash(object):
                 'date': None,
                 'deleted_by': None,
                 'restore_url': None,
+                'shred_url': None,
                 'title': version.title,
                 'url': url,
             })
@@ -314,6 +325,28 @@ def undelete(context, request):
     _restore_subtree(repo, parent, request)
 
     return HTTPFound(location=resource_url(parent, request))
+
+
+def shred(context, request):
+    repo = find_repo(context)
+    path = decode_trash_path(request.params['path'])
+    _name, docid, _item = list(traverse_trash(context, path))[-1]
+    docids = set([docid])
+
+    # If the object is a container, shred a subtree.
+    for contents in repo.iter_hierarchy(docid, follow_deleted=True,
+            follow_moved=False):
+        docids.update(contents.map.values())
+        for item in contents.deleted:
+            if not item.new_container_ids:
+                docids.add(item.docid)
+
+    container_ids = repo.filter_container_ids(docids)
+    repo.shred(docids, container_ids)
+    return HTTPFound(location=resource_url(context, request, '@@trash', query={
+        'path': encode_trash_path(path[:-1]),
+    }))
+
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
