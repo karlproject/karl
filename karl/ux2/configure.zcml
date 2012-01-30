@@ -87,7 +87,7 @@
   <bc:panel
     name="popper.footer"
     panel=".panels.footer"
-    renderer="templates/footer.pt"
+    renderer="templates/footer_panel.pt"
     />
 
   <bc:panel

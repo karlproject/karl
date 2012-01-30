@@ -7,10 +7,8 @@
       /* Place holder styles. Temporary for development. */
       /* Styles for the popper.footer panel. */
       
-      #footer { /* XXX somehow should come from main.less... just like sectionContainer, top-bar... */
-                /* XXX oh this is boken too! FIXME */
-        /*padding-left: 10%;
-        padding-right: 10%;*/
+      #footer .container {
+        padding: 10px 0;
       }
 
       /* XXX This stuff is plain taken over from themedstyles. */
@@ -26,7 +24,8 @@
       #footer .osi-logo {
           float: left;
           margin: 0px;
-          padding: 0px;
+          /*padding: 0px;*/
+          padding: 0 0 0 8px;
       }
       #footer .osi-logo img {
           border: none;
