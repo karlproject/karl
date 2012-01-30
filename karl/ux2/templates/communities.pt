@@ -12,8 +12,6 @@
 
     <div tal:condition="error" tal:content="error" />
 
-    ${panel('popper.grid_footer', batch=batch_info)}
-
     <div class="contentText">
             ${panel('popper.grid_header', letters=letters, filters=community_tabs)}
 
