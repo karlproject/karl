@@ -17,7 +17,7 @@
                 <th>Title</th>
                 <th>Date Deleted</th>
                 <th>Deleted By</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
             <tr tal:condition="not deleted">
                 <td colspan="4">
@@ -38,10 +38,48 @@
                 <td>
                     <a tal:condition="v['restore_url']"
                        href="${v['restore_url']}">Restore</a>
-                    <span tal:condition="not v['restore_url']">-</span>
+                    <span tal:condition="v['restore_url'] and v['shred_url']">|</span>
+                    <a class="shred-link" tal:condition="v['shred_url']"
+                       href="${v['shred_url']}" onclick="return false;"
+                       data-title="${v['title']}">Delete Permanently</a>
+                    <span tal:condition="not v['restore_url'] and not v['shred_url']">-</span>
                 </td>
             </tr>
         </table>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            $(document).ready(function () {
+                $(".shred-link").click(function () {
+                    var href = $(this).attr('href');
+                    var content = $(
+                        '<div class="ui-grid-dialog-content">' +
+                            '<p>Are you sure you want to delete ' +
+                            '<strong class="item-title"></strong> ' +
+                            'permanently? This can not be undone!</p>' +
+                        '</div>'
+                    ).appendTo('body').hide();
+                    content.find('.item-title').text($(this).attr('data-title'));
+                    content.karldialog({
+                        width: 400,
+                        buttons: {
+                            Cancel: function() {
+                                $(this).karldialog('close');
+                            },
+                            'Delete Permanently': function() {
+                                $(this).karldialog('close');
+                                window.location = href;
+                            }
+                        },
+                        open: function() {
+                        },
+                        close: function() {
+                        }
+                    }).karldialog('open');
+                });
+            });
+        //]]>
+        </script>
     </div>
 
     </div>
