@@ -165,13 +165,8 @@ $.widget('karl.karlcontentfeeds', {
     },
 
     _animate: function(nr) {
+        var self = this;
 
-        // XXX The animation is broken on IE8 for some reason.
-        // Temporarily disabled.
-        if ($.browser.msie) {
-            return;
-        }
-        
         // sum the full height, to see how large we need to go.
         // (XXX hmmm... should there be a better way?)
         var full_height = 0;
@@ -189,10 +184,11 @@ $.widget('karl.karlcontentfeeds', {
         var clear = this.element.css('clear'); 
         var wrapper = $('<div></div>')
             .css({overflow: 'hidden', 'clear': clear});
+        
         this.element
             .wrap(wrapper)
             .css({marginTop: -full_height, 'clear': 'none'});
-
+        
         // animate the new items
         // from the negative top margin, to zero
         this.element.animate({marginTop: 0}, {
@@ -200,7 +196,7 @@ $.widget('karl.karlcontentfeeds', {
             duration: 4 * full_height, // speed proportional with nr of items.
             complete: function() {
                 // when finished: remove the wrapper
-                wrapper.replaceWith(self.element);
+                self.element.unwrap();
             }
         });
     },
