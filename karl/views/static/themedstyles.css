@@ -2328,6 +2328,7 @@ ul.menu li {
 	border-bottom: solid 1px #cecece;
 	padding-top: 5px;
 	padding-bottom: 5px;
+        height: 86px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
 }
 .feeditem .thumbnail img {
     width: 55px;
