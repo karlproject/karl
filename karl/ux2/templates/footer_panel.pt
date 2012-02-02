@@ -94,6 +94,9 @@
       <a href="${layout.app_url}"><img src="${layout.karl_static}/images/osf-logo.gif" alt=""/></a>
     </div>
     <ul class="extra horListing">
+      <li tal:condition="layout.user_is_admin">
+        <a href="${layout.app_url}/admin.html"
+          >admin</a> | </li>
       <li>
         <a href="${layout.app_url}/communities/about-karl/wiki/karl-user-manual"
           >help</a> | </li>
