@@ -46,6 +46,13 @@ class QuipTests(unittest.TestCase):
         self.assertEqual(list(quip.tags), [])
         self.assertEqual(list(quip.communities), [])
 
+    def test_wo_syntax(self):
+        quip = self._makeOne('This is a test')
+        self.assertEqual(quip.text, 'This is a test')
+        self.assertEqual(list(quip.names), [])
+        self.assertEqual(list(quip.tags), [])
+        self.assertEqual(list(quip.communities), [])
+
     def test_text_immutable(self):
         quip = self._makeOne('before')
         def _set_text():
@@ -53,11 +60,25 @@ class QuipTests(unittest.TestCase):
         self.assertRaises(AttributeError, _set_text)
         self.assertEqual(quip.text, 'before')
 
-    def test_wo_syntax(self):
-        quip = self._makeOne('This is a test')
-        self.assertEqual(quip.text, 'This is a test')
+    def test_names_immutable(self):
+        quip = self._makeOne()
+        def _set_names():
+            quip.names = ['after', 'the', 'fact']
+        self.assertRaises(AttributeError, _set_names)
         self.assertEqual(list(quip.names), [])
+
+    def test_tags_immutable(self):
+        quip = self._makeOne()
+        def _set_tags():
+            quip.tags = ['after', 'the', 'fact']
+        self.assertRaises(AttributeError, _set_tags)
         self.assertEqual(list(quip.tags), [])
+
+    def test_communities_immutable(self):
+        quip = self._makeOne()
+        def _set_communities():
+            quip.communities = ['after', 'the', 'fact']
+        self.assertRaises(AttributeError, _set_communities)
         self.assertEqual(list(quip.communities), [])
 
     def test_w_syntax(self):
