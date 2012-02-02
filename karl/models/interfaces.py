@@ -597,6 +597,20 @@ class ISiteEvents(Interface):
         """ Append an mapping to the stack.
         """
 
+class IChatterbox(Interface):
+    """ Site-level 'tool' for holding chatter.
+    """
+
+class IQuip(Interface):
+    """ Individual chat element.
+
+    - Quips are immutable after creation.
+    """
+    text = Attribute(u'The actual text chattered by the user')
+    names = Attribute(u'Names mentioned in the text ("@foo")')
+    tags = Attribute(u'Tags mentioned in the text ("#foo")')
+    communities = Attribute(u'Communities mentioned in the text ("&foo")')
+
 # Reproduce repozitory interfaces here in order to be able to hedge instances
 # where repozitory is not available.
 try:
