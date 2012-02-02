@@ -27,7 +27,7 @@ class Layout(PopperLayout):
 
         self.app_url = app_url = request.application_url
         self.current_intranet = find_intranet(context)
-        self.people_url = app_url + settings.get('people_path', 'people')
+        self.people_url = app_url + '/' + settings.get('people_path', 'people')
         self.site = find_site(context)
         self.karl_static = '%s/static/%s' % (app_url, _get_static_rev())
         self.project_name = settings.get('system_name', 'KARL')
