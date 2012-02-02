@@ -66,7 +66,11 @@ def actions_menu(context, request, actions):
 def personal_tools(context, request):
     profiles = find_profiles(context)
     name = authenticated_userid(request)
-    return {'profile_name': profiles[name].title}
+    profile_url = request.resource_url(profiles[name]) 
+    logout_url = "%s/logout.html" % request.application_url
+    return {'profile_name': profiles[name].title,
+            'profile_url': profile_url,
+            'logout_url': logout_url}
 
 
 def status_message(context, request):

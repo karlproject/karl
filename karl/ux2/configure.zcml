@@ -58,7 +58,7 @@
   <bc:panel
     name="popper.personal_tools"
     panel=".panels.personal_tools"
-    renderer="bottlecap.layouts.popper:templates/personal_tools.pt"
+    renderer="templates/personal_tools.pt"
   />
 
   <bc:panel
