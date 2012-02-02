@@ -6,32 +6,30 @@ from karl.views.utils import get_user_home
 
 
 def global_nav(context, request):
+
+    def menu_item(title, url):
+        selected = request.resource_url(context).startswith(url)
+        return dict(title=title,
+                    url=url,
+                    selected=selected and 'selected' or None)
+
     layout = request.layout_manager.layout
     site = layout.site
     menu_items = [
-        dict(title="Communities",
-             url=request.resource_url(site, 'communities'),
-             selected=None),
-        dict(title="People",
-             url=layout.people_url,
-             selected=None),
-        dict(title="Feeds",
-             url=request.resource_url(site, 'contentfeeds.html'),
-             selected=None),
+        menu_item("Communities", request.resource_url(site, 'communities')),
+        menu_item("People", layout.people_url),
+        menu_item("Feeds", request.resource_url(site, 'contentfeeds.html')),
         ]
     intranets = find_intranets(site)
     if layout.current_intranet is not None:
-        menu_items.insert(0, dict(title="Intranet",
-             url=request.resource_url(intranets),
-             selected=None))
+        menu_items.insert(0, menu_item("Intranet",
+             request.resource_url(intranets)))
     if layout.should_show_calendar_tab:
-        menu_items.append(dict(title="Calendar",
-             url=request.resource_url(site, 'offices', 'calendar'),
-             selected=None))
+        menu_items.append(menu_item("Calendar",
+             request.resource_url(site, 'offices', 'calendar')))
     if layout.user_is_staff:
-        menu_items.append(dict(title="Tags",
-             url=request.resource_url(site, 'tagcloud.html'),
-             selected=None))
+        menu_items.append(menu_item("Tags",
+             request.resource_url(site, 'tagcloud.html')))
     return {'nav_menu': menu_items}
 
 
