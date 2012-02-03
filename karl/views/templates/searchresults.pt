@@ -41,6 +41,16 @@
 
         <!-- Left hand column of search knobs -->
 
+        <div class="sras-searchknobgroup" tal:condition="scope_knob">
+            <ul>
+                <li tal:repeat="o scope_knob">
+                    <a href="${o['url']}" tal:omit-tag="o['selected']">
+                        <strong tal:omit-tag="not o['selected']">
+                            ${o['name']}</strong></a>
+                </li>
+            </ul>
+        </div>
+
         <div class="sras-searchknobgroup sras-searchcontent">
             <ul>
                 <li tal:repeat="o kind_knob">

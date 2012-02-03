@@ -6,7 +6,7 @@
             <label for="searchfor">
                 Search for:
                 <select name="searchfor" id="searchfor">
-                    <option value="all_content">all content</option>
+                    <option value="">all content</option>
                     <option value="people">people</option>
                     <option value="pages">pages</option>
                     <option value="posts">posts</option>
@@ -17,8 +17,8 @@
             <label for="searchwhere">
                 in
                 <select name="searchwhere" id="searchwhere">
-                    <option value="search_all">all KARL</option>
-                    <option value="search_this_section">this community
+                    <option value="" data-label="all KARL">all KARL</option>
+                    <option value="/pg/communities/default" data-label="Default Community">this community
                     </option>
                 </select>
             </label>
@@ -38,31 +38,27 @@
     <script type="text/javascript" deferred>
     //<![CDATA[
         $(function() {
-            var appUrl = window.head_data.app_url;
+
+            var defaultKindLabel = $('select#searchfor option[value=""]').text();
+            var defaultScopeLabel = $('select#searchwhere option[value=""]').text();
+            function resetFilters(evt) {
+                $('select#searchfor')
+                    .val('')
+                    .next().text(defaultKindLabel);
+                $('select#searchwhere')
+                    .val('')
+                    .next().text(defaultScopeLabel);
+            }
 
             // Handle the initial selection of the "kind" selector
-            // XXX (I have the feeling that this secion would not be needed...
-            // ... provided we code the menus to assure the initial value)
-            var defaultOption = $('select#searchfor option').eq(0);
-            var defaultKind = defaultOption.attr('value');
-            var defaultLabel = defaultOption.text();
-            // let's start with the default 'all content', as kind.
-            var initialKind = defaultKind;
-            $('select#searchfor')
-                  .val(initialKind);
-                  //.next().text(initialKind);
+            resetFilters();
 
             // wire the livesearch component
+            var appUrl = window.head_data.app_url;
             $('#search-form .search-site-box').livesearch({
                 livesearchUrl: appUrl + '/jquery_livesearch',
                 advancedSearchUrl: appUrl + '/searchresults.html',
-                kind:  initialKind,
-                defaultKind: defaultKind,
-                resetKind: function(evt) {
-                    $('select#searchfor')
-                        .val(defaultKind)
-                        .next().text(defaultLabel);
-                },
+                resetFilters: resetFilters,
                 position: {
                     my: 'right top',
                     at: 'right bottom',
@@ -77,9 +73,17 @@
                   $('.search-site-box').livesearch('option', 'kind', value);
             });
 
+            // ui interaction: the "scope" selector change notifies the component
+            $('select#searchwhere').change(function(evt) {
+                  var option = $(this).find('option:selected');
+                  $('.search-site-box')
+                      .livesearch('option', 'scopePath', option.attr('value'))
+                      .livesearch('option', 'scopeLabel', option.data('label'));
+            });
+
             // ui interaction: search icon clicked: trigger a search.
             $('#search-form .searchButton').click(function(evt) {
-                $('#search-form .search-site-box').livesearch('searchButtonClicked', evt);   
+                $('#search-form .search-site-box').livesearch('searchButtonClicked', evt);
                 return false;
             });
 

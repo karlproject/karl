@@ -218,6 +218,40 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     kind_knob = []
     selected_kind = params.get('kind')
 
+    # XXX TODO Do something with me already!!!
+    scope_path = request.params.get('scopePath', '')
+
+    # We show the scope knob, but in a limited way.
+    # We only have a path here, so we show that path
+    # and a single option to go back to All KARL.
+    # If we are on all karl already, this knob group
+    # will not show at all, defaulting to KARL's legacy
+    # behaviour.
+    scope_label = request.params.get('scopeLabel', '')
+    if scope_path:
+        scope_knob = []
+        scope_knob.append({
+            'name': scope_label,
+            'title': scope_label,
+            'description': scope_label,
+            'icon': None,
+            'url': None,
+            'selected': True,
+        })
+        query = params.copy()
+        query.update(scopePath='', scopeLabel='All KARL')
+        scope_knob.append({
+            'name': 'All KARL',
+            'title': 'All KARL',
+            'description': 'All KARL',
+            'icon': None,
+            'url': resource_url(context, request, request.view_name, query=query),
+            'selected': False,
+        })
+    else:
+        # The knob will not show at all
+        scope_knob = None
+
     # There is a mapping needed between the livesearch
     # and the advanced search "kind" identifiers. This artifact is
     # a bit of annoyance but it's the easiest to do this
@@ -364,6 +398,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         kind_knob=kind_knob,
         since_knob=since_knob,
         sort_knob=sort_knob,
+        scope_knob=scope_knob,
         params=params,
         elapsed='%0.2f' % elapsed
         )
@@ -383,6 +418,9 @@ def jquery_livesearch_view(context, request):
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
 
+    scopePath = request.params.get('scopePath', '')
+    # XXX TODO Do something with me already!!!
+
     # maybe do some * checking to verify that we don't have a
     # prefix search < 3 chars
 
@@ -391,8 +429,8 @@ def jquery_livesearch_view(context, request):
     # we return back 5 results for each type of search
     results_per_type = 5
 
-    kind = request.params.get('kind', None)
-    if kind is None:
+    kind = request.params.get('kind', '')
+    if not kind:
         listitems = [item for item in get_listitems(IGroupSearchFactory) if
                      item['component'].livesearch]
     else:
