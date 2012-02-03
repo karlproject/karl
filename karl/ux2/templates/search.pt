@@ -17,9 +17,10 @@
             <label for="searchwhere">
                 in
                 <select name="searchwhere" id="searchwhere">
-                    <option value="" data-label="all KARL">all KARL</option>
-                    <option value="/pg/communities/default" data-label="Default Community">this community
-                    </option>
+                  <option tal:repeat="option scope_options"
+                    value="${option.path}"
+                    data-label="${option.label}"
+                    selected="${'selected' if option.get('selected', None) else None}">${option.name}</option>
                 </select>
             </label>
             <fieldset>

@@ -91,6 +91,12 @@
     />
 
   <bc:panel
+    name="popper.search"
+    panel=".panels.search"
+    renderer="templates/search.pt"
+    />
+
+  <bc:panel
     name="skinswitcher"
     panel=".panels.skinswitcher"
     renderer="templates/skinswitcher.pt"
