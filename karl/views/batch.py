@@ -17,6 +17,8 @@
 
 """Catalog results batching functions"""
 
+import datetime
+
 from pyramid.security import has_permission
 from pyramid.url import resource_url
 from pyramid.url import urlencode
@@ -258,12 +260,23 @@ def get_container_batch(container, request, batch_start=0, batch_size=20,
     if 'batch_size' in request.params:
         batch_size = int(request.params['batch_size'])
 
-    if sort_index:
+    if sort_index == 'modified_date':
+        now = datetime.datetime.now()
+
+        # Use fine-grained sort keys for the modified_date.
+        def sort_func(item, default):
+            try:
+                return item.modified
+            except AttributeError:
+                return now
+
+    elif sort_index:
         catalog = find_catalog(container)
         index = catalog[sort_index]
         # XXX this is not part of ICatalogIndex, but it happens to work
         # for most indexes. It might be useful to expand ICatalogIndex.
         sort_func = index.discriminator
+
     else:
         sort_func = None
 

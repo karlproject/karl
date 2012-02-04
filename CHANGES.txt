@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-
+- When sorting folder listings by modified date, use fine-grained sorting.
+  (lp:907527)
 
 3.81 (2012-02-03)
 -----------------
