@@ -3,11 +3,13 @@ from cgi import escape
 from pyramid.security import authenticated_userid
 from pyramid.traversal import resource_path
 
+from karl.utilities.image import thumb_url
 from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.utils import find_community
 from karl.views.utils import get_user_home
 
+PROFILE_ICON_SIZE = (15, 15)
 
 def global_nav(context, request):
 
@@ -66,12 +68,20 @@ def actions_menu(context, request, actions):
 
 
 def personal_tools(context, request):
+    layout = request.layout_manager.layout
     profiles = find_profiles(context)
     name = authenticated_userid(request)
-    profile_url = request.resource_url(profiles[name]) 
+    profile = profiles[name]
+    photo = profile.get('photo')
+    if photo is not None:
+        icon_url = thumb_url(photo, request, PROFILE_ICON_SIZE)
+    else:
+        icon_url = layout.static_url + 'img/person.png'
+    profile_url = request.resource_url(profile) 
     logout_url = "%s/logout.html" % request.application_url
-    return {'profile_name': profiles[name].title,
+    return {'profile_name': profile.title,
             'profile_url': profile_url,
+            'icon_url': icon_url,
             'logout_url': logout_url}
 
 

@@ -4,6 +4,6 @@
     This is a customized personal-tools panel
     -->
     </tal:comment>
-    <li><a href="${profile_url}">${profile_name}</a></li>
+    <li><a href="${profile_url}" style="background-image: url('${icon_url}');">${profile_name}</a></li>
     <li><a href="${logout_url}">Logout</a></li>
 </ul>
