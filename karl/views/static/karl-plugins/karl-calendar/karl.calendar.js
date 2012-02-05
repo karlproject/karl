@@ -364,6 +364,13 @@ $.widget('karl.karlcalendarbuttons', {
                 $(this).css('margin-top', '-4px');
         });
 
+        // Adjust the selection value: for example, Feb. 31 will be
+        // set back to Feb 28... This overcomes the problem of jumping
+        // one month forward, if the next month has no such day.
+        if (this.options.selection.day > days) {
+            this.options.selection.day = days;
+        }
+
     },
 
     _updateSelection: function() {
