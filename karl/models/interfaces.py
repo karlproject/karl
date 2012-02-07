@@ -601,7 +601,7 @@ class IChatterbox(Interface):
     """ Site-level 'tool' for holding chatter.
     """
 
-class IQuip(Interface):
+class IQuip(IContent):
     """ Individual chat element.
 
     - Quips are immutable after creation.
@@ -610,6 +610,8 @@ class IQuip(Interface):
     names = Attribute(u'Names mentioned in the text ("@foo")')
     tags = Attribute(u'Tags mentioned in the text ("#foo")')
     communities = Attribute(u'Communities mentioned in the text ("&foo")')
+    created = Attribute(u'Datetime indicating creation')
+    modified = Attribute(u'Datetime indicating modification:  == created')
 
 # Reproduce repozitory interfaces here in order to be able to hedge instances
 # where repozitory is not available.

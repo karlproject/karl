@@ -21,6 +21,13 @@ class ChatterboxTests(unittest.TestCase):
 
 
 class QuipTests(unittest.TestCase):
+    _old_NOW = None
+
+    def setUp(self):
+        self._set_NOW(None)
+
+    def tearDown(self):
+        self._set_NOW(None)
 
     def _getTargetClass(self):
         from karl.models.chatter import Quip
@@ -28,6 +35,10 @@ class QuipTests(unittest.TestCase):
 
     def _makeOne(self, text=''):
         return self._getTargetClass()(text)
+
+    def _set_NOW(self, when):
+        from karl.models import subscribers
+        subscribers._NOW, self._old_NOW = when, subscribers._NOW
 
     def test_class_conforms_to_IQuip(self):
         from zope.interface.verify import verifyClass
@@ -40,11 +51,15 @@ class QuipTests(unittest.TestCase):
         verifyObject(IQuip, self._makeOne())
 
     def test_empty(self):
+        NOW = object()
+        self._set_NOW(NOW)
         quip = self._makeOne()
         self.assertEqual(quip.text, '')
         self.assertEqual(list(quip.names), [])
         self.assertEqual(list(quip.tags), [])
         self.assertEqual(list(quip.communities), [])
+        self.failUnless(quip.created is NOW)
+        self.failUnless(quip.modified is NOW)
 
     def test_wo_syntax(self):
         quip = self._makeOne('This is a test')

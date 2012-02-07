@@ -21,6 +21,7 @@ from zope.interface import implements
 
 from karl.models.interfaces import IChatterbox
 from karl.models.interfaces import IQuip
+from karl.models.subscribers import set_created
 
 
 _NAME = re.compile(r'@\w+')
@@ -37,6 +38,7 @@ class Quip(Persistent):
 
     def __init__(self, text):
         self._text = text
+        set_created(self, None)
 
     def _getText(self):
         return self._text
