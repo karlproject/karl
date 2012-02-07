@@ -1,11 +1,14 @@
 <metal:macros>
 
-  <div class="tagbox" metal:define-macro="list_tags">
+  <!-- <div class="tagbox" metal:define-macro="list_tags">
     <strong class="label-tags" >Tags:</strong>
     <form id="tag-inputbox" action="javascript://return false;">
       <input name="taglist" id="tagsearch-input" value=""/>
     </form>
-  </div>
+  </div> -->
+
+  <section id="tags" class="tagbox contentRelated" 
+    metal:define-macro="list_tags"></section>
 
   <div metal:define-macro="rss_icon" class="rss-icon"
        tal:condition="feed_url|None">
