@@ -171,7 +171,7 @@ def _default_dates_requested(context, request):
 
 
 def _iterate_events_in_layer(layer, searcher, search_params,
-        docids_seen, docids_all, last_moment):
+        docids_seen, docids_all, first_moment, last_moment, in_list_view=False):
 
         _total, docids, resolver = searcher(
             virtual={'query':layer.paths, 'operator':'or'},
@@ -204,23 +204,38 @@ def _iterate_events_in_layer(layer, searcher, search_params,
                 # So we only add the event to the seen ones, if
                 # it is a normal, and not an all-day event.
                 # A special case is list views when we want the normal
-                # events duplicated too. The characteristics of a list
-                # view is that the end date is open.
+                # events duplicated too.
                 all_day = event.startDate.hour == 0 and \
                     event.startDate.minute == 0 and \
                     event.endDate.hour == 0 and \
                     event.endDate.minute == 0
-                in_list_view = last_moment is None
                 if not in_list_view and not all_day:
                     docids_seen.add(docid)
                 docids_all.add(docid)
 
-                yield event
+                # A list view, and a multi day event?
+                if in_list_view and all_day:
+                    # separate event bubble for each day of the event.
+                    # ... this is quite different from the original spec, and
+                    # possibly quite an inefficient way of doing it.
+                    new_startdate = max(event.startDate, first_moment)
+                    new_enddate = min(event.endDate, last_moment)
+                    plusone = datetime.timedelta(days=1)
+                    while new_startdate < new_enddate:
+                        day_event = copy.copy(event)
+                        day_event.startDate = new_startdate
+                        day_event._v_layer_color = layer.color.strip()
+                        day_event._v_layer_title = layer.title
+                        new_startdate += plusone
+                        yield day_event
+
+                else:
+                    yield event
 
 
 
 def _get_catalog_events(calendar, request,
-                        first_moment, last_moment, layer_name=None):
+                        first_moment, last_moment, layer_name=None, in_list_view=False):
 
     searcher = ICatalogSearch(calendar)
     search_params = dict(
@@ -253,13 +268,13 @@ def _get_catalog_events(calendar, request,
             this_calendar_layer = layer
             continue
         events.extend(_iterate_events_in_layer(layer, searcher, search_params,
-            docids_seen, docids_all, last_moment))
+            docids_seen, docids_all, first_moment, last_moment, in_list_view=in_list_view))
     # Default layer is always processed last
     # because we do not want to add any event that has already
     # been added in any other layer in the previous cycle.
     if this_calendar_layer is not None:
         events.extend(_iterate_events_in_layer(this_calendar_layer, searcher, search_params,
-            docids_all, set(), last_moment))
+            docids_all, set(), first_moment, last_moment, in_list_view=in_list_view))
 
     # The result set needs to be sorted by start_date.
     # XXX maybe we can do this directly from the catalog?
@@ -272,16 +287,22 @@ def _paginate_catalog_events(calendar, request,
                              per_page=20, page=1):
 
     all_events = _get_catalog_events(calendar, request,
-                                     first_moment, last_moment, layer_name)
+                                     first_moment, last_moment, layer_name, in_list_view=True)
 
     offset = (page - 1) * per_page
     limit  = per_page + 1
 
     events = []
     i = 0
+    prev_start_date = datetime.datetime(1970, 1, 1)   # does not match with any start date.
     for event in all_events:
         if i >= offset:
+            # Save the previous event's start date. This will be used in list view
+            # to show a day only at the firs event, and display the
+            # date of the rest of the events on the same day as blank.
+            event.prev_start_date = prev_start_date
             events.append(event)
+            prev_start_date = event.startDate
         if len(events) == limit:
             break
         i += 1
@@ -390,7 +411,8 @@ def _show_calendar_view(context, request, make_presenter, selection):
     events = _get_catalog_events(context, request,
                                  first_moment=calendar.first_moment,
                                  last_moment=calendar.last_moment,
-                                 layer_name=selected_layer)
+                                 layer_name=selected_layer,
+                                 in_list_view=False)
     calendar.paint_events(events)
 
     layers    = _get_calendar_layers(context)

@@ -276,3 +276,4 @@ class DummyCatalogEvent(object):
         self._v_layer_color = 'blue'
         self._v_layer_title = 'Vacation'
 
+        self.prev_start_date = datetime.datetime(1970, 1, 1)

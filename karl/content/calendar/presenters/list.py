@@ -148,18 +148,20 @@ class Event(object):
 
                 self.first_line_day   = start_day
                 self.first_line_time  = 'all-day'
-                if start_day != end_day:
-                    # Spans more days, so we need a second line (to-) date.
-                    self.second_line_day = end_day
-                else:
-                    # All-day event for a single day, no second line.
-                    self.second_line_day = ''
+                # All-day event for a single day, no second line.
+                self.second_line_day = ''
                 self.second_line_time = ''
             else:
                 self.first_line_day   = start_day
                 self.first_line_time  = '%s - ' % start_time
                 self.second_line_day  = end_day
                 self.second_line_time = end_time
+
+        # Do not display the start day, if we already
+        # had a previous event that showed this info.
+        event = self._catalog_event
+        if event.prev_start_date.date() == event.startDate.date():
+            self.first_line_day = ''
 
     def _format_time_of_day(self, dt):
         ''' Format a time like "2pm" or "3:15pm". '''
