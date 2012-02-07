@@ -610,6 +610,8 @@ class IQuip(IContent):
     names = Attribute(u'Names mentioned in the text ("@foo")')
     tags = Attribute(u'Tags mentioned in the text ("#foo")')
     communities = Attribute(u'Communities mentioned in the text ("&foo")')
+    creator = Attribute(u'Creating userid')
+    modified_by = Attribute(u'Modifying userid: == creator')
     created = Attribute(u'Datetime indicating creation')
     modified = Attribute(u'Datetime indicating modification:  == created')
 

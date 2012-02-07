@@ -36,8 +36,9 @@ class Chatterbox(Persistent):
 class Quip(Persistent):
     implements(IQuip)
 
-    def __init__(self, text):
+    def __init__(self, text, creator):
         self._text = text
+        self.creator = self.modified_by = creator
         set_created(self, None)
 
     def _getText(self):

@@ -22,6 +22,7 @@ class ChatterboxTests(unittest.TestCase):
 
 class QuipTests(unittest.TestCase):
     _old_NOW = None
+    _creator = 'TESTUSER'
 
     def setUp(self):
         self._set_NOW(None)
@@ -33,8 +34,10 @@ class QuipTests(unittest.TestCase):
         from karl.models.chatter import Quip
         return Quip
 
-    def _makeOne(self, text=''):
-        return self._getTargetClass()(text)
+    def _makeOne(self, text='', creator=None):
+        if creator is None:
+            creator = self._creator
+        return self._getTargetClass()(text, creator)
 
     def _set_NOW(self, when):
         from karl.models import subscribers
@@ -58,6 +61,8 @@ class QuipTests(unittest.TestCase):
         self.assertEqual(list(quip.names), [])
         self.assertEqual(list(quip.tags), [])
         self.assertEqual(list(quip.communities), [])
+        self.assertEqual(quip.creator, self._creator)
+        self.assertEqual(quip.modified_by, self._creator)
         self.failUnless(quip.created is NOW)
         self.failUnless(quip.modified is NOW)
 
