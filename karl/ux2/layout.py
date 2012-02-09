@@ -12,6 +12,7 @@ from pyramid.renderers import get_renderer
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import find_resource
+from pyramid.url import resource_url
 
 from karl.security.policy import VIEW
 from karl.utils import find_intranet
@@ -26,6 +27,7 @@ class Layout(PopperLayout):
         self.settings = settings = request.registry.settings
 
         self.app_url = app_url = request.application_url
+        self.here_url = resource_url(context, request)
         self.current_intranet = find_intranet(context)
         self.people_url = app_url + '/' + settings.get('people_path', 'people')
         self.site = find_site(context)

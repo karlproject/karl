@@ -1,0 +1,10 @@
+<fieldset id="${field.cssname}--field" class="${field.classes}">
+  <!-- structure/main.html -->
+  <span class="seqdelete"></span>
+  <span class="seqgrab"></span>
+  <legend tal:condition="field.title" class="group">${field.title}</legend>
+  <span tal:condition="hasattr(field.errors, 'message')">${unicode(field.error)}</span>
+  <span tal:repeat="f field.fields"
+        tal:replace="structure f()"/>
+  <div tal:condition="str(field.description) != ''" class="description">${field.description}</div>
+</fieldset>

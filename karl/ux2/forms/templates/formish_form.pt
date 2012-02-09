@@ -3,6 +3,14 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="main_template">
 
+<!-- TEMPORARY -->
+	<metal:tail fill-slot="head_slot">
+		<meta id="karl-app-url" content="${layout.app_url}"/>
+    <meta id="karl-here-url" content="${layout.here_url}"/>
+    <meta id="karl-static-url" content="${layout.karl_static}"/>
+	</metal:tail>
+<!-- TEMPORARY -->
+
   <div metal:fill-slot="content">
 
     ${panel('status_message')}
@@ -10,8 +18,15 @@
     <h1 class="kscreentitle">${layout.page_title}</h1>
 
       <span tal:content="structure request.form()" tal:omit-tag=""/>
-    
+
   </div>
-  
+
+<!-- TEMPORARY -->
+  <metal:tail fill-slot="tail_slot">
+  	<link rel="stylesheet" href="${layout.karl_static}/tinymce/min/tinymce-3.3.9.2.karl.min.css" type="text/css"/>
+		<script type="text/javascript" src="${layout.karl_static}/tinymce/min/tinymce-3.3.9.2.karl.min.js">//</script>
+	</metal:tail>
+<!-- TEMPORARY -->
+
 </div>
 
