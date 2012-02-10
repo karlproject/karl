@@ -33,6 +33,23 @@ class ChatterboxTests(_NowSetter):
         from karl.models.interfaces import IChatterbox
         verifyObject(IChatterbox, self._makeOne())
 
+    def test_empty(self):
+        cb = self._makeOne()
+        self.assertEqual(len(cb), 0)
+        self.assertEqual(list(cb), [])
+
+    def test___getitem___miss(self):
+        cb = self._makeOne()
+        self.assertRaises(KeyError, cb.__getitem__, 'nonesuch')
+
+    def test_addQuip(self):
+        cb = self._makeOne()
+        name = cb.addQuip('TEXT', 'USER')
+        self.assertEqual(len(cb), 1)
+        self.assertEqual(list(cb), [name])
+        quip = cb[name]
+        self.assertEqual(quip.text, 'TEXT')
+        self.assertEqual(quip.creator, 'USER')
 
 class QuipTests(_NowSetter):
     _creator = 'TESTUSER'

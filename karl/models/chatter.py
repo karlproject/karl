@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+import hashlib
 import re
 
+from BTrees.OOBTree import OOBTree
 from persistent import Persistent
 from zope.interface import implements
 
@@ -31,6 +33,33 @@ _COMMUNITY = re.compile(r'&\w+')
 
 class Chatterbox(Persistent):
     implements(IChatterbox)
+
+    def __init__(self):
+        self._quips = OOBTree()
+
+    def __iter__(self):
+        return iter(self._quips)
+
+    def __len__(self):
+        """ See IChatterbox.
+        """
+        return len(self._quips)
+
+    def __getitem__(self, key):
+        """ See IChatterbox.
+        """
+        return self._quips[key]
+
+    def addQuip(self, text, creator):
+        """ See IChatterbox.
+        """
+        quip = Quip(text, creator)
+        sha = hashlib.sha512(text)
+        sha.update(creator)
+        sha.update(quip.created.isoformat())
+        key = sha.hexdigest()
+        self._quips[key] = quip
+        return key
 
 
 class Quip(Persistent):

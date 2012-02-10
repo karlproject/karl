@@ -600,6 +600,25 @@ class ISiteEvents(Interface):
 class IChatterbox(Interface):
     """ Site-level 'tool' for holding chatter.
     """
+    def __len__():
+        """ How many quips are in the chatterbox?
+        """
+
+    def __iter__():
+        """ Return an iterator over the keys in the chatterbox.
+        """
+
+    def __getitem__(key):
+        """ Return the quip stored under 'key'.
+
+        o Raise KeyError on a miss.
+        """
+
+    def addQuip(text, creator):
+        """ Create and add a new quip to the chatterbox.
+
+        o Return the new quip's '__name__'.
+        """
 
 class IQuip(IContent):
     """ Individual chat element.
