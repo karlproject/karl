@@ -91,7 +91,7 @@ class Chatterbox(Persistent):
         """
         names = set(names)
         for quip in self.recent():
-            if names & set(quip.names):
+            if names & quip.names:
                 yield quip
 
 
@@ -100,6 +100,10 @@ class Quip(Persistent):
 
     def __init__(self, text, creator):
         self._text = text
+        self._names = frozenset([x[1:] for x in _NAME.findall(self._text)])
+        self._tags = frozenset([x[1:] for x in _TAG.findall(self._text)])
+        self._communities = frozenset(
+            [x[1:] for x in _COMMUNITY.findall(self._text)])
         self.creator = self.modified_by = creator
         set_created(self, None)
 
@@ -108,13 +112,13 @@ class Quip(Persistent):
     text = property(_getText,)
 
     def _getNames(self):
-        return [x[1:] for x in _NAME.findall(self._text)]
+        return self._names
     names = property(_getNames,)
 
     def _getTags(self):
-        return [x[1:] for x in _TAG.findall(self._text)]
+        return self._tags
     tags = property(_getTags,)
 
     def _getCommunities(self):
-        return [x[1:] for x in _COMMUNITY.findall(self._text)]
+        return self._communities
     communities = property(_getCommunities,)
