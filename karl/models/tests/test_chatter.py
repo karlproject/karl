@@ -159,6 +159,10 @@ class QuipTests(_NowSetter):
             quip.names = ['after', 'the', 'fact']
         self.assertRaises(AttributeError, _set_names)
         self.assertEqual(list(quip.names), [])
+        def _add_names():
+            quip.names += set(['after', 'the', 'fact'])
+        self.assertRaises(TypeError, _add_names)
+        self.assertEqual(list(quip.names), [])
 
     def test_tags_immutable(self):
         quip = self._makeOne()
@@ -166,12 +170,20 @@ class QuipTests(_NowSetter):
             quip.tags = ['after', 'the', 'fact']
         self.assertRaises(AttributeError, _set_tags)
         self.assertEqual(list(quip.tags), [])
+        def _add_tags():
+            quip.tags += set(['after', 'the', 'fact'])
+        self.assertRaises(TypeError, _add_tags)
+        self.assertEqual(list(quip.tags), [])
 
     def test_communities_immutable(self):
         quip = self._makeOne()
         def _set_communities():
             quip.communities = ['after', 'the', 'fact']
         self.assertRaises(AttributeError, _set_communities)
+        self.assertEqual(list(quip.communities), [])
+        def _add_communities():
+            quip.communities += set(['after', 'the', 'fact'])
+        self.assertRaises(TypeError, _add_communities)
         self.assertEqual(list(quip.communities), [])
 
     def test_w_syntax(self):
