@@ -2400,6 +2400,8 @@ ul.menu li {
 
 .feeditem .thumbnail {
     width: 55px;
+    height: 86px;
+    overflow: hidden;
     margin-right: 15px;
 }
 .feeditem .feedoperation {

@@ -4,6 +4,11 @@ karl package Changelog
 Unreleased
 ----------
 
+
+
+3.81 (2012-02-03)
+-----------------
+
 - Fixed lp:920668: more efficient trash UI for deep file hierarchies.
 
 - Implemented lp:897428: allow community moderators to delete files
