@@ -620,6 +620,29 @@ class IChatterbox(Interface):
         o Return the new quip's '__name__'.
         """
 
+    def recent():
+        """ Return an iterable of quips by recency.
+        """
+
+    def recentWithTag(tag):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'tag'.
+        """
+
+    def recentWithCommunity(community):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'community'.
+        """
+
+    def recentWithNames(self, *names):
+        """ Return an iterable of quips by recency.
+
+        Include only those which mention one or more of 'names'.
+        """
+
+
 class IQuip(IContent):
     """ Individual chat element.
 

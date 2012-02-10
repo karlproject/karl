@@ -17,6 +17,7 @@
 import hashlib
 import re
 
+from appendonly import AppendStack
 from BTrees.OOBTree import OOBTree
 from persistent import Persistent
 from zope.interface import implements
@@ -36,6 +37,7 @@ class Chatterbox(Persistent):
 
     def __init__(self):
         self._quips = OOBTree()
+        self._recent = AppendStack() #XXX parms?  10 layers x 100 items default
 
     def __iter__(self):
         return iter(self._quips)
@@ -59,7 +61,38 @@ class Chatterbox(Persistent):
         sha.update(quip.created.isoformat())
         key = sha.hexdigest()
         self._quips[key] = quip
+        self._recent.push(quip
+                         # TODO:  pruner=???
+                         )
         return key
+
+    def recent(self):
+        """ See IChatterbox.
+        """
+        for gen, index, quip in self._recent:
+            yield quip
+
+    def recentWithTag(self, tag):
+        """ See IChatterbox.
+        """
+        for quip in self.recent():
+            if tag in quip.tags:
+                yield quip
+
+    def recentWithCommunity(self, community):
+        """ See IChatterbox.
+        """
+        for quip in self.recent():
+            if community in quip.communities:
+                yield quip
+
+    def recentWithNames(self, *names):
+        """ See IChatterbox.
+        """
+        names = set(names)
+        for quip in self.recent():
+            if names & set(quip.names):
+                yield quip
 
 
 class Quip(Persistent):

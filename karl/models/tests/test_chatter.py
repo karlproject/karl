@@ -50,6 +50,59 @@ class ChatterboxTests(_NowSetter):
         quip = cb[name]
         self.assertEqual(quip.text, 'TEXT')
         self.assertEqual(quip.creator, 'USER')
+        self.assertEqual(list(cb.recent()), [quip])
+
+    def test_recent_with_multiple(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1', 'USER`')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        self.assertEqual(list(cb.recent()), [quip2, quip1])
+
+    def test_recentWithTag(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 #tag', 'USER`')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 #tag', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithTag('tag')), [quip3, quip1])
+
+    def test_recentWithCommunity(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 &community', 'USER`')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 &community', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithCommunity('community')),
+                         [quip3, quip1])
+
+    def test_recentWithNames_single(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 @name', 'USER`')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @name', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithNames('name')),
+                         [quip3, quip1])
+
+    def test_recentWithNames_multiple(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 @name1', 'USER`')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @name2', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithNames('name1', 'name2')),
+                         [quip3, quip1])
+
 
 class QuipTests(_NowSetter):
     _creator = 'TESTUSER'
