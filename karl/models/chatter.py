@@ -61,6 +61,8 @@ class Chatterbox(Persistent):
         sha.update(quip.created.isoformat())
         key = sha.hexdigest()
         self._quips[key] = quip
+        quip.__name__ = key
+        quip.__parent__ = self
         self._recent.push(quip
                          # TODO:  pruner=???
                          )

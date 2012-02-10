@@ -51,6 +51,8 @@ class ChatterboxTests(_NowSetter):
         self.assertEqual(quip.text, 'TEXT')
         self.assertEqual(quip.creator, 'USER')
         self.assertEqual(list(cb.recent()), [quip])
+        self.failUnless(quip.__parent__ is cb)
+        self.assertEqual(quip.__name__, name)
 
     def test_recent_with_multiple(self):
         cb = self._makeOne()
