@@ -107,18 +107,10 @@ class Quip(Persistent):
         self.creator = self.modified_by = creator
         set_created(self, None)
 
-    def _getText(self):
-        return self._text
-    text = property(_getText,)
+    text = property(lambda self: self._text,)
 
-    def _getNames(self):
-        return self._names
-    names = property(_getNames,)
+    names = property(lambda self: self._names,)
 
-    def _getTags(self):
-        return self._tags
-    tags = property(_getTags,)
+    tags = property(lambda self: self._tags,)
 
-    def _getCommunities(self):
-        return self._communities
-    communities = property(_getCommunities,)
+    communities = property(lambda self: self._communities,)
