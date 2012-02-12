@@ -50,8 +50,6 @@ requires = [
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',
-    'repoze.mailin',
-    'repoze.mailin.monitor',
     'repoze.monty',
     'repoze.postoffice',
     'repoze.retry',

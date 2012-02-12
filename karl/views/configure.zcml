@@ -1695,12 +1695,6 @@
     permission="administer"
     />
 
-  <view
-    for="karl.models.interfaces.ISite"
-    view="karl.views.admin.mailin_monitor_view"
-    name="mailin"
-    />
-
   <!-- imagedrawer ajax  -->
   <view
     for="zope.interface.Interface"
