@@ -8,5 +8,5 @@ def evolve(site):
     chatter = find_chatter(site)
     if chatter is None:
         print "Adding chatterbox"
-        site.chatter = Chatterbox()
+        site['chatter'] = Chatterbox()
 

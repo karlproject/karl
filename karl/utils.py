@@ -54,9 +54,6 @@ def find_catalog(context):
 def find_events(context):
     return getattr(find_site(context), 'events', None)
 
-def find_chatter(context):
-    return getattr(find_site(context), 'chatter', None)
-
 def find_tags(context):
     return getattr(find_site(context), 'tags', None)
 
@@ -68,6 +65,9 @@ def find_community(context):
 
 def find_communities(context):
     return find_site(context).get('communities')
+
+def find_chatter(context):
+    return find_site(context).get('chatter')
 
 def find_intranet(context):
     # Find the ancestor that has IIntranet, e.g. /osi/someoffice
