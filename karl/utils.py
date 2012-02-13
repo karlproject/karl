@@ -54,6 +54,9 @@ def find_catalog(context):
 def find_events(context):
     return getattr(find_site(context), 'events', None)
 
+def find_chatter(context):
+    return getattr(find_site(context), 'chatter', None)
+
 def find_tags(context):
     return getattr(find_site(context), 'tags', None)
 
