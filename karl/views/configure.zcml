@@ -1772,6 +1772,13 @@
     name="chatter.html"
     />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.chatter.add_chatter"
+    permission="create"
+    name="add_chatter.html"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"

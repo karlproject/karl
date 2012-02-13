@@ -18,15 +18,29 @@
 """
 import itertools
 
+from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
 from pyramid.url import resource_url
 
 from karl.utils import find_chatter
 from karl.views.api import TemplateAPI
 
+
 def recent_chatter(context, request):
     api = TemplateAPI(context, request, 'Recent Chatter')
     chatter = find_chatter(context)
+    def qurl(quip):
+        return resource_url(quip, request)
     return {'api': api,
             'recent': itertools.islice(chatter.recent(), 20),
-            'resource_url': resource_url,
+            'qurl': qurl,
            }
+
+
+def add_chatter(context, request):
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    chatter.addQuip(request.POST['text'], userid)
+    location = resource_url(context, request,
+                            request.view_name or 'chatter.html')
+    return HTTPFound(location=location)
