@@ -56,7 +56,7 @@ class ChatterboxTests(_NowSetter):
 
     def test_recent_with_multiple(self):
         cb = self._makeOne()
-        name1 = cb.addQuip('TEXT1', 'USER`')
+        name1 = cb.addQuip('TEXT1', 'USER')
         quip1 = cb[name1]
         name2 = cb.addQuip('TEXT2', 'USER2')
         quip2 = cb[name2]
@@ -64,7 +64,7 @@ class ChatterboxTests(_NowSetter):
 
     def test_recentWithTag(self):
         cb = self._makeOne()
-        name1 = cb.addQuip('TEXT1 #tag', 'USER`')
+        name1 = cb.addQuip('TEXT1 #tag', 'USER')
         quip1 = cb[name1]
         name2 = cb.addQuip('TEXT2', 'USER2')
         quip2 = cb[name2]
@@ -74,7 +74,7 @@ class ChatterboxTests(_NowSetter):
 
     def test_recentWithCommunity(self):
         cb = self._makeOne()
-        name1 = cb.addQuip('TEXT1 &community', 'USER`')
+        name1 = cb.addQuip('TEXT1 &community', 'USER')
         quip1 = cb[name1]
         name2 = cb.addQuip('TEXT2', 'USER2')
         quip2 = cb[name2]
@@ -83,9 +83,24 @@ class ChatterboxTests(_NowSetter):
         self.assertEqual(list(cb.recentWithCommunity('community')),
                          [quip3, quip1])
 
+    def test_recentWithNames_creator(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 @name', 'USER')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @name', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithNames('USER')),
+                         [quip1])
+        self.assertEqual(list(cb.recentWithNames('USER2')),
+                         [quip2])
+        self.assertEqual(list(cb.recentWithNames('USER3')),
+                         [quip3])
+
     def test_recentWithNames_single(self):
         cb = self._makeOne()
-        name1 = cb.addQuip('TEXT1 @name', 'USER`')
+        name1 = cb.addQuip('TEXT1 @name', 'USER')
         quip1 = cb[name1]
         name2 = cb.addQuip('TEXT2', 'USER2')
         quip2 = cb[name2]
@@ -96,7 +111,7 @@ class ChatterboxTests(_NowSetter):
 
     def test_recentWithNames_multiple(self):
         cb = self._makeOne()
-        name1 = cb.addQuip('TEXT1 @name1', 'USER`')
+        name1 = cb.addQuip('TEXT1 @name1', 'USER')
         quip1 = cb[name1]
         name2 = cb.addQuip('TEXT2', 'USER2')
         quip2 = cb[name2]

@@ -93,7 +93,7 @@ class Chatterbox(Persistent):
         """
         names = set(names)
         for quip in self.recent():
-            if names & quip.names:
+            if names & quip.names or quip.creator in names:
                 yield quip
 
 
