@@ -1763,6 +1763,15 @@
     renderer="json"
     />
 
+  <!-- chatter views -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.chatter.recent_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="chatter.html"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"

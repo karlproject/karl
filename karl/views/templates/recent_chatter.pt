@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+<body>
+
+ <div metal:fill-slot="content">
+
+  <h1>${api.page_title}</h1>
+
+  <div id="recent-quips-add-form">
+   <form action="add_quip" method="POST">
+    <fieldset id="text_fs">
+     <legend>Chatter</legend>
+     <textarea name="text" rows="2" cols="70"></textarea>
+    </fieldset>
+    <input type="submit" value="Post"/>
+   </form>
+  </div>
+
+  <div tal:repeat="quip recent">
+   <p>${quip.text}</p>
+   <p><span class="quip-creator">${quip.creator}</span>,
+      <a href="${resource_url(quip)}">${quip.created.isoformat()}</a>
+  </div>
+
+ </div>
+
+</body>
+</html>
