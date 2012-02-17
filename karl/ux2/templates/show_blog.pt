@@ -44,9 +44,11 @@
     </div>
 
     <div style="margin-top:20px;text-align:right">
-        <a href="mailto:${mailin_addr}"><img src="${layout.karl_static}/images/email.gif" border="0" alt="E-mail Community"
+        <a href="mailto:${mailin_addr}"><img 
+            src="${request.static_url('karl.views:static/images/email.gif')}" border="0" alt="E-mail Community"
           id="EmailIcon"/></a>
-      <a href="${feed_url}"><img src="${layout.karl_static}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+      <a href="${feed_url}"><img 
+          src="${request.static_url('karl.views:static/images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
           id="RSSIcon"/></a>
     </div>
 

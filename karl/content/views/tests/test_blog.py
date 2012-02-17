@@ -440,6 +440,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
     def _makeRequest(self):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.registry.settings = {}
         return request
 
     def _makeContext(self):

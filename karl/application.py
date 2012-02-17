@@ -1,4 +1,7 @@
+import os
 import pkg_resources
+import sys
+import time
 
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.renderers import RendererHelper
@@ -19,6 +22,9 @@ except ImportError:
 
 
 def configure_karl(config, load_zcml=True):
+    static_rev = get_static_rev()
+    config.registry.settings['static_rev'] = static_rev
+    config.add_static_view('/static/%s' % static_rev, 'karl.views:static')
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
     config.registry.registerUtility(FormishZPTMetaRenderer(), IFormishRenderer)
@@ -31,6 +37,36 @@ def configure_karl(config, load_zcml=True):
     debug = asbool(config.registry.settings.get('debug', 'false'))
     if debug and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
+
+
+def get_static_rev():
+    # If Karl is installed via an egg, we can try to get the Karl version
+    # number from the egg and use that.
+    _static_rev = _get_egg_rev()
+
+    if _static_rev is not None:
+        return _static_rev
+
+    # Fallback to just using a timestamp.  This is guaranteed not to fail
+    # but will create different revisions for each process, resulting in
+    # some extra static resource downloads
+    _static_rev = 'r%d' % int(time.time())
+
+    return _static_rev
+
+
+def _get_egg_rev():
+    # Find folder that this module is contained in
+    module = sys.modules[__name__]
+    path = os.path.dirname(os.path.abspath(module.__file__))
+
+    # Walk up the tree until we find the parent folder of an EGG-INFO folder.
+    while path != '/':
+        egg_info = os.path.join(path, 'EGG-INFO')
+        if os.path.exists(egg_info):
+            rev = os.path.split(path)[1]
+            return 'r%d' % hash(rev)
+        path = os.path.dirname(path)
 
 
 def ux2_metarenderer_factory(info):

@@ -36,16 +36,6 @@
     permission="administer"
   />
 
-  <!-- Publish static resources in a versioned path under /static/ -->
-
-  <route
-    name="static"
-    path="/static*subpath"
-    view_for=".site.StaticRootFactory"
-    view=".site.versioning_static_view"
-    factory=".site.StaticRootFactory"
-  />
-
   <!-- Redirect requests to site root, to correct URL -->
   <view
     for="karl.models.interfaces.ISite"
