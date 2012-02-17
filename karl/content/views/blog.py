@@ -55,6 +55,7 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
+from karl.utils import find_community
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -98,7 +99,7 @@ def show_blog_view(context, request):
         context, request, filter_func=filter_func, interfaces=[IBlogEntry],
         sort_index='creation_date', reverse=True)
 
-    # Unpack into data for the emplate
+    # Unpack into data for the template
     entries = []
     profiles = find_profiles(context)
     karldates = getUtility(IKarlDates)
@@ -132,7 +133,6 @@ def show_blog_view(context, request):
             }
         entries.append(info)
 
-    system_email_domain = get_setting(context, "system_email_domain")
     feed_url = "%satom.xml" % resource_url(context, request)
     workflow = get_workflow(IBlogEntry, 'security', context)
     if workflow is None:
@@ -140,14 +140,18 @@ def show_blog_view(context, request):
     else:
         security_states = get_security_states(workflow, None, request)
 
+    system_email_domain = get_setting(context, "system_email_domain")
+    community = find_community(context)
+    mailin_addr = '%s@%s' % (community.__name__, system_email_domain)
     return dict(
         api=api,
         actions=actions,
         entries=entries,
-        system_email_domain=system_email_domain,
+        system_email_domain=system_email_domain, # Deprecated UX1
         feed_url=feed_url,
         batch_info = batch,
         security_states=security_states,
+        mailin_addr=mailin_addr,  # UX2
         )
 
 def show_mailin_trace_blog(context, request):

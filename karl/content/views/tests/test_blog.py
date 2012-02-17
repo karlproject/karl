@@ -40,13 +40,15 @@ class ShowBlogViewTests(unittest.TestCase):
         return show_blog_view(context, request)
 
     def test_it(self):
-        context = testing.DummyModel()
-        from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
+        from karl.models.interfaces import ICommunity
+        from karl.models.interfaces import ISite
         from karl.testing import DummyProfile
         from repoze.workflow.testing import registerDummyWorkflow
+        site = testing.DummyModel()
+        site['test'] = context = testing.DummyModel()
+        directlyProvides(context, ICommunity, ISite)
         registerDummyWorkflow('security')
-        directlyProvides(context, ISite)
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
@@ -76,24 +78,25 @@ class ShowBlogViewTests(unittest.TestCase):
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
         self.assertEqual(response['entries'][0]['creator_href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
     def test_it_no_year_or_month(self):
-        context = testing.DummyModel()
+        from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from karl.testing import DummyProfile
         from repoze.workflow.testing import registerDummyWorkflow
+        site = testing.DummyModel()
+        site['test'] = context = testing.DummyModel()
+        directlyProvides(context, ICommunity, ISite)
         registerDummyWorkflow('security')
-        directlyProvides(context, ISite)
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
-        from webob.multidict import MultiDict
         request = testing.DummyRequest()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
@@ -118,20 +121,22 @@ class ShowBlogViewTests(unittest.TestCase):
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
         self.assertEqual(response['entries'][0]['creator_href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
     def test_it_no_comments(self):
-        context = testing.DummyModel()
+        from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from karl.testing import DummyProfile
         from repoze.workflow.testing import registerDummyWorkflow
+        site = testing.DummyModel()
+        site['test'] = context = testing.DummyModel()
+        directlyProvides(context, ICommunity, ISite)
         registerDummyWorkflow('security')
-        directlyProvides(context, ISite)
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
@@ -160,20 +165,22 @@ class ShowBlogViewTests(unittest.TestCase):
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
         self.assertEqual(response['entries'][0]['creator_href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
     def test_it_two_comments(self):
-        context = testing.DummyModel()
+        from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from karl.testing import DummyProfile
         from repoze.workflow.testing import registerDummyWorkflow
+        site = testing.DummyModel()
+        site['test'] = context = testing.DummyModel()
+        directlyProvides(context, ICommunity, ISite)
         registerDummyWorkflow('security')
-        directlyProvides(context, ISite)
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
@@ -204,18 +211,20 @@ class ShowBlogViewTests(unittest.TestCase):
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
         self.assertEqual(response['entries'][0]['creator_href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
     def test_it_no_workflow(self):
-        context = testing.DummyModel()
+        from karl.models.interfaces import ICommunity
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from karl.testing import DummyProfile
-        directlyProvides(context, ISite)
+        site = testing.DummyModel()
+        site['test'] = context = testing.DummyModel()
+        directlyProvides(context, ICommunity, ISite)
         context.catalog = {'creation_date': DummyCreationDateIndex()}
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
@@ -245,9 +254,9 @@ class ShowBlogViewTests(unittest.TestCase):
         self.assertEqual(len(response['entries']), 1)
         self.assertEqual(response['entries'][0]['title'], 'Dummy Entry')
         self.assertEqual(response['entries'][0]['creator_href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['href'],
-                         'http://example.com/e1/')
+                         'http://example.com/test/e1/')
         self.assertEqual(response['entries'][0]['creator_title'],
                          'Dummy Creator')
 
