@@ -25,6 +25,7 @@
   <metal:tail fill-slot="tail_slot">
   	<link rel="stylesheet" href="${layout.karl_static}/tinymce/min/tinymce-3.3.9.2.karl.min.css" type="text/css"/>
 		<script type="text/javascript" src="${layout.karl_static}/tinymce/min/tinymce-3.3.9.2.karl.min.js">//</script>
+    <script type="text/javascript" src="${layout.karl_static}/tinymce/karl-tiny-wire.js">//</script>
 	</metal:tail>
 <!-- TEMPORARY -->
 
