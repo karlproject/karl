@@ -94,6 +94,60 @@ class Test_tag_chatter(unittest.TestCase):
         self.failIf(context._names or context._community)
 
 
+class Test_community_chatter(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.chatter import community_chatter
+        return community_chatter(context, request)
+
+    def test_empty_chatterbox(self):
+        site = testing.DummyModel()
+        site['chatter'] = cb = _makeChatterbox()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['api'].page_title, 'Chatter: &testing')
+        self.assertEqual(list(info['recent']), [])
+        self.assertEqual(cb._community, 'testing')
+        self.failIf(cb._names or cb._tag)
+        self.assertEqual(info['qurl'](context),
+                         'http://example.com/communities/testing/')
+
+    def test_filled_chatterbox(self):
+        site = testing.DummyModel()
+        quip1, quip2, quip3 = object(), object(), object()
+        site['chatter'] = cb = _makeChatterbox((quip3, quip2, quip1))
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), [quip3, quip2, quip1])
+        self.assertEqual(cb._community, 'testing')
+        self.failIf(cb._names or cb._tag)
+
+    def test_overfilled_chatterbox(self):
+        site = testing.DummyModel()
+        site['chatter'] = cb = _makeChatterbox([object()] * 30)
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(len(list(info['recent'])), 20)
+        self.assertEqual(cb._community, 'testing')
+        self.failIf(cb._names or cb._tag)
+
+
 class Test_add_chatter(unittest.TestCase):
 
     def setUp(self):

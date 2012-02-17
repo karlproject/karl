@@ -1781,6 +1781,14 @@
     />
 
   <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="chatter.html"
+    />
+
+  <view
     for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.add_chatter"
     permission="create"

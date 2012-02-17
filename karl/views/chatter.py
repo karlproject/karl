@@ -51,6 +51,19 @@ def tag_chatter(context, request):
            }
 
 
+def community_chatter(context, request):
+    community = context.__name__
+    chatter = find_chatter(context)
+    api = TemplateAPI(context, request, 'Chatter: &%s' % community)
+    def qurl(quip):
+        return resource_url(quip, request)
+    return {'api': api,
+            'recent': itertools.islice(
+                        chatter.recentWithCommunity(community), 20),
+            'qurl': qurl,
+           }
+
+
 def add_chatter(context, request):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
