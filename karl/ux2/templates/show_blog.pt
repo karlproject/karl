@@ -1,9 +1,9 @@
 <metal:block use-macro="main_template">
-  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+  <metal:feed fill-slot="head_slot">
     <link rel="alternate" type="application/atom+xml"
-	  title="${api.page_title}" href="${feed_url}"
+	  title="${layout.page_title}" href="${feed_url}"
 	  />
-  </span>
+  </metal:feed>
   <div metal:fill-slot="content">
 
 
