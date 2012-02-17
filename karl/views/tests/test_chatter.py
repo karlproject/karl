@@ -19,28 +19,79 @@ class Test_recent_chatter(unittest.TestCase):
         return recent_chatter(context, request)
 
     def test_empty_chatterbox(self):
-        context = testing.DummyModel()
-        context['chatter'] = _makeChatterbox()
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Recent Chatter')
         self.assertEqual(list(info['recent']), [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/')
+        self.failIf(context._tag or context._names or context._community)
+        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
     def test_filled_chatterbox(self):
-        context = testing.DummyModel()
+        site = testing.DummyModel()
         quip1, quip2, quip3 = object(), object(), object()
-        context['chatter'] = _makeChatterbox((quip3, quip2, quip1))
+        site['chatter'] = context = _makeChatterbox((quip3, quip2, quip1))
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(list(info['recent']), [quip3, quip2, quip1])
 
     def test_overfilled_chatterbox(self):
-        context = testing.DummyModel()
-        context['chatter'] = _makeChatterbox([object()] * 30)
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox([object()] * 30)
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(len(list(info['recent'])), 20)
+
+
+class Test_tag_chatter(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.chatter import tag_chatter
+        return tag_chatter(context, request)
+
+    def test_wo_subpath(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest()
+        found = self._callFUT(context, request)
+        self.assertEqual(found.location, 'http://example.com/chatter/')
+
+    def test_empty_chatterbox(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(subpath=('sometag',))
+        info = self._callFUT(context, request)
+        self.assertEqual(info['api'].page_title, 'Chatter: #sometag')
+        self.assertEqual(list(info['recent']), [])
+        self.assertEqual(context._tag, 'sometag')
+        self.failIf(context._names or context._community)
+        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
+
+    def test_filled_chatterbox(self):
+        site = testing.DummyModel()
+        quip1, quip2, quip3 = object(), object(), object()
+        site['chatter'] = context = _makeChatterbox((quip3, quip2, quip1))
+        request = testing.DummyRequest(subpath=('sometag',))
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), [quip3, quip2, quip1])
+        self.assertEqual(context._tag, 'sometag')
+        self.failIf(context._names or context._community)
+
+    def test_overfilled_chatterbox(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox([object()] * 30)
+        request = testing.DummyRequest(subpath=('sometag',))
+        info = self._callFUT(context, request)
+        self.assertEqual(len(list(info['recent'])), 20)
+        self.assertEqual(context._tag, 'sometag')
+        self.failIf(context._names or context._community)
 
 
 class Test_add_chatter(unittest.TestCase):
@@ -57,14 +108,14 @@ class Test_add_chatter(unittest.TestCase):
 
     def test_it(self):
         _registerSecurityPolicy('user')
-        context = testing.DummyModel()
-        context['chatter'] = chatterbox = _makeChatterbox()
-        request = testing.DummyRequest(view_name='chatter.html')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest()
         request.POST['text'] = 'This is a quip.'
         found = self._callFUT(context, request)
-        self.assertEqual(found.location, 'http://example.com/chatter.html')
-        self.assertEqual(chatterbox._added.text, 'This is a quip.')
-        self.assertEqual(chatterbox._added.creator, 'user')
+        self.assertEqual(found.location, 'http://example.com/chatter/')
+        self.assertEqual(context._added.text, 'This is a quip.')
+        self.assertEqual(context._added.creator, 'user')
 
 
 def _makeChatterbox(recent=()):

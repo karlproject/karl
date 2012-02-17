@@ -1765,15 +1765,23 @@
 
   <!-- chatter views -->
   <view
-    for="karl.models.interfaces.ISite"
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.recent_chatter"
     renderer="templates/recent_chatter.pt"
     permission="view"
-    name="chatter.html"
+    name=""
     />
 
   <view
-    for="karl.models.interfaces.ISite"
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="tag"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.add_chatter"
     permission="create"
     name="add_chatter.html"
