@@ -1,0 +1,22 @@
+<metal:block use-macro="main_template">
+
+    <metal:slot metal:fill-slot="extra-headers">
+        <link rel="alternate" type="application/atom+xml" 
+            title="${layout.page_title}" href="${feed_url}"
+        />
+    </metal:slot>
+
+    <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+    
+    <tal:actions_menu 
+        content="panel('popper.actions_menu', actions=actions)">
+
+    <section class="noBullets" tal:repeat="column columns"
+             style="width: ${column['width']}"
+             tal:content="structure column['html']">
+    </section>
+
+    </metal:content>
+</metal:block>
