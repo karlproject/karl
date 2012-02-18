@@ -13,7 +13,7 @@
   <div metal:define-macro="rss_icon" class="rss-icon"
        tal:condition="feed_url|None">
     <a href="${feed_url}">
-        <img src="${request.stati_url('karl.views:static/images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
+        <img src="${request.static_url('karl.views:static/images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
         id="RSSIcon"/>
     </a>
   </div>
