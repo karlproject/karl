@@ -60,6 +60,7 @@ from karl.views.adapters import DefaultToolAddables
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import ISidebar
 from karl.views.interfaces import IToolAddables
+from karl.views.interfaces import IContextTools
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_name
 from karl.views.batch import get_catalog_batch_grid
@@ -128,12 +129,15 @@ def show_community_view(context, request):
 
     feed_url = resource_url(context, request, "atom.xml")
 
+    context_tools = getMultiAdapter((context, request), IContextTools)
+
     return {'api': api,
             'actions': actions,
             'recent_items': recent_items,
             'batch_info': recent_items_batch,
             'head_data': convert_to_script(client_json_data),
             'feed_url': feed_url,
+            'context_tools': context_tools,
            }
 
 def community_recent_items_ajax_view(context, request):

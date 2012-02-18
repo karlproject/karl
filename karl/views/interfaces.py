@@ -89,3 +89,6 @@ class IAdvancedSearchResultsDisplay(Interface):
 
     display_data = Attribute('Custom data to use for the template')
     macro = Attribute('Name of macro template to use')
+
+class IContextTools(Interface):
+    """ Which tabs should appear in the context tools panel """

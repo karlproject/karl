@@ -315,6 +315,8 @@ class CommunityInfo(object):
             tabs = [
                 {'url':resource_url(self.context, self.request, 'view.html'),
                  'css_class':overview_css_class,
+                 'selected':overview_css_class=='curr' and 'selected' or None,
+                 'title':'Overview',
                  'name':'OVERVIEW'}
                 ]
 
@@ -329,7 +331,10 @@ class CommunityInfo(object):
                         if toolfactory.is_current(self.context, self.request):
                             info['css_class'] = 'curr'
                             found_current = True
+                    selected = info['css_class']=='curr' and 'selected' or None
                     info['name'] = toolinfo['title'].upper()
+                    info['title'] = toolinfo['title'] # ux2
+                    info['selected'] = selected # ux2
                     tabs.append(info)
 
             self._tabs = tabs

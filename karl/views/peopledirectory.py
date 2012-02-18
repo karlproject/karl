@@ -168,9 +168,10 @@ def get_tabs(peopledir, request, current_sectionid):
         if not has_permission('view', section, request):
             continue
         result.append({
-            'href': resource_url(section, request),
+            'href': resource_url(section, request), # deprecated in ux2
+            'url': resource_url(section, request), # ux2
             'title': section.tab_title,
-            'selected': current_sectionid == section.__name__,
+            'selected': current_sectionid == section.__name__ and 'selected',
             })
     return result
 
@@ -271,7 +272,8 @@ def section_view(context, request):
     columns = [x for x in columns if x['html']]
     return dict(api=api,
                 peopledir=peopledir,
-                peopledir_tabs=peopledir_tabs,
+                peopledir_tabs=peopledir_tabs, # deprecated in ux2
+                context_tools=peopledir_tabs,
                 columns=columns,
                 actions=get_actions(context, request),
                )
@@ -313,7 +315,8 @@ def report_view(context, request):
     return dict(
         api=api,
         peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs,
+        peopledir_tabs=peopledir_tabs, # deprecated in ux2
+        context_tools=peopledir_tabs,
         head_data=convert_to_script(client_json_data),
         descriptions=descriptions,
         letters=letter_info,
@@ -407,7 +410,8 @@ def picture_view(context, request):
     return dict(
         api=api,
         peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs,
+        peopledir_tabs=peopledir_tabs, # deprecated in ux2
+        context_tools=peopledir_tabs,
         letters=letter_info,
         descriptions=descriptions,
         print_url=print_url,
