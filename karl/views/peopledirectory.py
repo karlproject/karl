@@ -300,7 +300,10 @@ def report_view(context, request):
     peopledir = find_peopledirectory(context)
     section = context.__parent__
     peopledir_tabs = get_tabs(peopledir, request, section.__name__)
-    client_json_data = {'grid_data': get_grid_data(context, request)}
+    report_data = get_grid_data(context, request)
+    batch = report_data['batch']
+    del(report_data['batch']) # non-json serializable
+    client_json_data = {'grid_data': report_data}
 
     descriptions = get_report_descriptions(context)
     mgr = ILetterManager(context)
@@ -318,6 +321,8 @@ def report_view(context, request):
         peopledir_tabs=peopledir_tabs, # deprecated in ux2
         context_tools=peopledir_tabs,
         head_data=convert_to_script(client_json_data),
+        report_data=report_data, # ux2
+        batch=batch, # ux2
         descriptions=descriptions,
         letters=letter_info,
         print_url=print_url,
@@ -510,6 +515,7 @@ def get_grid_data(context, request, start=0, limit=12,
         sortDirection=(reverse and 'desc' or 'asc'),
         allocateWidthForScrollbar=True,
         scrollbarWidth=SCROLLBAR_WIDTH,
+        batch=batch, # ux2
         )
     return payload
 
