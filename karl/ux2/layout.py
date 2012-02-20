@@ -8,6 +8,7 @@ from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 
 from karl.security.policy import VIEW
+from karl.utils import find_community
 from karl.utils import find_intranet
 from karl.utils import find_site
 
@@ -51,3 +52,20 @@ class Layout(PopperLayout):
 
     def static(self, fname):
         return self.request.static_url('karl.views:static/%s' % fname)
+
+    @apply
+    def section_title():
+        def getter(self):
+            community = find_community(self.context)
+            if community:
+                title = community.title
+            else:
+                title = 'Section Title'  # annoying default to spur override
+            self.__dict__['title'] = title  # reify
+            return title
+
+        def setter(self, title):
+            self.__dict__['title'] = title  # reify
+
+        return property(getter, setter)
+
