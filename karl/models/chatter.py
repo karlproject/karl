@@ -88,12 +88,20 @@ class Chatterbox(Persistent):
             if community in quip.communities:
                 yield quip
 
+    def recentWithCreators(self, *creators):
+        """ See IChatterbox.
+        """
+        names = set(creators)
+        for quip in self.recent():
+            if quip.creator in creators:
+                yield quip
+
     def recentWithNames(self, *names):
         """ See IChatterbox.
         """
         names = set(names)
         for quip in self.recent():
-            if names & quip.names or quip.creator in names:
+            if names & quip.names:
                 yield quip
 
 

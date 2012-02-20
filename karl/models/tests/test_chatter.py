@@ -83,7 +83,39 @@ class ChatterboxTests(_NowSetter):
         self.assertEqual(list(cb.recentWithCommunity('community')),
                          [quip3, quip1])
 
-    def test_recentWithNames_creator(self):
+    def test_recentWithCreators_single(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 @name', 'USER')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @name', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithCreators('USER')),
+                         [quip1])
+        self.assertEqual(list(cb.recentWithCreators('USER2')),
+                         [quip2])
+        self.assertEqual(list(cb.recentWithCreators('USER3')),
+                         [quip3])
+
+    def test_recentWithCreators_multiple(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 @name', 'USER')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @name', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithCreators('USER', 'USER2')),
+                         [quip2, quip1])
+        self.assertEqual(list(cb.recentWithCreators('USER', 'USER3')),
+                         [quip3, quip1])
+        self.assertEqual(list(cb.recentWithCreators('USER2', 'USER3')),
+                         [quip3, quip2])
+        self.assertEqual(list(cb.recentWithCreators('USER', 'USER2', 'USER3')),
+                         [quip3, quip2, quip1])
+
+    def test_recentWithNames_excludes_creator(self):
         cb = self._makeOne()
         name1 = cb.addQuip('TEXT1 @name', 'USER')
         quip1 = cb[name1]
@@ -92,11 +124,11 @@ class ChatterboxTests(_NowSetter):
         name3 = cb.addQuip('TEXT3 @name', 'USER3')
         quip3 = cb[name3]
         self.assertEqual(list(cb.recentWithNames('USER')),
-                         [quip1])
+                         [])
         self.assertEqual(list(cb.recentWithNames('USER2')),
-                         [quip2])
+                         [])
         self.assertEqual(list(cb.recentWithNames('USER3')),
-                         [quip3])
+                         [])
 
     def test_recentWithNames_single(self):
         cb = self._makeOne()
