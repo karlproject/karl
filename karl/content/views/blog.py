@@ -62,7 +62,6 @@ from karl.utils import get_setting
 from karl.utils import coarse_datetime_repr
 from karl.views.api import TemplateAPI
 from karl.views.interfaces import ISidebar
-from karl.views.interfaces import IContextTools
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
@@ -143,7 +142,6 @@ def show_blog_view(context, request):
 
     system_email_domain = get_setting(context, "system_email_domain")
     community = find_community(context)
-    context_tools = getMultiAdapter((community, request), IContextTools)
     mailin_addr = '%s@%s' % (community.__name__, system_email_domain)
     return dict(
         api=api,
@@ -154,7 +152,6 @@ def show_blog_view(context, request):
         batch_info = batch,
         security_states=security_states,
         mailin_addr=mailin_addr,  # UX2
-        context_tools=context_tools, # UX2
         )
 
 def show_mailin_trace_blog(context, request):

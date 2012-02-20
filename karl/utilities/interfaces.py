@@ -93,3 +93,6 @@ class IAlerts(Interface):
           root.
 
         """
+
+class IContextTools(Interface):
+    """ Which tabs should appear in the context tools panel """

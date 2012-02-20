@@ -9,6 +9,11 @@
     view=".switcher.switch_ui"
   />
 
+  <subscriber
+    for="pyramid.interfaces.IBeforeRender"
+    handler=".subscribers.add_renderer_globals"
+  />
+
   <!-- Default layout -->
   <bc:layout
     layout=".layout.Layout"

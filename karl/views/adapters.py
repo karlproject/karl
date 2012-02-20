@@ -1,5 +1,7 @@
 from zope.component import getUtility
 from zope.component import getMultiAdapter
+from zope.interface import implementer
+from zope.interface import implements
 
 from pyramid.renderers import render
 from pyramid.url import resource_url
@@ -9,7 +11,6 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
-from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
@@ -21,11 +22,8 @@ from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
-from karl.views.interfaces import IContextTools
 from karl.views.utils import get_static_url
-from zope.component import getMultiAdapter
-from zope.interface import implementer
-from zope.interface import implements
+
 
 class DefaultToolAddables(object):
     implements(IToolAddables)
@@ -228,12 +226,6 @@ def calendar_livesearch_result(context, request):
         type='calendarevent',
         category='calendarevent',
         )
-
-@implementer(IContextTools)
-def community_context_tools(context, request):
-    community_info = getMultiAdapter((context, request), ICommunityInfo)
-    if community_info is not None:
-        return community_info.tabs
 
 class BaseAdvancedSearchResultsDisplay(object):
 

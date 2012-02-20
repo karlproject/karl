@@ -1918,11 +1918,4 @@
     factory=".adapters.AdvancedSearchResultsDisplayFile"
     />
 
-  <adapter
-    for="karl.models.interfaces.ICommunity
-         pyramid.interfaces.IRequest"
-    provides=".interfaces.IContextTools"
-    factory=".adapters.community_context_tools"
-    />
-
 </configure>
