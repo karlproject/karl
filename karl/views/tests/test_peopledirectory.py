@@ -518,7 +518,8 @@ class Test_section_view(unittest.TestCase):
         self.assertEqual(info['peopledir'], pd)
         self.assertEqual(info['peopledir_tabs'], [{
             'href': 'http://example.com/people/s1/',
-            'selected': True,
+            'url': 'http://example.com/people/s1/',
+            'selected': 'selected',
             'title': 'B',
             }])
         c_info = info['columns']
@@ -957,12 +958,17 @@ class Test_get_grid_data(unittest.TestCase):
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
+        batch = {'reverse': False, 'next_batch': None, 'entries': [],
+            'batch_size': 10, 'sort_index': 'lastfirst',
+            'previous_batch': None, 'batch_end': 0,
+            'batching_required': False, 'total': 0, 'batch_start': 0}
         self.assertEqual(grid_data, {
             'fetch_url': 'http://example.com/people/s1/r1/jquery_grid',
             'sortColumn': 'name',
             'records': [],
             'sortDirection': 'asc',
             'width': 100,
+            'batch': batch,
             'batchSize': 10,
             'totalRecords': 0,
             'scrollbarWidth': 15,
