@@ -1766,6 +1766,14 @@
   <!-- chatter views -->
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.recent_chatter_json"
+    renderer="json"
+    permission="view"
+    name="index.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.recent_chatter"
     renderer="templates/recent_chatter.pt"
     permission="view"
@@ -1774,10 +1782,58 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter_json"
+    renderer="json"
+    permission="view"
+    name="creators.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="creators.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter_json"
+    renderer="json"
+    permission="view"
+    name="names.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="names.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter_json"
+    renderer="json"
+    permission="view"
+    name="tag.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.tag_chatter"
     renderer="templates/recent_chatter.pt"
     permission="view"
-    name="tag"
+    name="tag.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter_json"
+    renderer="json"
+    permission="view"
+    name="chatter.json"
     />
 
   <view

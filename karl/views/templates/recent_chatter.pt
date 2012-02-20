@@ -20,9 +20,9 @@
   </div>
 
   <div tal:repeat="quip recent">
-   <p>${quip.text}</p>
-   <p><span class="quip-creator">${quip.creator}</span>,
-      <a href="${qurl(quip)}">${quip.created.isoformat()}</a>
+   <p>${quip['text']}</p>
+   <p><span class="quip-creator">${quip['creator']}</span>,
+      <a href="${quip['url']}">${quip['created'].isoformat()}</a>
   </div>
 
  </div>

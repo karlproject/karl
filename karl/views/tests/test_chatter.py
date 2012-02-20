@@ -5,6 +5,48 @@ from pyramid import testing
 from karl import testing as karltesting
 
 
+class Test_quip_info(unittest.TestCase):
+
+    def _callFUT(self, request, *quips):
+        from karl.views.chatter import quip_info
+        return quip_info(request, *quips)
+
+    def test_single(self):
+        request = testing.DummyRequest()
+        quip = DummyQuip()
+        infos = self._callFUT(request, quip)
+        self.assertEqual(len(infos), 1)
+        info = infos[0]
+        self.assertEqual(info['text'], quip.text)
+        self.assertEqual(info['creator'], quip.creator)
+        self.failUnless(info['created'] is _WHEN)
+        self.assertEqual(info['names'], [])
+        self.assertEqual(info['communities'], [])
+        self.assertEqual(info['tags'], [])
+        self.assertEqual(info['url'], 'http://example.com/')
+
+    def test_multiple(self):
+        request = testing.DummyRequest()
+        quips = DummyQuip('1'), DummyQuip('2')
+        infos = self._callFUT(request, *quips)
+        self.assertEqual(len(infos), len(quips))
+        for info, quip in zip(infos, quips):
+            self.assertEqual(info['text'], quip.text)
+            self.assertEqual(info['creator'], quip.creator)
+            self.failUnless(info['created'] is quip.created)
+            self.assertEqual(info['names'], [])
+            self.assertEqual(info['communities'], [])
+            self.assertEqual(info['tags'], [])
+            self.assertEqual(info['url'], 'http://example.com/')
+
+
+def _verify_quips(infos, quips, request):
+    from karl.views.chatter import quip_info
+    assert len(infos) == len(quips)
+    for found, expected in zip(infos, quip_info(request, *quips)):
+        assert found == expected
+
+
 class Test_recent_chatter_json(unittest.TestCase):
 
     def _callFUT(self, context, request):
@@ -26,7 +68,7 @@ class Test_recent_chatter_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips)
+        _verify_quips(info['recent'], quips, request)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -36,7 +78,7 @@ class Test_recent_chatter_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[:20])
+        _verify_quips(info['recent'], quips[:20], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -46,7 +88,7 @@ class Test_recent_chatter_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest(GET={'start': 2, 'count': 5})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[2:7])
+        _verify_quips(info['recent'], quips[2:7], request)
 
 
 class Test_recent_chatter(unittest.TestCase):
@@ -62,7 +104,6 @@ class Test_recent_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Recent Chatter')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
 class Test_creators_chatter_json(unittest.TestCase):
@@ -94,7 +135,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'creators': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
-        self.assertEqual(info['recent'], quips)
+        _verify_quips(info['recent'], quips, request)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -105,7 +146,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER', 'USER2'])
-        self.assertEqual(info['recent'], quips[:20])
+        _verify_quips(info['recent'], quips[:20], request)
         self.assertEqual(context._creators, ('USER', 'USER2'))
         self.failIf(context._names or context._tag or context._community)
 
@@ -118,7 +159,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'creators': ['USER', 'USER2'],
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[2:7])
+        _verify_quips(info['recent'], quips[2:7], request)
 
 
 class Test_creators_chatter(unittest.TestCase):
@@ -142,7 +183,6 @@ class Test_creators_chatter(unittest.TestCase):
         self.assertEqual(info['creators'], ['USER'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
     def test_empty_chatterbox_creators_as_list(self):
         site = testing.DummyModel()
@@ -152,7 +192,6 @@ class Test_creators_chatter(unittest.TestCase):
         self.assertEqual(info['creators'], ['USER', 'USER2'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER, @USER2')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
 class Test_names_chatter_json(unittest.TestCase):
@@ -184,7 +223,7 @@ class Test_names_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'names': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER'])
-        self.assertEqual(info['recent'], quips)
+        _verify_quips(info['recent'], quips, request)
         self.assertEqual(context._names, ('USER',))
 
     def test_overfilled_chatterbox(self):
@@ -196,7 +235,7 @@ class Test_names_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER', 'USER2'])
-        self.assertEqual(info['recent'], quips[:20])
+        _verify_quips(info['recent'], quips[:20], request)
         self.assertEqual(context._names, ('USER', 'USER2'))
 
     def test_filled_chatterbox_w_start_and_count(self):
@@ -208,7 +247,7 @@ class Test_names_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2'],
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[2:7])
+        _verify_quips(info['recent'], quips[2:7], request)
 
 
 class Test_names_chatter(unittest.TestCase):
@@ -232,7 +271,6 @@ class Test_names_chatter(unittest.TestCase):
         self.assertEqual(info['names'], ['USER'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
     def test_empty_chatterbox_names_as_list(self):
         site = testing.DummyModel()
@@ -242,7 +280,6 @@ class Test_names_chatter(unittest.TestCase):
         self.assertEqual(info['names'], ['USER', 'USER2'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER, @USER2')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
 class Test_tag_chatter_json(unittest.TestCase):
@@ -273,7 +310,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips)
+        _verify_quips(info['recent'], quips, request)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -283,7 +320,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[:20])
+        _verify_quips(info['recent'], quips[:20], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -294,7 +331,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'tag': 'sometag',
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[2:7])
+        _verify_quips(info['recent'], quips[2:7], request)
 
 
 class Test_tag_chatter(unittest.TestCase):
@@ -317,7 +354,6 @@ class Test_tag_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: #sometag')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
 class Test_community_chatter_json(unittest.TestCase):
@@ -348,7 +384,7 @@ class Test_community_chatter_json(unittest.TestCase):
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips)
+        _verify_quips(info['recent'], quips, request)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -362,7 +398,7 @@ class Test_community_chatter_json(unittest.TestCase):
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[:20])
+        _verify_quips(info['recent'], quips[:20], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -376,7 +412,7 @@ class Test_community_chatter_json(unittest.TestCase):
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest(GET={'start': 2, 'count': 5})
         info = self._callFUT(context, request)
-        self.assertEqual(info['recent'], quips[2:7])
+        _verify_quips(info['recent'], quips[2:7], request)
 
 
 class Test_community_chatter(unittest.TestCase):
@@ -394,8 +430,6 @@ class Test_community_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: &testing')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['qurl'](context),
-                         'http://example.com/communities/testing/')
 
 
 class Test_add_chatter(unittest.TestCase):
@@ -452,10 +486,18 @@ def _registerSecurityPolicy(userid):
     karltesting.registerDummySecurityPolicy(userid)
 
 
-class DummyQuip(object):
-    def __init__(self, text='Dummy', creator='USER'):
+_WHEN = object()
+
+class DummyQuip(testing.DummyModel):
+    __name__ = __parent__ = None
+    def __init__(self, text='TEXT', creator='USER', created=_WHEN,
+                 names=(), communities=(), tags=()):
         self.text = text
         self.creator = creator
+        self.names = names
+        self.communities = communities
+        self.tags = tags
+        self.created = created
     def __repr__(self):
         return '%s: %s, %s' % (self.__class__.__name__, self.text, self.creator)
 

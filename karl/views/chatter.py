@@ -26,10 +26,27 @@ from karl.utils import find_chatter
 from karl.views.api import TemplateAPI
 
 
+
+def quip_info(request, *quips):
+    result = []
+    for quip in quips:
+        info = {'text': quip.text,
+                'creator': quip.creator,
+                'created': quip.created,
+                'names': list(quip.names),
+                'communities': list(quip.communities),
+                'tags': list(quip.tags),
+                'url': resource_url(quip, request),
+               }
+        result.append(info)
+    return result
+
 def _do_slice(iterable, request):
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 20)
-    return list(itertools.islice(iterable, start, start + count))
+    return quip_info(request,
+                     *[x for x in
+                           itertools.islice(iterable, start, start + count)])
 
 def recent_chatter_json(context, request):
     chatter = find_chatter(context)
