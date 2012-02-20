@@ -286,7 +286,8 @@ def show_blogentry_view(context, request):
         api=api,
         actions=actions,
         comments=comments,
-        attachments=fetch_attachments(context['attachments'], request),
+        attachments=fetch_attachments(
+            context['attachments'], request), # deprecated ux1
         head_data=convert_to_script(client_json_data),
         comment_form=comment_form,
         post_url=post_url,

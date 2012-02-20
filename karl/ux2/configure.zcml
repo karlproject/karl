@@ -102,6 +102,17 @@
     renderer="templates/skinswitcher.pt"
     />
 
+  <bc:panel
+    name="comments"
+    panel=".panels.comments"
+    renderer="templates/comments.pt"
+    />
+
+  <bc:panel
+    name="attachments"
+    panel=".panels.attachments"
+    renderer="templates/attachments.pt"
+    />
 
   <!-- Assets -->
   <asset

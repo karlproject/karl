@@ -25,7 +25,8 @@ from pyramid.testing import cleanUp
 
 class TestFileInfo(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        config = cleanUp()
+        config.add_static_view('static', 'karl.views:static')
 
     def tearDown(self):
         cleanUp()
@@ -65,19 +66,22 @@ class TestFileInfo(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.mimeinfo,
-                         {'small_icon_name':'files_folder_small.png',
-                          'title':'Folder'})
+        self.assertEqual(adapter.mimeinfo, {
+            'small_icon_name': 'files_folder_small.png',
+            'small_icon_url':
+                'http://example.com/static/images/files_folder_small.png',
+            'title': 'Folder'})
 
     def test_mimeinfo_with_mimetype(self):
+        mimeinfo = {'small_icon_name': 'iddybiddy.png'}
         def m(mimetype):
-            return 123
+            return mimeinfo
         from karl.utilities.interfaces import IMimeInfo
         karltesting.registerUtility(m, IMimeInfo)
         context = testing.DummyModel(mimetype='abc')
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.mimeinfo, 123)
+        self.assertEqual(adapter.mimeinfo, mimeinfo)
 
     def test_size(self):
         request = testing.DummyRequest()
