@@ -13,7 +13,6 @@ from karl.utils import find_site
 
 
 class Layout(PopperLayout):
-    page_title = 'Page Title'
     extra_css = ('karl.views:static/ux2/main.css',)
 
     def __init__(self, context, request):
@@ -26,6 +25,7 @@ class Layout(PopperLayout):
         self.people_url = app_url + '/' + settings.get('people_path', 'people')
         self.site = find_site(context)
         self.project_name = settings.get('system_name', 'KARL')
+        self.page_title = getattr(context, 'title', 'Page Title')
 
     @reify
     def should_show_calendar_tab(self):
