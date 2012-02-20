@@ -29,7 +29,7 @@ from karl.views.api import TemplateAPI
 def _do_slice(iterable, request):
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 20)
-    return itertools.islice(iterable, start, start + count)
+    return list(itertools.islice(iterable, start, start + count))
 
 def recent_chatter_json(context, request):
     chatter = find_chatter(context)
