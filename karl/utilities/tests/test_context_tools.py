@@ -17,3 +17,10 @@ class TestContextTools(unittest.TestCase):
         find_community.assert_called_once_with(context)
         getMultiAdapter.assert_called_once_with(
             ('community', request), ICommunityInfo)
+
+
+    @mock.patch('karl.utilities.context_tools.find_community')
+    def test_it_no_community(self, find_community):
+        from karl.utilities.context_tools import context_tools
+        find_community.return_value = None
+        self.assertEqual(context_tools(None, None), None)
