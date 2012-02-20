@@ -26,9 +26,14 @@ from karl.utils import find_chatter
 from karl.views.api import TemplateAPI
 
 
+def _do_slice(iterable, request):
+    start = request.GET.get('start', 0)
+    count = request.GET.get('count', 20)
+    return itertools.islice(iterable, start, start + count)
+
 def recent_chatter_json(context, request):
     chatter = find_chatter(context)
-    return {'recent': itertools.islice(chatter.recent(), 20),
+    return {'recent': _do_slice(chatter.recent(), request),
            }
 
 
@@ -48,8 +53,7 @@ def creators_chatter_json(context, request):
     else:
         creators = list(creators)
     chatter = find_chatter(context)
-    return {'recent': itertools.islice(
-                            chatter.recentWithCreators(*creators), 20),
+    return {'recent': _do_slice(chatter.recentWithCreators(*creators), request),
             'creators': creators,
            }
 
@@ -74,8 +78,7 @@ def names_chatter_json(context, request):
     else:
         names = list(names)
     chatter = find_chatter(context)
-    return {'recent': itertools.islice(
-                            chatter.recentWithNames(*names), 20),
+    return {'recent': _do_slice(chatter.recentWithNames(*names), request),
             'names': names,
            }
 
@@ -96,7 +99,7 @@ def names_chatter(context, request):
 def tag_chatter_json(context, request):
     tag = request.GET['tag']
     chatter = find_chatter(context)
-    return {'recent': itertools.islice(chatter.recentWithTag(tag), 20),
+    return {'recent': _do_slice(chatter.recentWithTag(tag), request),
             'tag': tag,
            }
 
@@ -117,8 +120,8 @@ def community_chatter_json(context, request):
     community = context.__name__
     chatter = find_chatter(context)
     return {'community': community,
-            'recent': itertools.islice(
-                        chatter.recentWithCommunity(community), 20),
+            'recent': _do_slice(
+                            chatter.recentWithCommunity(community), request),
            }
 
 

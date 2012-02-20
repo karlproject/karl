@@ -44,6 +44,16 @@ class Test_recent_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(list(info['recent']), quips[:20])
 
+    def test_filled_chatterbox_w_start_and_count(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[2:7])
+
 
 class Test_recent_chatter(unittest.TestCase):
 
@@ -116,6 +126,17 @@ class Test_creators_chatter_json(unittest.TestCase):
         self.assertEqual(list(info['recent']), quips[:20])
         self.assertEqual(context._creators, ('USER', 'USER2'))
         self.failIf(context._names or context._tag or context._community)
+
+    def test_filled_chatterbox_w_start_and_count(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2'],
+                                            'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[2:7])
 
 
 class Test_creators_chatter(unittest.TestCase):
@@ -208,6 +229,17 @@ class Test_names_chatter_json(unittest.TestCase):
         self.assertEqual(list(info['recent']), quips[:20])
         self.assertEqual(context._names, ('USER', 'USER2'))
 
+    def test_filled_chatterbox_w_start_and_count(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'names': ['USER', 'USER2'],
+                                            'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[2:7])
+
 
 class Test_names_chatter(unittest.TestCase):
 
@@ -295,6 +327,17 @@ class Test_tag_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(list(info['recent']), quips[:20])
 
+    def test_filled_chatterbox_w_start_and_count(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'tag': 'sometag',
+                                            'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[2:7])
+
 
 class Test_tag_chatter(unittest.TestCase):
 
@@ -374,6 +417,20 @@ class Test_community_chatter_json(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(list(info['recent']), quips[:20])
+
+    def test_filled_chatterbox_w_start_and_count(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = cb = _makeChatterbox(quips)
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest(GET={'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[2:7])
 
 
 class Test_community_chatter(unittest.TestCase):
