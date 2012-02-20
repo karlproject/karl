@@ -23,7 +23,8 @@ class Test_recent_chatter_json(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(list(info['recent']), [])
-        self.failIf(context._tag or context._names or context._community)
+        self.failIf(context._tag or context._names or
+                    context._community or context._creators)
 
     def test_filled_chatterbox(self):
         site = testing.DummyModel()
@@ -63,7 +64,103 @@ class Test_recent_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Recent Chatter')
         self.assertEqual(list(info['recent']), [])
-        self.failIf(context._tag or context._names or context._community)
+        self.failIf(context._tag or context._names or
+                    context._community or context._creators)
+        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
+
+
+class Test_creators_chatter_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.chatter import creators_chatter_json
+        return creators_chatter_json(context, request)
+
+    def test_wo_parm(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest()
+        self.assertRaises(KeyError, self._callFUT, context, request)
+
+    def test_empty_chatterbox_creators_as_string(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(GET={'creators': 'USER'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['creators'], ['USER'])
+        self.assertEqual(list(info['recent']), [])
+        self.assertEqual(context._creators, ('USER',))
+        self.failIf(context._names or context._community)
+
+    def test_filled_chatterbox_creators_as_tuple(self):
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'creators': ('USER',)})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips)
+        self.assertEqual(context._creators, ('USER',))
+        self.failIf(context._names or context._community or context._tag)
+
+    def test_overfilled_chatterbox(self):
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
+        info = self._callFUT(context, request)
+        self.assertEqual(list(info['recent']), quips[:20])
+        self.assertEqual(context._creators, ('USER', 'USER2'))
+        self.failIf(context._names or context._community or context._tag)
+
+
+class Test_creators_chatter(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.chatter import creators_chatter
+        return creators_chatter(context, request)
+
+    def test_wo_parm(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest()
+        found = self._callFUT(context, request)
+        self.assertEqual(found.location, 'http://example.com/chatter/')
+
+    def test_empty_chatterbox_creators_as_string(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(GET={'creators': 'USER'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['creators'], ['USER'])
+        self.assertEqual(info['api'].page_title, 'Chatter: @USER')
+        self.assertEqual(list(info['recent']), [])
+        self.assertEqual(context._creators, ('USER',))
+        self.failIf(context._names or context._tag or context._community)
+        self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
+
+    def test_empty_chatterbox_creators_as_list(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['creators'], ['USER', 'USER2'])
+        self.assertEqual(info['api'].page_title, 'Chatter: @USER, @USER2')
+        self.assertEqual(list(info['recent']), [])
+        self.assertEqual(context._creators, ('USER', 'USER2'))
+        self.failIf(context._names or context._tag or context._community)
         self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
@@ -93,26 +190,29 @@ class Test_tag_chatter_json(unittest.TestCase):
         self.assertEqual(info['tag'], 'sometag')
         self.assertEqual(list(info['recent']), [])
         self.assertEqual(context._tag, 'sometag')
-        self.failIf(context._names or context._community)
+        self.failIf(context._names or context._community or context._creators)
 
     def test_filled_chatterbox(self):
         site = testing.DummyModel()
-        quip1, quip2, quip3 = object(), object(), object()
-        site['chatter'] = context = _makeChatterbox((quip3, quip2, quip1))
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
-        self.assertEqual(list(info['recent']), [quip3, quip2, quip1])
+        self.assertEqual(list(info['recent']), quips)
         self.assertEqual(context._tag, 'sometag')
-        self.failIf(context._names or context._community)
+        self.failIf(context._names or context._community or context._creators)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
-        site['chatter'] = context = _makeChatterbox([object()] * 30)
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = context = _makeChatterbox(quips)
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
-        self.assertEqual(len(list(info['recent'])), 20)
+        self.assertEqual(list(info['recent']), quips[:20])
         self.assertEqual(context._tag, 'sometag')
-        self.failIf(context._names or context._community)
+        self.failIf(context._names or context._community or context._creators)
 
 
 class Test_tag_chatter(unittest.TestCase):
@@ -142,7 +242,7 @@ class Test_tag_chatter(unittest.TestCase):
         self.assertEqual(info['api'].page_title, 'Chatter: #sometag')
         self.assertEqual(list(info['recent']), [])
         self.assertEqual(context._tag, 'sometag')
-        self.failIf(context._names or context._community)
+        self.failIf(context._names or context._community or context._creators)
         self.assertEqual(info['qurl'](context), 'http://example.com/chatter/')
 
 
@@ -172,30 +272,33 @@ class Test_community_chatter_json(unittest.TestCase):
 
     def test_filled_chatterbox(self):
         site = testing.DummyModel()
-        quip1, quip2, quip3 = object(), object(), object()
-        site['chatter'] = cb = _makeChatterbox((quip3, quip2, quip1))
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = cb = _makeChatterbox(quips)
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(list(info['recent']), [quip3, quip2, quip1])
+        self.assertEqual(list(info['recent']), quips)
         self.assertEqual(cb._community, 'testing')
-        self.failIf(cb._names or cb._tag)
+        self.failIf(cb._names or cb._tag or cb._creators)
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
-        site['chatter'] = cb = _makeChatterbox([object()] * 30)
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = cb = _makeChatterbox(quips)
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(len(list(info['recent'])), 20)
+        self.assertEqual(list(info['recent']), quips[:20])
         self.assertEqual(cb._community, 'testing')
-        self.failIf(cb._names or cb._tag)
+        self.failIf(cb._names or cb._tag or cb._creators)
 
 
 class Test_community_chatter(unittest.TestCase):
@@ -220,7 +323,7 @@ class Test_community_chatter(unittest.TestCase):
         self.assertEqual(info['api'].page_title, 'Chatter: &testing')
         self.assertEqual(list(info['recent']), [])
         self.assertEqual(cb._community, 'testing')
-        self.failIf(cb._names or cb._tag)
+        self.failIf(cb._names or cb._tag or cb._creators)
         self.assertEqual(info['qurl'](context),
                          'http://example.com/communities/testing/')
 
@@ -252,12 +355,15 @@ class Test_add_chatter(unittest.TestCase):
 def _makeChatterbox(recent=()):
 
     class _Chatterbox(testing.DummyModel):
-        _names = _tag = _community = _added = None
+        _names = _tag = _community = _added = _creators = None
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator):
             self._added = testing.DummyModel(text=text, creator=creator)
         def recent(self):
+            return self._recent
+        def recentWithCreators(self, *creators):
+            self._creators = creators
             return self._recent
         def recentWithNames(self, *names):
             self._names = names

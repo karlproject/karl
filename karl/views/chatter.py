@@ -41,6 +41,32 @@ def recent_chatter(context, request):
     return info
 
 
+def creators_chatter_json(context, request):
+    creators = request.GET['creators']
+    if isinstance(creators, basestring):
+        creators = [creators]
+    else:
+        creators = list(creators)
+    chatter = find_chatter(context)
+    return {'recent': itertools.islice(
+                            chatter.recentWithCreators(*creators), 20),
+            'creators': creators,
+           }
+
+
+def creators_chatter(context, request):
+    try:
+        info = creators_chatter_json(context, request)
+    except KeyError:
+        return HTTPFound(location=resource_url(context, request))
+    def qurl(quip):
+        return resource_url(quip, request)
+    info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
+                        ', '.join(['@%s' % x for x in info['creators']]))
+    info['qurl'] = qurl
+    return info
+
+
 def tag_chatter_json(context, request):
     tag = request.GET['tag']
     chatter = find_chatter(context)
