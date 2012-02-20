@@ -15,10 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os
-from subprocess import PIPE
-from subprocess import Popen
-import sys
 import time
 
 from zope.component import getAdapter

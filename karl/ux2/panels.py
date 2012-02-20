@@ -1,12 +1,16 @@
 from cgi import escape
 
 from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 
+from karl.content.views.utils import fetch_attachments
 from karl.utilities.image import thumb_url
+from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.utils import find_community
+from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 
 PROFILE_ICON_SIZE = (15, 15)
@@ -77,7 +81,7 @@ def personal_tools(context, request):
         icon_url = thumb_url(photo, request, PROFILE_ICON_SIZE)
     else:
         icon_url = layout.static_url + 'img/person.png'
-    profile_url = request.resource_url(profile) 
+    profile_url = request.resource_url(profile)
     logout_url = "%s/logout.html" % request.application_url
     return {'profile_name': profile.title,
             'profile_url': profile_url,
@@ -181,3 +185,63 @@ def search(context, request):
     return {
         'scope_options': scope_options,
         }
+
+
+def attachments(context, request, other_context=None):
+    if other_context:
+        context = other_context
+    get_attachments = getattr(context, 'get_attachments', None)
+    if not get_attachments:
+        return ''
+    folder = get_attachments()
+    return {'attachments': fetch_attachments(folder, request)}
+
+
+def comments(context, request):
+    profiles = find_profiles(context)
+    karldates = request.registry.getUtility(IKarlDates)
+    comments = []
+    for comment in context['comments'].values():
+        profile = profiles.get(comment.creator)
+        author_name = profile.title
+        author_url = resource_url(profile, request)
+
+        newc = {}
+        newc['id'] = comment.__name__
+        if has_permission('edit', comment, request):
+            newc['edit_url'] = resource_url(comment, request, 'edit.html')
+        else:
+            newc['edit_url'] = None
+
+        if has_permission('delete', comment, request):
+            newc['delete_url'] = resource_url(comment, request, 'delete.html')
+        else:
+            newc['delete_url'] = None
+
+        if has_permission('administer', comment, request):
+            newc['advanced_url'] = resource_url(comment, request, 'advanced.html')
+        else:
+            newc['advanced_url'] = None
+
+        # Display portrait
+        photo = profile.get('photo')
+        if photo is not None:
+            photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
+        else:
+            photo_url = request.static_url(
+                "karl.views:static/images/defaultUser.gif")
+        newc["portrait_url"] = photo_url
+
+        newc['author_url'] = author_url
+        newc['author_name'] = author_name
+
+        newc['date'] = karldates(comment.created, 'longform')
+        newc['timestamp'] = comment.created
+        newc['text'] = comment.text
+
+        # Fetch the attachments info
+        newc['attachments'] = fetch_attachments(comment, request)
+        comments.append(newc)
+    comments.sort(key=lambda c: c['timestamp'])
+    return {'comments': comments}
+

@@ -148,6 +148,9 @@ class FileInfo(object):
             else:
                 mimeutil = getUtility(IMimeInfo)
                 self._mimeinfo =  mimeutil(mimetype)
+            self._mimeinfo['small_icon_url'] = self.request.static_url(
+                'karl.views:static/images/%s' %
+                self._mimeinfo['small_icon_name'])
         return self._mimeinfo
 
     @property
