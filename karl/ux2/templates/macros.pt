@@ -13,7 +13,7 @@
   <div metal:define-macro="rss_icon" class="rss-icon"
        tal:condition="feed_url|None">
     <a href="${feed_url}">
-        <img src="${request.static_url('karl.views:static/images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
+        <img src="${layout.static('images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
         id="RSSIcon"/>
     </a>
   </div>
@@ -24,7 +24,7 @@
 
   <metal:formish_js define-macro="formish_js">
     <script type="text/javascript"
-        src="${request.static_url('karl.views:static/formish.js')}">//</script>
+        src="${layout.static('formish.js')}">//</script>
     <script type="text/javascript">
       //<![CDATA[
       $(document).ready(function() {
@@ -35,11 +35,11 @@
   </metal:formish_js>
 
   <script metal:define-macro="tinymce_js" type="text/javascript" 
-      src="${request.static_url('karl.views:static/tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
+      src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
 
   <metal:backto define-macro="backto" tal:condition="backto|False">
     <a class="chparent" href="${backto['href']}" id="backto">
-      <img tal:attributes="src request.static_url('karl.views:static/images/arrow_up.jpg')"
+      <img tal:attributes="src layout.static('images/arrow_up.jpg')"
            height="15" width="15" alt="Up to"/> Back to ${backto['title']} </a>
   </metal:backto>
 

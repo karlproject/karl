@@ -92,7 +92,7 @@
   <div class="container">
     <div class="osi-logo">
         <a href="${layout.app_url}"><img 
-           src="${request.static_url('karl.views:static/images/osf-logo.gif')}" alt=""/></a>
+           src="${layout.static('images/osf-logo.gif')}" alt=""/></a>
     </div>
     <ul class="extra horListing">
       <li tal:condition="layout.user_is_admin">

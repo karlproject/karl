@@ -7,7 +7,7 @@
 	<metal:tail fill-slot="head_slot">
 		<meta id="karl-app-url" content="${layout.app_url}"/>
     <meta id="karl-here-url" content="${layout.here_url}"/>
-    <meta id="karl-static-url" content="${request.static_url('karl.views:static/')}"/>
+    <meta id="karl-static-url" content="${layout.static('')}"/>
 	</metal:tail>
 <!-- TEMPORARY -->
 
@@ -24,12 +24,12 @@
 <!-- TEMPORARY -->
   <metal:tail fill-slot="tail_slot">
     <link rel="stylesheet" 
-        href="${request.static_url('karl.views:static/tinymce/min/tinymce-3.3.9.2.karl.min.css')}" 
+        href="${layout.static('tinymce/min/tinymce-3.3.9.2.karl.min.css')}" 
         type="text/css"/>
     <script type="text/javascript" 
-            src="${request.static_url('karl.views:static/tinymce/min/tinymce-3.3.9.2.karl.min.js')}">//</script>
+            src="${layout.static('tinymce/min/tinymce-3.3.9.2.karl.min.js')}">//</script>
      <script type="text/javascript" 
-             src="${request.static_url('karl.views:static/tinymce/karl-tiny-wire.js')}">//</script>
+             src="${layout.static('tinymce/karl-tiny-wire.js')}">//</script>
   </metal:tail>
 <!-- TEMPORARY -->
 

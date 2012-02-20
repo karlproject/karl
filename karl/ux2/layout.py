@@ -49,5 +49,5 @@ class Layout(PopperLayout):
     def macros(self):
         return get_renderer('templates/macros.pt').implementation().macros
 
-
-
+    def static(self, fname):
+        return self.request.static_url('karl.views:static/%s' % fname)
