@@ -7,12 +7,6 @@ from karl import testing as karltesting
 
 class Test_recent_chatter_json(unittest.TestCase):
 
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from karl.views.chatter import recent_chatter_json
         return recent_chatter_json(context, request)
@@ -57,12 +51,6 @@ class Test_recent_chatter_json(unittest.TestCase):
 
 class Test_recent_chatter(unittest.TestCase):
 
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from karl.views.chatter import recent_chatter
         return recent_chatter(context, request)
@@ -78,12 +66,6 @@ class Test_recent_chatter(unittest.TestCase):
 
 
 class Test_creators_chatter_json(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.chatter import creators_chatter_json
@@ -141,12 +123,6 @@ class Test_creators_chatter_json(unittest.TestCase):
 
 class Test_creators_chatter(unittest.TestCase):
 
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from karl.views.chatter import creators_chatter
         return creators_chatter(context, request)
@@ -180,12 +156,6 @@ class Test_creators_chatter(unittest.TestCase):
 
 
 class Test_names_chatter_json(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.chatter import names_chatter_json
@@ -243,12 +213,6 @@ class Test_names_chatter_json(unittest.TestCase):
 
 class Test_names_chatter(unittest.TestCase):
 
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from karl.views.chatter import names_chatter
         return names_chatter(context, request)
@@ -282,12 +246,6 @@ class Test_names_chatter(unittest.TestCase):
 
 
 class Test_tag_chatter_json(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.chatter import tag_chatter_json
@@ -341,12 +299,6 @@ class Test_tag_chatter_json(unittest.TestCase):
 
 class Test_tag_chatter(unittest.TestCase):
 
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from karl.views.chatter import tag_chatter
         return tag_chatter(context, request)
@@ -369,12 +321,6 @@ class Test_tag_chatter(unittest.TestCase):
 
 
 class Test_community_chatter_json(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.chatter import community_chatter_json
@@ -434,12 +380,6 @@ class Test_community_chatter_json(unittest.TestCase):
 
 
 class Test_community_chatter(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
 
     def _callFUT(self, context, request):
         from karl.views.chatter import community_chatter
