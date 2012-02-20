@@ -26,42 +26,58 @@ from karl.utils import find_chatter
 from karl.views.api import TemplateAPI
 
 
-def recent_chatter(context, request):
-    api = TemplateAPI(context, request, 'Recent Chatter')
+def recent_chatter_json(context, request):
     chatter = find_chatter(context)
+    return {'recent': itertools.islice(chatter.recent(), 20),
+           }
+
+
+def recent_chatter(context, request):
     def qurl(quip):
         return resource_url(quip, request)
-    return {'api': api,
-            'recent': itertools.islice(chatter.recent(), 20),
-            'qurl': qurl,
+    info = recent_chatter_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Recent Chatter')
+    info['qurl'] = qurl
+    return info
+
+
+def tag_chatter_json(context, request):
+    tag = request.GET['tag']
+    chatter = find_chatter(context)
+    return {'recent': itertools.islice(chatter.recentWithTag(tag), 20),
+            'tag': tag,
            }
 
 
 def tag_chatter(context, request):
-    if not request.subpath:
+    try:
+        info = tag_chatter_json(context, request)
+    except KeyError:
         return HTTPFound(location=resource_url(context, request))
-    tag = request.subpath[0]
-    chatter = find_chatter(context)
-    api = TemplateAPI(context, request, 'Chatter: #%s' % tag)
     def qurl(quip):
         return resource_url(quip, request)
-    return {'api': api,
-            'recent': itertools.islice(chatter.recentWithTag(tag), 20),
-            'qurl': qurl,
+    info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
+    info['qurl'] = qurl
+    return info
+
+
+def community_chatter_json(context, request):
+    community = context.__name__
+    chatter = find_chatter(context)
+    return {'community': community,
+            'recent': itertools.islice(
+                        chatter.recentWithCommunity(community), 20),
            }
 
 
 def community_chatter(context, request):
-    community = context.__name__
-    chatter = find_chatter(context)
-    api = TemplateAPI(context, request, 'Chatter: &%s' % community)
+    info = community_chatter_json(context, request)
     def qurl(quip):
         return resource_url(quip, request)
-    return {'api': api,
-            'recent': itertools.islice(
-                        chatter.recentWithCommunity(community), 20),
-            'qurl': qurl,
-           }
+    info['api'] = TemplateAPI(context, request,
+                              'Chatter: &%s' % info['community'])
+    info['qurl'] = qurl
+    return info
 
 
 def add_chatter(context, request):
