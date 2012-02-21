@@ -55,11 +55,8 @@ def recent_chatter_json(context, request):
 
 
 def recent_chatter(context, request):
-    def qurl(quip):
-        return resource_url(quip, request)
     info = recent_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Recent Chatter')
-    info['qurl'] = qurl
     return info
 
 
@@ -80,11 +77,8 @@ def creators_chatter(context, request):
         info = creators_chatter_json(context, request)
     except KeyError:
         return HTTPFound(location=resource_url(context, request))
-    def qurl(quip):
-        return resource_url(quip, request)
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x for x in info['creators']]))
-    info['qurl'] = qurl
     return info
 
 
@@ -105,11 +99,8 @@ def names_chatter(context, request):
         info = names_chatter_json(context, request)
     except KeyError:
         return HTTPFound(location=resource_url(context, request))
-    def qurl(quip):
-        return resource_url(quip, request)
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x for x in info['names']]))
-    info['qurl'] = qurl
     return info
 
 
@@ -126,10 +117,7 @@ def tag_chatter(context, request):
         info = tag_chatter_json(context, request)
     except KeyError:
         return HTTPFound(location=resource_url(context, request))
-    def qurl(quip):
-        return resource_url(quip, request)
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
-    info['qurl'] = qurl
     return info
 
 
@@ -144,13 +132,9 @@ def community_chatter_json(context, request):
 
 def community_chatter(context, request):
     info = community_chatter_json(context, request)
-    def qurl(quip):
-        return resource_url(quip, request)
     info['api'] = TemplateAPI(context, request,
                               'Chatter: &%s' % info['community'])
-    info['qurl'] = qurl
     return info
-
 
 def add_chatter(context, request):
     chatter = find_chatter(context)
