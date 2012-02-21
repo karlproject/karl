@@ -79,6 +79,15 @@ class Test_recent_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
 
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
+
     def test_overfilled_chatterbox(self):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
@@ -154,6 +163,15 @@ class Test_creators_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
         _verify_quips(info['recent'], quips, request)
+
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'creators': ('USER',)})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -252,6 +270,15 @@ class Test_names_chatter_json(unittest.TestCase):
         _verify_quips(info['recent'], quips, request)
         self.assertEqual(context._names, ('USER',))
 
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'names': ('USER',)})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
+
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
         quips = []
@@ -345,6 +372,15 @@ class Test_tag_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
 
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(GET={'tag': 'sometag'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
+
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
         quips = []
@@ -430,6 +466,19 @@ class Test_community_chatter_json(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
+
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = cb = _makeChatterbox(quips)
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
 
     def test_overfilled_chatterbox(self):
         site = testing.DummyModel()
@@ -577,8 +626,8 @@ def _makeChatterbox(recent=()):
     return _Chatterbox(recent)
 
 
-def _registerSecurityPolicy(userid):
-    karltesting.registerDummySecurityPolicy(userid)
+def _registerSecurityPolicy(userid, groupids=(), permissive=True):
+    karltesting.registerDummySecurityPolicy(userid, groupids, permissive)
 
 
 _WHEN = object()

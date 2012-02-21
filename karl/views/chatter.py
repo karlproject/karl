@@ -20,6 +20,7 @@ import itertools
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
 from pyramid.url import resource_url
 
 from karl.utils import find_chatter
@@ -46,7 +47,8 @@ def _do_slice(iterable, request):
     count = request.GET.get('count', 20)
     return quip_info(request,
                      *[x for x in
-                           itertools.islice(iterable, start, start + count)])
+                           itertools.islice(iterable, start, start + count)
+                         if has_permission('view', x, request) ])
 
 def recent_chatter_json(context, request):
     chatter = find_chatter(context)
