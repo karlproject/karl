@@ -620,28 +620,6 @@ class IChatterbox(Interface):
         o Return the new quip's '__name__'.
         """
 
-    def recent():
-        """ Return an iterable of quips by recency.
-        """
-
-    def recentWithTag(tag):
-        """ Return an iterable of quips by recency.
-
-        Include only those which name 'tag'.
-        """
-
-    def recentWithCommunity(community):
-        """ Return an iterable of quips by recency.
-
-        Include only those which name 'community'.
-        """
-
-    def recentWithNames(*names):
-        """ Return an iterable of quips by recency.
-
-        Include only those which mention one or more of 'names'.
-        """
-
     def listFollowed(userid):
         """ Return a list of IDs of users followed by 'userid'.
         """
@@ -650,11 +628,42 @@ class IChatterbox(Interface):
         """ Update the list of IDs of users followed by 'userid'.
         """
 
+    def recent():
+        """ Return an iterable of quips by recency.
+
+        Perform security filtering on the quips.
+        """
+
     def recentFollowed(userid):
         """ Return an iterable of quips by recency.
 
-        o Quips will be those created by 'userid' or by users followed by
-          'userid'.
+        Include only quips created by 'userid' or users followed by 'userid'.
+
+        Perform security filtering on the quips.
+        """
+
+    def recentWithTag(tag):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'tag'.
+
+        Perform security filtering on the quips.
+        """
+
+    def recentWithCommunity(community):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'community'.
+
+        Perform security filtering on the quips.
+        """
+
+    def recentWithNames(*names):
+        """ Return an iterable of quips by recency.
+
+        Include only those which mention one or more of 'names'.
+
+        Perform security filtering on the quips.
         """
 
 

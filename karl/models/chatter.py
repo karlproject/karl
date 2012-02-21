@@ -69,11 +69,27 @@ class Chatterbox(Persistent):
                          )
         return key
 
+    def listFollowed(self, userid):
+        """ See IChatterbox.
+        """
+        return self._followed.get(userid, ())
+
+    def setFollowed(self, userid, followed):
+        """ See IChatterbox.
+        """
+        self._followed[userid] = tuple(followed)
+
     def recent(self):
         """ See IChatterbox.
         """
         for gen, index, quip in self._recent:
             yield quip
+
+    def recentFollowed(self, userid):
+        """ See IChatterbox.
+        """
+        creators = (userid,) + self.listFollowed(userid)
+        return self.recentWithCreators(*creators)
 
     def recentWithTag(self, tag):
         """ See IChatterbox.
@@ -104,22 +120,6 @@ class Chatterbox(Persistent):
         for quip in self.recent():
             if names & quip.names:
                 yield quip
-
-    def listFollowed(self, userid):
-        """ See IChatterbox.
-        """
-        return self._followed.get(userid, ())
-
-    def setFollowed(self, userid, followed):
-        """ See IChatterbox.
-        """
-        self._followed[userid] = tuple(followed)
-
-    def recentFollowed(self, userid):
-        """ See IChatterbox.
-        """
-        creators = (userid,) + self.listFollowed(userid)
-        return self.recentWithCreators(*creators)
 
 
 class Quip(Persistent):
