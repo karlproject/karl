@@ -585,7 +585,7 @@ class Test_add_chatter(unittest.TestCase):
         from karl.views.chatter import add_chatter
         return add_chatter(context, request)
 
-    def test_it(self):
+    def test_POST(self):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
@@ -596,15 +596,44 @@ class Test_add_chatter(unittest.TestCase):
         self.assertEqual(context._added.text, 'This is a quip.')
         self.assertEqual(context._added.creator, 'user')
 
+    def test_POST_w_private(self):
+        from pyramid.security import Allow
+        from pyramid.security import DENY_ALL
+        TEXT = 'Quip. @otheruser &testing'
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest()
+        request.POST['text'] = TEXT
+        request.POST['private'] = '1'
+        found = self._callFUT(context, request)
+        self.assertEqual(found.location, 'http://example.com/chatter/')
+        self.assertEqual(context._added.text, TEXT)
+        self.assertEqual(context._added.creator, 'user')
+        self.assertEqual(context._added.__acl__,
+                         [(Allow, 'view', 'user'),
+                          (Allow, 'view', 'otheruser'),
+                          (Allow, 'view', 'group.community:testing:members'),
+                          DENY_ALL,
+                         ])
+
 
 def _makeChatterbox(recent=()):
 
+    from karl.models.chatter import Quip
+
     class _Chatterbox(testing.DummyModel):
+        _KEY = 'KEY'
         _names = _tag = _community = _added = _creators = _followed = None
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator):
-            self._added = testing.DummyModel(text=text, creator=creator)
+            self._added = Quip(text=text, creator=creator)
+            return self._KEY
+        def __getitem__(self, key):
+            if key == self._KEY:
+                return self._added
+            raise KeyError
         def recent(self):
             return self._recent
         def recentFollowed(self, userid):

@@ -21,6 +21,8 @@ import itertools
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
+from pyramid.security import Allow
+from pyramid.security import DENY_ALL
 from pyramid.url import resource_url
 
 from karl.utils import find_chatter
@@ -158,6 +160,15 @@ def update_followed(context, request):
 def add_chatter(context, request):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    chatter.addQuip(request.POST['text'], userid)
+    name = chatter.addQuip(request.POST['text'], userid)
+    if request.POST.get('private'):
+        quip = chatter[name]
+        acl = quip.__acl__ = [(Allow, 'view', userid)]
+        for name in quip.names:
+            acl.append((Allow, 'view', name))
+        for community in quip.communities:
+            group = 'group.community:%s:members' % community
+            acl.append((Allow, 'view', group))
+        acl.append(DENY_ALL)
     location = resource_url(context, request)
     return HTTPFound(location=location)
