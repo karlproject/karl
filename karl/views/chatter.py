@@ -50,7 +50,8 @@ def _do_slice(iterable, request):
 
 def recent_chatter_json(context, request):
     chatter = find_chatter(context)
-    return {'recent': _do_slice(chatter.recent(), request),
+    userid = authenticated_userid(request)
+    return {'recent': _do_slice(chatter.recentFollowed(userid), request),
            }
 
 

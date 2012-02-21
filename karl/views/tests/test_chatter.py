@@ -49,20 +49,29 @@ def _verify_quips(infos, quips, request):
 
 class Test_recent_chatter_json(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import recent_chatter_json
         return recent_chatter_json(context, request)
 
     def test_empty_chatterbox(self):
+        _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
+        self.assertEqual(context._followed, 'user')
         self.failIf(context._tag or context._names or
                     context._community or context._creators)
 
     def test_filled_chatterbox(self):
+        _registerSecurityPolicy('user')
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
@@ -71,6 +80,7 @@ class Test_recent_chatter_json(unittest.TestCase):
         _verify_quips(info['recent'], quips, request)
 
     def test_overfilled_chatterbox(self):
+        _registerSecurityPolicy('user')
         site = testing.DummyModel()
         quips = []
         for i in range(30):
@@ -81,6 +91,7 @@ class Test_recent_chatter_json(unittest.TestCase):
         _verify_quips(info['recent'], quips[:20], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
+        _registerSecurityPolicy('user')
         site = testing.DummyModel()
         quips = []
         for i in range(30):
@@ -108,6 +119,12 @@ class Test_recent_chatter(unittest.TestCase):
 
 class Test_creators_chatter_json(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import creators_chatter_json
         return creators_chatter_json(context, request)
@@ -126,7 +143,8 @@ class Test_creators_chatter_json(unittest.TestCase):
         self.assertEqual(info['creators'], ['USER'])
         self.assertEqual(info['recent'], [])
         self.assertEqual(context._creators, ('USER',))
-        self.failIf(context._names or context._tag or context._community)
+        self.failIf(context._names or context._tag or
+                    context._followed or context._community)
 
     def test_filled_chatterbox_creators_as_tuple(self):
         site = testing.DummyModel()
@@ -148,7 +166,8 @@ class Test_creators_chatter_json(unittest.TestCase):
         self.assertEqual(info['creators'], ['USER', 'USER2'])
         _verify_quips(info['recent'], quips[:20], request)
         self.assertEqual(context._creators, ('USER', 'USER2'))
-        self.failIf(context._names or context._tag or context._community)
+        self.failIf(context._names or context._tag or context._followed or
+                    context._community)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -196,6 +215,12 @@ class Test_creators_chatter(unittest.TestCase):
 
 class Test_names_chatter_json(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import names_chatter_json
         return names_chatter_json(context, request)
@@ -214,7 +239,8 @@ class Test_names_chatter_json(unittest.TestCase):
         self.assertEqual(info['names'], ['USER'])
         self.assertEqual(info['recent'], [])
         self.assertEqual(context._names, ('USER',))
-        self.failIf(context._creators or context._tag or context._community)
+        self.failIf(context._creators or context._tag or context._followed
+                    or context._community)
 
     def test_filled_chatterbox_names_as_tuple(self):
         site = testing.DummyModel()
@@ -284,6 +310,12 @@ class Test_names_chatter(unittest.TestCase):
 
 class Test_tag_chatter_json(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import tag_chatter_json
         return tag_chatter_json(context, request)
@@ -302,7 +334,8 @@ class Test_tag_chatter_json(unittest.TestCase):
         self.assertEqual(info['tag'], 'sometag')
         self.assertEqual(info['recent'], [])
         self.assertEqual(context._tag, 'sometag')
-        self.failIf(context._names or context._community or context._creators)
+        self.failIf(context._names or context._followed or
+                    context._community or context._creators)
 
     def test_filled_chatterbox(self):
         site = testing.DummyModel()
@@ -336,6 +369,12 @@ class Test_tag_chatter_json(unittest.TestCase):
 
 class Test_tag_chatter(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import tag_chatter
         return tag_chatter(context, request)
@@ -358,6 +397,12 @@ class Test_tag_chatter(unittest.TestCase):
 
 class Test_community_chatter_json(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, context, request):
         from karl.views.chatter import community_chatter_json
         return community_chatter_json(context, request)
@@ -372,7 +417,7 @@ class Test_community_chatter_json(unittest.TestCase):
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['recent'], [])
         self.assertEqual(cb._community, 'testing')
-        self.failIf(cb._names or cb._creators or cb._tag)
+        self.failIf(cb._names or cb._creators or cb._followed or cb._tag)
 
     def test_filled_chatterbox(self):
         site = testing.DummyModel()
@@ -506,12 +551,15 @@ class Test_add_chatter(unittest.TestCase):
 def _makeChatterbox(recent=()):
 
     class _Chatterbox(testing.DummyModel):
-        _names = _tag = _community = _added = _creators = None
+        _names = _tag = _community = _added = _creators = _followed = None
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator):
             self._added = testing.DummyModel(text=text, creator=creator)
         def recent(self):
+            return self._recent
+        def recentFollowed(self, userid):
+            self._followed = userid
             return self._recent
         def recentWithCreators(self, *creators):
             self._creators = creators
