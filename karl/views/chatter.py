@@ -136,6 +136,22 @@ def community_chatter(context, request):
                               'Chatter: &%s' % info['community'])
     return info
 
+
+def update_followed(context, request):
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    followed = request.POST.get('followed')
+    if followed is not None:
+        followed = filter(None, followed.splitlines())
+        chatter.setFollowed(userid, followed)
+        location = resource_url(context, request)
+        return HTTPFound(location=location)
+    return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
+            'followed': '\n'.join(chatter.listFollowed(userid)),
+            'view_url': resource_url(context, request, request.view_name),
+           }
+
+
 def add_chatter(context, request):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)

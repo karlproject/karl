@@ -432,6 +432,53 @@ class Test_community_chatter(unittest.TestCase):
         self.assertEqual(info['recent'], [])
 
 
+class Test_update_followed(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.chatter import update_followed
+        return update_followed(context, request)
+
+    def test_GET(self):
+        FOLLOWED = ['user1', 'user2', 'user3']
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['profiles'] = testing.DummyModel() # TemplateAPI requires it
+        _called_with = []
+        def _listFollowed(userid):
+            _called_with.append(userid)
+            return FOLLOWED
+        site['chatter'] = context = _makeChatterbox()
+        context.listFollowed = _listFollowed
+        request = testing.DummyRequest(view_name='update_followed.html')
+        info = self._callFUT(context, request)
+        self.assertEqual(info['followed'], '\n'.join(FOLLOWED))
+        self.assertEqual(info['view_url'],
+                         'http://example.com/chatter/update_followed.html')
+        self.assertEqual(_called_with, ['user'])
+
+    def test_POST(self):
+        BEFORE = ['user1', 'user2', 'user3']
+        AFTER = ['user1', 'user2']
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        _called_with = []
+        def _setFollowed(userid, followed):
+            _called_with.append((userid, followed))
+        site['chatter'] = context = _makeChatterbox()
+        context.setFollowed = _setFollowed
+        request = testing.DummyRequest()
+        request.POST['followed'] = '\n'.join(AFTER)
+        found = self._callFUT(context, request)
+        self.assertEqual(found.location, 'http://example.com/chatter/')
+        self.assertEqual(_called_with, [('user', AFTER)])
+
+
 class Test_add_chatter(unittest.TestCase):
 
     def setUp(self):
