@@ -152,6 +152,29 @@ class ChatterboxTests(_NowSetter):
         self.assertEqual(list(cb.recentWithNames('name1', 'name2')),
                          [quip3, quip1])
 
+    def test_listFollowed_miss(self):
+        cb = self._makeOne()
+        self.assertEqual(list(cb.listFollowed('nonesuch')), [])
+
+    def test_setFollowed(self):
+        FOLLOWED = ['USER1', 'USER2', 'USER3']
+        cb = self._makeOne()
+        cb.setFollowed('USER', FOLLOWED)
+        self.assertEqual(list(cb.listFollowed('USER')), FOLLOWED)
+
+    def test_recentFollowed_skips_names(self):
+        FOLLOWED = ['USER1', 'USER2']
+        cb = self._makeOne()
+        cb.setFollowed('USER', FOLLOWED)
+        name1 = cb.addQuip('TEXT1 @USER1', 'USER')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 @USER1', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentFollowed('USER')),
+                         [quip2, quip1])
+
 
 class QuipTests(_NowSetter):
     _creator = 'TESTUSER'

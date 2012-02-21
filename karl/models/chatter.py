@@ -37,6 +37,7 @@ class Chatterbox(Persistent):
 
     def __init__(self):
         self._quips = OOBTree()
+        self._followed = OOBTree()
         self._recent = AppendStack() #XXX parms?  10 layers x 100 items default
 
     def __iter__(self):
@@ -104,6 +105,22 @@ class Chatterbox(Persistent):
             if names & quip.names:
                 yield quip
 
+    def listFollowed(self, userid):
+        """ See IChatterbox.
+        """
+        return self._followed.get(userid, ())
+
+    def setFollowed(self, userid, followed):
+        """ See IChatterbox.
+        """
+        self._followed[userid] = tuple(followed)
+
+    def recentFollowed(self, userid):
+        """ See IChatterbox.
+        """
+        creators = (userid,) + self.listFollowed(userid)
+        return self.recentWithCreators(*creators)
+
 
 class Quip(Persistent):
     implements(IQuip)
@@ -116,6 +133,9 @@ class Quip(Persistent):
             [x[1:] for x in _COMMUNITY.findall(self._text)])
         self.creator = self.modified_by = creator
         set_created(self, None)
+
+    def __repr__(self):
+        return 'Quip: %s [%s]' % (self._text, self.creator)
 
     text = property(lambda self: self._text,)
 

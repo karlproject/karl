@@ -636,10 +636,25 @@ class IChatterbox(Interface):
         Include only those which name 'community'.
         """
 
-    def recentWithNames(self, *names):
+    def recentWithNames(*names):
         """ Return an iterable of quips by recency.
 
         Include only those which mention one or more of 'names'.
+        """
+
+    def listFollowed(userid):
+        """ Return a list of IDs of users followed by 'userid'.
+        """
+
+    def setFollowed(userid, followed):
+        """ Update the list of IDs of users followed by 'userid'.
+        """
+
+    def recentFollowed(userid):
+        """ Return an iterable of quips by recency.
+
+        o Quips will be those created by 'userid' or by users followed by
+          'userid'.
         """
 
 
