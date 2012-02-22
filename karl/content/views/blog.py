@@ -92,7 +92,8 @@ def show_blog_view(context, request):
     actions = []
     if has_permission('create', context, request):
         actions.append(
-            ('Add Blog Entry', 'add_blogentry.html'),
+            ('Add Blog Entry',
+             request.resource_url(context, 'add_blogentry.html')),
             )
 
     batch = get_container_batch(
