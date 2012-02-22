@@ -1,8 +1,8 @@
 <div id="${field.cssname}--field" class="${field.classes} control-group">
   <!-- field/main.html -->
-  <label tal:condition="field.widget.type != 'Hidden' and '.' not in field.name and field.widget.template != 'field.KarlTinyMCE'"
+  <label tal:condition="field.widget.type != 'Hidden' and '.' not in field.name"
          for="${field.cssname}" tal:attributes="class field.required and 'required' and 'control-label' or 'control-label'">${field.title}</label>
-  <div class="controls${' stacked' if field.widget.template == 'field.KarlTinyMCE' else ''}">
+  <div class="controls">
   	<span tal:content="structure:field.widget()" tal:omit-tag></span>
   	<span tal:condition="field.error" class="help-inline">${unicode(field.error)}</span>
   	<p class="fieldHelp help-block" tal:condition="str(field.description) != ''">${field.description}</p>
