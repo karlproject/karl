@@ -24,7 +24,7 @@
 <!-- TEMPORARY -->
   <metal:tail fill-slot="tail_slot">
       <!-- tinymce, development mode -->
-      <script src="${layout.static('tinymce/karl-tiny-wire.js')}" type="text/javascript"></script>
+      <script src="${layout.static('ux2/tinymce/karl-tiny-wire.js')}" type="text/javascript"></script>
       <script src="${layout.static('tinymce/3.3.9.2/jquery.tinysafe.js')}" type="text/javascript"></script>
       <script src="${layout.static('tinymce/3.3.9.2/tiny_mce_src.js')}" type="text/javascript"></script>
       <script src="${layout.static('tinymce/3.3.9.2/langs/en.js')}" type="text/javascript"></script>
