@@ -33,9 +33,10 @@ from karl.views.api import TemplateAPI
 def quip_info(request, *quips):
     result = []
     for quip in quips:
+        timeago = str(quip.created.strftime('%Y-%m-%dT%H:%M:%SZ'))
         info = {'text': quip.text,
                 'creator': quip.creator,
-                'created': quip.created,
+                'timeago': timeago,
                 'names': list(quip.names),
                 'communities': list(quip.communities),
                 'tags': list(quip.tags),

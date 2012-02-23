@@ -3,6 +3,12 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
+<head>
+  <metal:slot metal:fill-slot="extra-headers">
+    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+  </metal:slot>
+</head>
+
 <body>
 
  <div metal:fill-slot="content">
@@ -22,8 +28,17 @@
   <div tal:repeat="quip recent">
    <p>${quip['text']}</p>
    <p><span class="quip-creator">${quip['creator']}</span>,
-      <a href="${quip['url']}">${quip['created'].isoformat()}</a>
+      <abbr class="timeago" title="${quip['timeago']}">XXX</abbr>
+      <a href="${quip['url']}">permalink</a>
   </div>
+
+<script language="javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        $('abbr.timeago').timeago();
+    });
+    //]]>
+</script>
 
  </div>
 

@@ -19,7 +19,7 @@ class Test_quip_info(unittest.TestCase):
         info = infos[0]
         self.assertEqual(info['text'], quip.text)
         self.assertEqual(info['creator'], quip.creator)
-        self.failUnless(info['created'] is _WHEN)
+        self.assertEqual(info['timeago'], '2012-02-23T20:29:47Z') # XXX zone?
         self.assertEqual(info['names'], [])
         self.assertEqual(info['communities'], [])
         self.assertEqual(info['tags'], [])
@@ -33,7 +33,7 @@ class Test_quip_info(unittest.TestCase):
         for info, quip in zip(infos, quips):
             self.assertEqual(info['text'], quip.text)
             self.assertEqual(info['creator'], quip.creator)
-            self.failUnless(info['created'] is quip.created)
+            self.assertEqual(info['timeago'], '2012-02-23T20:29:47Z')# XXX zone?
             self.assertEqual(info['names'], [])
             self.assertEqual(info['communities'], [])
             self.assertEqual(info['tags'], [])
@@ -675,11 +675,14 @@ class DummyQuip(testing.DummyModel):
     __name__ = __parent__ = None
     def __init__(self, text='TEXT', creator='USER', created=_WHEN,
                  names=(), communities=(), tags=()):
+        import datetime
         self.text = text
         self.creator = creator
         self.names = names
         self.communities = communities
         self.tags = tags
+        if created is _WHEN:
+            created = datetime.datetime(2012, 2, 23, 20, 29, 47) # XXX zone?
         self.created = created
     def __repr__(self):
         return '%s: %s, %s' % (self.__class__.__name__, self.text, self.creator)
