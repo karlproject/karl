@@ -184,10 +184,8 @@ class ListViewPresenterTests(unittest.TestCase):
         desc   = "%s - " % (starts)
         self.assertEqual(painted_event.first_line_time, desc)   # 1pm -
 
-        self.assertEqual(painted_event.second_line_day,
-                         event.endDate.strftime("%m/%d/%Y"))   # Wed, Feb 17
-        ends = painted_event._format_time_of_day(event.endDate)
-        self.assertEqual(painted_event.second_line_time, ends)   # 4pm
+        self.assertEqual(painted_event.second_line_day, '')
+        self.assertEqual(painted_event.second_line_time, '')
 
     def test_navigation_without_nav_params(self):
         focus_at = datetime.datetime(2009, 8, 26)

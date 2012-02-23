@@ -135,30 +135,32 @@ class Event(object):
         end_day  = self._catalog_event.endDate.strftime("%m/%d/%Y")
         end_time = self._format_time_of_day(self._catalog_event.endDate)
 
-        if start_day == end_day:
+        followup = getattr(self._catalog_event, '_followup', False)
+
+        if start_day == end_day and not followup:
+            # genuine 1-day event.
             self.first_line_day   = start_day
             self.first_line_time  = '%s - %s' % (start_time, end_time)
-            self.second_line_day  = ''
-            self.second_line_time = ''
         else:
-            if is_all_day_event(self._catalog_event):
-                one_day = datetime.timedelta(days=1)
-                ends_at = self._catalog_event.endDate - one_day
-                end_day = ends_at.strftime("%m/%d/%Y")
-
+            if is_all_day_event(self._catalog_event) or start_day != end_day and followup:
+                # All-day event for a single day or more days,
+                # or, the middle days of a non-all-day, but multi-day event.
                 self.first_line_day   = start_day
                 self.first_line_time  = 'all-day'
-                # All-day event for a single day or more days,
-                # - no second line in any case, the idea is that now
-                # we have the event listed once for each day.
-                self.second_line_day = ''
-                self.second_line_time = ''
+            elif start_day == end_day and followup:
+                # The last day of  a non-all-day, but multi-day event.
+                self.first_line_day   = start_day
+                self.first_line_time  = '- %s' % end_time
             else:
+                # The first day of  a non-all-day, but multi-day event.
                 self.first_line_day   = start_day
                 self.first_line_time  = '%s - ' % start_time
-                self.second_line_day  = end_day
-                self.second_line_time = end_time
 
+        # There is never a second line to be displayed.
+        # As ,the idea is that now
+        # we have the event listed once for each day.
+        self.second_line_day  = ''
+        self.second_line_time = ''
         # Do not display the start day, if we already
         # had a previous event that showed this info.
         event = self._catalog_event

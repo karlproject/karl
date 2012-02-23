@@ -214,19 +214,29 @@ def _iterate_events_in_layer(layer, searcher, search_params,
                 docids_all.add(docid)
 
                 # A list view, and a multi day event?
-                if in_list_view and all_day:
+                # Also handle the non-all day, but multi-day events here.
+                multi_day = event.startDate.year != event.endDate.year or \
+                    event.startDate.month != event.endDate.month or \
+                    event.startDate.day != event.endDate.day
+
+                if in_list_view and (all_day or multi_day):
                     # separate event bubble for each day of the event.
                     # ... this is quite different from the original spec, and
                     # possibly quite an inefficient way of doing it.
                     new_startdate = max(event.startDate, first_moment)
                     new_enddate = min(event.endDate, last_moment)
                     plusone = datetime.timedelta(days=1)
+                    followup = False
                     while new_startdate < new_enddate:
                         day_event = copy.copy(event)
                         day_event.startDate = new_startdate
                         day_event._v_layer_color = layer.color.strip()
                         day_event._v_layer_title = layer.title
+                        day_event._followup = followup
                         new_startdate += plusone
+                        new_startdate =  datetime.datetime.combine(
+                            new_startdate.date(), datetime.time())   # force to 0:00
+                        followup = True
                         yield day_event
 
                 else:
