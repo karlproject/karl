@@ -122,7 +122,10 @@ class AddIntranetFormController(object):
         api = self.api
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        return {'api': api, 'layout': layout, 'actions': []}
+        return {
+            'api': api,             # deprecated UX1
+            'old_layout': layout,   # deprecated UX1
+            'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

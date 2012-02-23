@@ -69,6 +69,13 @@ def _get_egg_rev():
         path = os.path.dirname(path)
 
 
+ux1_to_ux2_templates = {
+    'templates/anonymous_formish_form.pt': 'templates/formish_form.pt',
+    'templates/community_formish_form.pt': 'templates/formish_form.pt',
+    'templates/layout_formish_form.pt': 'templates/formish_form.pt',
+}
+
+
 def ux2_metarenderer_factory(info):
     """
     Use a custom renderer to choose between 'classic' and 'ux2' UI.
@@ -84,6 +91,7 @@ def ux2_metarenderer_factory(info):
     name = info.name
     if ':' in name:
         name = name[name.index(':') + 1:]
+    name = ux1_to_ux2_templates.get(name, name)
     if not pkg_resources.resource_exists('karl.ux2', name):
         # There's not a UX2 version, so just return the same old renderer
         # you would normally use

@@ -84,7 +84,7 @@ class TestAddPageFormController(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Page')
         self.failUnless('actions' in response)
-        self.failUnless('layout' in response)
+        self.failUnless('old_layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -213,7 +213,7 @@ class TestEditPageFormController(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Edit dummytitle')
         self.failUnless('actions' in response)
-        self.failUnless('layout' in response)
+        self.failUnless('old_layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)

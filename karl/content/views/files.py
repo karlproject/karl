@@ -258,7 +258,11 @@ class AddFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api, 'actions':(), 'layout':layout}
+        return {
+            'api':api,    # deprecated UX1
+            'actions':(), # deprecated UX1
+            'layout':layout   # deprecated UX1
+        }
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -414,9 +418,9 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api':api,          # deprecated UX1
+                'actions':(),       # deprecated UX1
+                'old_layout':layout}# deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -645,9 +649,9 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api':api,              # deprecated UX1
+                'actions':(),           # deprecated UX1
+                'old_layout':layout}    # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -733,9 +737,9 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api':api,              # deprecated UX1
+                'actions':(),           # deprecated UX1
+                'old_layout':layout}    # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

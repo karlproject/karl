@@ -231,7 +231,7 @@
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -252,7 +252,7 @@
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -273,7 +273,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportGroup"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -294,7 +294,7 @@
      name="add_category.html"
      for="karl.models.interfaces.IPeopleDirectory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -315,7 +315,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleCategory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -336,7 +336,7 @@
      name="add_category_item.html"
      for="karl.models.interfaces.IPeopleCategory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -357,7 +357,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleCategoryItem"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -378,7 +378,7 @@
      name="add_section.html"
      for="karl.models.interfaces.IPeopleDirectory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -399,7 +399,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -420,7 +420,7 @@
      name="add_section_column.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -441,7 +441,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -462,7 +462,7 @@
      name="add_redirector.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -483,7 +483,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleRedirector"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -504,7 +504,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -525,7 +525,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -546,7 +546,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleReportGroup"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -567,7 +567,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -588,7 +588,7 @@
      name="add_category_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -609,7 +609,7 @@
      name="add_group_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -630,7 +630,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportFilter"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -651,7 +651,7 @@
      name="add_is_staff_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -672,7 +672,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportIsStaffFilter"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -693,7 +693,7 @@
      name="add_mailing_list.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -714,7 +714,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportMailingList"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -734,7 +734,7 @@
      controller=".community.AddCommunityFormController"
      name="add_community.html"
      permission="create"
-     renderer="forms/templates/formish_form.pt"
+     renderer=".forms:templates/formish_form.pt"
      form_id="save">
 
      <formish:action
@@ -755,7 +755,7 @@
      for="karl.models.interfaces.ICommunity"
      name="edit.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer=".forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -775,7 +775,7 @@
      controller=".members.ManageMembersFormController"
      permission="moderate"
      name="manage.html"
-     renderer="forms/templates/community_formish_form.pt"
+     renderer=".forms:templates/community_formish_form.pt"
      >
 
      <formish:action
@@ -1103,7 +1103,7 @@
      controller=".members.AddExistingUserFormController"
      name="add_existing.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer=".forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1123,7 +1123,7 @@
      controller=".members.InviteNewUsersFormController"
      name="invite_new.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer=".forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1141,7 +1141,7 @@
   <formish:form
      controller=".members.AcceptInvitationFormController"
      for="karl.models.interfaces.IInvitation"
-     renderer="forms/templates/accept_invitation.pt">
+     renderer=".forms:templates/accept_invitation.pt">
 
      <formish:action
        name="submit"

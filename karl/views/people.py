@@ -913,7 +913,8 @@ class ChangePasswordFormController(object):
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctime = xhtml
         blurb_macro = snippets.macros['change_password_blurb']
-        return {'api': api, 'layout': layout, 'actions': [],
+        return {'api': api, 'old_layout': layout,  # deprecated UX1
+                'actions': [],
                 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):

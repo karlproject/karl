@@ -268,7 +268,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
-        self.failUnless('layout' in response)
+        self.failUnless('old_layout' in response)
         self.failUnless(response['api'].page_title)
 
     def test_handle_cancel(self):
@@ -289,7 +289,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
                 title=title, text=text, creator=creator)
             topic['comments'] = testing.DummyModel()
             topic['attachments'] = testing.DummyModel()
-            topic.get_attachments = lambda : None 
+            topic.get_attachments = lambda : None
             return topic
         registerContentFactory(factory, IForumTopic)
         registerContentFactory(DummyFile, ICommunityFile)
@@ -632,7 +632,7 @@ class EditForumTopicFormController(unittest.TestCase):
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
-        self.failUnless('layout' in response)
+        self.failUnless('old_layout' in response)
         self.failUnless(response['api'].page_title, 'Edit title')
 
     def test_handle_cancel(self):

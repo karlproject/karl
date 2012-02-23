@@ -117,7 +117,10 @@ class AddPageFormController(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'layout': layout}
+        return {
+            'api': api,             # deprecated UX1
+            'actions': (),          # deprecated UX1
+            'old_layout': layout}   # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -210,7 +213,10 @@ class EditPageFormController(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'layout': layout}
+        return {
+            'api': api,             # deprecated UX1
+            'actions': (),          # deprecated UX1
+            'old_layout': layout}   # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
