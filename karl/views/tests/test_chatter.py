@@ -123,6 +123,8 @@ class Test_recent_chatter(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Recent Chatter')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
 
 
@@ -219,6 +221,8 @@ class Test_creators_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
 
     def test_empty_chatterbox_creators_as_list(self):
@@ -323,6 +327,8 @@ class Test_names_chatter(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER'])
         self.assertEqual(info['api'].page_title, 'Chatter: @USER')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
 
     def test_empty_chatterbox_names_as_list(self):
@@ -428,6 +434,8 @@ class Test_tag_chatter(unittest.TestCase):
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: #sometag')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
 
 
@@ -523,6 +531,8 @@ class Test_community_chatter(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: &testing')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
 
 

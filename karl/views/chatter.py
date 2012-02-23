@@ -62,6 +62,8 @@ def recent_chatter_json(context, request):
 def recent_chatter(context, request):
     info = recent_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Recent Chatter')
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
     return info
 
 
@@ -84,6 +86,8 @@ def creators_chatter(context, request):
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x for x in info['creators']]))
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
     return info
 
 
@@ -106,6 +110,8 @@ def names_chatter(context, request):
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x for x in info['names']]))
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
     return info
 
 
@@ -123,6 +129,8 @@ def tag_chatter(context, request):
     except KeyError:
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
     return info
 
 
@@ -139,6 +147,8 @@ def community_chatter(context, request):
     info = community_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request,
                               'Chatter: &%s' % info['community'])
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
     return info
 
 

@@ -10,7 +10,7 @@
   <h1>${api.page_title}</h1>
 
   <div id="recent-quips-add-form">
-   <form action="add_chatter.html" method="POST">
+   <form action="${chatter_form_url}" method="POST">
     <fieldset id="text_fs">
      <legend>Chatter</legend>
      <textarea name="text" rows="2" cols="70"></textarea>
