@@ -54,6 +54,19 @@ class ChatterboxTests(_NowSetter):
         self.failUnless(quip.__parent__ is cb)
         self.assertEqual(quip.__name__, name)
 
+    def test_addQuip_with_pruning(self):
+        from appendonly import AppendStack
+        cb = self._makeOne()
+        # replace the stack with one which overflows quickly.
+        cb._recent = AppendStack(1, 1)
+        name1 = cb.addQuip('TEXT1', 'USER1')
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        name3 = cb.addQuip('TEXT3', 'USER3')
+        self.assertEqual(len(cb), 3)
+        self.assertEqual(list(cb), [name3, name2, name1])
+        # Overflowed twice
+        self.assertEqual(cb._archive._generation, 1)
+
     def test_listFollowed_miss(self):
         cb = self._makeOne()
         self.assertEqual(list(cb.listFollowed('nonesuch')), [])

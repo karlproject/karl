@@ -18,6 +18,7 @@ import hashlib
 import re
 
 from appendonly import AppendStack
+from appendonly import Archive
 from BTrees.OOBTree import OOBTree
 from persistent import Persistent
 from zope.interface import implements
@@ -39,6 +40,7 @@ class Chatterbox(Persistent):
         self._quips = OOBTree()
         self._followed = OOBTree()
         self._recent = AppendStack() #XXX parms?  10 layers x 100 items default
+        self._archive = Archive()
 
     def __iter__(self):
         return iter(self._quips)
@@ -64,9 +66,7 @@ class Chatterbox(Persistent):
         self._quips[key] = quip
         quip.__name__ = key
         quip.__parent__ = self
-        self._recent.push(quip
-                         # TODO:  pruner=???
-                         )
+        self._recent.push(quip, self._archive.addLayer)
         return key
 
     def listFollowed(self, userid):
