@@ -148,7 +148,9 @@ class Event(object):
 
                 self.first_line_day   = start_day
                 self.first_line_time  = 'all-day'
-                # All-day event for a single day, no second line.
+                # All-day event for a single day or more days,
+                # - no second line in any case, the idea is that now
+                # we have the event listed once for each day.
                 self.second_line_day = ''
                 self.second_line_time = ''
             else:
