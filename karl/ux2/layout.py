@@ -14,7 +14,6 @@ from karl.utils import find_site
 
 
 class Layout(PopperLayout):
-    extra_css = ('karl.views:static/ux2/main.css',)
 
     def __init__(self, context, request):
         super(Layout, self).__init__(context, request)
@@ -69,3 +68,44 @@ class Layout(PopperLayout):
 
         return property(getter, setter)
 
+    extra_css = (
+        'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
+        'karl.views:static/ux2/main.css',)
+
+    extra_js = (
+        'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
+        'karl.views:static/tinymce/3.3.9.2/jquery.tinysafe.js',
+        'karl.views:static/tinymce/3.3.9.2/tiny_mce_src.js',
+        'karl.views:static/tinymce/3.3.9.2/langs/en.js',
+        'karl.views:static/tinymce/3.3.9.2/themes/advanced/editor_template_src.js',
+        'karl.views:static/tinymce/3.3.9.2/themes/advanced/langs/en.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/paste/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/wicked/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/wicked/langs/en.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/spellchecker/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/embedmedia/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClientBase.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClient.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaTypes.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaVO.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/langs/en.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/advlist/editor_plugin.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/lists/editor_plugin.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/print/editor_plugin.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
+        'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
+        'karl.views:static/min/karl-ui.min.js',
+        'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
+        'karl.views:static/karl-plugins/karl-calendar/karl.calendar.js',
+        'karl.views:static/karl.js',)
