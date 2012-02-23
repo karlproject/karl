@@ -11,8 +11,8 @@ class _NowSetter(unittest.TestCase):
             self._set_NOW(self._old_NOW)
 
     def _set_NOW(self, when):
-        from karl.models import subscribers
-        subscribers._NOW, self._old_NOW = when, subscribers._NOW
+        from karl.models import chatter
+        chatter._NOW, self._old_NOW = when, chatter._NOW
 
 class ChatterboxTests(_NowSetter):
 
@@ -63,7 +63,7 @@ class ChatterboxTests(_NowSetter):
         name2 = cb.addQuip('TEXT2', 'USER2')
         name3 = cb.addQuip('TEXT3', 'USER3')
         self.assertEqual(len(cb), 3)
-        self.assertEqual(list(cb), [name3, name2, name1])
+        self.assertEqual(sorted(cb), sorted([name3, name2, name1]))
         # Overflowed twice
         self.assertEqual(cb._archive._generation, 1)
 

@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+from datetime import datetime
 import hashlib
 import re
 
@@ -27,6 +29,12 @@ from karl.models.interfaces import IChatterbox
 from karl.models.interfaces import IQuip
 from karl.models.subscribers import set_created
 
+
+_NOW = None
+def _now():
+    if _NOW is None:
+        return datetime.utcnow()
+    return _NOW
 
 _NAME = re.compile(r'@\w+')
 _TAG = re.compile(r'#\w+')
@@ -133,6 +141,7 @@ class Quip(Persistent):
             [x[1:] for x in _COMMUNITY.findall(self._text)])
         self.creator = self.modified_by = creator
         set_created(self, None)
+        self.modified = self.created = _now()
 
     def __repr__(self):
         return 'Quip: %s [%s]' % (self._text, self.creator)
