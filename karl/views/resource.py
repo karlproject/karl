@@ -48,8 +48,8 @@ def delete_resource_view(context, request, num_children=0):
         layout_name = 'community'
     layout = layout_provider(layout_name)
 
-    return {'api': api,
-            'layout': layout,
+    return {'api': api,             # deprecated UX2
+            'old_layout': layout,   # deprecated UX2
             'num_children': num_children,
            }
 
