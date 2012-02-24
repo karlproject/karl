@@ -4,9 +4,6 @@
 
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)}
-    <header>
-        <h1>${context.title}</h1>
-    </header>
 
     <div class="contentText">
 
