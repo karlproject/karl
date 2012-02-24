@@ -28,7 +28,6 @@ from pyramid.exceptions import Forbidden
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
-from pyramid.traversal import resource_path_tuple
 from pyramid.url import resource_url
 from simplejson import JSONEncoder
 from pyramid.response import Response
