@@ -27,7 +27,9 @@
           tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[bool(repeat['event'].odd())]">
         
         <th>
-          <a class="globalize-calendar-list" href="${event.start_day_url}">${event.first_line_day}</a>
+          <tal:block condition="event.first_line_day">
+            <a class="globalize-calendar-list" href="${event.start_day_url}">${event.first_line_day}</a>
+          </tal:block>
           <br/> 
           <tal:block condition="event.second_line_day">
             <a class="globalize-calendar-list" href="${event.end_day_url}">${event.second_line_day}</a>
