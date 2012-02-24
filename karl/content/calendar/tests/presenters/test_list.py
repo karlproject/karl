@@ -58,7 +58,7 @@ class ListViewPresenterTests(unittest.TestCase):
         event = DummyCatalogEvent(
                     title="Meeting",
                     startDate=datetime.datetime(2010, 2, 15,  13,  0,  0),
-                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0)
+                    endDate  =datetime.datetime(2010, 2, 15,  14,  0,  0),
                 )
         presenter.paint_events([event])
 
@@ -124,8 +124,42 @@ class ListViewPresenterTests(unittest.TestCase):
 
         ends_at = event.endDate - datetime.timedelta(days=1)
         self.assertEqual(painted_event.second_line_day,
-                         ends_at.strftime("%m/%d/%Y"))         # Wed, Feb 17
+                        '') # all day events: no second line.
         self.assertEqual(painted_event.second_line_time, '')
+
+
+    def test_paints_event_sameday_suppresses_label(self):
+        focus_at = datetime.datetime(2010, 2, 15)
+        now_at   = datetime.datetime.now()
+
+        presenter = self._makeOne(focus_at, now_at, dummy_url_for)
+        event = DummyCatalogEvent(
+                    title="Vacation",
+                    startDate=datetime.datetime(2010, 2, 15,  0,  0,  0),
+                    endDate  =datetime.datetime(2010, 2, 18,  0,  0,  0)
+                )
+        import copy
+        event2 = copy.copy(event)
+        event2.prev_start_date = event.startDate
+        presenter.paint_events([event, event2])
+
+        # presenters.list.Event
+        painted_events = presenter.events
+        self.assertEqual(len(painted_events), 2)
+        for i, _e in enumerate(painted_events):
+            if i == 0:
+                # first one has the date
+                self.assertEqual(_e.first_line_day,
+                    event.startDate.strftime("%m/%d/%Y")) # Mon, Feb 15
+            else:
+                # Consequtive lines that have the same date,
+                # have the day-label missing.
+                self.assertEqual(_e.first_line_day, '')
+            self.assertEqual(_e.first_line_time, 'all-day')
+            self.assertEqual(_e.second_line_day,
+                            '') # all day events: no second line.
+            self.assertEqual(painted_events[0].second_line_time, '')
+
 
     def test_paints_event_of_three_days_with_partial_days(self):
         focus_at = datetime.datetime(2010, 2, 17)
@@ -150,10 +184,8 @@ class ListViewPresenterTests(unittest.TestCase):
         desc   = "%s - " % (starts)
         self.assertEqual(painted_event.first_line_time, desc)   # 1pm -
 
-        self.assertEqual(painted_event.second_line_day,
-                         event.endDate.strftime("%m/%d/%Y"))   # Wed, Feb 17
-        ends = painted_event._format_time_of_day(event.endDate)
-        self.assertEqual(painted_event.second_line_time, ends)   # 4pm
+        self.assertEqual(painted_event.second_line_day, '')
+        self.assertEqual(painted_event.second_line_time, '')
 
     def test_navigation_without_nav_params(self):
         focus_at = datetime.datetime(2009, 8, 26)
