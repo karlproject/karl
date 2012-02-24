@@ -53,6 +53,22 @@ def _do_slice(iterable, request):
                            itertools.islice(iterable, start, start + count)
                          if has_permission('view', x, request) ])
 
+
+def all_chatter_json(context, request):
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    return {'recent': _do_slice(chatter.recent(), request),
+           }
+
+
+def all_chatter(context, request):
+    info = followed_chatter_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'All Chatter')
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
+    return info
+
+
 def followed_chatter_json(context, request):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
