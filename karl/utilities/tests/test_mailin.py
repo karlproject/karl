@@ -18,180 +18,6 @@
 import unittest
 from pyramid import testing
 
-class MailinRunnerTests(unittest.TestCase):
-
-    def setUp(self):
-        self.maildir_root = self._makeMaildir()
-        self.config = testing.cleanUp()
-
-    def tearDown(self):
-        import shutil
-        shutil.rmtree(self.maildir_root)
-        testing.cleanUp()
-
-    def _makeMaildir(self):
-        import os
-        import tempfile
-        root = tempfile.mkdtemp()
-        os.mkdir(os.path.join(root, 'Maildir'))
-        os.mkdir(os.path.join(root, 'Maildir', 'new'))
-        os.mkdir(os.path.join(root, 'Maildir', 'cur'))
-        os.mkdir(os.path.join(root, 'Maildir', 'tmp'))
-        return root
-
-    def _getTargetClass(self):
-        from karl.utilities.mailin import MailinRunner
-        return MailinRunner
-
-    def _makeOne(self, root=None, maildir_root=None, options=None):
-        if root is None:
-            from pyramid import testing
-            root = testing.DummyModel()
-        if maildir_root is None:
-            maildir_root = self.maildir_root
-        if options is None:
-            options = DummyOptions
-        mailin = self._getTargetClass()(
-            root, maildir_root, options, testing=True)
-        return mailin
-
-    def test_exit(self):
-        mailin = self._makeOne()
-        mailin.exit(23)
-        self.assertEqual(mailin.exited, 23)
-
-    def test_print_no_message(self):
-        mailin = self._makeOne()
-        mailin.print_()
-        self.assertEqual(mailin.printed, [''])
-
-    def test_print_w_message(self):
-        mailin = self._makeOne()
-        mailin.print_('foobar')
-        self.assertEqual(mailin.printed, ['foobar'])
-
-    def test_section_defaults(self):
-        mailin = self._makeOne()
-        mailin.section('foobar')
-        divider = '-' * 65
-        self.assertEqual(mailin.printed, [divider, 'foobar', divider])
-
-    def test_section_w_sep(self):
-        mailin = self._makeOne()
-        mailin.section('foobar', '#')
-        divider = '#' * 65
-        self.assertEqual(mailin.printed, [divider, 'foobar', divider])
-
-    def test_section_w_verbosity(self):
-        mailin = self._makeOne()
-        mailin.section('foobar', verbosity=2)
-        self.assertEqual(mailin.printed, [])
-
-    def test_processMessage_reply_no_attachments_community(self):
-        from pyramid.testing import DummyModel
-        from karl.adapters.interfaces import IMailinHandler
-        INFO = {'report': None,
-                'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
-                'author': 'phreddy',
-                'subject': 'Feedback'
-               }
-        handler = DummyHandler()
-        def _handlerFactory(context):
-            handler.context = context
-            return handler
-        self.config.registry.registerAdapter(
-            _handlerFactory, (DummyModel,), IMailinHandler)
-        mailin = self._makeOne()
-        catalog = mailin.root.catalog = DummyCatalog()
-        cf = mailin.root['communities'] = DummyModel()
-        testing = cf['testing'] = DummyModel()
-        tool = testing['random'] = DummyModel()
-        entry = tool['entry'] = DummyModel()
-        comments = entry['comments'] = DummyModel()
-        catalog.document_map._map[0] = '/communities/testing/random/entry'
-        self.config.testing_resources(
-            {'/communities/testing/random/entry': entry})
-        message = DummyMessage()
-        text = 'This entry stinks!'
-        attachments = ()
-
-        mailin.processMessage(message, INFO, text, attachments)
-
-        self.failUnless(handler.context is entry)
-        self.assertEqual(handler.handle_args,
-                         (message, INFO, text, attachments))
-
-    def test_processMessage_reply_w_attachment_community(self):
-        from pyramid.testing import DummyModel
-        from karl.adapters.interfaces import IMailinHandler
-        INFO = {'report': None,
-                'community': 'testing',
-                'tool': 'random',
-                'in_reply_to': '7FFFFFFF', # token for docid 0
-                'author': 'phreddy',
-                'subject': 'Feedback'
-               }
-        handler = DummyHandler()
-        def _handlerFactory(context):
-            handler.context = context
-            return handler
-        self.config.registry.registerAdapter(
-            _handlerFactory, (DummyModel,), IMailinHandler)
-        mailin = self._makeOne()
-        catalog = mailin.root.catalog = DummyCatalog()
-        cf = mailin.root['communities'] = DummyModel()
-        testing = cf['testing'] = DummyModel()
-        tool = testing['random'] = DummyModel()
-        entry = tool['entry'] = DummyModel()
-        comments = entry['comments'] = DummyModel()
-        catalog.document_map._map[0] = '/communities/testing/random/entry'
-        self.config.testing_resources(
-            {'/communities/testing/random/entry': entry})
-        message = DummyMessage()
-        text = 'This entry stinks!'
-        attachments = [('foo.txt', 'text/plain', 'My attachment')]
-
-        mailin.processMessage(message, INFO, text, attachments)
-
-        self.failUnless(handler.context is entry)
-        self.assertEqual(handler.handle_args,
-                         (message, INFO, text, attachments))
-
-    def test_processMessage_report(self):
-        from zope.interface import directlyProvides
-        from pyramid.testing import DummyModel
-        from karl.adapters.interfaces import IMailinHandler
-        from karl.models.interfaces import IPeopleDirectory
-        INFO = {'report': 'section+testing',
-                'community': None,
-                'tool': None,
-                'author': 'phreddy',
-                'subject': 'Feedback'
-               }
-        handler = DummyHandler()
-        def _handlerFactory(context):
-            handler.context = context
-            return handler
-        self.config.registry.registerAdapter(
-            _handlerFactory, (DummyModel,), IMailinHandler)
-        mailin = self._makeOne()
-        catalog = mailin.root.catalog = DummyCatalog()
-        pd = mailin.root['people'] = DummyModel()
-        directlyProvides(pd, IPeopleDirectory)
-        section = pd['section'] = DummyModel()
-        testing = section['testing'] = DummyModel()
-        message = DummyMessage()
-        text = 'This entry stinks!'
-        attachments = [('foo.txt', 'text/plain', 'My attachment')]
-
-        mailin.processMessage(message, INFO, text, attachments)
-
-        self.failUnless(handler.context is testing)
-        self.assertEqual(handler.handle_args,
-                         (message, INFO, text, attachments))
-
 class MailinRunner2Tests(unittest.TestCase):
 
     def setUp(self):
@@ -206,7 +32,6 @@ class MailinRunner2Tests(unittest.TestCase):
 
     def _makeOne(self, root=None):
         if root is None:
-            from pyramid import testing
             root = testing.DummyModel()
         mailin = self._getTargetClass()(
             root, 'zodb://test', '/postoffice', 'queue',
@@ -256,7 +81,7 @@ class MailinRunner2Tests(unittest.TestCase):
         testing = cf['testing'] = DummyModel()
         tool = testing['random'] = DummyModel()
         entry = tool['entry'] = DummyModel()
-        comments = entry['comments'] = DummyModel()
+        entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
         self.config.testing_resources(
             {'/communities/testing/random/entry': entry})
@@ -292,7 +117,7 @@ class MailinRunner2Tests(unittest.TestCase):
         testing = cf['testing'] = DummyModel()
         tool = testing['random'] = DummyModel()
         entry = tool['entry'] = DummyModel()
-        comments = entry['comments'] = DummyModel()
+        entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
         self.config.testing_resources(
             {'/communities/testing/random/entry': entry})
@@ -416,7 +241,7 @@ class MailinRunner2Tests(unittest.TestCase):
         testing = cf['testing'] = DummyModel()
         tool = testing['random'] = DummyModel()
         entry = tool['entry'] = DummyModel()
-        comments = entry['comments'] = DummyModel()
+        entry['comments'] = DummyModel()
         catalog.document_map._map[0] = '/communities/testing/random/entry'
         self.config.testing_resources(
             {'/communities/testing/random/entry': entry})
@@ -488,7 +313,7 @@ class DummyQueue(list):
     def bounce(self, message, send, from_addr, error=None,
                bounce_message=None):
         self.bounced.append((message, from_addr, error, bounce_message))
-        send(message_from, ['foo@example.com'], message)
+        send(from_addr, ['foo@example.com'], message)
 
 
 class DummyDispatcher(object):

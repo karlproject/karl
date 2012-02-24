@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-"""Process mail-in content from a repoze.mailin IMailStore / IPendingQueue.
+"""Process mail-in content from repoze.postoffice.
 
 'maildir_root' is the path to the folder containing the
 IMailStore-enabled maildir. The actual maildir must be named 'Maildir'
@@ -22,17 +22,12 @@ within that folder.
 """
 from __future__ import with_statement
 
-import datetime
 import logging
 import re
-import sys
 import traceback
-import transaction
 
 from pyramid.renderers import render
 from pyramid.traversal import find_resource
-from repoze.mailin.maildir import MaildirStore
-from repoze.mailin.pending import PendingQueue
 from repoze.postoffice.message import Message
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
@@ -53,141 +48,7 @@ LOG_FMT = '%s %s %s %s\n'
 
 log = logging.getLogger('karl.mailin')
 
-class MailinRunner: # pragma NO COVERAGE (deprecated)
-
-    def __init__(self, root, maildir_root, options, testing=False):
-        self.root = root
-        self.maildir_root = maildir_root
-        self.dry_run = options.dry_run  # boolean
-        self.verbosity = options.verbosity  # integer
-        self.pq_file = options.pq_file
-        self.log_file = options.log_file
-        self.default_tool = options.default_tool
-        self.text_scrubber = options.text_scrubber
-        self.testing = testing
-        self.printed = []
-        self.exited = None
-
-    def exit(self, rc):
-        if not self.testing:
-            sys.exit(rc)
-        self.exited = rc
-
-    def print_(self, message=''):
-        if not self.testing:
-            print message
-        else:
-            self.printed.append(message)
-
-    def section(self, message, sep='-', verbosity=0):
-        if self.verbosity > verbosity:
-            self.print_(sep * 65)
-            self.print_(message)
-            self.print_(sep * 65)
-
-    def log(self, status, message_id, extra=''):
-        now = datetime.datetime.now()
-        with open(self.log_file, 'a', -1) as f:
-            f.write(LOG_FMT % (now.isoformat(), status, message_id, extra))
-
-    def setup(self):
-        self.dispatcher = IMailinDispatcher(self.root)
-        self.dispatcher.default_tool = self.default_tool
-        self.dispatcher.text_scrubber = self.text_scrubber
-
-        self.mailstore = MaildirStore(self.maildir_root)
-        self.pending = PendingQueue(path='', dbfile=self.pq_file,
-                                    isolation_level='DEFERRED')
-
-    def processMessage(self, message, info, text, attachments):
-        report_name = info.get('report')
-        if report_name is not None:
-            pd = find_peopledirectory(self.root)
-            target = find_resource(pd, report_name.split('+'))
-        else:
-            community = find_communities(self.root)[info['community']]
-            target = tool = community[info['tool']]
-
-            # XXX this should be more like:
-            if info['in_reply_to'] is not None:
-                docid = int(hex_to_docid(info['in_reply_to']))
-                catalog = find_catalog(target)
-                path = catalog.document_map.address_for_docid(docid)
-                item = find_resource(self.root, path)
-                target = item
-
-        IMailinHandler(target).handle(message, info, text, attachments)
-
-    def bounceMessage(self, message, info):
-        return
-
-    def handleMessage(self, message_id):
-        # return 'True' if processed, 'False' if bounced.
-        try:
-            message = self.mailstore[message_id]
-            info = self.dispatcher.crackHeaders(message)
-            if info.get('error'):
-                self.bounceMessage(message, info)
-                self.log('BOUNCED', message_id,
-                    '%s %s' % (info['error'], repr(info)))
-                if self.verbosity > 1:
-                    print 'Bounced  : %s\n  %s' % (message_id, info['error'])
-                return False
-            else:
-                text, attachments = self.dispatcher.crackPayload(message)
-                self.processMessage(message, info, text, attachments)
-                extra = ['%s:%s' % (x, info.get(x))
-                            for x in ('community',
-                                      'in_reply_to',
-                                      'tool',
-                                      'author',
-                                     )
-                                if info.get(x) is not None]
-                self.log('PROCESSED', message_id, ','.join(extra))
-                if self.verbosity > 1:
-                    print 'Processed: %s\n  %s' % (message_id, ','.join(extra))
-                return True
-        except:
-            error_msg = traceback.format_exc()
-            self.pending.quarantine(message_id, error_msg)
-            self.log('QUARANTINED', message_id, error_msg)
-            if self.verbosity > 1:
-                print 'Quarantined: ', message_id
-                print error_msg
-            return False
-
-    def __call__(self):
-        processed = bounced = 0
-        self.section('Processing mail-in content', '=')
-        if self.verbosity > 0:
-            print 'Maildir root:   ', self.maildir_root
-            print 'Pending queue:  ', self.pq_file
-            print '=' * 65
-        self.setup()
-
-        while self.pending:
-            message_id = list(self.pending.pop())[0]
-            if self.verbosity > 0:
-                print 'Processing message:', message_id
-            if self.handleMessage(message_id):
-                processed += 1
-            else:
-                bounced += 1
-
-        if self.verbosity > 0:
-            print '=' * 65
-            print 'Processed %d messages' % processed
-            print 'Bounced %d messages' % bounced
-            print
-            sys.stdout.flush()
-        if not self.dry_run:
-            transaction.commit()
-            self.pending.sql.commit()
-
 class MailinRunner2(object):
-    """ Compatible with repoze.postoffice.
-    """
-
     def __init__(self, root, zodb_uri, zodb_path, queue_name,
                  factory=open_queue):
         self.root = root
@@ -258,7 +119,7 @@ class MailinRunner2(object):
             context = find_resource(pd, report_name.split('+'))
         else:
             community = find_communities(self.root)[target['community']]
-            context = tool = community[target['tool']]
+            context = community[target['tool']]
 
             if target['in_reply_to'] is not None:
                 docid = int(hex_to_docid(target['in_reply_to']))
