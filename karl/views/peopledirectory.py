@@ -309,6 +309,19 @@ def report_view(context, request):
     pictures_url = resource_url(context, request, 'picture_view.html', **kw)
     opensearch_url = resource_url(context, request, 'opensearch.xml')
 
+    formats = [   # ux2
+        {'name': 'table',
+         'selected': True,
+         'url': None,
+         'title': 'Tabular View',
+         'description': 'Show table'},
+        {'name': 'picture',
+         'selected': False,
+         'url': request.resource_url(context, 'picture_view.html'),
+         'title': 'Picture View',
+         'description': 'Show pictures'}
+    ]
+
     return dict(
         api=api,
         peopledir=peopledir,
@@ -319,9 +332,10 @@ def report_view(context, request):
         batch=batch, # ux2
         descriptions=descriptions,
         letters=letter_info,
+        formats=formats, # ux2
         print_url=print_url,
         csv_url=csv_url,
-        pictures_url=pictures_url,
+        pictures_url=pictures_url,  # deprecated ux1
         qualifiers=qualifiers,
         opensearch_url=opensearch_url,
         actions=get_actions(context, request),
@@ -406,20 +420,36 @@ def picture_view(context, request):
     csv_url = resource_url(context, request, 'csv', **kw)
     tabular_url = resource_url(context, request, **kw)
 
+    formats = [   # ux2
+        {'name': 'table',
+         'selected': False,
+         'url': request.resource_url(context),
+         'title': 'Tabular View',
+         'description': 'Show table'},
+        {'name': 'picture',
+         'selected': False,
+         'url': None,
+         'title': 'Picture View',
+         'description': 'Show pictures'}
+    ]
+
     return dict(
         api=api,
         peopledir=peopledir,
         peopledir_tabs=peopledir_tabs, # deprecated in ux2
         context_tools=peopledir_tabs,
         letters=letter_info,
+        formats=formats,
         descriptions=descriptions,
         print_url=print_url,
         csv_url=csv_url,
-        tabular_url=tabular_url,
+        tabular_url=tabular_url,  # deprecated in ux2
         qualifiers=qualifiers,
-        batch_info=batch_info,
+        batch_info=batch_info,    # deprecated in ux2
+        batch=batch_info,
         rows=rows,
         mailto=_get_mailto(context, peopledir),
+        actions=get_actions(context, request),
         )
 
 

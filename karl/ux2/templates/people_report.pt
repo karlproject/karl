@@ -10,7 +10,7 @@
 
     <div class="contentText">
 
-        ${panel('popper.grid_header', letters=letters)}
+        ${panel('popper.grid_header', letters=letters, formats=formats)}
 
         <table class="filtered sortable" id="peopledir" summary="">
             <thead>
