@@ -409,7 +409,7 @@ class TestGetContainerBatch(unittest.TestCase):
         self.assertEqual(batch['next_batch'], None)
         self.assertEqual(batch['batching_required'], False)
 
-    def test_sort(self):
+    def test_sort_by_creation_date(self):
         from datetime import datetime
         container = testing.DummyModel()
         container.catalog = {'creation_date': DummyCreationDateIndex()}
@@ -422,6 +422,23 @@ class TestGetContainerBatch(unittest.TestCase):
         self.assertEqual(len(batch['entries']), 3)
         self.assertEqual(
             [o.__name__ for o in batch['entries']], ['c', 'b', 'a'])
+
+    def test_sort_by_modified_date(self):
+        from datetime import datetime
+        container = testing.DummyModel()
+        container['a'] = testing.DummyModel(
+            modified=datetime(2007, 1, 1, 1, 1, 2))
+        container['b'] = testing.DummyModel(
+            modified=datetime(2007, 1, 1, 1, 1, 1))
+        container['c'] = testing.DummyModel(
+            modified=datetime(2007, 1, 1, 1, 1, 3))
+        container['d'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        batch = self._callFUT(
+            container, request, sort_index='modified_date', reverse=True)
+        self.assertEqual(len(batch['entries']), 4)
+        self.assertEqual(
+            [o.__name__ for o in batch['entries']], ['d', 'c', 'a', 'b'])
 
 class TestGetFileLineBatch(unittest.TestCase):
     def setUp(self):
