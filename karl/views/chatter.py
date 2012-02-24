@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Chatter views
 """
+import datetime
 import itertools
 
 from pyramid.httpexceptions import HTTPFound
@@ -29,11 +30,13 @@ from karl.utils import find_chatter
 from karl.views.api import TemplateAPI
 
 
+TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
 
 def quip_info(request, *quips):
     result = []
     for quip in quips:
-        timeago = str(quip.created.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        timeago = str(quip.created.strftime(TIMEAGO_FORMAT))
         info = {'text': quip.text,
                 'creator': quip.creator,
                 'timeago': timeago,
@@ -45,13 +48,35 @@ def quip_info(request, *quips):
         result.append(info)
     return result
 
+def _lastn(iterable, count):
+    buffer = []
+    for item in iterable:
+        buffer.append(item)
+        while len(buffer) > count:
+            buffer.pop(0)
+    return buffer
+
 def _do_slice(iterable, request):
+    orig = iterable #XXX
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 20)
-    return quip_info(request,
-                     *[x for x in
-                           itertools.islice(iterable, start, start + count)
-                         if has_permission('view', x, request) ])
+    since = request.GET.get('since')
+    before = request.GET.get('before')
+    def _check(x):
+        return has_permission('view', x, request)
+    iterable = itertools.ifilter(_check, iterable)
+    if since is not None:
+        since_dt = datetime.datetime.strptime(since, TIMEAGO_FORMAT)
+        iterable = itertools.takewhile(lambda x: x.created > since_dt, iterable)
+        iterable = _lastn(iterable, count)
+    elif before is not None:
+        before_dt = datetime.datetime.strptime(before, TIMEAGO_FORMAT)
+        iterable = itertools.dropwhile(lambda x: x.created >= before_dt,
+                                       iterable)
+        iterable = itertools.islice(iterable, count)
+    else:
+        iterable = itertools.islice(iterable, start, start + count)
+    return quip_info(request, *list(iterable))
 
 
 def all_chatter_json(context, request):

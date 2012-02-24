@@ -109,6 +109,44 @@ class Test_all_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[2:7], request)
 
+    def test_filled_chatterbox_w_since_and_count(self):
+        from datetime import datetime
+        from datetime import timedelta
+        from karl.views.chatter import TIMEAGO_FORMAT
+        now = datetime.utcnow()
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            # from 15 sec ago to 14 sec in the future
+            when = now + timedelta(0, i - 15)
+            quips.append(DummyQuip(str(i), created=when))
+        quips.reverse() # get them in recency-order
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(
+                    GET={'since': now.strftime(TIMEAGO_FORMAT), 'count': 5})
+        info = self._callFUT(context, request)
+        _verify_quips(info['recent'], quips[10:15], request)
+
+    def test_filled_chatterbox_w_before_and_count(self):
+        from datetime import datetime
+        from datetime import timedelta
+        from karl.views.chatter import TIMEAGO_FORMAT
+        now = datetime.utcnow()
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            # from 15 sec ago to 14 sec in the future
+            when = now + timedelta(0, i - 15)
+            quips.append(DummyQuip(str(i), created=when))
+        quips.reverse() # get them in recency-order
+        site['chatter'] = context = _makeChatterbox(quips)
+        request = testing.DummyRequest(
+                    GET={'before': now.strftime(TIMEAGO_FORMAT), 'count': 5})
+        info = self._callFUT(context, request)
+        _verify_quips(info['recent'], quips[15:20], request)
+
 
 class Test_all_chatter(unittest.TestCase):
 
