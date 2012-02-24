@@ -99,7 +99,6 @@ def admin_contents(context, request):
 
 
 def admin_contents_moveup_view(context, request):
-    peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
     order = context.order
@@ -113,7 +112,6 @@ def admin_contents_moveup_view(context, request):
 
 
 def admin_contents_movedown_view(context, request):
-    peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
     order = context.order
@@ -286,9 +284,6 @@ def section_column_view(context, request):
 def _get_mailto(context, peopledir):
     mailinglist = context.get('mailinglist')
     if mailinglist is not None:
-        pd_path = resource_path_tuple(peopledir)
-        report_path = resource_path_tuple(context)
-        mail_name = '+'.join(report_path[len(pd_path):])
         system_email_domain = get_setting(context, "system_email_domain")
         system_list_subdomain = get_setting(context, "system_list_subdomain",
                                             system_email_domain)
@@ -391,7 +386,7 @@ def picture_view(context, request):
     try:
         batch_info = get_catalog_batch_grid(
             context, request, batch_size=12, sort_index=sort_index, **kw)
-    except ParseError, e:
+    except ParseError:
         # user entered something weird in the text search box.
         # show no results.
         batch_info = {'entries': [], 'total': 0, 'batching_required': False}
@@ -491,7 +486,7 @@ def get_grid_data(context, request, start=0, limit=12,
             reverse=reverse,
             **kw
             )
-    except ParseError, e:
+    except ParseError:
         # user entered something weird in the text search box.
         # show no results.
         batch = {'entries': [], 'total': 0}
