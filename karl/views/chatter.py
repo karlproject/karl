@@ -136,7 +136,7 @@ def creators_chatter(context, request):
 def names_chatter_json(context, request):
     names = request.GET['names']
     if isinstance(names, basestring):
-        names = [names]
+        names = names.split(',')
     else:
         names = list(names)
     chatter = find_chatter(context)

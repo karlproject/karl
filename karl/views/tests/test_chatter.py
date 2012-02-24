@@ -393,6 +393,17 @@ class Test_names_chatter_json(unittest.TestCase):
         self.failIf(context._creators or context._tag or context._followed
                     or context._community)
 
+    def test_empty_chatterbox_names_as_string_multiple(self):
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(GET={'names': 'USER1,USER2'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['names'], ['USER1', 'USER2'])
+        self.assertEqual(info['recent'], [])
+        self.assertEqual(context._names, ('USER1', 'USER2'))
+        self.failIf(context._creators or context._tag or context._followed
+                    or context._community)
+
     def test_filled_chatterbox_names_as_tuple(self):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
