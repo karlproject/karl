@@ -112,7 +112,7 @@ def followed_chatter(context, request):
 def creators_chatter_json(context, request):
     creators = request.GET['creators']
     if isinstance(creators, basestring):
-        creators = [creators]
+        creators = creators.split(',')
     else:
         creators = list(creators)
     chatter = find_chatter(context)
