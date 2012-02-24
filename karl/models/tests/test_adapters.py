@@ -777,7 +777,7 @@ class TestPeopleReportLetterManager(unittest.TestCase):
 
         request = testing.DummyRequest({'lastnamestartswith': 'B'})
         letters = obj.get_info(request)
-        self.assertEqual(len(letters), 26)
+        self.assertEqual(len(letters), 27)
         self.assertEqual(letters[0]['name'], 'A')
         self.assertEqual(letters[0]['css_class'], 'notcurrent')
         self.assertEqual(letters[0]['href'],
@@ -792,6 +792,10 @@ class TestPeopleReportLetterManager(unittest.TestCase):
         self.assertEqual(letters[2]['css_class'], 'notcurrent')
         self.assertEqual(letters[2]['href'], None)
         self.assertEqual(letters[2]['is_current'], False)
+        self.assertEqual(letters[26]['name'], 'Any')
+        self.assertEqual(letters[26]['css_class'], 'notcurrent')
+        self.assertEqual(letters[26]['href'], 'http://example.com')
+        self.assertEqual(letters[26]['is_current'], False)
 
     def test_no_filters(self):
         site = testing.DummyModel()

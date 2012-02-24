@@ -509,6 +509,14 @@ class PeopleReportLetterManager(object):
                 'css_class': css_class,
                 'is_current': letter == current,
                 })
+        letters.append({'name': 'Any',
+                        'href': current is not None and
+                                    request.path_url or None,
+                        'css_class': current is None and
+                                        'current' or 'notcurrent',
+                        'is_current': current is None,
+                       })
+
         return letters
 
 
