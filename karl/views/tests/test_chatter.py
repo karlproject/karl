@@ -47,7 +47,7 @@ def _verify_quips(infos, quips, request):
         assert found == expected
 
 
-class Test_recent_chatter_json(unittest.TestCase):
+class Test_followed_chatter_json(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
@@ -56,8 +56,8 @@ class Test_recent_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.views.chatter import recent_chatter_json
-        return recent_chatter_json(context, request)
+        from karl.views.chatter import followed_chatter_json
+        return followed_chatter_json(context, request)
 
     def test_empty_chatterbox(self):
         _registerSecurityPolicy('user')
@@ -111,11 +111,11 @@ class Test_recent_chatter_json(unittest.TestCase):
         _verify_quips(info['recent'], quips[2:7], request)
 
 
-class Test_recent_chatter(unittest.TestCase):
+class Test_followed_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
-        from karl.views.chatter import recent_chatter
-        return recent_chatter(context, request)
+        from karl.views.chatter import followed_chatter
+        return followed_chatter(context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
