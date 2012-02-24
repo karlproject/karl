@@ -80,6 +80,19 @@ def _do_slice(iterable, request):
 
 
 def all_chatter_json(context, request):
+    """ Return *all* recent chatter.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     return {'recent': _do_slice(chatter.recent(), request),
@@ -87,6 +100,8 @@ def all_chatter_json(context, request):
 
 
 def all_chatter(context, request):
+    """ HTML wrapper for 'all_chatter_json'.
+    """
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'All Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
@@ -95,6 +110,19 @@ def all_chatter(context, request):
 
 
 def followed_chatter_json(context, request):
+    """ Return recent chatter by the current user, or by users followed by her.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     return {'recent': _do_slice(chatter.recentFollowed(userid), request),
@@ -102,6 +130,8 @@ def followed_chatter_json(context, request):
 
 
 def followed_chatter(context, request):
+    """ HTML wrapper for 'followed_chatter_json'.
+    """
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Recent Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
@@ -110,6 +140,23 @@ def followed_chatter(context, request):
 
 
 def creators_chatter_json(context, request):
+    """ Return recent chatter by any of the named users.
+
+    Query string must include:
+
+    - 'creators':  a sequence of userid's (may be a comma-separated string).
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     creators = request.GET['creators']
     if isinstance(creators, basestring):
         creators = creators.split(',')
@@ -122,6 +169,8 @@ def creators_chatter_json(context, request):
 
 
 def creators_chatter(context, request):
+    """ HTML wrapper for 'creators_chatter_json'.
+    """
     try:
         info = creators_chatter_json(context, request)
     except KeyError:
@@ -134,6 +183,23 @@ def creators_chatter(context, request):
 
 
 def names_chatter_json(context, request):
+    """ Return recent chatter mentioning any of the named users.
+
+    Query string must include:
+
+    - 'names':  a sequence of userid's (may be a comma-separated string).
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     names = request.GET['names']
     if isinstance(names, basestring):
         names = names.split(',')
@@ -146,6 +212,8 @@ def names_chatter_json(context, request):
 
 
 def names_chatter(context, request):
+    """ HTML wrapper for 'names_chatter_json'.
+    """
     try:
         info = names_chatter_json(context, request)
     except KeyError:
@@ -158,6 +226,23 @@ def names_chatter(context, request):
 
 
 def tag_chatter_json(context, request):
+    """ Return recent chatter mentioning a given tag.
+
+    Query string must include:
+
+    - 'tag':  a tag name.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     tag = request.GET['tag']
     chatter = find_chatter(context)
     return {'recent': _do_slice(chatter.recentWithTag(tag), request),
@@ -166,6 +251,8 @@ def tag_chatter_json(context, request):
 
 
 def tag_chatter(context, request):
+    """ HTML wrapper for 'tag_chatter_json'.
+    """
     try:
         info = tag_chatter_json(context, request)
     except KeyError:
@@ -177,6 +264,23 @@ def tag_chatter(context, request):
 
 
 def community_chatter_json(context, request):
+    """ Return recent chatter mentioning a given community.
+
+    Query string must include:
+
+    - 'community':  a community name.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
     community = context.__name__
     chatter = find_chatter(context)
     return {'community': community,
@@ -186,6 +290,8 @@ def community_chatter_json(context, request):
 
 
 def community_chatter(context, request):
+    """ HTML wrapper for 'community_chatter_json'.
+    """
     info = community_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request,
                               'Chatter: &%s' % info['community'])
@@ -195,6 +301,12 @@ def community_chatter(context, request):
 
 
 def update_followed(context, request):
+    """ View / update the list of users followed by the current user.
+
+    If posted, the form data must include the following:
+
+    - 'followed': a newline-separated list of userids.
+    """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     followed = request.POST.get('followed')
@@ -210,6 +322,19 @@ def update_followed(context, request):
 
 
 def add_chatter(context, request):
+    """ Add a new quip to the chatterbox.
+
+    The form data must include the following:
+
+    - 'text': the text of the quip (XXX 140 character max)
+
+    The form data may include the following:
+
+    - 'private':  if non-empty, the quip will have an ACL which allows
+                  viewing only by the creator, any names mentioned in the
+                  text (via '@name'), or members of any communities mentioned
+                  in the text (via '&community').
+    """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     name = chatter.addQuip(request.POST['text'], userid)
