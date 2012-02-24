@@ -18,7 +18,7 @@
 
     <div class="contentText">
 
-        ${panel('popper.grid_header', letters=letters, formats=formats)}
+        ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
 
         <div class="profilesWrapper">
           <tal:row_loop tal:repeat="row rows">
