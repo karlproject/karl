@@ -216,8 +216,6 @@ admin
 
 - (4) postoffice_quarantined_message
 
-- (4) mailin_monitor_view
-
 imagedrawer
 ===========
 

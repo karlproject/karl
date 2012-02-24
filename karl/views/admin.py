@@ -65,14 +65,8 @@ class AdminTemplateAPI(TemplateAPI):
         else:
             self.statistics_view_enabled = False
 
-        use_postoffice = not not get_setting(
-            context, 'postoffice.zodb_uri', False)
-        if use_postoffice:
-            self.quarantine_url = ('%s/po_quarantine.html' %
-                                   request.application_url)
-        else:
-            self.quarantine_url = ('%s/mailin/quarantine' %
-                                   request.application_url)
+        self.quarantine_url = ('%s/po_quarantine.html' %
+                               request.application_url)
 
         site = find_site(context)
         if 'offices' in site:
@@ -760,19 +754,15 @@ def error_monitor_view(context, request):
             error_monitor_dir, subsystem
         )
 
-    # Tack on mailin quarantine status while we're at it
-    use_postoffice = not not get_setting(
-        context, 'postoffice.zodb_uri', False)
-    if  use_postoffice:
-        name = 'postoffice quarantine'
-        urls[name] = '%s/po_quarantine.html' % request.application_url
-        queue, closer = _get_postoffice_queue(request.context)
-        if queue.count_quarantined_messages() > 0:
-            states[name] = ['Messages in quarantine.']
-        else:
-            states[name] = []
-        subsystems = list(subsystems)
-        subsystems.append(name)
+    name = 'postoffice quarantine'
+    urls[name] = '%s/po_quarantine.html' % request.application_url
+    queue, closer = _get_postoffice_queue(request.context)
+    if queue.count_quarantined_messages() > 0:
+        states[name] = ['Messages in quarantine.']
+    else:
+        states[name] = []
+    subsystems = list(subsystems)
+    subsystems.append(name)
 
     return dict(
         api=AdminTemplateAPI(context, request),
@@ -826,14 +816,11 @@ def error_monitor_status_view(context, request):
     for subsystem in subsystems:
         # Special case postoffice quarantine
         if subsystem == 'postoffice quarantine':
-            use_postoffice = not not get_setting(
-                context, 'postoffice.zodb_uri', False)
-            if  use_postoffice:
-                queue, closer = _get_postoffice_queue(request.context)
-                if queue.count_quarantined_messages() == 0:
-                    print >>buf, 'postoffice quarantine: OK'
-                else:
-                    print >>buf, 'postoffice quarantine: ERROR'
+            queue, closer = _get_postoffice_queue(request.context)
+            if queue.count_quarantined_messages() == 0:
+                print >>buf, 'postoffice quarantine: OK'
+            else:
+                print >>buf, 'postoffice quarantine: ERROR'
 
         # Normal case
         elif _get_error_monitor_state(error_monitor_dir, subsystem):
@@ -842,48 +829,6 @@ def error_monitor_status_view(context, request):
             print >>buf, '%s: OK' % subsystem
 
     return Response(buf.getvalue(), content_type='text/plain')
-
-_mailin_monitor_app = None
-def mailin_monitor_view(context, request):
-    """
-    Dispatches to a subapp from repoze.mailin.monitor.  I know this looks kind
-    of horrible, but this is the best way I know how to mount another object
-    graph onto the root object graph in BFG 1.2.  BFG 1.3 will theoretically
-    allow SCRIPT_NAME/PATH_INFO rewriting for routes of the form
-    '/some/path/*traverse', making it easier to do this with just a route,
-    rather than actually constituting a whole new bfg app just to serve this
-    subtree.
-    """
-    global _mailin_monitor_app
-    if _mailin_monitor_app is None:
-        # Keep imports local in hopes that this can be removed when BFG 1.3
-        # comes out.
-        from pyramid.authorization import ACLAuthorizationPolicy
-        from pyramid.configuration import Configurator
-        from karl.models.mailin_monitor import KarlMailInMonitor
-        from karl.security.policy import get_groups
-        from pyramid.authentication import RepozeWho1AuthenticationPolicy
-
-        authentication_policy = RepozeWho1AuthenticationPolicy(
-            callback=get_groups
-        )
-        authorization_policy = ACLAuthorizationPolicy()
-        config = Configurator(root_factory=KarlMailInMonitor(),
-                              authentication_policy=authentication_policy,
-                              authorization_policy=authorization_policy)
-        config.begin()
-        config.load_zcml('repoze.mailin.monitor:configure.zcml')
-        config.end()
-        _mailin_monitor_app = config.make_wsgi_app()
-
-    # Dispatch to subapp
-    from pyramid.request import Request
-    sub_environ = request.environ.copy()
-    sub_environ['SCRIPT_NAME'] = '/%s/%s' % (resource_path(context),
-                                            request.view_name)
-    sub_environ['PATH_INFO'] = '/' + '/'.join(request.subpath)
-    sub_request = Request(sub_environ)
-    return sub_request.get_response(_mailin_monitor_app)
 
 def _get_postoffice_queue(context):
     zodb_uri = get_setting(context, 'postoffice.zodb_uri')
