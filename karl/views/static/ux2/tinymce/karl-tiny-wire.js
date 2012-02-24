@@ -17,12 +17,15 @@ $(document).ready(function() {
         plugins += ',kaltura';
     }
 
+    // need urls
+    var head_data = window.head_data || {};
+
     // Url that contains the context prefix
-    var here_url = $('#karl-here-url')[0].content;
+    var here_url = head_data.context_url;
     // the root url of the tinymce tree
-    var tinymce_url = $('#karl-static-url')[0].content + '/tinymce/3.3.9.2';
+    var tinymce_url = head_data.karl_static_url + 'tinymce/3.3.9.2';
     // The root url of Karl
-    var app_url = $("#karl-app-url").eq(0).attr('content');
+    var app_url = head_data.app_url;
 
     // initialize the editor widget(s)
     $('.mceEditor').tinysafe({
@@ -51,7 +54,6 @@ $(document).ready(function() {
         paste_convert_middot_lists : true,
         paste_unindented_list_class : "unindentedList",
         paste_convert_headers_to_strong : true,
-        theme_advanced_toolbar_location: 'top',
         theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, print',
         theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, addwickedlink, delwickedlink, code, spellchecker, tinyautosave',
         theme_advanced_buttons3: '',

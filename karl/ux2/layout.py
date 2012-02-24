@@ -1,3 +1,5 @@
+
+import copy
 from bottlecap.layouts.popper.layout import PopperLayout
 
 from pyramid.decorator import reify
@@ -67,6 +69,16 @@ class Layout(PopperLayout):
             self.__dict__['title'] = title  # reify
 
         return property(getter, setter)
+
+    @reify
+    def head_data(self):
+        head_data = super(Layout, self).head_data
+        head_data = copy.deepcopy(head_data)
+        head_data.update({
+            # Add some more stuff to the head_data factorized by popper
+            'karl_static_url': self.static(''),
+        })
+        return head_data
 
     extra_css = (
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
