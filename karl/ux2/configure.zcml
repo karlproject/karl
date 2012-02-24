@@ -124,4 +124,29 @@
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
     override_with="karl.views:static/ux2/favicon.ico"
   />
+
+
+  <!-- Pushdowns data, and global notifications -->
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="notifier.json"
+    view=".pushdowns.notifier_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="chatter.json"
+    view=".pushdowns.chatter_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="radar.json"
+    view=".pushdowns.radar_ajax_view"
+    renderer="json"
+  />
+
 </configure>
