@@ -1,4 +1,4 @@
-<div id="${field.cssname}--field" class="${field.classes} control-group">
+<div id="${field.cssname}--field" class="control-group ${field.classes}">
   <!-- field/main.html -->
   <label tal:condition="field.widget.type != 'Hidden' and '.' not in field.name"
          for="${field.cssname}" tal:attributes="class field.required and 'required' and 'control-label' or 'control-label'">${field.title}</label>
