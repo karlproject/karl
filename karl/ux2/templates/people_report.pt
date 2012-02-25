@@ -4,13 +4,10 @@
 
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)}
-    <header>
-        <h1>${context.title}</h1>
-    </header>
 
     <div class="contentText">
 
-        ${panel('popper.grid_header', letters=letters, formats=formats)}
+        ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
 
         <table class="filtered sortable" id="peopledir" summary="">
             <thead>

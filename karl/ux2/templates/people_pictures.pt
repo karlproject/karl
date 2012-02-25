@@ -8,9 +8,6 @@
 
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)}
-    <header>
-        <h1>${context.title}</h1>
-    </header>
 
     <div class="peopledir-report-description"
       tal:repeat="description descriptions"
@@ -18,7 +15,7 @@
 
     <div class="contentText">
 
-        ${panel('popper.grid_header', letters=letters, formats=formats)}
+        ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
 
         <div class="profilesWrapper">
           <tal:row_loop tal:repeat="row rows">

@@ -65,7 +65,6 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
-from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
@@ -289,13 +288,21 @@ def _get_mailto(context, peopledir):
         return 'mailto:%s@%s' % (mailinglist.short_address,
                                  system_list_subdomain)
 
-def report_view(context, request):
+def report_view(context, request, pictures=False):
+    layout = request.layout_manager.layout
+    layout.section_style = 'compact'
+    layout.show_sidebar = False
+
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     section = context.__parent__
     peopledir_tabs = get_tabs(peopledir, request, section.__name__)
     report_data = get_grid_data(context, request)
     batch = report_data['batch']
+    if pictures:
+        rows = profile_photo_rows(batch['entries'], request, api)
+    else:
+        rows = None
     del(report_data['batch']) # non-json serializable
     client_json_data = {'grid_data': report_data}
 
@@ -307,39 +314,65 @@ def report_view(context, request):
     print_url = resource_url(context, request, 'print.html', **kw)
     csv_url = resource_url(context, request, 'csv', **kw)
     pictures_url = resource_url(context, request, 'picture_view.html', **kw)
+    tabular_url = resource_url(context, request, **kw)
     opensearch_url = resource_url(context, request, 'opensearch.xml')
+    mailto=_get_mailto(context, peopledir)
 
     formats = [   # ux2
         {'name': 'table',
-         'selected': True,
-         'url': None,
+         'selected': not pictures,
+         'url': tabular_url,
          'title': 'Tabular View',
          'description': 'Show table'},
         {'name': 'picture',
-         'selected': False,
-         'url': request.resource_url(context, 'picture_view.html'),
+         'selected': pictures,
+         'url': pictures_url,
          'title': 'Picture View',
          'description': 'Show pictures'}
     ]
 
+    actions = [
+        {'name': 'print', 'title': 'Print',
+         'description': 'Print this report',
+         'url': request.resource_url(context, 'print.html')},
+        {'name': 'csv', 'title': 'Export as CSV',
+         'description': 'Export this report as CSV',
+         'url': request.resource_url(context, 'csv')}]
+
+    if mailto:
+        actions.insert(0, {
+            'name': 'email', 'title': 'Email',
+            'description': 'Email', 'url': mailto})
+
+    if opensearch_url:
+        actions.insert(0, {
+            'name': 'opensearch', 'title': 'Opensearch',
+            'description': 'Add KARL People Search to your browser toolbar',
+            'url': "javascript:window.external.AddSearchProvider('%s');" %
+                   opensearch_url})
+
     return dict(
-        api=api,
-        peopledir=peopledir,
+        api=api,   # deprecated in ux2
+        peopledir=peopledir,   # deprecated in ux2
         peopledir_tabs=peopledir_tabs, # deprecated in ux2
         context_tools=peopledir_tabs,
-        head_data=convert_to_script(client_json_data),
+        head_data=convert_to_script(client_json_data), # deprecated in ux2
         report_data=report_data, # ux2
+        batch_info=batch, # deprecated in ux2
         batch=batch, # ux2
+        rows=rows,
         descriptions=descriptions,
         letters=letter_info,
         formats=formats, # ux2
-        print_url=print_url,
-        csv_url=csv_url,
-        pictures_url=pictures_url,  # deprecated ux1
-        qualifiers=qualifiers,
-        opensearch_url=opensearch_url,
+        report_actions=actions, # ux2
+        print_url=print_url,        # deprecated in ux2
+        csv_url=csv_url,            # deprecated in ux2
+        pictures_url=pictures_url,  # deprecated in ux2
+        tabular_url=tabular_url,    # deprecated in ux2
+        qualifiers=qualifiers,      # deprecated in ux2
+        opensearch_url=opensearch_url, # deprecated in ux2
         actions=get_actions(context, request),
-        mailto=_get_mailto(context, peopledir),
+        mailto=mailto,              # deprecated in ux2
     )
 
 
@@ -393,64 +426,7 @@ def profile_photo_rows(entries, request, api, columns=3):
 
 
 def picture_view(context, request):
-    sort_index = COLUMNS[context.columns[0]].sort_index
-
-    kw = get_report_query(context, request)
-    try:
-        batch_info = get_catalog_batch_grid(
-            context, request, batch_size=12, sort_index=sort_index, **kw)
-    except ParseError:
-        # user entered something weird in the text search box.
-        # show no results.
-        batch_info = {'entries': [], 'total': 0, 'batching_required': False}
-
-    api = TemplateAPI(context, request, context.title)
-    rows = profile_photo_rows(batch_info['entries'], request, api)
-
-    peopledir = find_peopledirectory(context)
-    section = context.__parent__
-    peopledir_tabs = get_tabs(peopledir, request, section.__name__)
-
-    mgr = ILetterManager(context)
-    letter_info = mgr.get_info(request)
-    kw, qualifiers = get_search_qualifiers(request)
-
-    descriptions = get_report_descriptions(context)
-    print_url = resource_url(context, request, 'print.html', **kw)
-    csv_url = resource_url(context, request, 'csv', **kw)
-    tabular_url = resource_url(context, request, **kw)
-
-    formats = [   # ux2
-        {'name': 'table',
-         'selected': False,
-         'url': request.resource_url(context),
-         'title': 'Tabular View',
-         'description': 'Show table'},
-        {'name': 'picture',
-         'selected': False,
-         'url': None,
-         'title': 'Picture View',
-         'description': 'Show pictures'}
-    ]
-
-    return dict(
-        api=api,
-        peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs, # deprecated in ux2
-        context_tools=peopledir_tabs,
-        letters=letter_info,
-        formats=formats,
-        descriptions=descriptions,
-        print_url=print_url,
-        csv_url=csv_url,
-        tabular_url=tabular_url,  # deprecated in ux2
-        qualifiers=qualifiers,
-        batch_info=batch_info,    # deprecated in ux2
-        batch=batch_info,
-        rows=rows,
-        mailto=_get_mailto(context, peopledir),
-        actions=get_actions(context, request),
-        )
+    return report_view(context, request, pictures=True)
 
 
 def get_search_qualifiers(request):
@@ -508,7 +484,7 @@ def get_grid_data(context, request, start=0, limit=12,
 
     kw = get_report_query(context, request)
     try:
-        batch = get_catalog_batch(context, request,
+        batch = get_catalog_batch_grid(context, request,
             batch_start=start,
             batch_size=limit,
             sort_index=sort_index,
