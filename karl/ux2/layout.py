@@ -117,7 +117,45 @@ class Layout(PopperLayout):
         'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
-        'karl.views:static/min/karl-ui.min.js',
+
+        ##'karl.views:static/min/karl-ui.min.js',
+        # This original combo has to be split up, as it contains code
+        # already ported to popper (eg. livesearch) or used from there (eg. jquery)
+        #
+        # JQuery and JQuery-UI:
+        #    jquery/jquery-1.4.4.js       
+        #    min/jquery-ui-1.9m3.karl.js
+        #
+        # Additional JQuery-UI:
+            'karl.views:static/jquery-ui/grid/ui/ui.grid.js',
+            'karl.views:static/jquery-ui/grid/ui/ui.gridmodel.js',
+            'karl.views:static/jquery-ui/autobox2/jquery.templating.js',
+            'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.ext.js',
+            'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.js',
+        #
+        # KARL plugins:
+            'karl.views:static/karl-plugins/karl-multistatusbox/karl.multistatusbox.js',
+            'karl.views:static/karl-plugins/karl-captionedimage/karl.captionedimage.js',
+            'karl.views:static/karl-plugins/karl-slider/karl.slider.js',
+            'karl.views:static/karl-plugins/karl-buttonset/karl.buttonset.js',
+        #
+        # Additional JQuery plugins:
+            'karl.views:static/jquery-plugins/jquery.scrollTo.src.js',
+            'karl.views:static/jquery-plugins/jquery.tools.js',
+        #
+        # Bottlecap livesearch:
+        #   bottlecap-wire/livesearch-all.js
+        #
+        #  i10n:
+            'karl.views:static/l10n/globalize.js',
+            'karl.views:static/l10n/globalize.cultures.js',
+            'karl.views:static/l10n/globalize.actions.js',
+        #
+        # END of this original combo
+        ## 'karl.views:static/min/karl-ui.min.js',
+
+        #
         'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
         'karl.views:static/karl-plugins/karl-calendar/karl.calendar.js',
-        'karl.views:static/karl.js',)
+        'karl.views:static/karl.js',
+        )
