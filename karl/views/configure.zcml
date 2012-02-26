@@ -1753,6 +1753,118 @@
     renderer="json"
     />
 
+  <!-- chatter views -->
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.all_chatter_json"
+    renderer="json"
+    permission="admin"
+    name="admin.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.all_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="all.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_chatter_json"
+    renderer="json"
+    permission="view"
+    name="all.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name=""
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter_json"
+    renderer="json"
+    permission="view"
+    name="creators.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="creators.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter_json"
+    renderer="json"
+    permission="view"
+    name="names.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="names.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter_json"
+    renderer="json"
+    permission="view"
+    name="tag.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="tag.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter_json"
+    renderer="json"
+    permission="view"
+    name="chatter.json"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="chatter.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.update_followed"
+    renderer="templates/update_followed.pt"
+    permission="view"
+    name="update_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_chatter"
+    permission="create"
+    name="add_chatter.html"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"

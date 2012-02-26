@@ -597,6 +597,80 @@ class ISiteEvents(Interface):
         """ Append an mapping to the stack.
         """
 
+class IChatterbox(Interface):
+    """ Site-level 'tool' for holding chatter.
+    """
+    def __len__():
+        """ How many quips are in the chatterbox?
+        """
+
+    def __iter__():
+        """ Return an iterator over the keys in the chatterbox.
+        """
+
+    def __getitem__(key):
+        """ Return the quip stored under 'key'.
+
+        o Raise KeyError on a miss.
+        """
+
+    def addQuip(text, creator):
+        """ Create and add a new quip to the chatterbox.
+
+        o Return the new quip's '__name__'.
+        """
+
+    def listFollowed(userid):
+        """ Return a list of IDs of users followed by 'userid'.
+        """
+
+    def setFollowed(userid, followed):
+        """ Update the list of IDs of users followed by 'userid'.
+        """
+
+    def recent():
+        """ Return an iterable of quips by recency.
+        """
+
+    def recentFollowed(userid):
+        """ Return an iterable of quips by recency.
+
+        Include only quips created by 'userid' or users followed by 'userid'.
+        """
+
+    def recentWithTag(tag):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'tag'.
+        """
+
+    def recentWithCommunity(community):
+        """ Return an iterable of quips by recency.
+
+        Include only those which name 'community'.
+        """
+
+    def recentWithNames(*names):
+        """ Return an iterable of quips by recency.
+
+        Include only those which mention one or more of 'names'.
+        """
+
+
+class IQuip(IContent):
+    """ Individual chat element.
+
+    - Quips are immutable after creation.
+    """
+    text = Attribute(u'The actual text chattered by the user')
+    names = Attribute(u'Names mentioned in the text ("@foo")')
+    tags = Attribute(u'Tags mentioned in the text ("#foo")')
+    communities = Attribute(u'Communities mentioned in the text ("&foo")')
+    creator = Attribute(u'Creating userid')
+    modified_by = Attribute(u'Modifying userid: == creator')
+    created = Attribute(u'Datetime indicating creation')
+    modified = Attribute(u'Datetime indicating modification:  == created')
+
 # Reproduce repozitory interfaces here in order to be able to hedge instances
 # where repozitory is not available.
 try:
