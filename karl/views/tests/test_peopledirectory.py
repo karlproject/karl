@@ -17,6 +17,7 @@
 """Tests of karl.views.peopledirectory
 """
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -630,6 +631,7 @@ class Test_report_view(unittest.TestCase):
         self._register()
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -644,33 +646,45 @@ class Test_report_view(unittest.TestCase):
             'http://example.com/people/s1/r1/picture_view.html')
         self.assertEqual(info['qualifiers'], [])
         self.assertEqual(info['mailto'], None)
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@karl3.example.com')
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@lists.example.com')
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_qualified_report(self):
         self._register()
         pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': 'spock'})
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -815,6 +829,7 @@ class Test_picture_view(unittest.TestCase):
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -829,12 +844,16 @@ class Test_picture_view(unittest.TestCase):
             'http://example.com/people/s1/r1/')
         self.assertEqual(info['qualifiers'], [])
         self.assertEqual(info['mailto'], None)
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_qualified_report(self):
         self._register()
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': "spock's brain"})
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -847,6 +866,9 @@ class Test_picture_view(unittest.TestCase):
             'http://example.com/people/s1/r1/?body=spock%27s+brain')
         self.assertEqual(info['qualifiers'], ['Search for "spock\'s brain"'])
         self.assertEqual(info['mailto'], None)
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_bad_search_text(self):
         from zope.index.text.parsetree import ParseError
@@ -864,31 +886,43 @@ class Test_picture_view(unittest.TestCase):
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         info = self._callFUT(report, request)
         self.assertEqual(len(list(info['rows'])), 0)
         self.assertEqual(info['mailto'], None)
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@karl3.example.com')
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@lists.example.com')
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.section_style, 'compact')
+        self.assertEqual(layout.show_sidebar, False)
 
 
 class Test_get_search_qualifiers(unittest.TestCase):
@@ -958,23 +992,29 @@ class Test_get_grid_data(unittest.TestCase):
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
-        batch = {'reverse': False, 'next_batch': None, 'entries': [],
-            'batch_size': 10, 'sort_index': 'lastfirst',
-            'previous_batch': None, 'batch_end': 0,
-            'batching_required': False, 'total': 0, 'batch_start': 0}
-        self.assertEqual(grid_data, {
-            'fetch_url': 'http://example.com/people/s1/r1/jquery_grid',
-            'sortColumn': 'name',
-            'records': [],
-            'sortDirection': 'asc',
-            'width': 100,
-            'batch': batch,
-            'batchSize': 10,
-            'totalRecords': 0,
-            'scrollbarWidth': 15,
-            'allocateWidthForScrollbar': True,
-            'columns': [{'width': 85, 'id': 'name', 'label': 'Name'}],
-            })
+        self.assertEqual(grid_data['fetch_url'],
+                         'http://example.com/people/s1/r1/jquery_grid')
+        self.assertEqual(grid_data['sortColumn'], 'name')
+        self.assertEqual(grid_data['records'], [])
+        self.assertEqual(grid_data['sortDirection'], 'asc')
+        self.assertEqual(grid_data['width'], 100)
+        self.assertEqual(grid_data['batchSize'], 10)
+        self.assertEqual(grid_data['totalRecords'], 0)
+        self.assertEqual(grid_data['scrollbarWidth'], 15)
+        self.assertEqual(grid_data['allocateWidthForScrollbar'], True)
+        self.assertEqual(grid_data['columns'], [
+            {'width': 85, 'id': 'name', 'label': 'Name'}])
+        batch = grid_data['batch']
+        self.assertEqual(batch['reverse'], False)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['entries'], [])
+        self.assertEqual(batch['batch_size'], 10)
+        self.assertEqual(batch['sort_index'], 'lastfirst')
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['batch_end'], 0)
+        self.assertEqual(batch['batching_required'], False)
+        self.assertEqual(batch['total'], 0)
+        self.assertEqual(batch['batch_start'], 0)
 
     def test_non_empty(self):
         from karl.models.interfaces import ICatalogSearch
