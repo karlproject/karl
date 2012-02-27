@@ -119,6 +119,12 @@
     renderer="templates/attachments.pt"
     />
 
+  <bc:panel
+    name="tagbox"
+    panel=".panels.tagbox"
+    renderer="templates/tagbox.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"

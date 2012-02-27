@@ -158,4 +158,5 @@ class Layout(PopperLayout):
         'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
         'karl.views:static/karl-plugins/karl-calendar/karl.calendar.js',
         'karl.views:static/karl.js',
+        'karl.views:static/ux2/karl-ux2.js',
         )
