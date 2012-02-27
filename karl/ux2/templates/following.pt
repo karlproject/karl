@@ -1,0 +1,34 @@
+<metal:block use-macro="main_template">
+
+    <metal:slot metal:fill-slot="extra-headers">
+        <link rel="alternate" type="application/atom+xml" 
+            title="${layout.page_title}" href="${feed_url}"
+        />
+    </metal:slot>
+
+    <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+
+    <div id="chatter-quips" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="quipper followed">
+        <div class="panel-item-content">
+          <div>
+            <a href="${quipper['url']}">
+              <img class="avatar" alt="${quipper['fullname']}"
+                   src="${quipper['image_url']}" />
+              <strong class="fullname">${quipper['userid']}</strong>
+            </a>
+            <a href="${quipper['url']}" class="messagetext">
+              ${quipper['fullname']}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

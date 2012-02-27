@@ -31,7 +31,7 @@
       </form>
     </div>
 
-    <div id="chatter" class="pushdownContent">
+    <div id="chatter-quips" class="pushdownContent">
       <div class="panel-item clearfix" tal:repeat="quip recent">
         <div class="panel-item-content">
           <div>

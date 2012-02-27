@@ -6,6 +6,7 @@ from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
+from pyramid.security import authenticated_userid
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 
@@ -28,6 +29,7 @@ class Layout(PopperLayout):
         self.site = find_site(context)
         self.project_name = settings.get('system_name', 'KARL')
         self.page_title = getattr(context, 'title', 'Page Title')
+        self.userid = authenticated_userid(request)
 
     @reify
     def should_show_calendar_tab(self):

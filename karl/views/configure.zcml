@@ -1860,6 +1860,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.following"
+    renderer="templates/following.pt"
+    permission="view"
+    name="following.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.add_chatter"
     permission="create"
     name="add_chatter.html"

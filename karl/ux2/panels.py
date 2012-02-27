@@ -250,3 +250,6 @@ def tagbox(context, request):
     return {}
 
 
+def quip_search(context, request):
+    return {}
+

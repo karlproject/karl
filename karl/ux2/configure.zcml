@@ -125,6 +125,12 @@
     renderer="templates/tagbox.pt"
     />
 
+  <bc:panel
+    name="chatter.quip_search"
+    panel=".panels.quip_search"
+    renderer="templates/quip_search.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
