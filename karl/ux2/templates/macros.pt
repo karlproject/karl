@@ -34,6 +34,17 @@
     </script>
   </metal:formish_js>
 
+  <metal:timeago_js define-macro="timeago_js">
+    <script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        $('small.timestamp').timeago();
+      });
+      //]]>
+    </script>
+  </metal:timeago_js>
+
   <script metal:define-macro="tinymce_js" type="text/javascript" 
       src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
 
