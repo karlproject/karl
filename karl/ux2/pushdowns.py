@@ -3,8 +3,12 @@ import datetime
 import random
 import itertools
 
+from zope.component import getMultiAdapter
+
+from karl.models.interfaces import IGridEntryInfo
 from karl.utils import find_communities
 from karl.views.communities import get_my_communities
+from karl.views.community import get_recent_items_batch
 
 
 def notifier_ajax_view(context, request):
@@ -179,58 +183,33 @@ def radar_ajax_view(context, request):
             )
             for community in communities
         ))
+        communities_info = list(itertools.islice(communities_info, 0, 5))
 
+        # 3rd column: Recent Activity
+        recent_items = []
+        recent_items_batch = get_recent_items_batch(context, request, size=5)
+        for item in recent_items_batch["entries"]:
+            adapted = getMultiAdapter((item, request), IGridEntryInfo)
+            # Since this is json, we need a real dict...
+            recent_items.append(dict(
+                title=adapted.title,
+                url=adapted.url,
+                modified=adapted.modified,
+                creator_title=adapted.creator_title,
+                type=adapted.type,
+                ))
 
         results['data'] = {
             'streams': [{
                 'class': 'stream1',
                 'title': 'My Communities',
-                'communities': list(itertools.islice(communities_info, 0, 4)),
+                'communities': communities_info,
                 }, {
                 'class': 'stream2',
-                'title': 'Private messages???',
-                'items': [{
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }],
+                'title': 'Recent Activity',
+                'contexts': recent_items,
                 }],
             }
+
     return results
 

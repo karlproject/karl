@@ -35,6 +35,29 @@
             </div>
             {{/communities}}
 
+            {{#contexts}}
+            <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
+                <div class="panel-item-content">
+                    <div>
+                        <a href="{{url}}" class="fullname">
+                            <strong>
+                                {{title}}
+                            </strong>
+                        </a>
+                    </div>
+                    <div>
+                        {{type}}
+                    </div>
+                    <div class="messagetext">
+                        Modified by: {{creator_title}}
+                    </div>
+                    <div class="messagetext">
+                        Date: {{modified}}
+                    </div>
+                </div>
+            </div>
+            {{/contexts}}
+
 
             {{#items}}
             <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
