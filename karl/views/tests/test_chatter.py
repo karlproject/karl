@@ -7,12 +7,22 @@ from karl import testing as karltesting
 
 class Test_quip_info(unittest.TestCase):
 
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _callFUT(self, request, *quips):
         from karl.views.chatter import quip_info
         return quip_info(request, *quips)
 
     def test_single(self):
+        _registerSecurityPolicy('user')
         request = testing.DummyRequest()
+        site = testing.DummyModel()
+        site['chatter'] = request.context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         quip = DummyQuip()
         infos = self._callFUT(request, quip)
         self.assertEqual(len(infos), 1)
@@ -26,7 +36,11 @@ class Test_quip_info(unittest.TestCase):
         self.assertEqual(info['url'], 'http://example.com/')
 
     def test_multiple(self):
+        _registerSecurityPolicy('user')
         request = testing.DummyRequest()
+        site = testing.DummyModel()
+        site['chatter'] = request.context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         quips = DummyQuip('1'), DummyQuip('2')
         infos = self._callFUT(request, *quips)
         self.assertEqual(len(infos), len(quips))
@@ -56,6 +70,7 @@ class Test_all_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import all_chatter_json
         return all_chatter_json(context, request)
 
@@ -63,6 +78,7 @@ class Test_all_chatter_json(unittest.TestCase):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -74,6 +90,7 @@ class Test_all_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
@@ -83,6 +100,7 @@ class Test_all_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -94,6 +112,7 @@ class Test_all_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[:20], request)
@@ -105,6 +124,7 @@ class Test_all_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'start': 2, 'count': 5})
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[2:7], request)
@@ -123,6 +143,7 @@ class Test_all_chatter_json(unittest.TestCase):
             quips.append(DummyQuip(str(i), created=when))
         quips.reverse() # get them in recency-order
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(
                     GET={'since': now.strftime(TIMEAGO_FORMAT), 'count': 5})
         info = self._callFUT(context, request)
@@ -142,6 +163,7 @@ class Test_all_chatter_json(unittest.TestCase):
             quips.append(DummyQuip(str(i), created=when))
         quips.reverse() # get them in recency-order
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(
                     GET={'before': now.strftime(TIMEAGO_FORMAT), 'count': 5})
         info = self._callFUT(context, request)
@@ -151,12 +173,14 @@ class Test_all_chatter_json(unittest.TestCase):
 class Test_all_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import all_chatter
         return all_chatter(context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'All Chatter')
@@ -174,6 +198,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import followed_chatter_json
         return followed_chatter_json(context, request)
 
@@ -181,6 +206,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -193,6 +219,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
@@ -202,6 +229,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -213,6 +241,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[:20], request)
@@ -224,6 +253,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'start': 2, 'count': 5})
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[2:7], request)
@@ -232,12 +262,15 @@ class Test_followed_chatter_json(unittest.TestCase):
 class Test_followed_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
+        request.context = context
+        request.layout_manager = testing.DummyModel(layout=None)
         from karl.views.chatter import followed_chatter
         return followed_chatter(context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Recent Chatter')
@@ -255,18 +288,21 @@ class Test_creators_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import creators_chatter_json
         return creators_chatter_json(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         self.assertRaises(KeyError, self._callFUT, context, request)
 
     def test_empty_chatterbox_creators_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': 'USER'})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
@@ -278,6 +314,7 @@ class Test_creators_chatter_json(unittest.TestCase):
     def test_empty_chatterbox_creators_as_string_multiple(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': 'USER1,USER2'})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER1', 'USER2'])
@@ -290,6 +327,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
@@ -300,6 +338,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -310,6 +349,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER', 'USER2'])
@@ -324,6 +364,7 @@ class Test_creators_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': ['USER', 'USER2'],
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
@@ -333,12 +374,14 @@ class Test_creators_chatter_json(unittest.TestCase):
 class Test_creators_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import creators_chatter
         return creators_chatter(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         found = self._callFUT(context, request)
         self.assertEqual(found.location, 'http://example.com/chatter/')
@@ -346,6 +389,7 @@ class Test_creators_chatter(unittest.TestCase):
     def test_empty_chatterbox_creators_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': 'USER'})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER'])
@@ -357,6 +401,7 @@ class Test_creators_chatter(unittest.TestCase):
     def test_empty_chatterbox_creators_as_list(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['creators'], ['USER', 'USER2'])
@@ -373,18 +418,21 @@ class Test_names_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import names_chatter_json
         return names_chatter_json(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         self.assertRaises(KeyError, self._callFUT, context, request)
 
     def test_empty_chatterbox_names_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': 'USER'})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER'])
@@ -396,6 +444,7 @@ class Test_names_chatter_json(unittest.TestCase):
     def test_empty_chatterbox_names_as_string_multiple(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': 'USER1,USER2'})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER1', 'USER2'])
@@ -408,6 +457,7 @@ class Test_names_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER'])
@@ -419,6 +469,7 @@ class Test_names_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': ('USER',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -429,6 +480,7 @@ class Test_names_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER', 'USER2'])
@@ -441,6 +493,7 @@ class Test_names_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2'],
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
@@ -450,12 +503,14 @@ class Test_names_chatter_json(unittest.TestCase):
 class Test_names_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import names_chatter
         return names_chatter(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         found = self._callFUT(context, request)
         self.assertEqual(found.location, 'http://example.com/chatter/')
@@ -463,6 +518,7 @@ class Test_names_chatter(unittest.TestCase):
     def test_empty_chatterbox_names_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': 'USER'})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER'])
@@ -474,6 +530,7 @@ class Test_names_chatter(unittest.TestCase):
     def test_empty_chatterbox_names_as_list(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER', 'USER2'])
@@ -490,18 +547,21 @@ class Test_tag_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import tag_chatter_json
         return tag_chatter_json(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         self.assertRaises(KeyError, self._callFUT, context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         self.assertEqual(info['tag'], 'sometag')
@@ -514,6 +574,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips, request)
@@ -523,6 +584,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
@@ -533,6 +595,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[:20], request)
@@ -543,6 +606,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag',
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
@@ -558,12 +622,14 @@ class Test_tag_chatter(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import tag_chatter
         return tag_chatter(context, request)
 
     def test_wo_parm(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         found = self._callFUT(context, request)
         self.assertEqual(found.location, 'http://example.com/chatter/')
@@ -571,6 +637,7 @@ class Test_tag_chatter(unittest.TestCase):
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: #sometag')
@@ -588,12 +655,14 @@ class Test_community_chatter_json(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import community_chatter_json
         return community_chatter_json(context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = cb = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -607,6 +676,7 @@ class Test_community_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
@@ -620,6 +690,7 @@ class Test_community_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
@@ -634,6 +705,7 @@ class Test_community_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
@@ -648,6 +720,7 @@ class Test_community_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
@@ -660,12 +733,14 @@ class Test_community_chatter_json(unittest.TestCase):
 class Test_community_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import community_chatter
         return community_chatter(context, request)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
         site['chatter'] = cb = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -685,6 +760,7 @@ class Test_update_followed(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import update_followed
         return update_followed(context, request)
 
@@ -698,6 +774,7 @@ class Test_update_followed(unittest.TestCase):
             _called_with.append(userid)
             return FOLLOWED
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         context.listFollowed = _listFollowed
         request = testing.DummyRequest(view_name='update_followed.html')
         info = self._callFUT(context, request)
@@ -715,6 +792,7 @@ class Test_update_followed(unittest.TestCase):
         def _setFollowed(userid, followed):
             _called_with.append((userid, followed))
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         context.setFollowed = _setFollowed
         request = testing.DummyRequest()
         request.POST['followed'] = '\n'.join(AFTER)
@@ -732,6 +810,7 @@ class Test_add_chatter(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.context = context
         from karl.views.chatter import add_chatter
         return add_chatter(context, request)
 
@@ -739,6 +818,7 @@ class Test_add_chatter(unittest.TestCase):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         request.POST['text'] = 'This is a quip.'
         found = self._callFUT(context, request)
@@ -753,6 +833,7 @@ class Test_add_chatter(unittest.TestCase):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         request.POST['text'] = TEXT
         request.POST['private'] = '1'
