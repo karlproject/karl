@@ -68,7 +68,7 @@ def quip_info(request, *quips):
     chatter_url = resource_url(chatter, request)
     for quip in quips:
         profile = profiles.get(quip.creator)
-        photo = profile.get('photo')
+        photo = profile and profile.get('photo') or None
         if photo is not None:
             photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
         else:
@@ -174,7 +174,8 @@ def followed_chatter(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
     layout = request.layout_manager.layout
-    layout.add_portlet('chatter.quip_search')
+    if layout is not None:
+        layout.add_portlet('chatter.quip_search')
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Recent Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
@@ -364,7 +365,6 @@ def update_followed(context, request):
         return HTTPFound(location=location)
     return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
             'followed': '\n'.join(chatter.listFollowed(userid)),
-            'followed_list': chatter.listFollowed(userid),
             'view_url': resource_url(context, request, request.view_name),
            }
 
@@ -380,7 +380,7 @@ def following(context, request):
     for quipper in chatter.listFollowed(userid):
         info = {}
         profile = profiles.get(quipper)
-        photo = profile.get('photo')
+        photo = profile and profile.get('photo') or None
         if photo is not None:
             photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
         else:
