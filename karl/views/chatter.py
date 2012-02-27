@@ -37,32 +37,35 @@ TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 CHATTER_THUMB_SIZE = (48, 48)
 
 
-def get_context_tools(request):
-    return [{'url': '#',
+def get_context_tools(request, selected='posts'):
+    chatter = find_chatter(request.context)
+    chatter_url = resource_url(chatter, request)
+    return [{'url': chatter_url,
              'title': 'Posts',
-             'selected': 'selected',
+             'selected': selected=='posts' and 'selected',
             },
             {'url': '#',
              'title': 'Following',
-             'selected': False,
+             'selected': selected=='following' and 'selected',
             },
             {'url': '#',
              'title': 'Topics',
-             'selected': False,
+             'selected': selected=='topics' and 'selected',
             },
             {'url': '#',
              'title': 'Messages',
-             'selected': False,
+             'selected': selected=='messages' and 'selected',
             },
             {'url': '#',
              'title': 'Discover',
-             'selected': False,
+             'selected': selected=='discover' and 'selected',
             }]
 
 def quip_info(request, *quips):
     result = []
     profiles = find_profiles(request.context)
-    profile_url = resource_url(profiles, request)
+    chatter = find_chatter(request.context)
+    chatter_url = resource_url(chatter, request)
     for quip in quips:
         profile = profiles.get(quip.creator)
         photo = profile.get('photo')
@@ -73,7 +76,8 @@ def quip_info(request, *quips):
         timeago = str(quip.created.strftime(TIMEAGO_FORMAT))
         info = {'text': quip.text,
                 'creator': quip.creator,
-                'creator_url': '%s/%s' % (profile_url, quip.creator),
+                'creator_url': '%screators.html?creators=%s' % (chatter_url,
+                    quip.creator),
                 'creator_image_url': photo_url,
                 'timeago': timeago,
                 'names': list(quip.names),
