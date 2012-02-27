@@ -1,0 +1,63 @@
+<metal:block use-macro="main_template">
+
+    <metal:slot metal:fill-slot="extra-headers">
+        <link rel="alternate" type="application/atom+xml" 
+            title="${layout.page_title}" href="${feed_url}"
+        />
+    </metal:slot>
+
+    <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+
+    <div id="recent-quips-add-form">
+      <h3>On your mind</h3>
+      <form class="form-stacked" action="${chatter_form_url}" method="POST">
+        <div class="control-group clearfix">
+          <div class="controls">
+            <textarea name="text"></textarea>
+            <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
+          </div>
+          <div class="actions">
+            <div class="btn-group">
+              <button type="submit" class="btn btn-large">Speak</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="chatter" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="quip recent">
+        <div class="panel-item-content">
+          <div>
+            <a href="${quip['creator_url']}">
+              <img class="avatar" alt="${quip['creator']}"
+                   src="${quip['creator_image_url']}" />
+              <strong class="fullname">${quip['creator']}</strong>
+            </a>
+            <a href="${quip['url']}" class="messagetext">
+              ${quip['text']}
+            </a>
+          </div>
+          <div class="panel-footer clearfix">
+            <small class="timestamp">${quip['timeago']}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script language="javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            $('small.timestamp').timeago();
+        });
+        //]]>
+    </script>
+
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

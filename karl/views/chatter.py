@@ -27,18 +27,54 @@ from pyramid.security import DENY_ALL
 from pyramid.url import resource_url
 
 from karl.utils import find_chatter
+from karl.utils import find_profiles
+from karl.utilities.image import thumb_url
 from karl.views.api import TemplateAPI
+from karl.views.utils import get_static_url
 
 
 TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+CHATTER_THUMB_SIZE = (48, 48)
 
+
+def get_context_tools(request):
+    return [{'url': '#',
+             'title': 'Posts',
+             'selected': 'selected',
+            },
+            {'url': '#',
+             'title': 'Following',
+             'selected': False,
+            },
+            {'url': '#',
+             'title': 'Topics',
+             'selected': False,
+            },
+            {'url': '#',
+             'title': 'Messages',
+             'selected': False,
+            },
+            {'url': '#',
+             'title': 'Discover',
+             'selected': False,
+            }]
 
 def quip_info(request, *quips):
     result = []
+    profiles = find_profiles(request.context)
+    profile_url = resource_url(profiles, request)
     for quip in quips:
+        profile = profiles.get(quip.creator)
+        photo = profile.get('photo')
+        if photo is not None:
+            photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
+        else:
+            photo_url = get_static_url(request) + "/images/defaultUser.gif"
         timeago = str(quip.created.strftime(TIMEAGO_FORMAT))
         info = {'text': quip.text,
                 'creator': quip.creator,
+                'creator_url': '%s/%s' % (profile_url, quip.creator),
+                'creator_image_url': photo_url,
                 'timeago': timeago,
                 'names': list(quip.names),
                 'communities': list(quip.communities),
@@ -106,6 +142,7 @@ def all_chatter(context, request):
     info['api'] = TemplateAPI(context, request, 'All Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
+    info['context_tools'] = get_context_tools(request)
     return info
 
 
@@ -136,6 +173,7 @@ def followed_chatter(context, request):
     info['api'] = TemplateAPI(context, request, 'Recent Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
+    info['context_tools'] = get_context_tools(request)
     return info
 
 
@@ -179,6 +217,7 @@ def creators_chatter(context, request):
                         ', '.join(['@%s' % x for x in info['creators']]))
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
+    info['context_tools'] = get_context_tools(request)
     return info
 
 
@@ -222,6 +261,7 @@ def names_chatter(context, request):
                         ', '.join(['@%s' % x for x in info['names']]))
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
+    info['context_tools'] = get_context_tools(request)
     return info
 
 
@@ -260,6 +300,7 @@ def tag_chatter(context, request):
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
+    info['context_tools'] = get_context_tools(request)
     return info
 
 
