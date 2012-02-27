@@ -245,3 +245,8 @@ def comments(context, request):
     comments.sort(key=lambda c: c['timestamp'])
     return {'comments': comments}
 
+
+def tagbox(context, request):
+    return {}
+
+
