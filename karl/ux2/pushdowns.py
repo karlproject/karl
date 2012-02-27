@@ -1,6 +1,10 @@
 
 import datetime
 import random
+import itertools
+
+from karl.utils import find_communities
+from karl.views.communities import get_my_communities
 
 
 def notifier_ajax_view(context, request):
@@ -163,51 +167,25 @@ def radar_ajax_view(context, request):
         results['data'] = None
     else:
         # Fetch the data
+
+        # 2nd column: my communities (preferred communities)
+        communities_folder = find_communities(context)
+        communities = get_my_communities(communities_folder, request)
+        communities_info = ((
+            dict(
+                title=community.title,
+                description=community.description,
+                url=community.url,
+            )
+            for community in communities
+        ))
+
+
         results['data'] = {
             'streams': [{
                 'class': 'stream1',
-                'title': 'What do we list here?',
-                'items': [{
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }],
+                'title': 'My Communities',
+                'communities': list(itertools.islice(communities_info, 0, 4)),
                 }, {
                 'class': 'stream2',
                 'title': 'Private messages???',

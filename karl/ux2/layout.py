@@ -1,6 +1,7 @@
 
 import copy
 from bottlecap.layouts.popper.layout import PopperLayout
+from bottlecap.layouts.popper.layout import get_microtemplates
 
 from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
@@ -162,3 +163,23 @@ class Layout(PopperLayout):
         'karl.views:static/karl.js',
         'karl.views:static/ux2/karl-ux2.js',
         )
+
+    @property
+    def microtemplates(self):
+        """Render the whole microtemplates dictionary
+        Take popper's templates and allow them to overriden locally.
+        """
+        if getattr(self, '_microtemplates', None) is None:
+            self._microtemplates = super(Layout, self).microtemplates
+            self._microtemplates.update(get_microtemplates(directory=_microtemplates,
+                names=getattr(self, '_used_microtemplate_names', ())))
+        return self._microtemplates
+
+
+# FIXME Use pkg_resources
+import os
+_here = os.path.dirname(__file__)
+_microtemplates = os.path.join(_here, 'microtemplates')
+
+
+
