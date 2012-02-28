@@ -702,21 +702,19 @@ def show_profile_view(context, request):
             continue
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
+    recent_url = request.resource_url(context, 'recent_content.html')
 
-    return render_to_response(
-        'templates/profile.pt',
-        dict(api=api,
-             profile=profile,
-             actions=get_profile_actions(context, request),
-             photo=photo,
-             head_data=convert_to_script(client_json_data),
-             communities=communities,
-             my_communities=my_communities,
-             preferred_communities=preferred_communities,
-             tags=tags,
-             recent_items=recent_items),
-        request=request,
-        )
+    return dict(api=api,
+        profile=profile,
+        actions=get_profile_actions(context, request),
+        photo=photo,
+        head_data=convert_to_script(client_json_data),
+        communities=communities,
+        my_communities=my_communities,
+        preferred_communities=preferred_communities,
+        tags=tags,
+        recent_items=recent_items,
+        recent_url=recent_url)
 
 def profile_thumbnail(context, request):
     api = TemplateAPI(context, request, 'Profile thumbnail redirector')

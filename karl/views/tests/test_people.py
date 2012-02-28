@@ -161,7 +161,7 @@ class TestEditProfileFormController(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
             str(form.errors['websites']), "You're doing it wrong.")
@@ -171,7 +171,7 @@ class TestEditProfileFormController(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failIf('websites.0' in form.errors)
         self.assertEqual(
             form.errors['websites'].message, 'You made a boo boo.')
@@ -904,7 +904,6 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'userid'
@@ -913,11 +912,11 @@ class ShowProfileTests(unittest.TestCase):
         context['communities'] = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 4)
-        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
-        self.assertEqual(renderer.actions[1][1], 'manage_communities.html')
-        self.assertEqual(renderer.actions[2][1], 'manage_tags.html')
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 4)
+        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
+        self.assertEqual(response['actions'][1][1], 'manage_communities.html')
+        self.assertEqual(response['actions'][2][1], 'manage_tags.html')
 
     def test_not_editable(self):
         self._registerTagbox()
@@ -925,7 +924,6 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'chris'
@@ -934,10 +932,9 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("chris", "chrislogin", "password", [])
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
-        self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 2)
-        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
-        #self.assertEqual(renderer.actions[1][1], 'delete.html')
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 2)
+        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
 
     def test_communities(self):
         self._registerTagbox()
@@ -946,7 +943,6 @@ class ShowProfileTests(unittest.TestCase):
         from pyramid.testing import DummyModel
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
@@ -966,8 +962,8 @@ class ShowProfileTests(unittest.TestCase):
         site["profiles"] = profiles = DummyModel()
         profiles["userid"] = context
 
-        self._callFUT(context, request)
-        self.assertEqual(renderer.communities, [
+        response = self._callFUT(context, request)
+        self.assertEqual(response['communities'], [
             {"title": "Community 1",
              "moderator": False,
              "url": "http://example.com/communities/community/",},
@@ -984,7 +980,6 @@ class ShowProfileTests(unittest.TestCase):
         karltesting.registerDummySecurityPolicy(permissive=False)
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         users = DummyUsers()
@@ -1004,8 +999,8 @@ class ShowProfileTests(unittest.TestCase):
         site["profiles"] = profiles = DummyModel()
         profiles["userid"] = context
 
-        self._callFUT(context, request)
-        self.assertEqual(renderer.communities, [])
+        response = self._callFUT(context, request)
+        self.assertEqual(response['communities'], [])
 
     def test_tags(self):
         from karl.testing import DummyUsers
@@ -1035,13 +1030,11 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
-
         response = self._callFUT(context, request)
 
-        self.assertEqual(len(renderer.tags), 2)
-        self.failUnless(renderer.tags[0], {'name': 'wally', 'count': 3})
-        self.failUnless(renderer.tags[1], {'name': 'beaver', 'count': 1})
+        self.assertEqual(len(response['tags']), 2)
+        self.failUnless(response['tags'][0], {'name': 'wally', 'count': 3})
+        self.failUnless(response['tags'][1], {'name': 'beaver', 'count': 1})
 
     def test_tags_capped_at_ten(self):
         from karl.testing import DummyUsers
@@ -1082,14 +1075,12 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
 
         response = self._callFUT(context, request)
-
-        self.assertEqual(len(renderer.tags), 10)
-        self.failUnless(renderer.tags[0], {'name': 'kilo', 'count': 11})
-        self.failUnless(renderer.tags[1], {'name': 'juliet', 'count': 10})
-        self.failUnless(renderer.tags[9], {'name': 'bravo', 'count': 2})
+        self.assertEqual(len(response['tags']), 10)
+        self.failUnless(response['tags'][0], {'name': 'kilo', 'count': 11})
+        self.failUnless(response['tags'][1], {'name': 'juliet', 'count': 10})
+        self.failUnless(response['tags'][9], {'name': 'bravo', 'count': 2})
 
     def test_show_recently_added(self):
         self._registerTagbox()
@@ -1113,7 +1104,6 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'chris'
@@ -1122,14 +1112,14 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("chris", "chris", "password", [])
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
-        self._callFUT(context, request)
+        response = self._callFUT(context, request)
         self.assertEqual(search_args['limit'], 5)
         self.assertEqual(search_args['creator'], 'chris')
         self.assertEqual(search_args['sort_index'], 'creation_date')
         self.assertEqual(search_args['reverse'], True)
-        self.assertEqual(len(renderer.recent_items), 2)
-        self.assertEqual(renderer.recent_items[0].context.title, 'doc1')
-        self.assertEqual(renderer.recent_items[1].context.title, 'doc2')
+        self.assertEqual(len(response['recent_items']), 2)
+        self.assertEqual(response['recent_items'][0].context.title, 'doc1')
+        self.assertEqual(response['recent_items'][1].context.title, 'doc2')
 
     def test_system_user(self):
         self._registerTagbox()
@@ -1137,7 +1127,6 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'admin'
@@ -1147,16 +1136,14 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(len(renderer.actions), 2)
-        self.assertEqual(renderer.actions[0][1], 'admin_edit_profile.html')
+        self.assertEqual(len(response['actions']), 2)
+        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
 
     def test_never_logged_in(self):
         self._registerTagbox()
         self._registerCatalogSearch()
 
         from karl.testing import DummyUsers
-        renderer = karltesting.registerDummyRenderer('templates/profile.pt')
         request = testing.DummyRequest()
         context = DummyProfile()
         context.__name__ = 'userid'
@@ -1165,8 +1152,8 @@ class ShowProfileTests(unittest.TestCase):
         context.users.add("userid", "userlogin", "password", [])
         context['communities'] = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
-        self._callFUT(context, request)
-        self.assertEqual(renderer.profile['last_login_time'], None)
+        response = self._callFUT(context, request)
+        self.assertEqual(response['profile']['last_login_time'], None)
 
 
 class ProfileThumbnailTests(unittest.TestCase):
