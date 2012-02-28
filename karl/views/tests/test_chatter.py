@@ -913,7 +913,32 @@ class Test_following_json(unittest.TestCase):
         from karl.views.chatter import following_json
         return following_json(context, request)
 
-    def test_simple(self):
+    def test_w_parm(self):
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = pf = testing.DummyModel()
+        pf['user1'] = testing.DummyModel(title='User 1')
+        pf['user2'] = testing.DummyModel(title='User 2')
+        context._following = ('user1', 'user2')
+        request = testing.DummyRequest(GET={'userid': 'other'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'other')
+        self.assertEqual(len(info['following']), 2)
+        self.assertEqual(info['following'][0]['userid'], 'user1')
+        self.assertEqual(info['following'][0]['fullname'], 'User 1')
+        self.assertEqual(info['following'][0]['url'],
+                   'http://example.com/chatter/creators.html?creators=user1')
+        self.assertEqual(info['following'][0]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+        self.assertEqual(info['following'][1]['userid'], 'user2')
+        self.assertEqual(info['following'][1]['fullname'], 'User 2')
+        self.assertEqual(info['following'][1]['url'],
+                   'http://example.com/chatter/creators.html?creators=user2')
+        self.assertEqual(info['following'][1]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+
+    def test_wo_parm(self):
         _registerSecurityPolicy('user')
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()

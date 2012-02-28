@@ -405,12 +405,19 @@ def update_followed(context, request):
 
 
 def following_json(context, request):
-    """ View the list of users followed by the current user.
+    """ View the list of users whom a given user is following..
+
+    Query string may include:
+
+    - 'userid':  the user for whom to enumerate followed users.  If not passed,
+                 defaults to the current user.
     """
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     profiles = find_profiles(context)
-    userid = authenticated_userid(request)
+    userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
     following = []
     for quipper in chatter.listFollowed(userid):
         info = {}
