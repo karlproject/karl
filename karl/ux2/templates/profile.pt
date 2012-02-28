@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
   <div metal:fill-slot="content">
 
     ${panel('status_message')}
-    ${panel('actions')}
+    ${panel('popper.actions_menu', actions=actions)} 
     <h1 class="kscreentitle">${profile.title}</h1>
     ${panel('list_tags')}
 
