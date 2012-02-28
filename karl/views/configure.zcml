@@ -988,6 +988,7 @@
     view=".people.recent_content_view"
     name="recent_content.html"
     permission="view"
+    renderer="templates/profile_recent_content.pt"
   />
 
   <formish:form

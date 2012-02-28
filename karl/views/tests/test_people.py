@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -384,7 +385,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
             str(form.errors['websites']), "You're doing it wrong.")
@@ -394,7 +395,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failIf('websites.0' in form.errors)
         self.assertEqual(
             form.errors['websites'].message, 'You made a boo boo.')
@@ -574,7 +575,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failUnless('websites.0' in form.errors)
         self.assertEqual(
             str(form.errors['websites']), "You're doing it wrong.")
@@ -584,7 +585,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         form.errors['websites.0'] = Exception("You made a boo boo.")
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
-        response = controller()
+        controller()
         self.failIf('websites.0' in form.errors)
         self.assertEqual(
             form.errors['websites'].message, 'You made a boo boo.')
@@ -651,7 +652,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         karltesting.registerAdapter(
             lambda *arg: DummyImageFile, (ICommunityFile,),
             IContentFactory)
-        workflow = registerDummyWorkflow('security')
+        registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
         # first set up the easier fields
@@ -669,7 +670,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                                          mimetype='image/jpeg',
                                          data=one_pixel_jpeg)
         # finally submit our constructed form
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
 
         self.failIf('invite' in self.community1)
         self.failIf('invite' in self.community2)
@@ -733,7 +734,6 @@ class AddUserFormControllerTests(unittest.TestCase):
 
     def test_handle_submit_duplicate_email_inactive_user(self):
         from karl.models.interfaces import IProfile
-        from karl.models.interfaces import IProfile
         from pyramid_formish import ValidationError
         # try again and make sure it fails
         controller = self._makeOne(self.context, self.request)
@@ -762,7 +762,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         from karl.models.profile import Profile
         # register defaults
-        workflow = registerDummyWorkflow('security')
+        registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
         # first set up the easier fields
@@ -778,7 +778,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                 continue
             converted[fieldname] = value
         # then set up the photo
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         profile = self.context['login']
         self.assertEqual(profile.websites, ['http://www.example.com'])
 
@@ -790,7 +790,7 @@ class AddUserFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         from karl.models.profile import Profile
         # register defaults
-        workflow = registerDummyWorkflow('security')
+        registerDummyWorkflow('security')
         registerContentFactory(Profile, IProfile)
         controller = self._makeOne(self.context, self.request)
         # first set up the easier fields
@@ -806,7 +806,7 @@ class AddUserFormControllerTests(unittest.TestCase):
                 continue
             converted[fieldname] = value
         # then set up the photo
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         profile = self.context['login']
         self.assertEqual(profile.websites, [])
 
@@ -833,7 +833,7 @@ class FilestorePhotoViewTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
         sessions = DummySessions()
-        context = self.context = testing.DummyModel(sessions=sessions)
+        self.context = testing.DummyModel(sessions=sessions)
         request = self.request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         request.subpath = ('sub', 'path', 'parts')
@@ -1199,14 +1199,16 @@ class RecentContentTests(unittest.TestCase):
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer(
-            'templates/profile_recent_content.pt')
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
-        self.assertEquals(len(renderer.recent_items), 0)
-        self.assertFalse(renderer.batch_info['batching_required'])
+        response = self._callFUT(context, request)
+        self.assert_(response['api'] is not None)
+        self.assertEquals(len(response['recent_items']), 0)
+        self.assertFalse(response['batch_info']['batching_required'])
+        self.assertEqual(layout.page_title, 'Content Added Recently by Z')
+        self.assertEqual(layout.section_style, 'none')
 
     def test_with_content(self):
         search_args = {}
@@ -1229,14 +1231,16 @@ class RecentContentTests(unittest.TestCase):
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer(
-            'templates/profile_recent_content.pt')
-        self._callFUT(context, request)
-        self.assert_(renderer.api is not None)
-        self.assertEquals(len(renderer.recent_items), 2)
-        self.assertEquals(renderer.recent_items[0].context.title, 'doc1')
-        self.assertEquals(renderer.recent_items[1].context.title, 'doc2')
-        self.assertFalse(renderer.batch_info['batching_required'])
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        response = self._callFUT(context, request)
+        self.assert_(response['api'] is not None)
+        self.assertEquals(len(response['recent_items']), 2)
+        self.assertEquals(response['recent_items'][0].context.title, 'doc1')
+        self.assertEquals(response['recent_items'][1].context.title, 'doc2')
+        self.assertFalse(response['batch_info']['batching_required'])
+        self.assertEqual(layout.page_title, 'Content Added Recently by Z')
+        self.assertEqual(layout.section_style, 'none')
 
 class ManageCommunitiesTests(unittest.TestCase):
     def setUp(self):
@@ -1315,7 +1319,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertFalse(community2["may_leave"])
 
     def test_cancel(self):
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1325,7 +1329,7 @@ class ManageCommunitiesTests(unittest.TestCase):
         self.assertEqual("http://example.com/profiles/a/", response.location)
 
     def test_submit_alert_prefs(self):
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1351,7 +1355,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             response.location)
 
     def test_leave_community(self):
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1369,7 +1373,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             response.location)
 
     def test_leave_community_sole_moderator(self):
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
@@ -1521,7 +1525,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         context = DummyProfile(firstname='Mori', lastname='Turi')
         context.title = 'Context'
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/deactivate_profile.pt')
         response = self._callFUT(context, request)
         self.assertEqual(sorted(response.keys()), ['api', 'myself'])
@@ -1620,7 +1624,7 @@ class TestReactivateProfileView(unittest.TestCase):
         context = DummyProfile(firstname='Mori', lastname='Turi')
         context.title = 'Context'
         request = testing.DummyRequest()
-        renderer = karltesting.registerDummyRenderer(
+        karltesting.registerDummyRenderer(
             'templates/reactivate_profile.pt')
         response = self._callFUT(context, request)
         self.assertEqual(sorted(response.keys()), ['api'])

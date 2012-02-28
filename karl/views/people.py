@@ -737,15 +737,13 @@ def recent_content_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    page_title = "Content Added Recently by %s" % context.title
-    api = TemplateAPI(context, request, page_title)
-    return render_to_response(
-        'templates/profile_recent_content.pt',
-        dict(api=api,
+    layout = request.layout_manager.layout
+    layout.page_title = "Content Added Recently by %s" % context.title
+    layout.section_style = 'none'
+    api = TemplateAPI(context, request, layout.page_title)
+    return dict(api=api,
              batch_info=batch,
-             recent_items=recent_items),
-        request=request,
-        )
+             recent_items=recent_items)
 
 def may_leave(userid, community):
     # May not leave community if a moderator
