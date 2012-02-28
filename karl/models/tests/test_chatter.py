@@ -108,7 +108,7 @@ class ChatterboxTests(_NowSetter):
         quip3 = cb[name3]
         self.assertEqual(list(cb.recentWithTag('tag')), [quip3, quip1])
 
-    def test_recentWithCommunity(self):
+    def test_recentWithCommunities_single(self):
         cb = self._makeOne()
         name1 = cb.addQuip('TEXT1 &community', 'USER')
         quip1 = cb[name1]
@@ -116,7 +116,19 @@ class ChatterboxTests(_NowSetter):
         quip2 = cb[name2]
         name3 = cb.addQuip('TEXT3 &community', 'USER3')
         quip3 = cb[name3]
-        self.assertEqual(list(cb.recentWithCommunity('community')),
+        self.assertEqual(list(cb.recentWithCommunities('community')),
+                         [quip3, quip1])
+
+    def test_recentWithCommunities_multiple(self):
+        cb = self._makeOne()
+        name1 = cb.addQuip('TEXT1 &community1', 'USER')
+        quip1 = cb[name1]
+        name2 = cb.addQuip('TEXT2', 'USER2')
+        quip2 = cb[name2]
+        name3 = cb.addQuip('TEXT3 &community2', 'USER3')
+        quip3 = cb[name3]
+        self.assertEqual(list(cb.recentWithCommunities(
+                                        'community1','community2')),
                          [quip3, quip1])
 
     def test_recentWithCreators_single(self):

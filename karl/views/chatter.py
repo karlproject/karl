@@ -21,6 +21,7 @@ import itertools
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.security import Allow
 from pyramid.security import DENY_ALL
@@ -30,6 +31,7 @@ from karl.utils import find_chatter
 from karl.utils import find_profiles
 from karl.utilities.image import thumb_url
 from karl.views.api import TemplateAPI
+from karl.views.communities import get_community_groups
 from karl.views.utils import get_static_url
 
 
@@ -333,7 +335,7 @@ def community_chatter_json(context, request):
     chatter = find_chatter(context)
     return {'community': community,
             'recent': _do_slice(
-                            chatter.recentWithCommunity(community), request),
+                            chatter.recentWithCommunities(community), request),
            }
 
 
@@ -343,6 +345,39 @@ def community_chatter(context, request):
     info = community_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request,
                               'Chatter: &%s' % info['community'])
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
+    return info
+
+
+def my_communities_chatter_json(context, request):
+    """ Return recent chatter mentioning current user's communities.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    principals = effective_principals(request)
+    communities = [x[0] for x in get_community_groups(principals)]
+    chatter = find_chatter(context)
+    return {'communities': communities,
+            'recent': _do_slice(
+                      chatter.recentWithCommunities(*communities), request),
+           }
+
+
+def my_communities_chatter(context, request):
+    """ HTML wrapper for 'my_communities_chatter_json'.
+    """
+    info = community_chatter_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Chatter: My Communities')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     return info
@@ -369,14 +404,14 @@ def update_followed(context, request):
            }
 
 
-def following(context, request):
+def following_json(context, request):
     """ View the list of users followed by the current user.
     """
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     profiles = find_profiles(context)
     userid = authenticated_userid(request)
-    followed = []
+    following = []
     for quipper in chatter.listFollowed(userid):
         info = {}
         profile = profiles.get(quipper)
@@ -389,9 +424,19 @@ def following(context, request):
         info['userid'] = quipper
         info['fullname'] = profile.title
         info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
-        followed.append(info)
-    return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
-            'followed': followed,
+        following.append(info)
+    return {'following': following,
+            'userid': userid,
+           }
+
+def following(context, request):
+    """ View the list of users followed by the current user.
+    """
+    following = following_json(context, request)
+    return {'api':  TemplateAPI(context, request,
+                                'Followed by: %s' % following['userid']),
+            'following': following,
+            'followed': following, #BBB
             'context_tools': get_context_tools(request, selected='following'),
            }
 

@@ -644,10 +644,10 @@ class IChatterbox(Interface):
         Include only those which name 'tag'.
         """
 
-    def recentWithCommunity(community):
+    def recentWithCommunities(*communities):
         """ Return an iterable of quips by recency.
 
-        Include only those which name 'community'.
+        Include only those which name one or more of 'communities'.
         """
 
     def recentWithNames(*names):

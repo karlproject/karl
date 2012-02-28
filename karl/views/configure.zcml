@@ -1853,6 +1853,22 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.my_communities_chatter_json"
+    renderer="json"
+    permission="view"
+    name="my_communities.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.my_communities_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="my_communities.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.update_followed"
     renderer="templates/update_followed.pt"
     permission="view"

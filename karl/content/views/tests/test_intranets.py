@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 from pyramid.testing import cleanUp
 
 from pyramid import testing
@@ -46,6 +47,7 @@ class TestShowIntranetsView(unittest.TestCase):
         directlyProvides(context, IIntranets)
         alsoProvides(context, ISite)
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         self._callFUT(context, request)
         self.assertEqual(len(renderer.actions), 1)
 

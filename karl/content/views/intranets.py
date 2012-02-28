@@ -53,6 +53,10 @@ def show_intranets_view(context, request):
         ('Add Intranet', 'add_intranet.html'),
         ]
 
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('popper.tagbox')
+
 
     return render_to_response(
         'templates/show_intranets.pt',

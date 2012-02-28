@@ -106,11 +106,12 @@ class Chatterbox(Persistent):
             if tag in quip.tags:
                 yield quip
 
-    def recentWithCommunity(self, community):
+    def recentWithCommunities(self, *communities):
         """ See IChatterbox.
         """
+        communities = set(communities)
         for quip in self.recent():
-            if community in quip.communities:
+            if communities & quip.communities:
                 yield quip
 
     def recentWithCreators(self, *creators):
