@@ -228,6 +228,7 @@ class QuipTests(_NowSetter):
         self._set_NOW(NOW)
         quip = self._makeOne()
         self.assertEqual(quip.text, '')
+        self.assertEqual(quip.html, '<div class="quip">\n\n</div>')
         self.assertEqual(list(quip.names), [])
         self.assertEqual(list(quip.tags), [])
         self.assertEqual(list(quip.communities), [])
@@ -239,6 +240,8 @@ class QuipTests(_NowSetter):
     def test_wo_syntax(self):
         quip = self._makeOne('This is a test')
         self.assertEqual(quip.text, 'This is a test')
+        self.assertEqual(quip.html,
+                         '<div class="quip">\nThis is a test\n</div>')
         self.assertEqual(list(quip.names), [])
         self.assertEqual(list(quip.tags), [])
         self.assertEqual(list(quip.communities), [])
@@ -286,6 +289,14 @@ class QuipTests(_NowSetter):
     def test_w_syntax(self):
         quip = self._makeOne('This is a test @name #tag &community')
         self.assertEqual(quip.text, 'This is a test @name #tag &community')
+        self.assertEqual(quip.html,
+                         '<div class="quip">\n'
+                         'This is a test '
+                         '<a class="quip-name" ref="name" href="#">@name</a> '
+                         '<a class="quip-tag" ref="tag" href="#">#tag</a> '
+                         '<a class="quip-community" ref="community" href="#">'
+                                '&community</a>\n'
+                         '</div>')
         self.assertEqual(list(quip.names), ['name'])
         self.assertEqual(list(quip.tags), ['tag'])
         self.assertEqual(list(quip.communities), ['community'])
