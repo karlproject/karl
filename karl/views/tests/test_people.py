@@ -905,6 +905,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         context.__name__ = 'userid'
         context.users = DummyUsers()
@@ -917,6 +918,7 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
+        self.assertEqual(request.layout_manager.layout.section_style, 'none')
 
     def test_not_editable(self):
         self._registerTagbox()
@@ -925,6 +927,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -944,6 +947,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         users = DummyUsers()
 
@@ -981,6 +985,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         users = DummyUsers()
 
@@ -1030,6 +1035,7 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
 
         self.assertEqual(len(response['tags']), 2)
@@ -1075,6 +1081,7 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         response = self._callFUT(context, request)
         self.assertEqual(len(response['tags']), 10)
@@ -1105,6 +1112,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -1128,6 +1136,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         context.__name__ = 'admin'
         context.users = DummyUsers()
@@ -1145,6 +1154,7 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = DummyProfile()
         context.__name__ = 'userid'
         context.last_login_time = None
