@@ -67,6 +67,10 @@ class ChatterboxTests(_NowSetter):
         # Overflowed twice
         self.assertEqual(cb._archive._generation, 1)
 
+    def test_listFollowing_miss(self):
+        cb = self._makeOne()
+        self.assertEqual(list(cb.listFollowing('nonesuch')), [])
+
     def test_listFollowed_miss(self):
         cb = self._makeOne()
         self.assertEqual(list(cb.listFollowed('nonesuch')), [])
@@ -76,6 +80,10 @@ class ChatterboxTests(_NowSetter):
         cb = self._makeOne()
         cb.setFollowed('USER', FOLLOWED)
         self.assertEqual(list(cb.listFollowed('USER')), FOLLOWED)
+        self.assertEqual(list(cb.listFollowing('USER')), [])
+        self.assertEqual(list(cb.listFollowing('USER1')), ['USER'])
+        self.assertEqual(list(cb.listFollowing('USER2')), ['USER'])
+        self.assertEqual(list(cb.listFollowing('USER3')), ['USER'])
 
     def test_recent_with_multiple(self):
         cb = self._makeOne()
