@@ -39,6 +39,7 @@ def _now():
 _NAME = re.compile(r'@\w+')
 _TAG = re.compile(r'#\w+')
 _COMMUNITY = re.compile(r'&\w+')
+_ANY = re.compile(r'(?P<marker>[@#&])(?P<name>\w+)')
 
 
 class Chatterbox(Persistent):
@@ -131,11 +132,34 @@ class Chatterbox(Persistent):
                 yield quip
 
 
+def _renderHTML(text):
+    chunks = []
+    last = 0
+    for match in _ANY.finditer(text):
+        chunks.append(text[last:match.start()])
+        if match.group('marker') == '@':
+            exp = match.expand('<a class="quip-name" ref="\g<name>" '
+                                  'href="#">@\g<name></a>')
+        elif match.group('marker') == '#':
+            exp = match.expand('<a class="quip-tag" ref="\g<name>" '
+                                  'href="#">#\g<name></a>')
+        elif match.group('marker') == '&':
+            exp = match.expand('<a class="quip-community" ref="\g<name>" '
+                                  'href="#">&\g<name></a>')
+        else:
+            raise ValueError("Unknown quip syntax: %s" % text)
+        chunks.append(exp)
+        last = match.end()
+    chunks.append(text[last:])
+    return '<div class="quip">\n%s\n</div>' % ''.join(chunks)
+
+
 class Quip(Persistent):
     implements(IQuip)
 
     def __init__(self, text, creator):
         self._text = text
+        self._html = _renderHTML(text)
         self._names = frozenset([x[1:] for x in _NAME.findall(self._text)])
         self._tags = frozenset([x[1:] for x in _TAG.findall(self._text)])
         self._communities = frozenset(
@@ -148,6 +172,8 @@ class Quip(Persistent):
         return 'Quip: %s [%s]' % (self._text, self.creator)
 
     text = property(lambda self: self._text,)
+
+    html = property(lambda self: self._html,)
 
     names = property(lambda self: self._names,)
 

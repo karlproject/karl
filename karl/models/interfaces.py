@@ -663,6 +663,7 @@ class IQuip(IContent):
     - Quips are immutable after creation.
     """
     text = Attribute(u'The actual text chattered by the user')
+    html = Attribute(u'HTML rendered from the text chattered by the user')
     names = Attribute(u'Names mentioned in the text ("@foo")')
     tags = Attribute(u'Tags mentioned in the text ("#foo")')
     communities = Attribute(u'Communities mentioned in the text ("&foo")')
