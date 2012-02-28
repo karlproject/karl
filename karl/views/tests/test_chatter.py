@@ -900,6 +900,45 @@ class Test_update_followed(unittest.TestCase):
         self.assertEqual(_called_with, [('user', AFTER)])
 
 
+class Test_following_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import following_json
+        return following_json(context, request)
+
+    def test_simple(self):
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = pf = testing.DummyModel()
+        pf['user1'] = testing.DummyModel(title='User 1')
+        pf['user2'] = testing.DummyModel(title='User 2')
+        context._following = ('user1', 'user2')
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'user')
+        self.assertEqual(len(info['following']), 2)
+        self.assertEqual(info['following'][0]['userid'], 'user1')
+        self.assertEqual(info['following'][0]['fullname'], 'User 1')
+        self.assertEqual(info['following'][0]['url'],
+                   'http://example.com/chatter/creators.html?creators=user1')
+        self.assertEqual(info['following'][0]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+        self.assertEqual(info['following'][1]['userid'], 'user2')
+        self.assertEqual(info['following'][1]['fullname'], 'User 2')
+        self.assertEqual(info['following'][1]['url'],
+                   'http://example.com/chatter/creators.html?creators=user2')
+        self.assertEqual(info['following'][1]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+
+
 class Test_add_chatter(unittest.TestCase):
 
     def setUp(self):
@@ -955,6 +994,7 @@ def _makeChatterbox(recent=()):
     class _Chatterbox(testing.DummyModel):
         _KEY = 'KEY'
         _names = _tag = _community = _added = _creators = _followed = None
+        _following = ()
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator):
@@ -981,6 +1021,8 @@ def _makeChatterbox(recent=()):
         def recentWithCommunities(self, *community):
             self._community = community
             return self._recent
+        def listFollowed(self, userid):
+            return self._following
 
     return _Chatterbox(recent)
 

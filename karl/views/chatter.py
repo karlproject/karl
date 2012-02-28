@@ -404,14 +404,14 @@ def update_followed(context, request):
            }
 
 
-def following(context, request):
+def following_json(context, request):
     """ View the list of users followed by the current user.
     """
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     profiles = find_profiles(context)
     userid = authenticated_userid(request)
-    followed = []
+    following = []
     for quipper in chatter.listFollowed(userid):
         info = {}
         profile = profiles.get(quipper)
@@ -424,9 +424,19 @@ def following(context, request):
         info['userid'] = quipper
         info['fullname'] = profile.title
         info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
-        followed.append(info)
-    return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
-            'followed': followed,
+        following.append(info)
+    return {'following': following,
+            'userid': userid,
+           }
+
+def following(context, request):
+    """ View the list of users followed by the current user.
+    """
+    following = following_json(context, request)
+    return {'api':  TemplateAPI(context, request,
+                                'Followed by: %s' % following['userid']),
+            'following': following,
+            'followed': following, #BBB
             'context_tools': get_context_tools(request, selected='following'),
            }
 
