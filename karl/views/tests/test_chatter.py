@@ -669,7 +669,7 @@ class Test_community_chatter_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['recent'], [])
-        self.assertEqual(cb._community, 'testing')
+        self.assertEqual(cb._community, ('testing',))
         self.failIf(cb._names or cb._creators or cb._followed or cb._tag)
 
     def test_filled_chatterbox(self):
@@ -677,8 +677,6 @@ class Test_community_chatter_json(unittest.TestCase):
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = cb = _makeChatterbox(quips)
         site['profiles'] = testing.DummyModel()
-        site['communities'] = cf = testing.DummyModel()
-        cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -691,8 +689,6 @@ class Test_community_chatter_json(unittest.TestCase):
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = cb = _makeChatterbox(quips)
         site['profiles'] = testing.DummyModel()
-        site['communities'] = cf = testing.DummyModel()
-        cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -708,8 +704,6 @@ class Test_community_chatter_json(unittest.TestCase):
         site['profiles'] = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
-        site['communities'] = cf = testing.DummyModel()
-        cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[:20], request)
@@ -721,8 +715,6 @@ class Test_community_chatter_json(unittest.TestCase):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = cb = _makeChatterbox(quips)
         site['profiles'] = testing.DummyModel()
-        site['communities'] = cf = testing.DummyModel()
-        cf['testing'] = context = testing.DummyModel()
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest(GET={'start': 2, 'count': 5})
@@ -746,6 +738,113 @@ class Test_community_chatter(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['api'].page_title, 'Chatter: &testing')
+        self.assertEqual(info['chatter_form_url'],
+                         'http://example.com/chatter/add_chatter.html')
+        self.assertEqual(info['recent'], [])
+
+
+class Test_my_communities_chatter_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import my_communities_chatter_json
+        return my_communities_chatter_json(context, request)
+
+    def test_empty_chatterbox(self):
+        _registerSecurityPolicy('user',
+                                ['group.community:testing:members',
+                                 'group.community:other:moderators',
+                                ])
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['communities'], ['testing', 'other'])
+        self.assertEqual(info['recent'], [])
+        self.assertEqual(context._community, ('testing', 'other'))
+        self.failIf(context._names or context._creators or
+                    context._followed or context._tag)
+
+    def test_filled_chatterbox(self):
+        _registerSecurityPolicy('user', ['group.community:testing:members'])
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = context = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        _verify_quips(info['recent'], quips, request)
+
+    def test_filled_chatterbox_skips_unauthorized_private_quips(self):
+        _registerSecurityPolicy('user', ['group.community:testing:members'],
+                                permissive=False)
+        site = testing.DummyModel()
+        quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
+        site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
+
+    def test_overfilled_chatterbox(self):
+        _registerSecurityPolicy('user', ['group.community:testing:members'])
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        _verify_quips(info['recent'], quips[:20], request)
+
+    def test_filled_chatterbox_w_start_and_count(self):
+        _registerSecurityPolicy('user', ['group.community:testing:members'])
+        site = testing.DummyModel()
+        quips = []
+        for i in range(30):
+            quips.append(DummyQuip(str(i)))
+        site['chatter'] = cb = _makeChatterbox(quips)
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest(GET={'start': 2, 'count': 5})
+        info = self._callFUT(context, request)
+        _verify_quips(info['recent'], quips[2:7], request)
+
+
+class Test_my_communities_chatter(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import my_communities_chatter
+        return my_communities_chatter(context, request)
+
+    def test_empty_chatterbox(self):
+        _registerSecurityPolicy('user', ['group.community:testing:members'])
+        site = testing.DummyModel()
+        site['chatter'] = cb = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = context = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['api'].page_title, 'Chatter: My Communities')
         self.assertEqual(info['chatter_form_url'],
                          'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
@@ -879,7 +978,7 @@ def _makeChatterbox(recent=()):
         def recentWithTag(self, tag):
             self._tag = tag
             return self._recent
-        def recentWithCommunity(self, community):
+        def recentWithCommunities(self, *community):
             self._community = community
             return self._recent
 
