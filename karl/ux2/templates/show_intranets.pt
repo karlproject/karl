@@ -1,16 +1,22 @@
 <metal:block use-macro="main_template">
   <div metal:fill-slot="content">
-   
+
+
+    ${panel('status_message')}
+    ${panel('popper.actions_menu', actions=actions)} 
+
     <h1 class="kscreentitle">${layout.page_title}</h1>
 
-    <table width="70%">
-      <tr tal:repeat="intranet intranets_info">
-	<td>${intranet['title']}</td>
-	<td width="30%">
-	  <a style="padding-right: 20px" href="${intranet['edit_href']}">Edit</a>
-	  <a target="_intranet" href="${intranet['intranet_href']}">Intranet View</a>
-	</td>
-      </tr>
+    <table class="content-listing">
+      <tbody>
+        <tr tal:repeat="intranet intranets_info">
+	      <td>${intranet['title']}</td>
+	      <td width="30%">
+	        <a style="padding-right: 20px" href="${intranet['edit_href']}">Edit</a>
+	        <a target="_intranet" href="${intranet['intranet_href']}">Intranet View</a>
+	      </td>
+        </tr>
+      </tbody>
     </table>
 
   </div>
