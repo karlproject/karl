@@ -96,6 +96,9 @@ class ShowCommunityViewTests(unittest.TestCase):
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        layout.head_data = {}
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
@@ -107,6 +110,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                          resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
         self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
+        layout.add_portlet.assert_called_once_with('popper.tagbox')
 
     def test_already_member(self):
         self._register()
@@ -114,6 +118,9 @@ class ShowCommunityViewTests(unittest.TestCase):
         context.member_names = set(('userid',))
         context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        layout.head_data = {}
         karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
@@ -121,6 +128,8 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Delete', 'delete.html'),
                           ('Advanced', 'advanced.html'),
                          ])
+        layout.add_portlet.assert_called_once_with('popper.tagbox')
+
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
     def setUp(self):
