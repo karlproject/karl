@@ -1047,6 +1047,7 @@
     for="karl.models.interfaces.IProfile"
     view=".people.show_profile_view"
     permission="view_only"
+    renderer="templates/profile.pt"
     />
 
   <view
