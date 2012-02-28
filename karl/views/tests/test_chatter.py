@@ -964,6 +964,70 @@ class Test_following_json(unittest.TestCase):
                    'http://example.com/static/None/images/defaultUser.gif')
 
 
+class Test_followed_by_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import followed_by_json
+        return followed_by_json(context, request)
+
+    def test_w_parm(self):
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = pf = testing.DummyModel()
+        pf['user1'] = testing.DummyModel(title='User 1')
+        pf['user2'] = testing.DummyModel(title='User 2')
+        context._followed_by = ('user1', 'user2')
+        request = testing.DummyRequest(GET={'userid': 'other'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'other')
+        self.assertEqual(len(info['followed_by']), 2)
+        self.assertEqual(info['followed_by'][0]['userid'], 'user1')
+        self.assertEqual(info['followed_by'][0]['fullname'], 'User 1')
+        self.assertEqual(info['followed_by'][0]['url'],
+                   'http://example.com/chatter/creators.html?creators=user1')
+        self.assertEqual(info['followed_by'][0]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+        self.assertEqual(info['followed_by'][1]['userid'], 'user2')
+        self.assertEqual(info['followed_by'][1]['fullname'], 'User 2')
+        self.assertEqual(info['followed_by'][1]['url'],
+                   'http://example.com/chatter/creators.html?creators=user2')
+        self.assertEqual(info['followed_by'][1]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+
+    def test_wo_parm(self):
+        _registerSecurityPolicy('user')
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = pf = testing.DummyModel()
+        pf['user1'] = testing.DummyModel(title='User 1')
+        pf['user2'] = testing.DummyModel(title='User 2')
+        context._followed_by = ('user1', 'user2')
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'user')
+        self.assertEqual(len(info['followed_by']), 2)
+        self.assertEqual(info['followed_by'][0]['userid'], 'user1')
+        self.assertEqual(info['followed_by'][0]['fullname'], 'User 1')
+        self.assertEqual(info['followed_by'][0]['url'],
+                   'http://example.com/chatter/creators.html?creators=user1')
+        self.assertEqual(info['followed_by'][0]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+        self.assertEqual(info['followed_by'][1]['userid'], 'user2')
+        self.assertEqual(info['followed_by'][1]['fullname'], 'User 2')
+        self.assertEqual(info['followed_by'][1]['url'],
+                   'http://example.com/chatter/creators.html?creators=user2')
+        self.assertEqual(info['followed_by'][1]['image_url'],
+                   'http://example.com/static/None/images/defaultUser.gif')
+
+
 class Test_add_chatter(unittest.TestCase):
 
     def setUp(self):
@@ -1048,6 +1112,8 @@ def _makeChatterbox(recent=()):
             return self._recent
         def listFollowed(self, userid):
             return self._following
+        def listFollowing(self, userid):
+            return self._followed_by
 
     return _Chatterbox(recent)
 

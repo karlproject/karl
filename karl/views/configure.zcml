@@ -1886,6 +1886,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by_json"
+    renderer="json"
+    permission="view"
+    name="followed_by.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.following"
     renderer="templates/following.pt"
     permission="view"
