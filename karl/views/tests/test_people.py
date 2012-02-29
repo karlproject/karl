@@ -1305,6 +1305,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
+        request.layout_manager = mock.Mock()
         self.profile.set_alerts_preference("community2", 1)
         self._callFUT(self.profile, request)
 
@@ -1333,6 +1334,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
+        request.layout_manager = mock.Mock()
 
         request.params["form.cancel"] = "cancel"
         response = self._callFUT(self.profile, request)
@@ -1343,6 +1345,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
+        request.layout_manager = mock.Mock()
 
         from karl.models.interfaces import IProfile
         request.params["form.submitted"] = "submit"
@@ -1369,6 +1372,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
+        request.layout_manager = mock.Mock()
 
         request.params["form.submitted"] = "submit"
         request.params["leave_community1"] = "True"
@@ -1387,6 +1391,7 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
+        request.layout_manager = mock.Mock()
 
         request.params["form.submitted"] = "submit"
         request.params["leave_community2"] = "True"
@@ -1395,6 +1400,7 @@ class ManageCommunitiesTests(unittest.TestCase):
 
     def test_set_alert_attachments_attach(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params["form.submitted"] = "submit"
         request.params["attachments"] = "attach"
 
@@ -1404,6 +1410,7 @@ class ManageCommunitiesTests(unittest.TestCase):
 
     def test_set_alert_attachments_link(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params["form.submitted"] = "submit"
         request.params["attachments"] = "link"
 

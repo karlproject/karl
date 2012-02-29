@@ -758,10 +758,9 @@ def may_leave(userid, community):
     #           userid not in community.moderator_names
 
 def manage_communities_view(context, request):
-    assert IProfile.providedBy(context)
-
-    page_title = 'Manage Communities'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Manage Communities'
+    api = TemplateAPI(context, request, layout.page_title)
 
     users = find_users(context)
     communities_folder = find_communities(context)
