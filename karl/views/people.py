@@ -132,7 +132,7 @@ class EditProfileFormController(object):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'edit-profile')
-        self.page_title = "Edit %s" % context.title
+        request.layout_manager.layout.page_title = "Edit %s" % context.title
         photo = context.get('photo')
         if photo is not None:
             photo = SchemaFile(None, photo.__name__, photo.mimetype)
@@ -162,7 +162,8 @@ class EditProfileFormController(object):
         return fields
 
     def form_widgets(self, fields):
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         default_icon = '%s/images/defaultUser.gif' % api.static_url
         show_remove_checkbox = self.photo is not None
         widgets = {'firstname': formish.Input(empty=''),
@@ -215,7 +216,8 @@ class EditProfileFormController(object):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         if api.user_is_admin:
             return HTTPFound(location=resource_url(self.context,
                 self.request, 'admin_edit_profile.html'))
@@ -329,7 +331,8 @@ class AdminEditProfileFormController(EditProfileFormController):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
@@ -416,7 +419,7 @@ class AddUserFormController(EditProfileFormController):
         self.photo = None
         self.users = find_users(context)
         self.group_options = get_group_options(self.context)
-        self.page_title = 'Add User'
+        request.layout_manager.layout.page_title = 'Add User'
 
     def form_fields(self):
         context = self.context
@@ -462,7 +465,8 @@ class AddUserFormController(EditProfileFormController):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'

@@ -95,6 +95,7 @@ class TestEditProfileFormController(unittest.TestCase):
         self.context = context
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
         self.request = request
         self.user_info = {'groups': set()}
         request.environ['repoze.who.identity'] = self.user_info
@@ -288,6 +289,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.context = context
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
         self.request = request
         # this initializes the available groups
         karltesting.registerSettings()
@@ -506,6 +508,7 @@ class AddUserFormControllerTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
         self.request = request
         karltesting.registerSettings()
 
