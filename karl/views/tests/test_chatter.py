@@ -17,7 +17,7 @@ class Test_quip_info(unittest.TestCase):
         from karl.views.chatter import quip_info
         return quip_info(request, *quips)
 
-    def test_single(self):
+    def test_single_wo_ACL(self):
         _registerSecurityPolicy('user')
         request = testing.DummyRequest()
         site = testing.DummyModel()
@@ -34,6 +34,27 @@ class Test_quip_info(unittest.TestCase):
         self.assertEqual(info['communities'], [])
         self.assertEqual(info['tags'], [])
         self.assertEqual(info['url'], 'http://example.com/')
+        self.assertEqual(info['private'], False)
+
+    def test_single_w_ACL(self):
+        _registerSecurityPolicy('user')
+        request = testing.DummyRequest()
+        site = testing.DummyModel()
+        site['chatter'] = request.context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
+        quip = DummyQuip()
+        quip.__acl__ = [(0, 1, 2)]
+        infos = self._callFUT(request, quip)
+        self.assertEqual(len(infos), 1)
+        info = infos[0]
+        self.assertEqual(info['text'], quip.text)
+        self.assertEqual(info['creator'], quip.creator)
+        self.assertEqual(info['timeago'], '2012-02-23T20:29:47Z') # XXX zone?
+        self.assertEqual(info['names'], [])
+        self.assertEqual(info['communities'], [])
+        self.assertEqual(info['tags'], [])
+        self.assertEqual(info['url'], 'http://example.com/')
+        self.assertEqual(info['private'], True)
 
     def test_multiple(self):
         _registerSecurityPolicy('user')
