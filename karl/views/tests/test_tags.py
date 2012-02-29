@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -1012,6 +1013,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -1053,6 +1055,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['bar', 'baz']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.rename'] = 'Rename tag'
         request.POST['old_tag'] = 'foo'
         request.POST['new_tag'] = 'bar'
@@ -1072,6 +1075,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.rename'] = 'Rename tag'
 
         result = self._callFUT(context, request)
@@ -1114,6 +1118,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['bar', 'baz']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.delete'] = 'Remove tag'
         request.POST['todelete'] = 'foo'
 
@@ -1132,6 +1137,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.delete'] = 'Delete tag'
 
         result = self._callFUT(context, request)
