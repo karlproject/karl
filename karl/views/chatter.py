@@ -86,6 +86,7 @@ def quip_info(request, *quips):
                 'communities': list(quip.communities),
                 'tags': list(quip.tags),
                 'url': resource_url(quip, request),
+                'private': bool(getattr(quip, '__acl__', ())),
                }
         result.append(info)
     return result
