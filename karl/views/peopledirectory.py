@@ -291,7 +291,6 @@ def _get_mailto(context, peopledir):
 def report_view(context, request, pictures=False):
     layout = request.layout_manager.layout
     layout.section_style = 'compact'
-    layout.show_sidebar = False
 
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)

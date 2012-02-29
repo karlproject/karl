@@ -648,7 +648,6 @@ class Test_report_view(unittest.TestCase):
         self.assertEqual(info['mailto'], None)
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
@@ -663,7 +662,6 @@ class Test_report_view(unittest.TestCase):
                          'mailto:alias@karl3.example.com')
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
@@ -678,7 +676,6 @@ class Test_report_view(unittest.TestCase):
                          'mailto:alias@lists.example.com')
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_qualified_report(self):
         self._register()
@@ -846,7 +843,6 @@ class Test_picture_view(unittest.TestCase):
         self.assertEqual(info['mailto'], None)
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_qualified_report(self):
         self._register()
@@ -868,7 +864,6 @@ class Test_picture_view(unittest.TestCase):
         self.assertEqual(info['mailto'], None)
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_bad_search_text(self):
         from zope.index.text.parsetree import ParseError
@@ -892,7 +887,6 @@ class Test_picture_view(unittest.TestCase):
         self.assertEqual(info['mailto'], None)
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
@@ -907,7 +901,6 @@ class Test_picture_view(unittest.TestCase):
                          'mailto:alias@karl3.example.com')
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
@@ -922,7 +915,6 @@ class Test_picture_view(unittest.TestCase):
                          'mailto:alias@lists.example.com')
         layout = request.layout_manager.layout
         self.assertEqual(layout.section_style, 'compact')
-        self.assertEqual(layout.show_sidebar, False)
 
 
 class Test_get_search_qualifiers(unittest.TestCase):
