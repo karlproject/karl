@@ -473,8 +473,9 @@ def community_tag_users_view(context, request):
 re_tag = re.compile(r"^[a-zA-Z0-9\.\-_]+$")
 
 def manage_tags_view(context, request):
-    page_title = 'Manage Tags'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Manage Tags'
+    api = TemplateAPI(context, request, layout.page_title)
     tagger = find_tags(context)
     userid = context.__name__
     error = ''
