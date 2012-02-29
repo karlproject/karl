@@ -96,6 +96,13 @@ def status_message(context, request):
     return ''
 
 
+def error_message(context, request):
+    message = request.layout_manager.layout.error_message
+    if message:
+        return '<div class="portalErrorMessage">%s</div>' % escape(message)
+    return ''
+
+
 def global_logo(context, request):
     home_context, home_path = get_user_home(context, request)
     return {'logo_title': request.registry.settings.get('system_name', 'KARL'),

@@ -226,7 +226,7 @@ class EditProfileFormController(object):
         else:
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': True}
 
     def handle_cancel(self):
@@ -334,7 +334,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Edit User and Profile Information'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'admin_edit': True, 'is_active': self.is_active}
 
@@ -467,7 +467,7 @@ class AddUserFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Add User'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'reactivate_user': self.reactivate_user}
 

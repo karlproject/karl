@@ -18,6 +18,7 @@ from karl.utils import find_site
 
 
 class Layout(PopperLayout):
+    error_message = None
 
     def __init__(self, context, request):
         super(Layout, self).__init__(context, request)
@@ -126,7 +127,7 @@ class Layout(PopperLayout):
         # already ported to popper (eg. livesearch) or used from there (eg. jquery)
         #
         # JQuery and JQuery-UI:
-        #    jquery/jquery-1.4.4.js       
+        #    jquery/jquery-1.4.4.js
         #    min/jquery-ui-1.9m3.karl.js
         #
         # Additional JQuery-UI:
