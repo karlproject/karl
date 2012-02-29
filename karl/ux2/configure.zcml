@@ -24,7 +24,7 @@
   <bc:layout
     layout=".layout.ProfileLayout"
     template="bottlecap.layouts.popper:templates/popper_layout.pt"
-    containment="karl.models.interfaces.IProfile"
+    containment="karl.models.interfaces.IProfiles"
   />
 
   <!-- 

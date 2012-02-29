@@ -11,6 +11,8 @@ from pyramid.security import authenticated_userid
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 
+from karl.consts import countries
+from karl.consts import cultures
 from karl.security.policy import VIEW
 from karl.utils import find_community
 from karl.utils import find_intranet
@@ -18,7 +20,9 @@ from karl.utils import find_site
 
 
 class Layout(PopperLayout):
+    countries = countries
     error_message = None
+    cultures = cultures
 
     def __init__(self, context, request):
         super(Layout, self).__init__(context, request)
