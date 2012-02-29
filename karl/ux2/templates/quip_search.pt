@@ -25,7 +25,7 @@
             </label>
             <label class="radio" for="show-only-communities">
             <input id="show-only-communities" class="noborder" type="radio"
-                   value="${layout.here_url}" name="showonly">
+                   value="${layout.here_url}/my_communities.html" name="showonly">
               Posts from my communities
             </label>
           </div>

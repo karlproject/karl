@@ -1878,10 +1878,34 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.following_json"
+    renderer="json"
+    permission="view"
+    name="following.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by_json"
+    renderer="json"
+    permission="view"
+    name="followed_by.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.following"
     renderer="templates/following.pt"
     permission="view"
     name="following.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by"
+    renderer="templates/followed_by.pt"
+    permission="view"
+    name="followed_by.html"
     />
 
   <view

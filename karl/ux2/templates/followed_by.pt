@@ -11,7 +11,7 @@
     ${panel('status_message')}
 
     <div id="chatter-followers" class="pushdownContent">
-      <div class="panel-item clearfix" tal:repeat="quipper following['following']">
+      <div class="panel-item clearfix" tal:repeat="quipper followed_by['followed_by']">
         <div class="panel-item-content">
           <div>
             <a href="${quipper['url']}">

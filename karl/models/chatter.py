@@ -88,6 +88,13 @@ class Chatterbox(Persistent):
         """
         self._followed[userid] = tuple(followed)
 
+    def listFollowing(self, userid):
+        """ See IChatterbox.
+        """
+        for name, following in self._followed.items():
+            if userid in following:
+                yield name
+
     def recent(self):
         """ See IChatterbox.
         """

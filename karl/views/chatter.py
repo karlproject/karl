@@ -86,6 +86,7 @@ def quip_info(request, *quips):
                 'communities': list(quip.communities),
                 'tags': list(quip.tags),
                 'url': resource_url(quip, request),
+                'private': bool(getattr(quip, '__acl__', ())),
                }
         result.append(info)
     return result
@@ -405,12 +406,19 @@ def update_followed(context, request):
 
 
 def following_json(context, request):
-    """ View the list of users followed by the current user.
+    """ View the list of users whom a given user is following.
+
+    Query string may include:
+
+    - 'userid':  the user for whom to enumerate followed users.  If not passed,
+                 defaults to the current user.
     """
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     profiles = find_profiles(context)
-    userid = authenticated_userid(request)
+    userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
     following = []
     for quipper in chatter.listFollowed(userid):
         info = {}
@@ -429,14 +437,63 @@ def following_json(context, request):
             'userid': userid,
            }
 
+
+def followed_by_json(context, request):
+    """ View the list of users who follow a given user.
+
+    Query string may include:
+
+    - 'userid':  the user for whom to enumerate followers.  If not passed,
+                 defaults to the current user.
+    """
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
+    following = []
+    for quipper in chatter.listFollowing(userid):
+        info = {}
+        profile = profiles.get(quipper)
+        photo = profile and profile.get('photo') or None
+        if photo is not None:
+            photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
+        else:
+            photo_url = get_static_url(request) + "/images/defaultUser.gif"
+        info['image_url'] = photo_url
+        info['userid'] = quipper
+        info['fullname'] = profile.title
+        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
+        following.append(info)
+    return {'followed_by': following,
+            'userid': userid,
+           }
+
 def following(context, request):
     """ View the list of users followed by the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.followers')
     following = following_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Followed by: %s' % following['userid']),
             'following': following,
-            'followed': following, #BBB
+            'context_tools': get_context_tools(request, selected='following'),
+           }
+
+
+def followed_by(context, request):
+    """ View the list of users following the current user.
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.followers')
+    followed_by = followed_by_json(context, request)
+    return {'api':  TemplateAPI(context, request,
+                                'Following: %s' % followed_by['userid']),
+            'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='following'),
            }
 
