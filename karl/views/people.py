@@ -589,7 +589,6 @@ def show_profile_view(context, request):
     """Show a profile with actions if the current user"""
     layout = request.layout_manager.layout
     layout.page_title = 'View Profile'
-    layout.section_style = 'none'
     api = TemplateAPI(context, request, layout.page_title)
 
     # Create display values from model object
@@ -741,7 +740,6 @@ def recent_content_view(context, request):
 
     layout = request.layout_manager.layout
     layout.page_title = "Content Added Recently by %s" % context.title
-    layout.section_style = 'none'
     api = TemplateAPI(context, request, layout.page_title)
     return dict(api=api,
              batch_info=batch,

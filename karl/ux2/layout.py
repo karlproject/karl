@@ -177,6 +177,10 @@ class Layout(PopperLayout):
         return self._microtemplates
 
 
+class ProfileLayout(Layout):
+    section_style = 'none'
+
+
 # FIXME Use pkg_resources
 import os
 _here = os.path.dirname(__file__)

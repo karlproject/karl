@@ -918,7 +918,6 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
-        self.assertEqual(request.layout_manager.layout.section_style, 'none')
 
     def test_not_editable(self):
         self._registerTagbox()
@@ -1218,7 +1217,6 @@ class RecentContentTests(unittest.TestCase):
         self.assertEquals(len(response['recent_items']), 0)
         self.assertFalse(response['batch_info']['batching_required'])
         self.assertEqual(layout.page_title, 'Content Added Recently by Z')
-        self.assertEqual(layout.section_style, 'none')
 
     def test_with_content(self):
         search_args = {}
@@ -1250,7 +1248,6 @@ class RecentContentTests(unittest.TestCase):
         self.assertEquals(response['recent_items'][1].context.title, 'doc2')
         self.assertFalse(response['batch_info']['batching_required'])
         self.assertEqual(layout.page_title, 'Content Added Recently by Z')
-        self.assertEqual(layout.section_style, 'none')
 
 class ManageCommunitiesTests(unittest.TestCase):
     def setUp(self):

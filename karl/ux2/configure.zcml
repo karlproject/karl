@@ -20,6 +20,13 @@
     template="bottlecap.layouts.popper:templates/popper_layout.pt"
   />
 
+  <!-- User profile layout -->
+  <bc:layout
+    layout=".layout.ProfileLayout"
+    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    containment="karl.models.interfaces.IProfile"
+  />
+
   <!-- 
       Other layouts can also be defined which use different main templates and
       are used in different parts of the site.  An example might be to define a
