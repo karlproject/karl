@@ -253,3 +253,7 @@ def tagbox(context, request):
 def quip_search(context, request):
     return {}
 
+
+def followers(context, request):
+    return {}
+

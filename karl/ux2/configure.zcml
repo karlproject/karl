@@ -131,6 +131,12 @@
     renderer="templates/quip_search.pt"
     />
 
+  <bc:panel
+    name="chatter.followers"
+    panel=".panels.followers"
+    renderer="templates/followers.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
