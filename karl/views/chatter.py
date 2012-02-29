@@ -472,11 +472,27 @@ def followed_by_json(context, request):
 def following(context, request):
     """ View the list of users followed by the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.followers')
     following = following_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Followed by: %s' % following['userid']),
             'following': following,
-            'followed': following, #BBB
+            'context_tools': get_context_tools(request, selected='following'),
+           }
+
+
+def followed_by(context, request):
+    """ View the list of users following the current user.
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.followers')
+    followed_by = followed_by_json(context, request)
+    return {'api':  TemplateAPI(context, request,
+                                'Following: %s' % followed_by['userid']),
+            'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='following'),
            }
 

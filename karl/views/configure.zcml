@@ -1902,6 +1902,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by"
+    renderer="templates/followed_by.pt"
+    permission="view"
+    name="followed_by.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.add_chatter"
     permission="create"
     name="add_chatter.html"
