@@ -54,8 +54,11 @@
            height="15" width="15" alt="Up to"/> Back to ${backto['title']} </a>
   </metal:backto>
 
-  <div metal:define-macro="byline" class="kbyline">Posted
-    by <a href="${byline_info.author_url}">${byline_info.author_name}</a>
-    on ${byline_info.posted_date}</div>
+  <small metal:define-macro="byline">
+    <time datetime="${byline_info.posted_date_compact}" pubdate="">${byline_info.posted_date}</time>
+    by <a href="#" title="Posts by ${byline_info.author_name}" rel="author">
+      ${byline_info.author_name}
+    </a>.
+  </small>
 
 </metal:macros>

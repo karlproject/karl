@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 from pyramid import testing
 from karl import testing as karltesting
 from datetime import datetime
@@ -160,13 +161,28 @@ class TestBylineInfo(unittest.TestCase):
     def test_posted_date(self):
         from karl.utilities.interfaces import IKarlDates
         context = DummyContext()
-        d1 = 'Wednesday, January 28, 2009 08:32 AM'
-        def dummy(date, flavor):
-            return d1
-        karltesting.registerUtility(dummy, IKarlDates)
         request = testing.DummyRequest()
+        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        karltesting.registerUtility(dummy, IKarlDates)
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.posted_date, context.posted_date)
+        self.assertEqual(adapter.posted_date, mock.sentinel.SOMEDATE)
+        dummy.assert_called_once_with(
+            datetime(2009, 1, 28, 14, 32, 0, 928857),
+            'longform',
+            )
+        
+    def test_posted_date_compact(self):
+        from karl.utilities.interfaces import IKarlDates
+        context = DummyContext()
+        request = testing.DummyRequest()
+        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        karltesting.registerUtility(dummy, IKarlDates)
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.posted_date_compact, mock.sentinel.SOMEDATE)
+        dummy.assert_called_once_with(
+            datetime(2009, 1, 28, 14, 32, 0, 928857),
+            'compact',
+            )
 
 
 class TestBlogEntryAlert(unittest.TestCase):

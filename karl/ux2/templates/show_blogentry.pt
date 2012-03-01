@@ -11,9 +11,10 @@
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)} 
 
-    <h1 class="kscreentitle">${layout.page_title}</h1>
-
-    <div metal:use-macro="layout.macros['byline']"/>
+    <header>
+      <h1>${layout.page_title}</h1>
+      <div metal:use-macro="layout.macros['byline']"/>
+    </header>
 
     <div class="kbody" tal:condition="context.text">
       <span tal:replace="structure context.text"/>

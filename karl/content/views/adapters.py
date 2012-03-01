@@ -212,6 +212,7 @@ class BylineInfo(object):
     _author_url = None
     _author_name = None
     _posted_date = None
+    _posted_date_compact = None
 
     def __init__(self, context, request):
         self.context = context
@@ -240,6 +241,14 @@ class BylineInfo(object):
             kd = getUtility(IKarlDates)
             self._posted_date = kd(self.context.created, 'longform')
         return self._posted_date
+
+    @property
+    def posted_date_compact(self):
+        if self._posted_date_compact is None:
+            kd = getUtility(IKarlDates)
+            self._posted_date_compact = kd(self.context.created, 'compact')
+        return self._posted_date_compact
+
 
 class Alert(object):
     """Base adapter class for generating emails from alerts.
