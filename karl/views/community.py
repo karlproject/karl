@@ -320,7 +320,9 @@ class AddCommunityFormController(object):
         return widgets
 
     def __call__(self):
-        self.request.layout_manager.layout.page_title = 'Add Community'
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Community'
+        layout.section_style = None
         api = TemplateAPI(self.context, self.request, 'Add Community')
         return {'api':api}
 
