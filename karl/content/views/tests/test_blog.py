@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from pyramid import testing
 
@@ -296,6 +297,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
+        request.layout_manager = mock.Mock()
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -327,6 +329,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         alsoProvides(context, IBlogEntry)
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
+        request.layout_manager = mock.Mock()
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -356,6 +359,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
+        request.layout_manager = mock.Mock()
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface

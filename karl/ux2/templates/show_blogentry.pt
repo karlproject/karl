@@ -15,8 +15,6 @@
 
     <div metal:use-macro="layout.macros['byline']"/>
 
-    <div metal:use-macro="layout.macros['list_tags']"/>
-
     <div class="kbody" tal:condition="context.text">
       <span tal:replace="structure context.text"/>
     </div>

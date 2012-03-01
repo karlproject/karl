@@ -280,6 +280,10 @@ def show_blogentry_view(context, request):
             enable_imagedrawer_upload = True,
             )
 
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('popper.tagbox')
+
     return dict(
         api=api,
         actions=actions,
