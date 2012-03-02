@@ -167,10 +167,10 @@ class TestBylineInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date, mock.sentinel.SOMEDATE)
         dummy.assert_called_once_with(
-            datetime(2009, 1, 28, 14, 32, 0, 928857),
+            datetime(2009, 1, 28, 13, 32, 0, 928857),
             'longform',
             )
-        
+
     def test_posted_date_compact(self):
         from karl.utilities.interfaces import IKarlDates
         context = DummyContext()
@@ -180,7 +180,7 @@ class TestBylineInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date_compact, mock.sentinel.SOMEDATE)
         dummy.assert_called_once_with(
-            datetime(2009, 1, 28, 14, 32, 0, 928857),
+            datetime(2009, 1, 28, 13, 32, 0, 928857),
             'compact',
             )
 
@@ -697,7 +697,7 @@ class DummyContext(testing.DummyModel):
         profile.title = 'Dummy Profile'
         parent['profiles'] = profiles = testing.DummyModel()
         profiles[u'dummy'] = profile
-        self.created = datetime.fromtimestamp(self.created_timestamp)
+        self.created = datetime.utcfromtimestamp(self.created_timestamp)
 
 malformed_text = """<p>In oil-rich Nigeria, Africa's most populous nation,
 where watchdog
