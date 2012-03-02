@@ -11,7 +11,7 @@
         <ul id="global-nav" class="pushdown">
             <li tal:repeat="item nav_menu"
                     tal:attributes="class item.selected">
-                <a href="${item.url}">${item.title}</a>
+                <a href="${item.url}" id="${item.css_id}">${item.title}</a>
             </li>
             <li><a id="radar" href="#">Radar <span class="messageCounter">7</span></a></li>
             <li>

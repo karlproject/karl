@@ -18,10 +18,11 @@ PROFILE_ICON_SIZE = (15, 15)
 
 def global_nav(context, request):
 
-    def menu_item(title, url):
+    def menu_item(title, url, css_id=None):
         selected = request.resource_url(context).startswith(url)
         return dict(title=title,
                     url=url,
+                    css_id=css_id,
                     selected=selected and 'selected' or None)
 
     layout = request.layout_manager.layout
@@ -43,7 +44,7 @@ def global_nav(context, request):
              request.resource_url(site, 'tagcloud.html')))
     chatter = find_chatter(site)
     menu_items.append(menu_item("Chatter",
-        request.resource_url(chatter)))
+        request.resource_url(chatter), css_id='chatter'))
     return {'nav_menu': menu_items}
 
 
