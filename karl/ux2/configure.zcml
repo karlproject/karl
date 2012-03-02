@@ -64,7 +64,7 @@
   <bc:panel
     name="popper.global_nav"
     panel=".panels.global_nav"
-    renderer="bottlecap.layouts.popper:templates/global_nav.pt"
+    renderer="templates/global_nav.pt"
   />
 
   <bc:panel

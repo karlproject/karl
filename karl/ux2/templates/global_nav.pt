@@ -1,0 +1,43 @@
+<nav id="bcpanel-global-nav">
+    <tal:comment condition="layout.devmode">
+    <!--
+    This is the global-nav panel per
+    https://agendaless.mybalsamiq.com/projects/popper/Popper+Overview
+    Filename is bottlecap/layouts/popper/templates/global_nav.pt
+    -->
+    </tal:comment>
+    <div data-quickpanel="pushdown" class="topNavIconWrapper">
+        <h2 id="navigation-toggle" class="pushdown-toggle ir" data-toggle="pushdown">Navigation</h2>
+        <ul id="global-nav" class="pushdown">
+            <li tal:repeat="item nav_menu"
+                    tal:attributes="class item.selected">
+                <a href="${item.url}">${item.title}</a>
+            </li>
+            <li><a id="radar" href="#">Radar <span class="messageCounter">7</span></a></li>
+            <li>
+                <a href="#" class="dropdown-toggle moreToggle" data-toggle="dropdown">More</a>
+                <div class="dropdown-menu">
+                    <figure>
+                        <img src="http://lorempixum.com/64/64/" alt="" />
+                    </figure>
+                    <p>The dropdowns can contain any information you
+                    want, including images, lists and plain text.</p>
+                    <ul>
+                        <li><a href="#">Cursus Ridiculus Nibh</a></li>
+                        <li><a href="#">Pellentesque Ligula</a></li>
+                        <li><a href="#">Dapibus Etiam Sollicitudin Tristique</a></li>
+                        <li><a href="#">Cursus</a></li>
+                    </ul>
+                    <p>Morbi leo risus, porta ac consectetur ac,
+                    vestibulum at eros. <a href="#">Curabitur</a> blandit tempus
+                    porttitor. Cras mattis consectetur purus sit amet
+                    fermentum. Aenean lacinia bibendum nulla sed
+                    consectetur.</p>
+                    <div class="dropdown-footer">
+                        The footer area of the dropdown.
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
