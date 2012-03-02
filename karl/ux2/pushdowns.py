@@ -56,9 +56,9 @@ def chatter_ajax_view(context, request):
     results['ts'] = now_iso
     ts_iso = request.params.get('ts', '')
     # template provision
+    layout = request.layout_manager.layout
     if request.params.get('needsTemplate', 'false') in ('true', 'True'):
         # We need the template. So, let's fetch it.
-        layout = request.layout_manager.layout
         results['microtemplate'] = layout.microtemplates['chatter']
     # Sometimes there is no need for an update. The server can just return
     # empty data. A condition is that a ts parameter is sent to us. The
@@ -69,6 +69,7 @@ def chatter_ajax_view(context, request):
     else:
         # Fetch the data
         results['data'] = {
+            'chatter_url': layout.chatter_url,
             'streams': [{
                 'class': 'your-stream',
                 'title': 'Direct messages',
