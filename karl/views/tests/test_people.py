@@ -921,6 +921,10 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.add_portlet.mock_calls, [
+            mock.call('popper.tagbox'),
+            mock.call('my_communities', [], None)])
 
     def test_not_editable(self):
         self._registerTagbox()
