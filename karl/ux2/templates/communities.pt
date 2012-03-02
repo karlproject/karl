@@ -36,6 +36,9 @@
                             <span tal:condition="community.moderator" 
                                 metal:use-macro="layout.macros['moderator_badge']"/>
                         </p>
+                        <p>
+                          ${community.description}
+                        </p>
                         <p class="footer-line">
                             <span>${community.number_of_members} Member(s)</span>
                             <span> | </span>
