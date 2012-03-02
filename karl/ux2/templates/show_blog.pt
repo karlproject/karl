@@ -9,7 +9,6 @@
 
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)} 
-    <h1 class="kscreentitle">${layout.page_title}</h1>
 
     <div class="kbody">
 		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
