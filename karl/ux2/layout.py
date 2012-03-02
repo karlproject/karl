@@ -17,6 +17,7 @@ from karl.security.policy import VIEW
 from karl.utils import find_community
 from karl.utils import find_intranet
 from karl.utils import find_site
+from karl.utils import find_chatter
 
 
 class Layout(PopperLayout):
@@ -33,6 +34,8 @@ class Layout(PopperLayout):
         self.current_intranet = find_intranet(context)
         self.people_url = app_url + '/' + settings.get('people_path', 'people')
         self.site = find_site(context)
+        chatter = find_chatter(context)
+        self.chatter_url = resource_url(chatter, request)
         self.project_name = settings.get('system_name', 'KARL')
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
@@ -85,6 +88,7 @@ class Layout(PopperLayout):
         head_data.update({
             # Add some more stuff to the head_data factorized by popper
             'karl_static_url': self.static(''),
+            'chatter_url': self.chatter_url,
         })
         return head_data
 

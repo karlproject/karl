@@ -10,6 +10,7 @@ from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.utils import find_community
+from karl.utils import find_chatter
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 
@@ -17,10 +18,11 @@ PROFILE_ICON_SIZE = (15, 15)
 
 def global_nav(context, request):
 
-    def menu_item(title, url):
+    def menu_item(title, url, css_id=None):
         selected = request.resource_url(context).startswith(url)
         return dict(title=title,
                     url=url,
+                    css_id=css_id,
                     selected=selected and 'selected' or None)
 
     layout = request.layout_manager.layout
@@ -40,6 +42,9 @@ def global_nav(context, request):
     if layout.user_is_staff:
         menu_items.append(menu_item("Tags",
              request.resource_url(site, 'tagcloud.html')))
+    chatter = find_chatter(site)
+    menu_items.append(menu_item("Chatter",
+        request.resource_url(chatter), css_id='chatter'))
     return {'nav_menu': menu_items}
 
 
