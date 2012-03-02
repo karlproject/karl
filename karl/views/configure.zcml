@@ -1105,7 +1105,7 @@
      controller=".members.AddExistingUserFormController"
      name="add_existing.html"
      permission="moderate"
-     renderer=".forms:templates/community_formish_form.pt">
+     renderer="karl.views.forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1125,7 +1125,7 @@
      controller=".members.InviteNewUsersFormController"
      name="invite_new.html"
      permission="moderate"
-     renderer=".forms:templates/community_formish_form.pt">
+     renderer="karl.views.forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1143,7 +1143,7 @@
   <formish:form
      controller=".members.AcceptInvitationFormController"
      for="karl.models.interfaces.IInvitation"
-     renderer=".forms:templates/accept_invitation.pt">
+     renderer="karl.views.forms:templates/accept_invitation.pt">
 
      <formish:action
        name="submit"
