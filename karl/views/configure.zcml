@@ -1870,6 +1870,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.discover_community_members_json"
+    renderer="json"
+    permission="view"
+    name="discover_community_members.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.update_followed"
     renderer="templates/update_followed.pt"
     permission="view"

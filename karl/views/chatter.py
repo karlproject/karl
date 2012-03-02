@@ -29,6 +29,7 @@ from pyramid.url import resource_url
 
 from karl.utils import find_chatter
 from karl.utils import find_profiles
+from karl.utils import find_users
 from karl.utilities.image import thumb_url
 from karl.views.api import TemplateAPI
 from karl.views.communities import get_community_groups
@@ -137,7 +138,6 @@ def all_chatter_json(context, request):
                 value.
     """
     chatter = find_chatter(context)
-    userid = authenticated_userid(request)
     return {'recent': _do_slice(chatter.recent(), request),
            }
 
@@ -382,6 +382,30 @@ def my_communities_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     return info
+
+
+def discover_community_members_json(context, request):
+    """ Return users who share a community with the given user.
+
+    Query string may include:
+
+    - 'userid':  the user whose communities we enumerate (defaults to the
+                 current user).
+    """
+    users = find_users(context)
+    userid = request.GET.get('userid', None)
+    if userid is None:
+        userid = authenticated_userid(request)
+        principals = effective_principals(request)
+        communities = [x[0] for x in get_community_groups(principals)]
+    else:
+        info = users.get(userid)
+        communities = [x[0] for x in get_community_groups(info['groups'])]
+    c_groups = [(x, users.users_in_group('group.community:%s:members' % x))
+                    for x in communities]
+    return {'userid': userid,
+            'members': dict(c_groups),
+           }
 
 
 def update_followed(context, request):

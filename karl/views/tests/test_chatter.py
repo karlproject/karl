@@ -871,6 +871,77 @@ class Test_my_communities_chatter(unittest.TestCase):
         self.assertEqual(info['recent'], [])
 
 
+class Test_discover_community_members_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import discover_community_members_json
+        return discover_community_members_json(context, request)
+
+    def test_GET_wo_parms(self):
+        _registerSecurityPolicy('user',
+                                ['group.community:testing:members',
+                                 'group.community:other:members',
+                                 'group.community:other:moderators',
+                                ])
+        MEMBERS = {
+            'group.community:testing:members': ['user', 'testing1', 'testing2'],
+            'group.community:other:members': ['user', 'other1'],
+        }
+        site = testing.DummyModel()
+        uf = site.users = testing.DummyModel()
+        def _users_in_group(group):
+            return MEMBERS.get(group, [])
+        uf.users_in_group = _users_in_group
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = testing.DummyModel()
+        cf['other'] = testing.DummyModel()
+        request = testing.DummyRequest()
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'user')
+        self.assertEqual(info['members'],
+                         {'testing': ['user', 'testing1', 'testing2'],
+                          'other': ['user', 'other1'],
+                         })
+
+    def test_GET_w_parms(self):
+        MEMBERS = {
+            'group.community:testing:members': ['user', 'testing1', 'testing2'],
+            'group.community:other:members': ['user', 'other1'],
+        }
+        site = testing.DummyModel()
+        uf = site.users = testing.DummyModel(groups=MEMBERS)
+        def _get(userid):
+            if userid == 'user':
+                return {'groups': ['group.community:testing:members',
+                                   'group.community:other:moderators']}
+            raise KeyError
+        uf.get = _get
+        def _users_in_group(group):
+            return MEMBERS.get(group, [])
+        uf.users_in_group = _users_in_group
+        site['chatter'] = context = _makeChatterbox()
+        site['profiles'] = testing.DummyModel()
+        site['communities'] = cf = testing.DummyModel()
+        cf['testing'] = testing.DummyModel()
+        cf['other'] = testing.DummyModel()
+        request = testing.DummyRequest(GET={'userid': 'user'})
+        info = self._callFUT(context, request)
+        self.assertEqual(info['userid'], 'user')
+        self.assertEqual(info['members'],
+                         {'testing': ['user', 'testing1', 'testing2'],
+                          'other': ['user', 'other1'],
+                         })
+
+
 class Test_update_followed(unittest.TestCase):
 
     def setUp(self):
