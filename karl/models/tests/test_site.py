@@ -187,6 +187,7 @@ class SiteTests(unittest.TestCase):
         self.failUnless('profiles' in site)
         self.failUnless(hasattr(site, 'catalog'))
         self.failUnless('people' in site)
+        self.failUnless('chatter' in site)
 
     def test_no_repo(self):
         self.config.add_settings({})
