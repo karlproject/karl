@@ -17,7 +17,6 @@
 """Tests of karl.views.peopledirectory
 """
 
-import mock
 import unittest
 
 from pyramid import testing
