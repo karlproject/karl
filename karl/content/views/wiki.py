@@ -28,7 +28,6 @@ from zope.component import queryUtility
 from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
-from pyramid.renderers import render_to_response
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
