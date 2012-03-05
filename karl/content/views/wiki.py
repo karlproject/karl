@@ -237,14 +237,14 @@ def get_wikitoc_data(context, request):
 
 
 def show_wikipage_view(context, request):
-
+    layout = request.layout_manager.layout
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
-        page_title = '%s Community Wiki Page' % community.title
+        layout.page_title = '%s Community Wiki Page' % community.title
         backto = False
     else:
-        page_title = context.title
+        layout.page_title = context.title
         backto = {
             'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
@@ -264,7 +264,7 @@ def show_wikipage_view(context, request):
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
-    api = TemplateAPI(context, request, page_title)
+    api = TemplateAPI(context, request, layout.page_title)
 
     client_json_data = convert_to_script(dict(
         tagbox = get_tags_client_data(context, request),

@@ -151,6 +151,17 @@
     renderer="templates/followers.pt"
     />
 
+  <bc:panel
+    name="wiki_lock"
+    panel=".panels.wiki_lock"
+    renderer="templates/wiki_lock.pt"
+    />
+
+  <bc:panel
+    name="page_title"
+    renderer="templates/page_title.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"

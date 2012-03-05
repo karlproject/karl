@@ -269,3 +269,6 @@ def quip_search(context, request):
 def followers(context, request):
     return {}
 
+
+def wiki_lock(context, request, lock_info):
+    return {'lock_info': lock_info}

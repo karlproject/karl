@@ -65,10 +65,14 @@ class Layout(PopperLayout):
     def static(self, fname):
         return self.request.static_url('karl.views:static/%s' % fname)
 
+    @reify
+    def community(self):
+        return find_community(self.context)
+
     @apply
     def section_title():
         def getter(self):
-            community = find_community(self.context)
+            community = self.community
             if community:
                 title = community.title
             else:
@@ -80,6 +84,16 @@ class Layout(PopperLayout):
             self.__dict__['title'] = title  # reify
 
         return property(getter, setter)
+
+    def is_private_in_public_community(self, context=None):
+        if context is None:
+            context = self.context
+        community = self.community
+        if not community or context is community:
+            return False
+        if getattr(community, 'security_state', 'inherits') == 'public':
+            return getattr(context, 'security_state', 'inherits') == 'private'
+        return False
 
     @reify
     def head_data(self):
