@@ -370,8 +370,9 @@ class AddBlogEntryFormController(object):
 
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request,
-                          'Add Blog Entry')
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Blog Entry'
+        api = TemplateAPI(self.context, self.request, layout.page_title)
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )

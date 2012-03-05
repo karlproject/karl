@@ -445,6 +445,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         request.registry.settings = {}
+        request.layout_manager = mock.Mock()
         return request
 
     def _makeContext(self):
@@ -506,6 +507,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
+        self.assertEqual(request.layout_manager.layout.page_title,
+                         'Add Blog Entry')
 
     def test_handle_cancel(self):
         context = self._makeContext()
