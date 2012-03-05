@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 from pyramid import testing
 
@@ -33,15 +34,18 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest({'came_from':'/login.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
         self.assertEqual(renderer.came_from, 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
+        request.layout_manager.use_layout.assert_called_once_with('anonymous')
 
     def test_GET_came_from_endswith_login_html_absolute(self):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/login.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
@@ -50,6 +54,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_endswith_logout_html_relative(self):
         request = testing.DummyRequest({'came_from':'/logout.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
@@ -59,6 +64,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_logout_html_absolute(self):
         request = testing.DummyRequest({'came_from':
                                             'http://example.com/logout.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
@@ -67,6 +73,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_other_relative(self):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
@@ -77,6 +84,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_other_absolute(self):
         request = testing.DummyRequest({'came_from':
                                          'http://example.com/somewhere.html'})
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
@@ -86,6 +94,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_forget_headers_when_auth_tkt_not_None(self):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
+        request.layout_manager = mock.Mock()
         plugin = DummyAuthenticationPlugin()
         request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
         context = testing.DummyModel()
@@ -100,6 +109,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_no_login_in_form(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['password'] = 'password'
         context = testing.DummyModel()
@@ -110,6 +120,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_no_password_in_form(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         context = testing.DummyModel()
@@ -125,6 +136,7 @@ class TestLoginView(unittest.TestCase):
         except ImportError: # Python < 2.6
             from cgi import parse_qsl
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -145,6 +157,7 @@ class TestLoginView(unittest.TestCase):
         except ImportError: # Python < 2.6
             from cgi import parse_qsl
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -174,6 +187,7 @@ class TestLoginView(unittest.TestCase):
         from datetime import datetime
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -213,6 +227,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_w_plugins_impostor_hit_w_came_from_no_profile(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -253,6 +268,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_w_zodb_hit_w_max_age(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -290,6 +306,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_w_zodb_hit_w_max_age_unicode(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
@@ -327,6 +344,7 @@ class TestLoginView(unittest.TestCase):
     def test_POST_w_zodb_hit_w_max_age_no_auth_tkt_plugin(self):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'

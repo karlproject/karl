@@ -40,7 +40,7 @@ def _fixup_came_from(request, came_from):
     return came_from
 
 def login_view(context, request):
-
+    request.layout_manager.use_layout('anonymous')
     plugins = request.environ.get('repoze.who.plugins', {})
     auth_tkt = plugins.get('auth_tkt')
 
