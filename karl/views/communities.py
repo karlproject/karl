@@ -150,7 +150,7 @@ def _show_communities_view_helper(context,
             'preferred_communities': preferred_communities, # deprecated in ux2
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
-            'qualifiers': qualifiers,
+            'qualifiers': qualifiers,   # deprecated in ux2
             'error': error,
            }
 

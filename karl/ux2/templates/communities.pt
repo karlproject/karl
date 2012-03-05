@@ -8,8 +8,6 @@
         <h1>Community Listing</h1>
     </header>
 
-    <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
-
     <div tal:condition="error" tal:content="error" />
 
     <div class="contentText">
