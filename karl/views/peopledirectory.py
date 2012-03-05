@@ -723,10 +723,12 @@ class AddBase(object):
     def __call__(self):
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
+        layout.page_title = self.page_title
         api = TemplateAPI(context, request)
-        return {'api':api,
-                'actions': [],
-                'page_title': self.page_title,
+        return {'api':api,   # deprecated in ux2
+                'actions': [],   # deprecated in ux2
+                'page_title': self.page_title,   # deprecated in ux2
                 }
 
     def handle_cancel(self):
