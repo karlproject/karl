@@ -248,7 +248,6 @@ class TestShowWikitocView(unittest.TestCase):
         return show_wikitoc_view(context, request)
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -261,8 +260,6 @@ class TestShowWikitocView(unittest.TestCase):
 
     def test_frontpage(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikitoc.pt')
         context = DummyWikiPage()
         context.__name__ = 'front_page'
         context.title = 'Page'
@@ -272,14 +269,18 @@ class TestShowWikitocView(unittest.TestCase):
         context.__parent__.catalog = DummyCatalog()
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 0)
-        self.assertEqual(renderer.backto, False)
-        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+        self.assertEqual(len(response['actions']), 0)
+        self.assertEqual(response['backto'], False)
+        self.assertEqual(response['head_data'],
+            '<script type="text/javascript">\nwindow._karl_client_data = '
+            '{"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": '
+            '[], "modified": "2011-08-20T00:00:00", "author_name": "", '
+            '"created": "2011-08-20T00:00:00", "title": "", "id": '
+            '"id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n'
+            '</script>')
 
     def test_otherpage(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikitoc.pt')
         context = DummyWikiPage(title='Other Page')
         context.__name__ = 'other_page'
         from karl.testing import DummyCommunity
@@ -290,12 +291,18 @@ class TestShowWikitocView(unittest.TestCase):
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 0)
-        self.assertEqual(renderer.backto, {
+        self.assertEqual(len(response['actions']), 0)
+        self.assertEqual(response['backto'], {
             'href': 'http://example.com/communities/community/',
             'title': u'Dummy Communit\xe0',
             })
-        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+        self.assertEqual(response['head_data'],
+            '<script type="text/javascript">\nwindow._karl_client_data = '
+            '{"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": '
+            '[], "modified": "2011-08-20T00:00:00", "author_name": "", '
+            '"created": "2011-08-20T00:00:00", "title": "", "id": '
+            '"id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n'
+            '</script>')
 
 
 class TestEditWikiPageFormController(unittest.TestCase):

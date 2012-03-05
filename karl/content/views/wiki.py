@@ -350,16 +350,13 @@ def show_wikitoc_view(context, request):
     repo = find_repo(context)
     show_trash = repo is not None and has_permission('edit', context, request)
 
-    return render_to_response(
-        'templates/show_wikitoc.pt',
-        dict(api=api,
-             actions=actions,
-             head_data=client_json_data,
-             feed_url=feed_url,
-             backto=backto,
-             show_trash=show_trash),
-        request = request,
-        )
+    return dict(api=api,
+         actions=actions,
+         head_data=client_json_data,
+         feed_url=feed_url,
+         backto=backto,
+         show_trash=show_trash)
+
 
 class EditWikiPageFormController(object):
     def __init__(self, context, request):
