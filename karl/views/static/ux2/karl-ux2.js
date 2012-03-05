@@ -1,17 +1,27 @@
 
+/*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
+/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 80, indent: 4 */
+/*jslint sub: true */
+
+/*globals window navigator document console setTimeout $ */
 
 (function ($) {
 
-  "use strict";
+    "use strict";
 
-	$(function () {
-		$('#tagbox').tagbox({
-			prevals: window.head_data.panel_data.tagbox,
-			validateRegexp: "^[a-zA-Z0-9\-\._]+$",
-			searchTagURL: window.head_data.context_url + 'jquery_tag_search',
-			addTagURL: window.head_data.context_url + 'jquery_tag_add',
-			delTagURL: window.head_data.context_url + 'jquery_tag_del'
-		});
-	});
+    $(function () {
+        var head_data = window.head_data || {};
+        // need urls
+        var appUrl = window.head_data.app_url;
+
+        $('#tagbox').tagbox({
+            prevals: window.head_data.panel_data.tagbox,
+            validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+            searchTagURL: window.head_data.context_url + 'jquery_tag_search',
+            addTagURL: window.head_data.context_url + 'jquery_tag_add',
+            delTagURL: window.head_data.context_url + 'jquery_tag_del',
+            autocompleteURL: appUrl + '/tag_search.json'
+        });
+    });
 
 })(jQuery);

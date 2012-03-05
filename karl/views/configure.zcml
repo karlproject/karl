@@ -1182,12 +1182,21 @@
 
 
   <!-- XXX This accompanies site.py and stays in karl.views -->
-  <view
+    <!-- UX1 only -->
+  <view   
     for="karl.models.interfaces.ISite"
     view=".tags.jquery_tag_search_view"
     permission="view"
     name="jquery_tag_search"
   />
+    <!-- UX2 only -->
+  <view   
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_search_json_view"
+    permission="view"
+    name="tag_search.json"
+  />
+
   <view
     for="*"
     view=".tags.jquery_tag_add_view"

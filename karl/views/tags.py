@@ -110,6 +110,7 @@ def set_tags(context, request, values):
         catalog.reindex_doc(docid, context)
 
 
+# This view is in function in KARL3 (UX1)
 def jquery_tag_search_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
     try:
@@ -123,6 +124,27 @@ def jquery_tag_search_view(context, request):
     values = tag_query_tool.tags_with_prefix(prefix)
     records = [dict(text=value) for value in values]
     result = JSONEncoder().encode(records)
+    return Response(result, content_type="application/x-json")
+
+
+# This view is made for KARL UX2.
+# We follow the payload format that the new client requires
+def tag_search_json_view(context, request):
+    tag_query_tool = getMultiAdapter((context, request), ITagQuery)
+    try:
+        # Query parameter shall be 'term'.
+        prefix = request.params['term']
+    except UnicodeDecodeError:
+        # not utf8, just return empty list since tags can't have these chars
+        result = JSONEncoder().encode([])
+        return Response(result, content_type="application/x-json")
+    # case insensitive
+    prefix = prefix.lower()
+    values = tag_query_tool.tags_with_prefix(prefix)
+    # uniterize
+    values = list(values)
+    # The return payload simply expects the list of labels.
+    result = JSONEncoder().encode(values)
     return Response(result, content_type="application/x-json")
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
