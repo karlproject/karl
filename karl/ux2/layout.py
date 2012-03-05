@@ -189,6 +189,10 @@ class ProfileLayout(Layout):
     section_style = 'none'
 
 
+class PeopleDirectoryLayout(Layout):
+    section_style = 'compact'
+
+
 # FIXME Use pkg_resources
 import os
 _here = os.path.dirname(__file__)

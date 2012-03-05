@@ -289,9 +289,6 @@ def _get_mailto(context, peopledir):
                                  system_list_subdomain)
 
 def report_view(context, request, pictures=False):
-    layout = request.layout_manager.layout
-    layout.section_style = 'compact'
-
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     section = context.__parent__

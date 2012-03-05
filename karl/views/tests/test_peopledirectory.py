@@ -631,7 +631,6 @@ class Test_report_view(unittest.TestCase):
         self._register()
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -646,42 +645,33 @@ class Test_report_view(unittest.TestCase):
             'http://example.com/people/s1/r1/picture_view.html')
         self.assertEqual(info['qualifiers'], [])
         self.assertEqual(info['mailto'], None)
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@karl3.example.com')
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@lists.example.com')
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_qualified_report(self):
         self._register()
         pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': 'spock'})
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -826,7 +816,6 @@ class Test_picture_view(unittest.TestCase):
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -841,15 +830,12 @@ class Test_picture_view(unittest.TestCase):
             'http://example.com/people/s1/r1/')
         self.assertEqual(info['qualifiers'], [])
         self.assertEqual(info['mailto'], None)
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_qualified_report(self):
         self._register()
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest({'body': "spock's brain"})
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
@@ -862,8 +848,6 @@ class Test_picture_view(unittest.TestCase):
             'http://example.com/people/s1/r1/?body=spock%27s+brain')
         self.assertEqual(info['qualifiers'], ['Search for "spock\'s brain"'])
         self.assertEqual(info['mailto'], None)
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_bad_search_text(self):
         from zope.index.text.parsetree import ParseError
@@ -881,40 +865,31 @@ class Test_picture_view(unittest.TestCase):
 
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         info = self._callFUT(report, request)
         self.assertEqual(len(list(info['rows'])), 0)
         self.assertEqual(info['mailto'], None)
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_report_with_mailinglist_wo_subdomain(self):
         self._register()
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@karl3.example.com')
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
     def test_report_with_mailinglist_w_subdomain(self):
         self._register(system_list_subdomain='lists.example.com')
         pd, section, report = _makeReport()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
 
         info = self._callFUT(report, request)
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@lists.example.com')
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.section_style, 'compact')
 
 
 class Test_get_search_qualifiers(unittest.TestCase):
