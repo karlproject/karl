@@ -1172,9 +1172,9 @@
     name="tinymce_spellcheck"
   />
 
-  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <!-- XXX This accompanies site.py (...no...) and stays in karl.views -->
+  <!-- XXX ... now, it is callable on each content! -->
   <view
-    for="karl.models.interfaces.ISite"
     view=".search.jquery_livesearch_view"
     permission="view"
     name="jquery_livesearch"

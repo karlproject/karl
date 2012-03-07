@@ -2,6 +2,7 @@ from zope.interface import directlyProvides
 from zope.interface import implements
 
 from pyramid.security import effective_principals
+from pyramid.traversal import resource_path
 from repoze.lemonade.interfaces import IContent
 
 from karl.content.interfaces import IBlogEntry
@@ -137,6 +138,8 @@ class GroupSearch:
         containment = self.containment
         if containment:
             criteria['containment'] = {'query': containment, 'operator': 'or'}
+        if self.context.__parent__: # if context is not site root
+            criteria['path'] = resource_path(self.context)
         return criteria
 
 
