@@ -41,6 +41,7 @@ from karl.models.interfaces import IProfile
 from karl.utilities.groupsearch import default_group_search
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
+from karl.utils import find_root
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import get_content_type_name_and_icon
@@ -218,7 +219,6 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     kind_knob = []
     selected_kind = params.get('kind')
 
-    # XXX TODO Do something with me already!!!
     scope_path = request.params.get('scopePath', '')
 
     # We show the scope knob, but in a limited way.
@@ -245,7 +245,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             'title': 'All KARL',
             'description': 'All KARL',
             'icon': None,
-            'url': resource_url(context, request, request.view_name, query=query),
+            'url': resource_url(find_root(context), request, request.view_name, query=query),
             'selected': False,
         })
     else:
@@ -417,9 +417,6 @@ def jquery_livesearch_view(context, request):
         # make a friendly error message.  Important for the unit test.
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
-
-    scopePath = request.params.get('scopePath', '')
-    # XXX TODO Do something with me already!!!
 
     # maybe do some * checking to verify that we don't have a
     # prefix search < 3 chars
