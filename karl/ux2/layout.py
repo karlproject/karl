@@ -155,6 +155,8 @@ class Layout(PopperLayout):
         # Additional JQuery-UI:
             'karl.views:static/jquery-ui/grid/ui/ui.grid.js',
             'karl.views:static/jquery-ui/grid/ui/ui.gridmodel.js',
+            # XXX we don't use autobox any more, but we keep it for a while
+            # because karl.js depends on it.
             'karl.views:static/jquery-ui/autobox2/jquery.templating.js',
             'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.ext.js',
             'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.js',
