@@ -57,8 +57,9 @@
             // wire the livesearch component
             var appUrl = window.head_data.app_url;
             $('#search-form .search-site-box').livesearch({
-                livesearchUrl: appUrl + '/jquery_livesearch',
-                advancedSearchUrl: appUrl + '/searchresults.html',
+                appUrl: appUrl,
+                livesearchMethod: 'jquery_livesearch',
+                advancedSearchMethod: 'searchresults.html',
                 resetFilters: resetFilters,
                 position: {
                     my: 'right top',
