@@ -78,6 +78,7 @@ from karl.utils import find_profiles
 
 # Imports used for the purpose of package_path
 from karl.views import site
+site = site      # shut up pylint
 
 MAX_ATTACHMENT_SIZE = (1<<20) * 5  # 5 megabytes
 
