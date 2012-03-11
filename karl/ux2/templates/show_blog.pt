@@ -17,16 +17,19 @@
           	<a href="${entry['href']}">${entry['title']}</a>
         	</h2>
 
-			<div class="kbyline globalize-full-date">${entry['byline_info'].posted_date}</div>
-
         	<tal:block condition="entry['description']">
         		<div tal:content="structure entry['description']"/>
         	</tal:block>
 
-			<div class="kbyline">Posted
-	  	by <a href="${entry['byline_info'].author_url}">${entry['byline_info'].author_name}</a>
-	  	| <span tal:replace="structure entry['comments_blurb']"/>
-			</div>
+            <div>
+              <span tal:define="byline_info entry['byline_info']"
+                    metal:use-macro="layout.macros['byline']"/>
+            | <span>
+                <small tal:replace="structure entry['comments_blurb']"/>
+              </span>
+            </div>
+
+
       	</div>
     </div>
 

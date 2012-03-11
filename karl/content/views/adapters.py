@@ -226,7 +226,6 @@ class BylineInfo(object):
             self._author_url = resource_url(self.profile, self.request)
         return self._author_url
 
-
     @property
     def author_name(self):
         if self._author_name is None:

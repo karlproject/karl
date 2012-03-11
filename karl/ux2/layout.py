@@ -18,6 +18,7 @@ from karl.utils import find_community
 from karl.utils import find_intranet
 from karl.utils import find_site
 from karl.utils import find_chatter
+from karl.views.utils import get_user_date_format
 
 
 class Layout(PopperLayout):
@@ -96,6 +97,10 @@ class Layout(PopperLayout):
         return False
 
     @reify
+    def user_date_format(self):
+        return get_user_date_format(self.context, self.request)
+
+    @reify
     def head_data(self):
         head_data = super(Layout, self).head_data
         head_data = copy.deepcopy(head_data)
@@ -103,6 +108,7 @@ class Layout(PopperLayout):
             # Add some more stuff to the head_data factorized by popper
             'karl_static_url': self.static(''),
             'chatter_url': self.chatter_url,
+            'date_format': self.user_date_format,
         })
         return head_data
 
@@ -174,10 +180,10 @@ class Layout(PopperLayout):
         # Bottlecap livesearch:
         #   bottlecap-wire/livesearch-all.js
         #
-        #  i10n:
-            'karl.views:static/l10n/globalize.js',
-            'karl.views:static/l10n/globalize.cultures.js',
-            'karl.views:static/l10n/globalize.actions.js',
+        #  i10n: (Now relocated to ux2)
+            'karl.views:static/ux2/l10n/globalize.js',
+            'karl.views:static/ux2/l10n/globalize.cultures.js',
+            'karl.views:static/ux2/l10n/globalize.actions.js',
         #
         # END of this original combo
         ## 'karl.views:static/min/karl-ui.min.js',

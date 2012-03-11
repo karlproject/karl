@@ -55,7 +55,8 @@
   </metal:backto>
 
   <small metal:define-macro="byline">
-    <time datetime="${byline_info.posted_date_compact}" pubdate="">${byline_info.posted_date}</time>
+    <time datetime="${byline_info.posted_date_compact}" pubdate=""
+          class="globalize-full-date">${byline_info.posted_date}</time>
     by <a href="#" title="Posts by ${byline_info.author_name}" rel="author">
       ${byline_info.author_name}
     </a>.
