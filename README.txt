@@ -1,242 +1,161 @@
-Building KARL
-=============
+=============================
+Get Started Quickly With Karl
+=============================
 
-Prequisites
------------
+PostgreSQL
+----------
 
-- Your own build of Python 2.5.x (or experimentally, Python 2.6.x).
-  This Python should include *both* the SSL and SQLite extensions.
-  This means, thus, that OpenSSL and SQLite must be installed.
+Karl requires PostgreSQL be installed on your system.  If you are on OSX, this
+is reported to work::
 
-- Command-line binaries for converting PDF, Word, etc.  These include:
-  ppthtml, wvWare, pdftotext, ps2ascii, rtf2xml, xls2csv.  Note that
-  these binaries must be on the PATH of the user running the KARL
-  application server.
+  $ sudo port install postgresql90
+  $ sudo port install postgresql90-server
 
-- Install the required system libraries (see below).
+Link pg_config to a place that is in the path:
 
-Required Libraries
-------------------
+  $ sudo ln -s /opt/local/lib/postgresql90/bin/pg_config /usr/local/bin/
 
-Karl uses the Python Imaging Library, which requires certain system
-libraries. Install the development headers for libjpeg and zlib
-(required for accepting JPEG and PNG image uploads, respectively). The
-command for installing these libraries varies by operating system. On
-Ubuntu, use::
+Alternately, add /opt/local/lib/postgresql90/bin/ to your path.
 
-    sudo apt-get install libjpeg-dev zlib1g-dev
-
-On CentOS 5, use::
-
-    sudo yum install libjpeg-devel zlib-devel
-
-On Mac OS X, there are apparently various methods of installing
-libraries. Try these or some variation:
-
-    port install gd2
-    fink install libjpeg
-
-A web search for "pil os x" provides helpful hints. Note that you do
-not need to install PIL itself, only the system libraries that PIL
-needs. Also note that if you build PIL without the required libraries,
-the build will succeed, but certain Karl tests will probably fail. To
-rebuild PIL with new libraries, delete ``eggs/PIL*`` and re-run
-``bin/buildout``.
-
-Building
+Buildout
 --------
+Check out the buildout from github::
 
-On most Mac OS X or Linux systems with compilation tools and Python
-2.5 (2.6 supported, with warnings) installed, you can build the
-environment using the following steps:
+  $ git clone git://github.com/karlproject/dev-buildout.git karl
+  $ cd karl
 
-Check out the buildout from Subversion (replace PROJECT with the project
-name)::
+Create a virtual environment and run the buildout::
 
-  svn co svn+ssh://PROJECT@agendaless.com/home/PROJECT/svn/karl3-PROJECT/trunk karl3
+  $ virtualenv -p python2.6 --no-site-packages .
+  $ bin/python bootstrap.py
+  $ bin/buildout
 
-``cd`` into the newly checked out ``karl3`` directory::
+Karl is now built and ready to run.  Run Karl using Paste HTTP server in the
+foreground::
 
-  cd karl3
+  $ bin/karlserve serve
 
-Create a ``virtualenv`` using your existing Python within the
-``karl3`` directory (obtain the ``virtualenv`` from `PyPI
-<http://pypi.python.org/pypi/virtualenv>`_)::
+Alternatively, you can use Paster::
 
-  virtualenv --no-site-packages .
+  $ bin/paster serve etc/karlserve.ini
 
-Bootstrap the installation::
+Visit the filesystem ZODB based test instance of Karl at::
 
-  bin/python bootstrap.py
+  http://localhost:6543/fs
 
-Run the buildout and wait several minutes for it to finish::
+Default login and password are admin/admin.
 
-  bin/buildout
+Relstorage
+----------
 
-You will know the buildout finished successfully when it prints the
-following::
+Create the user and database for the PostgreSQL/Relstroage based instance of
+Karl::
 
-   Generated script '/Users/chrism/projects/karl3/bin/twill-sh'.
-   Generated script '/Users/chrism/projects/karl3/bin/flunc'.
-   buildout: Generated interpreter '/Users/chrism/projects/karl3/bin/python-flunc'.
+  $ createuser -P karltest
+    (Enter 'test' for password.  Repeat.  Answer 'n' to next three questions.)
+  $ createdb -O karltest karltest
 
-Finally, make a symlink to the correct configuration area.  The
-various buildouts associated with KARL have a number of pre-setup
-configurations.  For development::
+Visit the Relstorage instance at::
 
-  ln -sfn etc-develop etc
+  http://localhost:6543/pg
 
-If you are building for production rather than development, redirect
-the link.  For example::
+Later, if you want to blow away the database and start over::
 
-    ln -sfn etc-deploy etc
+  $ dropdb karltest; createdb -O karltest karltest
 
-Debugging Build Problems
-------------------------
+Customization Packages
+----------------------
 
-Buildout ``default.cfg`` File in Home ``.buildout`` Directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Both instances are 'vanilla' instances of Karl which do not use any
+customization package. Most customers that are not OSI, going forward, will
+not use any customization package. To make the pg instance use the 'osi'
+customization package::
 
-Make sure you don't have a ~/.buildout/default.cfg file; particularly
-one that specifies a "download cache".  If you have one of these, the
-wrong eggs may be used during installation and the system won't
-install cleanly.  An example of such a symptom::
+  $ bin/karlserve settings set pg package osi
+  $ bin/karlserve serve (restart if already running)
 
-  Error: There is a version conflict.
-  We already have: elementtree 1.2.7-20070827-preview
-  but repoze.profile 0.6 requires 'elementtree>=1.2.6,<1.2.7'.
-  but supervisor 3.0a6 requires 'elementtree>=1.2.6,<1.2.7'.
+To revert back to vanilla::
 
-If you get an error like this or if you have other ``default.cfg``
-related problems, either change the ``~/.buildout/default.cfg`` to
-disuse a download cache or move the default.cfg aside temporarily,
-then delete the ``karl3`` checkout and start over completely.
+  $ bin/karlserve settings remove pg package
 
-Starting
---------
+Localization of date formats
+----------------------------
 
-After the build finishes successfully, start the system using
-supervisord::
+Karl uses the Globalize javascript library to handle date formatting. It is
+recommended that whenever you need to use a date in a Karl or customization
+package template, you use Karl's globalize mechanism instead of formatting
+the date in Python code.
 
-  bin/supervisord
+To use gloablize, it's best to serve the date to the template in one of two
+formats: 'dd/mm/yyyy' for dates and 'dd/mm/yyyy hh:mm:ss' for dates with
+times. In the template, the date has to be by itself inside a tag and must
+use one of the globalize classes:
 
-Check if it's come up successfully by using ``supervisorctl``::
+  - globalize-short-date:
+    MM/dd/yyyy (02/15/2012)
+  - globalize-long-date:
+    MMMM dd yyyy (February 15 2012)
+  - globalize-full-date:
+    dddd, MMMM dd yyyy HH:mm (Wednesday, February 15 2012 12:00)
+  - globalize-date-time:
+    M/d/yyyy HH:mm (2/15/2012 12:00)
+  - globalize-calendar-full:
+    dddd M/d (Wednesday 2/15)
+  - globalize-calendar-abbr:
+    ddd M/d (Wed 2/15)
+  - globalize-calendar-long:
+    dddd, MMMM d (Wednesday, February 15)
+  - globalize-calendar-list:
+    ddd, MMM d (Wed, Feb 15)
 
-  bin/supervisorctl status
+Globalize will convert the date to the proper format for the current
+culture on page load. Default culture is en-US.
 
-If it's up successfully, you should see something like the following
-as output from ``supervisorctl``::
+As an example::
 
-   karl                             RUNNING    pid 41565, uptime 0:00:45
-   zeo                              RUNNING    pid 41486, uptime 0:02:07
+  <h3 class="globalize-long-date">02/15/2012</h3>
 
-Debugging Startup Problems
---------------------------
+Will display an h3 title with the date 'February 15 2012'. The same date will
+show up as '15 February 2012' if the user has 'europe' as date format default.
 
-``ImportError: Failure linking new module`` at startup (lxml)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Users can pick their date formatting culture when editing their own profile.
+Currently, the only options are US and Europe (uses en-GB). To set a
+different default for the whole site use karlserve settings::
 
-This has only been witnessed on Mac OS X.  It usually means that the
-build found some existing ``libxml2`` or ``libxslt`` instead of the
-one that's compiled by the buildout.  It's unclear how this happens,
-but it can be resolved by manually setting the MacOS
-``DYLD_LIBRARY_PATH``.  For example, if your cwd is the ``karl3``
-directory::
+  $ bin/karlserve settings set pg date_format en-GB
 
-  export DYLD_LIBRARY_PATH=`pwd`/parts/libxml2/lib:`pwd`/parts/libxlst/lib:$DYLD_LIBRARY_PATH
+Hacking
+-------
 
-Then restart the servers.
+To hack on some source code::
 
-Blob layout related startup issue
----------------------------------
+  $ bin/develop co karl
+  $ bin/buildout -No
 
-If you see an error like this::
+Source code will now be in src/karl and src/karlserve.
 
-  ValueError: Directory layout `zeocache` selected for blob directory /blob dir,
-  but marker found for layout `lawn`
+When playing with the code it's usually very useful to have some sample
+content added to the site, so that it looks a bit closer to a real site.
+The karlserve command can be used for that::
 
-It means you've somehow gotten ZODB 3.9 installed instead of the
-required ZODB 3.8.  See the resolution steps above in ``Buildout
-default.cfg File in Home .buildout Directory`` above to resolve.
+  $ bin/karlserve samplegen
 
-Running The Software
---------------------
+Using this command 10 sample communities will be added to the site, each
+with their own wikis, blogs, calendars and files.
 
-To use the software, visit `http://localhost:8000/
-<http://localhost:8000>`_ in a browser. (Some customizations of KARL
-use `http://localhost:6543/ <http://localhost:6543>`_ instead.) When
-you see the login page, log in via username: ``admin``, password:
-``admin``. After logging in, you should see the "Communities" page.
+The samplegen command does not create intranets, so they need to be added
+manually if they are required. To do that visit your instance at:
 
-Debugging Runtime Failures
---------------------------
+  http://localhost:6543/pg/add_community.html
 
-The application is up but it won't respond to any HTTP requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fill the form to add a community, making sure the 'intranets' checkbox is
+selected. An 'intranets' tab will be visible on the community pages after
+that, from which new intranets can be added.
 
-Make sure that the ZEO server is started, and that it's listening on
-the right port.
+If you need to work with versioning, you need to initialize the repository
+before the versioning UI will show up. This is done with::
 
-Running the Server Without Supervisord
---------------------------------------
+  $ bin/karlserve init_repozitory pg
 
-To run the "front-end" (the main application), do::
-
-  bin/paster serve etc/karl.ini
-
-To run the "back end" (the ZEO server), do::
-
-  bin/runzeo -C etc/zeo.conf
-
-Keeping Up-To-Date
-------------------
-
-If time passes and you'd like to see the changes that have been made
-by other developers, you can update your "sandbox" using the
-"buildout" command.  From within the ``karl3`` directory::
-
-  svn up
-  bin/buildout
-
-The necessary changes will be downloaded.  Then start the servers by
-running::
-
- bin/supervisord
-
-.. or if they're already running::
-
- bin/supervisorctl reload
-
-In some cases after an update, it may be necessary to run the
-``start_over`` script to clear out existing data. If your
-sandbox doesn't work properly after updating, run this step to clear
-out all existing data (while the ZEO server is running)::
-
- bin/start_over --yes
-
-Generating Sample Content
--------------------------
-
-For testing purposes, KARL has a utility named ``samplegen`` that adds
-randomized sample content to the database. The utility generates
-communities, each containing blog entries, wiki pages, calendar events,
-and files.
-
-To use the ``samplegen`` utility, type::
-
- bin/samplegen
-
-Use the "-c" option to control the number of communities generated.
-Type ``bin/samplegen --help`` for more option documentation.
-
-Known Issues
-------------
-
-Slowness In Firefox With Firebug and Web Developer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Page load times in KARL3 under Firefox appear slow when either Firebug
-and/or the Firefox Web Developer toolkit is installed and enabled.
-Disable these tools as necessary or use a different browser to see the
-actual system speed.
+Enjoy!
 
