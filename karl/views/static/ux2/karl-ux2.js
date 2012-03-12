@@ -9,6 +9,13 @@
 
     "use strict";
 
+    var log = function () {
+        if (window.console && console.log) {
+            // log for FireBug or WebKit console
+            console.log(Array.prototype.slice.call(arguments));
+        }
+    };
+
     $(function () {
         var head_data = window.head_data || {};
         // need urls
@@ -22,6 +29,36 @@
             delTagURL: window.head_data.context_url + 'jquery_tag_del',
             autocompleteURL: appUrl + '/tag_search.json'
         });
+
+
+        // add the tab logic to radar chatter
+        $('#radar')
+            .bind('pushdowntabshow', function () {
+                console.log('yeah', this);
+                $('#radar-panel .radartabs li a').click(function () {
+                    var li = $(this).parent();
+                    var tabName = li.data('radartab');
+                    if (tabName) {
+                        var activeSection = $('#radar-panel .radarsection')
+                            .filter(function () {
+                                return $(this).is(':visible');
+                            });
+                        var openingSection = 
+                            $('#radar-panel .radarsection[data-radarsection="' +
+                                             tabName + '"]');
+
+                        if (activeSection.data('radarsection') != tabName) {
+                            activeSection.hide('fade');
+                            openingSection.show('fade');
+                            log('Switch to radar tab', tabName);
+                        }
+                    }
+                });
+
+            });
+        
+
+
     });
 
 })(jQuery);
