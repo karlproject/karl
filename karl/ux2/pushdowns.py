@@ -186,7 +186,7 @@ def radar_ajax_view(context, request):
         ))
         communities_info = list(itertools.islice(communities_info, 0, 5))
 
-        # 3rd column: Recent Activity
+        # 3rd column: My Recent Activity
         recent_items = []
         recent_items_batch = get_recent_items_batch(context, request, size=5)
         for item in recent_items_batch["entries"]:
@@ -207,7 +207,7 @@ def radar_ajax_view(context, request):
                 'communities': communities_info,
                 }, {
                 'class': 'stream2',
-                'title': 'Recent Activity',
+                'title': 'My Recent Activity',
                 'contexts': recent_items,
                 }],
             }
