@@ -4,8 +4,10 @@
 
   <div metal:fill-slot="content">
 
-  ${panel('status_message')}
-  <h1>${layout.page_title}</h1>
+      <header>
+          ${panel('status_message')}
+          <h1>${layout.page_title}</h1>
+      </header>
 
   <p>You can receive email notifications for new items posted to the Blog,
   Calendar, and Files sections of your communities.  If you quit a community,
