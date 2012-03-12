@@ -2,25 +2,31 @@
 
     <metal:content fill-slot="content">
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)}
+        ${panel('status_message')}
+        ${panel('popper.actions_menu', actions=actions)}
 
-    <div class="contentText">
+        <header>
+            <h1>${layout.page_title}</h1>
+        </header>
 
-        ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
+        <div class="contentText">
 
-        <table class="filtered sortable" id="peopledir" summary="">
-            <thead>
+            ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
+
+            <table class="filtered sortable" id="peopledir" summary="">
+                <thead>
                 <tr>
                     <!-- Anchors within TH are required in .sortable -->
-                    <th><a href="#" class="selected ascending">Name</a></th>
+                    <th><a href="#" class="selected ascending">Name</a>
+                    </th>
                     <th><a href="#">Department</a></th>
                     <th><a href="#">Position</a></th>
                     <th><a href="#">Phone</a></th>
                 </tr>
-            </thead>
-            <tbody>
-                <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}" tal:repeat="person batch['entries']">
+                </thead>
+                <tbody>
+                <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}"
+                    tal:repeat="person batch['entries']">
                     <td>
                         <div>
                             <a href="${request.resource_url(person)}">${person.title}</a>
@@ -42,14 +48,14 @@
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-        ${panel('popper.grid_footer', batch=batch)}
+            ${panel('popper.grid_footer', batch=batch)}
 
-    </div>
+        </div>
 
-    <div metal:use-macro="layout.macros['rss_icon']"/>
+        <div metal:use-macro="layout.macros['rss_icon']"/>
 
     </metal:content>
 </metal:block>
