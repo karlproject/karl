@@ -33,7 +33,7 @@
 
         // add the tab logic to radar chatter
         $('#radar')
-            .bind('pushdowntabshow', function () {
+            .bind('pushdowntabrender', function () {
                 console.log('yeah', this);
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
