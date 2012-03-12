@@ -18,7 +18,7 @@
                 <a href="#" class="dropdown-toggle moreToggle" data-toggle="dropdown">More</a>
                 <div class="dropdown-menu">
                     <figure>
-                        <img src="http://lorempixum.com/64/64/" alt="" />
+                        <!--img src="http://lorempixum.com/64/64/" alt="" / XXX remove me for good?-->
                     </figure>
                     <p>The dropdowns can contain any information you
                     want, including images, lists and plain text.</p>
