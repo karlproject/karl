@@ -5,9 +5,11 @@
 
   <div metal:fill-slot="content">
 
+    <header>
+        ${panel('status_message')}
+        ${panel('popper.actions_menu', actions=actions)}
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)}
+    </header>
 
     <div class="peopledir-report-description"
       tal:repeat="description descriptions"

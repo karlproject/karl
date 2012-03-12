@@ -8,12 +8,12 @@
 
     <metal:content fill-slot="content">
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)} 
+        <header>
+            ${panel('status_message')}
+            <h1>Overview</h1>
+            ${panel('popper.actions_menu', actions=actions)}
+        </header>
 
-    <h1 class="kscreentitle">Overview</h1>
-
-    
     <div class="koverview_body" 
          tal:condition="layout.context.text != u''">
       <span tal:replace="structure layout.context.text"/>
