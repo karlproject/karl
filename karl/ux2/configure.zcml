@@ -34,6 +34,13 @@
     containment="karl.models.interfaces.IPeopleDirectory"
   />
 
+  <!-- Chatter layout -->
+  <bc:layout
+    layout=".layout.ChatterLayout"
+    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    containment="karl.models.interfaces.IChatterbox"
+  />
+
   <!-- 
       Other layouts can also be defined which use different main templates and
       are used in different parts of the site.  An example might be to define a
