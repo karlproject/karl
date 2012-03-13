@@ -1,47 +1,20 @@
 <div id="chatter-panel">
     <div class="pushdownContent clearfix">
         <div class="panel">
-            <h3>On your mind</h3>
-            <form class="form-stacked" href="#" id="send-message">
-                <div class="control-group clearfix">
-                    <div class="controls">
-                        <textarea id="mywords" name="mywords" rows="4">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat vol.</textarea>
-                        <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
-                    </div>
+          <h3>On your mind</h3>
+          <form class="form-stacked" action="{{chatter_url}}/add_chatter.html" method="POST">
+            <div class="control-group clearfix">
+              <div class="controls">
+                <textarea id="chatter-panel-text" name="text"></textarea>
+                <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
+              </div>
+              <div class="actions">
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-large">Speak</button>
                 </div>
-                <div class="actions">
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-large">Speak</button>
-                        <!-- <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                        <div class="dropdown-menu">
-                            <div class="contentPadding">
-                                <fieldset>
-                                    <b>To:</b>
-                                    <label>
-                                        <input name="chatter-option-to"
-                                               type="radio" value="allkarl"
-                                               checked="checked"/>
-                                        All KARL
-                                    </label>
-                                    <label>
-                                        <input name="chatter-option-to"
-                                               type="radio" value="staff" />
-                                        Staff
-                                    </label>
-                                    <label>
-                                        <input name="chatter-option-to"
-                                               type="radio" value="users" />
-                                        Users
-                                    </label>
-                                </fieldset>
-                                <div>
-                                    <b>Attachments:</b>
-                                </div>
-                            </div>
-                        </div> -->
-                    </div>
-                </div>
-            </form>
+              </div>
+            </div>
+          </form>
             <div class="houstonWeHaveAProblem notification info">
                 <strong>Something went wrong.</strong>
                 <p>We could not update the messages for you. But don't you
@@ -70,6 +43,14 @@
                 </div>
             </div>
             {{/items}}
+            <a href="{{has_more_news_url}}" class="thereIsMore" title="Go to Chatter">
+                {{#has_more_news}}
+                    <span class="newMessages">{{has_more_news}} more new items</span>
+                {{/has_more_news}}
+                {{^has_more_news}}
+                    <span class="noNewMessages">&hellip;</span>
+                {{/has_more_news}}
+            </a>
         </div>
         {{/streams}}
 

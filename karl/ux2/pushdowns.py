@@ -9,6 +9,7 @@ from karl.models.interfaces import IGridEntryInfo
 from karl.utils import find_communities
 from karl.views.communities import get_my_communities
 from karl.views.community import get_recent_items_batch
+from karl.views.chatter import followed_chatter_json
 
 
 def notifier_ajax_view(context, request):
@@ -68,84 +69,48 @@ def chatter_ajax_view(context, request):
         results['data'] = None
     else:
         # Fetch the data
+        all_chatter = followed_chatter_json(context, request)
+        all_chatter_len = len(all_chatter['recent'])
         results['data'] = {
             'chatter_url': layout.chatter_url,
-            'streams': [{
-                'class': 'your-stream',
-                'title': 'Direct messages',
-                'has_more_news': False,
-                'items': [{
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '3 min ago',
-                        'new': True,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'John Doe',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volu',
-                        'info': '5 min ago',
-                        'new': False,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': False,
-                    }],
-                }, {
-                'class': 'recent-friend',
-                'title': 'Friends activity',
-                'has_more_news': True,
-                'items': [{
-                        'author': 'John Doe',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volu',
-                        'info': '3 min ago',
-                        'new': True,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volu',
-                        'info': '4 min ago',
-                        'new': True,
-                    }, {
-                        'author': 'Tester Testerson',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at ve.',
-                        'info': '4 min ago',
-                        'new': True,
-                    }, {
-                        'author': 'John Doe',
-                        'author_profile_url': '#author_profile',
-                        'message_url': '#message',
-                        'image_url': 'http://twimg0-a.akamaihd.net/profile_images/413225762/python_normal.png',
-                        'text': 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volu',
-                        'info': '5 min ago',
-                        'new': True,
-                    }],
-                }],
-            }
+            'streams': [],
+        }
+        all_chatter_stream = {
+            'class': 'recent-friend',
+            'title': 'Friends activity',
+            'has_more_news': all_chatter_len > 5 and (all_chatter_len - 5) or 0,
+            'has_more_news_url': layout.chatter_url,
+            'items': [
+                {
+                    'author': item['creator'],
+                    'author_profile_url': item['creator_url'],
+                    'message_url': item['url'],
+                    'image_url': item['creator_image_url'],
+                    'text': item['text'],
+                    'info': item['timeago'],
+                    'new': True,
+                } for item in all_chatter['recent'][:5]
+            ],
+        }
+        private_chatter_stream = {
+            'class': 'your-stream',
+            'title': 'Direct messages',
+            'has_more_news': all_chatter_len > 5 and (all_chatter_len - 5) or 0,
+            'has_more_news_url': '%sdirect.html' % layout.chatter_url,
+            'items': [
+                {
+                    'author': item['creator'],
+                    'author_profile_url': item['creator_url'],
+                    'message_url': item['url'],
+                    'image_url': item['creator_image_url'],
+                    'text': item['text'],
+                    'info': item['timeago'],
+                    'new': False,
+                } for item in all_chatter['recent'][:5]
+            ],
+        }
+        results['data']['streams'].append(all_chatter_stream)
+        results['data']['streams'].append(private_chatter_stream)
     return results
 
 

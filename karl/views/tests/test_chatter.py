@@ -652,8 +652,9 @@ class Test_tag_chatter(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox()
         site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
-        found = self._callFUT(context, request)
-        self.assertEqual(found.location, 'http://example.com/chatter/')
+        info = self._callFUT(context, request)
+        self.assertEqual(info['recent'], [])
+        self.assertEqual(info['tag'], '')
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()

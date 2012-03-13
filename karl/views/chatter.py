@@ -51,11 +51,11 @@ def get_context_tools(request, selected='posts'):
              'title': 'Following',
              'selected': selected=='following' and 'selected',
             },
-            {'url': '#',
+            {'url': '%stag.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
-            {'url': '#',
+            {'url': '%sdirect.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
             },
@@ -306,11 +306,11 @@ def tag_chatter(context, request):
     try:
         info = tag_chatter_json(context, request)
     except KeyError:
-        return HTTPFound(location=resource_url(context, request))
+        info = {'recent':[], 'tag':''}
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
-    info['context_tools'] = get_context_tools(request)
+    info['context_tools'] = get_context_tools(request, selected='topics')
     return info
 
 
