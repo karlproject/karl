@@ -42,11 +42,19 @@
                                      tabName + '"]');
 
                 if (activeSection.data('radarsection') != tabName) {
-                    activeSection.hide();
-                    openingSection.show('fade');
+                    // animate the section
+                    activeSection.hide('fade', function () {
+                        openingSection.show('fade');
+                    });
                     // Remember the tab
                     tab.data('radarselectedtab', tabName);
                     log('Switch to radar tab', tabName);
+                    // Set tab active
+                    $('#radar-panel .radartabs li.active')
+                        .removeClass('active');
+                    $('#radar-panel .radartabs li[data-radartab="' +
+                                     tabName + '"]')
+                        .addClass('active');
                 }
             }
         }
