@@ -4,7 +4,7 @@
             <h3>Radar</h3>
             <ul id="sections" class="nav nav-list radartabs">
                 <li class="active" data-radartab="home"><a href="#">Home <span class="messageCounter">3</span></a></li>
-                <li data-radartab="other"><a href="#">Other XXX</a></li>
+                <li data-radartab="approvals"><a href="#">Approvals</a></li>
                 <li><a href="#">Topics <span class="messageCounter">4</span></a></li>
                 <li><a href="#">Featured</a></li>
                 <li><a href="#">Apps</a></li>
@@ -14,7 +14,7 @@
 
         <div class="radarsection clearfix" data-radarsection="home">
 
-            {{#streams}}
+            {{#home}}
             <div id="{{class}}" class="panel">
                 <h3>{{title}}</h3>
 
@@ -55,7 +55,6 @@
                 </div>
                 {{/contexts}}
 
-
                 {{#items}}
                 <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
                     <div class="panel-item-content">
@@ -75,13 +74,55 @@
                     </div>
                 </div>
                 {{/items}}
+
             </div>
-            {{/streams}}
+            {{/home}}
 
         </div>
 
-        <div class="radarsection clearfix" data-radarsection="other">
-            Lorem ipsum!
+        <div class="radarsection clearfix" 
+             style="display: none;" data-radarsection="approvals">
+
+          {{#approvals}}
+          <div class="panel" style="margin-left: 20px;">
+              <table class="content-listing">
+                <thead>
+                  <!--tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
+                    <th colspan="4" class="ui-widget-header" style="padding: 0;">
+                      <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+                    </th>:w
+                    
+                  </tr-->
+                  <tr>
+                    <th class="cldate">Date</th>
+                    <th class="cltitle">Title</th>
+                    <th class="cltype">Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  {{#items}}
+                  <tr>
+                    <td class="cldate globalize-short-date">{{modified}}</td>
+                    <td class="cltitle">
+                      <a href="{{title_url}}">{{title}}</a>
+                    </td>
+                    <td class="cltype">{{type}}</td>
+                  </tr>
+                  {{/items}}
+
+                </tbody>
+                <!--tfoot tal:condition="batch_info.batching_required">
+                  <tr class="ui-grid-footer">
+                    <th colspan="4" class="ui-widget-header" style="padding: 0;">
+                      <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
+                    </th>
+                  </tr>
+                </tfoot-->
+              </table>
+          </div>
+          {{/approvals}}
+
         </div>
 
     </div>

@@ -165,8 +165,58 @@ def radar_ajax_view(context, request):
                 type=adapted.type,
                 ))
 
+        # Provide fake "approval items" for the "approvals" tab.
+
+
+
+        approval_items = [{
+            'modified': '12/28/2011',
+            'title': 'Funny Cat Pics',
+            'title_url': 'http://foo.com/bar',
+            'type': 'Blog Entry',
+            'author': 'Balazs Ree',
+            'title_url': 'http://foo.com/bar',
+            }, {
+            'modified': '12/28/2011',
+            'title': 'My Cat Says Meow',
+            'title_url': 'http://foo.com/bar',
+            'type': 'Video',
+            'author': 'Balazs Ree',
+            'title_url': 'http://foo.com/bar',
+            }, {
+            'modified': '12/28/2011',
+            'title': 'Cute Little Cat',
+            'title_url': 'http://foo.com/bar',
+            'type': 'Blog Entry',
+            'author': 'Balazs Ree',
+            'title_url': 'http://foo.com/bar',
+            }, {
+            'modified': '12/28/2011',
+            'title': 'How I learned to love the Cat, and...',
+            'title_url': 'http://foo.com/bar',
+            'type': 'Blog Entry',
+            'author': 'Balazs Ree',
+            'title_url': 'http://foo.com/bar',
+            }, {
+            'modified': '12/28/2011',
+            'title': 'More Funny Cat Pics',
+            'title_url': 'http://foo.com/bar',
+            'type': 'Blog Entry',
+            'author': 'Balazs Ree',
+            'title_url': 'http://foo.com/bar',
+            }]
+
+        approval2_items = []
+        for item in approval_items:
+            new_item = dict(item)
+            new_item['title'] = item['title'].replace('Cat', 'Dog') \
+                                .replace('Meow', 'Woof')
+            approval2_items.append(new_item)
+
+        # Assamble the final result.
         results['data'] = {
-            'streams': [{
+            # home section
+            'home': [{
                 'class': 'stream1',
                 'title': 'My Communities',
                 'communities': communities_info,
@@ -175,6 +225,17 @@ def radar_ajax_view(context, request):
                 'title': 'My Recent Activity',
                 'contexts': recent_items,
                 }],
+            # approvals section
+            'approvals': [{
+                'class': 'stream2',
+                'title': 'Approvals',
+                'items': approval_items,
+                }, {
+                'class': 'stream2',
+                'title': 'More Approvals',
+                'items': approval2_items,
+                }],
+
             }
 
     return results

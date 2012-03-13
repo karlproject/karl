@@ -48,7 +48,7 @@
                                              tabName + '"]');
 
                         if (activeSection.data('radarsection') != tabName) {
-                            activeSection.hide('fade');
+                            activeSection.hide();
                             openingSection.show('fade');
                             log('Switch to radar tab', tabName);
                         }
