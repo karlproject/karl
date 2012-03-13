@@ -31,33 +31,39 @@
         });
 
 
+        function switchToRadarTab(tab, tabName) {
+            if (tabName) {
+                var activeSection = $('#radar-panel .radarsection')
+                    .filter(function () {
+                        return $(this).is(':visible');
+                    });
+                var openingSection = 
+                    $('#radar-panel .radarsection[data-radarsection="' +
+                                     tabName + '"]');
+
+                if (activeSection.data('radarsection') != tabName) {
+                    activeSection.hide();
+                    openingSection.show('fade');
+                    // Remember the tab
+                    tab.data('radarselectedtab', tabName);
+                    log('Switch to radar tab', tabName);
+                }
+            }
+        }
+
+
         // add the tab logic to radar chatter
         $('#radar')
             .bind('pushdowntabrender', function () {
-                console.log('yeah', this);
+                var tab = $(this);
+                var selectedTabName = tab.data('radarselectedtab');
+                switchToRadarTab(tab, selectedTabName);
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
                     var tabName = li.data('radartab');
-                    if (tabName) {
-                        var activeSection = $('#radar-panel .radarsection')
-                            .filter(function () {
-                                return $(this).is(':visible');
-                            });
-                        var openingSection = 
-                            $('#radar-panel .radarsection[data-radarsection="' +
-                                             tabName + '"]');
-
-                        if (activeSection.data('radarsection') != tabName) {
-                            activeSection.hide();
-                            openingSection.show('fade');
-                            log('Switch to radar tab', tabName);
-                        }
-                    }
+                    switchToRadarTab(tab, tabName);
                 });
-
             });
-        
-
 
     });
 
