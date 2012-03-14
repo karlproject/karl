@@ -145,6 +145,9 @@ def all_chatter_json(context, request):
 def all_chatter(context, request):
     """ HTML wrapper for 'all_chatter_json'.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.discover')
     info = all_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'All Chatter')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
@@ -401,10 +404,22 @@ def discover_community_members_json(context, request):
     else:
         info = users.get(userid)
         communities = [x[0] for x in get_community_groups(info['groups'])]
-    c_groups = [(x, users.users_in_group('group.community:%s:members' % x))
-                    for x in communities]
+    c_groups = [(x, _quippers_from_users(context, request,
+         users.users_in_group('group.community:%s:members' % x)))
+         for x in communities]
     return {'userid': userid,
             'members': dict(c_groups),
+           }
+
+
+def discover_people(context, request):
+    """ View the list of users that share communities with the current user.
+    """
+    share_with = discover_community_members_json(context, request)
+    return {'api':  TemplateAPI(context, request,
+                                'Share communities with: %s' % share_with['userid']),
+            'members': share_with,
+            'context_tools': get_context_tools(request, selected='discover'),
            }
 
 
@@ -443,21 +458,9 @@ def following_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
-    following = []
-    for quipper in chatter.listFollowed(userid):
-        info = {}
-        profile = profiles.get(quipper)
-        photo = profile and profile.get('photo') or None
-        if photo is not None:
-            photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
-        else:
-            photo_url = get_static_url(request) + "/images/defaultUser.gif"
-        info['image_url'] = photo_url
-        info['userid'] = quipper
-        info['fullname'] = profile.title
-        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
-        following.append(info)
-    return {'following': following,
+    user_list = chatter.listFollowed(userid)
+    following = _quippers_from_users(context, request, user_list)
+    return {'members': following,
             'userid': userid,
            }
 
@@ -476,21 +479,9 @@ def followed_by_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
-    following = []
-    for quipper in chatter.listFollowing(userid):
-        info = {}
-        profile = profiles.get(quipper)
-        photo = profile and profile.get('photo') or None
-        if photo is not None:
-            photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
-        else:
-            photo_url = get_static_url(request) + "/images/defaultUser.gif"
-        info['image_url'] = photo_url
-        info['userid'] = quipper
-        info['fullname'] = profile.title
-        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
-        following.append(info)
-    return {'followed_by': following,
+    user_list = chatter.listFollowing(userid)
+    followed_by = _quippers_from_users(context, request, user_list)
+    return {'followed_by': followed_by,
             'userid': userid,
            }
 
@@ -503,7 +494,7 @@ def following(context, request):
     following = following_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Followed by: %s' % following['userid']),
-            'following': following,
+            'members': following,
             'context_tools': get_context_tools(request, selected='following'),
            }
 
@@ -550,3 +541,23 @@ def add_chatter(context, request):
         acl.append(DENY_ALL)
     location = resource_url(context, request)
     return HTTPFound(location=location)
+
+def _quippers_from_users(context, request, user_list):
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    following = []
+    for quipper in user_list:
+        info = {}
+        profile = profiles.get(quipper)
+        photo = profile and profile.get('photo') or None
+        if photo is not None:
+            photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
+        else:
+            photo_url = get_static_url(request) + "/images/defaultUser.gif"
+        info['image_url'] = photo_url
+        info['userid'] = quipper
+        info['fullname'] = profile.title
+        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
+        following.append(info)
+    return following

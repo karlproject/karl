@@ -10,10 +10,11 @@
 
     ${panel('status_message')}
 
-    <div id="chatter-followers" class="pushdownContent">
-      <div class="panel-item clearfix" tal:repeat="quipper members['members']">
-        <div class="panel-item-content">
-          <div>
+    <div id="chatter-people" class="pushdownContent">
+      <div tal:repeat="community members['members'].items()">
+      <h3>${community[0]}</h3>
+        <div class="panel-item clearfix" tal:repeat="quipper community[1]">
+          <div class="panel-item-content">
             <a href="${quipper['url']}">
               <img class="avatar" alt="${quipper['fullname']}"
                    src="${quipper['image_url']}" />

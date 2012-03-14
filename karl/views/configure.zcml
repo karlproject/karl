@@ -1887,6 +1887,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.discover_people"
+    renderer="templates/discover_people.pt"
+    permission="view"
+    name="discover_people.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.update_followed"
     renderer="templates/update_followed.pt"
     permission="view"

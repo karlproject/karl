@@ -270,5 +270,9 @@ def followers(context, request):
     return {}
 
 
+def discover(context, request):
+    return {}
+
+
 def wiki_lock(context, request, lock_info):
     return {'lock_info': lock_info}

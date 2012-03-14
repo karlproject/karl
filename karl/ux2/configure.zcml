@@ -159,6 +159,12 @@
     />
 
   <bc:panel
+    name="chatter.discover"
+    panel=".panels.discover"
+    renderer="templates/discover.pt"
+    />
+
+  <bc:panel
     name="wiki_lock"
     panel=".panels.wiki_lock"
     renderer="templates/wiki_lock.pt"
