@@ -112,6 +112,10 @@ class Layout(PopperLayout):
         })
         return head_data
 
+    extra_js_head = (
+        'https://www.google.com/jsapi',
+    )
+
     extra_css = (
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
         'karl.views:static/ux2/main.css',)

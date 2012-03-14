@@ -3,7 +3,7 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 80, indent: 4 */
 /*jslint sub: true */
 
-/*globals window navigator document console setTimeout $ */
+/*globals window navigator document console setTimeout jQuery google */
 
 (function ($) {
 
@@ -15,6 +15,10 @@
             console.log(Array.prototype.slice.call(arguments));
         }
     };
+
+    // Load for the google bars
+    // XXX It would _actually_ be better to have this from non-deferred.
+    google.load("visualization", "1", {packages: ["corechart"]});
 
     $(function () {
         var head_data = window.head_data || {};
@@ -33,45 +37,85 @@
 
         function switchToRadarTab(tab, tabName) {
             if (tabName) {
-                var activeSection = $('#radar-panel .radarsection')
-                    .filter(function () {
-                        return $(this).is(':visible');
-                    });
-                var openingSection = 
-                    $('#radar-panel .radarsection[data-radarsection="' +
-                                     tabName + '"]');
-
-                if (activeSection.data('radarsection') != tabName) {
-                    // animate the section
-                    activeSection.hide('fade', function () {
-                        openingSection.show('fade');
-                    });
-                    // Remember the tab
-                    tab.data('radarselectedtab', tabName);
-                    log('Switch to radar tab', tabName);
-                    // Set tab active
-                    $('#radar-panel .radartabs li.active')
-                        .removeClass('active');
-                    $('#radar-panel .radartabs li[data-radartab="' +
-                                     tabName + '"]')
-                        .addClass('active');
+                var currentTabName = tab.data('radarselectedtab');
+                var section = 
+                        $('#radar-panel .radarsection[data-radarsection="' +
+                        tabName + '"]');
+                if (! currentTabName) {
+                    // No tab yet. Initialize it by hiding all
+                    // the sections except one.
+                    $('#radar-panel .radarsection').hide();
+                    section.show();
+                } else {
+                    // Normal way: animate from one section to the other.
+                    var currentSection =
+                            $('#radar-panel .radarsection[data-radarsection="' +
+                            currentTabName + '"]');
+                    log('cu', currentTabName, currentSection);
+                    // Are we switching?
+                    if (currentSection.data('radarsection') != tabName) {
+                        // animate the section
+                        currentSection.hide('fade', function () {
+                            section.show('fade');
+                        });
+                    }
                 }
+                // Remember the tab
+                tab.data('radarselectedtab', tabName);
+                log('Switch to radar tab', tabName);
+                // Set tab active
+                $('#radar-panel .radartabs li.active')
+                    .removeClass('active');
+                $('#radar-panel .radartabs li[data-radartab="' +
+                                 tabName + '"]')
+                    .addClass('active');
             }
         }
 
+        function drawChart() {
+            /*
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Year');
+            data.addColumn('number', 'Sales');
+            data.addColumn('number', 'Expenses');
+            data.addRows([
+                ['2004', 1000, 400],   
+                ['2005', 1170, 460],
+                ['2006', 660, 1120],   
+                ['2007', 1030, 540]
+            ]);
+            var options = {         
+                title: 'Company Performance',        
+                hAxis: {
+                    title: 'Year',
+                    titleTextStyle: {color: 'red'}
+                }
+            };
+            var chart = new google.visualization.ColumnChart(
+                    document.getElementById('chart1')); 
+            chart.draw(data, options);
+            */
+        }
 
-        // add the tab logic to radar chatter
         $('#radar')
             .bind('pushdowntabrender', function () {
+                // add the tab logic to radar chatter
                 var tab = $(this);
-                var selectedTabName = tab.data('radarselectedtab');
+                var defaultTabName = 'home'; // XXX
+                var selectedTabName = tab.data('radarselectedtab') ||
+                        defaultTabName;
+                tab.data('radarselectedtab', null);
                 switchToRadarTab(tab, selectedTabName);
+                drawChart();
+
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
                     var tabName = li.data('radartab');
                     switchToRadarTab(tab, tabName);
                 });
+
             });
+
 
     });
 

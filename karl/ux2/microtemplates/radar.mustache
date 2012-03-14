@@ -4,8 +4,8 @@
             <h3>Radar</h3>
             <ul id="sections" class="nav nav-list radartabs">
                 <li class="active" data-radartab="home"><a href="#">Home <span class="messageCounter">3</span></a></li>
+                <li data-radartab="budget"><a href="#">Budget <span class="messageCounter">4</span></a></li>
                 <li data-radartab="approvals"><a href="#">Approvals</a></li>
-                <li><a href="#">Topics <span class="messageCounter">4</span></a></li>
                 <li><a href="#">Featured</a></li>
                 <li><a href="#">Apps</a></li>
                 <li><a href="#">Configure</a></li>
@@ -80,8 +80,14 @@
 
         </div>
 
-        <div class="radarsection clearfix" 
-             style="display: none;" data-radarsection="approvals">
+
+        <div class="radarsection clearfix" data-radarsection="budget">
+             Lorem Ipsum
+            <div id="chart1"></div>
+        </div>
+
+
+        <div class="radarsection clearfix" data-radarsection="approvals">
 
           {{#approvals}}
           <div class="panel" style="margin-left: 20px;">
