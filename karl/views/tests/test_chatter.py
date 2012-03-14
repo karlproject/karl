@@ -195,6 +195,7 @@ class Test_all_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
         request.context = context
+        request.layout_manager = testing.DummyModel(layout=None)
         from karl.views.chatter import all_chatter
         return all_chatter(context, request)
 
@@ -901,7 +902,11 @@ class Test_discover_community_members_json(unittest.TestCase):
             return MEMBERS.get(group, [])
         uf.users_in_group = _users_in_group
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        pf['testing2'] = testing.DummyModel(title='testing 2')
+        pf['other1'] = testing.DummyModel(title='Other 1')
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = testing.DummyModel()
         cf['other'] = testing.DummyModel()
@@ -909,9 +914,29 @@ class Test_discover_community_members_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['userid'], 'user')
         self.assertEqual(info['members'],
-                         {'testing': ['user', 'testing1', 'testing2'],
-                          'other': ['user', 'other1'],
-                         })
+                         {'testing': [
+                              {'url': 'http://example.com/chatter/creators.html?creators=user',
+                               'userid': 'user',
+                               'fullname': 'User 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=testing1',
+                               'userid': 'testing1',
+                               'fullname': 'Testing 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=testing2',
+                               'userid': 'testing2',
+                               'fullname': 'testing 2',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'}],
+                          'other': [
+                              {'url': 'http://example.com/chatter/creators.html?creators=user',
+                               'userid': 'user',
+                               'fullname': 'User 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=other1',
+                               'userid': 'other1',
+                               'fullname': 'Other 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'}]}
+                         )
 
     def test_GET_w_parms(self):
         MEMBERS = {
@@ -930,7 +955,11 @@ class Test_discover_community_members_json(unittest.TestCase):
             return MEMBERS.get(group, [])
         uf.users_in_group = _users_in_group
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
+        site['profiles'] = pf = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        pf['testing2'] = testing.DummyModel(title='testing 2')
+        pf['other1'] = testing.DummyModel(title='Other 1')
         site['communities'] = cf = testing.DummyModel()
         cf['testing'] = testing.DummyModel()
         cf['other'] = testing.DummyModel()
@@ -938,9 +967,29 @@ class Test_discover_community_members_json(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['userid'], 'user')
         self.assertEqual(info['members'],
-                         {'testing': ['user', 'testing1', 'testing2'],
-                          'other': ['user', 'other1'],
-                         })
+                         {'testing': [
+                              {'url': 'http://example.com/chatter/creators.html?creators=user',
+                               'userid': 'user',
+                               'fullname': 'User 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=testing1',
+                               'userid': 'testing1',
+                               'fullname': 'Testing 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=testing2',
+                               'userid': 'testing2',
+                               'fullname': 'testing 2',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'}],
+                          'other': [
+                              {'url': 'http://example.com/chatter/creators.html?creators=user',
+                               'userid': 'user',
+                               'fullname': 'User 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
+                              {'url': 'http://example.com/chatter/creators.html?creators=other1',
+                               'userid': 'other1',
+                               'fullname': 'Other 1',
+                               'image_url': 'http://example.com/static/None/images/defaultUser.gif'}]}
+                         )
 
 
 class Test_update_followed(unittest.TestCase):
@@ -1017,18 +1066,18 @@ class Test_following_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'userid': 'other'})
         info = self._callFUT(context, request)
         self.assertEqual(info['userid'], 'other')
-        self.assertEqual(len(info['following']), 2)
-        self.assertEqual(info['following'][0]['userid'], 'user1')
-        self.assertEqual(info['following'][0]['fullname'], 'User 1')
-        self.assertEqual(info['following'][0]['url'],
+        self.assertEqual(len(info['members']), 2)
+        self.assertEqual(info['members'][0]['userid'], 'user1')
+        self.assertEqual(info['members'][0]['fullname'], 'User 1')
+        self.assertEqual(info['members'][0]['url'],
                    'http://example.com/chatter/creators.html?creators=user1')
-        self.assertEqual(info['following'][0]['image_url'],
+        self.assertEqual(info['members'][0]['image_url'],
                    'http://example.com/static/None/images/defaultUser.gif')
-        self.assertEqual(info['following'][1]['userid'], 'user2')
-        self.assertEqual(info['following'][1]['fullname'], 'User 2')
-        self.assertEqual(info['following'][1]['url'],
+        self.assertEqual(info['members'][1]['userid'], 'user2')
+        self.assertEqual(info['members'][1]['fullname'], 'User 2')
+        self.assertEqual(info['members'][1]['url'],
                    'http://example.com/chatter/creators.html?creators=user2')
-        self.assertEqual(info['following'][1]['image_url'],
+        self.assertEqual(info['members'][1]['image_url'],
                    'http://example.com/static/None/images/defaultUser.gif')
 
     def test_wo_parm(self):
@@ -1042,18 +1091,18 @@ class Test_following_json(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['userid'], 'user')
-        self.assertEqual(len(info['following']), 2)
-        self.assertEqual(info['following'][0]['userid'], 'user1')
-        self.assertEqual(info['following'][0]['fullname'], 'User 1')
-        self.assertEqual(info['following'][0]['url'],
+        self.assertEqual(len(info['members']), 2)
+        self.assertEqual(info['members'][0]['userid'], 'user1')
+        self.assertEqual(info['members'][0]['fullname'], 'User 1')
+        self.assertEqual(info['members'][0]['url'],
                    'http://example.com/chatter/creators.html?creators=user1')
-        self.assertEqual(info['following'][0]['image_url'],
+        self.assertEqual(info['members'][0]['image_url'],
                    'http://example.com/static/None/images/defaultUser.gif')
-        self.assertEqual(info['following'][1]['userid'], 'user2')
-        self.assertEqual(info['following'][1]['fullname'], 'User 2')
-        self.assertEqual(info['following'][1]['url'],
+        self.assertEqual(info['members'][1]['userid'], 'user2')
+        self.assertEqual(info['members'][1]['fullname'], 'User 2')
+        self.assertEqual(info['members'][1]['url'],
                    'http://example.com/chatter/creators.html?creators=user2')
-        self.assertEqual(info['following'][1]['image_url'],
+        self.assertEqual(info['members'][1]['image_url'],
                    'http://example.com/static/None/images/defaultUser.gif')
 
 
@@ -1074,13 +1123,13 @@ class Test_following(unittest.TestCase):
         context._following = ('user1',)
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(len(info['following']['following']), 1)
+        self.assertEqual(len(info['members']['members']), 1)
         self.assertEqual(info['api'].page_title, 'Followed by: user')
-        self.assertEqual(info['following']['following'][0]['userid'], 'user1')
-        self.assertEqual(info['following']['following'][0]['fullname'], 'User 1')
-        self.assertEqual(info['following']['following'][0]['url'],
+        self.assertEqual(info['members']['members'][0]['userid'], 'user1')
+        self.assertEqual(info['members']['members'][0]['fullname'], 'User 1')
+        self.assertEqual(info['members']['members'][0]['url'],
                    'http://example.com/chatter/creators.html?creators=user1')
-        self.assertEqual(info['following']['following'][0]['image_url'],
+        self.assertEqual(info['members']['members'][0]['image_url'],
                    'http://example.com/static/None/images/defaultUser.gif')
 
 
