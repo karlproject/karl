@@ -22,8 +22,10 @@ except ImportError:
 
 
 def configure_karl(config, load_zcml=True):
-    static_rev = get_static_rev()
-    config.registry.settings['static_rev'] = static_rev
+    static_rev = config.registry.settings.get('static_rev')
+    if not static_rev:
+        static_rev = _guess_static_rev()
+        config.registry.settings['static_rev'] = static_rev
     config.add_static_view('/static/%s' % static_rev, 'karl.views:static')
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
@@ -39,8 +41,16 @@ def configure_karl(config, load_zcml=True):
         config.include(pyramid_debugtoolbar)
 
 
-def get_static_rev():
-    # If Karl is installed via an egg, we can try to get the Karl version
+def _guess_static_rev():
+    """Guess an appropriate static revision number.
+
+    This is only used when no deployment tool set the static_rev
+    for us.  Deployment tools should set static_rev because
+    karl can only guess what static revisions are appropriate,
+    while deployment tools can set a system-wide revision number
+    that encompasses all relevant system changes.
+    """
+    # If Karl is installed as an egg, we can try to get the Karl version
     # number from the egg and use that.
     _static_rev = _get_egg_rev()
 
