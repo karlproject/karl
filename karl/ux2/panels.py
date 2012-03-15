@@ -276,3 +276,13 @@ def discover(context, request):
 
 def wiki_lock(context, request, lock_info):
     return {'lock_info': lock_info}
+
+
+# global resources insert
+def extra_head(context, request):
+    # google api must be loaded from head, non-defer
+    html = '<script>\n' \
+           'google.load("visualization", "1", {packages:["corechart"]});\n' \
+           '</script>\n'
+    return html
+

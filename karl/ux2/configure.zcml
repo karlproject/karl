@@ -175,6 +175,12 @@
     renderer="templates/page_title.pt"
     />
 
+  <bc:panel
+    name="popper.extra_head"
+    panel=".panels.extra_head"
+    />
+
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
