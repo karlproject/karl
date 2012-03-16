@@ -238,5 +238,50 @@ def radar_ajax_view(context, request):
 
             }
 
+        results['state'] = {
+            'chart1': {
+                'options' : {         
+                    'title': 'Company Performance',        
+                    'hAxis': {
+                        'title': 'Year',
+                        'titleTextStyle': {'color': 'red'},
+                        },
+                    'width': 200,      # Must have fixed width! (matching css)
+                    },
+                'columns': [
+                    ['string', 'Year'],
+                    ['number', 'Sales'],
+                    ['number', 'Expenses'],
+                    ],
+                'rows': [
+                    ['2004', 1000, 400],   
+                    ['2005', 1170, 460],
+                    ['2006', 660, 1120],   
+                    ['2007', 1030, 540],
+                    ],
+                },
+            'chart2': {
+                'options' : {         
+                    'title': 'Monthly Operating Revenue',        
+                    'hAxis': {
+                        'title': 'Project',
+                        'titleTextStyle': {'color': 'red'},
+                        },
+                    'width': 400,      # Must have fixed width! (matching css)
+                    },
+                'columns': [
+                    ['string', 'Project'],
+                    ['number', 'Budgeted'],
+                    ['number', 'Actual'],
+                    ],
+                'rows': [
+                    ['My First Project', 1000, 400],   
+                    ['Another Project', 1170, 460],
+                    ['A Third Project', 660, 1120],   
+                    ],
+                },
+            }
+
+
     return results
 

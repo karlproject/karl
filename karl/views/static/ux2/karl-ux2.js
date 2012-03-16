@@ -31,30 +31,29 @@
         });
 
 
-        function drawChart(el) {
-            log('Draw chart.', el);
-            el.each(function () {
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Year');
-                data.addColumn('number', 'Sales');
-                data.addColumn('number', 'Expenses');
-                data.addRows([
-                    ['2004', 1000, 400],   
-                    ['2005', 1170, 460],
-                    ['2006', 660, 1120],   
-                    ['2007', 1030, 540]
-                ]);
-                var options = {         
-                    title: 'Company Performance',        
-                    hAxis: {
-                        title: 'Year',
-                        titleTextStyle: {color: 'red'}
-                    }
-                };
+        function drawChart(elChart, data) {
+            // Do we have a chart already?
+            if (! elChart.data('hasChart')) {
+                // Only do this if no chart yet.
+                // Mark we have a chart.
+                elChart.data('hasChart', true);
+                // Apply data-chartwidth attribute if specified
+                //if ((data.options || {}).width === undefined) {
+                //    var chartWidth = Number(elChart.data('chartwidth'));
+                //    if (chartWidth) {
+                //        data.options.width = chartWidth;
+                //    }
+                //}
+                // Draw the chart.
+                var gdata = new google.visualization.DataTable();
+                $.each(data.columns, function (index) {
+                    gdata.addColumn(this[0], this[1]);
+                });
+                gdata.addRows(data.rows);
                 var chart = new google.visualization.ColumnChart(
-                        this);
-                chart.draw(data, options);
-            });
+                        elChart[0]);
+                chart.draw(gdata, data.options);
+            }
         }
 
         function switchToRadarTab(tab, tabName) {
@@ -68,18 +67,16 @@
                     // the sections except one.
                     $('#radar-panel .radarsection').hide();
                     section.show();
-                    drawChart($('#radar-panel .radarchart'));
                 } else {
                     // Normal way: animate from one section to the other.
-                    var currentSection =
+                    // Are we switching?
+                    if (currentTabName != tabName) {
+                        var currentSection =
                             $('#radar-panel .radarsection[data-radarsection="' +
                             currentTabName + '"]');
-                    // Are we switching?
-                    if (currentSection.data('radarsection') != tabName) {
                         // animate the section
                         currentSection.hide('fade', function () {
                             section.show('fade');
-                            drawChart($('#radar-panel .radarchart'));
                         });
                     }
                 }
@@ -92,41 +89,42 @@
                 $('#radar-panel .radartabs li[data-radartab="' +
                                  tabName + '"]')
                     .addClass('active');
-
             }
         }
 
         $('#radar')
-            .bind('pushdowntabrender', function () {
-                // add the tab logic to radar chatter
+            .bind('pushdowntabrender', function (evt, state) {
                 var tab = $(this);
+                // store the newest state for the widgets
+                tab.data('pushdowntabstate', state);
+
+                // add the tab logic to radar chatter
                 var defaultTabName = 'home'; // XXX
                 var selectedTabName = tab.data('radarselectedtab') ||
                         defaultTabName;
                 tab.data('radarselectedtab', null);
-                tab.data('radarchart_bound', false);
-                // XXX Ugly, ugly, replace.
-                drawChart($('#radar-panel .radarchart'));
+
                 switchToRadarTab(tab, selectedTabName);
 
+                // Bind necessary extras
+                //
+                // Budget: draw the charts
+                $('#radar-panel .radarchart').each(function () {
+                    var elChart = $(this);
+                    var name = elChart.data('chartname');
+                    var chartData = state[name];
+                    // XXX note, a width must be specified for google charts
+                    // otherwise, they will have the wrong width
+                    // if hidden initially
+                    drawChart(elChart, chartData);
+                });
+
+                // implement switching by click
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
                     var tabName = li.data('radartab');
                     switchToRadarTab(tab, tabName);
                 });
-
-            })
-            .bind('pushdowntabshow', function () {
-                // Some panel-dependent extras
-                // require to be visible
-                //
-                // draw the google chart (only once)
-                var tab = $(this);
-                if (! tab.data('radarchart_bound')) {
-                    drawChart($('#radar-panel .radarchart'));
-                    tab.data('radarchart_bound', true);
-                }
-
 
             });
 
