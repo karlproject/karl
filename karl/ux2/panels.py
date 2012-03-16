@@ -274,6 +274,11 @@ def discover(context, request):
     return {}
 
 
+def follow_info(context, request, creators):
+    return {'creators': creators,
+            'chatter_url': request.resource_url(context)}
+
+
 def wiki_lock(context, request, lock_info):
     return {'lock_info': lock_info}
 

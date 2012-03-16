@@ -165,6 +165,12 @@
     />
 
   <bc:panel
+    name="chatter.follow_info"
+    panel=".panels.follow_info"
+    renderer="templates/follow_info.pt"
+    />
+
+  <bc:panel
     name="wiki_lock"
     panel=".panels.wiki_lock"
     renderer="templates/wiki_lock.pt"

@@ -1,0 +1,42 @@
+<metal:block use-macro="main_template">
+
+    <metal:slot metal:fill-slot="extra-headers">
+        <link rel="alternate" type="application/atom+xml" 
+            title="${layout.page_title}" href="${feed_url}"
+        />
+    </metal:slot>
+
+    <metal:head fill-slot="head_slot">
+      <metal:timeago use-macro="layout.macros['timeago_js']"/>
+    </metal:head>
+
+    <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+
+    <div id="chatter-quips" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="quip recent">
+        <div class="panel-item-content">
+          <div>
+            <a href="${quip['creator_url']}">
+              <img class="avatar" alt="${quip['creator']}"
+                   src="${quip['creator_image_url']}" />
+              <strong class="fullname">${quip['creator']}</strong>
+            </a>
+            <a href="${quip['url']}" class="messagetext">
+              ${quip['text']}
+            </a>
+          </div>
+          <div class="panel-footer clearfix">
+            <small class="timestamp"
+                   title="${quip['timeago']}">timeago</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

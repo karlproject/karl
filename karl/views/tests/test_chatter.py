@@ -324,24 +324,42 @@ class Test_creators_chatter_json(unittest.TestCase):
     def test_empty_chatterbox_creators_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': 'USER'})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        request = testing.DummyRequest(GET={'creators': 'user'})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER'])
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
         self.assertEqual(info['recent'], [])
-        self.assertEqual(context._creators, ('USER',))
+        self.assertEqual(context._creators, ('user',))
         self.failIf(context._names or context._tag or
                     context._followed or context._community)
 
     def test_empty_chatterbox_creators_as_string_multiple(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': 'USER1,USER2'})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        request = testing.DummyRequest(GET={'creators': 'user,testing1'})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER1', 'USER2'])
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False},
+             {'url': 'http://example.com/chatter/creators.html?creators=testing1',
+              'userid': 'testing1',
+              'fullname': 'Testing 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
         self.assertEqual(info['recent'], [])
-        self.assertEqual(context._creators, ('USER1', 'USER2'))
+        self.assertEqual(context._creators, ('user', 'testing1'))
         self.failIf(context._names or context._tag or
                     context._followed or context._community)
 
@@ -349,10 +367,16 @@ class Test_creators_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': ('USER',)})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        request = testing.DummyRequest(GET={'creators': ('user',)})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER'])
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
         _verify_quips(info['recent'], quips, request)
 
     def test_filled_chatterbox_skips_unauthorized_private_quips(self):
@@ -360,8 +384,10 @@ class Test_creators_chatter_json(unittest.TestCase):
         site = testing.DummyModel()
         quips = [DummyQuip('1'), DummyQuip('2'), DummyQuip('3')]
         site['chatter'] = context = _makeChatterbox(quips)
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': ('USER',)})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        request = testing.DummyRequest(GET={'creators': ('user',)})
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
 
@@ -371,12 +397,24 @@ class Test_creators_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        request = testing.DummyRequest(GET={'creators': ['user', 'testing1']})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER', 'USER2'])
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False},
+             {'url': 'http://example.com/chatter/creators.html?creators=testing1',
+              'userid': 'testing1',
+              'fullname': 'Testing 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
         _verify_quips(info['recent'], quips[:20], request)
-        self.assertEqual(context._creators, ('USER', 'USER2'))
+        self.assertEqual(context._creators, ('user', 'testing1'))
         self.failIf(context._names or context._tag or context._followed or
                     context._community)
 
@@ -386,8 +424,10 @@ class Test_creators_chatter_json(unittest.TestCase):
         for i in range(30):
             quips.append(DummyQuip(str(i)))
         site['chatter'] = context = _makeChatterbox(quips)
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2'],
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        request = testing.DummyRequest(GET={'creators': ['user', 'testing1'],
                                             'start': 2, 'count': 5})
         info = self._callFUT(context, request)
         _verify_quips(info['recent'], quips[2:7], request)
@@ -397,6 +437,7 @@ class Test_creators_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
         request.context = context
+        request.layout_manager = testing.DummyModel(layout=None)
         from karl.views.chatter import creators_chatter
         return creators_chatter(context, request)
 
@@ -411,11 +452,17 @@ class Test_creators_chatter(unittest.TestCase):
     def test_empty_chatterbox_creators_as_string(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': 'USER'})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        request = testing.DummyRequest(GET={'creators': 'user'})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER'])
-        self.assertEqual(info['api'].page_title, 'Chatter: @USER')
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
+        self.assertEqual(info['api'].page_title, 'Chatter: @user')
         self.assertEqual(info['chatter_form_url'],
                          'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
@@ -423,11 +470,23 @@ class Test_creators_chatter(unittest.TestCase):
     def test_empty_chatterbox_creators_as_list(self):
         site = testing.DummyModel()
         site['chatter'] = context = _makeChatterbox()
-        site['profiles'] = testing.DummyModel()
-        request = testing.DummyRequest(GET={'creators': ['USER', 'USER2']})
+        pf = site['profiles'] = testing.DummyModel()
+        pf['user'] = testing.DummyModel(title='User 1')
+        pf['testing1'] = testing.DummyModel(title='Testing 1')
+        request = testing.DummyRequest(GET={'creators': ['user', 'testing1']})
         info = self._callFUT(context, request)
-        self.assertEqual(info['creators'], ['USER', 'USER2'])
-        self.assertEqual(info['api'].page_title, 'Chatter: @USER, @USER2')
+        self.assertEqual(info['creators'],
+            [{'url': 'http://example.com/chatter/creators.html?creators=user',
+              'userid': 'user',
+              'fullname': 'User 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False},
+             {'url': 'http://example.com/chatter/creators.html?creators=testing1',
+              'userid': 'testing1',
+              'fullname': 'Testing 1',
+              'image_url': 'http://example.com/static/None/images/defaultUser.gif',
+              'followed': False}])
+        self.assertEqual(info['api'].page_title, 'Chatter: @user, @testing1')
         self.assertEqual(info['recent'], [])
 
 
@@ -918,23 +977,28 @@ class Test_discover_community_members_json(unittest.TestCase):
                               {'url': 'http://example.com/chatter/creators.html?creators=user',
                                'userid': 'user',
                                'fullname': 'User 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=testing1',
                                'userid': 'testing1',
                                'fullname': 'Testing 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=testing2',
                                'userid': 'testing2',
                                'fullname': 'testing 2',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'}],
                           'other': [
                               {'url': 'http://example.com/chatter/creators.html?creators=user',
                                'userid': 'user',
                                'fullname': 'User 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=other1',
                                'userid': 'other1',
                                'fullname': 'Other 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'}]}
                          )
 
@@ -971,23 +1035,28 @@ class Test_discover_community_members_json(unittest.TestCase):
                               {'url': 'http://example.com/chatter/creators.html?creators=user',
                                'userid': 'user',
                                'fullname': 'User 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=testing1',
                                'userid': 'testing1',
                                'fullname': 'Testing 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=testing2',
                                'userid': 'testing2',
                                'fullname': 'testing 2',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'}],
                           'other': [
                               {'url': 'http://example.com/chatter/creators.html?creators=user',
                                'userid': 'user',
                                'fullname': 'User 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'},
                               {'url': 'http://example.com/chatter/creators.html?creators=other1',
                                'userid': 'other1',
                                'fullname': 'Other 1',
+                               'followed': False,
                                'image_url': 'http://example.com/static/None/images/defaultUser.gif'}]}
                          )
 
@@ -1282,6 +1351,7 @@ def _makeChatterbox(recent=()):
         _KEY = 'KEY'
         _names = _tag = _community = _added = _creators = _followed = None
         _following = ()
+        _followed_by = ()
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator):
