@@ -551,7 +551,7 @@
           </tal:ifadmin>
         </div>
 
-        <span class="portraid">
+        <span class="portrait">
               <img width="75" height="100" src="${comment['portrait_url']}" />
         </span>
 
