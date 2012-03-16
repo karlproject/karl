@@ -1808,7 +1808,7 @@
   <view
     for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.creators_chatter"
-    renderer="templates/recent_chatter.pt"
+    renderer="templates/creators.pt"
     permission="view"
     name="creators.html"
     />
@@ -1899,6 +1899,20 @@
     renderer="templates/update_followed.pt"
     permission="view"
     name="update_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_followed"
+    permission="view"
+    name="add_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.remove_followed"
+    permission="view"
+    name="remove_followed.html"
     />
 
   <view

@@ -213,8 +213,10 @@ def creators_chatter_json(context, request):
         creators = creators.split(',')
     else:
         creators = list(creators)
+    creators = _quippers_from_users(context, request, creators)
+    creator_list = [x['userid'] for x in creators]
     chatter = find_chatter(context)
-    return {'recent': _do_slice(chatter.recentWithCreators(*creators), request),
+    return {'recent': _do_slice(chatter.recentWithCreators(*creator_list), request),
             'creators': creators,
            }
 
@@ -227,10 +229,13 @@ def creators_chatter(context, request):
     except KeyError:
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
-                        ', '.join(['@%s' % x for x in info['creators']]))
+                        ', '.join(['@%s' % x['userid'] for x in info['creators']]))
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.follow_info', info['creators'])
     return info
 
 
@@ -415,11 +420,13 @@ def discover_community_members_json(context, request):
 def discover_people(context, request):
     """ View the list of users that share communities with the current user.
     """
+    chatter = find_chatter(context)
     share_with = discover_community_members_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Share communities with: %s' % share_with['userid']),
             'members': share_with,
             'context_tools': get_context_tools(request, selected='discover'),
+            'chatter_url': request.resource_url(chatter),
            }
 
 
@@ -442,6 +449,44 @@ def update_followed(context, request):
             'followed': '\n'.join(chatter.listFollowed(userid)),
             'view_url': resource_url(context, request, request.view_name),
            }
+
+
+def add_followed(context, request):
+    """ Add an user to the list of users followed by the current user.
+
+    The form data must include the following:
+
+    - 'add': a new userid to add to the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    add = request.GET.get('add')
+    if add is not None:
+        following = list(chatter.listFollowed(userid))
+        if add not in following:
+            following.append(add)
+            chatter.setFollowed(userid, following)
+    location = "%sfollowing.html" % resource_url(context, request)
+    return HTTPFound(location=location)
+
+
+def remove_followed(context, request):
+    """ Remove an user from the list of users followed by the current user.
+
+    The form data must include the following:
+
+    - 'remove': a userid to remove from the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    remove = request.GET.get('remove')
+    if remove is not None:
+        following = list(chatter.listFollowed(userid))
+        if remove in following:
+            following.remove(remove)
+            chatter.setFollowed(userid, following)
+    location = "%sfollowing.html" % resource_url(context, request)
+    return HTTPFound(location=location)
 
 
 def following_json(context, request):
@@ -488,6 +533,8 @@ def followed_by_json(context, request):
 def following(context, request):
     """ View the list of users followed by the current user.
     """
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.followers')
@@ -496,12 +543,15 @@ def following(context, request):
                                 'Followed by: %s' % following['userid']),
             'members': following,
             'context_tools': get_context_tools(request, selected='following'),
+            'chatter_url': chatter_url,
            }
 
 
 def followed_by(context, request):
     """ View the list of users following the current user.
     """
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.followers')
@@ -510,6 +560,7 @@ def followed_by(context, request):
                                 'Following: %s' % followed_by['userid']),
             'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='following'),
+            'chatter_url': chatter_url,
            }
 
 
@@ -543,6 +594,7 @@ def add_chatter(context, request):
     return HTTPFound(location=location)
 
 def _quippers_from_users(context, request, user_list):
+    userid = authenticated_userid(request)
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     profiles = find_profiles(context)
@@ -559,5 +611,7 @@ def _quippers_from_users(context, request, user_list):
         info['userid'] = quipper
         info['fullname'] = profile.title
         info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
+        user_list = chatter.listFollowed(userid)
+        info['followed'] = quipper in user_list
         following.append(info)
     return following
