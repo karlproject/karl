@@ -31,8 +31,8 @@
         });
 
 
-        function drawChart(el) {
-            log('Draw chart.', el);
+        function drawChart(el, data) {
+            log('Draw chart.', el, data);
             el.each(function () {
                 // Do we have a chart already?
                 var elChart = $(this);
@@ -41,26 +41,14 @@
                     // Mark we have a chart.
                     elChart.data('hasChart', true);
                     // Draw the chart.
-                    var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Year');
-                    data.addColumn('number', 'Sales');
-                    data.addColumn('number', 'Expenses');
-                    data.addRows([
-                        ['2004', 1000, 400],   
-                        ['2005', 1170, 460],
-                        ['2006', 660, 1120],   
-                        ['2007', 1030, 540]
-                    ]);
-                    var options = {         
-                        title: 'Company Performance',        
-                        hAxis: {
-                            title: 'Year',
-                            titleTextStyle: {color: 'red'}
-                        }
-                    };
+                    var gdata = new google.visualization.DataTable();
+                    $.each(data.columns, function (index) {
+                        gdata.addColumn(this[0], this[1]);
+                    });
+                    gdata.addRows(data.rows);
                     var chart = new google.visualization.ColumnChart(
                             this);
-                    chart.draw(data, options);
+                    chart.draw(gdata, data.options);
                 }
             });
         }
@@ -110,18 +98,27 @@
         }
 
         $('#radar')
-            .bind('pushdowntabrender', function () {
-                // add the tab logic to radar chatter
+            .bind('pushdowntabrender', function (evt, state) {
                 var tab = $(this);
+                // store the newest state for the widgets
+                tab.data('pushdowntabstate', state);
+
+                // add the tab logic to radar chatter
                 var defaultTabName = 'home'; // XXX
                 var selectedTabName = tab.data('radarselectedtab') ||
                         defaultTabName;
                 tab.data('radarselectedtab', null);
 
                 function callbackShown(tab, tabName, section) {
+                    var state = tab.data('pushdowntabstate') || {};
                     if (tabName == 'budget') {
-                        log('Budget!!!');
-                        drawChart($('#radar-panel .radarchart'));
+                        $('#radar-panel .radarchart').each(function () {
+                            var elChart = $(this);
+                            var name = elChart.data('chartname');
+                            var chartData = state[name];
+                            drawChart(elChart, chartData);
+                        });
+
                     }
                 }
 
