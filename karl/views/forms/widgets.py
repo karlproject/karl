@@ -41,6 +41,11 @@ class RichTextWidget(Widget):
         result = [string_data]
         return result
 
+
+class CommentWidget(RichTextWidget):
+    show_label = False
+
+
 class TagsWidget(Widget):
     type = 'Input'
 

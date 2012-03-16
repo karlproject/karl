@@ -1,9 +1,10 @@
 <div>
-  <div class="addCommentButton" style="float: right;">
-    <a href="#addcomment">add comment</a>
+  <div tal:condition="comments" class="addCommentButton" style="float: right;">
+    <a href="#addcomment">jump to add comment</a>
   </div>
   <h2>
-        <a name="comments" id="comments">Comments</a>
+      <a tal:condition="comments" name="comments" id="comments">Comments</a>
+      <a tal:condition="not comments" name="comments" id="comments">Add Comment</a>
   </h2>
 
   <div tal:repeat="comment comments">

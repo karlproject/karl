@@ -1,8 +1,12 @@
-<div id="${field.cssname}--field" class="control-group ${field.classes}">
+<div id="${field.cssname}--field" class="control-group ${field.classes}"
+    tal:define="show_label field.widget.show_label|True">
   <!-- field/main.html -->
-  <label tal:condition="field.widget.type != 'Hidden' and '.' not in field.name"
-         for="${field.cssname}" tal:attributes="class field.required and 'required' and 'control-label' or 'control-label'">${field.title}</label>
-  <div class="controls">
+  <label tal:condition="show_label and field.widget.type != 'Hidden' and 
+                        '.' not in field.name"
+      for="${field.cssname}" 
+      tal:attributes="class field.required and 'required' and 'control-label' or 
+      'control-label'">${field.title}</label>
+  <div class="controls" tal:omit-tag="not show_label">
   	<span tal:content="structure:field.widget()" tal:omit-tag></span>
   	<span tal:condition="field.error" class="help-inline">${unicode(field.error)}</span>
   	<p class="fieldHelp help-block" tal:condition="str(field.description) != ''">${field.description}</p>

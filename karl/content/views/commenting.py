@@ -149,7 +149,7 @@ class AddCommentFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'add_comment': karlwidgets.RichTextWidget(empty=''),
+            'add_comment': karlwidgets.CommentWidget(empty=''),
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
