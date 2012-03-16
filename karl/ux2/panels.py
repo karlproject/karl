@@ -13,17 +13,25 @@ from karl.utils import find_community
 from karl.utils import find_chatter
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
+from karl.views.utils import make_name
+
 
 PROFILE_ICON_SIZE = (15, 15)
+EMPTY_CONTEXT = {}
 
 def global_nav(context, request):
 
-    def menu_item(title, url, css_id=None):
+    def menu_item(title, url, id=None, count=None):
+        if id is None:
+            id = make_name(EMPTY_CONTEXT, title)
         selected = request.resource_url(context).startswith(url)
-        return dict(title=title,
+        item = dict(title=title,
                     url=url,
-                    css_id=css_id,
+                    id=id,
                     selected=selected and 'selected' or None)
+        if count is not None:
+            item['count'] = count
+        return item
 
     layout = request.layout_manager.layout
     site = layout.site
@@ -39,13 +47,14 @@ def global_nav(context, request):
     if layout.should_show_calendar_tab:
         menu_items.append(menu_item("Calendar",
              request.resource_url(site, 'offices', 'calendar')))
-    if layout.user_is_staff:
-        menu_items.append(menu_item("Tags",
-             request.resource_url(site, 'tagcloud.html')))
     chatter = find_chatter(site)
-    menu_items.append(menu_item("Chatter",
-        request.resource_url(chatter), css_id='chatter'))
-    return {'nav_menu': menu_items}
+    menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
+    menu_items.append(menu_item("Radar", "#", count="7"))
+    overflow_menu = []
+    if layout.user_is_staff:
+        overflow_menu.append(menu_item("Tags",
+             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
+    return {'nav_menu': menu_items, 'overflow_menu': overflow_menu}
 
 
 def actions_menu(context, request, actions):
