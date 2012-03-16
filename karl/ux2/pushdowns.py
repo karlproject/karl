@@ -261,28 +261,24 @@ def radar_ajax_view(context, request):
                 },
             'chart2': {
                 'options' : {         
-                    'title': 'Company PerXformance',        
+                    'title': 'Monthly Operating Revenue',        
                     'hAxis': {
-                        'title': 'Year',
+                        'title': 'Project',
                         'titleTextStyle': {'color': 'red'},
                         }
                     },
                 'columns': [
-                    ['string', 'Year'],
-                    ['number', 'Sales'],
-                    ['number', 'Expenses'],
+                    ['string', 'Project'],
+                    ['number', 'Budgeted'],
+                    ['number', 'Actual'],
                     ],
                 'rows': [
-                    ['2004', 1000, 400],   
-                    ['2005', 1170, 460],
-                    ['2006', 660, 1120],   
-                    ['2007', 1030, 540],
+                    ['My First Project', 1000, 400],   
+                    ['Another Project', 1170, 460],
+                    ['A Third Project', 660, 1120],   
                     ],
                 },
             }
-
-
-
 
 
     return results
