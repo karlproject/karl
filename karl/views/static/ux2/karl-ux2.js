@@ -31,29 +31,32 @@
         });
 
 
-        function drawChart(el, data) {
-            log('Draw chart.', el, data);
-            el.each(function () {
-                // Do we have a chart already?
-                var elChart = $(this);
-                if (! elChart.data('hasChart')) {
-                    // Only do this if no chart yet.
-                    // Mark we have a chart.
-                    elChart.data('hasChart', true);
-                    // Draw the chart.
-                    var gdata = new google.visualization.DataTable();
-                    $.each(data.columns, function (index) {
-                        gdata.addColumn(this[0], this[1]);
-                    });
-                    gdata.addRows(data.rows);
-                    var chart = new google.visualization.ColumnChart(
-                            this);
-                    chart.draw(gdata, data.options);
-                }
-            });
+        function drawChart(elChart, data) {
+            // Do we have a chart already?
+            if (! elChart.data('hasChart')) {
+                // Only do this if no chart yet.
+                // Mark we have a chart.
+                elChart.data('hasChart', true);
+                // Apply data-chartwidth attribute if specified
+                //if ((data.options || {}).width === undefined) {
+                //    var chartWidth = Number(elChart.data('chartwidth'));
+                //    if (chartWidth) {
+                //        data.options.width = chartWidth;
+                //    }
+                //}
+                // Draw the chart.
+                var gdata = new google.visualization.DataTable();
+                $.each(data.columns, function (index) {
+                    gdata.addColumn(this[0], this[1]);
+                });
+                gdata.addRows(data.rows);
+                var chart = new google.visualization.ColumnChart(
+                        elChart[0]);
+                chart.draw(gdata, data.options);
+            }
         }
 
-        function switchToRadarTab(tab, tabName, /*optional*/ callbackShown) {
+        function switchToRadarTab(tab, tabName) {
             if (tabName) {
                 var currentTabName = tab.data('radarselectedtab');
                 var section = 
@@ -64,9 +67,6 @@
                     // the sections except one.
                     $('#radar-panel .radarsection').hide();
                     section.show();
-                    if (callbackShown) {
-                        callbackShown(tab, tabName, section);
-                    }
                 } else {
                     // Normal way: animate from one section to the other.
                     // Are we switching?
@@ -76,11 +76,7 @@
                             currentTabName + '"]');
                         // animate the section
                         currentSection.hide('fade', function () {
-                            section.show('fade', function () {
-                                if (callbackShown) {
-                                    callbackShown(tab, tabName, section);
-                                }
-                            });
+                            section.show('fade');
                         });
                     }
                 }
@@ -93,7 +89,6 @@
                 $('#radar-panel .radartabs li[data-radartab="' +
                                  tabName + '"]')
                     .addClass('active');
-
             }
         }
 
@@ -109,49 +104,26 @@
                         defaultTabName;
                 tab.data('radarselectedtab', null);
 
-                function callbackShown(tab, tabName, section) {
-                    var state = tab.data('pushdowntabstate') || {};
-                    if (tabName == 'budget') {
-                        $('#radar-panel .radarchart').each(function () {
-                            var elChart = $(this);
-                            var name = elChart.data('chartname');
-                            var chartData = state[name];
-                            drawChart(elChart, chartData);
-                        });
+                switchToRadarTab(tab, selectedTabName);
 
-                    }
-                }
+                // Bind necessary extras
+                //
+                // Budget: draw the charts
+                $('#radar-panel .radarchart').each(function () {
+                    var elChart = $(this);
+                    var name = elChart.data('chartname');
+                    var chartData = state[name];
+                    // XXX note, a width must be specified for google charts
+                    // otherwise, they will have the wrong width
+                    // if hidden initially
+                    drawChart(elChart, chartData);
+                });
 
-                switchToRadarTab(tab, selectedTabName,
-                    function (tab, tabName, section) {
-                        // XXX Next problem. We can only bind the google 
-                        // chart when the panel is actually shown. Due to the
-                        // animation, this will happen later. So we will need
-                        // an event for this, but for now,
-                        // let's just quick-and-dirty...
-                        var panelVisible = tab.data('pushdowntab')
-                            .panel.data('pushdownpanel')
-                            .isVisible();
-                        if (panelVisible) {
-                            log('onrender PREDRAW');
-                            // panel is visible now
-                            callbackShown(tab, tabName, section);
-                        } else {
-                            // panel is not visible, it will be when open.
-                            // XXX Try to do this with proper event
-                            // XXX from component.
-                            tab.one('pushdowntabshow', function () {
-                                log('onrender post draw');
-                                callbackShown(tab, tabName, section);
-                            });
-                        }
-                    }
-                );
-
+                // implement switching by click
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
                     var tabName = li.data('radartab');
-                    switchToRadarTab(tab, tabName, callbackShown);
+                    switchToRadarTab(tab, tabName);
                 });
 
             });

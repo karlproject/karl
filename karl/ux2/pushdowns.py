@@ -245,7 +245,8 @@ def radar_ajax_view(context, request):
                     'hAxis': {
                         'title': 'Year',
                         'titleTextStyle': {'color': 'red'},
-                        }
+                        },
+                    'width': 200,      # Must have fixed width! (matching css)
                     },
                 'columns': [
                     ['string', 'Year'],
@@ -265,7 +266,8 @@ def radar_ajax_view(context, request):
                     'hAxis': {
                         'title': 'Project',
                         'titleTextStyle': {'color': 'red'},
-                        }
+                        },
+                    'width': 400,      # Must have fixed width! (matching css)
                     },
                 'columns': [
                     ['string', 'Project'],
