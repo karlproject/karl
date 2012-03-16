@@ -12,10 +12,13 @@
 
     <metal:content fill-slot="content">
 
+        <header>
+            ${panel('status_message')}
+            <h1>On your mind</h1>
+        </header>
     ${panel('status_message')}
 
     <div id="recent-quips-add-form">
-      <h3>On your mind</h3>
       <form class="form-stacked" action="${chatter_form_url}" method="POST">
         <div class="control-group clearfix">
           <div class="controls">
