@@ -34,30 +34,38 @@
         function drawChart(el) {
             log('Draw chart.', el);
             el.each(function () {
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Year');
-                data.addColumn('number', 'Sales');
-                data.addColumn('number', 'Expenses');
-                data.addRows([
-                    ['2004', 1000, 400],   
-                    ['2005', 1170, 460],
-                    ['2006', 660, 1120],   
-                    ['2007', 1030, 540]
-                ]);
-                var options = {         
-                    title: 'Company Performance',        
-                    hAxis: {
-                        title: 'Year',
-                        titleTextStyle: {color: 'red'}
-                    }
-                };
-                var chart = new google.visualization.ColumnChart(
-                        this);
-                chart.draw(data, options);
+                // Do we have a chart already?
+                var elChart = $(this);
+                if (! elChart.data('hasChart')) {
+                    // Only do this if no chart yet.
+                    // Mark we have a chart.
+                    elChart.data('hasChart', true);
+                    // Draw the chart.
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Year');
+                    data.addColumn('number', 'Sales');
+                    data.addColumn('number', 'Expenses');
+                    data.addRows([
+                        ['2004', 1000, 400],   
+                        ['2005', 1170, 460],
+                        ['2006', 660, 1120],   
+                        ['2007', 1030, 540]
+                    ]);
+                    var options = {         
+                        title: 'Company Performance',        
+                        hAxis: {
+                            title: 'Year',
+                            titleTextStyle: {color: 'red'}
+                        }
+                    };
+                    var chart = new google.visualization.ColumnChart(
+                            this);
+                    chart.draw(data, options);
+                }
             });
         }
 
-        function switchToRadarTab(tab, tabName) {
+        function switchToRadarTab(tab, tabName, /*optional*/ callbackShown) {
             if (tabName) {
                 var currentTabName = tab.data('radarselectedtab');
                 var section = 
@@ -68,18 +76,23 @@
                     // the sections except one.
                     $('#radar-panel .radarsection').hide();
                     section.show();
-                    drawChart($('#radar-panel .radarchart'));
+                    if (callbackShown) {
+                        callbackShown(tab, tabName, section);
+                    }
                 } else {
                     // Normal way: animate from one section to the other.
-                    var currentSection =
+                    // Are we switching?
+                    if (currentTabName != tabName) {
+                        var currentSection =
                             $('#radar-panel .radarsection[data-radarsection="' +
                             currentTabName + '"]');
-                    // Are we switching?
-                    if (currentSection.data('radarsection') != tabName) {
                         // animate the section
                         currentSection.hide('fade', function () {
-                            section.show('fade');
-                            drawChart($('#radar-panel .radarchart'));
+                            section.show('fade', function () {
+                                if (callbackShown) {
+                                    callbackShown(tab, tabName, section);
+                                }
+                            });
                         });
                     }
                 }
@@ -104,29 +117,45 @@
                 var selectedTabName = tab.data('radarselectedtab') ||
                         defaultTabName;
                 tab.data('radarselectedtab', null);
-                tab.data('radarchart_bound', false);
-                // XXX Ugly, ugly, replace.
-                drawChart($('#radar-panel .radarchart'));
-                switchToRadarTab(tab, selectedTabName);
+
+                function callbackShown(tab, tabName, section) {
+                    if (tabName == 'budget') {
+                        log('Budget!!!');
+                        drawChart($('#radar-panel .radarchart'));
+                    }
+                }
+
+                switchToRadarTab(tab, selectedTabName,
+                    function (tab, tabName, section) {
+                        // XXX Next problem. We can only bind the google 
+                        // chart when the panel is actually shown. Due to the
+                        // animation, this will happen later. So we will need
+                        // an event for this, but for now,
+                        // let's just quick-and-dirty...
+                        var panelVisible = tab.data('pushdowntab')
+                            .panel.data('pushdownpanel')
+                            .isVisible();
+                        if (panelVisible) {
+                            log('onrender PREDRAW');
+                            // panel is visible now
+                            callbackShown(tab, tabName, section);
+                        } else {
+                            // panel is not visible, it will be when open.
+                            // XXX Try to do this with proper event
+                            // XXX from component.
+                            tab.one('pushdowntabshow', function () {
+                                log('onrender post draw');
+                                callbackShown(tab, tabName, section);
+                            });
+                        }
+                    }
+                );
 
                 $('#radar-panel .radartabs li a').click(function () {
                     var li = $(this).parent();
                     var tabName = li.data('radartab');
-                    switchToRadarTab(tab, tabName);
+                    switchToRadarTab(tab, tabName, callbackShown);
                 });
-
-            })
-            .bind('pushdowntabshow', function () {
-                // Some panel-dependent extras
-                // require to be visible
-                //
-                // draw the google chart (only once)
-                var tab = $(this);
-                if (! tab.data('radarchart_bound')) {
-                    drawChart($('#radar-panel .radarchart'));
-                    tab.data('radarchart_bound', true);
-                }
-
 
             });
 
