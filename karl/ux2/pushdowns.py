@@ -243,7 +243,7 @@ def radar_ajax_view(context, request):
             'statusDate': '02/14/2012',
             'overdueBy': '16',
             }, {
-            'amt': '45.09',
+            'amt': '71.21',
             'via': 'Check',
             'approvedBy': 'Last Person',
             'status': 'Approved',
@@ -254,7 +254,10 @@ def radar_ajax_view(context, request):
         for i, row in enumerate(approval_table1_items):
             row['rowClass'] = 'even' if i % 2 else 'odd' 
 
-        approval_table2_items = 2 * list(approval_table1_items)
+        import copy
+        approval_table2_items = 2 * copy.deepcopy(approval_table1_items)
+        for i, row in enumerate(approval_table2_items):
+            row['rowClass'] = 'even' if i % 2 else 'odd' 
 
         # Assemble the final result.
         results['data'] = {
@@ -270,12 +273,12 @@ def radar_ajax_view(context, request):
                 }],
             # approvals section
             'approvals': [{
-                'class': 'stream2',
+                'class': 'approvalpanel1',
                 'waitinglist': {
                     'items': approval_waitinglist_items,
                     },
                 }, {
-                'class': 'stream2',
+                'class': 'approvalpanel2',
                 'tables': [{
                     'id': 'table1',
                     'title': 'Open Project Project',
