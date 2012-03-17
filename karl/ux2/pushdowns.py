@@ -167,7 +167,6 @@ def radar_ajax_view(context, request):
                 title=adapted.title,
                 url=adapted.url,
                 modified=adapted.modified,
-                modified_readable=adapted.modified, # TODO: format readable
                 creator_title=adapted.creator_title,
                 type=adapted.type,
                 path='...' # TODO: get object path
