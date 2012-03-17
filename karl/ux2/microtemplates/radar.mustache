@@ -23,15 +23,12 @@
                         <a href="{{url}}">
                             <h4 class="pushDownList-title">{{title}}</h4>
                             <div class="pushDownList-info">{{description}}</div>
+                            <div class="actionlinks">
+                                {{#actions}}
+                                <a href="{{url}}">{{title}}</a> {{^last}}|{{/last}}
+                                {{/actions}}
+                            </div>
                         </a>
-                        <div class="pushDownList-helper">
-                            <a href="" class="btn btn-mini dropdown-toggle" data   toggle="dropdown"><span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                {{#tools}}
-                                <li><a class="panel-item-tools" href="{{url}}">{{title}}</a></li>
-                                {{/tools}}
-                            </ul>
-                        </div>
                     </li>
                     {{/communities}}
                 </ul>

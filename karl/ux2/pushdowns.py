@@ -146,6 +146,12 @@ def radar_ajax_view(context, request):
                 title=community.title,
                 description=community.description,
                 url=community.url,
+                actions=[dict(
+                    url=community.url + (a_name if a_name != 'overview' else 'view.html'),
+                    title=a_name.capitalize(),
+                    last=a_name == 'files',
+                    ) for a_name in ('overview', 'blog', 'wiki', 'calendar', 'files')]
+
             )
             for community in communities
         ))
