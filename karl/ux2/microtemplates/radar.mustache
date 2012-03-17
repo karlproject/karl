@@ -40,8 +40,12 @@
                         <a href="{{url}}">
                             <h4 class="pushDownList-title">{{title}}</h4>
                             <div class="pushDownList-info">
-                                {{type}}<br />
-                                <cite>Located at {{path}}</cite>
+                                <cite>{{type}} in 
+                                <!--XXX a inside an a? ... -->
+                                    <a class="community-link" href="{{community_url}}">
+                                        {{community_title}}
+                                    </a>
+                                </cite>
                             </div>
                         </a>
                         <div class="pushDownList-helper">

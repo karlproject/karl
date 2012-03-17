@@ -40,6 +40,13 @@ a#global-logo {
 #chatter-panel-text {
     width: 95%;
 }
+        
+.fixmylinks () {
+    /* Bring back the link color...
+     * but actually, it should rather not be overritten
+     * unconditionally from original! */
+    color: #3D8FB3;
+}
 
 
 #radar-panel {
@@ -52,16 +59,15 @@ a#global-logo {
     h4 {
         font-size: 105%;
     }
+    a.community-link {
+        .fixmylinks;
+    }
     .actionlinks {
         font-size: 75%;
         a {
-            /* Bring back the link color...
-             * but actually, it should rather not be overritten
-             * unconditionally from original! */
-            color: #3D8FB3;
+            .fixmylinks;
         }
     }
-    
 }
 
 

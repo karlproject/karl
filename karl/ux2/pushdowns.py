@@ -6,7 +6,9 @@ import itertools
 from zope.component import getMultiAdapter
 
 from karl.models.interfaces import IGridEntryInfo
+from karl.models.interfaces import ICommunityInfo
 from karl.utils import find_communities
+from karl.utils import find_community
 from karl.views.communities import get_my_communities
 from karl.views.community import get_recent_items_batch
 from karl.views.chatter import followed_chatter_json
@@ -150,8 +152,7 @@ def radar_ajax_view(context, request):
                     url=community.url + (a_name if a_name != 'overview' else 'view.html'),
                     title=a_name.capitalize(),
                     last=a_name == 'files',
-                    ) for a_name in ('overview', 'blog', 'wiki', 'calendar', 'files')]
-
+                    ) for a_name in ('overview', 'blog', 'wiki', 'calendar', 'files')],
             )
             for community in communities
         ))
@@ -162,6 +163,8 @@ def radar_ajax_view(context, request):
         recent_items_batch = get_recent_items_batch(context, request, size=5)
         for item in recent_items_batch["entries"]:
             adapted = getMultiAdapter((item, request), IGridEntryInfo)
+            community = find_community(item)
+            community_info = getMultiAdapter((community, request), ICommunityInfo)
             # Since this is json, we need a real dict...
             recent_items.append(dict(
                 title=adapted.title,
@@ -169,7 +172,8 @@ def radar_ajax_view(context, request):
                 modified=adapted.modified,
                 creator_title=adapted.creator_title,
                 type=adapted.type,
-                path='...' # TODO: get object path
+                community_title=community_info.title,
+                community_url=community_info.url,
                 ))
 
         # Provide fake "approval items" for the "approvals" tab.
