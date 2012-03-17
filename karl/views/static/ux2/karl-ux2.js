@@ -1,6 +1,6 @@
 
 /*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
-/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 80, indent: 4 */
+/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 135, indent: 4 */
 /*jslint sub: true */
 
 /*globals window navigator document console setTimeout jQuery google */
@@ -37,13 +37,6 @@
                 // Only do this if no chart yet.
                 // Mark we have a chart.
                 elChart.data('hasChart', true);
-                // Apply data-chartwidth attribute if specified
-                //if ((data.options || {}).width === undefined) {
-                //    var chartWidth = Number(elChart.data('chartwidth'));
-                //    if (chartWidth) {
-                //        data.options.width = chartWidth;
-                //    }
-                //}
                 // Draw the chart.
                 var gdata = new google.visualization.DataTable();
                 $.each(data.columns, function (index) {
@@ -117,6 +110,37 @@
                     // otherwise, they will have the wrong width
                     // if hidden initially
                     drawChart(elChart, chartData);
+                });
+                //
+                // Approvals: bind the tabs from column2
+                $('#radar-panel .approvalsection').hide();
+                var currentTabName = tab.data('radar.approval.activeTab');
+                var currentSection = $('#radar-panel .approvalsection[data-approvalsection="' +
+                    currentTabName + '"]');
+                currentSection.show();
+                $('#radar-panel a.approvaltab').click(function () {
+                    var link = $(this);
+                    var currentTabName = tab.data('radar.approval.activeTab');
+                    var tabName = link.data('approvaltab');
+                    var section = $('#radar-panel .approvalsection[data-approvalsection="' +
+                            tabName + '"]');
+                    // Only act, if we have a section, and the tab is changing.
+                    if (section.length > 0 && tabName != currentTabName) {
+                        if (currentTabName) {
+                            // animate the section
+                            var currentSection = $('#radar-panel .approvalsection[data-approvalsection="' +
+                                    currentTabName + '"]');
+                            currentSection.stop().hide('fade', function () {
+                                section.stop().show('fade');
+                            });
+                        } else {
+                            // quick show
+                            section.stop().show();
+                        }
+                        // remember
+                        link.data('approvaltabActive', tabName);
+                        tab.data('radar.approval.activeTab', tabName);
+                    }
                 });
 
                 // implement switching by click

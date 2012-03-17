@@ -169,53 +169,94 @@ def radar_ajax_view(context, request):
 
         # Provide fake "approval items" for the "approvals" tab.
 
+        approval_waitinglist_items = [{
+            'title': 'Approval Waiting List',
+            'group': [{
+                'title': 'e-Payment',
+                'count': 0,
+                'id': 'table1'
+                }, {
+                'title': 'Grant Payment',
+                'count': 2,
+                'id': 'table2'
+                }, {
+                'title': 'Contract Review',
+                'count': 3,
+                }, {
+                'title': 'Contract Approval',
+                'count': 2,
+                }, {
+                'title': 'Contract Payment',
+                'count': 1,
+                }, {
+                'title': 'Hardware / Software Request',
+                'count': 4,
+                }
+            ]
+        }, {
+            'title': 'Payment Waiting List',
+            'group': [{
+                'title': 'e-Payment',
+                'count': 0,
+                }, {
+                'title': 'Grant Payment',
+                'count': 133,
+                }, {
+                'title': 'Contract Payment',
+                'count': 116,
+                }
+            ]
+        }, {
+            'title': 'Accrual Waiting List',
+            'group': [{
+                'title': 'Grant Accrual',
+                'count': 7,
+                }
+            ]
 
+        }, {
+            'title': 'Fixed Assets Waiting List',
+            'group': [{
+                'title': 'e-Approval',
+                'count': 7,
+                }, {
+                'title': 'e-Bridge for Posting',
+                'count': 3,
+                }
+            ]
 
-        approval_items = [{
-            'modified': '12/28/2011',
-            'title': 'Funny Cat Pics',
-            'title_url': 'http://foo.com/bar',
-            'type': 'Blog Entry',
-            'author': 'Balazs Ree',
-            'title_url': 'http://foo.com/bar',
+        }];
+         
+
+        approval_table1_items = [{
+            'amt': '45.09',
+            'via': 'Check',
+            'approvedBy': 'Some Person',
+            'status': 'Approved',
+            'statusDate': '02/09/2012',
+            'overdueBy': '13',
             }, {
-            'modified': '12/28/2011',
-            'title': 'My Cat Says Meow',
-            'title_url': 'http://foo.com/bar',
-            'type': 'Video',
-            'author': 'Balazs Ree',
-            'title_url': 'http://foo.com/bar',
+            'amt': '13.00',
+            'via': 'Wire',
+            'approvedBy': 'Another Person',
+            'status': 'Submitted',
+            'statusDate': '02/14/2012',
+            'overdueBy': '16',
             }, {
-            'modified': '12/28/2011',
-            'title': 'Cute Little Cat',
-            'title_url': 'http://foo.com/bar',
-            'type': 'Blog Entry',
-            'author': 'Balazs Ree',
-            'title_url': 'http://foo.com/bar',
-            }, {
-            'modified': '12/28/2011',
-            'title': 'How I learned to love the Cat, and...',
-            'title_url': 'http://foo.com/bar',
-            'type': 'Blog Entry',
-            'author': 'Balazs Ree',
-            'title_url': 'http://foo.com/bar',
-            }, {
-            'modified': '12/28/2011',
-            'title': 'More Funny Cat Pics',
-            'title_url': 'http://foo.com/bar',
-            'type': 'Blog Entry',
-            'author': 'Balazs Ree',
-            'title_url': 'http://foo.com/bar',
+            'amt': '45.09',
+            'via': 'Check',
+            'approvedBy': 'Last Person',
+            'status': 'Approved',
+            'statusDate': '02/13/2012',
+            'overdueBy': '18',
             }]
+ 
+        for i, row in enumerate(approval_table1_items):
+            row['rowClass'] = 'even' if i % 2 else 'odd' 
 
-        approval2_items = []
-        for item in approval_items:
-            new_item = dict(item)
-            new_item['title'] = item['title'].replace('Cat', 'Dog') \
-                                .replace('Meow', 'Woof')
-            approval2_items.append(new_item)
+        approval_table2_items = 2 * list(approval_table1_items)
 
-        # Assamble the final result.
+        # Assemble the final result.
         results['data'] = {
             # home section
             'home': [{
@@ -230,14 +271,21 @@ def radar_ajax_view(context, request):
             # approvals section
             'approvals': [{
                 'class': 'stream2',
-                'title': 'Approvals',
-                'items': approval_items,
+                'waitinglist': {
+                    'items': approval_waitinglist_items,
+                    },
                 }, {
                 'class': 'stream2',
-                'title': 'More Approvals',
-                'items': approval2_items,
+                'tables': [{
+                    'id': 'table1',
+                    'title': 'Open Project Project',
+                    'items': approval_table1_items,
+                    }, {
+                    'id': 'table2',
+                    'title': 'Very Open Project',
+                    'items': approval_table2_items,
+                    }],
                 }],
-
             }
 
         results['state'] = {

@@ -93,42 +93,47 @@
         <div class="radarsection clearfix" data-radarsection="approvals">
 
           {{#approvals}}
-          <div class="panel" style="margin-left: 20px;">
-              <table class="content-listing">
-                <thead>
-                  <!--tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
-                    <th colspan="4" class="ui-widget-header" style="padding: 0;">
-                      <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
-                    </th>:w
-                    
-                  </tr-->
-                  <tr>
-                    <th class="cldate">Date</th>
-                    <th class="cltitle">Title</th>
-                    <th class="cltype">Type</th>
-                  </tr>
-                </thead>
-                <tbody>
+          <div class="panel {{class}}">
 
-                  {{#items}}
-                  <tr>
-                    <td class="cldate globalize-short-date">{{modified}}</td>
-                    <td class="cltitle">
-                      <a href="{{title_url}}">{{title}}</a>
-                    </td>
-                    <td class="cltype">{{type}}</td>
-                  </tr>
-                  {{/items}}
+              {{#waitinglist}}
+              {{#items}}
+              <h4 style="font-size: 1em;">{{title}}</h4>
+              {{#group}}
+              <div><a href="#" class="approvaltab" data-approvaltab="{{id}}">
+                {{title}} ({{count}})
+              </a></div>
+              {{/group}}
+              {{/items}}
+              {{/waitinglist}}
 
-                </tbody>
-                <!--tfoot tal:condition="batch_info.batching_required">
-                  <tr class="ui-grid-footer">
-                    <th colspan="4" class="ui-widget-header" style="padding: 0;">
-                      <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
-                    </th>
-                  </tr>
-                </tfoot-->
-              </table>
+              {{#tables}}
+              <div class="approvalsection" data-approvalsection="{{id}}">
+                  <h4>{{title}}</h4>
+                  <table class="content-listing">
+                      <tr>
+                        <th class="clamt">Amt</th>
+                        <th class="clvia">Via</th>
+                        <th class="clapprovedby">Approved by</th>
+                        <th class="clstatus">Status</th>
+                        <th class="clstatusdate">Status Date</th>
+                        <th class="cloverdueby">Overdue By</th>
+                      </tr>
+
+                      {{#items}}
+                      <tr class="{{rowClass}}">
+                        <td class="clamt">{{amt}}</td>
+                        <td class="clvia">{{via}}</td>
+                        <td class="clapprovedby">{{approvedBy}}</td>
+                        <td class="clstatus">{{status}}</td>
+                        <td class="clstatusdate globalize-short-date">{{statusDate}}</td>
+                        <td class="cloverdueby">{{overdueBy}}</td>
+                      </tr>
+                      {{/items}}
+
+                  </table>
+              </div>
+              {{/tables}}
+
           </div>
           {{/approvals}}
 
