@@ -84,11 +84,11 @@
                 tab.data('radarselectedtab', tabName);
                 log('Switch to radar tab', tabName);
                 // Set tab active
-                $('#radar-panel .radartabs li.active')
-                    .removeClass('active');
+                $('#radar-panel .radartabs li.selected')
+                    .removeClass('selected');
                 $('#radar-panel .radartabs li[data-radartab="' +
                                  tabName + '"]')
-                    .addClass('active');
+                    .addClass('selected');
             }
         }
 
