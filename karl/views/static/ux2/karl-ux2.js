@@ -3,7 +3,7 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 135, indent: 4 */
 /*jslint sub: true */
 
-/*globals window navigator document console setTimeout jQuery google */
+/*globals window navigator document console setTimeout jQuery google Globalize */
 
 (function ($) {
 
