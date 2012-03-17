@@ -16,43 +16,43 @@
             {{#home}}
             <div id="{{class}}" class="panel">
                 <h3>{{title}}</h3>
-
-                {{#communities}}
-                <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
-                    <div class="panel-item-content">
-                        <div>
-                            <a href="{{url}}" class="fullname">
-                                <strong>
-                                    {{title}}
-                                </strong>
-                            </a>
+                
+                <ul class="pushDownList {{#new}}newMessage{{/new}}">
+                    {{#communities}}
+                    <li class="panel-item-content">
+                        <a href="{{url}}">
+                            <h4 class="pushDownList-title">{{title}}</h4>
+                            <div class="pushDownList-info">{{description}}</div>
+                        </a>
+                        <div class="pushDownList-helper">
+                            <a href="" class="btn btn-mini dropdown-toggle" data   toggle="dropdown"><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {{#tools}}
+                                <li><a class="panel-item-tools" href="{{url}}">{{title}}</a></li>
+                                {{/tools}}
+                            </ul>
                         </div>
-                    </div>
-                </div>
-                {{/communities}}
+                    </li>
+                    {{/communities}}
+                </ul>
 
+
+                <ul class="pushDownList {{#new}}newMessage{{/new}}">
                 {{#contexts}}
-                <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
-                    <div class="panel-item-content">
-                        <div>
-                            <a href="{{url}}" class="fullname">
-                                <strong>
-                                    {{title}}
-                                </strong>
-                            </a>
+                    <li class="panel-item-content">
+                        <a href="{{url}}">
+                            <h4 class="pushDownList-title">{{title}}</h4>
+                            <div class="pushDownList-info">
+                                {{type}}<br />
+                                <cite>Located at {{path}}</cite>
+                            </div>
+                        </a>
+                        <div class="pushDownList-helper">
+                            <time datetime="{{modified}}">{{modified_readable}}</time>
                         </div>
-                        <div>
-                            {{type}}
-                        </div>
-                        <div class="messagetext">
-                            Modified by: {{creator_title}}
-                        </div>
-                        <div class="messagetext">
-                            Date: {{modified}}
-                        </div>
-                    </div>
-                </div>
+                    </li>
                 {{/contexts}}
+                </ul>
 
                 {{#items}}
                 <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
