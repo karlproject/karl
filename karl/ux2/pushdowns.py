@@ -164,7 +164,14 @@ def radar_ajax_view(context, request):
         for item in recent_items_batch["entries"]:
             adapted = getMultiAdapter((item, request), IGridEntryInfo)
             community = find_community(item)
-            community_info = getMultiAdapter((community, request), ICommunityInfo)
+            if community is not None:
+                community_adapter = getMultiAdapter((community, request), ICommunityInfo)
+                community_info = dict(
+                    url=community_adapter.url,
+                    title=community_adapter.title,
+                )
+            else:
+                community_info = None
             # Since this is json, we need a real dict...
             recent_items.append(dict(
                 title=adapted.title,
@@ -172,8 +179,7 @@ def radar_ajax_view(context, request):
                 modified=adapted.modified,
                 creator_title=adapted.creator_title,
                 type=adapted.type,
-                community_title=community_info.title,
-                community_url=community_info.url,
+                community=community_info,
                 ))
 
         # Provide fake "approval items" for the "approvals" tab.
