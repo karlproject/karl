@@ -103,6 +103,7 @@
                 //
                 // General: dates
                 Globalize.perform_actions('#radar-panel');
+
                 //
                 // Budget: draw the charts
                 $('#radar-panel .radarchart').each(function () {

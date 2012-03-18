@@ -193,6 +193,7 @@ class Layout(PopperLayout):
         ## 'karl.views:static/min/karl-ui.min.js',
 
         #
+        'karl.views:static/jquery-plugins/jquery.timeago.js',
         'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
         'karl.views:static/karl-plugins/karl-calendar/karl.calendar.js',
         'karl.views:static/karl.js',

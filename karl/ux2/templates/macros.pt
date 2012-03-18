@@ -35,7 +35,10 @@
   </metal:formish_js>
 
   <metal:timeago_js define-macro="timeago_js">
-    <script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script>
+    <!-- The code is already included globally.
+      -- If the .timestamp class can be replaced with .timeago-date,
+      -- then this macro is not needed to be called any more. -->
+    <!--script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script!-->
     <script type="text/javascript">
       //<![CDATA[
       $(document).ready(function() {

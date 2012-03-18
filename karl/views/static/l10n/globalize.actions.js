@@ -12,11 +12,7 @@ if ( typeof require !== "undefined"
 	Globalize = window.Globalize;
 }
 
-Globalize.perform_actions = function(el) {
-    
-    // Setup inside el, or if el is not specified,
-    // then inside the whole document.
-
+Globalize.perform_actions = function() {
 
     $('.globalize-short-date').each( function(i) {
         var d=Globalize.format(new Date($(this).text()),
