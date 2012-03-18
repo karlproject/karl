@@ -38,6 +38,7 @@
                 {{#contexts}}
                     <li class="panel-item-content">
                         <a href="{{url}}">
+                            <time class="timeago-date timeline" datetime="{{modified}}">{{modified}}</time>
                             <h4 class="pushDownList-title">{{title}}</h4>
                             <div class="pushDownList-info">
                                 <cite>{{type}}{{#community}} in 
@@ -47,9 +48,6 @@
                                 {{/community}}</cite>
                             </div>
                         </a>
-                        <div class="pushDownList-helper">
-                            <time class="timeago-date" datetime="{{modified}}">{{modified}}</time>
-                        </div>
                     </li>
                 {{/contexts}}
                 </ul>
