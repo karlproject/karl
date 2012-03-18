@@ -25,15 +25,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr tal:repeat="community communities" class="ui-grid-row ${'odd' if repeat.community.odd else 'even'">
+                <tr tal:repeat="community communities" class="ui-grid-row ${'odd' if repeat.community.odd else 'even'}">
                     <td>
-                        <h3><a href="${community.url}">${community.title}</a></h3>
-                        <p>
-                            <span tal:condition="not community.public" 
-                                metal:use-macro="layout.macros['privacy_badge']"/>
-                            <span tal:condition="community.moderator" 
-                                metal:use-macro="layout.macros['moderator_badge']"/>
-                        </p>
+                        <h3><a href="${community.url}">${community.title}</a>
+                        <span tal:condition="not community.public" 
+                            metal:use-macro="layout.macros['privacy_badge']"/>
+                        <span tal:condition="community.moderator" 
+                            metal:use-macro="layout.macros['moderator_badge']"/></h3>
                         <p>
                           ${community.description}
                         </p>
