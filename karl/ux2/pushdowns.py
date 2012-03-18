@@ -278,11 +278,11 @@ def radar_ajax_view(context, request):
         results['data'] = {
             # home section
             'home': [{
-                'class': 'stream1',
+                'class': 'homepanel1',
                 'title': 'My Communities',
                 'communities': communities_info,
                 }, {
-                'class': 'stream2',
+                'class': 'homepanel2',
                 'title': 'My Recent Activity',
                 'contexts': recent_items,
                 }],

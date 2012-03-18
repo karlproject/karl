@@ -44,28 +44,47 @@ a#global-logo {
 .fixmylinks () {
     /* Bring back the link color...
      * but actually, it should rather not be overritten
-     * unconditionally from original! */
+     * unconditionally from original! (#3D8FB3)
+     * However this blue on grey is not a big deal */
     color: #3D8FB3;
 }
 
 
 #radar-panel {
+    .homepanel1 {
+        .col(5);
+    }
+    .homepanel2 {
+        .col(4);
+    }
     .approvalpanel1 {
         /*.col(4.5);*/
     }
     .approvalpanel2 {
         /*.col(6);*/
     }
-    h4 {
-        font-size: 105%;
-    }
     a.community-link {
         .fixmylinks;
     }
-    .actionlinks {
-        font-size: 75%;
-        a {
-            .fixmylinks;
+    ul.actionlinks {
+        font-size: 0.75em;
+        float: none;
+        clear: both;
+        list-style: none;
+        padding: 0;
+        > li {
+            display: inline;
+            padding: 0 10px;
+            margin: 0;
+            border-left: 1px solid #000;
+            > a {
+                display: inline-block;
+                .fixmylinks();
+            }
+        }
+        > li:first-child {
+            border-left: none;
+            padding-left: 0;
         }
     }
 }

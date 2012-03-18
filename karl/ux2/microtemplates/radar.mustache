@@ -14,7 +14,7 @@
         <div class="radarsection clearfix" data-radarsection="home">
 
             {{#home}}
-            <div id="{{class}}" class="panel">
+            <div class="panel {{class}}">
                 <h3>{{title}}</h3>
                 
                 <ul class="pushDownList {{#new}}newMessage{{/new}}">
@@ -22,13 +22,13 @@
                     <li class="panel-item-content">
                         <a href="{{url}}">
                             <h4 class="pushDownList-title">{{title}}</h4>
-                            <div class="pushDownList-info">{{description}}</div>
-                            <div class="actionlinks">
-                                {{#actions}}
-                                <a href="{{url}}">{{title}}</a> {{^last}}|{{/last}}
-                                {{/actions}}
-                            </div>
+                            <!-- <div class="pushDownList-info">{{description}}</div> -->
                         </a>
+                        <ul class="actionlinks">
+                           {{#actions}}
+                            <li><a href="{{url}}">{{title}}</a></li>
+                            {{/actions}}
+                        </ul>
                     </li>
                     {{/communities}}
                 </ul>
@@ -98,7 +98,7 @@
 
               {{#waitinglist}}
               {{#items}}
-              <h4>{{title}}</h4>
+              <h4 class="pushDownList-title">{{title}}</h4>
               {{#group}}
               <div><a href="#" class="approvaltab" data-approvaltab="{{id}}">
                 {{title}} ({{count}})
@@ -109,7 +109,7 @@
 
               {{#tables}}
               <div class="approvalsection" data-approvalsection="{{id}}">
-                  <h4>{{title}}</h4>
+                  <h4 class="pushDownList-title">{{title}}</h4>
                   <table class="content-listing">
                       <tr>
                         <th class="clamt">Amt</th>
