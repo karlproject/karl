@@ -41,7 +41,6 @@
                             <h4 class="pushDownList-title">{{title}}</h4>
                             <div class="pushDownList-info">
                                 <cite>{{type}}{{#community}} in 
-                                <!--XXX a inside an a? ... -->
                                     <a class="community-link" href="{{url}}">
                                         {{title}}
                                     </a>
@@ -49,7 +48,7 @@
                             </div>
                         </a>
                         <div class="pushDownList-helper">
-                            <time class="globalize-full-date" datetime="{{modified}}">{{modified}}</time>
+                            <time class="globalize-long-date" datetime="{{modified}}">{{modified}}</time>
                         </div>
                     </li>
                 {{/contexts}}
