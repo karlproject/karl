@@ -121,14 +121,18 @@
                 var currentSection = $('#radar-panel .approvalsection[data-approvalsection="' +
                     currentTabName + '"]');
                 currentSection.show();
+                // set the active link, initially
+                $('#radar-panel a.approvaltab').removeClass('selected');
+                var currentTab = $('#radar-panel .approvaltab[data-approvaltab="' +
+                    currentTabName + '"]');
+                currentTab.addClass('selected');
+                // handle change by click
                 $('#radar-panel a.approvaltab').click(function () {
                     var link = $(this);
                     var currentTabName = tab.data('radar.approval.activeTab');
                     var tabName = link.data('approvaltab');
                     var section = $('#radar-panel .approvalsection[data-approvalsection="' +
                             tabName + '"]');
-                    $('#radar-panel a.approvaltab.selected').removeClass('selected');
-                    link.addClass('selected');
                     // Only act, if we have a section, and the tab is changing.
                     if (section.length > 0 && tabName != currentTabName) {
                         if (currentTabName) {
@@ -142,6 +146,9 @@
                             // quick show
                             section.stop().show();
                         }
+                        // change the link
+                        $('#radar-panel a.approvaltab.selected').removeClass('selected');
+                        link.addClass('selected');
                         // remember
                         link.data('approvaltabActive', tabName);
                         tab.data('radar.approval.activeTab', tabName);
