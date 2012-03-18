@@ -152,7 +152,7 @@ def radar_ajax_view(context, request):
                     url=community.url + (a_name if a_name != 'overview' else 'view.html'),
                     title=a_name.capitalize(),
                     last=a_name == 'files',
-                    ) for a_name in ('overview', 'blog', 'wiki', 'calendar', 'files')],
+                    ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
             )
             for community in communities
         ))
