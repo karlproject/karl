@@ -10,10 +10,11 @@ a#global-logo{padding-left:35px;}
 .contentWrapper section.main{padding-top:0;}.contentWrapper section.main form.addTag{width:20em;}
 #chatter-panel-text{width:95%;}
 #radar-panel .homepanel1{display:inline;float:left;width:39.58333333333333%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}
-#radar-panel .homepanel2{display:inline;float:left;width:31.25%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}#radar-panel .homepanel2 .timeline{float:right;font-family:Verdana,sans-serif;font-size:0.75em;margin:4px 0 0 4px;}
+#radar-panel .homepanel2{display:inline;float:left;width:31.25%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}
 #radar-panel .approvalpanel1{}
 #radar-panel .approvalpanel2{}
-#radar-panel a.community-link{color:#3D8FB3;}
+#radar-panel .pushDownList-info{overflow:hidden;}#radar-panel .pushDownList-info a.community-link{color:#3D8FB3;white-space:nowrap;}
 #radar-panel ul.actionlinks{font-size:0.75em;float:none;clear:both;list-style:none;padding:0;}#radar-panel ul.actionlinks>li{display:inline;padding:0 10px;margin:0;border-left:1px solid #000;}#radar-panel ul.actionlinks>li>a{display:inline-block;color:#3D8FB3;}
 #radar-panel ul.actionlinks>li:first-child{border-left:none;padding-left:0;}
 #radar-panel a.selected{color:#fff;}
+#radar-panel .timeline{float:right;font-family:Verdana,sans-serif;font-size:0.75em;margin:4px 0 0 4px;}
