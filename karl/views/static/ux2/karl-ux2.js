@@ -127,6 +127,8 @@
                     var tabName = link.data('approvaltab');
                     var section = $('#radar-panel .approvalsection[data-approvalsection="' +
                             tabName + '"]');
+                    $('#radar-panel a.approvaltab.selected').removeClass('selected');
+                    link.addClass('selected');
                     // Only act, if we have a section, and the tab is changing.
                     if (section.length > 0 && tabName != currentTabName) {
                         if (currentTabName) {
