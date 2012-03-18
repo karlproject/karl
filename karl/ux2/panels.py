@@ -16,7 +16,7 @@ from karl.views.utils import get_user_home
 from karl.views.utils import make_name
 
 
-PROFILE_ICON_SIZE = (15, 15)
+PROFILE_ICON_SIZE = (25, 25)
 EMPTY_CONTEXT = {}
 
 def global_nav(context, request):
