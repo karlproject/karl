@@ -1,23 +1,25 @@
 
 import datetime
 import random
-import itertools
 
+from pyramid.security import effective_principals
+from pyramid.security import authenticated_userid
 from zope.component import getMultiAdapter
 
 from karl.models.interfaces import IGridEntryInfo
+from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import ICommunityInfo
 from karl.utils import find_communities
 from karl.utils import find_community
+from karl.views.batch import get_catalog_batch
 from karl.views.communities import get_my_communities
-from karl.views.community import get_recent_items_batch
 from karl.views.chatter import followed_chatter_json
 
 
 def notifier_ajax_view(context, request):
     # Example result set, for demonstrating without
     # a real server database.
-    
+
     # XXX This method should dispatch a call to each catalog
     # search that needs to be notified.
     # It only needs to provide the recent counters in the resulting payload.
@@ -33,7 +35,7 @@ def notifier_ajax_view(context, request):
         updates[name] = d
     # ... for example update['chatter'] now contains the start-date that the
     # chatter query will need.
-    
+
     now = datetime.datetime.now()
     now_iso = now.isoformat()
     # Only those pushdowns are notified, who are in the dictionary.
@@ -42,7 +44,7 @@ def notifier_ajax_view(context, request):
         # XXX do a real query from here, using updates[name] for start date.
         notifications[name] = dict(
             cnt = random.choice([0, random.randrange(1, 5)]),
-            ts = now_iso, 
+            ts = now_iso,
             )
 
     return notifications
@@ -143,7 +145,7 @@ def radar_ajax_view(context, request):
         # 2nd column: my communities (preferred communities)
         communities_folder = find_communities(context)
         communities = get_my_communities(communities_folder, request)
-        communities_info = ((
+        communities_info = [
             dict(
                 title=community.title,
                 description=community.description,
@@ -154,13 +156,16 @@ def radar_ajax_view(context, request):
                     last=a_name == 'files',
                     ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
             )
-            for community in communities
-        ))
-        communities_info = list(itertools.islice(communities_info, 0, 5))
+            for community in communities[:5]
+        ]
 
         # 3rd column: My Recent Activity
         recent_items = []
-        recent_items_batch = get_recent_items_batch(context, request, size=5)
+        recent_items_batch = get_catalog_batch(context, request, batch_size=5,
+            interfaces=[ICommunityContent], sort_index="modified_date",
+            reverse=True, modified_by=authenticated_userid(request),
+            allowed={'query': effective_principals(request), 'operator': 'or'})
+
         for item in recent_items_batch["entries"]:
             adapted = getMultiAdapter((item, request), IGridEntryInfo)
             community = find_community(item)
@@ -241,7 +246,7 @@ def radar_ajax_view(context, request):
             ]
 
         }];
-         
+
 
         approval_table1_items = [{
             'amt': '45.09',
@@ -265,14 +270,14 @@ def radar_ajax_view(context, request):
             'statusDate': '02/13/2012',
             'overdueBy': '18',
             }]
- 
+
         for i, row in enumerate(approval_table1_items):
-            row['rowClass'] = 'even' if i % 2 else 'odd' 
+            row['rowClass'] = 'even' if i % 2 else 'odd'
 
         import copy
         approval_table2_items = 2 * copy.deepcopy(approval_table1_items)
         for i, row in enumerate(approval_table2_items):
-            row['rowClass'] = 'even' if i % 2 else 'odd' 
+            row['rowClass'] = 'even' if i % 2 else 'odd'
 
         # Assemble the final result.
         results['data'] = {
@@ -308,8 +313,8 @@ def radar_ajax_view(context, request):
 
         results['state'] = {
             'chart1': {
-                'options' : {         
-                    'title': 'Company Performance',        
+                'options' : {
+                    'title': 'Company Performance',
                     'hAxis': {
                         'title': 'Year',
                         'titleTextStyle': {'color': 'red'},
@@ -322,15 +327,15 @@ def radar_ajax_view(context, request):
                     ['number', 'Expenses'],
                     ],
                 'rows': [
-                    ['2004', 1000, 400],   
+                    ['2004', 1000, 400],
                     ['2005', 1170, 460],
-                    ['2006', 660, 1120],   
+                    ['2006', 660, 1120],
                     ['2007', 1030, 540],
                     ],
                 },
             'chart2': {
-                'options' : {         
-                    'title': 'Monthly Operating Revenue',        
+                'options' : {
+                    'title': 'Monthly Operating Revenue',
                     'hAxis': {
                         'title': 'Project',
                         'titleTextStyle': {'color': 'red'},
@@ -343,9 +348,9 @@ def radar_ajax_view(context, request):
                     ['number', 'Actual'],
                     ],
                 'rows': [
-                    ['My First Project', 1000, 400],   
+                    ['My First Project', 1000, 400],
                     ['Another Project', 1170, 460],
-                    ['A Third Project', 660, 1120],   
+                    ['A Third Project', 660, 1120],
                     ],
                 },
             }
