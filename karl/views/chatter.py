@@ -345,6 +345,8 @@ def tag_chatter_json(context, request):
 def tag_chatter(context, request):
     """ HTML wrapper for 'tag_chatter_json'.
     """
+    chatter = find_chatter(context)
+    tag_list = chatter.recentTags()
     try:
         info = tag_chatter_json(context, request)
     except KeyError:
@@ -353,6 +355,9 @@ def tag_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request, selected='topics')
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.quip_tags', tag_list)
     return info
 
 

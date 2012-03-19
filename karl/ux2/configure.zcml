@@ -153,6 +153,12 @@
     />
 
   <bc:panel
+    name="chatter.quip_tags"
+    panel=".panels.quip_tags"
+    renderer="templates/quip_tags.pt"
+    />
+
+  <bc:panel
     name="chatter.followers"
     panel=".panels.followers"
     renderer="templates/followers.pt"

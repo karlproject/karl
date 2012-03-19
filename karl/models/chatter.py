@@ -130,7 +130,6 @@ class Chatterbox(Persistent):
             if quip.creator in creators:
                 yield quip
 
-
     def recentWithNames(self, *names):
         """ See IChatterbox.
         """
@@ -139,6 +138,14 @@ class Chatterbox(Persistent):
             if names & quip.names:
                 yield quip
 
+    def recentTags(self):
+        """ See IChatterbox.
+        """
+        tags = set()
+        for quip in self.recent():
+            for tag in quip.tags:
+                tags.add(tag)
+        return list(tags)
 
     def recentPrivate(self, user):
         """ See IChatterbox.

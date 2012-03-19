@@ -704,6 +704,7 @@ class Test_tag_chatter(unittest.TestCase):
 
     def _callFUT(self, context, request):
         request.context = context
+        request.layout_manager = testing.DummyModel(layout=None)
         from karl.views.chatter import tag_chatter
         return tag_chatter(context, request)
 
@@ -1375,6 +1376,8 @@ def _makeChatterbox(recent=()):
         def recentWithTag(self, tag):
             self._tag = tag
             return self._recent
+        def recentTags(self):
+            return []
         def recentWithCommunities(self, *community):
             self._community = community
             return self._recent

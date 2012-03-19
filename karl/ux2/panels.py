@@ -275,6 +275,10 @@ def quip_search(context, request):
     return {}
 
 
+def quip_tags(context, request, tag_list):
+    return {'tag_list': tag_list}
+
+
 def followers(context, request):
     return {}
 
