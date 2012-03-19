@@ -1954,6 +1954,13 @@
     name="add_chatter.html"
     />
 
+  <view
+    for="karl.models.interfaces.IQuip"
+    view="karl.views.chatter.quip_view"
+    renderer="templates/quip.pt"
+    permission="view"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"

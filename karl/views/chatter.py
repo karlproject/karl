@@ -564,6 +564,13 @@ def followed_by(context, request):
            }
 
 
+def quip_view(context, request):
+    """ View a single quip
+    """
+    return {'quip': quip_info(request, *[context])[0],
+            'context_tools': get_context_tools(request, selected='posts'),
+           }
+
 def add_chatter(context, request):
     """ Add a new quip to the chatterbox.
 
