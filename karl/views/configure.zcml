@@ -1961,6 +1961,14 @@
     permission="view"
     />
 
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.messages"
+    renderer="templates/direct.pt"
+    permission="view"
+    name="direct.html"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"

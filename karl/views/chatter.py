@@ -100,7 +100,7 @@ def _lastn(iterable, count):
             buffer.pop(0)
     return buffer
 
-def _do_slice(iterable, request):
+def _do_slice(iterable, request, check=True):
     orig = iterable #XXX
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 20)
@@ -108,7 +108,8 @@ def _do_slice(iterable, request):
     before = request.GET.get('before')
     def _check(x):
         return has_permission('view', x, request)
-    iterable = itertools.ifilter(_check, iterable)
+    if check:
+        iterable = itertools.ifilter(_check, iterable)
     if since is not None:
         since_dt = datetime.datetime.strptime(since, TIMEAGO_FORMAT)
         iterable = itertools.takewhile(lambda x: x.created > since_dt, iterable)
@@ -187,6 +188,39 @@ def followed_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
+    return info
+
+
+def messages_json(context, request):
+    """ Return messages for the current user.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    return {'messages': _do_slice(chatter.recentPrivate(userid),
+                                  request, False),
+           }
+
+
+def messages(context, request):
+    """ HTML wrapper for 'followed_chatter_json'.
+    """
+    layout = request.layout_manager.layout
+    info = messages_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Messages')
+    info['chatter_form_url'] = resource_url(find_chatter(context), request,
+                                            'add_chatter.html')
+    info['context_tools'] = get_context_tools(request, selected='messages')
     return info
 
 

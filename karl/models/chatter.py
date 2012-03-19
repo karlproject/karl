@@ -130,12 +130,24 @@ class Chatterbox(Persistent):
             if quip.creator in creators:
                 yield quip
 
+
     def recentWithNames(self, *names):
         """ See IChatterbox.
         """
         names = set(names)
         for quip in self.recent():
             if names & quip.names:
+                yield quip
+
+
+    def recentPrivate(self, user):
+        """ See IChatterbox.
+        """
+        for quip in self.recent():
+            if not bool(getattr(quip, '__acl__', ())):
+                continue
+            allowed = [e[2] for e in quip.__acl__]
+            if user in allowed:
                 yield quip
 
 

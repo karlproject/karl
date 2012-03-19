@@ -656,6 +656,12 @@ class IChatterbox(Interface):
         Include only those which mention one or more of 'names'.
         """
 
+    def recentPrivate(user):
+        """ Return an iterable of private quips by recency.
+
+        Include only those which are marked as private.
+        """
+
 
 class IQuip(IContent):
     """ Individual chat element.
