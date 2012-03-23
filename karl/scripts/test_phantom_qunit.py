@@ -19,9 +19,11 @@ def run_phantom(config_file, resource_url, verbose=False):
 def main(argv=sys.argv):
     import karl.phantom_qunit
     config_file = module_path(karl.phantom_qunit, 'phantom-qunit.js')
-    if len(argv) !=1:
-        raise RuntimeError, 'Usage: test_phantom_qunit'
     verbose = False
+    if len(argv) == 2 and argv[1] == '-v':
+        verbose = True
+    elif len(argv) != 1:
+        raise RuntimeError, 'Usage: test_phantom_qunit [-v]'
     prefix = 'http://127.0.0.1:6543/pg'
 
     r = '/r1332503085'    # XXX This, of course, cannot work.
@@ -41,8 +43,7 @@ def main(argv=sys.argv):
 
         prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html',
         prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
-
-        #prefix + '/static/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
+        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html',
     ]
