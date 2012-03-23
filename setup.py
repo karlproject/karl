@@ -68,7 +68,6 @@ requires = [
     # Testing dependencies
     'coverage',
     'nose',
-    'twill',
     'zope.testing', # fwd compat when not directly relied on by BFG
     # Not really a code depdencency, but used by most buildouts
     # XXX Move to eggs in buildout?
