@@ -10,7 +10,7 @@
  * as a callback function.
  * @param timeOutMillis the max amount of time to wait. If not specified, 3 sec is used.
  */
-function waitFor(testFx, onReady, timeOutMillis) {
+function waitFor(testFx, onReady, timeOutMillis, timeoutlog) {
     var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 3001, //< Default Max Timout is 3s
         start = new Date().getTime(),
         condition = false,
@@ -21,11 +21,11 @@ function waitFor(testFx, onReady, timeOutMillis) {
             } else {
                 if(!condition) {
                     // If condition still not fulfilled (timeout but condition is 'false')
-                    console.log("'waitFor()' timeout");
+                    console.log(timeoutlog || "'waitFor()' timeout");
                     phantom.exit(1);
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
-                    console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");
+                    ///console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");
                     typeof(onReady) === "string" ? eval(onReady) : onReady(); //< Do what it's supposed to do once the condition is fulfilled
                     clearInterval(interval); //< Stop this interval
                 }
@@ -68,6 +68,8 @@ page.open(url, function(status){
         console.log("Are you running KARL on http://127.0.0.1:6543/pg/ ?");
         phantom.exit();
     } else {
+        var prolog = '\x1b[31mFAILED\x1b[37m ';
+        var timeoutlog = prolog + 'TIMEOUT of ' + phantom.args[0];
         waitFor(function(){
             return page.evaluate(function(){
                 var el = document.getElementById('qunit-testresult');
@@ -99,7 +101,7 @@ page.open(url, function(status){
                 ', Failed: ' + results.failed +
                 '    of ' + phantom.args[0]);
             phantom.exit((results.failed > 0) ? 1 : 0);
-        });
+        }, 3001, timeoutlog);
     }
 });
 
