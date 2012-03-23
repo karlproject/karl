@@ -64,7 +64,8 @@ if (verbose) {
 
 page.open(url, function(status){
     if (status !== "success") {
-        console.log("Unable to access network");
+        console.log("Unable to access network.");
+        console.log("Are you running KARL on http://127.0.0.1:6543/pg/ ?");
         phantom.exit();
     } else {
         waitFor(function(){
