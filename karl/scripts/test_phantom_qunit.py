@@ -24,7 +24,7 @@ def main(argv=sys.argv):
     verbose = False
     prefix = 'http://127.0.0.1:6543/pg'
 
-    r = 'r1332503085/'    # XXX This, of course, cannot work.
+    r = '/r1332503085'    # XXX This, of course, cannot work.
 
     tests = [
         prefix + '/popper-static/popper-plugins/popper-example/tests/test.html',
