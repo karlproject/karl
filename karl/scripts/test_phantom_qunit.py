@@ -40,8 +40,8 @@ def main(argv=sys.argv):
         #prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html',
 
         prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html',
+        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
 
-        #prefix + '/static/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html',
