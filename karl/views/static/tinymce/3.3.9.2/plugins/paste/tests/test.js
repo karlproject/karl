@@ -42,7 +42,7 @@ module("tiny.paste", {
         });
 
         // one timed event.
-        equals(this.timeouts.length, 1, 'timed event ok');
+        equal(this.timeouts.length, 1, 'timed event ok');
         this.timeouts.execute(0);
         
         this.timeouts.stop();
@@ -96,7 +96,7 @@ test("Create", function() {
     var textarea = $('.mceEditor').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'has generated the editor id');
-    equals($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
+    equal($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
 });
 
 // XXX Here we would simulate specific real life paste samples

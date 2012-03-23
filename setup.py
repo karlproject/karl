@@ -125,6 +125,7 @@ setup(name='karl',
       user_activity_report = karl.scripts.user_activity_report:main
       analyze_queries = karl.scripts.analyze_queries:main
       juice_all = karl.scripts.juice_all:main
+      test_phantom_qunit = karl.scripts.test_phantom_qunit:main
 
       [karlserve.scripts]
       generate_stats = karl.scripts.generate_stats:config_parser
