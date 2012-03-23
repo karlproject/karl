@@ -24,12 +24,18 @@ def main(argv=sys.argv):
     verbose = False
     prefix = 'http://127.0.0.1:6543/pg'
 
+    prefix2 = prefix + 'r1332503085/'    # XXX This, of course, cannot work.
+
     tests = [
+        prefix + '/popper-static/popper-plugins/popper-example/tests/test.html',
+        prefix + '/popper-static/popper-plugins/popper-tagbox/tests/test.html',
         prefix + '/popper-static/popper-plugins/popper-pushdown/tests/test.html',
-        #prefix + '/static/karl-plugins/karl-contentfeeds/test.html',
+
+        #prefix2 + '/static/karl-plugins/karl-contentfeeds/test.html',
+        #prefix2 + '/static/tinymce/3.3.9.2/plugins/paste/tests/test.html',
+
         #prefix + '/static/tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
-        #prefix + '/static/tinymce/3.3.9.2/plugins/paste/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
         #prefix + '/static/tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html',
