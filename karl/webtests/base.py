@@ -32,6 +32,9 @@ class Base(unittest.TestCase):
         initdb = pkg_resources.resource_filename(__name__, 'initdb.py')
         binpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         karlserve = os.path.join(binpath, 'karlserve')
+        subprocess.call('dropdb %s' % config['dbname'], shell=True)
+        subprocess.check_call('createdb -O %s %s' %
+                              (config['user'], config['dbname']), shell=True)
         subprocess.check_call('%s -C %s debug -S %s test' % (
             karlserve, karlserve_ini, initdb), shell=True)
 
