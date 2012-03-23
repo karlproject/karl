@@ -62,14 +62,19 @@ if (verbose) {
     };
 }
 
+function displayNum(num) {
+    return ("  " + num).slice(-3);
+}
+
+
 page.open(url, function(status){
     if (status !== "success") {
         console.log("Unable to access network.");
         console.log("Are you running KARL on http://127.0.0.1:6543/pg/ ?");
         phantom.exit();
     } else {
-        var prolog = '\x1b[31mFAILED\x1b[37m ';
-        var timeoutlog = prolog + 'TIMEOUT of ' + phantom.args[0];
+        var prolog = '\x1b[31mFAILED\x1b[37m  ';
+        var timeoutlog = prolog + 'TIMEOUT                   ' + phantom.args[0];
         waitFor(function(){
             return page.evaluate(function(){
                 var el = document.getElementById('qunit-testresult');
@@ -93,13 +98,13 @@ page.open(url, function(status){
             });
             var prolog;
             if (results.failed > 0) {
-                prolog = '\x1b[31mFAILED\x1b[37m ';
+                prolog = '\x1b[31mFAILED\x1b[37m  ';
             } else {
                 prolog = '\x1b[32mSUCCESS\x1b[37m ';
             }
-            console.log(prolog + 'Total: ' + results.total + 
-                ', Failed: ' + results.failed +
-                '    of ' + phantom.args[0]);
+            console.log(prolog + 'Total: ' + displayNum(results.total) + 
+                ' Failed: ' + displayNum(results.failed) +
+                '    ' + phantom.args[0]);
             phantom.exit((results.failed > 0) ? 1 : 0);
         }, 3001, timeoutlog);
     }
