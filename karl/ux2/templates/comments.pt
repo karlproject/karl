@@ -11,30 +11,40 @@
    <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
    <div class="blogComment">
 
-    <div class="commentManagement">
-      <a href="#" class="quo-paste">quote</a>
-      <tal:ifeditable
-         tal:condition="comment['edit_url'] is not None">
-        | <a class="k3_edit_comment"
-             href="${comment['edit_url']}">edit</a> |
-        <a class="k3_delete_comment"
-           href="${comment['delete_url']}">delete</a>
-      </tal:ifeditable>
-      <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
-        | <a class="k3_edit_comment"
-             href="${comment['advanced_url']}">advanced</a>
-      </tal:ifadmin>
+    <div class="portrait">
+          <img width="60" height="60" src="${comment['portrait_url']}" />
     </div>
 
-    <span class="portrait">
-          <img width="75" height="100" src="${comment['portrait_url']}" />
-    </span>
-
-    <strong class="kbyline">Posted
-      by <a href="${comment['author_url']}">${comment['author_name']}</a>
-      on ${comment['date']}</strong>
+    <div class="commentManagement">
+      <ul>
+        <li>
+          <a href="#" class="quo-paste">quote</a>
+        </li>
+        <tal:ifeditable
+           tal:condition="comment['edit_url'] is not None">
+          <li>
+            <a class="k3_edit_comment"
+               href="${comment['edit_url']}">edit</a>
+          </li>
+          <li>
+            <a class="k3_delete_comment"
+             href="${comment['delete_url']}">delete</a>
+          </li>
+        </tal:ifeditable>
+        <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
+          <li>
+            <a class="k3_edit_comment"
+               href="${comment['advanced_url']}">advanced</a>
+          </li>
+        </tal:ifadmin>
+      </ul>
+    </div>
 
     <div class="commentText" tal:content="structure comment['text']" />
+
+    <div class="kbyline">Posted
+      by <a href="${comment['author_url']}">${comment['author_name']}</a>
+      on ${comment['date']}</div>
 
     <div class="blogAttachments">
       <span tal:repeat="attachment comment['attachments']">
