@@ -7,8 +7,9 @@
 
     ${panel('status_message')}
 
-    <h1 class="kscreentitle">Content Added Recently
-        by <a href="${request.resource_url(context)}">${context.title}</a></h1>
+    <header>
+      <h1>Content Added Recently by <a href="${request.resource_url(context)}">${context.title}</a></h1>
+    </header>
 
     <div class="recentItemsWrapper">
       <table class="content-listing">

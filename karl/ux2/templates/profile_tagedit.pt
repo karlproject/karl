@@ -5,9 +5,11 @@
 
 <div metal:fill-slot="content">
 
-<form method="post" id="tag-manage">
+<header>
+	<h1 class="kscreentitle">${layout.page_title}</h1>
+</header>
 
-<h1 class="kscreentitle">${layout.page_title}</h1>
+<form method="post" id="tag-manage">
 
 <h4 class="abouthead">Rename tags</h4>
 

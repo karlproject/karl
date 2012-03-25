@@ -12,11 +12,11 @@
 
     <metal:content fill-slot="content">
 
+        ${panel('status_message')}
+        
         <header>
-            ${panel('status_message')}
             <h1>Messages</h1>
         </header>
-    ${panel('status_message')}
 
     <div id="recent-quips-add-form">
       <form class="form-stacked" action="${chatter_form_url}" method="POST">

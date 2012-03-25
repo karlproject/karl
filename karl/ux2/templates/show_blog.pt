@@ -10,7 +10,7 @@
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)} 
 
-    <div class="kbody">
+    <div>
 		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
 				tal:repeat="entry entries">
 			<h2>

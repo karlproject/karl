@@ -17,8 +17,10 @@
 
   <div metal:fill-slot="content">
 
+    ${panel('status_message')}
+    ${panel('popper.actions_menu', actions=actions)}
+
     <div class="contentbar-wrapper">
-      ${panel('popper.actions_menu', actions=actions)}
       <span class="contentbar-menu">
           <a href="${layout.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
           <a href="${layout.here_url}../wikitoc.html">Index</a>
@@ -28,7 +30,6 @@
       </span>
     </div>
 
-    ${panel('status_message')}
 
     ${panel('wiki_lock', lock_info)}
 

@@ -5,8 +5,10 @@
     ${panel('status_message')}
     ${panel('popper.actions_menu', actions=actions)} 
 
-    <h1 class="kscreentitle">${layout.page_title}</h1>
-
+    <header>
+      <h1>${layout.page_title}</h1>
+    </header>
+    
     <table class="content-listing">
       <tbody>
         <tr tal:repeat="intranet intranets_info">

@@ -10,10 +10,15 @@
 
 
   <div metal:fill-slot="content">
+
     ${panel('status_message')}
     ${panel('error_message')}
     ${panel('actions')}
-    <h1>${layout.page_title}</h1>
+    
+    <header>
+      <h1>${layout.page_title}</h1>
+    </header>
+
     <p tal:content="page_description|''"/>
     <div tal:condition="blurb_macro|False" metal:use-macro="blurb_macro"/>
     <span tal:replace="structure request.form()" />

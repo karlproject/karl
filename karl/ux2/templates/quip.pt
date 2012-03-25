@@ -12,10 +12,11 @@
 
     <metal:content fill-slot="content">
 
+        ${panel('status_message')}
+        
         <header>
             <h1>Post by ${quip['creator']}</h1>
         </header>
-    ${panel('status_message')}
 
     <div id="chatter-quips" class="pushdownContent">
       <div class="panel-item clearfix">
