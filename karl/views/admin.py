@@ -40,7 +40,6 @@ from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import find_site
-from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
