@@ -64,10 +64,10 @@
 
     <div class="buttons clearafter">
         <button id="form-submit" name="form.submitted" value="submit" 
-            type="submit" class="button primary_button"><span>submit</span>
+            type="submit" class="btn">submit
         </button>
         <button id="form-cancel" name="form.cancel" value="cancel" 
-            type="submit" class="button normal_button"><span>cancel</span>
+            type="submit" class="btn">cancel
         </button>
     </div>
   </fieldset>
