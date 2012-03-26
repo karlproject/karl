@@ -28,8 +28,8 @@ class TestCommunitiesView(Base):
         self.assertTrue('Admin Section: Move Content' in response)
 
         # admin_po_quarantine
-        response = self.app.get('/po_quarantine.html')
-        self.assertTrue('Post Office Quarantine' in response)
+        #response = self.app.get('/po_quarantine.html')
+        #self.assertTrue('Post Office Quarantine' in response)
 
         # admin_renameusers
         response = self.app.get('/rename_user.html')
@@ -55,31 +55,62 @@ class TestCommunitiesView(Base):
         # blogentry_add
         response = self.app.get(dc + '/blog/add_blogentry.html')
         self.assertTrue('Add Blog Entry' in response)
-
-        # blogentry_edit
+        form = response.forms['save']
+        form['title'] = 'someblogpost'
+        response = form.submit('submit')
+        response.follow()
 
         # blogentry_view
+        response = self.app.get(dc + '/blog/someblogpost')
+        self.assertTrue('someblogpost' in response)
+
+        # blogentry_edit
+        response = self.app.get(dc + '/blog/someblogpost/edit.html')
+        self.assertTrue('Edit someblogpost' in response)
+
+
+        # comment_edit
+
+        # comment_view
+
+        # comments_widget
 
         # attachment_download
+
         # attachment_edit
+
         # attachment_view
+
         # attachments_widget
 
         # calendar_listview
+        response = self.app.get(dc + '/calendar')
+        #self.assertTrue('Layer:' in response)
+
         # calendar_setup
+
         # calendar_view
+
         # calendarentry_add
+
         # calendarentry_edit
+
         # calendarentry_ics
+
         # calendarentry_view
+
         # chatter_discover
+
         # chatter_following
+
         # chatter_messages
+
         # chatter_posts
+
         # chatter_pushdown
+
         # chatter_topics
-        # comment_edit
-        # comments_widget
+
         # communities_view, active vs. all
         response = self.app.get('/communities/active_communities.html')
         self.assertTrue('KARL Communities' in response)
@@ -141,8 +172,8 @@ class TestCommunitiesView(Base):
         # trash_restore
         # trash_view
         # wiki_index
-        response = self.app.get(dc + '/wiki/wikitoc.html')
-        self.assertTrue('Wiki Index' in response)
+        #response = self.app.get(dc + '/wiki/wikitoc.html')
+        #self.assertTrue('Wiki Index' in response)
 
         # wikipage_edit
         # wikipage_view
