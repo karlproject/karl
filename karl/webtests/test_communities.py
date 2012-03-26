@@ -47,11 +47,14 @@ class TestCommunitiesView(Base):
         response = self.app.get('/admin.html')
         self.assertTrue('Admin Section' in response)
 
+        ##################
         # blog_view
         response = self.app.get(dc + '/blog')
         self.assertTrue('Add Blog Entry' in response)
 
         # blogentry_add
+        response = self.app.get(dc + '/blog/add_blogentry.html')
+        self.assertTrue('Add Blog Entry' in response)
 
         # blogentry_edit
 
