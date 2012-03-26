@@ -23,6 +23,9 @@ class Base(unittest.TestCase):
         karlserve_ini = os.path.join(tmp, 'karlserve.ini')
         with open(karlserve_ini, 'w') as out:
             out.write(karlserve_ini_tmpl)
+        postoffice_ini = os.path.join(tmp, 'postoffice.ini')
+        with open(postoffice_ini, 'w') as out:
+            out.write(postoffice_ini_tmpl)
         var = os.path.join(tmp, 'var')
         os.mkdir(var)
 
@@ -37,12 +40,18 @@ class Base(unittest.TestCase):
                               (config['user'], config['dbname']), shell=True)
         subprocess.check_call('%s -C %s debug -S %s test' % (
             karlserve, karlserve_ini, initdb), shell=True)
+        postoffice = os.path.join(binpath, 'postoffice')
+        subprocess.check_call('%s -C %s' % (postoffice, postoffice_ini),
+                              shell=True)
 
         from karlserve.application import make_app
         from webtest import TestApp
-        self.app = TestApp(
-            make_app({}, var=var, instances_config=instances_ini,
-                     who_secret='wackadoo', who_cookie='macadamia'))
+        settings = {
+            'var': var, 'instances_config': instances_ini,
+            'who_secret': 'wackadoo', 'who_cookie': 'macadamia',
+            'postoffice.zodb_uri':
+            'file://%s/po.db?blobstorage_dir=%s/poblobs' % (var, var)}
+        self.app = TestApp(make_app(settings))
 
     def tearDown(self):
         import shutil
@@ -78,4 +87,14 @@ instances_config = %(here)s/instances.ini
 var = %(here)s/var
 who_secret = wackadoo
 who_cookie = macadamia
+"""
+
+
+postoffice_ini_tmpl = """\
+[post office]
+zodb_uri = file://%(here)s/var/po.db?blobstorage_dir=%(here)s/var/poblobs
+maildir = %(here)s/var/po_mail
+
+[queue:test]
+filters = to_hostname:pg.example.com
 """
