@@ -1,5 +1,7 @@
 import unittest
 
+from repoze.browserid.middleware import make_middleware as browserid
+
 
 class Base(unittest.TestCase):
 
@@ -51,7 +53,7 @@ class Base(unittest.TestCase):
             'who_secret': 'wackadoo', 'who_cookie': 'macadamia',
             'postoffice.zodb_uri':
             'file://%s/po.db?blobstorage_dir=%s/poblobs' % (var, var)}
-        self.app = TestApp(make_app(settings))
+        self.app = TestApp(browserid(make_app(settings), None, 'sshwabbits'))
 
     def tearDown(self):
         import shutil
