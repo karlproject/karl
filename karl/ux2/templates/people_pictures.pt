@@ -5,11 +5,9 @@
 
   <div metal:fill-slot="content">
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)}
-
     <header>
-
+      ${panel('status_message')}
+      ${panel('popper.actions_menu', actions=actions)}
     </header>
 
     <div class="peopledir-report-description"

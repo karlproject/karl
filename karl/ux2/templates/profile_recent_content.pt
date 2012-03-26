@@ -5,9 +5,8 @@
 
   <div metal:fill-slot="content">
 
-    ${panel('status_message')}
-
     <header>
+      ${panel('status_message')}
       <h1>Content Added Recently by <a href="${request.resource_url(context)}">${context.title}</a></h1>
     </header>
 

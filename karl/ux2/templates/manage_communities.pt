@@ -4,9 +4,8 @@
 
   <div metal:fill-slot="content">
 
-      ${panel('status_message')}
-
       <header>
+          ${panel('status_message')}
           <h1>${layout.page_title}</h1>
       </header>
 

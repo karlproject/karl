@@ -10,12 +10,11 @@
 
 
   <div metal:fill-slot="content">
-
-    ${panel('status_message')}
-    ${panel('error_message')}
-    ${panel('actions')}
     
     <header>
+      ${panel('status_message')}
+      ${panel('error_message')}
+      ${panel('actions')}
       <h1>${layout.page_title}</h1>
     </header>
 

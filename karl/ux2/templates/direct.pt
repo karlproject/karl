@@ -11,10 +11,9 @@
     </metal:head>
 
     <metal:content fill-slot="content">
-
-        ${panel('status_message')}
         
         <header>
+            ${panel('status_message')}
             <h1>Messages</h1>
         </header>
 

@@ -12,9 +12,8 @@
 
     <metal:content fill-slot="content">
 
-        ${panel('status_message')}
-
         <header>
+            ${panel('status_message')}
             <h1>On your mind</h1>
         </header>
 

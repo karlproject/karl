@@ -1,11 +1,9 @@
 <metal:block use-macro="main_template">
   <div metal:fill-slot="content">
 
-
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)} 
-
     <header>
+      ${panel('status_message')}
+      ${panel('popper.actions_menu', actions=actions)} 
       <h1>${layout.page_title}</h1>
     </header>
     

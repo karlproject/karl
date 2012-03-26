@@ -15,10 +15,9 @@ jQuery(document).ready(function($) {
 <body>
   <div metal:fill-slot="content">
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)}
-
     <header>
+      ${panel('status_message')}
+      ${panel('popper.actions_menu', actions=actions)}
       <h1>${profile.title}</h1>
     </header>
     
