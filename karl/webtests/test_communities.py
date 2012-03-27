@@ -172,8 +172,8 @@ class TestCommunitiesView(Base):
         # trash_restore
         # trash_view
         # wiki_index
-        #response = self.app.get(dc + '/wiki/wikitoc.html')
-        #self.assertTrue('Wiki Index' in response)
+        response = self.app.get(dc + '/wiki/wikitoc.html')
+        self.assertTrue('Wiki Index' in response)
 
         # wikipage_edit
         # wikipage_view

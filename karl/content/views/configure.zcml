@@ -734,7 +734,7 @@
     view=".wiki.show_wikitoc_view"
     name="wikitoc.html"
     permission="view"
-    renderer="show_wikitoc.pt"
+    renderer="templates/show_wikitoc.pt"
   />
 
   <formish:form
