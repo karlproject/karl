@@ -261,7 +261,7 @@ class AddFolderFormController(object):
         return {
             'api':api,    # deprecated UX1
             'actions':(), # deprecated UX1
-            'layout':layout   # deprecated UX1
+            'old_layout':layout   # deprecated UX1
         }
 
     def handle_cancel(self):
