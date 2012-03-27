@@ -3,7 +3,11 @@ from karl.webtests.base import Base
 # Help on the 72 char limit
 dc = '/communities/default'
 
-class TestCommunitiesView(Base):
+class TestAllScreens(Base):
+    """
+    Basic smoke test, hits all screens in Karl and makes sure the templates
+    render without raising an exception.
+    """
 
     def test_it(self):
         # login
