@@ -841,6 +841,7 @@
     name="delete.html"
     view=".community.delete_community_view"
     permission="delete community"
+    renderer="templates/delete_resource.pt"
   />
 
   <view
@@ -865,6 +866,7 @@
     name="join.html"
     view=".community.join_community_view"
     permission="view"
+    renderer="templates/join_community.pt"
     />
 
   <adapter

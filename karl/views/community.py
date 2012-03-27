@@ -111,7 +111,7 @@ def show_community_view(context, request):
     # inject tagbox data to panel header data
     panel_data = layout.head_data.get('panel_data', {})
     panel_data['tagbox'] = client_json_data['tagbox']
-    layout.head_data['panel_data'] = panel_data 
+    layout.head_data['panel_data'] = panel_data
 
     # Filter the actions based on permission
     actions = []
@@ -547,15 +547,11 @@ def join_community_view(context, request):
     # Show form
     page_title = "Join " + context.title
     api = TemplateAPI(context, request, page_title)
-    return render_to_response(
-        "templates/join_community.pt",
-        dict(api=api,
+    return dict(api=api,
              profile=profile,
              community=context,
              post_url=resource_url(context, request, "join.html"),
-             formfields=api.formfields),
-        request=request,
-    )
+             formfields=api.formfields)
 
 def delete_community_view(context, request):
 
@@ -573,13 +569,9 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return render_to_response(
-        'templates/delete_resource.pt',
-        dict(api=api,
-             layout=layout,
-             num_children=0,),
-        request = request,
-        )
+    return dict(api=api,            # deprecated in ux2
+             old_layout=layout,     # deprecated in ux2
+             num_children=0,)       # deprecated in ux2
 
 class CommunitySidebar(object):
     implements(ISidebar)
