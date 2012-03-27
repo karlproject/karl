@@ -213,7 +213,6 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Calendar Entry')
         self.failUnless('actions' in response)
-        self.failUnless('layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
