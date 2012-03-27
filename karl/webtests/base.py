@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 
 from repoze.browserid.middleware import make_middleware as browserid
@@ -32,19 +33,15 @@ class Base(unittest.TestCase):
         os.mkdir(var)
 
         import pkg_resources
-        import subprocess
         import sys
         initdb = pkg_resources.resource_filename(__name__, 'initdb.py')
         binpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         karlserve = os.path.join(binpath, 'karlserve')
-        subprocess.call('dropdb %s' % config['dbname'], shell=True)
-        subprocess.check_call('createdb -O %s %s' %
-                              (config['user'], config['dbname']), shell=True)
-        subprocess.check_call('%s -C %s debug -S %s test' % (
-            karlserve, karlserve_ini, initdb), shell=True)
+        shell('dropdb %s' % config['dbname'], check=False)
+        shell('createdb -O %s %s' % (config['user'], config['dbname']))
+        shell('%s -C %s debug -S %s test' % (karlserve, karlserve_ini, initdb))
         postoffice = os.path.join(binpath, 'postoffice')
-        subprocess.check_call('%s -C %s' % (postoffice, postoffice_ini),
-                              shell=True)
+        shell('%s -C %s' % (postoffice, postoffice_ini))
 
         from karlserve.application import make_app
         from webtest import TestApp
@@ -72,6 +69,14 @@ class Base(unittest.TestCase):
         r = r.follow()    # redirect to /communities/default/view.html
         self.assertTrue('Default Community' in r)
         return r
+
+
+def shell(cmd, check=True):
+    if check:
+        call = subprocess.check_call
+    else:
+        call = subprocess.call
+    return call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
 
 instances_ini_tmpl = """\
