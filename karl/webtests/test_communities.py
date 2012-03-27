@@ -6,10 +6,9 @@ dc = '/communities/default'
 class TestCommunitiesView(Base):
 
     def test_it(self):
-
         # login
-        self.login()
-        self.assertTrue('Active KARL Communities')
+        response = self.login()
+        self.assertTrue('Default Community' in response)
 
         # admin_deletecontent
         response = self.app.get('/delete_content.html')
