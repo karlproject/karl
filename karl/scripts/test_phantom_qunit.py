@@ -18,33 +18,37 @@ def run_phantom(config_file, resource_url, verbose=False):
 
 def main(argv=sys.argv):
     import karl.phantom_qunit
+    from karl import views as karl_views # we use views, as karl is multiegg
+    import bottlecap
     config_file = module_path(karl.phantom_qunit, 'phantom-qunit.js')
     verbose = False
     if len(argv) == 2 and argv[1] == '-v':
         verbose = True
     elif len(argv) != 1:
         raise RuntimeError, 'Usage: test_phantom_qunit [-v]'
-    prefix = 'http://127.0.0.1:6543/pg'
 
-    r = '/r1332503085'    # XXX This, of course, cannot work.
+    popper_static_prefix = module_path(bottlecap, 'layouts', 'popper', 'static')
+    karl_static_prefix = module_path(karl_views, 'static')
 
     tests = [
-        prefix + '/popper-static/popper-plugins/popper-example/tests/test.html',
-        prefix + '/popper-static/popper-plugins/popper-tagbox/tests/test.html',
-        prefix + '/popper-static/popper-plugins/popper-pushdown/tests/test.html',
+        popper_static_prefix + '/popper-plugins/popper-example/tests/test.html',
+        popper_static_prefix + '/popper-plugins/popper-tagbox/tests/test.html',
+        popper_static_prefix + '/popper-plugins/popper-pushdown/tests/test.html',
 
         # XXX broken because of static path
-        #prefix2 + '/static' + r + '/karl-plugins/karl-contentfeeds/test.html',
+        #karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
 
-        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/paste/tests/test.html',
+        karl_static_prefix + '/tinymce/3.3.9.2/plugins/paste/tests/test.html',
 
         # XXX broken still
-        #prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html',
+        #karl_static_prefix + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html',
 
-        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html',
-        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
-        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
-        prefix + '/static' + r + '/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
+        # XXX broken still
+        #karl_static_prefix + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html',
+        
+        karl_static_prefix + '/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
+        karl_static_prefix + '/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
+        karl_static_prefix + '/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
 
         #prefix + '/static/tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html',
     ]

@@ -69,8 +69,7 @@ function displayNum(num) {
 
 page.open(url, function(status){
     if (status !== "success") {
-        console.log("Unable to access network.");
-        console.log("Are you running KARL on http://127.0.0.1:6543/pg/ ?");
+        console.log("Unable to access some files. (" + phantom.args[0] + ')');
         phantom.exit();
     } else {
         var prolog = '\x1b[31mFAILED\x1b[37m  ';
