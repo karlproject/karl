@@ -487,7 +487,7 @@ class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
 
         import karl.views.api
         save_community = karl.views.api.TemplateAPI.community_layout
-        save_generic = karl.views.api.TemplateAPI.community_layout
+        save_generic = karl.views.api.TemplateAPI.generic_layout
         try:
             karl.views.api.TemplateAPI.community_layout = 'COMMUNITY'
             karl.views.api.TemplateAPI.generic_layout = 'GENERIC'
@@ -549,7 +549,7 @@ class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
 
         import karl.views.api
         save_community = karl.views.api.TemplateAPI.community_layout
-        save_generic = karl.views.api.TemplateAPI.community_layout
+        save_generic = karl.views.api.TemplateAPI.generic_layout
         try:
             karl.views.api.TemplateAPI.community_layout = 'COMMUNITY'
             karl.views.api.TemplateAPI.generic_layout = 'GENERIC'
