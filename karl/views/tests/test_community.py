@@ -629,17 +629,13 @@ class JoinCommunityViewTests(unittest.TestCase):
         site = c.__parent__.__parent__
         profiles = site["profiles"] = testing.DummyModel()
         profiles["user"] = karltesting.DummyProfile()
-        renderer = karltesting.registerDummyRenderer(
-            "templates/join_community.pt")
         karltesting.registerDummySecurityPolicy("user")
         request = testing.DummyRequest()
-        karltesting.registerDummyRenderer(
-            'karl.views:templates/formfields.pt')
-        self._callFUT(c, request)
-        self.assertEqual(renderer.profile, profiles["user"])
-        self.assertEqual(renderer.community, c)
+        response = self._callFUT(c, request)
+        self.assertEqual(response['profile'], profiles["user"])
+        self.assertEqual(response['community'], c)
         self.assertEqual(
-            renderer.post_url,
+            response['post_url'],
             "http://example.com/communities/community/join.html"
         )
 
@@ -709,7 +705,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         karltesting.registerDummyRenderer('templates/delete_resource.pt')
         self._register()
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
+        self.assertTrue(isinstance(response, dict))
 
     def test_confirmed(self):
         request = testing.DummyRequest({'confirm':'1'})

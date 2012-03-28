@@ -3,13 +3,16 @@ from karl.webtests.base import Base
 # Help on the 72 char limit
 dc = '/communities/default'
 
-class TestCommunitiesView(Base):
+class TestAllScreens(Base):
+    """
+    Basic smoke test, hits all screens in Karl and makes sure the templates
+    render without raising an exception.
+    """
 
     def test_it(self):
-
         # login
-        self.login()
-        self.assertTrue('Active KARL Communities')
+        response = self.login()
+        self.assertTrue('Default Community' in response)
 
         # admin_deletecontent
         response = self.app.get('/delete_content.html')
@@ -172,8 +175,8 @@ class TestCommunitiesView(Base):
         # trash_restore
         # trash_view
         # wiki_index
-        #response = self.app.get(dc + '/wiki/wikitoc.html')
-        #self.assertTrue('Wiki Index' in response)
+        response = self.app.get(dc + '/wiki/wikitoc.html')
+        self.assertTrue('Wiki Index' in response)
 
         # wikipage_edit
         # wikipage_view
