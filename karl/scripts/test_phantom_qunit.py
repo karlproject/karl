@@ -36,7 +36,7 @@ def main(argv=sys.argv):
         popper_static_prefix + '/popper-plugins/popper-pushdown/tests/test.html',
 
         # XXX broken because of static path
-        #karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
+        karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
 
         karl_static_prefix + '/tinymce/3.3.9.2/plugins/paste/tests/test.html',
 
