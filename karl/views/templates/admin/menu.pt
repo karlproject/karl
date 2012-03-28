@@ -51,7 +51,7 @@
                 Email Users
               </a>
           </div>
-          <div class="portlet-item" tal:condition="api.can_administer">
+          <div class="portlet-item" tal:condition="api.can_administer and api.has_mailin">
               <a href="${api.quarantine_url}">
                 View mailin quarantine
               </a>
