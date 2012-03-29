@@ -31,8 +31,8 @@ class TestAllScreens(Base):
         self.assertTrue('Admin Section: Move Content' in response)
 
         # admin_po_quarantine
-        #response = self.app.get('/po_quarantine.html')
-        #self.assertTrue('Post Office Quarantine' in response)
+        response = self.app.get('/po_quarantine.html')
+        self.assertTrue('Post Office Quarantine' in response)
 
         # admin_renameusers
         response = self.app.get('/rename_user.html')
@@ -72,11 +72,25 @@ class TestAllScreens(Base):
         self.assertTrue('Edit someblogpost' in response)
 
 
-        # comment_edit
-
-        # comment_view
+        # Add a comment, see it in the widget, navigate to it, edit
+        response = self.app.get(dc + '/blog/someblogpost')
+        form = response.forms['save']
+        form['add_comment'] = "someblogcomment"
+        response = form.submit('submit')
 
         # comments_widget
+        response = self.app.get(dc + '/blog/someblogpost')
+        self.assertTrue('someblogcomment' in response)
+
+        # comment_view
+        url = dc + '/blog/someblogpost/comments/001'
+        response = self.app.get(url)
+        self.assertTrue('someblogcomment' in response)
+
+        # comment_edit
+        response = self.app.get(url + '/edit.html')
+        self.assertTrue('Edit Re:' in response)
+
 
         # attachment_download
 
@@ -86,15 +100,24 @@ class TestAllScreens(Base):
 
         # attachments_widget
 
+        # calendar_view
+        response = self.app.get(dc + '/calendar/month.html')
+        self.assertTrue('Layer:' in response)
+        response = self.app.get(dc + '/calendar/week.html')
+        self.assertTrue('Layer:' in response)
+        response = self.app.get(dc + '/calendar/day.html')
+        self.assertTrue('Layer:' in response)
+
         # calendar_listview
-        response = self.app.get(dc + '/calendar')
-        #self.assertTrue('Layer:' in response)
+        response = self.app.get(dc + '/calendar/list.html')
+        self.assertTrue('Layer:' in response)
 
         # calendar_setup
-
-        # calendar_view
+        response = self.app.get(dc + '/calendar/setup.html')
+        self.assertTrue('Calendar Categories' in response)
 
         # calendarentry_add
+
 
         # calendarentry_edit
 
@@ -121,7 +144,16 @@ class TestAllScreens(Base):
         self.assertTrue('KARL Communities' in response)
 
         # community_add
+        response = self.app.get('/communities/add_community.html')
+        form = response.forms['save']
+        form['title'] = "sometitle"
+        form['description'] = "somedescription"
+        response = form.submit('submit')
+
         # community_edit
+        response = self.app.get('/communities/default/edit.html')
+        self.assertTrue("Edit Default Community" in response)
+
         # community_join
         # community_overview
         # community_searchresults
@@ -167,6 +199,7 @@ class TestAllScreens(Base):
         # newsitem_view
         # page_title
         # profile_adminedit
+        # profile_recentcontent
         # profile_edit
         # profile_managecommunities
         # profile_managetags
