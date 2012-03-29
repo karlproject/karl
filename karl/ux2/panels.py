@@ -57,6 +57,19 @@ def global_nav(context, request):
     return {'nav_menu': menu_items, 'overflow_menu': overflow_menu}
 
 
+def context_tools(context, request, tools=None):
+    overflow_menu = []
+    community = find_community(context)
+    if community:
+        url = request.resource_url(context, 'tagcloud.html')
+        selected = 'tagcloud.html' in request.path_url
+        overflow_menu.append(dict(title="Tags",
+                                  url=url,
+                                  selected=selected,
+                                  id='tagcloud'))
+    return {'tools': tools, 'overflow_menu': overflow_menu}
+
+
 def actions_menu(context, request, actions):
     # Karl has traditionally used a list of tuples (title, view_name) to
     # represent actions.  Popper layout expects a list of dicts.  Actions
