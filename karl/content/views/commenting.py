@@ -122,7 +122,7 @@ add_comment_field = schemaish.String(
     title='Add Comment',
     description='Enter your comments below.')
 sendalert_field = schemaish.Boolean(
-    title='Send email alert to community members?')
+    title='Email alert')
 attachments_field = schemaish.Sequence(schemaish.File(),
     title='Attachments',
     )
