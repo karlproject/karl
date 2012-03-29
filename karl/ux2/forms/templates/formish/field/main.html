@@ -1,5 +1,6 @@
 <div id="${field.cssname}--field" class="control-group ${field.classes}"
-    tal:define="show_label field.widget.show_label|True">
+    tal:define="show_label field.widget.show_label|True;
+                show_description field.widget.show_description|True">
   <!-- field/main.html -->
   <label tal:condition="show_label and field.widget.type != 'Hidden' and 
                         '.' not in field.name"
@@ -9,6 +10,6 @@
   <div class="controls" tal:omit-tag="not show_label">
   	<span tal:content="structure:field.widget()" tal:omit-tag></span>
   	<span tal:condition="field.error" class="help-inline">${unicode(field.error)}</span>
-  	<p class="fieldHelp help-block" tal:condition="str(field.description) != ''">${field.description}</p>
+  	<p class="fieldHelp help-block" tal:condition="str(field.description) != '' and show_description">${field.description}</p>
 	</div>
 </div>

@@ -44,6 +44,7 @@ class RichTextWidget(Widget):
 
 class CommentWidget(RichTextWidget):
     show_label = False
+    show_description = False
 
 
 class TagsWidget(Widget):
