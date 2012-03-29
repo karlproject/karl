@@ -154,6 +154,7 @@ def all_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request, selected='discover')
+    info['page_title'] = 'Chatter: Discover'
     return info
 
 
@@ -188,6 +189,7 @@ def followed_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
+    info['page_title'] = 'Chatter: Recent Chatter'
     return info
 
 
@@ -221,6 +223,7 @@ def messages(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request, selected='messages')
+    info['page_title'] = 'Chatter: Messages'
     return info
 
 
@@ -267,6 +270,8 @@ def creators_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
+    info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x['userid']
+                         for x in info['creators']])
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.follow_info', info['creators'])
@@ -314,6 +319,8 @@ def names_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
+    info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x
+                         for x in info['names']])
     return info
 
 
@@ -355,6 +362,7 @@ def tag_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request, selected='topics')
+    info['page_title'] = 'Chatter: %s' % info['tag']
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.quip_tags', tag_list)
@@ -583,6 +591,7 @@ def following(context, request):
             'members': following,
             'context_tools': get_context_tools(request, selected='following'),
             'chatter_url': chatter_url,
+            'page_title': 'Chatter: following'
            }
 
 
@@ -608,6 +617,7 @@ def quip_view(context, request):
     """
     return {'quip': quip_info(request, *[context])[0],
             'context_tools': get_context_tools(request, selected='posts'),
+            'page_title': 'Chatter: Quip',
            }
 
 def add_chatter(context, request):
