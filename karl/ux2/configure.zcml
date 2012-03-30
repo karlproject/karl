@@ -88,6 +88,12 @@
   />
 
   <bc:panel
+    name="popper.context_tools"
+    panel=".panels.context_tools"
+    renderer="bottlecap.layouts.popper:templates/context_tools.pt"
+  />
+
+  <bc:panel
     name="status_message"
     panel=".panels.status_message"
     />

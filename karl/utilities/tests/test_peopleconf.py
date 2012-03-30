@@ -976,7 +976,7 @@ class Test_peopleconf(unittest.TestCase):
             <categories>
                 <category name="offices" title="Offices">
                     <value name="nyc" title="NYC">
-                        <description>I<b>heart</b>NY</description>
+                        I<b>heart</b>NY
                     </value>
                 </category>
             </categories>
