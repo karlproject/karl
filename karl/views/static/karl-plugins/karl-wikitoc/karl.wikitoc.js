@@ -38,6 +38,7 @@ $.widget('karl.karlwikitoc', {
 
     options: {
         //items: []...,
+        //rowHeight: 25,
     },
 
     _create: function() {
@@ -208,7 +209,8 @@ $.widget('karl.karlwikitoc', {
         var options = {
             enableCellNavigation: true,
             editable: false,
-            forceFitColumns: true
+            forceFitColumns: true,
+            rowHeight: this.options.rowHeight
         };
 
         var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();

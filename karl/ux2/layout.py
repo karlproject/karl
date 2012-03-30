@@ -118,7 +118,9 @@ class Layout(PopperLayout):
 
     extra_css = (
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
-        'karl.views:static/ux2/main.css',)
+        'karl.views:static/slickgrid/slick.grid.css',
+        'karl.views:static/ux2/main.css',
+        )
 
     extra_js = (
         'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
@@ -191,6 +193,22 @@ class Layout(PopperLayout):
         #
         # END of this original combo
         ## 'karl.views:static/min/karl-ui.min.js',
+
+        # SlickGrid
+        'karl.views:static/slickgrid/lib/jquery.event.drag-2.0.js',
+        'karl.views:static/slickgrid/lib/jquery.event.drop-2.0.min.js',
+        'karl.views:static/slickgrid/slick.core.js',
+
+        #'karl.views:static/slickgrid/slick.editors.js',
+        #'karl.views:static/slickgrid/plugins/slick.cellrangedecorator.js',
+        #'karl.views:static/slickgrid/plugins/slick.cellrangeselector.js',
+        #'karl.views:static/slickgrid/plugins/slick.cellselectionmodel.js',
+        #'karl.views:static/slickgrid/plugins/slick.rowselectionmodel.js',
+
+        'karl.views:static/slickgrid/slick.grid.js',
+        'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
+        'karl.views:static/slickgrid/slick.dataview.js',
+        'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
 
         #
         'karl.views:static/jquery-plugins/jquery.timeago.js',

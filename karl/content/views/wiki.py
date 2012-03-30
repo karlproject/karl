@@ -340,9 +340,15 @@ def show_wikitoc_view(context, request):
 
     wikitoc_data = get_wikitoc_data(context, request)
 
-    client_json_data = convert_to_script(dict(
+    page_data = dict(
         wikitoc = wikitoc_data,
-        ))
+        )
+
+    # ... for ux1
+    client_json_data = convert_to_script(page_data)
+
+    # ... for ux2
+    request.layout_manager.layout.head_data['page_data'] = page_data
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
@@ -350,11 +356,13 @@ def show_wikitoc_view(context, request):
     show_trash = repo is not None and has_permission('edit', context, request)
 
     return dict(api=api,
-         actions=actions,
-         head_data=client_json_data,
-         feed_url=feed_url,
-         backto=backto,
-         show_trash=show_trash)
+        actions=actions,
+        head_data=client_json_data,
+        feed_url=feed_url,
+        backto=backto,
+        lock_info=lock.lock_info_for_view(context, request),
+        show_trash=show_trash,
+        )
 
 
 class EditWikiPageFormController(object):
