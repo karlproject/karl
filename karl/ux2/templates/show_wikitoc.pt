@@ -46,20 +46,11 @@
           $(function() {
               $('#karl-wikitoc')
                   .karlwikitoc({
+                      ux2: true,
                       rowHeight: 34,
+                      headerHeight: 34,
                       items: head_data.page_data.wikitoc.items
                   });
-              // Modification for UX2: remove ui-widget classes,
-              // as this is currently the simplest way to make
-              // the page styles effective inside the widget.
-              // These classes are added by SlickGrid which
-              // is 3rd party source for us.
-              $('#karl-wikitoc')
-                .find('.ui-widget').removeClass('ui-widget')
-              $('#karl-wikitoc')
-                .find('.ui-widget-header').removeClass('ui-widget-header');
-              $('#karl-wikitoc')
-                .find('.ui-widget-content').removeClass('ui-widget-content');
           });
           //]]>
       </script>
