@@ -24,12 +24,12 @@ jQuery(document).ready(function($) {
     ${panel('list_tags')}
 
     <div class="profile_page_body">
-      <span class="portrait">
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect
-                 ratio. -->
-        <img src="${profile.photo.url}" style="width: 75px"/>
-      </span>
       <div class="wrapper">
+        <span class="portrait">
+          <!-- XXX Browser scaling with fixed dims will not preserve aspect
+                   ratio. -->
+          <img src="${profile.photo.url}" style="width: 75px"/>
+        </span>
         <div class="profileDetails">
           <p tal:condition="profile.last_login_time | False">
             <span class="profileLabel">Last login:</span>
