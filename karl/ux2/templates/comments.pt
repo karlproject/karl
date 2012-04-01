@@ -59,4 +59,5 @@
 
    </div>
   </div>
+  <h3 tal:condition="comments">Add Comment</h3>
 </div>
