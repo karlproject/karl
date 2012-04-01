@@ -17,6 +17,10 @@ Globalize.perform_actions = function(el) {
     // then inside the whole document.
     el = $(el);
 
+    // when this is called on page load the element is of
+    // type 'ready', which is of no use.
+    if (el.attr('type') == 'ready' || el.size() == 0) { el = $(document); }
+
     $('.globalize-short-date', el).each( function(i) {
         var d=Globalize.format(new Date($(this).text()),
             'd',
