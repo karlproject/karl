@@ -49,8 +49,10 @@ a#global-logo{padding-left:35px;}
 #radar-panel .timeline{float:right;font-family:Verdana,sans-serif;font-size:0.75em;margin:4px 0 0 4px;}
 .column{padding:0;}
 .save-attachments{margin-bottom:15px;}
+.save-attachments label{display:inline;}
+.adderlink{margin-left:22.75%;}
 .save-sendalert label{text-align:left !important;}
-.save-attachments-n input {margin-left:-150px;margin-right: 40px;}
+.save-attachments-n input {margin-left:0;margin-right: 40px;}
 .portrait{float: left; margin: 5px 20px 5px 0;}
 .profileDetails{float: left;}
 .profileLabel{font-weight:bold;}
