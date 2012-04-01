@@ -38,10 +38,17 @@ $.widget('karl.karlwikitoc', {
 
     options: {
         //items: []...,
+        //rowHeight: 25,
+        //headerHeight: 25,
+        //ux2: false,
     },
 
     _create: function() {
         var self = this;
+
+        var button = this.options.ux2 ?
+            '<button class="btn karl-wikitoc-button-inspector">Options</button>' :
+            '<a href="#" class="karl-wikitoc-button-inspector">Options</a>';
 
         this.element.append(
           '<div class="karl-wikitoc-gridwrapper ui-helper-clearfix">' +
@@ -106,7 +113,7 @@ $.widget('karl.karlwikitoc', {
           '</div>' +
           '<div class="karl-wikitoc-footer ui-widget-header">' +
             '<span class="karl-wikitoc-items"><span class="karl-wikitoc-items-num">0</span> items</span>' +
-            '<a href="#" class="karl-wikitoc-button-inspector">Options</a>' +
+            button +
           '</div>'
         );
 
@@ -143,10 +150,13 @@ $.widget('karl.karlwikitoc', {
         });
 
         // inspector toggle
+        if (! this.options.ux2) {
+            this.el_button_inspector
+                .button({
+                    icons: { primary: 'ui-icon-triangle-1-w' }
+                });
+        }
         this.el_button_inspector
-            .button({
-                icons: { primary: 'ui-icon-triangle-1-w' }
-            })
             .click(function(evt) {
                 // we need the current sizes and order, so refresh it.
                 self.grid_columns = self.grid.getColumns();
@@ -208,7 +218,9 @@ $.widget('karl.karlwikitoc', {
         var options = {
             enableCellNavigation: true,
             editable: false,
-            forceFitColumns: true
+            forceFitColumns: true,
+            rowHeight: this.options.rowHeight,
+            headerHeight: this.options.headerHeight
         };
 
         var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
@@ -267,6 +279,22 @@ $.widget('karl.karlwikitoc', {
 
         // display the footer info
         this.el_label_items_num.text(this.options.items.length);       
+
+        // ux2: remove UI markup
+        if (this.options.ux2) {
+            // Modification for UX2: remove ui-widget classes,
+            // as this is currently the simplest way to make
+            // the page styles effective inside the widget.
+            // These classes are added by SlickGrid which
+            // is 3rd party source for us.
+            this.element
+                .find('.ui-widget').removeClass('ui-widget');
+            this.element
+                .find('.ui-widget-header').removeClass('ui-widget-header');
+            this.element
+                .find('.ui-widget-content').removeClass('ui-widget-content');
+        }
+
     },
 
     //destroy: function() {
@@ -447,8 +475,10 @@ $.widget('karl.karlwikitoc', {
         var full_w = this.el_widthconstrainer.width();
         if (new_open) {
             // opening
-            this.el_button_inspector
-                .button('option', 'icons', {primary: 'ui-icon-triangle-1-e'});
+            if (! this.options.ux2) {
+                this.el_button_inspector
+                    .button('option', 'icons', {primary: 'ui-icon-triangle-1-e'});
+            }
             this.el_inspector
                 .animate({
                     'width': '' + width + 'px'
@@ -466,8 +496,10 @@ $.widget('karl.karlwikitoc', {
                 });
         } else {
             // closing
-            this.el_button_inspector
-                .button('option', 'icons', {primary: 'ui-icon-triangle-1-w'});
+            if (! this.options.ux2) {
+                this.el_button_inspector
+                    .button('option', 'icons', {primary: 'ui-icon-triangle-1-w'});
+            }
             this.el_inspector
                 .animate({
                     'width': '0px'

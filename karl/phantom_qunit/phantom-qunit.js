@@ -69,11 +69,11 @@ function displayNum(num) {
 
 page.open(url, function(status){
     if (status !== "success") {
-        console.log("Unable to access some files. (" + phantom.args[0] + ')');
+        console.log("Unable to access some files. (" + url + ')');
         phantom.exit();
     } else {
         var prolog = '\x1b[31mFAILED\x1b[37m  ';
-        var timeoutlog = prolog + 'TIMEOUT                   ' + phantom.args[0];
+        var timeoutlog = prolog + 'TIMEOUT                   ' + url;
         waitFor(function(){
             return page.evaluate(function(){
                 var el = document.getElementById('qunit-testresult');
@@ -103,7 +103,7 @@ page.open(url, function(status){
             }
             console.log(prolog + 'Total: ' + displayNum(results.total) + 
                 ' Failed: ' + displayNum(results.failed) +
-                '    ' + phantom.args[0]);
+                '    ' + url);
             phantom.exit((results.failed > 0) ? 1 : 0);
         }, 3001, timeoutlog);
     }
