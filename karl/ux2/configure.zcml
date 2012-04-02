@@ -117,6 +117,12 @@
     />
 
   <bc:panel
+    name="my_tags"
+    panel=".panels.my_tags"
+    renderer="templates/my_tags.pt"
+    />
+
+  <bc:panel
     name="popper.footer"
     panel=".panels.footer"
     renderer="templates/footer_panel.pt"

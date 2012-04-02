@@ -592,7 +592,7 @@ def get_profile_actions(profile, request):
 def show_profile_view(context, request):
     """Show a profile with actions if the current user"""
     layout = request.layout_manager.layout
-    layout.page_title = 'View Profile'
+    layout.page_title = "Profile: %s" % context.title
     api = TemplateAPI(context, request, layout.page_title)
 
     # Create display values from model object
@@ -711,6 +711,7 @@ def show_profile_view(context, request):
 
     layout.add_portlet('popper.tagbox')
     layout.add_portlet('my_communities', my_communities, preferred_communities)
+    layout.add_portlet('my_tags', tags)
 
     return dict(api=api,
         profile=profile,

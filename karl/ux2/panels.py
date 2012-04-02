@@ -80,9 +80,13 @@ def actions_menu(context, request, actions):
 
     converted = []
     addables = []
+    overflow_menu = []
     for title, url in actions:
         if title.startswith('Add '):
             addables.append((title, url))
+        elif title.startswith('Manage ') or (overflow_menu != [] and
+            title == 'Advanced'):
+            overflow_menu.append({'title': title, 'url': url})
         else:
             converted.append({'title': title, 'url': url})
 
@@ -95,7 +99,12 @@ def actions_menu(context, request, actions):
         converted = [{'title': title, 'url': url}
                      for title, url in addables] + converted
 
-    return {'actions': converted}
+    menu = {'actions': converted}
+
+    if len(overflow_menu) > 0:
+        menu['overflow_menu'] = overflow_menu
+
+    return menu
 
 
 def personal_tools(context, request):
@@ -119,7 +128,7 @@ def personal_tools(context, request):
 def status_message(context, request):
     message = request.params.get('status_message')
     if message:
-        return '<div class="portalMessage">%s</div>' % escape(message)
+        return '<div class="notification info">%s</div>' % escape(message)
     return ''
 
 
@@ -140,6 +149,13 @@ def my_communities(context, request, my_communities, preferred_communities):
         'my_communities': my_communities,
         'preferred_communities': preferred_communities}
 
+
+def my_tags(context, request, tags):
+    profiles = find_profiles(context)
+    name = authenticated_userid(request)
+    profile = profiles[name]
+    return {'tags': tags,
+            'firstname': profile.firstname,}
 
 
 # --

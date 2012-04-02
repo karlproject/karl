@@ -1,5 +1,5 @@
 <h3>My Communities</h3>
-<div tal:condition="status_message is not None" class="portalMessage">
+<div tal:condition="status_message is not None" class="notification info">
   ${status_message}
 </div>
 <div class="portlet-item" tal:repeat="my_community my_communities">
