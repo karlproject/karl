@@ -6,7 +6,7 @@
 .karl-wikitoc-gridwrapper .grid-canvas .even div{background:#f1eade;}
 .karl-wikitoc-gridwrapper .grid-canvas .odd div{background:#f9f5f0;}
 .karl-wikitoc-gridwrapper .grid-canvas .karl-wikitoc-grid-row-hover .slick-cell{background:#ffffff;}
-.karl-wikitoc-gridwrapper .grid-canvas .slick-cell{padding:0.375em .5em;font-size:0.889em;}@media only screen and (min-width:640px){.karl-wikitoc-gridwrapper .grid-canvas .slick-cell{padding:0.375em 1em;}}.karl-wikitoc-gridwrapper .grid-canvas .slick-cell a,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell a:visited,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell .ui-widget-content a,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell .ui-widget-content a:visited{color:#3d8fb3;text-decoration:none;}
+.karl-wikitoc-gridwrapper .grid-canvas .slick-cell{padding:0.375em .5em;font-size:0.889em;}@media only screen and (min-width: 640px){padding:0.375em 1em;}.karl-wikitoc-gridwrapper .grid-canvas .slick-cell a,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell a:visited,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell .ui-widget-content a,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell .ui-widget-content a:visited{color:#3d8fb3;text-decoration:none;}
 .karl-wikitoc-gridwrapper .grid-canvas .slick-cell a:hover,.karl-wikitoc-gridwrapper .grid-canvas .slick-cell .ui-widget-content a:hover{color:#82bbd4;text-decoration:none;border-bottom:none;}
 .karl-wikitoc-gridwrapper .slick-header-columns{background:#8f806f;}.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column{height:24px;line-height:24px;margin:0;padding:4px;font-size:0.889em;border-right:1px solid #FFFFFF;border-left:0px;border-top:0px;border-bottom:0px;background:none repeat scroll 0 0 #8F806F;color:#DBCFC1;background:#8f806f;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#dbcfc1;text-shadow:0 -1px 0 rgba(0, 0, 0, 0.4);}.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column a,.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column a:visited{color:#dbcfc1;}
 .karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column a:hover{color:#fff;}
@@ -48,12 +48,11 @@ a#global-logo{padding-left:35px;}
 #radar-panel a.selected{color:#fff;}
 #radar-panel .timeline{float:right;font-family:Verdana,sans-serif;font-size:0.75em;margin:4px 0 0 4px;}
 .column{padding:0;}
-.save-attachments{margin-bottom:15px;}
-.save-attachments label{display:inline;}
+.save-attachments{margin-bottom:15px;}.save-attachments label{display:inline;}
 .adderlink{margin-left:22.75%;}
 .save-sendalert label{text-align:left !important;}
-.save-attachments-n input {margin-left:0;margin-right: 40px;}
-.portrait{float: left; margin: 5px 20px 5px 0;}
-.profileDetails{float: left;}
+.save-attachments-n input{margin-left:0;margin-right:40px;}
+.portrait{float:left;margin:5px 20px 5px 0;}
+.profileDetails{float:left;}
 .profileLabel{font-weight:bold;}
 .profileBio{clear:both;margin-right:25px;}
