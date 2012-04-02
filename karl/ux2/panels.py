@@ -80,9 +80,13 @@ def actions_menu(context, request, actions):
 
     converted = []
     addables = []
+    overflow_menu = []
     for title, url in actions:
         if title.startswith('Add '):
             addables.append((title, url))
+        elif title.startswith('Manage ') or (overflow_menu != [] and
+            title == 'Advanced'):
+            overflow_menu.append({'title': title, 'url': url})
         else:
             converted.append({'title': title, 'url': url})
 
@@ -95,7 +99,12 @@ def actions_menu(context, request, actions):
         converted = [{'title': title, 'url': url}
                      for title, url in addables] + converted
 
-    return {'actions': converted}
+    menu = {'actions': converted}
+
+    if len(overflow_menu) > 0:
+        menu['overflow_menu'] = overflow_menu
+
+    return menu
 
 
 def personal_tools(context, request):
