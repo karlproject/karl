@@ -31,12 +31,13 @@ class Layout(PopperLayout):
         self.settings = settings = request.registry.settings
 
         self.app_url = app_url = request.application_url
-        self.here_url = resource_url(context, request)
+        if getattr(context, '__name__', None) is not None:
+            self.here_url = resource_url(context, request)
+            self.site = find_site(context)
+            chatter = find_chatter(context)
+            self.chatter_url = resource_url(chatter, request)
         self.current_intranet = find_intranet(context)
         self.people_url = app_url + '/' + settings.get('people_path', 'people')
-        self.site = find_site(context)
-        chatter = find_chatter(context)
-        self.chatter_url = resource_url(chatter, request)
         self.project_name = settings.get('system_name', 'KARL')
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
