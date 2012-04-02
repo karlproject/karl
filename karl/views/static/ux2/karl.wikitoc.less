@@ -4,14 +4,20 @@
     height: 500px;
     position: relative;
 
+    /* This is also repeated from popper. In addition,
+     * the slickgrid will explode its row headers, in case
+     * the paddings are given in ems. So we need to
+     * provide the padding in pixels here.
+     */
     .slickcell-padding () {
-        padding: 0.375em .5em;
-        font-size: 0.889em;
-        @media only screen and (min-width: 640px) {
-            padding: 0.375em 1em;
-        }
-    }
-
+        /* padding: 0.375em .5em; */
+        padding: 0.375em 7.5834px;
+        font-size: 0.889em;
+        @media only screen and (min-width: 640px) {
+            /* padding: 0.375em 1em; */
+            padding: 0.375em 15.1667px;
+        }
+    }
 
     /* Repetition of table styles from popper.
      * We _may_ want to be smarter here, but this is
@@ -77,10 +83,11 @@
 
             margin: 0;
 
-            /* XXX We would like the same padding but it's a no-go */
-            /*.slickcell-padding ();*/
-            padding: 4px;
-            font-size: 0.889em;
+            /* Same padding as with cells, needed 
+             * to override from slickgrid */
+            &.ui-state-default {
+                .slickcell-padding ();
+            }
 
 
             border-right: 1px solid #FFFFFF;
@@ -156,6 +163,7 @@
                 color: #222222;
                 padding: 0 2px;
                 margin: 0 0 0 11px; 
+                width: auto;
             }
 
             > div {
