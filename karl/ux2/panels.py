@@ -150,6 +150,13 @@ def my_communities(context, request, my_communities, preferred_communities):
         'preferred_communities': preferred_communities}
 
 
+def my_tags(context, request, tags):
+    profiles = find_profiles(context)
+    name = authenticated_userid(request)
+    profile = profiles[name]
+    return {'tags': tags,
+            'firstname': profile.firstname,}
+
 
 # --
 # XXX This used to belong to "api". Now, we need it from the footer

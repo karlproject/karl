@@ -711,6 +711,7 @@ def show_profile_view(context, request):
 
     layout.add_portlet('popper.tagbox')
     layout.add_portlet('my_communities', my_communities, preferred_communities)
+    layout.add_portlet('my_tags', tags)
 
     return dict(api=api,
         profile=profile,
