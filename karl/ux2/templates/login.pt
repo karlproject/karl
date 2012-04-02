@@ -1,11 +1,10 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:tal="http://xml.zope.org/namespaces/tal"
-     xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="main_template">
+<metal:block use-macro="main_template">
 
   <div class="anonymous-form" metal:fill-slot="content">
 
-    ${panel('popper.status_message')}
+    <header>
+      ${panel('popper.status_message')}
+    </header>
 
     ${panel('popper.global_logo')}
     <form name="formLogin" method="post" action="${app_url}/login.html" class="form-horizontal">
@@ -88,4 +87,5 @@
     </form>
 
   </div>
-</html>
+
+</metal:block>
