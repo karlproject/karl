@@ -13,6 +13,8 @@
 .karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column a:hover{color:#fff;}
 .karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column.ui-state-default{background:#8f806f;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#dbcfc1;text-shadow:0 -1px 0 rgba(0, 0, 0, 0.4);}.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column.ui-state-default a,.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column.ui-state-default a:visited{color:#dbcfc1;}
 .karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column.ui-state-default a:hover{color:#fff;}
+.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column .slick-sort-indicator-asc{background:url("sort-asc.gif") repeat scroll 0 0 transparent;}
+.karl-wikitoc-gridwrapper .slick-header-columns .slick-header-column .slick-sort-indicator-desc{background:url("sort-desc.gif") repeat scroll 0 0 transparent;}
 .karl-wikitoc-gridwrapper .karl-wikitoc-grid{width:100%;height:500px;}
 .karl-wikitoc-gridwrapper .karl-wikitoc-widthconstrainer{width:100%;height:500px;}
 .karl-wikitoc-gridwrapper .karl-wikitoc-inspector{width:0px;height:500px;position:absolute;top:0;right:0;z-index:1111;overflow:hidden;border:1px solid #AAAAAA;color:#222222;background-color:#d3d3d3;font-weight:bold;font-size:11px;line-height:11px;}.karl-wikitoc-gridwrapper .karl-wikitoc-inspector fieldset{border:2px groove #f0f0f0;margin:0;}.karl-wikitoc-gridwrapper .karl-wikitoc-inspector fieldset.karl-wikitoc-grouping,.karl-wikitoc-gridwrapper .karl-wikitoc-inspector fieldset.karl-wikitoc-columnselectors{margin-top:20px;}
