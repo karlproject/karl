@@ -3,14 +3,6 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="main_template">
 <head>
-<metal:block metal:fill-slot="extra-headers">
-<script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script>
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    $("abbr.timeago").timeago();
-});
-</script>
-</metal:block>
 </head>
 <body>
   <div metal:fill-slot="content">
@@ -24,16 +16,16 @@ jQuery(document).ready(function($) {
     ${panel('list_tags')}
 
     <div class="profile_page_body">
-      <span class="portrait">
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect
-                 ratio. -->
-        <img src="${profile.photo.url}" style="width: 75px"/>
-      </span>
       <div class="wrapper">
+        <span class="portrait">
+          <!-- XXX Browser scaling with fixed dims will not preserve aspect
+                   ratio. -->
+          <img src="${profile.photo.url}" style="width: 75px"/>
+        </span>
         <div class="profileDetails">
           <p tal:condition="profile.last_login_time | False">
             <span class="profileLabel">Last login:</span>
-            <abbr class="timeago"
+            <abbr class="timeago-date"
                   title="${profile.last_login_time}"
             >${profile.last_login_time}</abbr>
           </p>

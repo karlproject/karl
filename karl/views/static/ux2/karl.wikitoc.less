@@ -1,0 +1,268 @@
+
+.karl-wikitoc-gridwrapper {
+    width: 100%;
+    height: 500px;
+    position: relative;
+
+    /* This is also repeated from popper. In addition,
+     * the slickgrid will explode its row headers, in case
+     * the paddings are given in ems. So we need to
+     * provide the padding in pixels here.
+     */
+    .slickcell-padding () {
+        /* padding: 0.375em .5em; */
+        padding: 0.375em 7.5834px;
+        font-size: 0.889em;
+        @media only screen and (min-width: 640px) {
+            /* padding: 0.375em 1em; */
+            padding: 0.375em 15.1667px;
+        }
+    }
+
+    /* Repetition of table styles from popper.
+     * We _may_ want to be smarter here, but this is
+     * ok as the SlickGrid generates the markup it wants,
+     * so it is acceptable that we have to roll custom
+     * css to make it work.
+     */
+    .grid-canvas {
+        .slick-row {
+            border: 0 none;
+            position: absolute;
+        }
+        .slick-cell, .slick-headerrow-column {
+            border-top: 1px solid #FFFFFF; 
+            border-bottom: 0;
+            border-left: 0;
+            border-right: 0;
+        }
+        .even div {
+            background: lighten(@bodyBg, 5%);
+        }
+        .odd div {
+            background: lighten(@bodyBg, 10%);
+        }
+        .karl-wikitoc-grid-row-hover .slick-cell {
+            background: lighten(@bodyBg, 40%);
+        }
+
+        /* ... needed because SlickGrid overrides these,
+         * and also we need these styles, originally
+         * applied to "td, th", effective on the cells.
+         * As a consequence we _must_ embed here all
+         * the responsive styles too.
+         */
+        .slick-cell {
+            .slickcell-padding ();
+            a, a:visited, .ui-widget-content a, .ui-widget-content a:visited {
+                color: @linkColor;
+                text-decoration: none;
+            }
+            a:hover, .ui-widget-content a:hover {
+                color: lighten(@linkColor, 20%);
+                text-decoration: none;
+                border-bottom: none;
+            }
+        }
+
+
+    }
+ 
+    .slick-header-columns {
+        background: @baseColor1;
+
+        .slick-header-column {
+            /*position: relative;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            float: left;*/
+
+            height: 34px - (5 + 5);
+            line-height: 34px - (5 + 5);
+
+            margin: 0;
+
+            /* Same padding as with cells, needed 
+             * to override from slickgrid */
+            &.ui-state-default {
+                .slickcell-padding ();
+            }
+
+
+            border-right: 1px solid #FFFFFF;
+            border-left: 0px;
+            border-top: 0px;
+            border-bottom: 0px;
+
+            background: none repeat scroll 0 0 #8F806F;
+            color: #DBCFC1;
+            
+            .reset-columns () {
+                /* like TH in popper */
+                background: @baseColor1;
+                font-family: @fancyFont;
+                /*text-align: left;*/
+                color: @baseColor2;
+                text-shadow: 0 -1px 0 rgba(0,0,0,.4);
+                a, a:visited {
+                    color: @baseColor2;
+                }
+                a:hover {
+                    color: #fff;
+                }    
+            }
+ 
+            .reset-columns ();
+            &.ui-state-default {
+                .reset-columns ();
+            }
+           
+            .slick-sort-indicator-asc {
+                background: url("sort-asc.gif") repeat scroll 0 0 transparent;
+            }
+
+            .slick-sort-indicator-desc {
+                background: url("sort-desc.gif") repeat scroll 0 0 transparent;
+            }
+           
+        }
+    }
+
+
+   
+    .karl-wikitoc-grid {
+        width: 100%;
+        height: 500px;
+    }
+    .karl-wikitoc-widthconstrainer {
+        width: 100%;
+        height: 500px;
+    }
+
+    /* inspector panel */
+
+    .karl-wikitoc-inspector {
+        width: 0px;
+        height: 500px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 1111;
+        overflow: hidden;
+        border: 1px solid #AAAAAA;
+        color: #222222;
+        background-color: #d3d3d3; 
+        font-weight: bold;
+
+        font-size: 11px;
+        line-height: 11px;
+
+        fieldset {
+            border: 2px groove #f0f0f0;
+            margin: 0;
+            
+            &.karl-wikitoc-grouping,
+            &.karl-wikitoc-columnselectors {
+                margin-top: 20px;
+            }
+
+            legend {
+                color: #222222;
+                padding: 0 2px;
+                margin: 0 0 0 11px; 
+                width: auto;
+            }
+
+            > div {
+                padding: 8px;
+            }
+
+            p {
+                margin: 0 0 10px 2px;
+                font-weight: normal;
+                font-style: italic;
+            }
+
+            label {
+                font-weight: bold;
+                display: inline-block;
+            }
+
+            input[type="checkbox"] {
+                margin: 3px;
+                border: 2px;
+            }
+
+        }
+
+    }
+
+    /* inspector panel fieldsets spacing */
+
+    .karl-wikitoc-inspector-wrapper {
+        width: 190px; /* this width is picked from js */
+    }
+    .karl-wikitoc-inspector-wrapper2 {
+        padding: 10px;
+        padding-top: 40px;
+    }
+
+    
+
+
+    .karl-wikitoc-icon-search {
+        float: left;
+        position: relative;
+        margin-top: 4px;
+    }
+    .karl-wikitoc-input-livesearch {
+        width: 122px;
+        margin-left: -16px;
+        padding-left: 16px;
+    }
+    
+    .karl-wikitoc-items  {
+        padding: 10px;
+        display: inline-block;
+        float: left;
+    }
+
+
+    /* slickgrid cell, group and expansion styles */
+
+
+    .slick-group .slick-cell {
+        background: #d3d3d3 !important;
+    }
+
+
+    .slick-group-toggle {
+        width: 9px;
+        height: 9px;
+        margin-right: 5px;
+    }
+
+    .slick-group-toggle.expanded {
+        background: url(images/collapse.gif) no-repeat center center;
+    }
+
+    .slick-group-toggle.collapsed {
+        background: url(images/expand.gif) no-repeat center center;
+    }
+
+}
+
+
+.karl-wikitoc-footer {
+    width: 100%;
+    height: 36px;
+    border: 0 none;
+
+    .karl-wikitoc-button-inspector {
+        float: right;
+        margin: 4px;
+    }
+
+}
+

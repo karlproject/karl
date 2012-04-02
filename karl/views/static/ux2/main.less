@@ -1,6 +1,7 @@
 
 @import "variables.less";
 @import "_grid.less";
+@import "karl.wikitoc.less";
 
 
 #bcpanel-global-logo {
@@ -9,6 +10,25 @@
 
 a#global-logo {
     padding-left: 35px;
+}
+
+@media only screen and (min-width: 768px) {
+    input,
+    textarea,
+    select,
+    .uneditable-input,
+    .help-block {
+        width: 550px;
+    }
+    
+    .tagbox {
+        display: block;
+        width: 550px;
+    }
+    
+    #newTag {
+        width: 460px;
+    }
 }
 
 .pushdownContent {
@@ -110,6 +130,13 @@ a#global-logo {
 
 .save-attachments {
     margin-bottom:15px;
+    label {
+        display:inline;
+    }
+}
+
+.adderlink {
+    margin-left:22.75%;
 }
 
 .save-sendalert label {
@@ -117,6 +144,34 @@ a#global-logo {
 }
 
 .save-attachments-n input {
-    margin-left:-150px;
+    margin-left:0;
     margin-right: 40px;
+}
+
+.portrait {
+    float: left;
+    margin: 5px 20px 5px 0;
+}
+
+.profileDetails {
+    float: left;
+}
+
+.profileLabel {
+    font-weight:bold;
+}
+
+.profileBio {
+    clear:both;
+    margin-right:25px;
+}
+
+.notification {
+    .actions {
+        margin: 1em 0 1em 2.75em;
+    }
+}
+
+#actions-overflow-menu {
+    margin:0px 20px;
 }

@@ -1,4 +1,4 @@
-<div id="${field.cssname}--field" class="control-group ${field.classes}"
+<div id="${field.cssname}--field" class="control-group${' required' if 'required' in field.classes else ''}"
     tal:define="show_label field.widget.show_label|True;
                 show_description field.widget.show_description|True">
   <!-- field/main.html -->

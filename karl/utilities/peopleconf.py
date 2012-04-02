@@ -467,17 +467,13 @@ def peopleconf(peopledir, tree, force_reindex=False):
             pc = categories[c_name] = PeopleCategory(title)
             for value_elem in cat_elem.findall('value'):
                 v_name, title = name_and_title(value_elem)
-                desc_elem = value_elem.find('description')
-                if desc_elem is not None:
-                    # get the content of the description as XML
-                    # Note that lxml.etree.Element.text is documented as the
-                    # "text before the first subelement".
-                    text = desc_elem.text or ''
-                    description = text + u''.join(
-                        etree.tostring(e, encoding=unicode) for e in desc_elem)
-                else:
-                    description = u''
-                item = PeopleCategoryItem(title, description)
+                # get the content of the description as XML
+                # Note that lxml.etree.Element.text is documented as the
+                # "text before the first subelement".
+                text = value_elem.text or ''
+                description = text + u''.join(
+                    etree.tostring(e, encoding=unicode) for e in value_elem)
+                item = PeopleCategoryItem(title, description.strip())
                 pc[v_name] = item
 
     for name in list(peopledir.keys()):

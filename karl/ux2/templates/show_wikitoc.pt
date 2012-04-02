@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="main_template">
+
+  <!-- XXX UX2 porting note: what were these doing in UX1? -->
+
+  <!--span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
+      <a href="${layout.here_url}wikitoc.html">Contents</a> |
+      Tree |
+      This Wiki Page |
+  </span-->
+
+  <!--span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <link rel="alternate" type="application/atom+xml"
+	  title="${layout.page_title}" href="${feed_url}"
+	  />
+  </span-->
+
+  <div metal:fill-slot="content">
+
+    ${panel('status_message')}
+    ${panel('popper.actions_menu', actions=actions)}
+
+    <div class="contentbar-wrapper">
+      <span class="contentbar-menu">
+          <a href="${layout.here_url}..">Front Page</a> |
+          Index
+          <tal:block condition="show_trash"> |
+            <a href="${layout.here_url}../trash">Trash</a>
+          </tal:block>
+      </span>
+    </div>
+
+
+    ${panel('wiki_lock', lock_info)}
+
+    ${panel('page_title')}
+
+    ${panel('list_tags')}
+
+    <div class="kbody">
+      <div id='karl-wikitoc'></div>
+      <script language="javascript" type="text/javascript">
+          //<![CDATA[
+          $(function() {
+              $('#karl-wikitoc')
+                  .karlwikitoc({
+                      ux2: true,
+                      rowHeight: 34,
+                      headerHeight: 34,
+                      items: head_data.page_data.wikitoc.items
+                  });
+          });
+          //]]>
+      </script>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+  </div>
+
+</html>

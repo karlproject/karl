@@ -26,6 +26,7 @@
       <script src="${api.static_url}/slickgrid/slick.groupitemmetadataprovider.js"></script>
       <script src="${api.static_url}/slickgrid/slick.dataview.js"></script>
       <script src="${api.static_url}/karl-plugins/karl-wikitoc/karl.wikitoc.js"></script>
+      <link rel="stylesheet" href="${api.static_url}/slickgrid/slick.grid.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/karl-wikitoc.css" type="text/css"/>
     </tal:resources>
   </span>
