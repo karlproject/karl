@@ -381,6 +381,7 @@ def jquery_grid_view(context, request):
         sort_on=sort_on,
         reverse=reverse,
     )
+    del payload['batch']
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")
 
