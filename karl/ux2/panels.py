@@ -119,7 +119,7 @@ def personal_tools(context, request):
 def status_message(context, request):
     message = request.params.get('status_message')
     if message:
-        return '<div class="portalMessage">%s</div>' % escape(message)
+        return '<div class="notification info">%s</div>' % escape(message)
     return ''
 
 
