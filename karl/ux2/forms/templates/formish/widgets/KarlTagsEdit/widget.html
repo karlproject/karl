@@ -1,0 +1,15 @@
+<fieldset>
+  <span id="${field.cssname}"></span>
+  <script language="javascript" type="text/javascript">
+         $(document).ready(function() {
+ 
+             // bind the widget
+             $("#${field.cssname}").tagbox({
+                prevals:  {"records": []},
+                validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                name: "${field.name}",
+                partialForm: true
+             });
+         });
+  </script>
+</fieldset>
