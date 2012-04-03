@@ -266,6 +266,9 @@ class TestShowWikitocView(unittest.TestCase):
         from karl.testing import DummyCatalog
         context.__parent__.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock(
+            layout=mock.Mock(head_data={})
+            )
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 0)
         self.assertEqual(response['backto'], False)
@@ -288,6 +291,9 @@ class TestShowWikitocView(unittest.TestCase):
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
+        request.layout_manager = mock.Mock(
+            layout=mock.Mock(head_data={})
+            )
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 0)
         self.assertEqual(response['backto'], {
