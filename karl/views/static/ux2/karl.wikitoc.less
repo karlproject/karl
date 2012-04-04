@@ -120,6 +120,7 @@
                 font-family: @fancyFont;
                 /*text-align: left;*/
                 color: @baseColor2;
+                font-weight: bold;
                 text-shadow: 0 -1px 0 rgba(0,0,0,.4);
                 a, a:visited {
                     color: @baseColor2;
@@ -134,6 +135,14 @@
                 .reset-columns ();
             }
            
+            &.slick-header-column-sorted {
+                font-style: normal;
+                color: #fff;
+            }
+            &:hover {
+                color: #fff;
+            }
+
             .slick-sort-indicator-asc {
                 background: url("sort-asc.gif") repeat scroll 0 0 transparent;
             }
