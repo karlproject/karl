@@ -51,6 +51,16 @@
                       headerHeight: 34,
                       items: head_data.page_data.wikitoc.items
                   });
+              var timer = null;
+              $(window).resize(function (evt) {
+                  if (timer !== null) {
+                      clearTimeout(timer);
+                  }
+                  timer = setTimeout(function() {
+                      $('#karl-wikitoc').karlwikitoc('resizeColumns');
+                      timer = null;
+                  }, 400);
+              });
           });
           //]]>
       </script>
