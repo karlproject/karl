@@ -1,8 +1,19 @@
 
+.filter.karl-wikitoc-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    height: 0;
+}
+
 .karl-wikitoc-gridwrapper {
     width: 100%;
     height: 500px;
     position: relative;
+
+
+    .slick-viewport {
+        background: darken(@bodyBg, 5%);
+    }
 
     /* This is also repeated from popper. In addition,
      * the slickgrid will explode its row headers, in case
@@ -68,6 +79,11 @@
 
     }
  
+    .slick-header {
+        border-top: 0;
+        border-bottom: 0;
+    }
+
     .slick-header-columns {
         background: @baseColor1;
 
@@ -150,7 +166,7 @@
         right: 0;
         z-index: 1111;
         overflow: hidden;
-        border: 1px solid #AAAAAA;
+        /* border: 1px solid #AAAAAA; */
         color: #222222;
         background-color: #d3d3d3; 
         font-weight: bold;
@@ -255,7 +271,6 @@
 
 
 .karl-wikitoc-footer {
-    width: 100%;
     height: 36px;
     border: 0 none;
 

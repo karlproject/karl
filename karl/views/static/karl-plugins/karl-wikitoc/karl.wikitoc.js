@@ -50,6 +50,10 @@ $.widget('karl.karlwikitoc', {
             '<button class="btn karl-wikitoc-button-inspector">Options</button>' :
             '<a href="#" class="karl-wikitoc-button-inspector">Options</a>';
 
+        var footer_classes = this.options.ux2 ?
+            'karl-wikitoc-footer paginationBar' :
+            'karl-wikitoc-footer ui-widget-header';
+
         this.element.append(
           '<div class="karl-wikitoc-gridwrapper ui-helper-clearfix">' +
             '<div class="karl-wikitoc-widthconstrainer">' +
@@ -111,7 +115,7 @@ $.widget('karl.karlwikitoc', {
               '</div></div>' +
             '</div>' +
           '</div>' +
-          '<div class="karl-wikitoc-footer ui-widget-header">' +
+          '<div class="' + footer_classes + '">' +
             '<span class="karl-wikitoc-items"><span class="karl-wikitoc-items-num">0</span> items</span>' +
             button +
           '</div>'
