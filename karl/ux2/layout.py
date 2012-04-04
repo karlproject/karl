@@ -38,6 +38,7 @@ class Layout(PopperLayout):
             self.chatter_url = resource_url(chatter, request)
         self.current_intranet = find_intranet(context)
         self.people_url = app_url + '/' + settings.get('people_path', 'people')
+        self.profiles_url = app_url + '/profiles'
         self.project_name = settings.get('system_name', 'KARL')
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)

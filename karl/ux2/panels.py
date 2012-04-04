@@ -21,10 +21,12 @@ EMPTY_CONTEXT = {}
 
 def global_nav(context, request):
 
-    def menu_item(title, url, id=None, count=None):
+    def menu_item(title, url, id=None, count=None, secondary=None):
         if id is None:
             id = make_name(EMPTY_CONTEXT, title)
         selected = request.resource_url(context).startswith(url)
+        if secondary is not None and not selected:
+            selected = request.resource_url(context).startswith(secondary)
         item = dict(title=title,
                     url=url,
                     id=id,
@@ -37,7 +39,7 @@ def global_nav(context, request):
     site = layout.site
     menu_items = [
         menu_item("Communities", request.resource_url(site, 'communities')),
-        menu_item("People", layout.people_url),
+        menu_item("People", layout.people_url, secondary=layout.profiles_url),
         menu_item("Feeds", request.resource_url(site, 'contentfeeds.html')),
         ]
     intranets = find_intranets(site)
