@@ -40,7 +40,7 @@
     ${panel('list_tags')}
 
     <div class="kbody">
-      <div id='karl-wikitoc'></div>
+      <div id='karl-wikitoc' style="height: 536px;"></div>
       <script language="javascript" type="text/javascript">
           //<![CDATA[
           $(function() {
