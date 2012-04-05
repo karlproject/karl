@@ -51,7 +51,8 @@ def global_nav(context, request):
              request.resource_url(site, 'offices', 'calendar')))
     chatter = find_chatter(site)
     menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
-    menu_items.append(menu_item("Radar", "#", count="7"))
+    # XXX Radar is disabled for the time.  
+    ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
     if layout.user_is_staff:
         overflow_menu.append(menu_item("Tags",
