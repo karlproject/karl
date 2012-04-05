@@ -50,6 +50,10 @@ $.widget('karl.karlwikitoc', {
             '<button class="btn karl-wikitoc-button-inspector">Options</button>' :
             '<a href="#" class="karl-wikitoc-button-inspector">Options</a>';
 
+        var footer_classes = this.options.ux2 ?
+            'karl-wikitoc-footer paginationBar' :
+            'karl-wikitoc-footer ui-widget-header';
+
         this.element.append(
           '<div class="karl-wikitoc-gridwrapper ui-helper-clearfix">' +
             '<div class="karl-wikitoc-widthconstrainer">' +
@@ -111,7 +115,7 @@ $.widget('karl.karlwikitoc', {
               '</div></div>' +
             '</div>' +
           '</div>' +
-          '<div class="karl-wikitoc-footer ui-widget-header">' +
+          '<div class="' + footer_classes + '">' +
             '<span class="karl-wikitoc-items"><span class="karl-wikitoc-items-num">0</span> items</span>' +
             button +
           '</div>'
@@ -294,6 +298,21 @@ $.widget('karl.karlwikitoc', {
             this.element
                 .find('.ui-widget-content').removeClass('ui-widget-content');
         }
+
+        // ux2: pin the header padding.
+        //
+        // The grid uses the header padding for calculation.
+        // And it considers it never changes during the lifetime of
+        // the widget. However, if the padding changes (ie, due
+        // to a resize) then the grid column layout borks.
+        // As a workaround we will adjust the widths with the padding.
+        // We _only_ need to remember them now for the later correction ;)
+        //
+        //
+        // Use just the first one.
+        var firstHeader = this.element.find('.slick-header-column').eq(0);
+        this.headerColumnPadding = parseInt(firstHeader.css('padding-left'), 10) +
+                parseInt(firstHeader.css('padding-right'), 10);
 
     },
 
@@ -516,6 +535,49 @@ $.widget('karl.karlwikitoc', {
             });
             this.grid.setColumns(this.grid_columns);
         }
+    },
+
+
+    resizeColumns: function(evt) {
+        var self = this;
+        // avoid resize while toggling is in progress
+        if (this.inspector_button_locked) {
+            return;
+        }
+        this.inspector_button_locked = true;
+        //
+        var full_w = this.el_gridwrapper.width();
+        if (this._inspector_open) {
+            full_w = full_w - this.inspector_width;
+            this.el_widthconstrainer.width(full_w);
+        }
+        //
+        var width = 0;
+        $.each(this.grid_columns, function(index, column) {
+            width += column.width;
+        });
+        var ratio = full_w / width;
+       // $.each(this.grid_columns, function(index, column) {
+       //     column.width = Math.round(column.width * ratio);
+       // });
+
+        this.grid.autosizeColumns();
+        this.grid.resizeCanvas();
+        this.grid.setColumns(this.grid_columns);
+
+        // compensate widths after setColumns
+        //
+        var headers = this.element.find('.slick-header-column');
+        var firstHeader = headers.eq(0);
+        var newHeaderColumnPadding = parseInt(firstHeader.css('padding-left'), 10) +
+                parseInt(firstHeader.css('padding-right'), 10);
+        var headerWidthCorrection = this.headerColumnPadding - newHeaderColumnPadding;
+        this.element.find('.slick-header-column').each(function () {
+            var el = $(this);
+            el.width(el.width() + headerWidthCorrection); 
+        });
+
+        this.inspector_button_locked = false;
     }
     
 });
