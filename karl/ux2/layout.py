@@ -115,7 +115,7 @@ class Layout(PopperLayout):
         return head_data
 
     extra_js_head = (
-        'https://www.google.com/jsapi',
+        'karl.views:static/ux2/google/jsapi.js',
     )
 
     extra_css = (
