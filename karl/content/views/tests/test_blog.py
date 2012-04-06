@@ -56,6 +56,7 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
+        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -99,6 +100,7 @@ class ShowBlogViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -144,6 +146,7 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
+        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -188,6 +191,7 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
+        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -232,6 +236,7 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
+        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -557,9 +562,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         recipients.sort()
         self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
 
-        blogentry_url = "http://example.com/communities/community/blog/foo/"
-
-        attachments_url = "%sattachments" % blogentry_url
         self.failUnless(context['foo']['attachments']['test1.txt'])
         self.failUnless(context['foo']['attachments']['test2.txt'])
 
@@ -612,9 +614,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         recipients.sort()
         self.assertEqual(["a@x.org", "b@x.org", "c@x.org",], recipients)
 
-        blogentry_url = "http://example.com/communities/community/blog/foo/"
-
-        attachments_url = "%sattachments" % blogentry_url
         self.failUnless(context['foo']['attachments']['test1.txt'])
         self.failUnless(context['foo']['attachments']['test2.txt'])
 
@@ -763,7 +762,6 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         There seems to be some set of circumstances under which formish will
         return a None as a value in the attachments sequence.
         """
-        from schemaish.type import File as SchemaFile
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
@@ -820,7 +818,10 @@ class BlogSidebarTests(unittest.TestCase):
         return b(api)
 
     def test_render(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
         context = testing.DummyModel()
+        directlyProvides(context, IBlog)
         request = testing.DummyRequest()
         api = object()
         renderer = karl.testing.registerDummyRenderer(
@@ -831,7 +832,10 @@ class BlogSidebarTests(unittest.TestCase):
         self.assertEquals(renderer.blog_url, 'http://example.com/')
 
     def test_render_with_content(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
         context = testing.DummyModel()
+        directlyProvides(context, IBlog)
         from datetime import datetime
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
@@ -854,7 +858,10 @@ class BlogSidebarTests(unittest.TestCase):
         self.assertEquals(renderer.blog_url, 'http://example.com/')
 
     def test_render_ten(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
         context = testing.DummyModel()
+        directlyProvides(context, IBlog)
         from datetime import datetime
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
@@ -869,6 +876,64 @@ class BlogSidebarTests(unittest.TestCase):
             'templates/blog_sidebar.pt')
         self._callFUT(context, request, api)
         self.assertEquals(len(renderer.activity_list), 10)
+
+
+class TestArchivePortlet(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.blog import archive_portlet as fut
+        return fut(context, request)
+
+    def test_empty(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
+        context = testing.DummyModel()
+        directlyProvides(context, IBlog)
+        request = testing.DummyRequest()
+        archive = self._callFUT(context, request)['archive']
+        self.assertEqual(archive, [])
+
+    def test_render_with_content(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
+        context = testing.DummyModel()
+        directlyProvides(context, IBlog)
+        from datetime import datetime
+        from karl.content.interfaces import IBlogEntry
+        e1 = testing.DummyModel(created=datetime(2009, 1, 2))
+        directlyProvides(e1, IBlogEntry)
+        e2 = testing.DummyModel(created=datetime(2009, 1, 10))
+        directlyProvides(e2, IBlogEntry)
+        context['e1'] = e1
+        context['e2'] = e2
+        request = testing.DummyRequest()
+        archive = self._callFUT(context, request)['archive']
+        self.assertEquals(len(archive), 1)
+        self.assertEquals(archive[0].year, 2009)
+        self.assertEquals(archive[0].month_name, 'January')
+        self.assertEquals(archive[0].count, 2)
+
+    def test_render_ten(self):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import IBlog
+        context = testing.DummyModel()
+        directlyProvides(context, IBlog)
+        from datetime import datetime
+        from karl.content.interfaces import IBlogEntry
+        for month in range(1, 11):
+            for day in (4, 7):
+                e = testing.DummyModel(created=datetime(2008, month, day))
+                directlyProvides(e, IBlogEntry)
+                context['e%d-%d' % (month, day)] = e
+        request = testing.DummyRequest()
+        archive = self._callFUT(context, request)['archive']
+        self.assertEquals(len(archive), 10)
+
 
 class Test_upload_attachments(unittest.TestCase):
     def setUp(self):
