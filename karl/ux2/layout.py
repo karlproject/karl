@@ -31,7 +31,7 @@ class Layout(PopperLayout):
         self.settings = settings = request.registry.settings
 
         self.app_url = app_url = request.application_url
-        if getattr(context, '__name__', None) is not None:
+        if getattr(context, '__name__', '_no_name_') != '_no_name_':
             self.here_url = resource_url(context, request)
             self.site = find_site(context)
             chatter = find_chatter(context)

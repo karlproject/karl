@@ -376,8 +376,8 @@ def jquery_grid_view(context, request):
     sort_on = request.params.get('sortColumn', None)
     reverse = request.params.get('sortDirection') == 'desc'
     payload = get_grid_data(context, request,
-        start=int(request.params['start']),
-        limit=int(request.params['limit']),
+        start=int(request.params.get('start','0')),
+        limit=int(request.params.get('limit','12')),
         sort_on=sort_on,
         reverse=reverse,
     )
