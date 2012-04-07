@@ -1,0 +1,9 @@
+<section id="blog_archive" class="portlet contentRelated">
+    <h2>Archive</h2>
+    <ul>
+        <li tal:repeat="item archive">
+            <a href="${item.url}">${item.month_name} ${item.year}
+                <strong>(${item.count})</strong></a>
+        </li>
+    </ul>
+</section>

@@ -204,6 +204,11 @@
     panel=".panels.extra_head"
     />
 
+  <bc:panel
+    name="blog_archive"
+    panel="karl.content.views.blog.archive_portlet"
+    renderer="templates/blog_archive.pt"
+    />
 
   <!-- Assets -->
   <asset
