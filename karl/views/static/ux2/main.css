@@ -62,6 +62,7 @@ a#global-logo{padding-left:35px;}
 .save-attachments-n input{margin-left:0;margin-right:40px;}
 .portrait{float:left;margin:5px 20px 5px 0;}
 .profileDetails{float:left;}
+.profileDetails p{margin-bottom:0;}
 .profileLabel{font-weight:bold;}
 .profileBio{clear:both;margin-right:25px;}
 .notification .actions{margin:1em 0 1em 2.75em;}
