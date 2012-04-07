@@ -918,6 +918,7 @@ class ChangePasswordFormController(object):
         blurb_macro = snippets.macros['change_password_blurb']
         return {'api': api, 'old_layout': layout,  # deprecated UX1
                 'actions': [],
+                'admin_email': api.settings.admin_email, #ux2
                 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
