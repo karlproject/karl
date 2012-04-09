@@ -19,7 +19,7 @@
     </header>
 
     <p tal:content="page_description|''"/>
-    <div tal:condition="blurb_macro|False" metal:use-macro="blurb_macro"/>
+    <div tal:condition="blurb|False" tal:replace="blurb"/>
     <span tal:replace="structure request.form()" />
   </div>
  

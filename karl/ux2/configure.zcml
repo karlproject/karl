@@ -20,6 +20,13 @@
     template="bottlecap.layouts.popper:templates/popper_layout.pt"
   />
 
+  <!-- Anonymous layout -->
+  <bc:layout
+    name="anonymous"
+    layout=".layout.Layout"
+    template="bottlecap.layouts.popper:templates/anonymous_layout.pt"
+  />
+
   <!-- User profile layout -->
   <bc:layout
     layout=".layout.ProfileLayout"

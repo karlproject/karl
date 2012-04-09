@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 from zope.interface import directlyProvides
 from pyramid import testing
@@ -59,12 +60,14 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         self.failUnless('email' in widgets)
 
     def test___call__(self):
+        self.request.layout_manager = lm = mock.Mock()
         controller = self._makeOne(self.context, self.request)
         response = controller()
         self.failUnless('api' in response)
-        self.assertEqual(response['api'].page_title,
-                         u'Forgot Password Request')
+        self.assertEqual(response['api'].page_title, u'Forgot Password Request')
         self.failUnless('blurb_macro' in response)
+        lm.use_layout.assert_called_once_with('anonymous')
+        self.assertEqual(lm.layout.page_title, u'Forgot Password Request')
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
