@@ -42,6 +42,8 @@ class Layout(PopperLayout):
         self.project_name = settings.get('system_name', 'KARL')
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
+        self.tinymce_height = 400
+        self.tinymce_width = 500
 
     @reify
     def should_show_calendar_tab(self):
@@ -111,6 +113,8 @@ class Layout(PopperLayout):
             'karl_static_url': self.static(''),
             'chatter_url': self.chatter_url,
             'date_format': self.user_date_format,
+            'tinymce_height': self.tinymce_height,
+            'tinymce_width': self.tinymce_width,
         })
         return head_data
 

@@ -74,6 +74,9 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('blog_archive')
 
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
@@ -283,6 +286,10 @@ def show_blogentry_view(context, request):
     # add portlets to template
     layout = request.layout_manager.layout
     layout.add_portlet('popper.tagbox')
+    layout.add_portlet('blog_archive')
+    # editor width and height for comments textarea
+    layout.tinymce_height = 250
+    layout.tinymce_width = 700
 
     return dict(
         api=api,
@@ -537,14 +544,18 @@ def coarse_month_range(year, month):
 
 class MonthlyActivity(object):
 
-    def __init__(self, year, month, count):
+    def __init__(self, year, month, count, url):
         self.year = year
         self.month = month
         self.month_name = calendar.month_name[month]
         self.count = count
+        self.url = url
 
 
 class BlogSidebar(object):
+    """
+    deprecated in ux2
+    """
     implements(ISidebar)
 
     def __init__(self, context, request):
@@ -552,20 +563,7 @@ class BlogSidebar(object):
         self.request = request
 
     def __call__(self, api):
-        counts = {}  # {(year, month): count}
-        for entry in self.context.values():
-            if not IBlogEntry.providedBy(entry):
-                continue
-            if not has_permission('view', entry, self.request):
-                continue
-            year = entry.created.year
-            month = entry.created.month
-            counts[(year, month)] = counts.get((year, month), 0) + 1
-        counts = counts.items()
-        counts.sort()
-        counts.reverse()
-        activity_list = [MonthlyActivity(year, month, count)
-            for ((year, month), count) in counts]
+        activity_list = archive_portlet(self.context, self.request)['archive']
         blog_url = resource_url(self.context, self.request)
         return render(
             'templates/blog_sidebar.pt',
@@ -575,3 +573,21 @@ class BlogSidebar(object):
             request = self.request,
             )
 
+
+def archive_portlet(context, request):
+    blog = find_interface(context, IBlog)
+    counts = {}  # {(year, month): count}
+    for entry in blog.values():
+        if not IBlogEntry.providedBy(entry):
+            continue
+        if not has_permission('view', entry, request):
+            continue
+        year = entry.created.year
+        month = entry.created.month
+        counts[(year, month)] = counts.get((year, month), 0) + 1
+    counts = counts.items()
+    counts.sort()
+    counts.reverse()
+    return {'archive': [MonthlyActivity(year, month, count,
+            request.resource_url(blog, query={'year': year, 'month': month}))
+            for ((year, month), count) in counts]}

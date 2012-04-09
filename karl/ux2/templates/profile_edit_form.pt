@@ -19,25 +19,13 @@
 
     <div tal:condition="include_blurb">
         <p>
-        Use the following form to edit your profile information. If
-        you would like to deactivate your ${layout.project_name} account and remove
-        yourself from all communities, click this <a
-        href="${layout.here_url}deactivate.html" id="deleteuserlink">deactivate
-        account</a> link and say <em>yes</em> to the confirmation
-        window. If you would like to change your password, please click
+        Use the following form to edit your profile information. 
+        If you would like to change your password, please click
         <a href="${layout.here_url}change_password.html">Change Password</a>.
         </p>
     </div>
 
     <span tal:content="structure request.form()" tal:omit-tag=""/>
-
-    <a tal:condition="is_active and admin_edit|False"
-       href="${layout.here_url}deactivate.html"
-       id="deleteuserlink">deactivate this user</a>
-
-    <a tal:condition="not is_active and admin_edit|False"
-       href="${layout.here_url}reactivate.html"
-       id="deleteuserlink">reactivate this user</a>
 
   </div>
 

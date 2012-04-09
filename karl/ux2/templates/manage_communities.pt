@@ -64,7 +64,7 @@
 
     <div class="buttons clearafter">
         <button id="form-submit" name="form.submitted" value="submit" 
-            type="submit" class="btn">submit
+            type="submit" class="btn btn-primary">submit
         </button>
         <button id="form-cancel" name="form.cancel" value="cancel" 
             type="submit" class="btn">cancel
