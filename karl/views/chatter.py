@@ -362,7 +362,7 @@ def tag_chatter(context, request):
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request, selected='topics')
-    info['page_title'] = 'Chatter: %s' % info['tag']
+    info['page_title'] = 'Chatter: Topics'
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.quip_tags', tag_list)
