@@ -23,11 +23,11 @@ a#global-logo {
     
     .tagbox {
         display: block;
-        width: 550px;
+        width: auto;
     }
     
     #newTag {
-        width: 460px;
+        width: auto;
     }
 }
 
@@ -184,4 +184,71 @@ a#global-logo {
 .karlselectionradiofield label {
     display:inline;
 }
+
+/* PEOPLE PICTURE TRANSITION CSS */
+.profilesWrapper {
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+    display: block;
+    width: 100%;
+    .photoProfile {
+        height: 130px;
+        background-color: #F1EADE;
+        padding: 0;
+        width: 33%;
+        margin: 0 0.5% 0.5% 0;
+        font-size: 0.9em;
+        float: left;
+        display: inline;
+        overflow: hidden;
+        img {
+            font-size: 1em;
+        }
+        h4 {
+            margin: 10px 10px 0;
+            font-weight: normal;
+            font-size: 1em;
+        }
+        p {
+          line-height: 1.5em;
+          margin: 0.5em 10px 10px;
+        }
+        p span {
+          display: block;
+        }
+    }
+    .photoProfileEndRow {
+        margin-right: 0;
+    }
+    .photoProfileImage {
+        float: left;
+        display: inline;
+        margin: 10px;
+        height: 100px;
+        width: 75px;
+        img {
+            border: none;
+            -ms-interpolation-mode: bicubic; /* ie 7 */
+        }
+    }
+    .profileInfoBox {
+      float: left;
+      margin: 1em 0 0.2em;
+      line-height: 1.5em;
+      overflow: hidden;
+      width: 118px;
+    }
+    .profileNoWrap {
+      white-space: nowrap;
+    }
+    a.rightFloatLink {
+      float: right;
+      text-decoration: none;
+    }
+    .visual-clear {
+        clear: both;
+    }
+}
+
 

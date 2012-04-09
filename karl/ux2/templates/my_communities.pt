@@ -1,31 +1,31 @@
 <section class="portlet sectionRelated" id="my-communities-portlet">
-  <div id="my-communities-list">
-    <h3>My Communities</h3>
-    <div class="portlet-item" tal:repeat="my_community my_communities">
+  <h3>My Communities</h3>
+  <ul id="my-communities-list" class="portlet-list">
+    <li class="portlet-item" tal:repeat="my_community my_communities">
       <a href="${my_community.url}">
         ${my_community.title}
       </a> <span tal:omit-tag="not my_community.moderator" class="label label-moderator">M</span>
-    </div>
-    <div class="portlet-buttons">
-      <a tal:condition="preferred_communities is None"
-         class="btn btn-small"
-         title="Personalize the list of communities that appear on this list"
-         href="${layout.app_url}/jquery_edit_preferred.html">
-         Set preferred
-      </a>
-      <a tal:condition="preferred_communities is not None"
-         class="btn btn-small"
-         title="Edit your personalized list of communities"
-         href="${layout.app_url}/jquery_edit_preferred.html">
-         Edit preferred
-      </a>
-      <a tal:condition="preferred_communities is not None"
-         class="btn btn-small"
-         title="Show all of your communities now"
-         href="${layout.app_url}/jquery_list_my_communities.html">
-         Show all
-      </a>
-    </div>
+    </li>
+  </ul>
+  <div class="portlet-buttons">
+    <a tal:condition="preferred_communities is None"
+       class="btn btn-small"
+       title="Personalize the list of communities that appear on this list"
+       href="${layout.app_url}/jquery_edit_preferred.html">
+       Set preferred
+    </a>
+    <a tal:condition="preferred_communities is not None"
+       class="btn btn-small"
+       title="Edit your personalized list of communities"
+       href="${layout.app_url}/jquery_edit_preferred.html">
+       Edit preferred
+    </a>
+    <a tal:condition="preferred_communities is not None"
+       class="btn btn-small"
+       title="Show all of your communities now"
+       href="${layout.app_url}/jquery_list_my_communities.html">
+       Show all
+    </a>
   </div>
   <script language="javascript" type="text/javascript">
     //<![CDATA[
