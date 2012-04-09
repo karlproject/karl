@@ -42,9 +42,6 @@
 
     <div class="commentText" tal:content="structure comment['text']" />
 
-    <div class="kbyline">Posted
-      by <a href="${comment['author_url']}">${comment['author_name']}</a>
-      on ${comment['date']}</div>
 
     <div class="blogAttachments">
       <span tal:repeat="attachment comment['attachments']">
@@ -56,6 +53,10 @@
                title="Click to Tag, Edit or Delete attachment">#</a>)
         </span>
     </div>
+
+    <div class="kbyline">Posted
+           by <a href="${comment['author_url']}">${comment['author_name']}</a>
+           on ${comment['date']}</div>
 
    </div>
   </div>

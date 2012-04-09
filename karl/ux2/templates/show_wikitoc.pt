@@ -19,25 +19,22 @@
 
   <div metal:fill-slot="content">
 
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)}
+      <div class="contentbar-wrapper">
+          <span class="contentbar-menu">
+              <a href="${layout.here_url}..">Front Page</a> |
+              Index
+              <tal:block condition="show_trash"> |
+                  <a href="${layout.here_url}../trash">Trash</a>
+              </tal:block>
+          </span>
+      </div>
+      <header>
+          ${panel('status_message')}
+          ${panel('wiki_lock', lock_info)}
+          ${panel('popper.actions_menu', actions=actions)}
+          <h1>Wiki Index</h1>
+      </header>
 
-    <div class="contentbar-wrapper">
-      <span class="contentbar-menu">
-          <a href="${layout.here_url}..">Front Page</a> |
-          Index
-          <tal:block condition="show_trash"> |
-            <a href="${layout.here_url}../trash">Trash</a>
-          </tal:block>
-      </span>
-    </div>
-
-
-    ${panel('wiki_lock', lock_info)}
-
-    ${panel('page_title')}
-
-    ${panel('list_tags')}
 
     <div class="kbody">
       <div class="filter karl-wikitoc-header"></div>
