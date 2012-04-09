@@ -228,10 +228,9 @@ def calendar_livesearch_result(context, request):
         )
 
 class BaseAdvancedSearchResultsDisplay(object):
-
     implements(IAdvancedSearchResultsDisplay)
 
-    macro = 'searchresults_generic'
+    panel = macro = 'searchresults_generic'  # macro is deprecated in ux2
     display_data = {}
 
     def __init__(self, context, request):
@@ -239,10 +238,10 @@ class BaseAdvancedSearchResultsDisplay(object):
         self.request = request
 
 class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_office'
+    panel = macro = 'searchresults_office'
 
 class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_people'
+    panel = macro = 'searchresults_people'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayPeople, self).__init__(context,
@@ -273,7 +272,7 @@ class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
             )
 
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_event'
+    panel = macro = 'searchresults_event'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayEvent, self).__init__(context,
@@ -291,7 +290,7 @@ class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
             )
 
 class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_file'
+    panel = macro = 'searchresults_file'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayFile, self).__init__(context,

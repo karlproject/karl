@@ -184,27 +184,28 @@ def _author_profile_data(profiles, doc, docattr, request):
 def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
 
-    # The layout is decided independently of whether we are a
+    # The old_layout is decided independently of whether we are a
     # calendar search or not. What is taken in consideration: if we are
     # in a community. The /offices section is considered a non-community
-    # and will use the wide layout.
+    # and will use the wide old_layout.
     if ICommunity.providedBy(context):
         if calendar_search:
             # We are either in /communities, or in /offices. In the first case:
-            # we use the community layout. For offices: we need the wide layout
-            # with the generic layout.
+            # we use the community old_layout. For offices: we need the wide old_layout
+            # with the generic old_layout.
             context_path = resource_path(context)
             wide = context_path.startswith('/offices')
             if wide:
-                layout = api.generic_layout
+                old_layout = api.generic_layout
             else:
-                layout = api.community_layout
+                old_layout = api.community_layout
         else:
-            layout = api.community_layout
+            old_layout = api.community_layout
         community = context.title
     else:
-        layout = api.generic_layout
+        old_layout = api.generic_layout
         community = None
+        request.layout_manager.layout.section_style = 'none'
 
     request.unicode_errors = 'ignore'
     batch = None
@@ -387,7 +388,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
 
     return dict(
         api=api,
-        layout=layout,
+        old_layout=old_layout,
         error=error,
         show_search_knobs=show_search_knobs,
         terms=terms,

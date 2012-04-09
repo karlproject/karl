@@ -1,11 +1,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="old_layout">
+      metal:use-macro="main_template">
 
 <head>
   <metal:slot metal:fill-slot="extra-headers">
-    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+    <script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script>
     <script language="javascript" type="text/javascript">
       //<![CDATA[
       $(document).ready(function() {
@@ -54,7 +54,7 @@
         <div class="sras-searchknobgroup sras-searchcontent">
             <ul>
                 <li tal:repeat="o kind_knob">
-                    <img src="${api.static_url}/images/${o['icon']}"
+                    <img src="${layout.static('/images/' + o['icon'])}"
                          alt="${o['title']}" tal:condition="o['icon']"/>
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
@@ -123,13 +123,12 @@ $(document).ready(function(){
       <tal:loop repeat="r results">
         <tal:var define="result_display r['result_display'];
                          doc result_display.context">
-          <metal:searchresult
-              use-macro="api.snippets.macros[result_display.macro]">
-          </metal:searchresult>
+          ${panel(result_display.panel, r, doc, result_display)}
         </tal:var>
       </tal:loop>
     </div>
 
+    <!--
     <div id="sras-pagination" tal:condition="batch_info['batching_required']">
         <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
         <table width="100%">
@@ -141,6 +140,7 @@ $(document).ready(function(){
           </tr>
         </table>
     </div>
+    -->
 
 </div>
 

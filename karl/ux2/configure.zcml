@@ -217,6 +217,36 @@
     renderer="templates/blog_archive.pt"
     />
 
+  <bc:panel
+    name="searchresults_generic"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_generic.pt"
+    />
+
+  <bc:panel
+    name="searchresults_office"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_office.pt"
+    />
+
+  <bc:panel
+    name="searchresults_people"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_people.pt"
+    />
+
+  <bc:panel
+    name="searchresults_event"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_event.pt"
+    />
+
+  <bc:panel
+    name="searchresults_file"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_file.pt"
+    />
+
   <!-- Assets -->
   <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
