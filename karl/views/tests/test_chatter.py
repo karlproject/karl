@@ -295,7 +295,7 @@ class Test_followed_chatter(unittest.TestCase):
         site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        self.assertEqual(info['api'].page_title, 'Recent Chatter')
+        self.assertEqual(info['api'].page_title, 'Posts')
         self.assertEqual(info['chatter_form_url'],
                          'http://example.com/chatter/add_chatter.html')
         self.assertEqual(info['recent'], [])
