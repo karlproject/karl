@@ -2,7 +2,7 @@
    tal:define="addremoveclass field.widget.addremove is True and ' addremove' or '';
                sortableclass field.widget.sortable is True and ' sortable' or ''"
    id="${field.cssname}--field" 
-   class="${field.classes}${addremoveclass}${sortableclass}">
+   class="${field.classes}${addremoveclass}${sortableclass} control-group">
   <!-- sequence/main.html -->
   <span class="formish-sequencedata" 
         title="batch_add_count=${field.widget.batch_add_count}"> </span>
