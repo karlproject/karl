@@ -310,6 +310,7 @@ def _calculateTagWeights(taglist):
     return taglist
 
 def tag_cloud_view(context, request):
+    request.layout_manager.layout.section_style = 'none'
     page_title = 'Tag Cloud'
     api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)

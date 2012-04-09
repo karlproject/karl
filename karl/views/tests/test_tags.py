@@ -490,6 +490,7 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_wo_tags_tool(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
 
@@ -499,6 +500,7 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_tool_empty(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: []
@@ -510,6 +512,7 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_tool_one_tag(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('foo', 1)]
@@ -526,6 +529,7 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_sorted_by_name(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
@@ -539,6 +543,7 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_exceeding_limit(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
