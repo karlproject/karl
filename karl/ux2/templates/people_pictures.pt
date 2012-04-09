@@ -8,6 +8,7 @@
     <header>
       ${panel('status_message')}
       ${panel('popper.actions_menu', actions=actions)}
+        <h1>${layout.page_title}</h1>
     </header>
 
     <div class="peopledir-report-description"
