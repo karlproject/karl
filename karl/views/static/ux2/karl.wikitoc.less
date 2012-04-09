@@ -144,11 +144,21 @@
             }
 
             .slick-sort-indicator-asc {
-                background: url("sort-asc.gif") repeat scroll 0 0 transparent;
+                background-image: none;
+                .quickpanelToggle(#fff);
+                vertical-align: middle;
+                padding: 0 0 0 10px;
+                &:before {
+                    border-top: 0;
+                    border-bottom: .266666667em solid #fff;
+                }
             }
 
             .slick-sort-indicator-desc {
-                background: url("sort-desc.gif") repeat scroll 0 0 transparent;
+                background-image: none;
+                .quickpanelToggle(#fff);
+                vertical-align: middle;
+                padding: 0 0 0 10px;
             }
            
         }
