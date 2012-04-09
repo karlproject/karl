@@ -50,7 +50,7 @@
             <div class="visual-clear"></div>
           </tal:row_loop>
         </div>
-
+        <div class="visual-clear"></div>
         ${panel('popper.grid_footer', batch=batch)}
 
     </div>
