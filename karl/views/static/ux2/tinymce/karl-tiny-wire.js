@@ -26,6 +26,10 @@ $(document).ready(function() {
     var tinymce_url = head_data.karl_static_url + 'tinymce/3.3.9.2';
     // The root url of Karl
     var app_url = head_data.app_url;
+    // Editor height
+    var tinymce_height = head_data.tinymce_height;
+    // Editor width 
+    var tinymce_width= head_data.tinymce_width;
 
     // initialize the editor widget(s)
     $('.mceEditor').tinysafe({
@@ -38,8 +42,8 @@ $(document).ready(function() {
         theme: 'advanced',
         skin: 'karl',
         mode: 'specific_textareas',
-        height: 400,
-        width: 550,
+        height: tinymce_height,
+        width: tinymce_width,
         convert_urls : false,
         gecko_spellcheck : true,
         submit_patch: false,

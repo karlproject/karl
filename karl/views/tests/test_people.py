@@ -917,7 +917,7 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
-        self.assertEqual(len(response['actions']), 4)
+        self.assertEqual(len(response['actions']), 5)
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
@@ -943,7 +943,7 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
-        self.assertEqual(len(response['actions']), 2)
+        self.assertEqual(len(response['actions']), 3)
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
 
     def test_communities(self):
@@ -1152,7 +1152,7 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles'] = testing.DummyModel()
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
-        self.assertEqual(len(response['actions']), 2)
+        self.assertEqual(len(response['actions']), 3)
         self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
 
     def test_never_logged_in(self):

@@ -87,8 +87,10 @@ def actions_menu(context, request, actions):
     for title, url in actions:
         if title.startswith('Add '):
             addables.append((title, url))
-        elif title.startswith('Manage ') or (overflow_menu != [] and
-            title == 'Advanced'):
+        # very difficult to convert a simple tuple structure into a full
+        # featured ux2 menu. Let's add the overflow menu if there's a manage
+        # option and put all remaining options after that there.
+        elif title.startswith('Manage ') or overflow_menu != []:
             overflow_menu.append({'title': title, 'url': url})
         else:
             converted.append({'title': title, 'url': url})

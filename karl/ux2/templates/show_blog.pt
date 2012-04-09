@@ -6,16 +6,13 @@
   </metal:feed>
   <div metal:fill-slot="content">
 
-
-    ${panel('status_message')}
-    ${panel('popper.actions_menu', actions=actions)} 
-
-    <div>
 		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
 				tal:repeat="entry entries">
-			<h2>
-          	<a href="${entry['href']}">${entry['title']}</a>
-        	</h2>
+        <header>
+          ${panel('status_message')}
+          ${panel('popper.actions_menu', actions=actions)}
+          <h2><a href="${entry['href']}">${entry['title']}</a></h2>
+      </header>
 
         	<tal:block condition="entry['description']">
         		<div tal:content="structure entry['description']"/>
@@ -54,6 +51,5 @@
           id="RSSIcon"/></a>
     </div>
 
-  </div>
 
 </metal:block>

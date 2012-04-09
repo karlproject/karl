@@ -587,6 +587,20 @@ def get_profile_actions(profile, request):
         actions.append(('Manage Tags', 'manage_tags.html'))
     if has_permission('administer', profile, request):
         actions.append(('Advanced', 'advanced.html'))
+    if same_user:
+        actions.append(('Deactivate My Account', 'javascript:deactivate()'))
+    if has_permission('administer', profile, request) and not same_user:
+        users = find_users(profile)
+        userid = profile.__name__
+        user = users.get_by_id(userid)
+        if user is not None:
+            is_active = True
+        else:
+            is_active = False
+        if is_active:
+            actions.append(('Deactivate This User', 'javascript:deactivate()'))
+        if not is_active:
+            actions.append(('Reactivate This User', 'javascript:reactivate()'))
     return actions
 
 def show_profile_view(context, request):
