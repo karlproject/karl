@@ -6,11 +6,15 @@
   </metal:feed>
   <div metal:fill-slot="content">
 
-		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
-				tal:repeat="entry entries">
-        <header>
+      <header>
           ${panel('status_message')}
           ${panel('popper.actions_menu', actions=actions)}
+          <h1>Blog Listing</h1>
+      </header>
+
+      <div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
+				tal:repeat="entry entries">
+        <header>
           <h2><a href="${entry['href']}">${entry['title']}</a></h2>
       </header>
 

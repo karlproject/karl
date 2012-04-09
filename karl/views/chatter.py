@@ -185,11 +185,11 @@ def followed_chatter(context, request):
     if layout is not None:
         layout.add_portlet('chatter.quip_search')
     info = followed_chatter_json(context, request)
-    info['api'] = TemplateAPI(context, request, 'Recent Chatter')
+    info['api'] = TemplateAPI(context, request, 'Posts')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
-    info['page_title'] = 'Chatter: Recent Chatter'
+    info['page_title'] = 'Chatter: Posts'
     return info
 
 
@@ -591,7 +591,7 @@ def following(context, request):
             'members': following,
             'context_tools': get_context_tools(request, selected='following'),
             'chatter_url': chatter_url,
-            'page_title': 'Chatter: following'
+            'page_title': 'Chatter: Following'
            }
 
 
