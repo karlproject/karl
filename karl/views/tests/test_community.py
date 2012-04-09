@@ -43,6 +43,17 @@ class RedirectCommunityViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/murg')
 
+    def test_it_with_query(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        context.default_tool = 'murg'
+        request = testing.DummyRequest(GET={'status': 'married'})
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+                         'http://example.com/murg?status=married')
+
     def test_it_notool(self):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides

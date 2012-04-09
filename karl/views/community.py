@@ -89,7 +89,13 @@ def redirect_community_view(context, request):
     default_tool = getattr(context, 'default_tool', None)
     if not default_tool:
         default_tool = 'view.html'
-    return HTTPFound(location=resource_url(context, request, default_tool))
+    # Preserve status_message=, etc in query string
+    query = request.GET
+    if query:
+        location = resource_url(context, request, default_tool, query=query)
+    else:
+        location = resource_url(context, request, default_tool)
+    return HTTPFound(location=location)
 
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))

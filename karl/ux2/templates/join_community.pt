@@ -1,0 +1,32 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+        <h1>${layout.page_title}</h1>
+    </header>
+
+    <p>Type a message to the moderators of this community, below.  Your
+    request to join the ${community.title} community will be sent to the 
+    community's moderators.</p>
+
+    <form method="post" action="${post_url}" class="k3_genericForm" 
+          id="contentform" name="save">
+        <fieldset>
+          <label>Message</label>
+          <textarea id="message" name="message" rows="5" cols="60"></textarea>
+        </fieldset>
+
+        <fieldset>
+          <div>
+            <button id="form-submit" name="form.submitted" value="submit" type="submit">submit</button>
+            <button id="form-cancel" name="form.cancel" value="cancel" type="submit">cancel</button>
+          </div>
+        </fieldset>
+
+     </form>
+  </div>
+
+</div>
