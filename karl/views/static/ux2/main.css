@@ -78,3 +78,5 @@ a#global-logo{padding-left:35px;}
 .profilesWrapper .profileNoWrap{white-space:nowrap;}
 .profilesWrapper a.rightFloatLink{float:right;text-decoration:none;}
 .profilesWrapper .visual-clear{clear:both;}
+#deactivateModal{display:none;}
+#reactivateModal{display:none;}
