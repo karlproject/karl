@@ -8,21 +8,23 @@
         <h1>${layout.page_title}</h1>
     </header>
 
-    <p>Type a message to the moderators of this community, below.  Your
+    <p class="notification info">Type a message to the moderators of this community, below.  Your
     request to join the ${community.title} community will be sent to the 
     community's moderators.</p>
 
-    <form method="post" action="${post_url}" class="k3_genericForm" 
+    <form method="post" action="${post_url}" class="k3_genericForm form-horizontal" 
           id="contentform" name="save">
         <fieldset>
-          <label>Message</label>
-          <textarea id="message" name="message" rows="5" cols="60"></textarea>
-        </fieldset>
+          <div class="field control-group">
+            <label for="message" class="control-label">Message</label>
+            <div class="controls">
+              <textarea id="message" name="message" rows="5" cols="60"></textarea>
+            </div>
+          </div>
 
-        <fieldset>
-          <div>
-            <button id="form-submit" name="form.submitted" value="submit" type="submit">submit</button>
-            <button id="form-cancel" name="form.cancel" value="cancel" type="submit">cancel</button>
+          <div class="form-actions">
+            <button id="form-submit" name="form.submitted" value="submit" type= "submit" class="btn btn-primary">submit</button>
+            <button id="form-cancel" name="form.cancel" value="cancel" type=" submit" class="btn">cancel</button>
           </div>
         </fieldset>
 
