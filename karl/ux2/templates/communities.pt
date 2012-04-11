@@ -4,14 +4,14 @@
 
     <header>
         ${panel('status_message')}
-        ${panel('popper.actions_menu', actions=actions)}
+        ${panel('actions_menu', actions=actions)}
         <h1>Community Listing</h1>
     </header>
 
     <div tal:condition="error" tal:content="error" />
 
     <div class="contentText">
-            ${panel('popper.grid_header', letters=letters, filters=community_tabs)}
+            ${panel('grid_header', letters=letters, filters=community_tabs)}
 
             <table class="filtered sortable" id="someid" summary="">
                 <!--
@@ -46,7 +46,7 @@
                 </tbody>
             </table>
 
-            ${panel('popper.grid_footer', batch=batch_info)}
+            ${panel('grid_footer', batch=batch_info)}
 
         </div>
 

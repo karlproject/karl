@@ -3,10 +3,10 @@
   <div class="anonymous-form" metal:fill-slot="content">
 
     <header>
-      ${panel('popper.status_message')}
+      ${panel('status_message')}
     </header>
 
-    ${panel('popper.global_logo')}
+    ${panel('global_logo')}
     <form name="formLogin" method="post" action="${app_url}/login.html" class="form-horizontal">
 
       <fieldset>

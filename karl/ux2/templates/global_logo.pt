@@ -1,0 +1,13 @@
+<h1 id="bcpanel-global-logo" class="sitetitle">
+    <tal:comment condition="layout.devmode">
+    <!--
+    This is the global-logo panel per
+    https://agendaless.mybalsamiq.com/projects/popper/Popper+Overview
+    Filename is bottlecap/layouts/popper/templates/global_logo.pt
+    -->
+    </tal:comment>
+    <a id="global-logo" href="${logo_href}"
+       title="${logo_title} home page">
+        ${logo_title}
+    </a>
+</h1>

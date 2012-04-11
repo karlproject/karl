@@ -7,7 +7,7 @@
 
     <header>
       ${panel('status_message')}
-      ${panel('popper.actions_menu', actions=actions)}
+      ${panel('actions_menu', actions=actions)}
         <h1>${layout.page_title}</h1>
     </header>
 
@@ -17,7 +17,7 @@
 
     <div class="contentText">
 
-        ${panel('popper.grid_header', letters=letters, formats=formats, actions=report_actions)}
+        ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}
 
         <div class="profilesWrapper">
           <tal:row_loop tal:repeat="row rows">
@@ -52,7 +52,7 @@
           </tal:row_loop>
         </div>
         <div class="visual-clear"></div>
-        ${panel('popper.grid_footer', batch=batch)}
+        ${panel('grid_footer', batch=batch)}
 
     </div>
   </div>

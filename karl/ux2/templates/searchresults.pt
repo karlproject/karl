@@ -128,7 +128,7 @@ $(document).ready(function(){
       </tal:loop>
     </div>
 
-    ${panel('popper.grid_footer', batch=batch_info)}
+    ${panel('grid_footer', batch=batch_info)}
     <!--
     <div id="sras-pagination" tal:condition="batch_info['batching_required']">
         <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />

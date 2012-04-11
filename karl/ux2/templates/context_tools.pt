@@ -1,0 +1,35 @@
+<ul class="sectionTools noBullets">
+    <tal:block repeat="tool tools">
+        <li tal:attributes="class tool['selected']"
+            tal:condition="'dropdown' not in tool">
+            <a
+               href="${tool['url']}">${tool['title']}</a>
+        </li>
+        <li tal:condition="'dropdown' in tool"
+            class="btn-group ${tool['selected']}">
+            <a href="${tool['url']}">${tool['title']}</a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li tal:attributes="class dtool['selected']"
+                    tal:repeat="dtool tool['dropdown']">
+                    <a href="${dtool['url']}">${dtool['title']}</a>
+                </li>
+            </ul>
+        </li>
+    </tal:block>
+    <li tal:condition="overflow_menu|False">
+        <a href="#" class="dropdown-toggle moreToggle" data-toggle="dropdown">More</a>
+        <div class="dropdown-menu">
+            <ul>
+                <li tal:repeat="item overflow_menu"
+                    tal:attributes="class item.selected"
+                    id="${item.id}-wrapper">
+                   <a href="${item.url}" id="${item.id}">${item.title}<span 
+                      tal:condition="'count' in item" 
+                      class="messageCounter">${item.count}</span></a>
+                </li>
+            </ul>
+        </div>
+    </li>
+</ul>

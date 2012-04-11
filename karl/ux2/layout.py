@@ -1,13 +1,16 @@
 
 import copy
-from bottlecap.layouts.popper.layout import PopperLayout
-from bottlecap.layouts.popper.layout import get_microtemplates
+import json
+#from bottlecap.layouts.popper.layout import PopperLayout
+#from bottlecap.layouts.popper.layout import get_microtemplates
+from bottlecap.layout import layout_config
 
 from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.security import authenticated_userid
+from pyramid.settings import asbool
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 
@@ -21,13 +24,33 @@ from karl.utils import find_chatter
 from karl.views.utils import get_user_date_format
 
 
-class Layout(PopperLayout):
+class Layout(object):
+    # Some configurable options that can be overriden in a view
+    project_name = 'KARL'
+    section_title = 'Section Title'
+    page_title = 'Page Title'
+    section_style = 'full'
+    extra_css = ()
+    extra_js = ()
+    extra_css_head = ()
+    extra_js_head = ()
+
     countries = countries
     error_message = None
     cultures = cultures
 
     def __init__(self, context, request):
-        super(Layout, self).__init__(context, request)
+        self.context = context
+        self.request = request
+        self.app_url = request.application_url
+        # what if context is not traversable?
+        if getattr(context, '__name__', None) is not None:
+            self.context_url = request.resource_url(context)
+        else:
+            self.context_url = request.url
+        self.portlets = []
+
+        #super(Layout, self).__init__(context, request)
         self.settings = settings = request.registry.settings
 
         self.app_url = app_url = request.application_url
@@ -44,6 +67,26 @@ class Layout(PopperLayout):
         self.userid = authenticated_userid(request)
         self.tinymce_height = 400
         self.tinymce_width = 500
+
+    @reify
+    def devmode(self):
+        """Let templates know if we are in devmode, for comments """
+
+        sn = 'bottlecap.devmode'
+        dm = self.request.registry.settings.get(sn, "false")
+        return dm == "true"
+
+    def add_portlet(self, name, *args, **kw):
+        self.portlets.append((name, args, kw))
+
+    @apply
+    def show_sidebar():
+        def getter(self):
+            return bool(self.portlets)
+        def setter(self, value):
+            # allow manual override
+            self.__dict__['show_sidebar'] = value
+        return property(getter, setter)
 
     @reify
     def should_show_calendar_tab(self):
@@ -106,9 +149,71 @@ class Layout(PopperLayout):
 
     @reify
     def head_data(self):
-        head_data = super(Layout, self).head_data
-        head_data = copy.deepcopy(head_data)
-        head_data.update({
+        if getattr(self, '_head_data', None) is None:
+            self._head_data = {
+                'app_url': self.app_url,
+                'context_url': self.context_url,
+
+                # XXX this does not belong here, but for now
+                # we generate the data for some panels here.
+                # The pushdowns are already moved out from this place.
+                'panel_data': {
+                    'tagbox': {
+                        'records': [
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'flyers'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'park'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'volunteer'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': '',
+                                'tag': 'un'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'foreign_policy'
+                                },
+                            {
+                                'count': 1,
+                                'snippet': 'nondeleteable',
+                                'tag': 'unsaid'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'advocacy'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': '',
+                                'tag': 'zimbabwe'
+                                },
+                            {
+                                'count': 2,
+                                'snippet': 'nondeleteable',
+                                'tag': 'aryeh_neier'
+                                },
+                        ],
+                        'docid': -1352878729,
+                        },
+                    },
+                }
+        #return self._head_data
+        #head_data = super(Layout, self).head_data
+        #head_data = copy.deepcopy(head_data)
+        self._head_data.update({
             # Add some more stuff to the head_data factorized by popper
             'karl_static_url': self.static(''),
             'chatter_url': self.chatter_url,
@@ -116,7 +221,7 @@ class Layout(PopperLayout):
             'tinymce_height': self.tinymce_height,
             'tinymce_width': self.tinymce_width,
         })
-        return head_data
+        return self._head_data
 
     extra_js_head = (
         ##'karl.views:static/ux2/google/jsapi.js',
@@ -225,14 +330,21 @@ class Layout(PopperLayout):
         )
 
     @property
+    def head_data_json(self):
+        return json.dumps(self.head_data)
+
+    def use_microtemplates(self, names):
+        self._used_microtemplate_names = names
+        self._microtemplates = None
+        # update head data with it
+        self.head_data['microtemplates'] = self.microtemplates
+
+    @property
     def microtemplates(self):
-        """Render the whole microtemplates dictionary
-        Take popper's templates and allow them to overriden locally.
-        """
+        """Render the whole microtemplates dictionary"""
         if getattr(self, '_microtemplates', None) is None:
-            self._microtemplates = super(Layout, self).microtemplates
-            self._microtemplates.update(get_microtemplates(directory=_microtemplates,
-                names=getattr(self, '_used_microtemplate_names', ())))
+            self._microtemplates = get_microtemplates(directory=_microtemplates,
+                names=getattr(self, '_used_microtemplate_names', ()))
         return self._microtemplates
 
 
@@ -251,5 +363,26 @@ import os
 _here = os.path.dirname(__file__)
 _microtemplates = os.path.join(_here, 'microtemplates')
 
+def get_microtemplates(directory, names=None):
+
+    templates = {}
+
+    all_filenames = {}
+    for _fn in os.listdir(directory):
+        if _fn.endswith('.mustache'):
+            name = _fn[:-9]
+            fname = os.path.join(directory, _fn)
+            all_filenames[name] = fname
+
+    # XXX Names can be a list of templates that the page needs.
+    # For now on, we ignore names and include all the templates we have.
+    names = all_filenames.keys()
+
+    for name in names:
+        #try:
+        fname = all_filenames[name]
+        #except KeyError:
+        #    raise "No such microtemplate %s" % name
+        templates[name] = file(fname).read()
 
 

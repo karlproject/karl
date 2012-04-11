@@ -17,34 +17,34 @@
   <!-- Default layout -->
   <bc:layout
     layout=".layout.Layout"
-    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    template="templates/layout.pt"
   />
 
   <!-- Anonymous layout -->
   <bc:layout
     name="anonymous"
     layout=".layout.Layout"
-    template="bottlecap.layouts.popper:templates/anonymous_layout.pt"
+    template="templates/anonymous_layout.pt"
   />
 
   <!-- User profile layout -->
   <bc:layout
     layout=".layout.ProfileLayout"
-    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    template="templates/layout.pt"
     containment="karl.models.interfaces.IProfiles"
   />
 
   <!-- People directory layout -->
   <bc:layout
     layout=".layout.PeopleDirectoryLayout"
-    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    template="templates/layout.pt"
     containment="karl.models.interfaces.IPeopleDirectory"
   />
 
   <!-- Chatter layout -->
   <bc:layout
     layout=".layout.ChatterLayout"
-    template="bottlecap.layouts.popper:templates/popper_layout.pt"
+    template="templates/layout.pt"
     containment="karl.models.interfaces.IChatterbox"
   />
 
@@ -83,21 +83,33 @@
   -->
 
   <bc:panel
-    name="popper.global_nav"
-    panel=".panels.global_nav"
-    renderer="bottlecap.layouts.popper:templates/global_nav.pt"
+    name="generic_panel"
+    panel=".panels.generic_panel"
+    renderer="templates/generic_panel.pt"
   />
 
   <bc:panel
-    name="popper.personal_tools"
+    name="column_one"
+    panel=".panels.column_one"
+    renderer="templates/column_one.pt"
+  />
+
+  <bc:panel
+    name="global_nav"
+    panel=".panels.global_nav"
+    renderer="templates/global_nav.pt"
+  />
+
+  <bc:panel
+    name="personal_tools"
     panel=".panels.personal_tools"
     renderer="templates/personal_tools.pt"
   />
 
   <bc:panel
-    name="popper.context_tools"
+    name="context_tools"
     panel=".panels.context_tools"
-    renderer="bottlecap.layouts.popper:templates/context_tools.pt"
+    renderer="templates/context_tools.pt"
   />
 
   <bc:panel
@@ -106,15 +118,15 @@
     />
 
   <bc:panel
-    name="popper.actions_menu"
+    name="actions_menu"
     panel=".panels.actions_menu"
-    renderer="bottlecap.layouts.popper:templates/actions_menu.pt"
+    renderer="templates/actions_menu.pt"
     />
 
   <bc:panel
-    name="popper.global_logo"
+    name="global_logo"
     panel=".panels.global_logo"
-    renderer="bottlecap.layouts.popper:templates/global_logo.pt"
+    renderer="templates/global_logo.pt"
     />
 
   <bc:panel
@@ -130,13 +142,13 @@
     />
 
   <bc:panel
-    name="popper.footer"
+    name="footer"
     panel=".panels.footer"
     renderer="templates/footer_panel.pt"
     />
 
   <bc:panel
-    name="popper.search"
+    name="search"
     panel=".panels.search"
     renderer="templates/search.pt"
     />
@@ -207,8 +219,28 @@
     />
 
   <bc:panel
-    name="popper.extra_head"
+    name="extra_slot_head"
     panel=".panels.extra_head"
+    />
+
+  <bc:panel
+    name="extra_css_head"
+    panel=".panels.extra_css_head"
+    />
+
+  <bc:panel
+    name="extra_js_head"
+    panel=".panels.extra_js_head"
+    />
+
+  <bc:panel
+    name="extra_css"
+    panel=".panels.extra_css"
+    />
+
+  <bc:panel
+    name="extra_js"
+    panel=".panels.extra_js"
     />
 
   <bc:panel
@@ -248,10 +280,10 @@
     />
 
   <!-- Assets -->
-  <asset
+  <!-- <asset
     to_override="bottlecap.layouts.popper:static/img/favicon.ico"
     override_with="karl.views:static/ux2/favicon.ico"
-  />
+  /> -->
 
 
   <!-- Pushdowns data, and global notifications -->

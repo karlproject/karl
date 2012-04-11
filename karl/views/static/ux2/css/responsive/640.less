@@ -1,0 +1,229 @@
+@media only screen and (min-width: 640px) {
+h1 { font-size: 2.105em; padding-top:  0; }
+h2 { font-size: 1.777em; }
+th, td {
+    padding: 0.375em 1em;
+}
+.contentWrapper { padding: 1.333em; }
+.description {
+    font-size: 1.185em;
+    font-style: italic;
+}	
+h2#search-toggle {
+	height: 2.35em;
+	width: 2.35em;		    
+}
+#top-bar {
+    .gradientBar(#444, #222);
+    text-shadow: 0 -1px 0 black;    	
+}
+#bcpanel-global-nav {
+    .horList();
+    clear:none;
+    margin: 0;
+    padding: 0;
+    > li > a {
+        display: block;
+    }
+}
+#bcpanel-global-logo {
+	float: left;
+	padding: 0 0 0 (@space * 1em);
+	margin: 0 (@space * 1em) 0 0;
+	background-position: (@space * 1em) 50%;
+}    
+a#global-logo{
+    margin-left: 0;
+}
+.topNavIconWrapper {
+    float: left;
+}
+.search .topNavIconWrapper {
+    width: 100%;
+}
+h2#navigation-toggle {
+    display: none;
+}
+#global-nav {
+    background: transparent;
+    display: block;
+    background: transparent;
+    float: left;
+    overflow: visible;
+    position: static;
+    padding: 0;
+    border: none;
+    font-size: 1em;
+    font-family: @baseFont;
+    .css3_box_shadow(none);
+    > li {
+    	float:left;
+        border-top: none;
+        border-bottom: none;	
+        position: static;	    
+    }
+    > li > a {
+    	margin: 0 1px 0 0;
+    	z-index: 1;
+    	display: block;
+    	line-height: 2.6923em;
+    	font-family: @fancyFont;
+        font-weight: normal;
+    	font-size: 0.889em;
+    	color: #bbb;
+    	background-image: none;
+    	text-decoration: none;
+    	&:hover { 
+    		color: #fff;
+    	}		   
+    }
+    .selected a {
+    	color: #fff;	
+    	margin-bottom: 0;
+    	background: #000;
+        font-weight: normal;
+    	&:hover {
+            border-bottom: none;
+    	}
+    }	
+    .selected a:after {
+    	content: "";
+    	font-size: 0;
+        display: block;
+        position: absolute;
+        top: auto;
+        bottom: 0px;
+        left: 50%;
+        margin-left: -7px;
+        width:0; 
+        height:0; 
+        border-left: 7px solid transparent; 
+        border-right: 7px solid transparent;
+        border-bottom: 7px solid @bodyBg;
+        border-top: 0;
+    }                
+}
+#global-nav .dropdown-menu li {
+    display: list-item;
+    float: none;
+    border: none;
+}
+#global-nav .dropdown-menu a {
+    display: inline;
+    padding: 0;
+    line-height: normal;
+    font-size: 1em;
+    background: transparent;
+}
+.open {
+    .css3_border_radius(.5em .5em 0 0);
+}
+.noSectionMenu #global-nav .selected a:after {
+    border-bottom-color: #eaddcb;
+}
+a.moreToggle {
+    background-image: url('../img/cog_section.png');
+    background-position: 50% 50%;
+    /* don't ask *me* why this copy of .ir should be here explicitely, ask IE8 */
+    display: block;
+    border: 0;
+    text-indent: -999em;
+    overflow: hidden;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    text-align: left;
+    direction: ltr;
+    width: 19px;
+    &:before {
+        display: none;   
+    }
+}
+.btn-group a.moreToggle {
+    .css3_box_shadow(none);    
+}
+#global-nav a.moreToggle {
+    background-image: url('../img/cog_globalnav.png');
+}
+#global-nav a.moreToggle:hover,
+#global-nav .open > a.moreToggle {
+    background-image: url('../img/cog.png');
+}
+#global-nav li[data-quickpanel="quickpanel"] {
+    display: block;
+}
+#global-nav:before {
+    display: none;
+}
+form#search-form {
+    top: 0;
+    z-index: 0;
+    .css3_box_shadow(none);
+    .css3_border_radius(0);
+    font-size: 1em;
+    font-family: @baseFont;
+    background-color: @pushDownBg; /* for IE to prevent overriding with .quickpanel's black background */        
+}
+h2#search-toggle:before {
+    display: none;
+}
+
+/* @group Content */
+section.main {
+    position: relative;
+}
+section.main header {
+    position: static;
+}
+section.main aside {
+    float: right;
+    width: 17.713em;
+	padding: (@space * 1em);
+	margin: 0 0 (@space * 1em) (@space * 1em);
+	font-size: 0.889em;
+}
+.column {
+    padding: 0; //(@space * 1em) 0;
+    .clearfix();
+}
+.res {
+    display: block;
+    float: left;    
+}
+/* @end */
+
+fieldset legend {
+    padding-left: 25%;
+    width: 75%;
+    *padding: 0 0 5px 23%;
+    line-height: @baseLineHeight * 2;    
+}
+// Float the labels left
+.form-horizontal {
+    .control-group > label {
+      float: left;
+      width: 20%;
+      padding-top: 5px;
+      text-align: right;
+    }
+    // Move over all input controls and content
+    .controls {
+      margin-left: 22.75%;
+      font-size: 0.889em;
+      padding-top: 5px;
+    }
+    // Move over buttons in .form-actions to align with .controls
+    .form-actions {
+      padding-left: 22.75%;
+    }    
+}
+.form-actions {
+    padding: (@baseLineHeight - 1) 20px @baseLineHeight;    
+}
+
+section.main .vcard .adr {
+    float: left;
+}
+section.main .vcard aside {
+    text-align: right;
+}
+}

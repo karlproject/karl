@@ -1,5 +1,6 @@
 from cgi import escape
 
+from pyramid.encode import urlencode
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
@@ -18,6 +19,22 @@ from karl.views.utils import make_name
 
 PROFILE_ICON_SIZE = (25, 25)
 EMPTY_CONTEXT = {}
+
+
+def generic_panel(context, request):
+    return {}
+
+
+def column_one(context, request):
+    layout_manager = request.layout_manager
+    layout = layout_manager.layout
+    render = layout_manager.render_panel
+    if layout.portlets:
+        return '\n'.join(
+            [render(name, *args, **kw)
+             for name, args, kw in layout.portlets])
+    return ''
+
 
 def global_nav(context, request):
 
@@ -342,3 +359,138 @@ def extra_head(context, request):
 
 def searchresults(context, request, r, doc, result_display):
     return {'r': r, 'result_display': result_display, 'doc': doc}
+
+
+def site_announcement(context, request):
+    if "show_announcement" not in request.params:
+        # We only want to show the site announcement in the sample
+        # app if we ask for it. We'll make a link on the sample page
+        # to make this obvious
+        return {}
+    announcement = """
+    Praesent commodo cursus magna, vel scelerisque nisl
+        consectetur et. Sed posuere consectetur est at lobortis.
+        Aenean eu leo quam. Pellentesque ornare sem lacinia quam
+        venenatis vestibulum."""
+    return dict(
+        ann_headline="The dismissible site announcement",
+        ann_body=announcement,
+        ann_href="/",
+    )
+
+
+def grid_header(context, request, letters=None, filters=None, formats=None,
+                actions=None):
+    return {
+        'letters': letters,
+        'filters': filters,
+        'formats': formats,
+        'actions': actions}
+
+
+def grid_footer(context, request, batch):
+    # Pagination
+    batch_size = batch['batch_size']
+    n_pages = (batch['total'] - 1) / batch_size + 1
+    if n_pages <= 1:
+        batch['pagination'] = False
+        return batch
+
+    url = request.path_url
+    def page_url(page):
+        params = request.GET.copy()
+        params['batch_start'] = str(page * batch_size)
+        return '%s?%s' % (url, urlencode(params))
+
+    batch['pagination'] = True
+    current = batch['batch_start'] / batch['batch_size']
+    if current > 0:
+        batch['prev_url'] = page_url(current - 1)
+    else:
+        batch['prev_url'] = None
+    if current + 1 < n_pages:
+        batch['next_url'] = page_url(current + 1)
+    else:
+        batch['next_url'] = None
+    pages = []
+    for i in xrange(n_pages):
+        ellipsis = i != 0 and i != n_pages - 1 and abs(current - i) > 3
+        if ellipsis:
+            if pages[-1]['name'] != 'ellipsis':
+                pages.append({
+                    'name': 'ellipsis',
+                    'title': '...',
+                    'url': None,
+                    'selected': False})
+        else:
+            title = '%d' % (i + 1)
+            pages.append({
+                'name': title,
+                'title': title,
+                'url': page_url(i),
+                'selected': i == current})
+
+    batch['pages'] = pages
+    return batch
+
+
+def extra_css(context, request):
+    layout = request.layout_manager.layout
+    static_url = request.static_url
+    css = []
+    for spec in layout.extra_css:
+        # We allow spec to be an absolute url, in which case
+        # we "just use it".
+        if not (spec.startswith('http://') or spec.startswith('https://')):
+            spec = static_url(spec)
+        css.append('\t\t<link rel="stylesheet" href="%s" />' % spec)
+    return '\n'.join(css)
+
+
+def extra_js(context, request):
+    layout = request.layout_manager.layout
+    static_url = request.static_url
+    js = []
+    for spec in layout.extra_js:
+        # We allow spec to be an absolute url, in which case
+        # we "just use it".
+        if not (spec.startswith('http://') or spec.startswith('https://')):
+            spec = static_url(spec)
+        # XXX We make it all defer. Revise and provide a parameter,
+        # XXX if it makes sense!
+        defer = True
+        js.append('\t\t<script src="%s" %s></script>' % (spec, 'defer' if defer else ''))
+    return '\n'.join(js)
+
+
+def extra_css_head(context, request):
+    layout = request.layout_manager.layout
+    static_url = request.static_url
+    css = []
+    for spec in layout.extra_css_head:
+        # We allow spec to be an absolute url, in which case
+        # we "just use it".
+        if not (spec.startswith('http://') or spec.startswith('https://')):
+            spec = static_url(spec)
+        css.append('\t\t<link rel="stylesheet" href="%s" />' % spec)
+    return '\n'.join(css)
+
+
+def extra_js_head(context, request):
+    layout = request.layout_manager.layout
+    static_url = request.static_url
+    js = []
+    for spec in layout.extra_js_head:
+        # We allow spec to be an absolute url, in which case
+        # we "just use it".
+        if not (spec.startswith('http://') or spec.startswith('https://')):
+            spec = static_url(spec)
+        # XXX We make it all non-defer. Revise and provide a parameter,
+        # XXX if it makes sense!
+        defer = False
+        js.append('\t\t<script src="%s" %s></script>' % (spec, 'defer' if defer else ''))
+    return '\n'.join(js)
+
+
+def extra_head(context, request):
+    return ''

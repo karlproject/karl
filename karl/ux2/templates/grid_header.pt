@@ -1,0 +1,38 @@
+<ul class="contentActions" id="report-actions" tal:condition="actions">
+    <li tal:repeat="action actions">
+        <a href="${action['url']}" title="${action['description']}" 
+           id="${action['name']}-action">${action['title']}</a>
+    </li>
+</ul>
+
+<div class="filter">
+    <ul class="contentActions" id="view-switcher" tal:condition="formats">
+        <li tal:repeat="format formats" 
+            tal:attributes="selected 'selected' if format['selected'] else None">
+            <a id="${format['name']}-view" href="${format['url']}" 
+                title="${format['description']}">${format['title']}</a></li>
+    </ul>
+
+
+    <div class="btn-group filterOptions" id="filter-options" tal:condition="filters">
+        <div tal:repeat="filter filters" tal:omit-tag>
+            <a class="btn btn-small${' active' if filter['selected'] else ''}"
+                name="filter-options"
+                id="${filter['name']}-view"
+                href="${filter['url']}">${filter['title']}</a>
+        </div>
+    </div>
+
+    <ul class="alphabet" tal:condition="letters">
+        <tal:block repeat="letter letters">
+            <li tal:condition="letter['is_current']" class="current">
+                <span>${letter['name']}</span>
+            </li>
+
+            <li tal:condition="not letter['is_current']" class="notcurrent">
+                <a href="${letter['href']}" tal:condition="letter['href']">${letter['name']}</a>
+                <span tal:condition="not letter['href']">${letter['name']}</span>
+            </li>
+        </tal:block>
+    </ul>
+</div>

@@ -1,0 +1,7 @@
+<section class="notification info globalNotification"
+        tal:condition="exists: ann_headline">
+    <a href="#" class="dismissNotification" title="Dismiss the notification">X</a>
+    <h1>${ann_headline}</h1>
+    <p>${ann_body} <a href="${ann_href}">Read more…</a></p>
+</section>
+
