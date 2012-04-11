@@ -219,7 +219,7 @@
     />
 
   <bc:panel
-    name="extra_slot_head"
+    name="extra_head"
     panel=".panels.extra_head"
     />
 

@@ -103,8 +103,8 @@
         window.head_data = ${structure: layout.head_data_json};
     </script>
 
-    <!-- <script src="${layout.static('ux2/js/jquery-ui-1.9m5.min.js')}" defer></script>
-    <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" /> -->
+    <script src="${layout.static('ux2/js/jquery-ui-1.9m5.min.js')}" defer></script>
+    <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
     <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js')}" type="text/javascript" defer></script>
     <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js')}" type="text/javascript" defer></script>
     <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js')}" type="text/javascript" defer></script>
