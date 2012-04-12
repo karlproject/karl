@@ -27,17 +27,14 @@ def main(argv=sys.argv):
     elif len(argv) != 1:
         raise RuntimeError, 'Usage: test_phantom_qunit [-v]'
 
-    popper_static_prefix = module_path(bottlecap, 'layouts', 'popper', 'static')
     karl_static_prefix = module_path(karl_views, 'static')
 
     tests = [
-        popper_static_prefix + '/popper-plugins/popper-example/tests/test.html',
-        popper_static_prefix + '/popper-plugins/popper-tagbox/tests/test.html',
-        popper_static_prefix + '/popper-plugins/popper-pushdown/tests/test.html',
+        karl_static_prefix + '/ux2/plugins/popper-example/tests/test.html',
+        karl_static_prefix + '/ux2/plugins/popper-tagbox/tests/test.html',
+        karl_static_prefix + '/ux2/plugins/popper-pushdown/tests/test.html',
 
-        # XXX broken because of static path
         karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
-
         karl_static_prefix + '/tinymce/3.3.9.2/plugins/paste/tests/test.html',
 
         # XXX broken still
