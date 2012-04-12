@@ -29,6 +29,7 @@ def column_one(context, request):
     layout_manager = request.layout_manager
     layout = layout_manager.layout
     render = layout_manager.render_panel
+    print 'Huh?', layout.portlets
     if layout.portlets:
         return '\n'.join(
             [render(name, *args, **kw)

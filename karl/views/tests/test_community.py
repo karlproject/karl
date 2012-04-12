@@ -121,7 +121,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                          resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
         self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
-        layout.add_portlet.assert_called_once_with('popper.tagbox')
+        layout.add_portlet.assert_called_once_with('tagbox')
 
     def test_already_member(self):
         self._register()
@@ -139,7 +139,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Delete', 'delete.html'),
                           ('Advanced', 'advanced.html'),
                          ])
-        layout.add_portlet.assert_called_once_with('popper.tagbox')
+        layout.add_portlet.assert_called_once_with('tagbox')
 
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):

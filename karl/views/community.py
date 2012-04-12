@@ -31,7 +31,6 @@ from pyramid.httpexceptions import HTTPFound
 
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
-from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -113,7 +112,7 @@ def show_community_view(context, request):
 
     # add tagbox to template
     layout = request.layout_manager.layout
-    layout.add_portlet('popper.tagbox')
+    layout.add_portlet('tagbox')
     # inject tagbox data to panel header data
     panel_data = layout.head_data.get('panel_data', {})
     panel_data['tagbox'] = client_json_data['tagbox']

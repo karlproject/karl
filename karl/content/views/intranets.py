@@ -55,7 +55,7 @@ def show_intranets_view(context, request):
 
     # add portlets to template
     layout = request.layout_manager.layout
-    layout.add_portlet('popper.tagbox')
+    layout.add_portlet('tagbox')
 
 
     return render_to_response(
