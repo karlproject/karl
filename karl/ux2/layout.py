@@ -375,4 +375,7 @@ def get_microtemplates(directory, names=None):
         #    raise "No such microtemplate %s" % name
         templates[name] = file(fname).read()
 
+    return templates
+
+
 
