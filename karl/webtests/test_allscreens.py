@@ -1,3 +1,6 @@
+from os.path import dirname
+from os.path import join
+
 from karl.webtests.base import Base
 
 # Help on the 72 char limit
@@ -12,7 +15,6 @@ class TestAllScreens(Base):
     def test_it(self):
         # login
         response = self.login()
-        self.assertTrue('Default Community' in response)
 
         # admin_deletecontent
         response = self.app.get('/delete_content.html')
@@ -189,12 +191,28 @@ class TestAllScreens(Base):
         self.assertTrue("shows all the tags" in response)
 
         # file_add
+        filename = join(dirname(__file__), 'sample_upload_file.txt')
+        filecontent = open(filename).read()
+
         response = self.app.get(dc + '/files/add_file.html')
         self.assertTrue("Add File</h" in response)
+        form = response.forms['save']
+        form['title'] = 'somefiletitle'
+        form['file.file'] = (filename, filecontent)
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue('somefiletitle' in response)
 
-        # file_download
-        # file_edit
         # file_view
+        url = 'sample_upload_file.txt'
+        response = self.app.get(dc + '/files/' + url)
+        self.assertTrue(url in response)
+
+        # file_edit
+        url = 'sample_upload_file.txt'
+        response = self.app.get(dc + '/files/' + url + '/edit.html')
+        self.assertTrue('Edit somefiletitle' in response)
+
         # folder_add
         response = self.app.get(dc + '/files/add_folder.html')
         self.assertTrue("Add Folder</h" in response)
@@ -267,12 +285,46 @@ class TestAllScreens(Base):
         # newsitem_edit
         # newsitem_view
 
-        # profile_adminedit
-        # profile_recentcontent
-        # profile_edit
-        # profile_managecommunities
-        # profile_managetags
+        # profile_adduser
+        response = self.app.get('/profiles/add.html')
+        self.assertTrue('Home Path' in response)
+        form = response.forms['save']
+        form['login'] = 'newuser'
+        form['password.password'] = '12345678'
+        form['password.confirm'] = '12345678'
+        form['firstname'] = 'Firstname'
+        form['lastname'] = 'Lastname'
+        form['email'] = 'someone@x.org'
+        form['country'] = 'AF'
+        #response = form.submit()
+        #response.showbrowser()
+        #response = response.follow()
+        #self.assertTrue('Firstname' in response)
+
         # profile_view
+        response = self.app.get('/profiles/admin')
+        self.assertTrue('Content Added Recently' in response)
+
+        # profile_adminedit
+        response = self.app.get('/profiles/admin/admin_edit_profile.html')
+        self.assertTrue('Edit User and Profile Information' in response)
+
+        # profile_deactivateuser
+        response = self.app.get('/profiles/admin/deactivate.html')
+        self.assertTrue('really want to deactivate' in response)
+
+        # profile_recentcontent
+        response = self.app.get('/profiles/admin/recent_content.html')
+        self.assertTrue('Content Added Recently by' in response)
+
+        # profile_managecommunities
+        response = self.app.get('/profiles/admin/manage_communities.html')
+        self.assertTrue('You can receive email' in response)
+
+        # profile_managetags
+        response = self.app.get('/profiles/admin/manage_tags.html')
+        self.assertTrue('Rename tags' in response)
+
 
         # wiki_index
         response = self.app.get(dc + '/wiki/wikitoc.html')
@@ -332,3 +384,13 @@ class TestAllScreens(Base):
         # We have to be logged out in order to see this
         response = self.app.get(dc + '/members/' + invitation_key)
         self.assertTrue('You have been invited to join' in response)
+
+        ###########
+        # Now login as staff1 and do anything that couldn't be done as
+        # admin
+
+        # profile_edit
+        #self.login(login='staff1', password='staff1')
+        #response = self.app.get('/profiles/staff1/edit_profile.html')
+        #self.assertTrue('Edit User and Profile Information' in response)
+
