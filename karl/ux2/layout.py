@@ -49,10 +49,7 @@ class Layout(object):
         else:
             self.context_url = request.url
         self.portlets = []
-
-        #super(Layout, self).__init__(context, request)
         self.settings = settings = request.registry.settings
-
         self.app_url = app_url = request.application_url
         if getattr(context, '__name__', '_no_name_') != '_no_name_':
             self.here_url = resource_url(context, request)
@@ -149,79 +146,71 @@ class Layout(object):
 
     @reify
     def head_data(self):
-        if getattr(self, '_head_data', None) is None:
-            self._head_data = {
-                'app_url': self.app_url,
-                'context_url': self.context_url,
-
-                # XXX this does not belong here, but for now
-                # we generate the data for some panels here.
-                # The pushdowns are already moved out from this place.
-                'panel_data': {
-                    'tagbox': {
-                        'records': [
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'flyers'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'park'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'volunteer'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': '',
-                                'tag': 'un'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'foreign_policy'
-                                },
-                            {
-                                'count': 1,
-                                'snippet': 'nondeleteable',
-                                'tag': 'unsaid'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'advocacy'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': '',
-                                'tag': 'zimbabwe'
-                                },
-                            {
-                                'count': 2,
-                                'snippet': 'nondeleteable',
-                                'tag': 'aryeh_neier'
-                                },
-                        ],
-                        'docid': -1352878729,
-                        },
-                    },
-                }
-        #return self._head_data
-        #head_data = super(Layout, self).head_data
-        #head_data = copy.deepcopy(head_data)
-        self._head_data.update({
-            # Add some more stuff to the head_data factorized by popper
+        return {
+            'app_url': self.app_url,
+            'context_url': self.context_url,
             'karl_static_url': self.static(''),
             'chatter_url': self.chatter_url,
             'date_format': self.user_date_format,
             'tinymce_height': self.tinymce_height,
             'tinymce_width': self.tinymce_width,
-        })
-        return self._head_data
+            # XXX this does not belong here, but for now
+            # we generate the data for some panels here.
+            # The pushdowns are already moved out from this place.
+            'panel_data': {
+                'tagbox': {
+                    'records': [
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'flyers'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'park'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'volunteer'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': '',
+                            'tag': 'un'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'foreign_policy'
+                            },
+                        {
+                            'count': 1,
+                            'snippet': 'nondeleteable',
+                            'tag': 'unsaid'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'advocacy'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': '',
+                            'tag': 'zimbabwe'
+                            },
+                        {
+                            'count': 2,
+                            'snippet': 'nondeleteable',
+                            'tag': 'aryeh_neier'
+                            },
+                    ],
+                    'docid': -1352878729,
+                    },
+                },
+            }
+
 
     extra_js_head = (
         ##'karl.views:static/ux2/google/jsapi.js',
@@ -362,6 +351,7 @@ class ChatterLayout(Layout):
 import os
 _here = os.path.dirname(__file__)
 _microtemplates = os.path.join(_here, 'microtemplates')
+
 
 def get_microtemplates(directory, names=None):
 
