@@ -81,7 +81,7 @@ def context_tools(context, request, tools=None):
     overflow_menu = []
     community = find_community(context)
     if community:
-        url = request.resource_url(context, 'tagcloud.html')
+        url = request.resource_url(community, 'tagcloud.html')
         selected = 'tagcloud.html' in request.path_url
         overflow_menu.append(dict(title="Tags",
                                   url=url,
