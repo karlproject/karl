@@ -1,3 +1,6 @@
+from os.path import dirname
+from os.path import join
+
 from karl.webtests.base import Base
 
 # Help on the 72 char limit
@@ -12,7 +15,6 @@ class TestAllScreens(Base):
     def test_it(self):
         # login
         response = self.login()
-        self.assertTrue('Default Community' in response)
 
         # admin_deletecontent
         response = self.app.get('/delete_content.html')
@@ -61,7 +63,6 @@ class TestAllScreens(Base):
         form = response.forms['save']
         form['title'] = 'someblogpost'
         response = form.submit('submit')
-        response.follow()
 
         # blogentry_view
         response = self.app.get(dc + '/blog/someblogpost')
@@ -163,24 +164,64 @@ class TestAllScreens(Base):
         form = response.forms['save']
         form['title'] = "sometitle"
         form['description'] = "somedescription"
-        response = form.submit('submit')
+        form.submit('submit')
 
         # community_edit
-        response = self.app.get('/communities/default/edit.html')
+        response = self.app.get(dc + '/edit.html')
         self.assertTrue("Edit Default Community" in response)
 
         # community_join
+        response = self.app.get(dc + '/join.html')
+        self.assertTrue("Type a message" in response)
+
         # community_overview
+        response = self.app.get(dc + '/view.html')
+        self.assertTrue("Overview" in response)
+
         # community_searchresults
+        response = self.app.get(dc + '/searchresults.html?body=Hatter')
+        self.assertTrue("Reference Manuals" in response)
+
         # community_tagcloud
+        response = self.app.get(dc + '/tagcloud.html')
+        self.assertTrue("a list of tags" in response)
+
         # community_taglisting
+        response = self.app.get(dc + '/taglisting.html')
+        self.assertTrue("shows all the tags" in response)
+
         # file_add
-        # file_download
-        # file_edit
+        filename = join(dirname(__file__), 'sample_upload_file.txt')
+        filecontent = open(filename).read()
+
+        response = self.app.get(dc + '/files/add_file.html')
+        self.assertTrue("Add File</h" in response)
+        form = response.forms['save']
+        form['title'] = 'somefiletitle'
+        form['file.file'] = (filename, filecontent)
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue('somefiletitle' in response)
+
         # file_view
+        url = 'sample_upload_file.txt'
+        response = self.app.get(dc + '/files/' + url)
+        self.assertTrue(url in response)
+
+        # file_edit
+        url = 'sample_upload_file.txt'
+        response = self.app.get(dc + '/files/' + url + '/edit.html')
+        self.assertTrue('Edit somefiletitle' in response)
+
         # folder_add
+        response = self.app.get(dc + '/files/add_folder.html')
+        self.assertTrue("Add Folder</h" in response)
+
         # folder_edit
         # folder_view
+        response = self.app.get(dc + '/files/')
+        self.assertTrue("Files </h" in response)
+
         # forum_add
         # forum_edit
         # forum_view
@@ -188,45 +229,168 @@ class TestAllScreens(Base):
         # forumtopic_add
         # forumtopic_edit
         # forumtopic_view
+
         # atom
-        # contact
+        response = self.app.get(dc + '/atom.xml')
+        self.assertTrue("subtitle" in response)
+
+
         # error_forbidden
         # error_general
         # error_notfound
-        # legal
+
         # resource_advanced
+        response = self.app.get(dc + '/advanced.html')
+        self.assertTrue("Advanced Settings for" in response)
+
         # resource_delete
-        # history_preview
-        # history_restore
-        # history_view
+        response = self.app.get(dc + '/calendar/sometitle/delete.html')
+        self.assertTrue("you really want" in response)
+
         # intranet_networkevents
         # intranet_networknews
         # intranet_view
-        # members_acceptinvitation
-        # members_addexisting
-        # members_invitenew
-        # members_manage
+
         # members_picturesview
+        response = self.app.get(dc + '/members')
+        self.assertTrue("Community Members" in response)
+
         # members_tableview
+        response = self.app.get(dc + '/members?hide_pictures')
+        self.assertTrue("Organization" in response)
+
+        # members_manage
+        response = self.app.get(dc + '/members/manage.html')
+        self.assertTrue('Manage Community Members' in response)
+
+        # members_addexisting
+        response = self.app.get(dc + '/members/add_existing.html')
+        self.assertTrue('Add Existing KARL Users' in response)
+
+        # members_invitenew
+        response = self.app.get(dc + '/members/invite_new.html')
+        self.assertTrue('Invite New KARL Users' in response)
+        # Let's make an invitation, find the invitation code,
+        # so we can use it at the end after logout
+        form = response.forms[1]
+        form['email_addresses'] = 'foo@bar.org'
+        response = form.submit('submit')
+        response = response.follow()
+        xp = '//table[@id="members"]/tbody/tr[2]/td[2]/span/@title'
+        invitation_key = response.lxml.xpath(xp)[0]
+
+
         # networknews_view
         # newsitem_add
         # newsitem_edit
         # newsitem_view
-        # page_title
-        # profile_adminedit
-        # profile_recentcontent
-        # profile_edit
-        # profile_managecommunities
-        # profile_managetags
+
+        # profile_adduser
+        response = self.app.get('/profiles/add.html')
+        self.assertTrue('Home Path' in response)
+        form = response.forms['save']
+        form['login'] = 'newuser'
+        form['password.password'] = '12345678'
+        form['password.confirm'] = '12345678'
+        form['firstname'] = 'Firstname'
+        form['lastname'] = 'Lastname'
+        form['email'] = 'someone@x.org'
+        form['country'] = 'AF'
+        #response = form.submit()
+        #response.showbrowser()
+        #response = response.follow()
+        #self.assertTrue('Firstname' in response)
+
         # profile_view
-        # trash_deletepermanently
-        # trash_restore
-        # trash_view
+        response = self.app.get('/profiles/admin')
+        self.assertTrue('Content Added Recently' in response)
+
+        # profile_adminedit
+        response = self.app.get('/profiles/admin/admin_edit_profile.html')
+        self.assertTrue('Edit User and Profile Information' in response)
+
+        # profile_deactivateuser
+        response = self.app.get('/profiles/admin/deactivate.html')
+        self.assertTrue('really want to deactivate' in response)
+
+        # profile_recentcontent
+        response = self.app.get('/profiles/admin/recent_content.html')
+        self.assertTrue('Content Added Recently by' in response)
+
+        # profile_managecommunities
+        response = self.app.get('/profiles/admin/manage_communities.html')
+        self.assertTrue('You can receive email' in response)
+
+        # profile_managetags
+        response = self.app.get('/profiles/admin/manage_tags.html')
+        self.assertTrue('Rename tags' in response)
+
+
         # wiki_index
         response = self.app.get(dc + '/wiki/wikitoc.html')
         self.assertTrue('Wiki Index' in response)
 
-        # wikipage_edit
+        # wikipage_add
+        url = '/wiki/add_wikipage.html?title=yourwiki'
+        response = self.app.get(dc + url)
+        form = response.forms['save']
+        response = form.submit('submit')
+
         # wikipage_view
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('yourwiki' in response)
+
+        # wikipage_edit
+        response = self.app.get(dc + '/wiki/yourwiki/edit.html')
+        self.assertTrue('Edit yourwiki' in response)
+        form = response.forms['save']
+        form['text'] = "<p>editedtext</p>"
+        response = form.submit('submit')
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('<p>editedtext</p>' in response)
+
+        # history_view
+        response = self.app.get(dc + '/wiki/yourwiki/history.html')
+        self.assertTrue('History for yourwiki' in response)
+
+        # history_preview
+        url = '/wiki/yourwiki/preview.html?version_num=1'
+        response = self.app.get(dc + url)
+        self.assertTrue('"author":' in response)
+
+
+        # history_restore
+        url = '/wiki/yourwiki/revert?version_num=1'
+        response = self.app.get(dc + url)
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('<p>editedtext</p>' not in response)
+
+        # trash_view
+        url = '/wiki/yourwiki/delete.html?confirm=1'
+        response = self.app.get(dc + '/trash')
+        self.assertTrue('Date Deleted' in response)
+        self.assertTrue('yourwiki' in response)
+
+        # global searchresults
+        response = self.app.get(dc + '/searchresults.html?body=france')
+        self.assertTrue('Reference Manuals' in response)
 
         # logout
+        response = self.app.get('/logout.html')
+        response = response.follow()
+        self.assertTrue('Login to' in response)
+
+        # members_acceptinvitation
+        # We have to be logged out in order to see this
+        response = self.app.get(dc + '/members/' + invitation_key)
+        self.assertTrue('You have been invited to join' in response)
+
+        ###########
+        # Now login as staff1 and do anything that couldn't be done as
+        # admin
+
+        # profile_edit
+        #self.login(login='staff1', password='staff1')
+        #response = self.app.get('/profiles/staff1/edit_profile.html')
+        #self.assertTrue('Edit User and Profile Information' in response)
+
