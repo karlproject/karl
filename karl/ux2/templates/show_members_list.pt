@@ -1,0 +1,58 @@
+<metal:block use-macro="main_template">
+
+    <metal:content fill-slot="content">
+
+        <header>
+            ${panel('status_message')}
+            ${panel('actions_menu', actions=actions)}
+            <h1>${layout.page_title}</h1>
+        </header>
+
+        <div class="contentText">
+
+            ${panel('grid_header', formats=formats)}
+
+            <table class="filtered sortable" id="peopledir" summary="">
+                <thead>
+                <tr>
+                    <!-- Anchors within TH are required in .sortable -->
+                    <th><a href="#" class="selected ascending">Name</a>
+                    </th>
+                    <th><a href="#">Department</a></th>
+                    <th><a href="#">Position</a></th>
+                    <th><a href="#">Phone</a></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}"
+                    tal:repeat="person batch['entries']">
+                    <td>
+                        <div>
+                            <a href="${request.resource_url(person)}">${person.title}</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            ${person.department}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            ${person.position}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            ${person.phone}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            ${panel('grid_footer', batch=batch)}
+
+        </div>
+
+    </metal:content>
+</metal:block>

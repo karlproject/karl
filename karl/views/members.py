@@ -41,7 +41,6 @@ from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
-from pyramid.renderers import render_to_response
 from pyramid.renderers import get_renderer
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
@@ -72,10 +71,11 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 
+from karl.views.peopledirectory import profile_photo_rows
+from karl.views.forms.widgets import ManageMembersWidget
 from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
 from karl.views.utils import photo_from_filestore_view
-from karl.views.forms.widgets import ManageMembersWidget
 
 PROFILE_THUMB_SIZE = (75, 100)
 
@@ -122,22 +122,37 @@ def _member_profile_batch(context, request):
 def show_members_view(context, request):
     """Default view of community members (with/without pictures)."""
 
-    page_title = 'Community Members'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Community Members'
+    api = TemplateAPI(context, request, layout.page_title)
 
     # Filter the actions based on permission in the **community**
     community = find_interface(context, ICommunity)
     actions = _get_manage_actions(community, request)
 
     # Did we get the "show pictures" flag?
-    hp = request.params.has_key('hide_pictures')
-    mu = resource_url(context, request)
-    submenu = [
+    list_view = request.view_name == 'list_view.html'
+    pictures_href = request.resource_url(context)
+    list_href = request.resource_url(context, 'list_view.html')
+    submenu = [  # deprecated in ux2
         {'label': 'Show Pictures',
-         'href': mu, 'make_link': hp},
+         'href': pictures_href, 'make_link': list_view},
         {'label': 'Hide Pictures',
-         'href': mu + '?hide_pictures', 'make_link': not(hp)},
+         'href': list_href, 'make_link': not(list_view)},
         ]
+
+    formats = [   # ux2
+        {'name': 'table',
+         'selected': list_view,
+         'url': list_href,
+         'title': 'Tabular View',
+         'description': 'Show table'},
+        {'name': 'picture',
+         'selected': not list_view,
+         'url': pictures_href,
+         'title': 'Picture View',
+         'description': 'Show pictures'}
+    ]
 
     profiles = find_profiles(context)
     member_batch = _member_profile_batch(context, request)
@@ -185,17 +200,22 @@ def show_members_view(context, request):
             derived['href'] = resource_url(profile, request)
             moderator_info.append(derived)
 
-    return render_to_response(
-        'templates/show_members.pt',
-        dict(api=api,
-             actions=actions,
-             submenu=submenu,
-             moderators=moderator_info,
-             members=member_info,
-             batch_info=member_batch,
-             hide_pictures=hp),
-        request=request,
-        )
+    renderer_data = dict(
+        api=api,  # deprecated in ux2
+        actions=actions,
+        submenu=submenu,  # deprecated in ux2
+        formats=formats,
+        moderators=moderator_info,  # deprecated in ux2
+        members=member_info,  # deprecated in ux2
+        batch=member_batch,
+        batch_info=member_batch,  # deprecated in ux2
+        hide_pictures=list_view)  # deprecated in ux2
+
+    if not list_view:
+        renderer_data['rows'] = profile_photo_rows(
+            member_batch['entries'], request, api)
+
+    return renderer_data
 
 
 def _send_moderators_changed_email(community,

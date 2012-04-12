@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -56,19 +57,20 @@ class ShowMembersViewTests(unittest.TestCase):
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
-        request = testing.DummyRequest(params={'hide_pictures':True})
-        renderer = karltesting.registerDummyRenderer('templates/show_members.pt')
-        self._callFUT(context, request)
+        request = testing.DummyRequest()
+        request.view_name = 'list_view.html'
+        request.layout_manager = mock.Mock()
+        response = self._callFUT(context, request)
         actions = [('Manage Members', 'manage.html'),
                    ('Add Existing', 'add_existing.html'),
                    ('Invite New', 'invite_new.html')]
-        self.assertEqual(renderer.actions, actions)
-        self.assertEqual(len(renderer.members), 2)
-        self.assertEqual(len(renderer.moderators), 1)
-        self.assertEqual(renderer.hide_pictures, True)
-        self.assertEqual(len(renderer.submenu), 2)
-        self.assertEqual(renderer.submenu[0]['make_link'], True)
-        self.assertEqual(renderer.submenu[1]['make_link'], False)
+        self.assertEqual(response['actions'], actions)
+        self.assertEqual(len(response['members']), 2)
+        self.assertEqual(len(response['moderators']), 1)
+        self.assertEqual(response['hide_pictures'], True)
+        self.assertEqual(len(response['submenu']), 2)
+        self.assertEqual(response['submenu'][0]['make_link'], True)
+        self.assertEqual(response['submenu'][1]['make_link'], False)
         self.assertEqual(searchkw['sort_index'], 'lastfirst')
 
 class AddExistingUserFormControllerTests(unittest.TestCase):
