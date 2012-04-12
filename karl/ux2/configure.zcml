@@ -291,13 +291,6 @@
     renderer="templates/searchresults_file.pt"
     />
 
-  <!-- Assets -->
-  <!-- <asset
-    to_override="bottlecap.layouts.popper:static/img/favicon.ico"
-    override_with="karl.views:static/ux2/favicon.ico"
-  /> -->
-
-
   <!-- Pushdowns data, and global notifications -->
 
   <view

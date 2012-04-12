@@ -1,11 +1,4 @@
 <nav id="bcpanel-global-nav">
-    <tal:comment condition="layout.devmode">
-    <!--
-    This is the global-nav panel per
-    https://agendaless.mybalsamiq.com/projects/popper/Popper+Overview
-    Filename is bottlecap/layouts/popper/templates/global_nav.pt
-    -->
-    </tal:comment>
     <div data-quickpanel="pushdown" class="topNavIconWrapper">
         <h2 id="navigation-toggle" class="pushdown-toggle ir" data-toggle="pushdown">Navigation</h2>
         <ul id="global-nav" class="pushdown pushDownList pushDownNavigation">

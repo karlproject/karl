@@ -1,16 +1,11 @@
 
-import copy
 import json
-#from bottlecap.layouts.popper.layout import PopperLayout
-#from bottlecap.layouts.popper.layout import get_microtemplates
-from bottlecap.layout import layout_config
 
 from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.security import authenticated_userid
-from pyramid.settings import asbool
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 
