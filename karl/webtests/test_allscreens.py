@@ -61,7 +61,6 @@ class TestAllScreens(Base):
         form = response.forms['save']
         form['title'] = 'someblogpost'
         response = form.submit('submit')
-        response.follow()
 
         # blogentry_view
         response = self.app.get(dc + '/blog/someblogpost')
@@ -163,7 +162,7 @@ class TestAllScreens(Base):
         form = response.forms['save']
         form['title'] = "sometitle"
         form['description'] = "somedescription"
-        response = form.submit('submit')
+        form.submit('submit')
 
         # community_edit
         response = self.app.get(dc + '/edit.html')
@@ -243,13 +242,24 @@ class TestAllScreens(Base):
         self.assertTrue("Organization" in response)
 
         # members_manage
+        response = self.app.get(dc + '/members/manage.html')
+        self.assertTrue('Manage Community Members' in response)
 
         # members_addexisting
+        response = self.app.get(dc + '/members/add_existing.html')
+        self.assertTrue('Add Existing KARL Users' in response)
 
         # members_invitenew
-
-
-        # members_acceptinvitation
+        response = self.app.get(dc + '/members/invite_new.html')
+        self.assertTrue('Invite New KARL Users' in response)
+        # Let's make an invitation, find the invitation code,
+        # so we can use it at the end after logout
+        form = response.forms[1]
+        form['email_addresses'] = 'foo@bar.org'
+        response = form.submit('submit')
+        response = response.follow()
+        xp = '//table[@id="members"]/tbody/tr[2]/td[2]/span/@title'
+        invitation_key = response.lxml.xpath(xp)[0]
 
 
         # networknews_view
@@ -309,11 +319,16 @@ class TestAllScreens(Base):
         self.assertTrue('Date Deleted' in response)
         self.assertTrue('yourwiki' in response)
 
-        # searchresults
+        # global searchresults
         response = self.app.get(dc + '/searchresults.html?body=france')
         self.assertTrue('Reference Manuals' in response)
 
         # logout
-        response = self.app.get(dc + '/logout.html')
-        response.follow()
+        response = self.app.get('/logout.html')
+        response = response.follow()
         self.assertTrue('Login to' in response)
+
+        # members_acceptinvitation
+        # We have to be logged out in order to see this
+        response = self.app.get(dc + '/members/' + invitation_key)
+        self.assertTrue('You have been invited to join' in response)
