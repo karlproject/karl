@@ -64,10 +64,6 @@ class Base(unittest.TestCase):
         form['login'] = login
         form['password'] = password
         r = form.submit()
-        r = r.follow()    # redirect to /
-        r = r.follow()    # redirect to /communities/default
-        r = r.follow()    # redirect to /communities/default/view.html
-        self.assertTrue('Default Community' in r)
         return r
 
 
