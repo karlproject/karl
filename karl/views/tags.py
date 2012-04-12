@@ -175,8 +175,9 @@ def jquery_tag_del_view(context, request):
 def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""
 
-    page_title = 'Show Tag'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Show Tag'
+    api = TemplateAPI(context, request, layout.page_title)
 
     # The tag screens (cloud, listing, and this view) each have a
     # "jump box" that allows you to quickly jump to another tag.  All
@@ -203,12 +204,20 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
         # Ahh, the good part.  Let's find some tag results and unpack
         # data into what the ZPT needs.
         tag = tag[0]
-        page_title = 'Show Tag ' + tag
+        layout.page_title = 'Show Tag ' + tag
 
         catalog = find_catalog(context)
         dm = catalog.document_map
         tags = find_tags(context)
-        related = tags.getRelatedTags(tag, user=user, community=community)
+
+        if community is None and user is None:
+            # Only show related tags portlet in global view
+            related = tags.getRelatedTags(tag, user=user, community=community)
+            layout.add_portlet('related_tags', related)
+            layout.section_style = 'none'
+        else:
+            related = []
+
         entries = []
         if user:
             users = (user,)
@@ -249,10 +258,10 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             entries.append(entry)
 
     args = dict(
-        api=api,
+        api=api,  # deprecated in ux2
         tag=tag,
         entries=entries,
-        related=related,
+        related=related,  # deprecated in ux2
     )
 
     if crumb_title:
