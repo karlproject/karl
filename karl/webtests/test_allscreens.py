@@ -117,13 +117,28 @@ class TestAllScreens(Base):
         self.assertTrue('Calendar Categories' in response)
 
         # calendarentry_add
-
-
-        # calendarentry_edit
-
-        # calendarentry_ics
+        response = self.app.get(dc + '/calendar/add_calendarevent.html')
+        self.assertTrue('Start Date' in response)
+        form = response.forms['save']
+        form['title'] = "sometitle"
+        form['start_date'] = "4/12/2012 11:00"
+        form['end_date'] = "4/13/2012 11:00"
+        response = form.submit('submit')
 
         # calendarentry_view
+        response = self.app.get(dc + '/calendar/sometitle')
+        self.assertTrue('sometitle' in response)
+
+        # calendarentry_edit
+        response = self.app.get(dc + '/calendar/sometitle')
+        form['title'] = "anothertitle"
+        response = form.submit('submit')
+        response.follow()
+        self.assertTrue('anothertitle' in response)
+
+        # calendarentry_ics
+        response = self.app.get(dc + '/calendar/sometitle/@@event.ics')
+        self.assertTrue('VCALENDAR' in response)
 
         # chatter_discover
 
