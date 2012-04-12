@@ -244,6 +244,18 @@
     />
 
   <bc:panel
+    name="grid_header"
+    panel=".panels.grid_header"
+    renderer="templates/grid_header.pt"
+    />
+
+  <bc:panel
+    name="grid_footer"
+    panel=".panels.grid_footer"
+    renderer="templates/grid_footer.pt"
+    />
+
+  <bc:panel
     name="blog_archive"
     panel="karl.content.views.blog.archive_portlet"
     renderer="templates/blog_archive.pt"
