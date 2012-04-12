@@ -166,21 +166,45 @@ class TestAllScreens(Base):
         response = form.submit('submit')
 
         # community_edit
-        response = self.app.get('/communities/default/edit.html')
+        response = self.app.get(dc + '/edit.html')
         self.assertTrue("Edit Default Community" in response)
 
         # community_join
+        response = self.app.get(dc + '/join.html')
+        self.assertTrue("Type a message" in response)
+
         # community_overview
+        response = self.app.get(dc + '/view.html')
+        self.assertTrue("Overview" in response)
+
         # community_searchresults
+        response = self.app.get(dc + '/searchresults.html?body=Hatter')
+        self.assertTrue("Reference Manuals" in response)
+
         # community_tagcloud
+        response = self.app.get(dc + '/tagcloud.html')
+        self.assertTrue("a list of tags" in response)
+
         # community_taglisting
+        response = self.app.get(dc + '/taglisting.html')
+        self.assertTrue("shows all the tags" in response)
+
         # file_add
+        response = self.app.get(dc + '/files/add_file.html')
+        self.assertTrue("Add File</h" in response)
+
         # file_download
         # file_edit
         # file_view
         # folder_add
+        response = self.app.get(dc + '/files/add_folder.html')
+        self.assertTrue("Add Folder</h" in response)
+
         # folder_edit
         # folder_view
+        response = self.app.get(dc + '/files/')
+        self.assertTrue("Files </h" in response)
+
         # forum_add
         # forum_edit
         # forum_view
@@ -188,45 +212,108 @@ class TestAllScreens(Base):
         # forumtopic_add
         # forumtopic_edit
         # forumtopic_view
+
         # atom
-        # contact
+        response = self.app.get(dc + '/atom.xml')
+        self.assertTrue("subtitle" in response)
+
+
         # error_forbidden
         # error_general
         # error_notfound
-        # legal
+
         # resource_advanced
+        response = self.app.get(dc + '/advanced.html')
+        self.assertTrue("Advanced Settings for" in response)
+
         # resource_delete
-        # history_preview
-        # history_restore
-        # history_view
+        response = self.app.get(dc + '/calendar/sometitle/delete.html')
+        self.assertTrue("you really want" in response)
+
         # intranet_networkevents
         # intranet_networknews
         # intranet_view
-        # members_acceptinvitation
-        # members_addexisting
-        # members_invitenew
-        # members_manage
+
         # members_picturesview
+        response = self.app.get(dc + '/members')
+        self.assertTrue("Community Members" in response)
+
         # members_tableview
+        response = self.app.get(dc + '/members?hide_pictures')
+        self.assertTrue("Organization" in response)
+
+        # members_manage
+
+        # members_addexisting
+
+        # members_invitenew
+
+
+        # members_acceptinvitation
+
+
         # networknews_view
         # newsitem_add
         # newsitem_edit
         # newsitem_view
-        # page_title
+
         # profile_adminedit
         # profile_recentcontent
         # profile_edit
         # profile_managecommunities
         # profile_managetags
         # profile_view
-        # trash_deletepermanently
-        # trash_restore
-        # trash_view
+
         # wiki_index
         response = self.app.get(dc + '/wiki/wikitoc.html')
         self.assertTrue('Wiki Index' in response)
 
-        # wikipage_edit
+        # wikipage_add
+        url = '/wiki/add_wikipage.html?title=yourwiki'
+        response = self.app.get(dc + url)
+        form = response.forms['save']
+        response = form.submit('submit')
+
         # wikipage_view
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('yourwiki' in response)
+
+        # wikipage_edit
+        response = self.app.get(dc + '/wiki/yourwiki/edit.html')
+        self.assertTrue('Edit yourwiki' in response)
+        form = response.forms['save']
+        form['text'] = "<p>editedtext</p>"
+        response = form.submit('submit')
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('<p>editedtext</p>' in response)
+
+        # history_view
+        response = self.app.get(dc + '/wiki/yourwiki/history.html')
+        self.assertTrue('History for yourwiki' in response)
+
+        # history_preview
+        url = '/wiki/yourwiki/preview.html?version_num=1'
+        response = self.app.get(dc + url)
+        self.assertTrue('"author":' in response)
+
+
+        # history_restore
+        url = '/wiki/yourwiki/revert?version_num=1'
+        response = self.app.get(dc + url)
+        response = self.app.get(dc + '/wiki/yourwiki/')
+        self.assertTrue('<p>editedtext</p>' not in response)
+
+        # trash_view
+        url = '/wiki/yourwiki/delete.html?confirm=1'
+        response = self.app.get(dc + '/trash')
+        self.assertTrue('Date Deleted' in response)
+        self.assertTrue('yourwiki' in response)
+
+        # searchresults
+        response = self.app.get(dc + '/searchresults.html?body=france')
+        self.assertTrue('Reference Manuals' in response)
 
         # logout
+        response = self.app.get(dc + '/logout.html')
+        response.follow()
+        self.assertTrue('Login to' in response)
