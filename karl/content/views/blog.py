@@ -285,7 +285,7 @@ def show_blogentry_view(context, request):
 
     # add portlets to template
     layout = request.layout_manager.layout
-    layout.add_portlet('popper.tagbox')
+    layout.add_portlet('tagbox')
     layout.add_portlet('blog_archive')
     # editor width and height for comments textarea
     layout.tinymce_height = 250
