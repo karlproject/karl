@@ -297,6 +297,12 @@
     renderer="templates/related_tags.pt"
     />
 
+  <bc:panel
+    name="recent_activity"
+    panel=".panels.recent_activity"
+    renderer="templates/recent_activity.pt"
+    />
+
   <!-- Pushdowns data, and global notifications -->
 
   <view

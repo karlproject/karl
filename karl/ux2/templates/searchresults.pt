@@ -3,19 +3,6 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="main_template">
 
-<head>
-  <metal:slot metal:fill-slot="extra-headers">
-    <script src="${layout.static('jquery-plugins/jquery.timeago.js')}"></script>
-    <script language="javascript" type="text/javascript">
-      //<![CDATA[
-      $(document).ready(function() {
-          $("abbr.timeago").timeago();
-      });
-      //]]>
-    </script>
-  </metal:slot>
-</head>
-
 <div metal:fill-slot="content">
 
 <form method="GET" action=""

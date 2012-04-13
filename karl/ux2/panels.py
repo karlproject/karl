@@ -2,10 +2,14 @@ from cgi import escape
 
 from pyramid.encode import urlencode
 from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 
 from karl.content.views.utils import fetch_attachments
+from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import ICommunityContent
+from karl.models.interfaces import IGridEntryInfo
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_intranets
@@ -493,3 +497,29 @@ def related_tags(context, request, related):
         return request.resource_url(context, 'showtag', tag)
     return {'related': related,
             'tagurl': tagurl}
+
+
+def recent_activity(context, request):
+    community = find_community(context)
+    if not community:
+        return ''
+
+    registry = request.registry
+    community_path = resource_path(community)
+    search = registry.getAdapter(context, ICatalogSearch)
+    principals = effective_principals(request)
+    recent_items = []
+    num, docids, resolver = search(
+        limit=10,
+        path={'query': community_path},
+        allowed={'query': principals, 'operator': 'or'},
+        sort_index='modified_date',
+        reverse=True,
+        interfaces=[ICommunityContent],
+        )
+    models = filter(None, map(resolver, docids))
+    for model in models:
+        adapted = registry.getMultiAdapter((model, request), IGridEntryInfo)
+        recent_items.append(adapted)
+
+    return {'recent_items': recent_items}

@@ -1,0 +1,11 @@
+<section class="portlet sectionRelated" id="my-communities-portlet">
+  <h3>Recent Activity</h3>
+  <ul id="recent-activity-list" class="portlet-list">
+    <li class="portlet-item" tal:repeat="item recent_items">
+    <b><a href="${item.url}">${item.title}</a></b><br/>
+    ${item.type} 
+    <abbr class="timeago" title="${item.modified_ago}">${item.modified_ago}</abbr> by
+    <a href="${item.modified_by_url}">${item.modified_by_title}</a>
+    </li>
+  </ul>
+</section>

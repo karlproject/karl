@@ -238,6 +238,7 @@ def get_wikitoc_data(context, request):
 
 def show_wikipage_view(context, request):
     layout = request.layout_manager.layout
+    layout.add_portlet('recent_activity')
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)

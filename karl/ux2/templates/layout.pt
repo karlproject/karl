@@ -33,6 +33,7 @@
         <script src="${layout.static('ux2/js/respond.min.js')}"></script>
         <script src="${layout.static('ux2/js/ios-orientationchange-fix.js')}"></script>
 
+    
         <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}
@@ -130,6 +131,14 @@
     ${panel('extra_css')}
     ${panel('extra_js')}
 
+    <script language="javascript" type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        $("abbr.timeago").timeago();
+      });
+      //]]>
+    </script>
+ 
     <metal:tailslot metal:define-slot="tail_slot"/>
 
     </body>

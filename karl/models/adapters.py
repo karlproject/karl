@@ -56,6 +56,8 @@ from karl.utils import find_tags
 from karl.utils import get_content_type_name
 from karl.utils import get_setting
 
+TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
 
 class CatalogSearch(object):
     """ Centralize policies about searching """
@@ -99,6 +101,7 @@ class GridEntryInfo(object):
     _type = None
     _url = None
     _modified = None
+    _modified_ago = None
     _created = None
     _creator_title = None
     _creator_url = None
@@ -138,6 +141,12 @@ class GridEntryInfo(object):
         if self._modified is None:
             self._modified = self.context.modified.strftime("%m/%d/%Y")
         return self._modified
+
+    @property
+    def modified_ago(self):
+        if self._modified_ago is None:
+            self._modified_ago = self.context.modified.strftime(TIMEAGO_FORMAT)
+        return self._modified_ago
 
     @property
     def created(self):
