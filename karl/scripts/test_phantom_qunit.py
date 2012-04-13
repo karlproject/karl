@@ -19,7 +19,6 @@ def run_phantom(config_file, resource_url, verbose=False):
 def main(argv=sys.argv):
     import karl.phantom_qunit
     from karl import views as karl_views # we use views, as karl is multiegg
-    import bottlecap
     config_file = module_path(karl.phantom_qunit, 'phantom-qunit.js')
     verbose = False
     if len(argv) == 2 and argv[1] == '-v':
