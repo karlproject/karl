@@ -90,6 +90,14 @@ def _get_manage_actions(community, request):
 
     return actions
 
+def _get_actions_menu(context, request, actions):
+    """
+    Convert UX1 actions to UX2 menu.
+    """
+    return {'actions': [
+        {'title': title, 'url': request.resource_url(context, view)}
+        for title, view in actions]}
+
 def _get_common_email_info(community, community_href):
     info = {}
     info['system_name'] = get_setting(community, 'system_name', 'KARL')
@@ -129,6 +137,7 @@ def show_members_view(context, request):
     # Filter the actions based on permission in the **community**
     community = find_interface(context, ICommunity)
     actions = _get_manage_actions(community, request)
+    actions_menu = _get_actions_menu(context, request, actions)
 
     # Did we get the "show pictures" flag?
     list_view = request.view_name == 'list_view.html'
@@ -202,7 +211,8 @@ def show_members_view(context, request):
 
     renderer_data = dict(
         api=api,  # deprecated in ux2
-        actions=actions,
+        actions=actions,  # deprecated in ux2
+        actions_menu=actions_menu,
         submenu=submenu,  # deprecated in ux2
         formats=formats,
         moderators=moderator_info,  # deprecated in ux2
@@ -352,17 +362,20 @@ class ManageMembersFormController(object):
         community = self.community
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
 
-        page_title = u'Manage Community Members'
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Manage Community Members'
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Use the form below to remove members or to resend invites '
                 'to people who have not accepted your invitation to join '
                 'this community.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,  # deprecated in ux2
+                'actions': actions,  # deprecated in ux2
+                'page_title': layout.page_title,  # deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -498,6 +511,7 @@ class AddExistingUserFormController(object):
         context = self.context
         request = self.request
         profiles = self.profiles
+        layout = request.layout_manager.layout
 
         # Handle userid passed in via GET request
         # Moderator would get here by clicking a link in an email to grant a
@@ -511,17 +525,19 @@ class AddExistingUserFormController(object):
 
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        page_title = u'Add Existing %s Users' % system_name
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Add Existing %s Users' % system_name
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type the first few letters of the name of the person you '
                 'would like to add to this community, select their name, '
                 'and press submit. The short message below is included '
                 'along with the text of your invite.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,   # deprecated in ux2
+                'actions': actions,# deprecated in ux2
+                'page_title': layout.page_title,# deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_submit(self, converted):
         request = self.request
@@ -793,18 +809,21 @@ class InviteNewUsersFormController(object):
         community = self.community
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        page_title = u'Invite New %s Users' % system_name
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Invite New %s Users' % system_name
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type email addresses (one per line) of people you would '
                 'like to add to your community. The short message below is '
                 'included along with the text of your invite.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,    # deprecated in ux2
+                'actions': actions,    # deprecated in ux2
+                'page_title': layout.page_title,    # deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

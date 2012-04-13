@@ -1,6 +1,6 @@
 <ul class="sectionTools noBullets">
     <tal:block repeat="tool tools">
-        <li tal:attributes="class tool['selected']"
+        <li tal:attributes="class 'selected' if tool['selected'] else None"
             tal:condition="'dropdown' not in tool">
             <a
                href="${tool['url']}">${tool['title']}</a>
@@ -11,7 +11,7 @@
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <span class="caret"></span></a>
             <ul class="dropdown-menu">
-                <li tal:attributes="class dtool['selected']"
+                <li tal:attributes="class 'selected' if dtool['selected'] else None"
                     tal:repeat="dtool tool['dropdown']">
                     <a href="${dtool['url']}">${dtool['title']}</a>
                 </li>

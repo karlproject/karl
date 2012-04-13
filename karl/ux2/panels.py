@@ -91,13 +91,15 @@ def context_tools(context, request, tools=None):
 
 
 def actions_menu(context, request, actions):
-    # Karl has traditionally used a list of tuples (title, view_name) to
-    # represent actions.  Popper layout expects a list of dicts.  Actions
-    # are passed to the renderer by individual views which then pass them
-    # to the panel.
     if not actions:
         return '' # short circuit renderer
 
+    # Allow views to pass in UX2 action menu.  The menu will be a dict.
+    if isinstance(actions, dict):
+        return actions
+
+    # Backwards compatability layer.  Attempt to convert old style UX1 actions
+    # into newer menu structure.
     converted = []
     addables = []
     overflow_menu = []

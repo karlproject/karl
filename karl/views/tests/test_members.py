@@ -110,6 +110,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
     def test__call__(self):
         context = self._getContext()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         info = controller()
         actions = [('Manage Members', 'manage.html'),
@@ -122,6 +123,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
     def test___call__with_userid_get(self):
         from repoze.sendmail.interfaces import IMailDelivery
         request = testing.DummyRequest({"user_id": "admin"})
+        request.layout_manager = mock.Mock()
         context = self._getContext()
         mailer = karltesting.DummyMailer()
         karltesting.registerUtility(mailer, IMailDelivery)
@@ -384,6 +386,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
     def test_call(self):
         context = self._makeCommunity()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         result = controller()
         self.failUnless('api' in result)
@@ -599,6 +602,7 @@ class ManageMembersFormControllerTests(unittest.TestCase):
     def test_call(self):
         context = self._makeCommunity()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         result = controller()
         self.failUnless('api' in result)

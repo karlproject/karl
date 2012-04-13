@@ -256,7 +256,7 @@ class TestAllScreens(Base):
         self.assertTrue("Community Members" in response)
 
         # members_tableview
-        response = self.app.get(dc + '/members?hide_pictures')
+        response = self.app.get(dc + '/members/list_view.html')
         self.assertTrue("Organization" in response)
 
         # members_manage
