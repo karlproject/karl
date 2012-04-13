@@ -1,0 +1,47 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="main_template">
+
+ 
+  <div metal:fill-slot="content">
+
+    <div id="showtag">
+     <tal:block tal:condition="tag is None">
+       <p>No tag provided.</p>
+     </tal:block>
+
+     <tal:block tal:condition="tag is not None">
+
+      <h2 class="tagsHeaderSpace">
+       <form id="tag-form" action="${request.url}"
+            onsubmit="this.action='${request.url}/'+getElementById('tag-field').value;
+                      return true"
+       ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x> /
+         <input id="tag-field" class="tag_field" type="text"
+                name="jumptag" value="${tag}" size="20" />
+       </form>
+      </h2>
+
+      <div>
+        <div class="searchresult_entry" tal:repeat="entry entries">
+          <div class="klisting_header">
+            <a href="${entry['href']}">${entry['title']}</a>
+          </div>
+          <p>${entry['description']}</p>
+          <p class="kbyline">${entry['type']}
+            <span tal:condition="entry.get('tagusers_href', False)"> |
+              Tagged by
+              <a href="${entry['tagusers_href']}">${entry['tagusers_count']}</a>
+            </span>
+              | ${entry['href']}</p>
+        </div>
+      </div>
+
+     </tal:block>
+
+    </div>
+
+  </div>
+</div>

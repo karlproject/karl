@@ -84,6 +84,9 @@ ux1_to_ux2_templates = {
     'templates/community_formish_form.pt': 'templates/formish_form.pt',
     'templates/layout_formish_form.pt': 'templates/formish_form.pt',
     'templates/community_tagcloud.pt': 'templates/tagcloud.pt',
+    'templates/community_taglisting.pt': 'templates/taglisting.pt',
+    'templates/community_showtag.pt': 'templates/showtag.pt',
+    'templates/profile_showtag.pt': 'templates/showtag.pt',
 }
 
 

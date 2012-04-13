@@ -12,31 +12,43 @@
     <h1>${layout.page_title}</h1>
   </header>
 
-  <div id="tagcloud"
-       metal:define-macro="tagcloud">
+  <div id="taglisting"
+       metal:define-macro="taglisting">
+
    <h2 class="tagsHeaderSpace">
     <form id="tag-form" action="" method="post"
           onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                     return true"
     ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
-    ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x>
+    ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x> /
      <input id="tag-field" class="tag_field" type="text" name="tag"
-            size="20" /></form>
+            size="20" />
+    </form>
    </h2>
 
-   <p>This is the ${layout.project_name} tag cloud - a list of tags where size reflect
-   popularity.</p>
+   <p>This page shows all the tags applied across ${layout.project_name}, with a
+     count of each tag.</p>
 
-   <span tal:repeat="e entries"
-         tal:attributes="class e['class']">
-    <a href="#" title=""
-       tal:attributes="href string:showtag/${e['name']};
-                       title
-                        string:count: ${e['count']}, weight: ${e['weight']};
-                      "
-       tal:content="e['name']">NAME</a> </span>
+   <table border="0" cellpadding="6" cellspacing="0">
+    <tr>
+     <th> Tag </th>
+     <th> Count </th>
+    </tr>
+
+    <tr tal:repeat="entry entries">
+     <td>
+      <a href="${layout.here_url}showtag/${entry['name']}"
+      >${entry['name']}</a>
+     </td>
+     <td>
+      ${entry['count']}
+     </td>
+    </tr>
+
+   </table>
 
   </div>
+
 
 </div>
 </div>

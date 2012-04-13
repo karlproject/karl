@@ -29,7 +29,6 @@ def column_one(context, request):
     layout_manager = request.layout_manager
     layout = layout_manager.layout
     render = layout_manager.render_panel
-    print 'Huh?', layout.portlets
     if layout.portlets:
         return '\n'.join(
             [render(name, *args, **kw)
@@ -82,7 +81,7 @@ def context_tools(context, request, tools=None):
     overflow_menu = []
     community = find_community(context)
     if community:
-        url = request.resource_url(context, 'tagcloud.html')
+        url = request.resource_url(community, 'tagcloud.html')
         selected = 'tagcloud.html' in request.path_url
         overflow_menu.append(dict(title="Tags",
                                   url=url,
@@ -347,16 +346,6 @@ def wiki_lock(context, request, lock_info):
     return {'lock_info': lock_info}
 
 
-# global resources insert
-def extra_head(context, request):
-    # google api must be loaded from head, non-defer
-    ##html = '<script>\n' \
-    ##       'google.load("visualization", "1", {packages:["corechart"]});\n' \
-    ##       '</script>\n'
-    html = ''
-    return html
-
-
 def searchresults(context, request, r, doc, result_display):
     return {'r': r, 'result_display': result_display, 'doc': doc}
 
@@ -493,4 +482,12 @@ def extra_js_head(context, request):
 
 
 def extra_head(context, request):
+    # FIXME: so what's the point of this, then?
     return ''
+
+
+def related_tags(context, request, related):
+    def tagurl(tag):
+        return request.resource_url(context, 'showtag', tag)
+    return {'related': related,
+            'tagurl': tagurl}

@@ -1094,8 +1094,17 @@
      for="karl.models.interfaces.IMembers"
      view=".members.show_members_view"
      permission="view"
+     renderer="templates/show_members.pt"
      />
 
+  <view
+     for="karl.models.interfaces.IMembers"
+     name='list_view.html'
+     view=".members.show_members_view"
+     permission="view"
+     renderer="templates/show_members_list.pt"
+     />
+ 
   <view
     for="karl.models.interfaces.IMembers"
     view=".members.jquery_member_search_view"

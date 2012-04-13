@@ -291,6 +291,12 @@
     renderer="templates/searchresults_file.pt"
     />
 
+  <bc:panel
+    name="related_tags"
+    panel=".panels.related_tags"
+    renderer="templates/related_tags.pt"
+    />
+
   <!-- Pushdowns data, and global notifications -->
 
   <view
