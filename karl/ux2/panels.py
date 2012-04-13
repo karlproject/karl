@@ -233,6 +233,8 @@ def footer(context, request):
 
 
 def skinswitcher(context, request):
+    if 'group.KarlAdmin' not in effective_principals(request):
+        return ''
     using_ux2 = request.cookies.get('ux2') == 'true'
     return {
         'skinswitcher': dict(value='false', label='LEGACY') \
