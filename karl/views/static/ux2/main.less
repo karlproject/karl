@@ -61,6 +61,21 @@ a#global-logo {
     }
 } 
 
+.contentbar-wrapper {
+    font-family: @fancyFont;
+    font-size: 0.75em;
+    padding: 0;
+    margin: 0;
+    .nav-pills {
+        padding: 0;
+    }
+    .nav-pills > li > a:hover {
+        //background: darken(@baseColor2, 10%);
+        color: @white;
+        background-color: @linkColor;
+    }
+}
+
 #chatter-panel-text {
     width: 95%;
 }

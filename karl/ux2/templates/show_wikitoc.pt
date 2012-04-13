@@ -6,13 +6,13 @@
  <div metal:fill-slot="content">
 
       <div class="contentbar-wrapper">
-          <span class="contentbar-menu">
-              <a href="${layout.here_url}..">Front Page</a> |
-              Index
-              <tal:block condition="show_trash"> |
-                  <a href="${layout.here_url}../trash">Trash</a>
-              </tal:block>
-          </span>
+        <ul class="nav nav-pills">
+          <li><a href="${layout.here_url}../wiki/">Front Page</a></li>
+          <li class="active"><a href="${layout.here_url}../wikitoc.html">Index</a></li>
+          <tal:block condition="show_trash">
+          <li><a href="${layout.here_url}../trash">Trash</a></li>
+          </tal:block>
+        </ul>
       </div>
       <header>
           ${panel('status_message')}

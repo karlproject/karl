@@ -48,6 +48,8 @@ a#global-logo{padding-left:35px;}
 .kscreentitle{margin-top:0;}
 #recent-quips-add-form textarea{width:99%;}
 .contentWrapper section.main{padding-top:0;}.contentWrapper section.main form.addTag{width:20em;}
+.contentbar-wrapper{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.75em;padding:0;margin:0;}.contentbar-wrapper .nav-pills{padding:0;}
+.contentbar-wrapper .nav-pills>li>a:hover{color:#eadecc;background-color:#3d8fb3;}
 #chatter-panel-text{width:95%;}
 #radar-panel .homepanel1{display:inline;float:left;width:39.58333333333333%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}
 #radar-panel .homepanel2{display:inline;float:left;width:31.25%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}

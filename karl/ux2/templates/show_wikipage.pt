@@ -15,13 +15,13 @@
     ${panel('actions_menu', actions=actions)}
 
     <div class="contentbar-wrapper">
-      <span class="contentbar-menu">
-          <a href="${layout.here_url}.." tal:omit-tag="is_front_page">Front Page</a> |
-          <a href="${layout.here_url}../wikitoc.html">Index</a>
-          <tal:block condition="show_trash"> |
-            <a href="${layout.here_url}../trash">Trash</a>
-          </tal:block>
-      </span>
+      <ul class="nav nav-pills">
+        <li class="active"><a href="${layout.here_url}..">Front Page</a></li>
+        <li><a href="${layout.here_url}../wikitoc.html">Index</a></li>
+        <tal:block condition="show_trash">
+          <li><a href="${layout.here_url}../trash">Trash</a></li>
+        </tal:block>
+      </ul>
     </div>
 
 
