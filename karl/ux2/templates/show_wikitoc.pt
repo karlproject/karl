@@ -3,21 +3,7 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="main_template">
 
-  <!-- XXX UX2 porting note: what were these doing in UX1? -->
-
-  <!--span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
-      <a href="${layout.here_url}wikitoc.html">Contents</a> |
-      Tree |
-      This Wiki Page |
-  </span-->
-
-  <!--span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <link rel="alternate" type="application/atom+xml"
-	  title="${layout.page_title}" href="${feed_url}"
-	  />
-  </span-->
-
-  <div metal:fill-slot="content">
+ <div metal:fill-slot="content">
 
       <div class="contentbar-wrapper">
           <span class="contentbar-menu">
