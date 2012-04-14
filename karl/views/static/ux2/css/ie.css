@@ -15,6 +15,7 @@ a.tagCounter{behavior:url(PIE.htc);}
 form.addTag fieldset{behavior:url(PIE.htc);}
 form.addTag input{behavior:url(PIE.htc);}
 form.addTag button{filter:none;behavior:url(PIE.htc);}
+.nav-tabs>li>a,.nav-pills>li>a{behavior:url(PIE.htc);}
 form#search-form fieldset{behavior:url(PIE.htc);}
 .search{behavior:url(PIE.htc);}.search .searchInputWrapper{behavior:url(PIE.htc);}
 .notification{behavior:url(PIE.htc);}
