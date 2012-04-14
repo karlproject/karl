@@ -521,6 +521,8 @@ form#send-message {
 #csv-action {
     background-position: -78px 0%;
 }
+
+@iconColorHover: #ab9779;
 #tabular-view,
 #picture-view {
     background-color: @baseColor1;
@@ -530,7 +532,13 @@ form#send-message {
        -moz-box-shadow: @shadow; 
             box-shadow: @shadow;
     &:hover {
-        background-color: #ab9779;
+        background-color: @iconColorHover;
+    }
+}
+li[selected="selected"] {
+    #tabular-view,
+    #picture-view {
+        background-color: @iconColorHover;
     }
 }
 #tabular-view {

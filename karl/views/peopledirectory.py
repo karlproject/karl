@@ -315,7 +315,7 @@ def report_view(context, request, pictures=False):
     mailto=_get_mailto(context, peopledir)
 
     formats = [   # ux2
-        {'name': 'table',
+        {'name': 'tabular',
          'selected': not pictures,
          'url': tabular_url,
          'title': 'Tabular View',

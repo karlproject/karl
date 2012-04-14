@@ -151,7 +151,7 @@ def show_members_view(context, request):
         ]
 
     formats = [   # ux2
-        {'name': 'table',
+        {'name': 'tabular',
          'selected': list_view,
          'url': list_href,
          'title': 'Tabular View',
