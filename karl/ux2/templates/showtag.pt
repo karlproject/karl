@@ -6,6 +6,16 @@
  
   <div metal:fill-slot="content">
 
+  <div class="section-submenu">
+    <ul class="nav nav-pills">
+      <li><a href="../taglisting.html">Tag listing</a></li>
+      <li><a href="../tagcloud.html">Tag cloud</a></li>
+    </ul>
+  </div>
+
+    <header>
+      <h1>${layout.page_title}</h1>
+    </header>
     <div id="showtag">
      <tal:block tal:condition="tag is None">
        <p>No tag provided.</p>
@@ -13,31 +23,44 @@
 
      <tal:block tal:condition="tag is not None">
 
-      <h2 class="tagsHeaderSpace">
+      <h4 class="tagsHeaderSpace">
        <form id="tag-form" action="${request.url}"
             onsubmit="this.action='${request.url}/'+getElementById('tag-field').value;
                       return true"
        ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
       ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x> /
-         <input id="tag-field" class="tag_field" type="text"
-                name="jumptag" value="${tag}" size="20" />
+         <input id="tag-field" class="input input-medium" type="text"
+                name="jumptag" value="${tag}" />
        </form>
-      </h2>
+      </h4>
 
-      <div>
-        <div class="searchresult_entry" tal:repeat="entry entries">
-          <div class="klisting_header">
-            <a href="${entry['href']}">${entry['title']}</a>
-          </div>
-          <p>${entry['description']}</p>
-          <p class="kbyline">${entry['type']}
-            <span tal:condition="entry.get('tagusers_href', False)"> |
-              Tagged by
-              <a href="${entry['tagusers_href']}">${entry['tagusers_count']}</a>
-            </span>
-              | ${entry['href']}</p>
-        </div>
-      </div>
+      
+
+      <table class="">
+        <thead>
+          <tr>
+              <!-- Anchors within TH are required in .sortable -->
+              <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="entry entries" class="ui-grid-row ${'odd' if repeat.entry.odd else 'even'}">
+            <td>
+                <h3>
+                  <a href="${entry['href']}">${entry['title']}</a>
+                </h3>
+                <p>${entry['description']}</p>
+                <p class="footer-line">${entry['type']}
+                  <span tal:condition="entry.get('tagusers_href', False)"> |
+                    Tagged by
+                    <a href="${entry['tagusers_href']}">${entry['tagusers_count']}</a>
+                  </span>
+                  | ${entry['href']}
+                </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
      </tal:block>
 
