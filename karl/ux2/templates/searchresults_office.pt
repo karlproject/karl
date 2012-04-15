@@ -1,6 +1,8 @@
 <div class="sras-result">
-  <a class="sras-result-title" href="${r['url']}">${r['title']} Office</a>
-  <p class="sras-summary">
+  <h3>
+    <a href="${r['url']}">${r['title']} Office</a>
+  </h3>
+  <p>
     <div>${doc.telephone}</div>
     <div>${doc.address}</div>
     <div>

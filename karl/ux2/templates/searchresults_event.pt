@@ -1,19 +1,20 @@
 <div class="sras-result" metal:define-macro="searchresults_event">
-  <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
-  <div class="sras-summary"
-     tal:define="data result_display.display_data">
-    <div tal:condition="data['startDate']">
+  <h3>
+    <a href="${r['url']}">${r['title']}</a>
+  </h3>
+  <div tal:define="data result_display.display_data">
+    <p tal:condition="data['startDate']">
       ${data['startDate']}
       -> <span tal:condition="data['endDate']"
                tal:replace="data['endDate']" />
-    </div>
-    <div tal:condition="data['location']">
+    </p>
+    <p tal:condition="data['location']">
       ${data['location']}
-    </div>
+    </p>
   </div>
-  <div class="sras-details">
+  <p class="footer-line">
     <img src="${layout.static('/images/' + r['icon'])}"
-         alt="${r['type']}" height="12" width="12"/>
+         alt="${r['type']}" class="icon-karl" />
     ${r['type']}
 
     <tal:block condition="r['community'] is not None"
@@ -33,5 +34,5 @@
       href="${r['author']['url']}">
       ${r['author']['name']}</a>
     </tal:block>
-  </div>
+  </p>
 </div>

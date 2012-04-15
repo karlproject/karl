@@ -144,7 +144,7 @@ table.filtered{-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;-web
 tr.even{background:#f1eade;}
 th a.selected{display:inline-block;padding:0 1.3em 0 .7em;margin:0;position:relative;line-height:1.5em;color:#ffffff;color:#fff;}th a.selected:before{border-bottom:none;border-left:0.266666667em solid transparent;border-right:0.266666667em solid transparent;border-top:0.266666667em solid #ffffff;content:"";display:block;width:0;height:0;*line-height:0;position:absolute;z-index:2;top:50%;margin-top:-0.1em;right:.266666667em;*line-height:0;}
 th a.selected.ascending:before{border-top:0;border-bottom:.266666667em solid #fff;}
-.icon-karl{float:left;display:inline-block;width:14px;height:14px;margin:5px 0;*margin-right:.3em;}.icon-karl:last-child{*margin-left:0;}
+.icon-karl{float:left;display:inline-block;width:14px;height:14px;margin:2px 5px 2px 0;*margin-right:.3em;}.icon-karl:last-child{*margin-left:0;}
 [class^="icon-"]{display:inline-block;width:14px;height:14px;vertical-align:text-top;background-image:url(../img/glyphicons-halflings.png);background-position:14px 14px;background-repeat:no-repeat;*margin-right:.3em;}[class^="icon-"]:last-child{*margin-left:0;}
 .icon-white{background-image:url(../img/glyphicons-halflings-white.png);}
 .icon-glass{background-position:0 0;}

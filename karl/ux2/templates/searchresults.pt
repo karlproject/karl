@@ -105,13 +105,8 @@
     </form>
 
     <table class="" id="someid" summary="">
-        <!--
-           .filtered means the table is filtered and has filter bar above (used for a specific styling for this case)
-           .sortable indicates that the table rows are sortable by clicking a column's header
-        -->
         <thead>
         <tr>
-            <!-- Anchors within TH are required in .sortable -->
             <th></th>
         </tr>
         </thead>
