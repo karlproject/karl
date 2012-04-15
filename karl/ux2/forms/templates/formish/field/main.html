@@ -2,10 +2,10 @@
     tal:define="show_label field.widget.show_label|True;
                 show_description field.widget.show_description|True">
   <!-- field/main.html -->
-  <div tal:condition="field.widget.type in ('CheckedPassword',)" tal:omit-tag>
+  <div tal:condition="field.widget.type in ('CheckedPassword', 'Grid')" tal:omit-tag>
     <span tal:content="structure:field.widget()" tal:omit-tag></span>
   </div>
-  <div tal:condition="field.widget.type not in ('CheckedPassword',)" tal:omit-tag>
+  <div tal:condition="field.widget.type not in ('CheckedPassword', 'Grid')" tal:omit-tag>
     <label tal:condition="show_label and field.widget.type != 'Hidden' and 
                           '.' not in field.name"
         for="${field.cssname}" 
