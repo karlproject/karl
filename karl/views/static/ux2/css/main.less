@@ -335,6 +335,14 @@ th a.selected {
     }
 }
 
+.icon-karl {
+    float: left;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin: 5px 0;
+    .ie7-restore-right-whitespace();
+}
 
 // FORMS
 @import "elements/sprites.less";
@@ -780,6 +788,16 @@ a.next {
 }
 /* @end */
 
+.search-portlet {
+    .col(2.5);
+    .nav-list form {
+        padding: 0;
+        margin: 0;
+    }
+}
+.search-content {
+    .col(9.5);
+}
 /* @group FOOTER */
 body > footer {
     border-top: 2px solid lighten(@baseColor1, 20%);

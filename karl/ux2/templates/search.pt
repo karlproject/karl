@@ -1,8 +1,8 @@
 <nav class="search">
-    <div data-quickpanel="quickpanel" class="topNavIconWrapper">
-        <h2 id="search-toggle" class="dropdown-toggle ir">Search</h2>
+    <div data-quickpanel="pushdown" class="topNavIconWrapper">
+        <h2 id="search-toggle" class="pushdown-toggle ir">Search</h2>
 
-        <form action="#" class="dropdown" id="search-form">
+        <form action="#" class="pushdown" id="search-form">
             <label for="searchfor">
                 Search for:
                 <select name="searchfor" id="searchfor">

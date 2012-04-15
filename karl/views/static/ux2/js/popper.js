@@ -98,7 +98,7 @@ $(function () {
             } else if (!Modernizr.csstransitions && !$fst.hasClass('opened')){
                 $fst.animate({
                     marginTop: '.2em'
-                }, 4000);            
+                }, 500);            
             }
         });
 
