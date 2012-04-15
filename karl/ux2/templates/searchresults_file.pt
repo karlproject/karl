@@ -7,7 +7,7 @@
 
   <div class="sras-details">
     <img src="${result_display.display_data['icon']}"
-         alt="${r['type']}" height="12" width="12" />
+         alt="${r['type']}" class="icon-karl" />
     ${r['type']}
 
     <tal:block condition="r['community'] is not None"

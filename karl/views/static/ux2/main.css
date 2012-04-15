@@ -50,6 +50,10 @@ a#global-logo{padding-left:35px;}
 .contentWrapper section.main{padding-top:0;}.contentWrapper section.main form.addTag{width:20em;}
 .section-submenu{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.75em;padding:0;margin:0;}.section-submenu .nav-pills{padding:0;}
 .section-submenu .nav-pills>li>a:hover{color:#eadecc;background-color:#3d8fb3;}
+.sras-searchknobs{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.8em;}.sras-searchknobs .nav-list [class^="icon-"]{margin-right:5px;}
+.sras-result-title{font-size:1.1em;}
+.sras-details{font-size:0.85em;}.sras-details .icon-karl{width:14px;height:14px;margin:2px 5px 2px 0;}
+#sras-search-form{padding:0;margin:0 0 5px 0;}#sras-search-form .sras-discreet{font-size:0.75em;}
 #chatter-panel-text{width:95%;}
 #radar-panel .homepanel1{display:inline;float:left;width:39.58333333333333%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}
 #radar-panel .homepanel2{display:inline;float:left;width:31.25%;margin-left:1.0416666666666665%;margin-right:1.0416666666666665%;}

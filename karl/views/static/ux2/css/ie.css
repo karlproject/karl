@@ -16,6 +16,7 @@ form.addTag fieldset{behavior:url(PIE.htc);}
 form.addTag input{behavior:url(PIE.htc);}
 form.addTag button{filter:none;behavior:url(PIE.htc);}
 .nav-tabs>li>a,.nav-pills>li>a{behavior:url(PIE.htc);}
+.nav-list{behavior:url(PIE.htc);}
 form#search-form fieldset{behavior:url(PIE.htc);}
 .search{behavior:url(PIE.htc);}.search .searchInputWrapper{behavior:url(PIE.htc);}
 .notification{behavior:url(PIE.htc);}
@@ -37,4 +38,4 @@ form.addKeyword button{behavior:url(PIE.htc);}
 .next,.prev{behavior:url(PIE.htc);}
 #radar-panel .radar-content{behavior:url(PIE.htc);}#radar-panel .radar-content .radar-header ul#sections li{behavior:url(PIE.htc);}
 #chatter-panel .chatter-content{behavior:url(PIE.htc);}
-@media only screen and (min-width:640px){form#search-form{behavior:url(PIE.htc);} .dropdown{behavior:url(PIE.htc);} .no-touch li[data-quickpanel="dropdown"]:hover>a,li[data-quickpanel="quickpanel"].open>a.dropdown-toggle,.touch li[data-quickpanel="dropdown"]>a.open{behavior:url(PIE.htc);} .no-touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1):hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1)>a.open{behavior:url(PIE.htc);} .no-touch .actionsMenu li[data-quickpanel="dropdown"]:last-child:hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:last-child>a.open{behavior:url(PIE.htc);}}@media only screen and (min-width:768px){ul.actionsMenu>li:nth-child(1)>a{behavior:url(PIE.htc);} ul.actionsMenu>li:nth-child(1)>adropdown-toggle:hover{behavior:url(PIE.htc);} ul.actionsMenu>li:last-child>a{behavior:url(PIE.htc);} ul.actionsMenu>li:last-child>adropdown-toggle:hover{behavior:url(PIE.htc);}}@media only screen and (min-width:1024px){.sectionContainer nav.search{behavior:url(PIE.htc);}}
+@media only screen and (min-width: 640px){form#search-form{behavior:url(PIE.htc);} .dropdown{behavior:url(PIE.htc);} .no-touch li[data-quickpanel="dropdown"]:hover>a,li[data-quickpanel="quickpanel"].open>a.dropdown-toggle,.touch li[data-quickpanel="dropdown"]>a.open{behavior:url(PIE.htc);} .no-touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1):hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1)>a.open{behavior:url(PIE.htc);} .no-touch .actionsMenu li[data-quickpanel="dropdown"]:last-child:hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:last-child>a.open{behavior:url(PIE.htc);}}@media only screen and (min-width: 768px){ul.actionsMenu>li:nth-child(1)>a{behavior:url(PIE.htc);} ul.actionsMenu>li:nth-child(1)>adropdown-toggle:hover{behavior:url(PIE.htc);} ul.actionsMenu>li:last-child>a{behavior:url(PIE.htc);} ul.actionsMenu>li:last-child>adropdown-toggle:hover{behavior:url(PIE.htc);}}@media only screen and (min-width: 1024px){.sectionContainer nav.search{behavior:url(PIE.htc);}}
