@@ -5,6 +5,7 @@
     <meta id="karl-app-url" content="${layout.app_url}"/>
     <meta id="karl-here-url" content="${layout.here_url}"/>
     <meta id="karl-static-url" content="${layout.static('')}"/>
+    <metal:formish use-macro="layout.macros['formish_js']"/>
   </metal:tail>
   <!-- TEMPORARY -->
 
