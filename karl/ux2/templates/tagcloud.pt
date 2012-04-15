@@ -5,27 +5,30 @@
 
 <div metal:fill-slot="content">
 
-  <header>
-    <a class="rightFloatLink" title="View tag listing"
-       href="taglisting.html">Tag listing</a>
+  <div class="section-submenu">
+    <ul class="nav nav-pills">
+      <li><a href="taglisting.html">Tag listing</a></li>
+      <li class="active"><a href="tagcloud.html">Tag cloud</a></li>
+    </ul>
+  </div>
 
+  <header>
     <h1>${layout.page_title}</h1>
   </header>
 
   <div id="tagcloud"
        metal:define-macro="tagcloud">
-   <h2 class="tagsHeaderSpace">
+   <h4 class="tagsHeaderSpace">
     <form id="tag-form" action="" method="post"
           onsubmit="this.action='showtag/'+getElementById('tag-field').value;
                     return true"
     ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
-    ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x>
-     <input id="tag-field" class="tag_field" type="text" name="tag"
-            size="20" /></form>
-   </h2>
+    ><tal:x tal:condition="not crumbs|True">${layout.project_name} / Tags</tal:x> / 
+     <input id="tag-field" class="input input-medium" type="text" name="tag" /></form>
+   </h4>
 
-   <p>This is the ${layout.project_name} tag cloud - a list of tags where size reflect
-   popularity.</p>
+  <div class="notification info">This is the ${layout.project_name} tag cloud - a list of tags where size reflect popularity.
+  </div>
 
    <span tal:repeat="e entries"
          tal:attributes="class e['class']">
