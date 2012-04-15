@@ -9,7 +9,7 @@
 	<h1>${layout.page_title}</h1>
 </header>
 
-<form method="post" id="tag-manage">
+<form class="form-horizontal" method="post" id="tag-manage">
 
 <h4 class="abouthead">Rename tags</h4>
 
@@ -21,16 +21,28 @@
 <div tal:condition="error" class="portalMessage">${error}</div>
 
 <fieldset>
- <label for="old_tag">Old tag</label>
- <select name="old_tag">
-   <option tal:repeat="tag my_tags"
+  <div class="control-group">
+    <label class="control-label" for="old_tag">Old tag</label>
+    <div class="controls">
+      <select name="old_tag">
+        <option tal:repeat="tag my_tags"
                 value="${tag}" selected="${tag == old}">${tag}</option>
- </select>
+      </select>
+    </div>
+  </div>
 
- <label for="new_tag">New tag</label>
- <input type="text" size="35" name="new_tag" value="${new}"/>
+  <div class="control-group">
+    <label class="control-label" for="new_tag">New tag</label>
+    <div class="controls">
+      <input class="input" type="text" name="new_tag" value="${new}"/>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn" type="submit" name="form.rename">
+      Rename tags
+    </button>
+  </div>
 
- <input type="submit" name="form.rename" value="Rename tags" />
 </fieldset>
 
 <h4 class="abouthead">Delete tags</h4>
@@ -41,14 +53,22 @@
 </p>
 
 <fieldset>
- <label for="todelete">Tag to be deleted</label>
- <select name="todelete">
-  <option tal:repeat="to_delete my_tags"
-          value="${to_delete}">${to_delete}</option>
- </select>
-
- <input type="submit" name="form.delete" value="delete tag" />
+  <div class="control-group">
+    <label class="control-label" for="todelete">Tag to be deleted</label>
+    <div class="controls">
+      <select name="todelete">
+        <option tal:repeat="to_delete my_tags"
+                value="${to_delete}">${to_delete}</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn" type="submit" name="form.delete">
+      Delete tags
+    </button>
+  </div>
 </fieldset>
+
 </form>
 
 </div>

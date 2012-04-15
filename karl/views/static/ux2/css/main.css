@@ -278,7 +278,7 @@ label input,label textarea,label select{display:block;}
 input[type="image"],input[type="checkbox"],input[type="radio"]{width:auto;height:auto;padding:0;margin:3px 0;*margin-top:0;line-height:normal;border:0;cursor:pointer;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}
 input[type="file"]{padding:initial;line-height:initial;border:initial;background-color:#eadecc;background-color:initial;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;}
 input[type="button"],input[type="reset"],input[type="submit"]{width:auto;height:auto;}
-select,input[type="file"]{height:28px;*margin-top:4px;line-height:28px;}
+select,input[type="file"]{height:30px;*margin-top:4px;line-height:30px;}
 select{width:270px;background-color:#eadecc;}
 select[multiple],select[size]{height:auto;}
 input[type="image"]{-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;}
