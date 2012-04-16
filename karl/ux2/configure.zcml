@@ -1,5 +1,6 @@
 <configure xmlns="http://pylonshq.com/pyramid"
-           xmlns:bc="http://pylonshq.com/bottlecap">
+           xmlns:bc="http://pylonshq.com/bottlecap"
+           xmlns:formish="http://pylonshq.com/pyramid_formish">
 
   <include package="bottlecap" file="meta.zcml"/>
 
@@ -324,6 +325,12 @@
     name="radar.json"
     view=".pushdowns.radar_ajax_view"
     renderer="json"
+  />
+
+  <!-- Asset Override -->
+  <asset
+    to_override="karl.views.forms:templates/anonymous_formish_form.pt"
+    override_with="karl.ux2.forms:templates/anonymous_formish_form.pt"
   />
 
 </configure>
