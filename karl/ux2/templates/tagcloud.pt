@@ -27,9 +27,6 @@
      <input id="tag-field" class="input input-medium" type="text" name="tag" /></form>
    </h4>
 
-  <div class="notification info">This is the ${layout.project_name} tag cloud - a list of tags where size reflect popularity.
-  </div>
-
    <span tal:repeat="e entries"
          tal:attributes="class e['class']">
     <a href="#" title=""
