@@ -530,23 +530,26 @@ form#send-message {
     background-position: -78px 0%;
 }
 
-@iconColorHover: #ab9779;
 #tabular-view,
 #picture-view {
-    background-color: @baseColor1;
+    background-color: darken(@baseColor2, 15%);
     border: none;
     @shadow:0 1px 0 0 rgba(0,0,0,.4), 0 -1px 0 0 rgba(255,255,255,.5);
     -webkit-box-shadow: @shadow;
        -moz-box-shadow: @shadow; 
             box-shadow: @shadow;
     &:hover {
-        background-color: @iconColorHover;
+        background-color: lighten(@bodyBg, 5%);
     }
 }
 li[selected="selected"] {
     #tabular-view,
     #picture-view {
-        background-color: @iconColorHover;
+        background-color: lighten(@baseColor1, 10%);
+        @shadow:0 -1px 0 0 rgba(0,0,0,.4), 0 1px 0 0 rgba(255,255,255,.5);
+        -webkit-box-shadow: @shadow;
+           -moz-box-shadow: @shadow; 
+                box-shadow: @shadow;
     }
 }
 #tabular-view {
