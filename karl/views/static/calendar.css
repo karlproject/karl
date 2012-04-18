@@ -72,16 +72,16 @@
   background-color: #f6f8f9;
 }
 .cal_actions .cal_download {
-  background: url("../images/cal_icons_download.png") 0 0 no-repeat;
+  background: url("images/cal_icons_download.png") 0 0 no-repeat;
   margin-right: 8px;
   padding-left: 17px;
 }
 .cal_actions .cal_subscribe {
-  background: url("../images/cal_icons_rss.png") 0 0 no-repeat;
+  background: url("images/cal_icons_rss.png") 0 0 no-repeat;
   padding-left: 18px;
 }
 .cal_actions .cal_print {
-  background: url("../images/cal_icons_print.png") 0 0 no-repeat;
+  background: url("images/cal_icons_print.png") 0 0 no-repeat;
   padding-left: 18px;
 }
 
