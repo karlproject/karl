@@ -439,7 +439,7 @@ table.cal_scroll {
   position: absolute;
   top: 20px;
   left: 40px;
-  background: url("../images/cal_time.png") 0 0 no-repeat;
+  background: url("images/cal_time.png") 0 0 no-repeat;
   font-size: 1%;
   line-height: 1em;
   z-index: 3;
@@ -448,7 +448,7 @@ table.cal_scroll {
   line-height: 1.5em;
 }
 .cal td .cal_stack {
-  background: url("../images/cal_event_bg.png") 0 0 no-repeat;
+  background: url("images/cal_event_bg.png") 0 0 no-repeat;
 }
 .cal th .cal_time_label {
   height: 51px;
