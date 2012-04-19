@@ -49,39 +49,42 @@
             </table>
         </div>
 
+        <div class="modal" id="preview-modal">
+          <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Title</h3>
+            <h4>Preview version from 5/12/2010 by Daniela</h4>
+          </div>
+          <div class="modal-body" id="preview-body">
+          </div>
+      </div>
+     
         <script language="javascript" type="text/javascript">
-        //<![CDATA[
         function preview(url) {
             $.ajax({
                 url: url,
                 success: function(data) {
+                    // Server can tell us to redirect
                     if ('url' in data) {
                         window.location.href = data['url'];
                         return;
                     }
-                    var page_title = $('.kscreentitle');
-                    var position = page_title.offset();
-                    position = [position.left, position.top + page_title.height()];
-                    var title = 'Preview Version from ' + data['date'] + ' by ' +
-                                data['author'];
-                    var dialog = $('<div class="preview_dialog">' +
-                                      '<p><b>' + data['title'] + '</b></p>' +
-                                      '<div class="kbody">' + data['body'] + '</div>' +
-                                   '</div>')
-                        .appendTo('body')
-                        .hide()
-                        .karldialog({
-                            title: title,
-                            width: 600,
-                            position: position,
-                            draggable: true // Draggable doesn't seem to work :(
-                        });
-                    dialog.karldialog('open');
-                }
+                    $('#preview-modal .modal-header h3').text(data['title']);
+                    $('#preview-modal .model-header h4').text(
+                        'Preview Version from ' + data['date'] + ' by ' +
+                        data['author']);
+                    $('#preview-body').html(data['body']);
+                    $('#preview-modal').modal();
+               }
             });
             return false;
         }
-        //]]>
+
+        // This should be unnecessary since modals should be hidden by default
+        // anyway.
+        $(document).ready(function() {
+            $('#preview-modal').css("display", "none");
+        });
         </script>
 
     </div>
